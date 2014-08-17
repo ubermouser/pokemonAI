@@ -1,0 +1,2 @@
+PKAIE0	soloTeamC	1
+PKAIP0	TankSwampert	Swampert	100	Choice Band	0	Torrent	Adamant	earthquake	ice punch	stone edge	waterfall	31	31	31	31	31	31	252	0	0	0	84	172

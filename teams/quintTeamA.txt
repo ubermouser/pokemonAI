@@ -1,0 +1,6 @@
+PKAIE0	quintTeamA	5
+PKAIP0	EvilGengar	Gengar	100	Life Orb	0	Levitate	Timid	shadow ball	focus blast	thunderbolt	icy wind	31	31	31	31	31	31	0	252	4	0	252	0
+PKAIP0	OffensiveDD	Dragonite	100	Life Orb	0	Inner Focus	Jolly	dragon dance	dragon claw	earthquake	extremespeed	31	31	31	31	31	31	252	0	4	0	252	0
+PKAIP0	StrikerInfernape	Infernape	100	Choice Band	0	Blaze	Naive	close combat	u-turn	stone edge	overheat	31	31	31	31	31	31	252	64	0	0	192	0
+PKAIP0	AgilityLucario	Lucario	100	Life Orb	1	Inner Focus	Adamant	agility	close combat	crunch	ice punch	31	31	31	31	31	31	252	0	0	4	252	0
+PKAIP0	Dusknoir	Dusknoir	100	Leftovers	0	Pressure	Impish	will-o-wisp	thunderpunch	ice punch	toxic	31	31	31	31	31	31	28	0	228	0	0	252

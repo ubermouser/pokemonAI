@@ -1,0 +1,2 @@
+PKAIE0	soloTeamK	1
+PKAIP0	sleepyRoserade	Roserade	100	Choice Scarf	1	Natural Cure	Timid	leaf storm	sludge bomb	sleep powder	hidden power	30	31	30	31	31	31	0	252	0	0	252	4

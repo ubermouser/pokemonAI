@@ -1,0 +1,2 @@
+PKAIE0	soloTeamN	1
+PKAIP0	annoyingTogekiss	Togekiss	100	Leftovers	1	Serene Grace	Modest	Nasty Plot	Air Slash	Aura Sphere	Roost	31	31	31	31	31	31	0	36	0	0	220	252

@@ -1,0 +1,71 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pokemonAI", "pokemonAI.vcxproj", "{318E1AE2-93D7-F068-D929-428CF0D35C04}"
+	ProjectSection(ProjectDependencies) = postProject
+		{70460084-ECE1-4F37-B554-9B2C82173D8D} = {70460084-ECE1-4F37-B554-9B2C82173D8D}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gen4_scripts", "gen4_scripts\gen4_scripts.vcxproj", "{C6575D2F-CFBE-463E-9E2F-2E06864969A3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{318E1AE2-93D7-F068-D929-428CF0D35C04} = {318E1AE2-93D7-F068-D929-428CF0D35C04}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "networkXorTest", "tests\networkXorTest\networkXorTest.vcxproj", "{84A3D6B5-C760-413E-B830-7B3B43DD0640}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "networkLambdaTest", "tests\networkLambdaTest\networkLambdaTest.vcxproj", "{CD721B0E-8611-4B92-8C1B-FE606537EDFB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plannerEvaluatorTest", "tests\plannerEvaluatorTest\plannerEvaluatorTest.vcxproj", "{8942C168-5475-DC5C-1C32-561A8B15B04F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{70460084-ECE1-4F37-B554-9B2C82173D8D} = {70460084-ECE1-4F37-B554-9B2C82173D8D}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pkaiEngine", "pkaiEngine\pkaiEngine.vcxproj", "{70460084-ECE1-4F37-B554-9B2C82173D8D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "networkExperienceTest", "tests\networkExperienceTest\networkExperienceTest.vcxproj", "{E2484256-CCFF-4322-B972-A5DFE41D4422}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plannerEntropyTest", "tests\plannerEntropyTest\plannerEntropyTest.vcxproj", "{694302F8-C89E-A233-2ACF-5474F1295638}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "printRankedObjects", "tests\printRankedObjects\printRankedObjects.vcxproj", "{87A2EB54-9EDC-41F8-A170-1AC33ECEB638}"
+	ProjectSection(ProjectDependencies) = postProject
+		{70460084-ECE1-4F37-B554-9B2C82173D8D} = {70460084-ECE1-4F37-B554-9B2C82173D8D}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = pokemonAI.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{318E1AE2-93D7-F068-D929-428CF0D35C04}.Debug|x64.ActiveCfg = Debug|x64
+		{318E1AE2-93D7-F068-D929-428CF0D35C04}.Debug|x64.Build.0 = Debug|x64
+		{318E1AE2-93D7-F068-D929-428CF0D35C04}.Release|x64.ActiveCfg = Release|x64
+		{318E1AE2-93D7-F068-D929-428CF0D35C04}.Release|x64.Build.0 = Release|x64
+		{C6575D2F-CFBE-463E-9E2F-2E06864969A3}.Debug|x64.ActiveCfg = Debug|x64
+		{C6575D2F-CFBE-463E-9E2F-2E06864969A3}.Debug|x64.Build.0 = Debug|x64
+		{C6575D2F-CFBE-463E-9E2F-2E06864969A3}.Release|x64.ActiveCfg = Release|x64
+		{C6575D2F-CFBE-463E-9E2F-2E06864969A3}.Release|x64.Build.0 = Release|x64
+		{84A3D6B5-C760-413E-B830-7B3B43DD0640}.Debug|x64.ActiveCfg = Debug|x64
+		{84A3D6B5-C760-413E-B830-7B3B43DD0640}.Release|x64.ActiveCfg = Release|x64
+		{CD721B0E-8611-4B92-8C1B-FE606537EDFB}.Debug|x64.ActiveCfg = Debug|x64
+		{CD721B0E-8611-4B92-8C1B-FE606537EDFB}.Release|x64.ActiveCfg = Release|x64
+		{8942C168-5475-DC5C-1C32-561A8B15B04F}.Debug|x64.ActiveCfg = Debug|x64
+		{8942C168-5475-DC5C-1C32-561A8B15B04F}.Release|x64.ActiveCfg = Release|x64
+		{70460084-ECE1-4F37-B554-9B2C82173D8D}.Debug|x64.ActiveCfg = Debug|x64
+		{70460084-ECE1-4F37-B554-9B2C82173D8D}.Debug|x64.Build.0 = Debug|x64
+		{70460084-ECE1-4F37-B554-9B2C82173D8D}.Release|x64.ActiveCfg = Release|x64
+		{70460084-ECE1-4F37-B554-9B2C82173D8D}.Release|x64.Build.0 = Release|x64
+		{E2484256-CCFF-4322-B972-A5DFE41D4422}.Debug|x64.ActiveCfg = Debug|x64
+		{E2484256-CCFF-4322-B972-A5DFE41D4422}.Release|x64.ActiveCfg = Release|x64
+		{694302F8-C89E-A233-2ACF-5474F1295638}.Debug|x64.ActiveCfg = Debug|x64
+		{694302F8-C89E-A233-2ACF-5474F1295638}.Release|x64.ActiveCfg = Release|x64
+		{87A2EB54-9EDC-41F8-A170-1AC33ECEB638}.Debug|x64.ActiveCfg = Debug|x64
+		{87A2EB54-9EDC-41F8-A170-1AC33ECEB638}.Release|x64.ActiveCfg = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

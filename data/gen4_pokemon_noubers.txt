@@ -1,0 +1,494 @@
+PKAIS	492										
+Name	Type1	Type2	Atk	Sp Atk	Def	Sp Def	Spd	Hp	Weight (kg)	Ability 1	Ability 2
+Abomasnow	Ice	Grass	92	92	75	85	60	90	135.5	Snow Warning	---
+Abra	Psychic	None	20	105	15	55	90	25	19.5	Synchronize	Inner Focus
+Absol	Dark	None	130	75	60	60	75	65	47	Pressure	Super Luck
+Aerodactyl	Rock	Flying	105	60	65	75	130	80	59	Pressure	Rock Head
+Aggron	Steel	Rock	110	60	180	60	50	70	360	Sturdy	Rock Head
+Aipom	Normal	None	70	40	55	55	85	55	11.5	Run Away	Pickup
+Alakazam	Psychic	None	50	135	45	85	120	55	48	Synchronize	Inner Focus
+Altaria	Dragon	Flying	70	70	90	105	80	75	20.6	Natural Cure	---
+Ambipom	Normal	None	100	60	66	66	115	75	20.3	Pickup	Technician
+Ampharos	Electric	None	75	115	75	90	55	90	61.5	Static	---
+Anorith	Rock	Bug	95	40	50	50	75	45	12.5	Battle Armor	---
+Arbok	Poison	None	85	65	69	79	80	60	65	Intimidate	Shed Skin
+Arcanine	Fire	None	110	100	80	80	95	90	155	Flash Fire	Intimidate
+Ariados	Bug	Poison	90	60	70	60	40	70	33.5	Insomnia	Swarm
+Armaldo	Rock	Bug	125	70	100	80	45	75	68.2	Battle Armor	---
+Aron	Steel	Rock	70	40	100	40	30	50	60	Sturdy	Rock Head
+Articuno	Ice	Flying	85	95	100	125	85	90	55.4	Pressure	---
+Azelf	Psychic	None	125	125	70	70	115	75	0.3	Levitate	---
+Azumarill	Water	None	50	50	80	80	50	100	28.5	Huge Power	Thick Fat
+Azurill	Normal	None	20	20	40	40	20	50	2	Huge Power	Thick Fat
+Bagon	Dragon	None	75	40	60	30	50	45	42.1	Rock Head	---
+Baltoy	Ground	Psychic	40	40	55	70	55	40	21.5	Levitate	---
+Banette	Ghost	None	115	83	65	63	65	64	12.5	Insomnia	Frisk
+Barboach	Water	Ground	48	46	43	41	60	50	1.9	Oblivious	Anticipation
+Bastiodon	Rock	Steel	52	47	168	138	30	60	149.5	Sturdy	---
+Bayleef	Grass	None	62	63	80	80	60	60	15.8	Overgrow	---
+Beautifly	Bug	Flying	70	90	50	50	65	60	28.4	Swarm	---
+Beedrill	Bug	Poison	80	45	40	80	75	65	29.5	Swarm	---
+Beldum	Steel	Psychic	55	35	80	60	30	40	95.2	Clear Body	---
+Bellossom	Grass	None	80	90	85	100	50	75	5.8	Chlorophyll	---
+Bellsprout	Grass	Poison	75	70	35	30	40	50	4	Chlorophyll	---
+Bibarel	Normal	Water	85	55	60	60	71	79	31.5	Simple	Unaware
+Bidoof	Normal	None	45	35	40	40	31	59	20	Simple	Unaware
+Blastoise	Water	None	83	85	100	105	78	79	85.5	Torrent	---
+Blaziken	Fire	Fighting	120	110	70	70	80	80	52	Blaze	---
+Blissey	Normal	None	10	75	10	135	55	255	46.8	Natural Cure	Serene Grace
+Bonsly	Rock	None	80	10	95	45	10	50	15	Sturdy	Rock Head
+Breloom	Grass	Fighting	130	60	80	60	70	60	39.2	Effect Spore	Poison Heal
+Bronzong	Steel	Psychic	89	79	116	116	33	67	187	Levitate	Heatproof
+Bronzor	Steel	Psychic	24	24	86	86	23	57	60.5	Levitate	Heatproof
+Budew	Grass	Poison	30	50	35	70	55	40	1.2	Natural Cure	Poison Point
+Buizel	Water	None	65	60	35	30	85	55	29.5	Swift Swim	---
+Bulbasaur	Grass	Poison	49	65	49	65	45	45	6.9	Overgrow	---
+Buneary	Normal	None	66	44	44	56	85	55	5.5	Run Away	Klutz
+Burmy	Bug	None	29	29	45	45	36	40	3.4	Shed Skin	---
+Butterfree	Bug	Flying	45	80	50	80	70	60	32	Compoundeyes	---
+Cacnea	Grass	None	85	85	40	40	35	50	51.3	Sand Veil	---
+Cacturne	Grass	Dark	115	115	60	60	55	70	77.4	Sand Veil	---
+Camerupt	Fire	Ground	100	105	70	75	40	70	220	Magma Armor	Solid Rock
+Carnivine	Grass	None	100	90	72	72	46	74	27	Levitate	---
+Carvanha	Water	Dark	90	65	20	20	65	45	20.8	Rough Skin	---
+Cascoon	Bug	Poison	35	25	55	25	15	50	11.5	Shed Skin	---
+Castform	Normal	None	70	70	70	70	70	70	0.8	Forecast	---
+Caterpie	Bug	None	30	20	35	20	45	45	2.9	Shield Dust	---
+Celebi	Psychic	Grass	100	100	100	100	100	100	5	Natural Cure	---
+Chansey	Normal	None	5	35	5	105	50	250	34.6	Natural Cure	Serene Grace
+Charizard	Fire	Flying	84	109	78	85	100	78	90.5	Blaze	---
+Charmander	Fire	None	52	60	43	50	65	39	8.5	Blaze	---
+Charmeleon	Fire	None	64	80	58	65	80	58	19	Blaze	---
+Chatot	Normal	Flying	65	92	45	42	91	76	1.9	Keen Eye	Tangled Feet
+Cherrim	Grass	None	60	87	70	78	85	70	9.3	Flower Gift	---
+Cherubi	Grass	None	35	62	45	53	35	45	3.3	Chlorophyll	---
+Chikorita	Grass	None	49	49	65	65	45	45	6.4	Overgrow	---
+Chimchar	Fire	None	58	58	44	44	61	44	6.2	Blaze	---
+Chimecho	Psychic	None	50	95	70	80	65	65	1	Levitate	---
+Chinchou	Water	Electric	38	56	38	56	67	75	12	Volt Absorb	Illuminate
+Chingling	Psychic	None	30	65	50	50	45	45	0.6	Levitate	---
+Clamperl	Water	None	64	74	85	55	32	35	52.5	Shell Armor	---
+Claydol	Ground	Psychic	70	70	105	120	75	60	108	Levitate	---
+Clefable	Normal	None	70	85	73	90	60	95	40	Cute Charm	Magic Guard
+Clefairy	Normal	None	45	60	48	65	35	70	7.5	Cute Charm	Magic Guard
+Cleffa	Normal	None	25	45	28	55	15	50	3	Cute Charm	Magic Guard
+Cloyster	Water	Ice	95	85	180	45	70	50	132.5	Shell Armor	Skill Link
+Combee	Bug	Flying	30	30	42	42	70	30	5.5	Honey Gather	---
+Combusken	Fire	Fighting	85	85	60	60	55	60	19.5	Blaze	---
+Corphish	Water	None	80	50	65	35	35	43	11.5	Hyper Cutter	Shell Armor
+Corsola	Water	Rock	55	65	85	85	35	55	5	Natural Cure	Hustle
+Cradily	Rock	Grass	81	81	97	107	43	86	60.4	Suction Cups	---
+Cranidos	Rock	Psychic	125	30	40	30	58	67	31.5	Mold Breaker	---
+Crawdaunt	Water	Dark	120	90	85	55	55	63	32.8	Hyper Cutter	Shell Armor
+Cresselia	Psychic	None	70	75	120	130	85	120	85.6	Levitate	---
+Croagunk	Poison	Fighting	61	61	40	40	50	48	23	Dry Skin	Anticipation
+Crobat	Poison	Flying	90	70	80	80	130	85	75	Inner Focus	---
+Croconaw	Water	None	80	59	80	63	58	65	25	Torrent	---
+Cubone	Ground	None	50	40	95	50	35	50	6.5	Lightningrod	Rock Head
+Cyndaquil	Fire	None	52	60	43	50	65	39	7.9	Blaze	---
+Darkrai	Dark	None	90	135	90	90	125	70	50.5	Bad Dreams	---
+Delcatty	Normal	None	65	55	65	55	70	70	32.6	Cute Charm	Normalize
+Delibird	Ice	Flying	55	65	45	45	75	45	16	Hustle	Vital Spirit
+Dewgong	Water	Ice	70	70	80	95	70	90	120	Thick Fat	Hydration
+Diglett	Ground	None	55	35	25	45	95	10	0.8	Sand Veil	Arena Trap
+Ditto	Normal	None	48	48	48	48	48	48	4	Limber	---
+Dodrio	Normal	Flying	110	60	70	60	100	60	85.2	Early Bird	Run Away
+Doduo	Normal	Flying	85	35	45	35	75	35	39.2	Early Bird	Run Away
+Donphan	Ground	None	120	60	120	60	50	90	120	Sturdy	---
+Dragonair	Dragon	None	84	70	65	70	70	61	16.5	Shed Skin	---
+Dragonite	Dragon	Flying	134	100	95	100	80	91	210	Inner Focus	---
+Drapion	Poison	Dark	90	60	110	75	95	70	61.5	Battle Armor	Sniper
+Dratini	Dragon	None	64	50	45	50	50	41	3.3	Shed Skin	---
+Drifblim	Ghost	Flying	80	90	44	54	80	150	15	Unburden	Aftermath
+Drifloon	Ghost	Flying	50	60	34	44	70	90	1.2	Unburden	Aftermath
+Drowzee	Psychic	None	48	43	45	90	42	60	32.4	Insomnia	Forewarn
+Dugtrio	Ground	None	80	50	50	70	120	35	33.3	Sand Veil	Arena Trap
+Dunsparce	Normal	None	70	65	70	65	45	100	14	Serene Grace	Run Away
+Dusclops	Ghost	None	70	60	130	130	25	40	30.6	Pressure	---
+Dusknoir	Ghost	None	100	65	135	135	45	45	106.6	Pressure	---
+Duskull	Ghost	None	40	30	90	90	25	20	15	Levitate	---
+Dustox	Bug	Poison	50	50	70	90	65	60	31.6	Shield Dust	---
+Eevee	Normal	None	55	45	50	65	55	55	6.5	Run Away	Adaptibility
+Ekans	Poison	None	60	40	44	54	55	35	6.9	Intimidate	Shed Skin
+Electabuzz	Electric	None	83	95	57	85	105	65	30	Static	---
+Electivire	Electric	None	123	95	67	85	95	75	138.6	Motor Drive	---
+Electrike	Electric	None	45	65	40	40	65	40	15.2	Static	Lightningrod
+Electrode	Electric	None	50	80	70	80	140	60	66.6	Static	Soundproof
+Elekid	Electric	None	63	65	37	55	95	45	23.5	Static	---
+Empoleon	Water	Steel	86	111	88	101	60	84	84.5	Torrent	---
+Entei	Fire	None	115	90	85	75	100	115	198	Pressure	---
+Espeon	Psychic	None	65	130	60	95	110	65	26.5	Synchronize	---
+Exeggcute	Grass	Psychic	40	60	80	45	40	60	2.5	Chlorophyll	---
+Exeggutor	Grass	Psychic	95	125	85	65	55	95	120	Chlorophyll	---
+Exploud	Normal	None	91	91	63	63	68	104	84	Soundproof	---
+Farfetch'd	Normal	Flying	65	58	55	62	60	52	15	Inner Focus	Keen Eye
+Fearow	Normal	Flying	90	61	65	61	100	65	38	Keen Eye	---
+Feebas	Water	None	15	10	20	55	80	20	7.4	Swift Swim	---
+Feraligatr	Water	None	105	79	100	83	78	85	88.8	Torrent	---
+Finneon	Water	None	49	49	56	61	66	49	7	Swift Swim	Storm Drain
+Flaaffy	Electric	None	55	80	55	60	45	70	13.3	Static	---
+Flareon	Fire	None	130	95	60	110	65	65	25	Flash Fire	---
+Floatzel	Water	None	105	85	55	50	115	85	33.5	Swift Swim	---
+Flygon	Ground	Dragon	100	80	80	80	100	80	82	Levitate	---
+Forretress	Bug	Steel	90	60	140	60	40	75	125.8	Sturdy	---
+Froslass	Ice	Ghost	80	80	70	70	110	70	26.6	Snow Cloak	---
+Furret	Normal	None	76	45	64	55	90	85	32.5	Run Away	Keen Eye
+Gabite	Dragon	Ground	90	50	65	55	82	68	56	Sand Veil	---
+Gallade	Psychic	Fighting	125	65	65	115	80	68	52	Steadfast	---
+Garchomp	Dragon	Ground	130	80	95	85	102	108	95	Sand Veil	---
+Gardevoir	Psychic	None	65	125	65	115	80	68	48.4	Synchronize	Trace
+Gastly	Ghost	Poison	35	100	30	35	80	30	0.1	Levitate	---
+Gastrodon	Water	Ground	83	92	68	82	39	111	29.9	Sticky Hold	Storm Drain
+Gengar	Ghost	Poison	65	130	60	75	110	60	40.5	Levitate	---
+Geodude	Rock	Ground	80	30	100	30	20	40	20	Sturdy	Rock Head
+Gible	Dragon	Ground	70	40	45	45	42	58	20.5	Sand Veil	---
+Girafarig	Normal	Psychic	80	90	65	65	85	70	41.5	Inner Focus	Early Bird
+Glaceon	Ice	None	60	130	110	95	65	65	25.9	Snow Cloak	---
+Glalie	Ice	None	80	80	80	80	80	80	256.5	Inner Focus	Ice Body
+Glameow	Normal	None	55	42	42	37	85	49	3.9	Limber	Own Tempo
+Gligar	Ground	Flying	75	35	105	65	85	65	64.8	Sand Veil	Hyper Cutter
+Gliscor	Ground	Flying	95	45	125	75	95	75	42.5	Sand Veil	Hyper Cutter
+Gloom	Grass	Poison	65	85	70	75	40	60	8.6	Chlorophyll	---
+Golbat	Poison	Flying	80	65	70	75	90	75	55	Inner Focus	---
+Goldeen	Water	None	67	35	60	50	63	45	15	Swift Swim	Water Veil
+Golduck	Water	None	82	95	78	80	85	80	76.6	Damp	Cloud Nine
+Golem	Rock	Ground	110	55	130	65	45	80	300	Sturdy	Rock Head
+Gorebyss	Water	None	84	114	105	75	52	55	22.6	Swift Swim	---
+Granbull	Normal	None	120	60	75	60	45	90	48.7	Intimidate	Quick Feet
+Graveler	Rock	Ground	95	45	115	45	35	55	105	Sturdy	Rock Head
+Grimer	Poison	None	80	40	50	50	25	80	30	Stench	Sticky Hold
+Grotle	Grass	None	89	55	85	65	36	75	97	Overgrow	---
+Groudon	Ground	None	150	100	140	90	90	100	950	Drought	---
+Grovyle	Grass	None	65	85	45	65	95	50	21.6	Overgrow	---
+Growlithe	Fire	None	70	70	45	50	60	55	19	Flash Fire	Intimidate
+Grumpig	Psychic	None	45	90	65	110	80	80	71.5	Own Tempo	Thick Fat
+Gulpin	Poison	None	43	43	53	53	40	70	10.3	Sticky Hold	Liquid Ooze
+Gyarados	Water	Flying	125	60	79	100	81	95	235	Intimidate	---
+Happiny	Normal	None	5	15	5	65	30	100	24.4	Natural Cure	Serene Grace
+Hariyama	Fighting	None	120	40	60	60	50	144	253.8	Thick Fat	Guts
+Haunter	Ghost	Poison	50	115	45	55	95	45	0.1	Levitate	---
+Heatran	Fire	Steel	90	130	106	106	77	91	430	Flash Fire	---
+Heracross	Bug	Fighting	125	40	75	95	85	80	54	Guts	Swarm
+Hippopotas	Ground	None	72	38	78	42	32	68	49.5	Sand Stream	---
+Hippowdon	Ground	None	112	68	118	72	47	108	300	Sand Stream	---
+Hitmonchan	Fighting	None	105	35	79	110	76	50	50.2	Keen Eye	Iron Fist
+Hitmonlee	Fighting	None	120	35	53	110	87	50	49.8	Limber	Reckless
+Hitmontop	Fighting	None	95	35	95	110	70	50	48	Intimidate	Technician
+Honchkrow	Dark	Flying	125	105	52	52	71	100	27.3	Insomnia	Super Luck
+Ho-oh	Fire	Flying	130	110	90	154	90	106	199	Pressure	---
+Hoothoot	Normal	Flying	30	36	30	56	50	60	21.2	Insomnia	Keen Eye
+Hoppip	Grass	Flying	35	35	40	55	50	35	0.5	Chlorophyll	Leaf Guard
+Horsea	Water	None	40	70	70	25	60	30	8	Swift Swim	Sniper
+Houndoom	Dark	Fire	90	110	50	80	95	75	35	Flash Fire	Early Bird
+Houndour	Dark	Fire	60	80	30	50	65	45	10.8	Flash Fire	Early Bird
+Huntail	Water	None	104	94	105	75	52	55	27	Swift Swim	---
+Hypno	Psychic	None	73	73	70	115	67	85	75.6	Insomnia	Forewarn
+Igglybuff	Normal	None	30	40	15	20	15	90	1	Cute Charm	---
+Illumise	Bug	None	47	73	55	75	85	65	17.7	Oblivious	Tinted Lens
+Infernape	Fire	Fighting	104	104	71	71	108	76	55	Blaze	---
+Ivysaur	Grass	Poison	62	80	63	80	60	60	13	Overgrow	---
+Jigglypuff	Normal	None	45	45	20	25	20	115	5.5	Cute Charm	---
+Jirachi	Steel	Psychic	100	100	100	100	100	100	1.1	Serene Grace	---
+Jolteon	Electric	None	65	110	60	95	130	65	24.5	Volt Absorb	---
+Jumpluff	Grass	Flying	55	55	70	85	110	75	3	Chlorophyll	Leaf Guard
+Jynx	Ice	Psychic	50	115	35	95	95	65	40.6	Oblivious	Forewarn
+Kabuto	Rock	Water	80	55	90	45	55	30	11.5	Battle Armor	Swift Swim
+Kabutops	Rock	Water	115	65	105	70	80	60	40.5	Battle Armor	Swift Swim
+Kadabra	Psychic	None	35	120	30	70	105	40	56.5	Synchronize	Inner Focus
+Kakuna	Bug	Poison	25	25	50	25	35	45	10	Shed Skin	---
+Kangaskhan	Normal	None	95	40	80	80	90	105	80	Early Bird	Scrappy
+Kecleon	Normal	None	90	60	70	120	40	60	22	Color Change	---
+Kingdra	Water	Dragon	95	95	95	95	85	75	152	Swift Swim	Sniper
+Kingler	Water	None	130	50	115	50	75	55	60	Hyper Cutter	Shell Armor
+Kirlia	Psychic	None	35	65	35	55	50	38	20.2	Synchronize	Trace
+Koffing	Poison	None	65	60	95	45	35	40	1	Levitate	---
+Krabby	Water	None	105	25	90	25	50	30	6.5	Hyper Cutter	Shell Armor
+Kricketot	Bug	None	25	25	41	41	25	37	2.2	Shed Skin	---
+Kricketune	Bug	None	85	55	51	51	65	77	25.5	Swarm	---
+Kyogre	Water	None	100	150	90	140	90	100	352	Drizzle	---
+Lairon	Steel	Rock	90	50	140	50	40	60	120	Sturdy	Rock Head
+Lanturn	Water	Electric	58	76	58	76	67	125	22.5	Volt Absorb	Illuminate
+Lapras	Water	Ice	85	85	80	95	60	130	220	Water Absorb	Shell Armor
+Larvitar	Rock	Ground	64	45	50	50	41	50	72	Guts	---
+Leafeon	Grass	None	110	60	130	65	95	65	25.5	Leaf Guard	---
+Ledian	Bug	Flying	35	55	50	110	85	55	35.6	Early Bird	Swarm
+Ledyba	Bug	Flying	20	40	30	80	55	40	10.8	Early Bird	Swarm
+Lickilicky	Normal	None	85	80	95	95	50	110	140	Oblivious	Own Tempo
+Lickitung	Normal	None	55	60	75	75	30	90	65.5	Oblivious	Own Tempo
+Lileep	Rock	Grass	41	61	77	87	23	66	23.8	Suction Cups	---
+Linoone	Normal	None	70	50	61	61	100	78	32.5	Pickup	Gluttony
+Lombre	Water	Grass	50	60	50	70	50	60	32.5	Swift Swim	Rain Dish
+Lopunny	Normal	None	76	54	84	96	105	65	33.3	Cute Charm	Klutz
+Lotad	Water	Grass	30	40	30	50	30	40	2.6	Swift Swim	Rain Dish
+Loudred	Normal	None	71	71	43	43	48	84	40.5	Soundproof	---
+Lucario	Fighting	Steel	110	115	70	70	90	70	54	Inner Focus	Steadfast
+Ludicolo	Water	Grass	70	90	70	100	70	80	55	Swift Swim	Rain Dish
+Lumineon	Water	None	69	69	76	86	91	69	24	Swift Swim	Storm Drain
+Lunatone	Rock	Psychic	55	95	65	85	70	70	168	Levitate	---
+Luvdisc	Water	None	30	40	55	65	97	43	8.7	Swift Swim	---
+Luxio	Electric	None	85	60	49	49	60	60	30.5	Intimidate	Rivalry
+Luxray	Electric	None	120	95	79	79	70	80	42	Intimidate	Rivalry
+Machamp	Fighting	None	130	65	80	85	55	90	130	Guts	No Guard
+Machoke	Fighting	None	100	50	70	60	45	80	70.5	Guts	No Guard
+Machop	Fighting	None	80	35	50	35	35	70	19.5	Guts	No Guard
+Magby	Fire	None	75	70	37	55	83	45	21.4	Flame Body	---
+Magcargo	Fire	Rock	50	80	120	80	30	50	55	Magma Armor	Flame Body
+Magikarp	Water	None	10	15	55	20	80	20	10	Swift Swim	---
+Magmar	Fire	None	95	100	57	85	93	65	44.5	Flame Body	---
+Magmortar	Fire	None	95	125	67	95	83	75	68	Flame Body	---
+Magnemite	Electric	Steel	35	95	70	55	45	25	6	Sturdy	Magnet Pull
+Magneton	Electric	Steel	60	120	95	70	70	50	60	Sturdy	Magnet Pull
+Magnezone	Electric	Steel	70	130	115	90	60	70	180	Sturdy	Magnet Pull
+Makuhita	Fighting	None	60	20	30	30	25	72	86.4	Thick Fat	Guts
+Mamoswine	Ice	Ground	130	70	80	60	80	110	291	Oblivious	Snow Cloak
+Manaphy	Water	None	100	100	100	100	100	100	1.4	Hydration	---
+Manectric	Electric	None	75	105	60	60	105	70	40.2	Static	Lightningrod
+Mankey	Fighting	None	80	35	35	45	70	40	28	Vital Spirit	Anger Point
+Mantine	Water	Flying	40	80	70	140	70	65	220	Water Absorb	Swift Swim
+Mantyke	Water	Flying	20	60	50	120	50	45	65	Water Absorb	Swift Swim
+Mareep	Electric	None	40	65	40	45	35	55	7.8	Static	---
+Marill	Water	None	20	20	50	50	40	70	8.5	Huge Power	Thick Fat
+Marowak	Ground	None	80	50	110	80	45	60	45	Lightningrod	Rock Head
+Marshtomp	Water	Ground	85	60	70	70	50	70	28	Torrent	---
+Masquerain	Bug	Flying	60	80	62	82	60	70	3.6	Intimidate	---
+Mawile	Steel	None	85	55	85	55	50	50	11.5	Intimidate	Hyper Cutter
+Medicham	Fighting	Psychic	60	60	75	75	80	60	31.5	Pure Power	---
+Meditite	Fighting	Psychic	40	40	55	55	60	30	11.2	Pure Power	---
+Meganium	Grass	None	82	83	100	100	80	80	100.5	Overgrow	---
+Meowth	Normal	None	45	40	35	40	90	40	4.2	Pickup	Technician
+Mesprit	Psychic	None	105	105	105	105	80	80	0.3	Levitate	---
+Metagross	Steel	Psychic	135	95	130	90	70	80	550	Clear Body	---
+Metang	Steel	Psychic	75	55	100	80	50	60	202.5	Clear Body	---
+Metapod	Bug	None	20	25	55	25	30	50	9.9	Shed Skin	---
+Mew	Psychic	None	100	100	100	100	100	100	4	Synchronize	---
+Mewtwo	Psychic	None	110	154	90	90	130	106	122	Pressure	---
+Mightyena	Dark	None	90	60	70	60	70	70	37	Intimidate	Quick Feet
+Milotic	Water	None	60	100	79	125	81	95	162	Marvel Scale	---
+Miltank	Normal	None	80	40	105	70	100	95	75.5	Thick Fat	Scrappy
+Mime Jr.	Psychic	None	25	70	45	90	60	20	13	Soundproof	Filter
+Minun	Electric	None	40	75	50	85	95	60	4.2	Minus	---
+Misdreavus	Ghost	None	60	85	60	85	85	60	1	Levitate	---
+Mismagius	Ghost	None	60	105	60	105	105	60	4.4	Levitate	---
+Moltres	Fire	Flying	100	125	90	85	90	90	60	Pressure	---
+Monferno	Fire	Fighting	78	78	52	52	81	64	22	Blaze	---
+Mothim	Bug	Flying	94	94	50	50	66	70	23.3	Swarm	---
+Mr. Mime	Psychic	None	45	100	65	120	90	40	54.5	Soundproof	Filter
+Mudkip	Water	None	70	50	50	50	40	50	7.6	Torrent	---
+Muk	Poison	None	105	65	75	100	50	105	30	Stench	Sticky Hold
+Munchlax	Normal	None	85	40	40	85	5	135	105	Thick Fat	Pickup
+Murkrow	Dark	Flying	85	85	42	42	91	60	2.1	Insomnia	Super Luck
+Natu	Psychic	Flying	50	70	45	45	70	40	2	Synchronize	Early Bird
+Nidoking	Poison	Ground	92	85	77	75	85	81	62	Poison Point	Rivalry
+Nidoqueen	Poison	Ground	82	75	87	85	76	90	60	Poison Point	Rivalry
+Nidoran-F	Poison	None	47	40	52	40	41	55	7	Poison Point	Rivalry
+Nidoran-M	Poison	None	57	40	40	40	50	46	9	Poison Point	Rivalry
+Nidorina	Poison	None	62	55	67	55	56	70	20	Poison Point	Rivalry
+Nidorino	Poison	None	72	55	57	55	65	61	19.5	Poison Point	Rivalry
+Nincada	Bug	Ground	45	30	90	30	40	31	5.5	Compoundeyes	---
+Ninetales	Fire	None	76	81	75	100	100	73	19.9	Flash Fire	---
+Ninjask	Bug	Flying	90	50	45	50	160	61	12	Speed Boost	---
+Noctowl	Normal	Flying	50	76	50	96	70	100	40.8	Insomnia	Keen Eye
+Nosepass	Rock	None	45	45	135	90	30	30	97	Sturdy	Magnet Pull
+Numel	Fire	Ground	60	65	40	45	35	60	24	Oblivious	Simple
+Nuzleaf	Grass	Dark	70	60	40	40	60	70	28	Chlorophyll	Early Bird
+Octillery	Water	None	105	105	75	75	45	75	28.5	Suction Cups	Sniper
+Oddish	Grass	Poison	50	75	55	65	30	45	5.4	Chlorophyll	---
+Omanyte	Rock	Water	40	90	100	55	35	35	7.5	Swift Swim	Shell Armor
+Omastar	Rock	Water	60	115	125	70	55	70	35	Swift Swim	Shell Armor
+Onix	Rock	Ground	45	30	160	45	70	35	210	Sturdy	Rock Head
+Pachirisu	Electric	None	45	45	70	90	95	60	3.9	Run Away	Pickup
+Paras	Bug	Grass	70	45	55	55	25	35	5.4	Effect Spore	Dry Skin
+Parasect	Bug	Grass	95	60	80	80	30	60	29.5	Effect Spore	Dry Skin
+Pelipper	Water	Flying	50	85	100	70	65	60	28	Keen Eye	---
+Persian	Normal	None	70	65	60	65	115	65	32	Limber	Technician
+Phanpy	Ground	None	60	40	60	40	40	90	33.5	Pickup	---
+Phione	Water	None	80	80	80	80	80	80	3.1	Hydration	---
+Pichu	Electric	None	40	35	15	35	60	20	2	Static	---
+Pidgeot	Normal	Flying	80	70	75	70	91	83	39.5	Keen Eye	Tangled Feet
+Pidgeotto	Normal	Flying	60	50	55	50	71	63	30	Keen Eye	Tangled Feet
+Pidgey	Normal	Flying	45	35	40	35	56	40	1.8	Keen Eye	Tangled Feet
+Pikachu	Electric	None	55	50	30	40	90	35	6	Static	---
+Piloswine	Ice	Ground	100	60	80	60	50	100	55.8	Oblivious	Snow Cloak
+Pineco	Bug	None	65	35	90	35	15	50	7.2	Sturdy	---
+Pinsir	Bug	None	125	55	100	70	85	65	55	Hyper Cutter	Mold Breaker
+Piplup	Water	None	51	61	53	56	40	53	5.2	Torrent	---
+Plusle	Electric	None	50	85	40	75	95	60	4.2	Plus	---
+Politoed	Water	None	75	90	75	100	70	90	33.9	Damp	Water Absorb
+Poliwag	Water	None	50	40	40	40	90	40	12.4	Damp	Water Absorb
+Poliwhirl	Water	None	65	50	65	50	90	65	20	Damp	Water Absorb
+Poliwrath	Water	None	85	70	95	90	70	90	54	Damp	Water Absorb
+Ponyta	Fire	None	85	65	55	65	90	50	30	Flash Fire	Run Away
+Poochyena	Dark	None	55	30	35	30	35	35	13.6	Run Away	Quick Feet
+Porygon	Normal	None	60	85	70	75	40	65	36.5	Trace	Download
+Porygon2	Normal	None	80	105	90	95	60	85	32.5	Trace	Download
+Porygon-Z	Normal	None	80	135	70	75	90	85	34	Download	Adaptibility
+Primeape	Fighting	None	105	60	60	70	95	65	32	Vital Spirit	Anger Point
+Prinplup	Water	None	66	81	68	76	50	64	23	Torrent	---
+Probopass	Rock	None	55	75	145	150	40	60	340	Sturdy	Magnet Pull
+Psyduck	Water	None	52	65	48	50	55	50	19.6	Damp	Cloud Nine
+Pupitar	Rock	Ground	84	65	70	70	51	70	152	Shed Skin	---
+Purugly	Normal	None	82	64	64	59	112	71	43.8	Own Tempo	Thick Fat
+Quagsire	Water	Ground	85	65	85	65	35	95	75	Damp	Water Absorb
+Quilava	Fire	None	64	80	58	65	80	58	19	Blaze	---
+Qwilfish	Water	Poison	95	55	75	55	85	65	3.9	Swift Swim	Poison Point
+Raichu	Electric	None	90	90	55	80	100	60	30	Static	---
+Raikou	Electric	None	85	115	75	100	115	90	178	Pressure	---
+Ralts	Psychic	None	25	45	25	35	40	28	6.6	Synchronize	Trace
+Rampardos	Rock	None	165	65	60	50	58	97	102.5	Mold Breaker	---
+Rapidash	Fire	None	100	80	70	80	105	65	95	Flash Fire	Run Away
+Raticate	Normal	None	81	50	60	70	97	55	18.5	Run Away	Guts
+Rattata	Normal	None	56	25	35	35	72	30	3.5	Run Away	Guts
+Rayquaza	Dragon	Flying	150	150	90	90	95	105	206.5	Air Lock	---
+Regice	Ice	None	50	100	100	200	50	80	175	Clear Body	---
+Regirock	Rock	None	100	50	200	100	50	80	230	Clear Body	---
+Registeel	Steel	None	75	75	150	150	50	80	205	Clear Body	---
+Relicanth	Water	Rock	90	45	130	65	55	100	23.4	Swift Swim	Rock Head
+Remoraid	Water	None	65	65	35	35	65	35	12	Hustle	Sniper
+Rhydon	Ground	Rock	130	45	120	45	40	105	120	Lightningrod	Rock Head
+Rhyhorn	Ground	Rock	85	30	95	30	25	80	115	Lightningrod	Rock Head
+Rhyperior	Ground	Rock	140	55	130	55	40	115	282.8	Lightningrod	Solid Rock
+Riolu	Fighting	None	70	35	40	40	60	40	20.2	Inner Focus	Steadfast
+Roselia	Grass	Poison	60	100	45	80	65	50	2	Natural Cure	Poison Point
+Roserade	Grass	Poison	70	125	55	105	90	60	14.5	Natural Cure	Poison Point
+Rotom	Electric	Ghost	50	95	77	77	91	50	0.3	Levitate	---
+Rotom-C	Electric	Ghost	67	107	109	109	88	52	0.3	Levitate	---
+Rotom-F	Electric	Ghost	66	106	108	108	87	51	0.3	Levitate	---
+Rotom-H	Electric	Ghost	68	108	110	110	89	53	0.3	Levitate	---
+Rotom-S	Electric	Ghost	65	105	107	107	86	50	0.3	Levitate	---
+Rotom-W	Electric	Ghost	69	109	111	111	90	54	0.3	Levitate	---
+Sableye	Dark	Ghost	75	65	75	65	50	50	11	Keen Eye	Stall
+Salamence	Dragon	Flying	135	110	80	80	100	95	102.6	Intimidate	---
+Sandshrew	Ground	None	75	20	85	30	40	50	12	Sand Veil	---
+Sandslash	Ground	None	100	45	110	55	65	75	29.5	Sand Veil	---
+Sceptile	Grass	None	85	105	65	85	120	70	52.2	Overgrow	---
+Scizor	Bug	Steel	130	55	100	80	65	70	118	Swarm	Technician
+Scyther	Bug	Flying	110	55	80	80	105	70	56	Swarm	Technician
+Seadra	Water	None	65	95	95	45	85	55	25	Poison Point	Sniper
+Seaking	Water	None	92	65	65	80	68	80	39	Swift Swim	Water Veil
+Sealeo	Ice	Water	60	75	70	70	45	90	87.6	Thick Fat	Ice Body
+Seedot	Grass	None	40	30	50	30	30	40	4	Chlorophyll	Early Bird
+Seel	Water	None	45	45	55	70	45	65	90	Thick Fat	Hydration
+Sentret	Normal	None	46	35	34	45	20	35	6	Run Away	Keen Eye
+Seviper	Poison	None	100	100	60	60	65	73	52.5	Shed Skin	---
+Sharpedo	Water	Dark	120	95	40	40	95	70	88.8	Rough Skin	---
+Shaymin	Grass	None	100	100	100	100	100	100	2.1	Natural Cure	---
+Shaymin-S	Grass	Flying	103	127	75	120	75	100	2.1	Serene Grace	---
+Shedinja	Bug	Ghost	90	30	45	30	40	1	1.2	Wonder Guard	---
+Shelgon	Dragon	None	95	60	100	50	50	65	110.5	Rock Head	---
+Shellder	Water	None	65	45	100	25	40	30	4	Shell Armor	Skill Link
+Shellos	Water	None	48	57	48	62	34	76	6.3	Sticky Hold	Storm Drain
+Shieldon	Rock	Steel	42	42	118	88	30	30	57	Sturdy	---
+Shiftry	Grass	Dark	100	90	60	60	80	90	59.6	Chlorophyll	Early Bird
+Shinx	Electric	None	65	40	34	34	45	45	9.5	Intimidate	Rivalry
+Shroomish	Grass	None	40	40	60	60	35	60	4.5	Effect Spore	Poison Heal
+Shuckle	Bug	Rock	10	10	230	230	5	20	20.5	Sturdy	Gluttony
+Shuppet	Ghost	None	75	63	35	33	45	44	2.3	Insomnia	Frisk
+Silcoon	Bug	None	35	25	55	25	15	50	10	Shed Skin	---
+Skarmory	Steel	Flying	80	40	140	70	70	65	50.5	Sturdy	Keen Eye
+Skiploom	Grass	Flying	45	45	50	65	80	55	1	Chlorophyll	Leaf Guard
+Skitty	Normal	None	45	35	45	35	50	50	11	Cute Charm	Normalize
+Skorupi	Poison	Bug	50	30	90	55	65	40	12	Battle Armor	Sniper
+Skuntank	Poison	Dark	93	71	67	61	84	103	38	Stench	Aftermath
+Slaking	Normal	None	160	95	100	65	100	150	130.5	Truant	---
+Slakoth	Normal	None	60	35	60	35	30	60	24	Truant	---
+Slowbro	Water	Psychic	75	100	110	80	30	95	78.5	Oblivious	Own Tempo
+Slowking	Water	Psychic	75	100	80	110	30	95	79.5	Oblivious	Own Tempo
+Slowpoke	Water	Psychic	65	40	65	40	15	90	36	Oblivious	Own Tempo
+Slugma	Fire	None	40	70	40	40	20	40	35	Magma Armor	Flame Body
+Smeargle	Normal	None	20	20	35	45	75	55	58	Own Tempo	Technician
+Smoochum	Ice	Psychic	30	85	15	65	65	45	6	Oblivious	Forewarn
+Sneasel	Dark	Ice	95	35	55	75	115	55	28	Inner Focus	Keen Eye
+Snorlax	Normal	None	110	65	65	110	30	160	460	Immunity	Thick Fat
+Snorunt	Ice	None	50	50	50	50	50	50	16.8	Inner Focus	Ice Body
+Snover	Ice	Grass	62	62	50	60	40	60	50.5	Snow Warning	---
+Snubbull	Normal	None	80	40	50	40	30	60	7.8	Intimidate	Run Away
+Solrock	Rock	Psychic	95	55	85	65	70	70	154	Levitate	---
+Spearow	Normal	Flying	60	31	30	31	70	40	2	Keen Eye	---
+Spheal	Ice	Water	40	55	50	50	25	70	39.5	Thick Fat	Ice Body
+Spinarak	Bug	Poison	60	40	40	40	30	40	8.5	Insomnia	Swarm
+Spinda	Normal	None	60	60	60	60	60	60	5	Own Tempo	Tangled Feet
+Spiritomb	Ghost	Dark	92	92	108	108	35	50	108	Pressure	---
+Spoink	Psychic	None	25	70	35	80	60	60	30.6	Own Tempo	Thick Fat
+Squirtle	Water	None	48	50	65	64	43	44	9	Torrent	---
+Stantler	Normal	None	95	85	62	65	85	73	71.2	Intimidate	Frisk
+Staraptor	Normal	Flying	120	50	70	50	100	85	24.9	Intimidate	---
+Staravia	Normal	Flying	75	40	50	40	80	55	15.5	Intimidate	---
+Starly	Normal	Flying	55	30	30	30	60	40	2	Keen Eye	---
+Starmie	Water	Psychic	75	100	85	85	115	60	80	Natural Cure	Illuminate
+Staryu	Water	None	45	70	55	55	85	30	34.5	Natural Cure	Illuminate
+Steelix	Steel	Ground	85	55	200	65	30	75	400	Sturdy	Rock Head
+Stunky	Poison	Dark	63	41	47	41	74	63	19.2	Stench	Aftermath
+Sudowoodo	Rock	None	100	30	115	65	30	70	38	Sturdy	Rock Head
+Suicune	Water	None	75	90	115	115	85	100	187	Pressure	---
+Sunflora	Grass	None	75	105	55	85	30	75	8.5	Chlorophyll	Solar Power
+Sunkern	Grass	None	30	30	30	30	30	30	1.8	Chlorophyll	Solar Power
+Surskit	Bug	Water	30	50	32	52	65	40	1.7	Swift Swim	---
+Swablu	Normal	Flying	40	40	60	75	50	45	1.2	Natural Cure	---
+Swalot	Poison	None	73	73	83	83	55	100	80	Sticky Hold	Liquid Ooze
+Swampert	Water	Ground	110	85	90	90	60	100	81.9	Torrent	---
+Swellow	Normal	Flying	85	50	60	50	125	60	19.8	Guts	---
+Swinub	Ice	Ground	50	30	40	30	50	50	6.5	Oblivious	Snow Cloak
+Taillow	Normal	Flying	55	30	30	30	85	40	2.3	Guts	---
+Tangela	Grass	None	55	100	115	40	60	65	35	Chlorophyll	Leaf Guard
+Tangrowth	Grass	None	100	110	125	50	50	100	128.6	Chlorophyll	Leaf Guard
+Tauros	Normal	None	100	40	95	70	110	75	88.4	Intimidate	Anger Point
+Teddiursa	Normal	None	80	50	50	50	40	60	8.8	Pickup	Quick Feet
+Tentacool	Water	Poison	40	50	35	100	70	40	45.5	Clear Body	Liquid Ooze
+Tentacruel	Water	Poison	70	80	65	120	100	80	55	Clear Body	Liquid Ooze
+Togekiss	Normal	Flying	50	120	95	115	80	85	38	Serene Grace	Hustle
+Togepi	Normal	None	20	40	65	65	20	35	1.5	Serene Grace	Hustle
+Togetic	Normal	Flying	40	80	85	105	40	55	3.2	Serene Grace	Hustle
+Torchic	Fire	None	60	70	40	50	45	45	2.5	Blaze	---
+Torkoal	Fire	None	85	85	140	70	20	70	80.4	White Smoke	---
+Torterra	Grass	Ground	109	75	105	85	56	95	310	Overgrow	---
+Totodile	Water	None	65	44	64	48	43	50	9.5	Torrent	---
+Toxicroak	Poison	Fighting	106	86	65	65	85	83	44.4	Dry Skin	Anticipation
+Trapinch	Ground	None	100	45	45	45	10	45	15	Hyper Cutter	Arena Trap
+Treecko	Grass	None	45	65	35	55	70	40	5	Overgrow	---
+Tropius	Grass	Flying	68	72	83	87	51	99	100	Chlorophyll	Solar Power
+Turtwig	Grass	None	68	45	64	55	31	55	10.2	Overgrow	---
+Typhlosion	Fire	None	84	109	78	85	100	78	79.5	Blaze	---
+Tyranitar	Rock	Dark	134	95	110	100	61	100	202	Sand Stream	---
+Tyrogue	Fighting	None	35	35	35	35	35	35	21	Guts	Steadfast
+Umbreon	Dark	None	65	60	110	130	65	95	27	Synchronize	---
+Unown	Psychic	None	72	72	48	48	48	48	5	Levitate	---
+Ursaring	Normal	None	130	75	75	75	55	90	125.8	Guts	Quick Feet
+Uxie	Psychic	None	75	75	130	130	95	75	0.3	Levitate	---
+Vaporeon	Water	None	65	110	60	95	65	130	29	Water Absorb	---
+Venomoth	Bug	Poison	65	90	60	75	90	70	12.5	Shield Dust	Tinted Lens
+Venonat	Bug	Poison	55	40	50	55	45	60	30	Compoundeyes	Tinted Lens
+Venusaur	Grass	Poison	82	100	83	100	80	80	100	Overgrow	---
+Vespiquen	Bug	Flying	80	80	102	102	40	70	38.5	Pressure	---
+Vibrava	Ground	Dragon	70	50	50	50	70	50	15.3	Levitate	---
+Victreebel	Grass	Poison	105	100	65	60	70	80	15.5	Chlorophyll	---
+Vigoroth	Normal	None	80	55	80	55	90	80	46.5	Vital Spirit	---
+Vileplume	Grass	Poison	80	100	85	90	50	75	18.6	Chlorophyll	---
+Volbeat	Bug	None	73	47	55	75	85	65	17.7	Illuminate	Swarm
+Voltorb	Electric	None	30	55	50	55	100	40	10.4	Static	Soundproof
+Vulpix	Fire	None	41	50	40	65	65	38	9.9	Flash Fire	---
+Wailmer	Water	None	70	70	35	35	60	130	130	Oblivious	Water Veil
+Wailord	Water	None	90	90	45	45	60	170	398	Oblivious	Water Veil
+Walrein	Ice	Water	80	95	90	90	65	110	150.6	Thick Fat	Ice Body
+Wartortle	Water	None	63	65	80	80	58	59	22.5	Torrent	---
+Weavile	Dark	Ice	120	45	65	85	125	70	34	Pressure	---
+Weedle	Bug	Poison	35	20	30	20	50	40	3.2	Shield Dust	---
+Weepinbell	Grass	Poison	90	85	50	45	55	65	6.4	Chlorophyll	---
+Weezing	Poison	None	90	85	120	70	60	65	9.5	Levitate	---
+Whiscash	Water	Ground	78	76	73	71	60	110	23.6	Oblivious	Anticipation
+Whismur	Normal	None	51	51	23	23	28	64	16.3	Soundproof	---
+Wigglytuff	Normal	None	70	75	45	50	45	140	12	Cute Charm	---
+Wingull	Water	Flying	30	55	30	30	85	40	9.5	Keen Eye	---
+Wobbuffet	Psychic	None	33	33	58	58	33	190	28.5	Shadow Tag	---
+Wooper	Water	Ground	45	25	45	25	15	55	8.5	Damp	Water Absorb
+Wormadam	Bug	Ground	79	59	105	85	36	60	6.5	Anticipation	---
+Wormadam-G	Bug	Grass	59	79	85	105	36	60	6.5	Anticipation	---
+Wormadam-S	Bug	Steel	69	69	95	95	36	60	6.5	Anticipation	---
+Wurmple	Bug	None	45	20	35	30	20	45	3.6	Shield Dust	---
+Wynaut	Psychic	None	23	23	48	48	23	95	14	Shadow Tag	---
+Xatu	Psychic	Flying	75	95	70	70	95	65	15	Synchronize	Early Bird
+Yanma	Bug	Flying	65	75	45	45	95	65	38	Speed Boost	Compoundeyes
+Yanmega	Bug	Flying	76	116	86	56	95	86	51.5	Speed Boost	Tinted Lens
+Zangoose	Normal	None	115	60	60	60	90	73	40.3	Immunity	---
+Zapdos	Electric	Flying	90	125	85	90	100	90	52.6	Pressure	---
+Zigzagoon	Normal	None	30	30	41	41	60	38	17.5	Pickup	Gluttony
+Zubat	Poison	Flying	45	30	35	40	55	40	7.5	Inner Focus	---

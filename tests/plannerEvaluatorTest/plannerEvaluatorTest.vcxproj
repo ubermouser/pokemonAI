@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\agentMove.cpp" />
+    <ClCompile Include="..\..\src\evaluator.cpp" />
+    <ClCompile Include="..\..\src\evaluator_network128.cpp" />
+    <ClCompile Include="..\..\src\evaluator_network32.cpp" />
+    <ClCompile Include="..\..\src\evaluator_network64.cpp" />
+    <ClCompile Include="..\..\src\evaluator_random.cpp" />
+    <ClCompile Include="..\..\src\evaluator_simple.cpp" />
+    <ClCompile Include="..\..\src\evaluator_network16.cpp" />
+    <ClCompile Include="..\..\src\experienceNet.cpp" />
+    <ClCompile Include="..\..\src\evaluator_featureVector.cpp" />
+    <ClCompile Include="..\..\src\fixedpoint\fixed_func.cpp" />
+    <ClCompile Include="..\..\src\game.cpp" />
+    <ClCompile Include="..\..\src\gen4_scripts.cpp" />
+    <ClCompile Include="..\..\src\neuralNet.cpp" />
+    <ClCompile Include="..\..\src\orderHeuristic.cpp" />
+    <ClCompile Include="..\..\src\otherMove.cpp" />
+    <ClCompile Include="..\..\src\planner_directed.cpp" />
+    <ClCompile Include="..\..\src\planner_human.cpp" />
+    <ClCompile Include="..\..\src\planner_max.cpp" />
+    <ClCompile Include="..\..\src\planner.cpp" />
+    <ClCompile Include="..\..\src\planner_minimax.cpp" />
+    <ClCompile Include="..\..\src\planner_minimax_thread.cpp" />
+    <ClCompile Include="..\..\src\planner_random.cpp" />
+    <ClCompile Include="..\..\src\planner_stochastic.cpp" />
+    <ClCompile Include="..\..\src\ply.cpp" />
+    <ClCompile Include="..\..\src\signature.cpp" />
+    <ClCompile Include="..\..\src\transposition_table.cpp" />
+    <ClCompile Include="..\..\src\vertex.cpp" />
+    <ClCompile Include="plannerEvaluatorTest.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\inc\ability.h" />
+    <ClInclude Include="..\..\inc\agentMove.h" />
+    <ClInclude Include="..\..\inc\environment_nonvolatile.h" />
+    <ClInclude Include="..\..\inc\environment_possible.h" />
+    <ClInclude Include="..\..\inc\environment_volatile.h" />
+    <ClInclude Include="..\..\inc\evaluator.h" />
+    <ClInclude Include="..\..\inc\evaluator_network128.h" />
+    <ClInclude Include="..\..\inc\evaluator_network32.h" />
+    <ClInclude Include="..\..\inc\evaluator_network64.h" />
+    <ClInclude Include="..\..\inc\evaluator_random.h" />
+    <ClInclude Include="..\..\inc\evaluator_simple.h" />
+    <ClInclude Include="..\..\inc\evaluator_network16.h" />
+    <ClInclude Include="..\..\inc\experienceNet.h" />
+    <ClInclude Include="..\..\inc\evaluator_featureVector.h" />
+    <ClInclude Include="..\..\inc\game.h" />
+    <ClInclude Include="..\..\inc\item.h" />
+    <ClInclude Include="..\..\inc\move.h" />
+    <ClInclude Include="..\..\inc\move_nonvolatile.h" />
+    <ClInclude Include="..\..\inc\move_volatile.h" />
+    <ClInclude Include="..\..\inc\nature.h" />
+    <ClInclude Include="..\..\inc\neuralNet.h" />
+    <ClInclude Include="..\..\inc\orderHeuristic.h" />
+    <ClInclude Include="..\..\inc\orphan.h" />
+    <ClInclude Include="..\..\inc\otherMove.h" />
+    <ClInclude Include="..\..\inc\planner_directed.h" />
+    <ClInclude Include="..\..\inc\planner_human.h" />
+    <ClInclude Include="..\..\inc\planner_max.h" />
+    <ClInclude Include="..\..\inc\name.h" />
+    <ClInclude Include="..\..\inc\planner.h" />
+    <ClInclude Include="..\..\inc\planner_minimax.h" />
+    <ClInclude Include="..\..\inc\planner_minimax_thread.h" />
+    <ClInclude Include="..\..\inc\planner_random.h" />
+    <ClInclude Include="..\..\inc\pkai.h" />
+    <ClInclude Include="..\..\inc\pkCU.h" />
+    <ClInclude Include="..\..\inc\planner_stochastic.h" />
+    <ClInclude Include="..\..\inc\pluggable.h" />
+    <ClInclude Include="..\..\inc\pluggable_types.h" />
+    <ClInclude Include="..\..\inc\plugin.h" />
+    <ClInclude Include="..\..\inc\ply.h" />
+    <ClInclude Include="..\..\inc\pokedex.h" />
+    <ClInclude Include="..\..\inc\pokemon_base.h" />
+    <ClInclude Include="..\..\inc\pokemon_nonvolatile.h" />
+    <ClInclude Include="..\..\inc\pokemon_volatile.h" />
+    <ClInclude Include="..\..\inc\roulette.h" />
+    <ClInclude Include="..\..\inc\signature.h" />
+    <ClInclude Include="..\..\inc\team_volatile.h" />
+    <ClInclude Include="..\..\inc\transposition_table.h" />
+    <ClInclude Include="..\..\inc\type.h" />
+    <ClInclude Include="..\..\inc\vertex.h" />
+    <ClInclude Include="..\..\src\fixedpoint\fixed_class.h" />
+    <ClInclude Include="..\..\src\fixedpoint\fixed_func.h" />
+    <ClInclude Include="..\..\src\fixedpoint\fixsintab.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>Intel C++ Compiler XE 12.1</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>Intel C++ Compiler XE 12.1</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;PKAI_STATIC;GEN4_SCRIPTS_STATIC;_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;DOUBLEPRECISION;_DISABLEFINEGRAINEDLOCKING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(BOOST_ROOT)\lib\i686;$(SolutionDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>pkaiEngine_$(Configuration)_$(Platform).lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;PKAI_STATIC;GEN4_SCRIPTS_STATIC;NDEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;DOUBLEPRECISION;_DISABLEFINEGRAINEDLOCKING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <GenerateAlternateCodePaths>AVX</GenerateAlternateCodePaths>
+      <UseProcessorExtensions>HOST</UseProcessorExtensions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <Parallelization>false</Parallelization>
+      <UseIntelOptimizedHeaders>false</UseIntelOptimizedHeaders>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableEnhancedInstructionSet>AVX</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(BOOST_ROOT)\lib\i686;$(SolutionDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>pkaiEngine_$(Configuration)_$(Platform).lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,2 @@
+PKAIE0	soloTeamJ	1
+PKAIP0	RevengeHeatran	Heatran	100	Choice Scarf	0	Flash Fire	Naive	fire blast	earth power	dragon pulse	metal sound	31	31	31	31	31	31	0	252	0	4	252	0

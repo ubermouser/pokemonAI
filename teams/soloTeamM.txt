@@ -1,0 +1,2 @@
+PKAIE0	soloTeamM	1
+PKAIP0	fatBlissey	Blissey	100	Leftovers	1	Natural Cure	Bold	Aromatherapy	Softboiled	Seismic Toss	Toxic	31	31	31	31	31	31	0	0	252	0	4	252

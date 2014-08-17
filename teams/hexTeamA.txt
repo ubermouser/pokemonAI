@@ -1,0 +1,7 @@
+PKAIE0	hexTeamA	6
+PKAIP0	Machamp_AtkLead	Machamp	100	Lum Berry	0	No Guard	Adamant	DynamicPunch	Payback	Bullet Punch	Ice Punch	31	31	31	31	31	31	248	0	0	16	4	240
+PKAIP0	Gengar_SubSplit	Gengar	100	Life Orb	1	Levitate	Timid	Substitute	Pain Split	Shadow Ball	Focus Blast	31	31	31	31	31	31	0	252	4	0	252	0
+PKAIP0	Scizor_Swords	Scizor	100	Leftovers	0	Technician	Adamant	Swords Dance	Bullet Punch	Brick Break	Roost	31	31	31	31	31	31	252	0	0	0	252	4
+PKAIP0	Starmie_RapidSpin	Starmie	100	Life Orb	2	Natural Cure	Timid	Rapid Spin	Hydro Pump	Thunderbolt	Ice Beam	31	31	31	31	31	31	0	252	0	4	252	0
+PKAIP0	Dusknoir_Tank	Dusknoir	100	Leftovers	0	Pressure	Impish	Will-O-Wisp	Pain Split	Ice Punch	Earthquake	31	31	31	31	31	31	28	0	228	0	0	252
+PKAIP0	Blissey_Fatass	Blissey	100	Leftovers	1	Natural Cure	Bold	Aromatherapy	Softboiled	Seismic Toss	Toxic	31	31	31	31	31	31	0	0	252	0	4	252

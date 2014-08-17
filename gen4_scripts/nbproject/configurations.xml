@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="84">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <logicalFolder name="f1" displayName="engine" projectFiles="true">
+        <itemPath>../inc/ability.h</itemPath>
+        <itemPath>../inc/environment_nonvolatile.h</itemPath>
+        <itemPath>../inc/environment_possible.h</itemPath>
+        <itemPath>../inc/environment_volatile.h</itemPath>
+        <itemPath>../inc/item.h</itemPath>
+        <itemPath>../inc/move.h</itemPath>
+        <itemPath>../inc/move_nonvolatile.h</itemPath>
+        <itemPath>../inc/move_volatile.h</itemPath>
+        <itemPath>../inc/nature.h</itemPath>
+        <itemPath>../inc/pkCU.h</itemPath>
+        <itemPath>../inc/pluggable.h</itemPath>
+        <itemPath>../inc/pluggable_types.h</itemPath>
+        <itemPath>../inc/plugin.h</itemPath>
+        <itemPath>../inc/pokedex.h</itemPath>
+        <itemPath>../inc/pokemon_base.h</itemPath>
+        <itemPath>../inc/pokemon_nonvolatile.h</itemPath>
+        <itemPath>../inc/pokemon_volatile.h</itemPath>
+        <itemPath>../inc/team_nonvolatile.h</itemPath>
+        <itemPath>../inc/team_volatile.h</itemPath>
+        <itemPath>../inc/type.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f2" displayName="toolbox" projectFiles="true">
+        <itemPath>../inc/orphan.h</itemPath>
+      </logicalFolder>
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>../src/gen4_scripts.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceFolderFilter>^(nbproject|build|test|tests|ipch|plugins|x64|(shoddy.*)|(trainer.*))$</sourceFolderFilter>
+  <sourceRootList>
+    <Elem>../src</Elem>
+    <Elem>../inc</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="2">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>default</compilerSet>
+      </toolsSet>
+      <compileType>
+        <ccTool>
+          <preprocessorList>
+            <Elem>DOUBLEPRECISION</Elem>
+            <Elem>GEN4_SCRIPTS_EXPORTS</Elem>
+            <Elem>_LINUX</Elem>
+          </preprocessorList>
+        </ccTool>
+        <linkerTool>
+          <output>../plugins/libgen4_scripts.so</output>
+          <linkerAddLib>
+            <pElem>../dist/Debug/GNU-Linux-x86/</pElem>
+          </linkerAddLib>
+        </linkerTool>
+      </compileType>
+    </conf>
+    <conf name="Release" type="2">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>default</compilerSet>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+        </cTool>
+        <ccTool>
+          <developmentMode>6</developmentMode>
+          <commandLine>-mtune=native -march=native</commandLine>
+          <preprocessorList>
+            <Elem>DOUBLEPRECISION</Elem>
+            <Elem>GEN4_SCRIPTS_EXPORTS</Elem>
+            <Elem>NDEBUG</Elem>
+            <Elem>TOLUA_RELEASE</Elem>
+            <Elem>_LINUX</Elem>
+          </preprocessorList>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+        <linkerTool>
+          <output>../plugins/libgen4_scripts.so</output>
+          <linkerAddLib>
+            <pElem>../dist/Release/GNU-Linux-x86/</pElem>
+          </linkerAddLib>
+        </linkerTool>
+      </compileType>
+    </conf>
+  </confs>
+</configurationDescriptor>

@@ -1,0 +1,7 @@
+PKAIE0	hexTeamD	6
+PKAIP0	ROCKBOT	Azelf	100	Choice Scarf	0	Levitate	Naive	Stealth Rock	Explosion	Psychic	Trick	31	31	31	31	31	31	4	244	0	0	252	8
+PKAIP0	DRAGONBOT	Flygon	100	Choice Band	0	Natural Cure	Jolly	Earthquake	U-turn	Outrage	Dragon Claw	31	31	31	31	31	31	252	0	0	0	252	4
+PKAIP0	STARBOT	Starmie	100	Life Orb	2	Natural Cure	Timid	Rapid Spin	Ice Beam	Hydro Pump	Thunderbolt	31	31	31	31	31	31	0	252	0	0	252	4
+PKAIP0	HOTBOT	Heatran	100	Life Orb	0	Flash Fire	Timid	fire blast	earth power	explosion	hidden power	31	30	31	31	31	30	4	252	0	0	252	0
+PKAIP0	STOVEBOT	Rotom-H	100	Choice Scarf	2	Levitate	Timid	Trick	Overheat	Thunderbolt	Shadow Ball	31	31	31	31	31	31	0	216	0	0	252	40
+PKAIP0	KILLBOT	Scizor	100	Choice Band	0	Technician	Adamant	Bullet Punch	Superpower	U-turn	Pursuit	31	31	31	31	31	31	252	0	0	0	32	224

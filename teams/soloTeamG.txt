@@ -1,0 +1,2 @@
+PKAIE0	soloTeamG	1
+PKAIP0	Dusknoir	Dusknoir	100	Leftovers	0	Pressure	Impish	will-o-wisp	thunderpunch	ice punch	toxic	31	31	31	31	31	31	28	0	228	0	0	252

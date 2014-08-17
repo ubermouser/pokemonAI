@@ -1,0 +1,4 @@
+PKAIE0	triTeamC	3
+PKAIP0	sleepyRoserade	Roserade	100	Choice Scarf	1	Natural Cure	Timid	leaf storm	sludge bomb	sleep powder	double team	31	31	31	31	31	31	0	252	0	0	252	4
+PKAIP0	RevengeHeatran	Heatran	100	Choice Scarf	0	Flash Fire	Naive	fire blast	earth power	dragon pulse	metal sound	31	31	31	31	31	31	0	252	0	4	252	0
+PKAIP0	Machamp	Machamp	100	Lum Berry	0	No Guard	Adamant	bullet punch	dynamicpunch	payback	ice punch	31	31	31	31	31	31	248	0	0	16	4	240

@@ -1,0 +1,7 @@
+PKAIE0	AltayHunterTeam	6
+PKAIP0	Pawn	Ambipom	100	Silk Scarf	0	Technician	Jolly	Fake Out	Return	U-turn	Shadow Claw	31	31	31	31	31	31	252	0	0	4	252	0
+PKAIP0	Knight	Spiritomb	100	Choice Band	0	Pressure	Adamant	Will-o-Wisp	Sucker Punch	Pursuit	Trick	31	31	31	31	31	31	252	0	4	0	0	252
+PKAIP0	Bishop	Gyarados	100	Leftovers	0	Intimidate	Jolly	Dragon Dance	Taunt	Waterfall	Stone Edge	31	31	31	31	31	31	252	0	4	0	252	0
+PKAIP0	Rook	Flygon	100	Choice Scarf	0	Levitate	Adamant	Earthquake	Fire Blast	Outrage	U-turn	31	31	31	31	31	31	252	0	0	4	252	0
+PKAIP0	Queen	Starmie	100	Leftovers	2	Natural Cure	Timid	Rapid Spin	Recover	Surf	Thunderbolt	31	31	31	31	31	31	0	0	156	0	216	136
+PKAIP0	King	Scizor	100	Choice Band	0	Technician	Adamant	Bullet Punch	Superpower	U-turn	Pursuit	31	31	31	31	31	31	252	0	0	0	8	248

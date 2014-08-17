@@ -1,0 +1,2 @@
+PKAIE0	soloTeamB	1
+PKAIP0	LeadMachamp	Machamp	100	Lum Berry	0	No Guard	Adamant	Bullet Punch	DynamicPunch	Ice Punch	Payback	31	31	31	31	31	31	248	0	0	16	4	240

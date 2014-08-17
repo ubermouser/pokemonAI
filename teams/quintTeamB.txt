@@ -1,0 +1,6 @@
+PKAIE0	quintTeamB	5
+PKAIP0	SwordsDanceSZ	Scizor	100	Life Orb	0	Technician	Adamant	swords dance	bullet punch	brick break	bug bite	31	31	31	31	31	31	252	0	0	0	252	4
+PKAIP0	PorygonStriker	Porygon2	100	Choice Specs	2	Download	Modest	tri attack	agility	ice beam	signal beam	31	31	31	31	31	31	0	252	4	0	252	0
+PKAIP0	NastyPlotAzelf	Azelf	100	Life Orb	0	Levitate	Timid	nasty plot	psychic	flamethrower	u-turn	31	31	31	31	31	31	0	252	0	4	252	0
+PKAIP0	LeadMachamp	Machamp	100	Lum Berry	0	No Guard	Adamant	bullet punch	dig	facade	brick break	31	31	31	31	31	31	248	0	0	16	4	240
+PKAIP0	TankSwampert	Swampert	100	Choice Band	0	Torrent	Adamant	earthquake	ice punch	stone edge	waterfall	31	31	31	31	31	31	252	0	0	0	84	172

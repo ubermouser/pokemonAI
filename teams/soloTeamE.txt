@@ -1,0 +1,2 @@
+PKAIE0	soloTeamE	1
+PKAIP0	AgilityLucario	Lucario	100	Life Orb	1	Inner Focus	Adamant	agility	close combat	crunch	ice punch	31	31	31	31	31	31	252	0	0	4	252	0

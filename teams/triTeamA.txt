@@ -1,0 +1,4 @@
+PKAIE0	triTeamA	3
+PKAIP0	OffensiveDD	Dragonite	100	Life Orb	0	Inner Focus	Jolly	dragon dance	dragon claw	earthquake	extremespeed	31	31	31	31	31	31	252	0	4	0	252	0
+PKAIP0	Dusknoir	Dusknoir	100	Leftovers	0	Pressure	Impish	will-o-wisp	thunderpunch	ice punch	toxic	31	31	31	31	31	31	28	0	228	0	0	252
+PKAIP0	NastyPlotAzelf	Azelf	100	Life Orb	0	Levitate	Timid	nasty plot	psychic	flamethrower	u-turn	31	31	31	31	31	31	0	252	0	4	252	0

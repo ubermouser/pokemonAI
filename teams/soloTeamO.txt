@@ -1,0 +1,2 @@
+PKAIE0	soloTeamO	1
+PKAIP0	defenseForretress	Forretress	100	Leftovers	1	Sturdy	Relaxed	Stealth Rock	Toxic Spikes	Rapid Spin	Explosion	31	31	31	31	31	31	112	0	144	0	0	252

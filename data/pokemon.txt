@@ -1,0 +1,398 @@
+Purposes:
+	orderHeuristic:
+		collects statistics on which pokemon moves are most often used / most effective against various other pokemon
+		modifies move ordering used in ply and agentMove for greater pruning performance
+	transposition_table:
+		stores and recalls important game positions from memory
+		collects statistics on which game positions are more important than others
+		deletes stored game positions in order of importance when memory usage is too extreme
+	environment_possible:
+		represents an environment_volatile with a probability of occurence
+		includes status of environment_volatile to hint at what transition occured
+	environment_volatile:
+		all values that may change during combat in a team fight
+	team_volatile:
+		all in-combat values of a specific team in a team fight
+		includes values which do not transfer when a pokemon switches
+	pokemon_volatile:
+		all in-combat values of a specific pokemon in a team fight
+	move_volatile:
+		all in-combat values of a specific move in a team fight
+	environment_nonvolatile:
+		all in-combat values the user may configure but may not change during combat
+	team_nonvolatile:
+		all out of combat values of a specific team in a team fight
+	pokemon_nonvolatile:
+		all out of combat values of a specific pokemon in a team fight
+	move_nonvolatile:
+		all out of combat values of a specific move in a team fight
+	pluggable:
+		defines an interface for passing extensible behavior to pkCU
+	move:
+		describes a given pokemon move. Loads all of a pokemon move's scripts
+	pokemon_base:
+		describes a given pokemon's predefined attributes - moves allowed, sexes allowed, physical stats, etc
+	ability:
+		describes a pokemon's ability. Mostly used as a script holder
+	type:
+		describes a pokemon's type - an array of modifiers to other types
+	team_ranked:
+		consists of a team_nonvolatile, values important for that team's evaluation function and metrics used for that team's ranking
+	neuralNet_ranked:
+		consists of a neuralNet, values important to improving that network's performance over time
+	action:
+		the behavior a given team will perform at a given ply, Also includes target. Double and triple battles pass multiple actions per team to pkCU
+	game:
+		driver for running matches between pokemon teams with different evaluation functions and planners.
+	planner:
+		polymorphic base class. Determines which move best maximizes the fitness of a given team at a given environment_volatile
+	max_planner:
+		performs expectimax with alpha pruning(?) from a given state to a maximum ply depth of 1. Requires an evaluator
+	minimax_planner:
+		performs expectiminimax with star pruning from a given state to an arbitrary depth defined in its configuration. Includes transposition table, move ordering, multithreaded search. Minimum ply depth is "0", maximum is 62, but only in multiples of 2. Requires an evaluator
+	random_planner:
+		enumerates all possible valid actions from a given state, then chooses one at random
+	human_planner:
+		a pass-through planner, allows human input for move selection
+	evaluator:
+		polymorphic base class. Evaluates a given position. Returns a probability of a given team winning and a likely move that the agents will perform
+	neuralNetworkEvaluator
+		128 neuron neural net evaluator. Requires a network be passed to it on creation
+	simpleEvaluator
+		returns weighted piece value total as fitness. May play defensively (weighted towards friendly team), offensively (weighted towards enemy team), or reactively (equal weight)
+	randomEvaluator
+		returns a random number from 0 to 1 as fitness
+	trainer:
+		attempts to generate new team_ranked objects which might improve on the trueskill of existing ones
+		determine the "trueskill" of team_ranked objects via matchmaking against other team_ranked objects
+		maintain a population of team_ranked objects based on fitness as "trueskill"
+		
+
+compile-time defines:
+	NDEBUG :
+		removes ALL fine-grained debugging code
+		sanity checking of transposition table hashes
+	DOUBLEPRECISION :
+		replaces all internal floating point container formats with 64 bit doubles instead of 32 bit floats
+	_DISABLESCRIPTS :
+		removes LUA initialization code
+	_DISABLEPLUGINS :
+		removes all plugin handlers
+	_DISABLETIGHTBOUNDS : 
+		disables multilayer probabilistic alpha-beta-gamma pruning (single layer alpha-beta max)
+	_DISABLETTABLE :
+		disables transposition table
+	_DISABLEHISTORYHEURISTIC :
+		prevents engine from incrementing order heuristic upon cutoff
+	_DISABLEBUTTERFLYHEURISTIC :
+		prevents engine from incrementing order heuristic upon visit
+	_DISABLEORDERHEURISTIC :
+		prevents any changes to the move ordering from occuring after initialization (usually in the order 0, 1, 2, 3, ...)
+	_DISABLEPROBABILITYCHECK :
+		when in debug mode, disables a check which assures that the total probility returned from PKCU / planner is around 1.0. There are cases where this check will return false if epsilon is too small, or there are a LARGE number of states returned (12+)
+	_USEFNVHASH :
+		replaces the much faster murmurhash 3 hash with the free for use fnv hash algorithm in all usages
+	_USEMURMURHASH2 :
+		replaced murmurhash 3 with murmurhash 2 -- murmurhash 2 64 bit for x64 might have had a mixing problem, so was replaced
+	_HTSTORESIGNATURE :
+		stores much larger environment_volatile object within transposition table, performs comparisons with this object as well. Used for finding hash collisions. 
+		WARNING: THIS WILL RUIN CACHE ALIGNMENT
+	_PKCUCHECKSIGNATURE :
+		performs bitwise comparison on all environments returned by PKCU
+	_HTCOLLECTSTATISTICS :
+		collects statistics about the transposition table while in action - number of probes and stores, probe hits, how many nodes and of what types are stored
+	_DISABLEFINEGRAINEDLOCKING :
+		disables locking mechanisms in ply, agent, other
+	_ALLOWINVALIDTEAMS :
+		disables sanity checking for created team input via file. So long as they reference, they work
+Features to implement as of 5/1/2012:
+	bool takeownership - when passed polymorphic type, true implies create clone, false implies copy pointer
+	pokemon library that excludes ubers
+	action and action_packed class - a pokemon's given move
+	pkCU produces vector of possible moves, agents do not attempt to test all possible moves exhaustively
+	roulette - support for larger numbers
+	nonvolatile status type immunities
+	redesign minimax_planner
+	remove fpType
+	all outputs that use verbose go to std::cout; all outputs that use warning go to std::cerr. The two verbose tags should be separate warning: ERR/WAR/INF. verbose: runtime data, clog
+	FP_EPSILON may be too large (engine is producing acceptable values with probabilities less than 1.0e-8) (or use a 64 bit fixed point value?)
+Current bugs, features to implement:
+	general:
+?		replace probability and fitness floating point values with a fixed point value, as they're bounded from 0 to 1? -- chose signed Q2.30, but could probably go with Q1.31 or Q0.32 if not accurate enough. Only changed in memory critical section, transposition table
+		can we implement aspiraton search or MTD-f? -- search must be stabler along with tNode being able to detect when it caches a fully evaluated tree. How does one write multi-threaded MTD-f? -- search can now detect when it caches a fully evaluated tree
+?		replace all usages of datatypes other than size_t for iteration with size_t, and if possible replace with iterators
+		replace usage of stdint.h and x_MAX datatypes with the <limits> equivalent
+		enumerated types instead of define arrays in pkai.h
+		boost_foreach instead of most for loops
+		support for generation 1 (red / blue)
+		support for generation 4 (heartgold / soulsilver)
+		support for generation 5 (black, white)
+		what are "yomi layers" and how can they benefit the project?
+		Can pkai perform any opponent modeling?
+		support for partial information games
+	ply:
+		codesize of ply / agent / other needs to shrink, too many bugs
+		don't consider moves with a delay and no immediate affect at the lower search depths OR - never consider a partial state to be a leaf node, even when that leaf node is on the horizon. Continue evaluating until a "resting" or full state is reached
+		cycle detection - prevent redundant switches? -- maximum n unforced switches without damage in a row?
+?		children arrays of agent/ply nodes should reserve their size to average branching factor? -- reserved to some branching factor, not sure about average...
+		why cant an agent predict the behavior of another agent? -- HOW WELL can an agent predict the behavior of another agent?
+		If a move of priority x was preempted 100% of the time by another in ply y, do not evaluate any move whose priority is lower than priority x, as the lower priority move is guaranteed to be preempted as well
+?		(!!!) depth pruning - initial alpha-beta pruning, when started at a null window, will gradually increase in size to the point where the initial pruning bounds are nonexistent. Can we start with an impossible window, where alpha > beta, and still get plausible results at the apparent depth of the solution? -- window shrinks normally with pruning? Window now propagated as a datatype and not as a recursive call
+		above is called STAR algorithm - Ballard
+	max_planner:
+		
+	minimax_planner:
+		don't allow agent to switch or use the same move x times in a row unless they absolutely have to
+		detect if move returned from search is invalid, and if so, delete transposition table and redo the search. No code in release builds exists to determine if a potential ttable max exhibits type 1 key collisions
+		Can the fitness function provide a guess as to the best move? -- this would only serve to increase the power of move-ordering. Make it so! -- and decrease raw performance for dubious gain
+		should planner identify partial matches at root nodes as solutions, and skip to a depth greater than the tNode partial match?
+		out of bounds exception if no evaluation is returned before time limit. A valid move should always be returned, regardless of time parameter
+	game:
+		load all teams in a directory at startup, select team for players/agents via ini
+		somehow possible for a pokemon not to contribute to a match it lost, why? -- if a pokemon dies immediately upon switching in. Temporary solution does not count lead pokemon's contribution as being a lead if it immediately switches out
+		should pokemon be weighted on how "lucky" they were? A string of lucky moves may produce a very high or low performing pokemon -- how lucky is a regularly lucky pokemon?
+		pokemon who score similarly should have their ranks tied
+		pokemon scoring:
+			predicted fitnesses may be fallible, weight both agent and other fitness calculation together?
+x			possible out of bounds exception if no evaluation is returned from planner
+		draw / stalemate:
+			teams awarded points in measure to how likely they were to win at end of match?
+		tie:
+x			if both teams are reduced to 0 active pokemon at the end of a turn
+			teams awarded 0.5 points each?
+	orderHeuristic:
+		seed highest damage multiplier move first? -- a better decision: evaluation function returns best possible move for agent, and likely refuting move for other
+		switch moves always worse than damage moves?
+		should the table be zeroed before the start of every search?
+	transpositionTable:
+		Should we modulo the 22 bit remainder hash into the 20 bit space for 256mb hash table sizes?
+		is saving the probability with the fitness absolutely necessary? Can it be emulated with fail-high, fail-low, exact value status bits?
+		(quirk) tnode replacement strategy may replace a fully evaluated tree with no possibility of greater depth evaluation with a partially evaluated tree of greater depth
+		(quirk) It's possible for a solution returned to be bounded, as in - have a probability greater than 0 and not be fully evaluated, yet still be evaluated to cutoff. This is because at current, a transposition node guess at level n + 1 has a higher priority than a fully evaluated node at level n.
+	pkCU:
+		moves with no damage component cannot miss! 
+		damage calculation rounding errors
+		move restriction
+x		pkCU allows for variable accuracy - final state determination should use maximum accuracy even if predictor does not (won't this drastically change the usefulness of the transposition table?)
+		pkCU - use iterators for std vector, they're faster than at and []  -- of form 	for(size_t i = 0, size = vs.size(); i != size; ++i)
+		if we can't generate all 16 damage possibilities, can we generate the percentage that will cause a death and the percentage that will not separately?
+		Is it useful to calculate the probability of states that will occur less than e-4 of the time? Even if calculated last, very low probability PV nodes could possibly be skipped
+		pkCU should return an array (vector?) of valid actions
+	environment_possible:
+?		speed up or replace hash function with something faster -- replaced fnv with murmur2_x64 -- can we replace with something faster? -- replaced with murmur3, but not much faster
+	team_volatile:
+		union for global environmental conditions? TEAM_A contains some values, TEAM_B contains others
+		if necessary to bitpack further, boosts only requires 22 of its total 32 bits for representation
+		is there any need for a critical hit boost array? Only one move affects +crit boost, and may only occur once
+		is there any need for the 4 bits of abilityScratch (slow start) anymore? Can itemScratch be cannibalized too? (choice items, metronome)
+		11 bits unused in pokemon_nonvolatile - pointer to extended datatype?
+	pokemon_base:
+		store minimum level a given pokemon could exist (what level it evolves at)
+		store pokemon capable of evolving from and to target pokemon
+		store level at which a given move becomes available to target pokemon for leagues of lower levels
+		store what genders are acceptable for a given pokemon
+x		do not assert a hardware limit to the number of acceptable abilities pokemon can have (B/W allows 3 or more)
+	move:
+		store whether move makes contact, is affected by protect, magic coat / magic bounce, snatch, king's rock, targets the move may accept
+	pkIO:
+x		input lua scripts automatically from a scripts folder, subfolders "moves" "items" "abilities", scripts named after name of move/item/ability -- LUA to be removed from project as of version 370
+			each file.lua contains module of its script's name, functions by name of when they are called
+		find a way to sort movelist-moves before adding them to the array, or perform full O(N^2) search on them. Excel doesn't sort strings the same way C++ std lib does
+		move input library functions to their respective classes - move, pokemon_base, ability, item
+		movelist input is very slow (in debug mode) because of many hundreds of tokenize calls - is there some way we can speed this up?
+		broke team_input orphan error reporting in 359, fix regression
+x		inputTeam should not allow input to accept orphan moves, orphan abilities or orphan items, but instead force to no ability, no item, no move. Error out if the pokemon has no moves? -- don't error out if pokemon has no moves, because every pokemon implements struggle
+		replace ini file and command-line input with boost::program_options?
+	moves:
+x		sort movelists so isLegalSet and the like can quickly determine if a move exists within them
+	types:
+		will require a special sort function, as it's doubly indexed
+	roulette:
+		partition function should perform as many random values as there are doubles between 0 and 1 (2^52?)
+	pokemonAI:
+x		assure sorted libraries in library with std algorithms.h in init
+		assure no duplicates in library with std algorithms.h in init
+		redundant verbose and warning tags?
+x		lowercase all libraries for a-Z sorting
+	move_volatile:
+		PPcurrent only requires 6 bits, bitpack extra status into remaining 2 bits?
+	environment_nonvolatile:
+		store stage type enum
+	pokemon_volatile:
+x		change name of status condition getters / setters to status ailment
+		format of get/set ailments: pass in bitmask, return value of status within that bitmask
+x		convert boosts array of int8_t to bitpacked array of int4_t, remove HP boost (32 bits total down from 72). This won't reduce the size of pokemon_volatile (I think) but will allow for more status enums
+x		HPcurrent only needs 9 bits, use remaining 7 for bitpacked additional status? Bitpack item ID into HPCurrent? (only 100 items and a sentinel) -- HPCurrent needs 10 bits, Blissey can get REALLY fat. Maximum HP should be ~700 or something -- bitpack nonvolatile status into HPCurrent? 5 bits needed
+	pokemon_nonvolatile:
+?		rounding errors up to 0.0001 when dealing with extreme accuracies and evasions? -- haven't seen accumulator errors in awhile as of version 370 -- accumulator errors still exist when dealing with a large number of stack vars
+		FV_Accuracy, FV_evasion and FV_critical should be simple fixed point 16 bits wide?
+	state_evaluation:
+		train SVM instead of neural network?
+		use RPROP to train neural network instead of backpropagation? -- Multithreaded -- not necessary, considering the speed of backprop
+		Monte Carlo + random search of tree to generate evaluation function? -- creating board position evaluations with monte carlo random walk method not practical, according to paper. Need 1000+ random walks per board position
+		Features for neural network:
+			indexed environment_nonvolatile and bitwise environment_volatile? -- MUCH too large. 64 neurons in input layer max until better optimization can be made
+?		all values passed into the neural network MUST be normalized from 0..1. This is not an option -- values normalized, but some of their ranges are quite large
+	neuralNet:
+x		initial performance is very poor - consider replacing with FANN? (includes openCL bindings) -- opencl overhead may be too great for such small neural networks -- networks are now MUCH larger than before, re-consider replacing with openCL/cuda bindings?
+		find a way to determine network weight array size before writing network to memory? Topology should define network size
+	backpropNet:
+		momentum should not have an effect unless the error has the same sign as the momentum value?
+	experienceNet:
+		use of gaussian distribution is a performance bottleneck
+		trilinear interpolation instead of bilinear?
+	neuralNetworkEvaluator:
+		can nne launch an instance of pkcu, perform given moves on a base environment, then determine their lower bound damage from the pkcu evaluation? (would allow better support for scripted moves)
+?		order of pokemon in team is order of the amount of damage they can deal to enemy team? (5 - lowest priority, 1 - highest priority, 0 - active)
+		can move classification be added to feature vector? isDamage, isHeal, isBuff, isDebuff, isEnvironment, etc...
+		typeCoverage feature - how redundant is this to bestDamage?
+		interaction between teammates alive and damage - should the best damage to a dead pokemon be 0, 1, or something in between?
+		best features:
+			bestDamage (improvement: scale based on remaining HP instead of total HP?)
+			percentHP (improvement: remove .1 bias for living pokemon?)
+?			damagingStatus (improvement: scale by amount of HP removed per turn, to a max of .5?)
+			entryHazard
+		poor features:
+			speed (improvement: normalize speed? 0 is lowest speed of set of 12, report relative speed?
+			volatileStatus
+			bestDamage of low priority pokemon
+		16 neuron:
+			x6 %hp
+			x1 nonvolatile status
+			x1 volatile status
+		32 neuron:
+			x6 %hp
+			x6 lower bound % damage against current
+			x1 nonvolatile status
+			x1 volatile status
+			x1 entryHazard
+			x1 accuracy of attack
+			CHECK FOR BUGS
+		64 neuron:
+			x6 %hp
+			x6 damaging nonvolatile status
+			x6 debilitating nonvolatile status
+			x6 sleeping nonvolatile status
+			x6 lower bound % damage against current
+			x1 volatile status
+			x1 entry hazard
+		128 neuron:
+			x6 %hp
+			x6 damaging nonvolatile status
+			x6 debilitating nonvolatile status
+			x6 sleeping nonvolatile status
+			x36 lower bound % damage
+			x1 faster than enemy
+			x1 accuracy of attack
+			x1 volatile status
+			x1 entry hazard
+	signature:
+x		implement smhasher3 / murmurhash3 as alternative to FNV and murmurhash2
+	trainer:
+		how to detect networks which are no longer learning? (very low MSE compared to normal networks, which are usually at .01+ and normally around .03-.04)
+		reset all ratings command-line hook
+		allow seeding of arbitrary evaluation functions based on pkIO input
+		sometimes updates only n-1 of n teams in long runs! WHAT'S GOING ON
+		add more data to rank update output in minimal mode?
+x		rank teams based upon their actual mean fitness instead of rank? -- not rank, but affects all genetic functions now
+		why do some teams get an order of magnitude more games in compared to others?
+		all unranked teams must play at least n games before being marked for deletion?
+x		since duels between single pokemon are MUCH faster, why not start by making a single pokemon tier, upgrading the top % to double pokemon tier, upgrading the top % to a triple tier, and so on? -- the initial fear of only pokemon being good at singles tier making it to other tiers is still very real. Also, possible that training networks on single battles not a good idea
+		pokemon teams undergo lamarckian evolution? - Use it more, becomes strengthened (maxmize EV/IV of move's or quality's requisite stat).. use it less, becomes weakened (more likely to replace with a new move) -- how would this work for pokemon that copy other moves?
+		extinction events? n% of elements within euclidian distance of N of target team are purged
+?		new fitness function: likelihood that an observed team has a rank less than the median rank? -- first function looks kind of like a sigmoid.. use sqrt(mean skill) + 1 instead?
+x		selection for heat games: power function instead of linear
+		should teammates receive less of a rating change for single matches as opposed to team matches? (less representative of the real game)
+		when combining populations, determine correspondence between populations by playing games of league vs league, weight fitness by result? -- preliminary games are played, but population is pruned before correspondence is generated
+		hybrid genetic algorithm implementing local search simulated annealing as well?
+x		rank pokemon in team by change in fitness / turn?
+		allow player / team to rank his or herself in relation to the AI league?
+		leaderboard:
+x			leaderboard score = mean - 3 * variability (99.7% team is better than this value)
+x		win: skill levels diverge, draw/tie: skill levels converge
+?			all subset and superset teams of that winning team also receive an update to their realskill (in accordance to rank and participation) -- participation and rank not accounted for yet
+			weight increases / decreases in skill by the amount of participation by the team member
+			blame distributed by the rank of the team member -- not done in classic trueskill!
+		creation:
+			single pokemon:
+x				random generation of new pokemon
+x					given default trueskill
+				genetic modification of existing pokemon
+					given modified pokemon's trueskill + variability constant -- will this abnormally grow the system? -- YES! Give default trueskill?
+			teams of pokemon:
+x				randomly combine smaller teams of pokemon, weighting towards selections of higher skill
+?				given aggregate of team trueskills -- not weighted for team size yet
+x				genetic modification of existing team (replace a pokemon or set of pokemon, change lead)
+					given modified team's trueskill + variability constant, weighted toward lead
+x		allow teams to face teams of different leagues if their trueskill is very high / very low? Or more importantly, if no matches exist in the current league
+	neuralNet_ranked:
+x		scale neuralnet's trueskill with the size of the team it's linked to -- or don't scale anything at all?
+		detect stagnant neuralNets and jitter them?
+		add prediction accuracy and predictability metrics
+	team_ranked:
+x		include participation, average rank in team_ranked dataset -- average rank in the form of rankpoints. More rankpoints = better average performance, weighted for larger games
+x		score of a team is based on trueskill algorithm
+?		on update: update performance of all team_ranked teams that can be made from the current team_ranked as well -- not sure this is a good idea -- how can this be done in such a way that a team's fitness does not scale wildly out of control?
+x		frequency of using a given move per pokemon
+x		number of plies a given pokemon has been in use 
+		createRandom_single will simply produce an exception instead of trying again when the pokemon chosen is invalid (doesn't have any moves)
+		weight negatively teams that take too long to battle? (or draw too often)
+		negatively weight teams which are too genetically similar to other teams?
+		probability of changing species too low for mutation, and crossover doesn't allow the possibility of species mutation -- increased mutation species change probability
+x		move ALL genetic algorithm methods to a new static file, genetic.cpp and genetic.h?
+	trueSkill:
+x		update recursively all teammates that took part within a match -- doesn't take into account participation and blame
+		feather function may not be adding enough of a feather -- no functions perform feather now, handle via trueskill algorithm? -- problem of very well ranked teams in lower divisions suddenly gaining top rank in upper divisions
+		can we modify variables v, w, and c such that we can calculate their effect based on the number of players in the team? (CHECK FACTOR GRAPH)
+x		participation and rank currently unused! -- trueskill algorithm as designed doesn't take rank into account at all, only win / loss / tie -- now takes into account contribution
+		mean trueSkill of entire population shifts oddly over time when no elements with default trueSkill are seeded to the population (this has only happened once so far) -- impose hard upper and lower bound limits on trueSkill?
+	plugin performance:
+		replace remaining tolua hooks with dub? https://github.com/lubyk/dub gaspard bucher, gaspard@teti.ch
+		lua: print all global members: for n,v in pairs(_G) do print (n,v); end
+		view symbols of an exe or dll: DUMPBIN.EXE /EXPORTS <file>
+		view symbols of a linux exe or .so: nm -gC <file>
+		c++filt <symbol> -- turn a symbol into readable plaintext
+	pkai_gen:
+		to use: 
+			./dist/Release/GNU-Linux-x86/pokemonai "networkLayers 128 160 48 32 1" "networkDirectory networksx"; mv ./networksx/* ./networks1/
+		to scan directory for network sizes:
+			grep -iP "^(16|32|64|128)\t[0-9]" networks1/*
+	gen4_pokemon:
+		Gyratina-O must have the Griseous orb to be a valid pokemon
+	gen4_moves:
+		primary accuracy and secondary accuracy may be being interpreted incorrectly
+		secret power type seems to be set to grass / tall grass, is this correct?
+		Wormadan-S has no movelist (exclude pokemon with no movelist?) -- excluded
+	gen4_scripts:
+		is pkCU wrongly resetting statuses to their full values when restatusing a pokemon with the same status? (e.g.: if asleep for 3 turns, reset to 0 turns)
+		roost does not produce a weakness to ground
+		pokemon who have type immunity to a status effect's move are immune to that move's status effect?
+			steel/poison: poison/poison toxic 
+			ground: paralysis
+			ice: freeze
+			fire: burn
+		move plugins should be move specific - if a move plugin is called, it should be guaranteed that that move is the current move -- adding extra plugin arrays for this may take too much memory
+		pokemon hurt its self due to confusion is implemented incorrectly, doesn't subtract correct damage
+		high priority implement objects:
+			moves:
+				substitute
+				fake out
+				uturn
+				sucker punch
+				pursuit
+				trick
+				taunt
+				earthquake
+				outrage
+				roar/whirlwind
+				rest
+				sleep talk
+			abilities:
+				pressure
+				intimidate
+?				natural cure
+				synchronize
+			items:
+x				silk scarf
+				choice band
+				choice scarf

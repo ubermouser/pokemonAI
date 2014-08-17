@@ -1,0 +1,2 @@
+PKAIE0	soloTeamI	1
+PKAIP0	PorygonStriker	Porygon2	100	Choice Specs	2	Download	Modest	tri attack	agility	ice beam	signal beam	31	31	31	31	31	31	0	252	4	0	252	0

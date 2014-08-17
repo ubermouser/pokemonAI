@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\trainer">
+      <UniqueIdentifier>{20260a97-9833-4dfa-b6e9-a64573b8d801}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\trainer\ranked">
+      <UniqueIdentifier>{4c57d4c3-7769-4cfa-91ea-7e8c032a7489}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\toolbox">
+      <UniqueIdentifier>{b812e74c-c45e-4036-be15-27b9882e378a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\evaluators">
+      <UniqueIdentifier>{d458c8e8-80e8-4e1a-b180-74d013e19d86}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="printRankedObjects.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\trueSkill.cpp">
+      <Filter>Source Files\trainer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ranked.cpp">
+      <Filter>Source Files\trainer\ranked</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\init_toolbox.cpp">
+      <Filter>Source Files\toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\evaluator_simple.cpp">
+      <Filter>Source Files\evaluators</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\inc\pkai.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

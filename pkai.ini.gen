@@ -1,0 +1,58 @@
+# pkai gen - generates a random set of networks via the trainer then exits immediately
+
+verbose 6
+#network builder variables here:
+#
+#
+#networkPopulation: (default 20)
+#	how many networks to generate
+networkPopulation 2
+#networkDirectory: (no default)
+#	the directory pokemonAI will load and save trained networks to
+networkDirectory ../pkData/networksx
+#networkLayers: (no default)
+#	then number of neurons (including input and output) each hidden layer of generated neural networks will have.
+#	Define additional by specifying more numbers, e.g. "96 64 1" or "128 96 64 1".
+networkLayers 128 192 96 1
+
+#trueSkill variables here:
+#
+#
+trueskill_initialMean 25
+trueskill_initialStdDev 8.333
+trueskill_dPerformance 4.166
+trueskill_drawProbability 0.10
+trueskill_dynamicsFactor 0.08333
+
+srand time
+
+movesInput data/gen4_moves.txt
+naturesInput data/gen4_natures.txt
+typesInput data/gen4_types.txt
+itemsInput data/gen4_items.txt
+abilitiesInput data/gen4_abilities.txt
+pokemonInput data/gen4_pokemon.txt
+movelistInput data/gen4_movelist.txt
+pluginInput plugins
+
+maxMatches 1
+maxPlies 1
+
+#genetic algorithm / team builder variables here:
+#
+#
+minimumWorkTime 0
+writeOutInterval 0
+maxGenerations 1
+
+teamPopulations 2 0 0 0 0 0
+
+learningRate 0.0
+learningMomentum 0.00
+jitterSize 0.25
+
+#the type of game we wish to play:
+# 12 - do not start a game, instead attempt to evolve new evaluation networks
+gameType 12
+
+verbose 0

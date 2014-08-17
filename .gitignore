@@ -212,3 +212,6 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
+
+# User-defined -- Other repositories:
+.svn/

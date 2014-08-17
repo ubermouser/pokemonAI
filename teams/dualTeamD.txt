@@ -1,0 +1,3 @@
+PKAIE0	dualTeamD	2
+PKAIP0	EvilGengar	Gengar	100	Life Orb	0	Levitate	Timid	shadow ball	focus blast	thunderbolt	icy wind	31	31	31	31	31	31	0	252	4	0	252	0
+PKAIP0	PorygonStriker	Porygon2	100	Choice Specs	2	Download	Modest	tri attack	agility	ice beam	signal beam	31	31	31	31	31	31	0	252	4	0	252	0

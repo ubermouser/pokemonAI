@@ -1,0 +1,99 @@
+PKAII	97			Natural Gift			
+Name	Fling Power	Type Boosted	Pokemon Affected	Power	Type	Type Resisted	Script
+Adamant Orb	60	---	Dialga	---	---	---	YES
+Aguav Berry	10	---	---	60	Dragon	---	YES
+Apicot Berry	10	---	---	80	Ground	---	YES
+Berry Juice	30	---	---	---	---	---	YES
+Big Root	10	---	---	---	---	---	YES
+Black Belt	30	Fighting	---	---	---	---	---
+Black Sludge	30	---	---	---	---	---	YES
+BlackGlasses	30	Dark	---	---	---	---	---
+Brightpowder	10	---	---	---	---	---	YES
+Charti Berry	10	---	---	60	Rock	Rock	---
+Cheri Berry	10	---	---	60	Fire	---	YES
+Chesto Berry	10	---	---	60	Water	---	YES
+Chilan Berry	10	---	---	60	Normal	Normal	---
+Choice Band	10	---	---	---	---	---	YES
+Choice Scarf	10	---	---	---	---	---	YES
+Choice Specs	10	---	---	---	---	---	YES
+Chople Berry	10	---	---	60	Fighting	Fighting	---
+Colbur Berry	10	---	---	60	Dark	Dark	---
+Damp Rock	60	---	---	---	---	---	YES
+Deepseascale	30	---	Clamperl	---	---	---	YES
+Deepseatooth	90	---	Clamperl	---	---	---	YES
+Destiny Knot	10	---	---	---	---	---	YES
+Draco Plate	90	Dragon	---	---	---	---	---
+Earth Plate	90	Ground	---	---	---	---	---
+Expert Belt	10	---	---	---	---	---	YES
+Fist Plate	90	Fighting	---	---	---	---	---
+Flame Orb	30	---	---	---	---	---	YES
+Flame Plate	90	Fire	---	---	---	---	---
+Focus Band	10	---	---	---	---	---	YES
+Focus Sash	10	---	---	---	---	---	YES
+Ganlon Berry	10	---	---	80	Ice	---	YES
+Grip Claw	90	---	---	---	---	---	YES
+Haban Berry	10	---	---	60	Dragon	Dragon	---
+Heat Rock	60	---	---	---	---	---	YES
+Icicle Plate	90	Ice	---	---	---	---	---
+Icy Rock	40	---	---	---	---	---	YES
+Iron Ball	130	---	---	---	---	---	YES
+Iron Plate	90	Steel	---	---	---	---	---
+Jaboca Berry	10	---	---	80	Dragon	---	YES
+Kasib Berry	10	---	---	60	Ghost	Ghost	---
+King's Rock	30	---	---	---	---	---	YES
+Lansat Berry	10	---	---	80	Flying	---	YES
+Lax Incense	10	---	---	---	---	---	YES
+Leftovers	10	---	---	---	---	---	YES
+Liechi Berry	10	---	---	80	Grass	---	YES
+Life Orb	30	---	---	---	---	---	YES
+Light Ball	30	---	Pikachu	---	---	---	YES
+Light Clay	30	---	---	---	---	---	YES
+Lucky Punch	40	---	---	---	---	---	YES
+Lum Berry	10	---	---	60	Flying	---	YES
+Lustrous Orb	60	---	Palkia	---	---	---	YES
+Macho Brace	60	---	---	---	---	---	YES
+Magnet	30	Electric	---	---	---	---	---
+Mago Berry	10	---	---	60	Ghost	---	YES
+Metal Coat	30	Steel	---	---	---	---	---
+Metronome	30	---	---	---	---	---	YES
+Muscle Band	10	---	---	---	---	---	YES
+Mystic Water	30	Water	---	---	---	---	---
+Occa Berry	10	---	---	60	Fire	Fire	---
+Oran Berry	10	---	---	60	Poison	---	YES
+Passho Berry	10	---	---	60	Water	Water	---
+Pecha Berry	10	---	---	60	Electric	---	YES
+Petaya Berry	10	---	---	80	Poison	---	YES
+Poison Barb	70	Poison	---	---	---	---	---
+Pure Incense	10	---	---	---	---	---	YES
+Quick Powder	10	---	Ditto	---	---	---	YES
+Rawst Berry	10	---	---	60	Grass	---	YES
+Razor Claw	80	---	---	---	---	---	YES
+Rindo Berry	10	---	---	60	Grass	Grass	---
+Salac Berry	10	---	---	80	Fighting	---	YES
+Scope Lens	30	---	---	---	---	---	YES
+Sea Incense	10	Water	---	---	---	---	---
+Sharp Beak	50	Flying	---	---	---	---	---
+Shed Shell	10	---	---	---	---	---	YES
+Shell Bell	30	---	---	---	---	---	YES
+Shuca Berry	10	---	---	60	Ground	Ground	---
+Silk Scarf	10	Normal	---	---	---	---	---
+Silverpowder	10	Bug	---	---	---	---	---
+Sitrus Berry	10	---	---	60	Psychic	---	YES
+Sky Plate	90	Flying	---	---	---	---	---
+Smooth Rock	10	---	---	---	---	---	YES
+Soft Sand	10	Ground	---	---	---	---	---
+Soul Dew	30	---	Latios / Latias	---	---	---	YES
+Spell Tag	30	Ghost	---	---	---	---	---
+Splash Plate	90	Water	---	---	---	---	---
+Stick	60	---	Farfetch'd	---	---	---	YES
+Sticky Barb	80	---	---	---	---	---	YES
+Stone Plate	90	Rock	---	---	---	---	---
+Thick Club	90	---	Cubone / Marowak	---	---	---	YES
+Toxic Orb	30	---	---	---	---	---	YES
+Toxic Plate	90	Poison	---	---	---	---	---
+Twisted Spoon	---	---	---	---	---	---	YES
+Wave Incense	10	Water	---	---	---	---	---
+Wide Lens	10	---	---	---	---	---	YES
+Wise Glasses	10	---	---	---	---	---	YES
+Yache Berry	10	---	---	60	Ice	Ice	---
+Zap Plate	90	Electric	---	---	---	---	---

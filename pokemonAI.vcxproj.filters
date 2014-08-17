@@ -1,0 +1,389 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Source Files\evaluators">
+      <UniqueIdentifier>{f5d32716-3d4e-454c-a464-d93170df49b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\engine">
+      <UniqueIdentifier>{b86d9744-bf8e-43b4-ba67-2e50d141d0b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\evaluators">
+      <UniqueIdentifier>{4395035c-d786-417a-bf7b-1d171a21ce47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\planners">
+      <UniqueIdentifier>{600f2427-acc7-4af0-85f8-170e78167396}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\trainer">
+      <UniqueIdentifier>{b01e37c7-9a34-4b4f-a497-8d19a5b31a08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\neural">
+      <UniqueIdentifier>{05eca30f-9d6b-4fbc-8d67-bdaf4bf90005}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\planners\planner_minimax">
+      <UniqueIdentifier>{9d8b9cd4-9ea5-4ef0-8725-7f38eccd69e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\planners">
+      <UniqueIdentifier>{27b5070a-6c11-484d-9981-c9e5dae2f8b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\neural">
+      <UniqueIdentifier>{bae93369-3a9f-4dae-9f97-26550196ce72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\planners\planner_minimax">
+      <UniqueIdentifier>{facc362b-74eb-4724-b013-921d1eb654c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\trainer">
+      <UniqueIdentifier>{dc390021-0a63-4fd2-8444-eb767669f198}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\trainer\ranked">
+      <UniqueIdentifier>{b7ad5377-57d3-4b1d-b083-30aa536719c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\trainer\ranked">
+      <UniqueIdentifier>{dceafcb2-679f-42a4-b884-a5433f06adb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\toolbox">
+      <UniqueIdentifier>{9f8d60f0-a1e1-4ef0-9dd8-3c7a9a29fd44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\toolbox">
+      <UniqueIdentifier>{7f50757b-3030-45d3-9840-c4f049fca93f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pkIO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pokemonAI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\evaluator.cpp">
+      <Filter>Source Files\evaluators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\evaluator_network128.cpp">
+      <Filter>Source Files\evaluators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\evaluator_random.cpp">
+      <Filter>Source Files\evaluators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\evaluator_simple.cpp">
+      <Filter>Source Files\evaluators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\evaluator_network16.cpp">
+      <Filter>Source Files\evaluators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\agentMove.cpp">
+      <Filter>Source Files\planners\planner_minimax</Filter>
+    </ClCompile>
+    <ClCompile Include="src\backpropNet.cpp">
+      <Filter>Source Files\neural</Filter>
+    </ClCompile>
+    <ClCompile Include="src\planner.cpp">
+      <Filter>Source Files\planners</Filter>
+    </ClCompile>
+    <ClCompile Include="src\planner_human.cpp">
+      <Filter>Source Files\planners</Filter>
+    </ClCompile>
+    <ClCompile Include="src\planner_max.cpp">
+      <Filter>Source Files\planners</Filter>
+    </ClCompile>
+    <ClCompile Include="src\planner_stochastic.cpp">
+      <Filter>Source Files\planners</Filter>
+    </ClCompile>
+    <ClCompile Include="src\planner_random.cpp">
+      <Filter>Source Files\planners</Filter>
+    </ClCompile>
+    <ClCompile Include="src\planner_minimax_thread.cpp">
+      <Filter>Source Files\planners\planner_minimax</Filter>
+    </ClCompile>
+    <ClCompile Include="src\temporalpropNet.cpp">
+      <Filter>Source Files\neural</Filter>
+    </ClCompile>
+    <ClCompile Include="src\trainer.cpp">
+      <Filter>Source Files\trainer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\trueSkill.cpp">
+      <Filter>Source Files\trainer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vertex.cpp">
+      <Filter>Source Files\planners\planner_minimax</Filter>
+    </ClCompile>
+    <ClCompile Include="src\transposition_table.cpp">
+      <Filter>Source Files\planners\planner_minimax</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ply.cpp">
+      <Filter>Source Files\planners\planner_minimax</Filter>
+    </ClCompile>
+    <ClCompile Include="src\otherMove.cpp">
+      <Filter>Source Files\planners\planner_minimax</Filter>
+    </ClCompile>
+    <ClCompile Include="src\orderHeuristic.cpp">
+      <Filter>Source Files\planners\planner_minimax</Filter>
+    </ClCompile>
+    <ClCompile Include="src\neuralNet.cpp">
+      <Filter>Source Files\neural</Filter>
+    </ClCompile>
+    <ClCompile Include="src\experienceNet.cpp">
+      <Filter>Source Files\neural</Filter>
+    </ClCompile>
+    <ClCompile Include="src\trainer_io.cpp">
+      <Filter>Source Files\trainer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\evaluator_featureVector.cpp">
+      <Filter>Source Files\evaluators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\planner_directed.cpp">
+      <Filter>Source Files\planners</Filter>
+    </ClCompile>
+    <ClCompile Include="src\planner_minimax.cpp">
+      <Filter>Source Files\planners\planner_minimax</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ranked.cpp">
+      <Filter>Source Files\trainer\ranked</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ranked_evaluator.cpp">
+      <Filter>Source Files\trainer\ranked</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ranked_neuralNet.cpp">
+      <Filter>Source Files\trainer\ranked</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ranked_team.cpp">
+      <Filter>Source Files\trainer\ranked</Filter>
+    </ClCompile>
+    <ClCompile Include="src\init_toolbox.cpp">
+      <Filter>Source Files\toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="src\signature.cpp">
+      <Filter>Source Files\toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="src\name.cpp">
+      <Filter>Source Files\toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fixedpoint\fixed_func.cpp">
+      <Filter>Source Files\toolbox</Filter>
+    </ClCompile>
+    <ClCompile Include="src\evaluator_network32.cpp">
+      <Filter>Source Files\evaluators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\evaluator_network64.cpp">
+      <Filter>Source Files\evaluators</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\pkIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\pkai.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\pokemonAI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\agentMove.h">
+      <Filter>Header Files\planners\planner_minimax</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ability.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\backpropNet.h">
+      <Filter>Header Files\neural</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\environment_nonvolatile.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\environment_possible.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\environment_volatile.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\evaluator.h">
+      <Filter>Header Files\evaluators</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\evaluator_network128.h">
+      <Filter>Header Files\evaluators</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\evaluator_random.h">
+      <Filter>Header Files\evaluators</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\evaluator_simple.h">
+      <Filter>Header Files\evaluators</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\evaluator_network16.h">
+      <Filter>Header Files\evaluators</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\genetic.h">
+      <Filter>Header Files\trainer</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\item.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\move.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\move_volatile.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\move_nonvolatile.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\nature.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\neuralNet.h">
+      <Filter>Header Files\neural</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\planner.h">
+      <Filter>Header Files\planners</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\planner_human.h">
+      <Filter>Header Files\planners</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\planner_max.h">
+      <Filter>Header Files\planners</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\planner_random.h">
+      <Filter>Header Files\planners</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\planner_stochastic.h">
+      <Filter>Header Files\planners</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\planner_minimax_thread.h">
+      <Filter>Header Files\planners\planner_minimax</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\pkCU.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\otherMove.h">
+      <Filter>Header Files\planners\planner_minimax</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\orderHeuristic.h">
+      <Filter>Header Files\planners\planner_minimax</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\pluggable.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\pluggable_types.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\plugin.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\pokedex.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\pokemon_base.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\pokemon_nonvolatile.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\pokemon_volatile.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\team_nonvolatile.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\team_volatile.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\temporalpropNet.h">
+      <Filter>Header Files\neural</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\transposition_table.h">
+      <Filter>Header Files\planners\planner_minimax</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\trainer.h">
+      <Filter>Header Files\trainer</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\vertex.h">
+      <Filter>Header Files\planners\planner_minimax</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\type.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\trueSkill.h">
+      <Filter>Header Files\trainer</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ply.h">
+      <Filter>Header Files\planners\planner_minimax</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\experienceNet.h">
+      <Filter>Header Files\neural</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\evaluator_featureVector.h">
+      <Filter>Header Files\evaluators</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\planner_directed.h">
+      <Filter>Header Files\planners</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\planner_minimax.h">
+      <Filter>Header Files\planners\planner_minimax</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ranked_evaluator.h">
+      <Filter>Header Files\trainer\ranked</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ranked.h">
+      <Filter>Header Files\trainer\ranked</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ranked_neuralNet.h">
+      <Filter>Header Files\trainer\ranked</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ranked_team.h">
+      <Filter>Header Files\trainer\ranked</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\signature.h">
+      <Filter>Header Files\toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\roulette.h">
+      <Filter>Header Files\toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="src\fixedpoint\fixed_class.h">
+      <Filter>Header Files\toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="src\fixedpoint\fixed_func.h">
+      <Filter>Header Files\toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="src\fixedpoint\fixsintab.h">
+      <Filter>Header Files\toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\fp_compare.h">
+      <Filter>Header Files\toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\init_toolbox.h">
+      <Filter>Header Files\toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\name.h">
+      <Filter>Header Files\toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\orphan.h">
+      <Filter>Header Files\toolbox</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\evaluator_network32.h">
+      <Filter>Header Files\evaluators</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\evaluator_network64.h">
+      <Filter>Header Files\evaluators</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+</Project>

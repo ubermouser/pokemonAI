@@ -1,0 +1,2 @@
+PKAIE0	soloTeamA	1
+PKAIP0	StrikerInfernape	Infernape	100	Choice Band	0	Blaze	Naive	close combat	u-turn	stone edge	overheat	31	31	31	31	31	31	252	64	0	0	192	0

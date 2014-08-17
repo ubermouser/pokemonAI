@@ -1,0 +1,6 @@
+source $HOME/.screenrc
+screen -t trainer_0 /cygdrive/d/Homework/programming/pokemonAI/startTrainer.sh trainer0 0
+screen -t trainer_1 /cygdrive/d/Homework/programming/pokemonAI/startTrainer.sh trainer1 1
+screen -t trainer_2 /cygdrive/d/Homework/programming/pokemonAI/startTrainer.sh trainer2 2
+screen -t trainer_3 /cygdrive/d/Homework/programming/pokemonAI/startTrainer.sh trainer3 3
+
