@@ -18,16 +18,16 @@
 class PKAISHARED ability: public name, public pluggable
 {
 public:
-	static const ability* no_ability;
+  static const ability* no_ability;
 
-	ability();
-	ability(const ability& source);
-	~ability();
+  ability();
+  ability(const ability& source);
+  ~ability();
 
-	friend class pokedex;
+  friend class pokedex;
 private:
 
-	std::string script;
+  std::string script;
 };
 
 #endif	/* ABILITY_H */

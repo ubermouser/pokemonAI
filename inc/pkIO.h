@@ -32,43 +32,43 @@ class neuralNet;
 class pkIO
 {
 private:
-	class pokemonAI* parent;
-	
-	pkIO() { };
+  class pokemonAI* parent;
+  
+  pkIO() { };
 public:
-	std::string input_moveLibrary;
-	std::string input_pokemonLibrary;
-	std::string input_natureLibrary;
-	std::string input_itemLibrary;
-	std::string input_abilityLibrary;
-	std::string input_typeLibrary;
-	std::string input_movelistLibrary;
-	std::string input_metagameLibrary;
-	std::string input_pluginFolder;
-	std::vector<std::string> input_teams;
-	std::vector<std::string> input_networks;
+  std::string input_moveLibrary;
+  std::string input_pokemonLibrary;
+  std::string input_natureLibrary;
+  std::string input_itemLibrary;
+  std::string input_abilityLibrary;
+  std::string input_typeLibrary;
+  std::string input_movelistLibrary;
+  std::string input_metagameLibrary;
+  std::string input_pluginFolder;
+  std::vector<std::string> input_teams;
+  std::vector<std::string> input_networks;
 
-	pkIO(class pokemonAI* _parent);
-	~pkIO() { };
+  pkIO(class pokemonAI* _parent);
+  ~pkIO() { };
 
-	static bool parseArg(const std::string& input, pkIO*& target);
+  static bool parseArg(const std::string& input, pkIO*& target);
 
 
-	bool inputMoves(); // the moves themselves
-	bool inputPokemon(); // pokemon species
-	bool inputAbilities(); // abilities pokemon might have
-	bool inputNatures(); // natures pokemon might have
-	bool inputItems(); // items pokemon might carry
-	bool inputTypes(); // types pokemon might have
-	bool inputMovelist(); // the moves that each pokemon has
-	
-	static bool inputRankedTeam(const boost::filesystem::path& path, ranked_team& cTeam); 
-	static bool inputPlayerTeam(const boost::filesystem::path& path, team_nonvolatile& cTeam);
+  bool inputMoves(); // the moves themselves
+  bool inputPokemon(); // pokemon species
+  bool inputAbilities(); // abilities pokemon might have
+  bool inputNatures(); // natures pokemon might have
+  bool inputItems(); // items pokemon might carry
+  bool inputTypes(); // types pokemon might have
+  bool inputMovelist(); // the moves that each pokemon has
+  
+  static bool inputRankedTeam(const boost::filesystem::path& path, ranked_team& cTeam); 
+  static bool inputPlayerTeam(const boost::filesystem::path& path, team_nonvolatile& cTeam);
 
-	static bool inputRankedNetwork(const boost::filesystem::path& path, ranked_neuralNet& cNet);
-	static bool inputPlayerNetwork(const boost::filesystem::path& path, neuralNet& cNet);
+  static bool inputRankedNetwork(const boost::filesystem::path& path, ranked_neuralNet& cNet);
+  static bool inputPlayerNetwork(const boost::filesystem::path& path, neuralNet& cNet);
 
-	bool inputPlugins(); // input scripts for registered moves
+  bool inputPlugins(); // input scripts for registered moves
 
 };
 

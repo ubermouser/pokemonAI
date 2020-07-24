@@ -20,15 +20,15 @@ class pokedex;
 class PKAISHARED type: public name 
 {
 public:
-	static const type* no_type;
+  static const type* no_type;
 
-	std::vector<uint8_t> modTable; // type's values
-	
-	type();
-	type(const type& source);
-	~type() { };
+  std::vector<uint8_t> modTable; // type's values
+  
+  type();
+  type(const type& source);
+  ~type() { };
 
-	fpType getModifier(const type& other) const;
+  fpType getModifier(const type& other) const;
 private:
 
 };

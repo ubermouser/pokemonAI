@@ -17,56 +17,56 @@
 
 inline static double fastabs(double x)
 {	
-	typedef union 
-	{
-		double fval;
-		uint64_t ival;
-	} intflt;
-	
-	intflt y = { x };
-	y.ival &= ABSMASK_D;
-	
-	return y.fval;
-	
-	/*SIZETYPE_D y = (SIZETYPE_D)((USIZETYPE_D&)x & ABSMASK_D);
-	return (double&)y;*/
+  typedef union 
+  {
+    double fval;
+    uint64_t ival;
+  } intflt;
+  
+  intflt y = { x };
+  y.ival &= ABSMASK_D;
+  
+  return y.fval;
+  
+  /*SIZETYPE_D y = (SIZETYPE_D)((USIZETYPE_D&)x & ABSMASK_D);
+  return (double&)y;*/
 };
 
 inline static float fastabs(float x)
 {
-	typedef union 
-	{
-		float fval;
-		uint32_t ival;
-	} intflt;
-	
-	intflt y = { x };
-	y.ival &= ABSMASK_F;
-	
-	return y.fval;
-	
-	/*SIZETYPE_F y = (SIZETYPE_F)((USIZETYPE_F&)x & ABSMASK_F);
-	return (float&)y;*/
+  typedef union 
+  {
+    float fval;
+    uint32_t ival;
+  } intflt;
+  
+  intflt y = { x };
+  y.ival &= ABSMASK_F;
+  
+  return y.fval;
+  
+  /*SIZETYPE_F y = (SIZETYPE_F)((USIZETYPE_F&)x & ABSMASK_F);
+  return (float&)y;*/
 };
 
 inline static fixType fastabs(fixType x)
 {
-	return fixedpoint::abs(x);
+  return fixedpoint::abs(x);
 };
 
 inline static bool mostlyEQ(double lhs, double rhs)
 {
-	return (fastabs(lhs - rhs) < EPSILON_D);
+  return (fastabs(lhs - rhs) < EPSILON_D);
 };
 
 inline static bool mostlyEQ(float lhs, float rhs)
 {
-	return (fastabs(lhs - rhs) < EPSILON_F);
+  return (fastabs(lhs - rhs) < EPSILON_F);
 };
 
 inline static bool mostlyEQ(fixType lhs, fixType rhs)
 {
-	return (fastabs(lhs - rhs).intValue < EPSILON_S);
+  return (fastabs(lhs - rhs).intValue < EPSILON_S);
 };
 
 #undef ABSMASK_D
@@ -81,31 +81,31 @@ inline static bool mostlyEQ(fixType lhs, fixType rhs)
 template<class cType>
 inline static bool mostlyNEQ(cType lhs, cType rhs)
 {
-	return !(mostlyEQ(lhs, rhs));
+  return !(mostlyEQ(lhs, rhs));
 };
 
 template<class cType>
 inline static bool mostlyLTE(cType lhs, cType rhs)
 {
-	return (lhs < rhs) || (mostlyEQ(lhs, rhs));
+  return (lhs < rhs) || (mostlyEQ(lhs, rhs));
 };
 
 template<class cType>
 inline static bool mostlyGTE(cType lhs, cType rhs)
 {
-	return (lhs > rhs) || (mostlyEQ(lhs, rhs));
+  return (lhs > rhs) || (mostlyEQ(lhs, rhs));
 };
 
 template<class cType>
 inline static bool mostlyLT(cType lhs, cType rhs)
 {
-	return !(mostlyGTE(lhs, rhs));
+  return !(mostlyGTE(lhs, rhs));
 };
 
 template<class cType>
 inline static bool mostlyGT(cType lhs, cType rhs)
 {
-	return !(mostlyLTE(lhs, rhs));
+  return !(mostlyLTE(lhs, rhs));
 };
 
 /* Scales a floating point number value, bounded from min..max,
@@ -113,11 +113,11 @@ inline static bool mostlyGT(cType lhs, cType rhs)
 template <class cType>
 inline static cType scale(cType value, cType max, cType min)
 {
-	// scale from Max .. Min to -1 .. 1
-	if (mostlyEQ(min, max)) return (cType)1.0;
-	cType ratio = (value - min) / (max - min);
+  // scale from Max .. Min to -1 .. 1
+  if (mostlyEQ(min, max)) return (cType)1.0;
+  cType ratio = (value - min) / (max - min);
 
-	return ratio;
+  return ratio;
 };
 
 /* Scales a floating point number value, bounded from 0..1,
@@ -125,9 +125,9 @@ inline static cType scale(cType value, cType max, cType min)
 template <class cType>
 inline static cType deScale(cType value, cType max, cType min)
 {
-	cType result = value * (max - min) + min;
+  cType result = value * (max - min) + min;
 
-	return result;
+  return result;
 };
 
 #endif /* FP_COMPARE_H */

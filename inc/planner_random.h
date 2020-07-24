@@ -9,31 +9,31 @@ class pkCU;
 class planner_random : public planner
 {
 private:
-	static const std::string ident;
+  static const std::string ident;
 
-	pkCU* cu;
+  pkCU* cu;
 
-	size_t agentTeam;
+  size_t agentTeam;
 
 public:
-	planner_random();
+  planner_random();
 
-	planner_random(const planner_random& other);
-	
-	~planner_random() { };
+  planner_random(const planner_random& other);
+  
+  ~planner_random() { };
 
-	planner_random* clone() const { return new planner_random(*this); }
+  planner_random* clone() const { return new planner_random(*this); }
 
-	bool isInitialized() const;
+  bool isInitialized() const;
 
-	const std::string& getName() const { return ident; };
+  const std::string& getName() const { return ident; };
 
-	void setEvaluator(const evaluator& evalType) { /* we're not going to use the evaluator, so do nothing with it */ };
-	const evaluator* getEvaluator() const { return NULL; }
+  void setEvaluator(const evaluator& evalType) { /* we're not going to use the evaluator, so do nothing with it */ };
+  const evaluator* getEvaluator() const { return NULL; }
 
-	void setEnvironment(pkCU& _cu, size_t _agentTeam);
+  void setEnvironment(pkCU& _cu, size_t _agentTeam);
 
-	uint32_t generateSolution(const environment_possible& origin);
+  uint32_t generateSolution(const environment_possible& origin);
 };
 
 #endif /* PLANNER_RANDOM_H */

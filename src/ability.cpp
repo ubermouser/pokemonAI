@@ -6,9 +6,9 @@
 const ability* ability::no_ability = NULL;
 
 ability::ability() 
-	: name(), 
-	pluggable(),
-	script()
+  : name(), 
+  pluggable(),
+  script()
 {
 }
 
@@ -17,9 +17,9 @@ ability::ability()
 
 
 ability::ability(const ability& source) 
-	: name(source), 
-	pluggable(source),
-	script(source.script)
+  : name(source), 
+  pluggable(source),
+  script(source.script)
 {
 }
 
@@ -29,6 +29,6 @@ ability::ability(const ability& source)
 
 ability::~ability() 
 {
-	script.clear();
+  script.clear();
 }
 

@@ -163,10 +163,10 @@ typedef fixedpoint::fixed_point<30> fixType;
 // win conditions:
 enum matchState
 {
-	MATCH_MIDGAME = -1,
-	MATCH_TEAM_A_WINS = TEAM_A,
-	MATCH_TEAM_B_WINS = TEAM_B,
-	MATCH_TIE = 2
+  MATCH_MIDGAME = -1,
+  MATCH_TEAM_A_WINS = TEAM_A,
+  MATCH_TEAM_B_WINS = TEAM_B,
+  MATCH_TIE = 2
 };
 #define MATCH_DRAW MATCH_MIDGAME
 
@@ -196,20 +196,20 @@ enum matchState
 // game type:
 enum gameType_t
 {
-	GT_DIAG_HUVSHU = 0 , // diagnostic-human , human (known) vs human (known)
-	GT_DIAG_HUVSHU_UNCERTAIN = 1, // diagnostic-uncertainty , human (known) vs human (unknown)
-	GT_DIAG_HUVSCPU = 2, // diagnostic , human (known) vs computer (known)
-	GT_NORM_HUVSCPU = 3, // normal , human (unknown) vs computer (known)
-	GT_NORM_CPUVSCPU = 4, // ai battle, computer (known) vs computer (known)
-	GT_DIAG_BENCHMARK = 5, // plays the first team loaded against its self for secondsPerMove seconds, then quits
-	GT_NORM_CPUVSHU = 6, // normal (swapped), computer (known) vs human (unknown)
-	GT_OTHER_CONSOLE = 10, // do not start a game, drop directly to the console
-	GT_OTHER_EVOTEAMS = 11, // do not start a game, instead attempt to evolve new pokemon teams with genetic algorithm
-	GT_OTHER_EVONETS = 12, // do not start a game, instead attempt to evolve new evaluation networks
-	GT_OTHER_EVOBOTH = 13, // do not start a game, instead attempt to evolve both new teams and networks
-	GT_OTHER_GAUNTLET_TEAM = 14, // do not start a game, instead rank a provided pokemon team
-	GT_OTHER_GAUNTLET_NET = 15, // do not start a game, instead rank a provided evaluation network
-	GT_OTHER_GAUNTLET_BOTH = 16 // do not start a game, instead rank a provided team and network
+  GT_DIAG_HUVSHU = 0 , // diagnostic-human , human (known) vs human (known)
+  GT_DIAG_HUVSHU_UNCERTAIN = 1, // diagnostic-uncertainty , human (known) vs human (unknown)
+  GT_DIAG_HUVSCPU = 2, // diagnostic , human (known) vs computer (known)
+  GT_NORM_HUVSCPU = 3, // normal , human (unknown) vs computer (known)
+  GT_NORM_CPUVSCPU = 4, // ai battle, computer (known) vs computer (known)
+  GT_DIAG_BENCHMARK = 5, // plays the first team loaded against its self for secondsPerMove seconds, then quits
+  GT_NORM_CPUVSHU = 6, // normal (swapped), computer (known) vs human (unknown)
+  GT_OTHER_CONSOLE = 10, // do not start a game, drop directly to the console
+  GT_OTHER_EVOTEAMS = 11, // do not start a game, instead attempt to evolve new pokemon teams with genetic algorithm
+  GT_OTHER_EVONETS = 12, // do not start a game, instead attempt to evolve new evaluation networks
+  GT_OTHER_EVOBOTH = 13, // do not start a game, instead attempt to evolve both new teams and networks
+  GT_OTHER_GAUNTLET_TEAM = 14, // do not start a game, instead rank a provided pokemon team
+  GT_OTHER_GAUNTLET_NET = 15, // do not start a game, instead rank a provided evaluation network
+  GT_OTHER_GAUNTLET_BOTH = 16 // do not start a game, instead rank a provided team and network
 };
 
 // command-line and text output variables

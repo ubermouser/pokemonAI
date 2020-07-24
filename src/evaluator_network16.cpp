@@ -27,103 +27,103 @@ const size_t evaluator_network16::numInputNeurons = (NEURONSPERTEAM*2);
 const size_t evaluator_network16::numOutputNeurons = 1U;
 
 evaluator_network16::evaluator_network16()
-	: ident(),
-	envNV(NULL),
-	network(NULL),
-	orders()
+  : ident(),
+  envNV(NULL),
+  network(NULL),
+  orders()
 {
-	{
-		std::ostringstream name;
-		name << "neural_Evaluator(" << numInputNeurons << "." << numOutputNeurons << ")-NULLNETWORK";
-		ident = name.str();
-	}
+  {
+    std::ostringstream name;
+    name << "neural_Evaluator(" << numInputNeurons << "." << numOutputNeurons << ")-NULLNETWORK";
+    ident = name.str();
+  }
 };
 
 evaluator_network16::evaluator_network16(const evaluator_network16& other)
-	: ident(other.ident),
-	envNV(other.envNV),
-	network(other.network!=NULL?new neuralNet(*other.network):NULL),
-	orders(other.orders)
+  : ident(other.ident),
+  envNV(other.envNV),
+  network(other.network!=NULL?new neuralNet(*other.network):NULL),
+  orders(other.orders)
 {
 };
 
 evaluator_network16::evaluator_network16(const neuralNet& _cNet)
-	: envNV(NULL),
-	network(new neuralNet(_cNet)),
-	orders()
+  : envNV(NULL),
+  network(new neuralNet(_cNet)),
+  orders()
 {
-	{
-		std::ostringstream name;
-		name << "neural_Evaluator(" << numInputNeurons << "." << numOutputNeurons << ")-" << network->getName();
-		ident = name.str();
-	}
+  {
+    std::ostringstream name;
+    name << "neural_Evaluator(" << numInputNeurons << "." << numOutputNeurons << ")-" << network->getName();
+    ident = name.str();
+  }
 };
 
 evaluator_network16::~evaluator_network16()
 {
-	if (network != NULL) { delete network; network = NULL; }
+  if (network != NULL) { delete network; network = NULL; }
 }
 
 bool evaluator_network16::isInitialized() const
 {
-	if (envNV == NULL) { return false; }
-	if (network == NULL) { return false; }
-	if (!network->isInitialized()) { return false; }
-	// check neural network size:
-	if ((network->numInputs() != numInputNeurons) || (network->numOutputs() != numOutputNeurons))
-	{
-		std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-			": neural_Evaluator(" << numInputNeurons << "." << numOutputNeurons << ")" <<
-			" requires input-" << numInputNeurons <<
-			" (has " << network->numInputs() <<
-			"), output-" << numOutputNeurons <<
-			" (has " << network->numOutputs() << 
-			")!\n";
-		return false; 
-	}
+  if (envNV == NULL) { return false; }
+  if (network == NULL) { return false; }
+  if (!network->isInitialized()) { return false; }
+  // check neural network size:
+  if ((network->numInputs() != numInputNeurons) || (network->numOutputs() != numOutputNeurons))
+  {
+    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
+      ": neural_Evaluator(" << numInputNeurons << "." << numOutputNeurons << ")" <<
+      " requires input-" << numInputNeurons <<
+      " (has " << network->numInputs() <<
+      "), output-" << numOutputNeurons <<
+      " (has " << network->numOutputs() << 
+      ")!\n";
+    return false; 
+  }
 
-	return true;
+  return true;
 }
 
 void evaluator_network16::resetNetwork(const neuralNet& cNet)
 {
-	if (network != NULL) { delete network; network = NULL; }
-	network = new neuralNet(cNet);
-	{
-		std::ostringstream name;
-		name << "neural_Evaluator(" << numInputNeurons << "." << numOutputNeurons << ")-" << network->getName();
-		ident = name.str();
-	}
+  if (network != NULL) { delete network; network = NULL; }
+  network = new neuralNet(cNet);
+  {
+    std::ostringstream name;
+    name << "neural_Evaluator(" << numInputNeurons << "." << numOutputNeurons << ")-" << network->getName();
+    ident = name.str();
+  }
 }
 
 void evaluator_network16::resetEvaluator(const environment_nonvolatile& _envNV)
 {
-	envNV = &_envNV;
-	// reset memoized data:
-	generateOrders();
-	// zero input layer:
-	if (network != NULL) { network->clearInput(); }
+  envNV = &_envNV;
+  // reset memoized data:
+  generateOrders();
+  // zero input layer:
+  if (network != NULL) { network->clearInput(); }
 };
 
 evalResult_t evaluator_network16::calculateFitness(const environment_volatile& env, size_t iTeam)
 {
-	return calculateFitness(*network, env, iTeam);
+  return calculateFitness(*network, env, iTeam);
 };
 
 evalResult_t evaluator_network16::calculateFitness(neuralNet& cNet, const environment_volatile& env, size_t iTeam)
 {
-	// seed network with values:
-	seed(&*cNet.inputBegin(), env, iTeam);
-	// perform feed-forward evaluation:
-	cNet.feedForward();
-	// parse output:
-	constFloatIterator_t output = cNet.outputBegin();
-	// values returned less than 0.15 have 0 fitness, greater than 0.85 have 1 fitness
-	fpType fitness = *output;
-	fitness = std::max(0.0, std::min(1.0, scale(fitness, 0.85, 0.15)));
+  // seed network with values:
+  seed(&*cNet.inputBegin(), env, iTeam);
+  // perform feed-forward evaluation:
+  cNet.feedForward();
+  // parse output:
+  constFloatIterator_t output = cNet.outputBegin();
+  // values returned less than 0.15 have 0 fitness, greater than 0.85 have 1 fitness
+  fpType fitness = *output;
+  fitness = std::max(0.0, std::min(1.0, scale(fitness, 0.85, 0.15)));
 
-	evalResult_t result= { fitness , -1/*agentMove*/ , -1/*otherMove*/ };
-	return result;
+  evalResult_t result= { fitness , -1/*agentMove*/ , -1/*otherMove*/ };
+  return result;
 };
 
 
@@ -132,62 +132,62 @@ evalResult_t evaluator_network16::calculateFitness(neuralNet& cNet, const enviro
 
 void evaluator_network16::seed(float* inputBegin, const environment_volatile& env, size_t _iTeam) const
 {
-	float* cInput;
+  float* cInput;
 
-	for (size_t iNTeam = 0; iNTeam < 2; ++iNTeam)
-	{
-		size_t iTeam = (_iTeam + iNTeam) & 1;
-		const team_volatile& cTV = env.getTeam(iTeam);
-		const team_nonvolatile& cTNV = envNV->getTeam(iTeam);
+  for (size_t iNTeam = 0; iNTeam < 2; ++iNTeam)
+  {
+    size_t iTeam = (_iTeam + iNTeam) & 1;
+    const team_volatile& cTV = env.getTeam(iTeam);
+    const team_nonvolatile& cTNV = envNV->getTeam(iTeam);
 
-		// order of inputs:
-		const boost::array<uint8_t, 6>& iTeammates = orders[iTeam][cTV.getICPKV()];
+    // order of inputs:
+    const boost::array<uint8_t, 6>& iTeammates = orders[iTeam][cTV.getICPKV()];
 
-		cInput = inputBegin + (NEURONSPERTEAM * iNTeam);
+    cInput = inputBegin + (NEURONSPERTEAM * iNTeam);
 
-		// 1 neuron per pokemon:
-		size_t numTeammatesAlive = cTNV.getNumTeammates();
-		for (size_t iNTeammate = 0; iNTeammate != cTNV.getNumTeammates(); ++iNTeammate)
-		{
-			size_t iTeammate = iTeammates[iNTeammate];
-			const pokemon_volatile& cPKV = cTV.teammate(iTeammate);
-			if (!cPKV.isAlive()) 
-			{
-				// special case when this is the first teammate
-				if (iNTeammate == 0) { memset(cInput, 0, sizeof(float)*NEURONSPERTEAMMATE); cInput+=NEURONSPERTEAMMATE; }
-				else { numTeammatesAlive--; }
-				continue; 
-			}
-			const pokemon_nonvolatile& cPKNV = cTNV.teammate(iTeammate);
+    // 1 neuron per pokemon:
+    size_t numTeammatesAlive = cTNV.getNumTeammates();
+    for (size_t iNTeammate = 0; iNTeammate != cTNV.getNumTeammates(); ++iNTeammate)
+    {
+      size_t iTeammate = iTeammates[iNTeammate];
+      const pokemon_volatile& cPKV = cTV.teammate(iTeammate);
+      if (!cPKV.isAlive()) 
+      {
+        // special case when this is the first teammate
+        if (iNTeammate == 0) { memset(cInput, 0, sizeof(float)*NEURONSPERTEAMMATE); cInput+=NEURONSPERTEAMMATE; }
+        else { numTeammatesAlive--; }
+        continue; 
+      }
+      const pokemon_nonvolatile& cPKNV = cTNV.teammate(iTeammate);
 
-			// percent hitpoints of pokemon: (guaranteed to be nonzero)
-			float percentHP = (float)cPKV.getPercentHP(cPKNV);
-			*cInput++ = percentHP; //scale(percentHP + 0.1f, 1.1f, 0.0f);
-		} // endof current team teammates
-		{
-			// pokemon is past index or not alive:
-			memset(&*cInput, 0, sizeof(float)*NEURONSPERTEAMMATE * (6 - numTeammatesAlive)); 
-			cInput += NEURONSPERTEAMMATE * (6 - numTeammatesAlive);
-		}
+      // percent hitpoints of pokemon: (guaranteed to be nonzero)
+      float percentHP = (float)cPKV.getPercentHP(cPKNV);
+      *cInput++ = percentHP; //scale(percentHP + 0.1f, 1.1f, 0.0f);
+    } // endof current team teammates
+    {
+      // pokemon is past index or not alive:
+      memset(&*cInput, 0, sizeof(float)*NEURONSPERTEAMMATE * (6 - numTeammatesAlive)); 
+      cInput += NEURONSPERTEAMMATE * (6 - numTeammatesAlive);
+    }
 
-		assert((cInput - inputBegin) == ((NEURONSPERTEAM * iNTeam) + (NEURONSPERTEAMMATE * 6)));
-		
-		// volatile status:
-		{
-			assert((cInput - inputBegin) == ((NEURONSPERTEAM * iNTeam) + (NEURONSPERTEAMMATE * 6)));
-			const pokemon_volatile& cPKV = cTV.getPKV();
+    assert((cInput - inputBegin) == ((NEURONSPERTEAM * iNTeam) + (NEURONSPERTEAMMATE * 6)));
+    
+    // volatile status:
+    {
+      assert((cInput - inputBegin) == ((NEURONSPERTEAM * iNTeam) + (NEURONSPERTEAMMATE * 6)));
+      const pokemon_volatile& cPKV = cTV.getPKV();
 
-			// 2 neurons per status:
-			// if pokemon has been statused:
-			float statusAilment = cPKV.getStatusAilment();
-			cInput[0] = scale(statusAilment, (float)AIL_NV_POISON_TOXIC, (float)AIL_NV_NONE);
-			// confused or infatuated:
-			cInput[1] = (float)((cTV.getVolatile().confused | cTV.getVolatile().infatuate) > AIL_V_NONE);
+      // 2 neurons per status:
+      // if pokemon has been statused:
+      float statusAilment = cPKV.getStatusAilment();
+      cInput[0] = scale(statusAilment, (float)AIL_NV_POISON_TOXIC, (float)AIL_NV_NONE);
+      // confused or infatuated:
+      cInput[1] = (float)((cTV.getVolatile().confused | cTV.getVolatile().infatuate) > AIL_V_NONE);
 
-			cInput += NEURONSPERSTATUS;
-		} // endOf volatile status
-		assert((cInput - inputBegin) == (NEURONSPERTEAM*(iNTeam+1)));
-	} // endOf foreach team
+      cInput += NEURONSPERSTATUS;
+    } // endOf volatile status
+    assert((cInput - inputBegin) == (NEURONSPERTEAM*(iNTeam+1)));
+  } // endOf foreach team
 }; // endOf seed volatile
 
 
@@ -196,8 +196,8 @@ void evaluator_network16::seed(float* inputBegin, const environment_volatile& en
 
 const float* evaluator_network16::getInput() const
 {
-	if (network == NULL) { return NULL; }
-	return &*network->inputBegin();
+  if (network == NULL) { return NULL; }
+  return &*network->inputBegin();
 };
 
 
@@ -206,25 +206,25 @@ const float* evaluator_network16::getInput() const
 
 void evaluator_network16::generateOrders()
 {
-	boost::array< uint8_t , 6> preOrder;
-	// seed the unmodified order into preOrders:
-	for (size_t iTeammate = 0; iTeammate != 6; ++iTeammate) { preOrder[iTeammate] = iTeammate; }
+  boost::array< uint8_t , 6> preOrder;
+  // seed the unmodified order into preOrders:
+  for (size_t iTeammate = 0; iTeammate != 6; ++iTeammate) { preOrder[iTeammate] = iTeammate; }
 
-	// place modified order into orders:
-	for (size_t iTeam = 0; iTeam < 2; ++iTeam)
-	{
-		boost::array< boost::array< uint8_t , 6> , 6>& cOrders = orders[iTeam];
-		for (size_t iTeammate = 0; iTeammate != 6; ++iTeammate)
-		{
-			boost::array<uint8_t, 6>::iterator cTeammate = cOrders[iTeammate].begin();
-			*cTeammate++ = iTeammate;
-			for (size_t iNTeammate = 0; iNTeammate != 6; ++iNTeammate)
-			{
-				if (iTeammate == preOrder[iNTeammate]) { continue; }
-				*cTeammate++ = preOrder[iNTeammate];
-			}
-		}
-	}
+  // place modified order into orders:
+  for (size_t iTeam = 0; iTeam < 2; ++iTeam)
+  {
+    boost::array< boost::array< uint8_t , 6> , 6>& cOrders = orders[iTeam];
+    for (size_t iTeammate = 0; iTeammate != 6; ++iTeammate)
+    {
+      boost::array<uint8_t, 6>::iterator cTeammate = cOrders[iTeammate].begin();
+      *cTeammate++ = iTeammate;
+      for (size_t iNTeammate = 0; iNTeammate != 6; ++iNTeammate)
+      {
+        if (iTeammate == preOrder[iNTeammate]) { continue; }
+        *cTeammate++ = preOrder[iNTeammate];
+      }
+    }
+  }
 }; // endOf generateOrders
 
 
@@ -233,20 +233,20 @@ void evaluator_network16::generateOrders()
 
 void evaluator_network16::outputNames(std::ostream& oS) const
 {
-	for (size_t iTeam = 0; iTeam < 2; ++iTeam)
-	{
-		for (size_t iTeammate = 0; iTeammate != 6; ++iTeammate)
-		{
-			oS << "percentHP-" << iTeam << iTeammate << ", ";
-		}
+  for (size_t iTeam = 0; iTeam < 2; ++iTeam)
+  {
+    for (size_t iTeammate = 0; iTeammate != 6; ++iTeammate)
+    {
+      oS << "percentHP-" << iTeam << iTeammate << ", ";
+    }
 
-		oS << "nonvolatileStatus-" << iTeam << ", ";
-		oS << "volatileStatus-" << iTeam << ", ";
-	}
-	oS << "fitness-0";
-	for (size_t iOutput = 1; iOutput < outputSize(); ++iOutput)
-	{
-		oS << ", fitness-" << iOutput;
-	}
-	oS << "\n";
+    oS << "nonvolatileStatus-" << iTeam << ", ";
+    oS << "volatileStatus-" << iTeam << ", ";
+  }
+  oS << "fitness-0";
+  for (size_t iOutput = 1; iOutput < outputSize(); ++iOutput)
+  {
+    oS << ", fitness-" << iOutput;
+  }
+  oS << "\n";
 };

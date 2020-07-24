@@ -12,45 +12,45 @@ union environment_volatile;
 class planner_human : public planner
 {
 private:
-	static const std::string ident;
+  static const std::string ident;
 
-	pkCU* cu;
+  pkCU* cu;
 
-	size_t agentTeam;
+  size_t agentTeam;
 
-	/* Returns a valid action as per the user's choice 
-	 * AT_MOVE_0-3: pokemon's move
-	 * AT_MOVE_STRUGGLE  : struggle
-	 * AT_MOVE_NOTHING  : do nothing
-	 * AT_SWITCH_0-5: pokemon switches out for pokemon n-6
-	 * AT_ITEM_USE: pokemon uses an item (not implemented)
-	 */
-	unsigned int actionSelect(const environment_volatile& env);
+  /* Returns a valid action as per the user's choice 
+   * AT_MOVE_0-3: pokemon's move
+   * AT_MOVE_STRUGGLE  : struggle
+   * AT_MOVE_NOTHING  : do nothing
+   * AT_SWITCH_0-5: pokemon switches out for pokemon n-6
+   * AT_ITEM_USE: pokemon uses an item (not implemented)
+   */
+  unsigned int actionSelect(const environment_volatile& env);
 
-	/*
-	 * Prints all possible actions a given pokemon may take to stdout
-	 */
-	void printActions(const environment_volatile& env);
+  /*
+   * Prints all possible actions a given pokemon may take to stdout
+   */
+  void printActions(const environment_volatile& env);
 
 public:
-	planner_human();
+  planner_human();
 
-	planner_human(const planner_human& other);
-	
-	~planner_human() { };
+  planner_human(const planner_human& other);
+  
+  ~planner_human() { };
 
-	planner_human* clone() const { return new planner_human(*this); }
+  planner_human* clone() const { return new planner_human(*this); }
 
-	bool isInitialized() const;
+  bool isInitialized() const;
 
-	const std::string& getName() const { return ident; };
+  const std::string& getName() const { return ident; };
 
-	void setEvaluator(const evaluator& evalType) { /* we're not going to use the evaluator, so do nothing with it */ };
-	const evaluator* getEvaluator() const { return NULL; }
+  void setEvaluator(const evaluator& evalType) { /* we're not going to use the evaluator, so do nothing with it */ };
+  const evaluator* getEvaluator() const { return NULL; }
 
-	void setEnvironment(pkCU& _cu, size_t _agentTeam);
+  void setEnvironment(pkCU& _cu, size_t _agentTeam);
 
-	uint32_t generateSolution(const environment_possible& origin);
+  uint32_t generateSolution(const environment_possible& origin);
 };
 
 #endif /* PLANNER_HUMAN_H */

@@ -12,7 +12,7 @@ const type* type::no_type = NULL;
 
 
 type::type() 
-	: modTable()
+  : modTable()
 {
 }
 
@@ -21,7 +21,7 @@ type::type()
 
 
 type::type(const type& source) 
-	: modTable(source.modTable)
+  : modTable(source.modTable)
 {
 }
 
@@ -31,7 +31,7 @@ type::type(const type& source)
 
 fpType type::getModifier(const type& other) const
 {
-	size_t iOType = &other - &pkdex->getTypes().front();
+  size_t iOType = &other - &pkdex->getTypes().front();
 
-	return (fpType)modTable[iOType] / (fpType) FPMULTIPLIER;
+  return (fpType)modTable[iOType] / (fpType) FPMULTIPLIER;
 }

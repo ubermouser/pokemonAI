@@ -10,22 +10,22 @@ class evaluator;
 class ranked_evaluator : public ranked
 {
 private:
-	evaluator* eval;
+  evaluator* eval;
 public:
-	ranked_evaluator(
-		const evaluator& _eval,
-		size_t generation = 0, 
-		const trueSkillSettings& settings = trueSkillSettings::defaultSettings);
+  ranked_evaluator(
+    const evaluator& _eval,
+    size_t generation = 0, 
+    const trueSkillSettings& settings = trueSkillSettings::defaultSettings);
 
-	ranked_evaluator(const ranked_evaluator& other);
+  ranked_evaluator(const ranked_evaluator& other);
 
-	~ranked_evaluator();
+  ~ranked_evaluator();
 
-	const std::string& getName() const;
+  const std::string& getName() const;
 
-	const evaluator& getEvaluator() const { return *eval; };
+  const evaluator& getEvaluator() const { return *eval; };
 
-	friend std::ostream& operator <<(std::ostream& os, const ranked_evaluator& tR);
+  friend std::ostream& operator <<(std::ostream& os, const ranked_evaluator& tR);
 };
 
 std::ostream& operator <<(std::ostream& os, const ranked_evaluator& tR);

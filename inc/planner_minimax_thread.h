@@ -22,77 +22,77 @@ union environment_possible;
 class plyComparison
 {
 public:
-	bool operator() (const class ply* lhs, const class ply* rhs) const;
+  bool operator() (const class ply* lhs, const class ply* rhs) const;
 };
 
 class minimax_threadArg
 {
 private:
-	/* minimax planner base */
-	planner_minimax* base;
+  /* minimax planner base */
+  planner_minimax* base;
 
-	/* this thread's plyQueue */
-	std::priority_queue<class ply*, std::vector<class ply*>, plyComparison> plyQueue;
+  /* this thread's plyQueue */
+  std::priority_queue<class ply*, std::vector<class ply*>, plyComparison> plyQueue;
 
-	/* root node */
-	ply* root;
+  /* root node */
+  ply* root;
 
-	/* this threads CU engine */
-	pkCU* cu;
+  /* this threads CU engine */
+  pkCU* cu;
 
-	/* evaluator being used by this thread */
-	evaluator* eval;
+  /* evaluator being used by this thread */
+  evaluator* eval;
 
-	minimax_threadArg(); // default constructor should NOT be called
+  minimax_threadArg(); // default constructor should NOT be called
 
-	bool evaluateVertex_IDDFS_Fitness(ply& current, std::vector<ply*>& _children);
-	int evaluateVertex_IDDFS();
+  bool evaluateVertex_IDDFS_Fitness(ply& current, std::vector<ply*>& _children);
+  int evaluateVertex_IDDFS();
 
 public:
-	minimax_threadArg(planner_minimax& _base, const evaluator& eval);
-	minimax_threadArg(planner_minimax& _base);
-	~minimax_threadArg();
+  minimax_threadArg(planner_minimax& _base, const evaluator& eval);
+  minimax_threadArg(planner_minimax& _base);
+  ~minimax_threadArg();
 
-	minimax_threadArg(const minimax_threadArg& other);
+  minimax_threadArg(const minimax_threadArg& other);
 
-	const environment_nonvolatile& getNV() const;
+  const environment_nonvolatile& getNV() const;
 
-	pkCU& getCU();
+  pkCU& getCU();
 
-	transposition_table& getTTable();
-	const transposition_table& getTTable() const;
+  transposition_table& getTTable();
+  const transposition_table& getTTable() const;
 
-	evaluator& getEval();
-	const evaluator& getEval() const;
+  evaluator& getEval();
+  const evaluator& getEval() const;
 
-	size_t getAgentTeam();
-	size_t getOtherTeam();
+  size_t getAgentTeam();
+  size_t getOtherTeam();
 
-	void setEvaluator(const evaluator& evalType);
+  void setEvaluator(const evaluator& evalType);
 
-	orderHeuristic& getAgentOrder();
-	orderHeuristic& getOtherOrder();
+  orderHeuristic& getAgentOrder();
+  orderHeuristic& getOtherOrder();
 
-	const orderHeuristic& getAgentOrder() const;
-	const orderHeuristic& getOtherOrder() const;
+  const orderHeuristic& getAgentOrder() const;
+  const orderHeuristic& getOtherOrder() const;
 
-	size_t getMaxDepth() const;
+  size_t getMaxDepth() const;
 
-	boost::mutex& getStdioLock();
+  boost::mutex& getStdioLock();
 
-	void setEnvironment(pkCU& _cu, size_t _agentTeam);
+  void setEnvironment(pkCU& _cu, size_t _agentTeam);
 
-	void setRoot(const environment_possible& origin);
+  void setRoot(const environment_possible& origin);
 
-	void cleanUp();
-	
-	bool isInitialized() const;
+  void cleanUp();
+  
+  bool isInitialized() const;
 
-	friend class planner_minimax;
-	friend class ply;
-	friend class agentMove;
-	friend class otherMove;
-	friend void minimax_thread(minimax_threadArg* t);
+  friend class planner_minimax;
+  friend class ply;
+  friend class agentMove;
+  friend class otherMove;
+  friend void minimax_thread(minimax_threadArg* t);
 };
 
 /* static driver for all threads. This is a thread's main method */

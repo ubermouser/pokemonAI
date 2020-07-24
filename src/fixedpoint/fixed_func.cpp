@@ -56,7 +56,7 @@ int32_t fixcos16(int32_t a)
     a >>= 4;
 
     v = (a & 0x400) ? sin_tab[0x3ff - (a & 0x3ff)] : sin_tab[a & 0x3ff];
-	v = fixmul<16>(v, 1 << 16);
+  v = fixmul<16>(v, 1 << 16);
     return (a & 0x800) ? -v : v;
 }
 
@@ -81,21 +81,21 @@ int32_t fixrsqrt16(int32_t a)
     int32_t x;
 
     static const uint16_t rsq_tab[] = { /* domain 0.5 .. 1.0-1/16 */
-		0xb504, 0xaaaa, 0xa1e8, 0x9a5f, 0x93cd, 0x8e00, 0x88d6, 0x8432,
+    0xb504, 0xaaaa, 0xa1e8, 0x9a5f, 0x93cd, 0x8e00, 0x88d6, 0x8432,
     };
 
     int32_t i, exp;
     if (a == 0) return 0x7fffffff;
     if (a == (1<<16)) return a;
 
-	exp = detail::CountLeadingZeros(a);
+  exp = detail::CountLeadingZeros(a);
     x = rsq_tab[(a>>(28-exp))&0x7]<<1;
 
-	exp -= 16;
+  exp -= 16;
     if (exp <= 0)
-		x >>= -exp>>1;
+    x >>= -exp>>1;
     else
-		x <<= (exp>>1)+(exp&1);
+    x <<= (exp>>1)+(exp&1);
     if (exp&1) x = fixmul<16>(x, rsq_tab[0]);
 
 
@@ -104,7 +104,7 @@ int32_t fixrsqrt16(int32_t a)
     i = 0;
     do {
 
-		x = fixmul<16>((x>>1),((1<<16)*3 - fixmul<16>(fixmul<16>(a,x),x)));
+    x = fixmul<16>((x>>1),((1<<16)*3 - fixmul<16>(fixmul<16>(a,x),x)));
     } while(++i < 3);
 
     return x;
@@ -112,11 +112,11 @@ int32_t fixrsqrt16(int32_t a)
 
 static inline int32_t fast_div16(int32_t a, int32_t b)
 {
-	if ((b >> 24) && (b >> 24) + 1) {
-		return fixmul<16>(a >> 8, fixinv<16>(b >> 8));
-	} else {
-		return fixmul<16>(a, fixinv<16>(b));
-	}
+  if ((b >> 24) && (b >> 24) + 1) {
+    return fixmul<16>(a >> 8, fixinv<16>(b >> 8));
+  } else {
+    return fixmul<16>(a, fixinv<16>(b));
+  }
 }
 
 int32_t fixsqrt16(int32_t a) 
@@ -126,7 +126,7 @@ int32_t fixsqrt16(int32_t a)
     s = (a + (1<<16)) >> 1;
     /* 6 iterations to converge */
     for (i = 0; i < 6; i++)
-		s = (s + fast_div16(a, s)) >> 1;
+    s = (s + fast_div16(a, s)) >> 1;
     return s;
 }
 

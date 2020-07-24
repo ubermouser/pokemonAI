@@ -10,21 +10,21 @@
 plugin_t pluggable::emptyPlugin = { NULL, 0, 0 };
 
 bool pluggable::registerPlugin_void(
-	pluginType pType, 
-	voidFunction_rawType _function, 
-	int32_t _priority, 
-	uint32_t _target,
-	bool setIsImplemented)
+  pluginType pType, 
+  voidFunction_rawType _function, 
+  int32_t _priority, 
+  uint32_t _target,
+  bool setIsImplemented)
 {
-	bool existed = (plugins[(size_t)pType].pFunction != NULL);
-	{
-		plugin_t result = { _function, _priority, _target };
-		plugins[(size_t)pType] = result;
-	}
+  bool existed = (plugins[(size_t)pType].pFunction != NULL);
+  {
+    plugin_t result = { _function, _priority, _target };
+    plugins[(size_t)pType] = result;
+  }
 
-	if (setIsImplemented) { implemented = true; }
+  if (setIsImplemented) { implemented = true; }
 
-	return existed;
+  return existed;
 };
 
 
@@ -33,7 +33,7 @@ bool pluggable::registerPlugin_void(
 
 bool pluggable::registerPlugin(const plugin& cPlugin, bool setImp)
 {
-	return registerPlugin_void(cPlugin.getType(), cPlugin.getFunction(), cPlugin.getPriority(), cPlugin.getTarget(), setImp);
+  return registerPlugin_void(cPlugin.getType(), cPlugin.getFunction(), cPlugin.getPriority(), cPlugin.getTarget(), setImp);
 }
 
 
@@ -42,10 +42,10 @@ bool pluggable::registerPlugin(const plugin& cPlugin, bool setImp)
 
 bool enginePlugins::registerPlugin(const plugin& cPlugin, bool setImp)
 {
-	{
-		plugin_t result = { cPlugin.getFunction(), cPlugin.getPriority(), cPlugin.getTarget() };
-		plugins[(size_t)cPlugin.getType()].push_back(result);
-	}
+  {
+    plugin_t result = { cPlugin.getFunction(), cPlugin.getPriority(), cPlugin.getTarget() };
+    plugins[(size_t)cPlugin.getType()].push_back(result);
+  }
 
-	return false;
+  return false;
 }

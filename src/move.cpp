@@ -15,34 +15,34 @@ const move* move::move_none = NULL;
 
 void move::init(const move& source)
 {
-	cType = source.cType;
-	
-	primaryAccuracy = source.primaryAccuracy;
-	secondaryAccuracy = source.secondaryAccuracy;
-	
-	power = source.power;
-	
-	PP = source.PP;
-	
-	damageType = source.damageType;
-	
-	target = source.target;
-	
-	priority = source.priority;
-	
-	// buffs
-	for (unsigned int indexBuff = 0; indexBuff < 9; indexBuff++)
-	{
-		selfBuff[indexBuff] = source.selfBuff[indexBuff];
-		targetDebuff[indexBuff] = source.targetDebuff[indexBuff];
-	}
-	
-	targetAilment = source.targetAilment;
-	targetVolatileAilment = source.targetVolatileAilment;
-	
-	description = source.description;
-	
-	lostChild = source.lostChild;
+  cType = source.cType;
+  
+  primaryAccuracy = source.primaryAccuracy;
+  secondaryAccuracy = source.secondaryAccuracy;
+  
+  power = source.power;
+  
+  PP = source.PP;
+  
+  damageType = source.damageType;
+  
+  target = source.target;
+  
+  priority = source.priority;
+  
+  // buffs
+  for (unsigned int indexBuff = 0; indexBuff < 9; indexBuff++)
+  {
+    selfBuff[indexBuff] = source.selfBuff[indexBuff];
+    targetDebuff[indexBuff] = source.targetDebuff[indexBuff];
+  }
+  
+  targetAilment = source.targetAilment;
+  targetVolatileAilment = source.targetVolatileAilment;
+  
+  description = source.description;
+  
+  lostChild = source.lostChild;
 }
 
 
@@ -50,33 +50,33 @@ void move::init(const move& source)
 
 
 move::move()
-	: name(),
-	pluggable(),
-	description()
+  : name(),
+  pluggable(),
+  description()
 {
-	cType = NULL;
-	
-	primaryAccuracy = UINT8_MAX;
-	secondaryAccuracy = -1;
-	
-	power = 0;
-	
-	PP = 0;
-	
-	damageType = 0;
-	
-	target = -1;
-	
-	priority = 0;
-	
-	// buffs
-	selfBuff.assign(0);
-	targetDebuff.assign(0);
-	
-	targetAilment = AIL_NV_NONE;
-	targetVolatileAilment = AIL_V_NONE;
-	
-	lostChild = true;
+  cType = NULL;
+  
+  primaryAccuracy = UINT8_MAX;
+  secondaryAccuracy = -1;
+  
+  power = 0;
+  
+  PP = 0;
+  
+  damageType = 0;
+  
+  target = -1;
+  
+  priority = 0;
+  
+  // buffs
+  selfBuff.assign(0);
+  targetDebuff.assign(0);
+  
+  targetAilment = AIL_NV_NONE;
+  targetVolatileAilment = AIL_V_NONE;
+  
+  lostChild = true;
 }
 
 
@@ -84,10 +84,10 @@ move::move()
 
 
 move::move(const move& source)
-	: name(source),
-	pluggable(source)
+  : name(source),
+  pluggable(source)
 {
-	init(source);
+  init(source);
 }
 
 
@@ -96,15 +96,15 @@ move::move(const move& source)
 
 move& move::operator=(const move& source)
 {
-	// identity theorem - simply return what we have now if equal address
-	if (this == &source) { return *this; } 
-	
-	name::operator=(source);
-	pluggable::operator=(source);
-	
-	init(source);
-	
-	return *this;
+  // identity theorem - simply return what we have now if equal address
+  if (this == &source) { return *this; } 
+  
+  name::operator=(source);
+  pluggable::operator=(source);
+  
+  init(source);
+  
+  return *this;
 }
 
 
@@ -113,7 +113,7 @@ move& move::operator=(const move& source)
 
 move::~move()
 {
-	description.clear();
+  description.clear();
 }
 
 
@@ -122,6 +122,6 @@ move::~move()
 
 const type& move::getType() const
 {
-	assert(cType != NULL);
-	return *cType;
+  assert(cType != NULL);
+  return *cType;
 }

@@ -18,18 +18,18 @@
 class PKAISHARED nature: public name
 {
 public:
-	static const nature* no_nature;
+  static const nature* no_nature;
 
-	/*
-	 * FV_ATTACK - attack
-	 * FV_SPATTACK - special attack
-	 * FV_DEFENSE - defense
-	 * FV_SPDEFENSE - special defense
-	 * FV_SPEED - speed
-	 * 
-	 * other FV values are not allocated
-	 */
-	boost::array<uint8_t, 5> modTable;
+  /*
+   * FV_ATTACK - attack
+   * FV_SPATTACK - special attack
+   * FV_DEFENSE - defense
+   * FV_SPDEFENSE - special defense
+   * FV_SPEED - speed
+   * 
+   * other FV values are not allocated
+   */
+  boost::array<uint8_t, 5> modTable;
 };
 
 #endif	/* NATURE_H */
