@@ -4,7 +4,7 @@
 #include <algorithm>
 
 #include <boost/function.hpp>
-#include <boost/extension/shared_library.hpp>
+#include <boost/dll/shared_library.hpp>
 
 #include "../inc/init_toolbox.h"
 
@@ -25,7 +25,7 @@
 #include "../inc/ranked_team.h"
 #include "../inc/ranked_neuralNet.h"
 
-using namespace boost::extensions;
+//using namespace boost::extensions;
 
 using namespace INI;
 using namespace orphan;

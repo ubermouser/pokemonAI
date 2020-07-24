@@ -21,7 +21,7 @@
 #include "../inc/temporalpropNet.h"
 #include "../inc/experienceNet.h"
 
-namespace boost { namespace extensions { class shared_library; } }
+namespace boost { namespace dll { class shared_library; } }
 class pkIO;
 class game;
 class trainer;
@@ -105,7 +105,7 @@ private:
 	enginePlugins engineExtensions; // list of engine extensions
 	std::vector<team_nonvolatile> teams; // growable list of team_nonvolatile objects
 	std::vector<neuralNet> networks; // growable list of neural network evaluation functions
-	std::vector<boost::extensions::shared_library*> plugins; // growable list of plugins (need to be closed upon exiting program)
+	std::vector<boost::dll::shared_library*> plugins; // growable list of plugins (need to be closed upon exiting program)
 
 public:
 
@@ -128,7 +128,7 @@ public:
 	std::vector<nature>& getNatures() { return natures; };
 	std::vector<item>& getItems() { return items; };
 	enginePlugins& getExtensions() { return engineExtensions; };
-	std::vector<boost::extensions::shared_library*>& getPlugins() { return plugins; };
+	std::vector<boost::dll::shared_library*>& getPlugins() { return plugins; };
 	const std::vector<move>& getMoves() const { return moves; };
 	const std::vector<type>& getTypes() const { return types; };
 	const std::vector<pokemon_base>& getPokemon() const { return pokemon; };

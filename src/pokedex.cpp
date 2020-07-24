@@ -2,7 +2,7 @@
 //#define PKAI_EXPORT
 #include "../inc/pokedex.h"
 
-#include <boost/extension/shared_library.hpp>
+#include <boost/dll/shared_library.hpp>
 #include <boost/function.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -10,11 +10,9 @@
 
 #include "../inc/init_toolbox.h"
 #include "../inc/orphan.h"
-
-#include "../inc/plugin.h"
 #include "../inc/pluggable.h"
 
-using namespace boost::extensions;
+using namespace boost::dll;
 
 using namespace INI;
 using namespace orphan;
@@ -1147,38 +1145,39 @@ bool pokedex::inputPlugins(const std::string& input_pluginFolder)
 		}
 
 		numPluginsTotal++;
-		shared_library* cPlugin = new shared_library(iPlugin->path().file_string(), false);
+		shared_library* cPlugin = new shared_library(iPlugin->path());
 
 		// attempt to load plugin:
-		if (!cPlugin->open())
+		/*if (!cPlugin->open())
 		{
 			std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
 				": plugin \"" << *iPlugin <<
 				"\" could not be loaded:!\n";
 			continue;
-		}
+		}*/
 
 		// attempt to find function which enumerates scripts within this plugin:
 		//regExtension_type registerExtensions = NULL;
-		regExtension_type registerExtensions(cPlugin->get<bool, const pokedex&, std::vector<plugin>&>("registerExtensions"));
+		regExtension_type registerExtensions(cPlugin->get<bool(const pokedex&, std::vector<plugin>&)>("registerExtensions"));
 		if (!registerExtensions)
 		{
 			std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
 				": could not find registerExtensions method in plugin \"" << *iPlugin << 
 				"\"!\n";
 			// close faulty module:
-			if (!cPlugin->close())
+			cPlugin->unload();
+			/*if (!)
 			{
 				std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
 					": FATAL - could not unregister unacceptable plugin \"" << *iPlugin << 
 					"\"!\n";
 				return false;
-			}
+			}*/
 			continue;
 		}
 
 		bool success = registerPlugin(
-			(regExtension_rawType)registerExtensions.functor.func_ptr, 
+			registerExtensions, 
 			&numExtensions, 
 			&numOverwritten, 
 			&mismatchedItems, 
@@ -1188,13 +1187,14 @@ bool pokedex::inputPlugins(const std::string& input_pluginFolder)
 
 		if (!success)
 		{
-			if (!cPlugin->close())
+			cPlugin->unload();
+			/*if (!cPlugin->unload())
 			{
 				std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
 					": FATAL - could not unregister unacceptable plugin \"" << *iPlugin << 
 					"\"!\n";
 				return false;
-			}
+			}*/
 			continue;
 		}
 
@@ -1278,7 +1278,7 @@ bool pokedex::inputPlugins(const std::string& input_pluginFolder)
 } // endOf inputScript
 
 bool pokedex::registerPlugin(
-	regExtension_rawType registerExtensions,
+	regExtension_type registerExtensions,
 	size_t* _numExtensions,
 	size_t* _numOverwritten,
 	std::vector<std::string>* _mismatchedItems,

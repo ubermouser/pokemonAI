@@ -7,7 +7,6 @@
 #include <boost/foreach.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 
-#define BOOST_FILESYSTEM_VERSION 2
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -575,7 +574,7 @@ bool trainer::saveTeamPopulation()
 		// make sure extension is txt, ignore all others:
 		if ((cTeamFile->path().extension().compare(".txt") != 0)) { continue; }
 
-		const std::string& cTeamFileStem = cTeamFile->path().stem();
+		const std::string cTeamFileStem = cTeamFile->path().stem().string();
 
 		// make sure extension is of the form _N-x<HASH>.txt
 		if (cTeamFileStem.size() != 20) { continue; }
@@ -820,7 +819,7 @@ bool trainer::saveNetworkPopulation()
 		// make sure extension is txt, ignore all others:
 		if ((cNetworkFile->path().extension().compare(".txt") != 0)) { continue; }
 
-		const std::string& cNetworkFileStem = cNetworkFile->path().stem();
+		const std::string cNetworkFileStem = cNetworkFile->path().stem().string();
 
 		// make sure extension is of the form NETx<HASH>.txt
 		if (cNetworkFileStem.size() != 20) { continue; }

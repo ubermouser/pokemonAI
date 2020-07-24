@@ -1,12 +1,6 @@
 
 #include "../inc/backpropNet.h"
 
-#ifdef WIN32
-#include <xmmintrin.h>
-#else // probably linux
-#include <x86intrin.h>
-#endif
-
 #include <math.h>
 #include <boost/math/special_functions/fpclassify.hpp>
 
@@ -62,34 +56,34 @@ void backpropNet::randomizeWeights()
 
 void backpropNet::updateWeights()
 {
-	__m128 vMomentumConstant;
-	__m128 vLearnRate;
-	__m128 vSub0, vSub1;
+	float vMomentumConstant;
+	float vLearnRate;
+	float vSub0, vSub1;
 
-	vLearnRate = _mm_load_ps1(&settings->learningRate);
-	vMomentumConstant = _mm_load_ps1(&settings->momentum);
+	vLearnRate = settings->learningRate;
+	vMomentumConstant = settings->momentum;
 
 	// update weights, reset weight accumulator:
-	for (__m128* vWeight = (__m128*)&cNet.weights.front(),
-		*vDeltaWeight = (__m128*)&deltaWeights.front(),
-		*vMomentum = (__m128*)&momentums.front(),
-		*vEndWeight = (__m128*)&cNet.weights.back();
+	for (float* vWeight = (float*)&cNet.weights.front(),
+		*vDeltaWeight = (float*)&deltaWeights.front(),
+		*vMomentum = (float*)&momentums.front(),
+		*vEndWeight = (float*)&cNet.weights.back();
 		vWeight != vEndWeight; 
 		++vWeight, ++vDeltaWeight, ++vMomentum)
 	{
 		// scale current momentum by momentum constant
-		vSub0 = _mm_mul_ps(*vMomentum, vMomentumConstant);
+		vSub0 = *vMomentum * vMomentumConstant;
 		// multiply aggregate error by learning rate
-		vSub1 = _mm_mul_ps(*vDeltaWeight, vLearnRate);
+		vSub1 = *vDeltaWeight * vLearnRate;
 		// add momentum to learning rate
-		vSub0 = _mm_add_ps(vSub0, vSub1);
+		vSub0 = vSub0 + vSub1;
 		// save momentum:
-		_mm_store_ps((float*)vMomentum, vSub0);
+		*vMomentum = vSub0;
 		// update weight:
-		*vWeight = _mm_add_ps(*vWeight, vSub0);
+		*vWeight = *vWeight + vSub0;
 
 		// zero delta weight:
-		*vDeltaWeight = _mm_setzero_ps();
+		*vDeltaWeight = 0;
 	}
 };
 
@@ -150,50 +144,28 @@ void backpropNet::backPropagate_layer(rLayerIterator_t nLayer)
 	const float* cActivation = (&cNet.activations.front() + nLayer->front().iNeuronIndex);
 	float* cError = (&cErrors.front() + nLayer->front().iNeuronIndex);
 	float* lError = (&cErrors.front() + nLayer->back().iNeuronIndex + 1);
-	float* lVectorError = lError - ((lError - cError)&3); // equivalent to mod 4
-	__m128 vActPrime;
+	float vActPrime;
 
-	// aligned deactivations:
-	while (cError != lVectorError)
+	// deactivations:
+	float activationPrime;
+	while (cError != lError)
 	{
 		// perform activation prime, store to vActPrime:
-		neuralNet::activationPrime_sse(cActivation, (float*)&vActPrime);
-		// multiply error of neuron by actPrime:
-		vActPrime = _mm_mul_ps((*(__m128*)cError), vActPrime);
+		neuralNet::activationPrime(cActivation, &activationPrime);
 		// store modified error back to pointer:
-		_mm_store_ps(cError, vActPrime);
+		*cError *= activationPrime;
 		// increment pointers:
-		cError += 4;
-		cActivation += 4;
+		cError += 1;
+		cActivation += 1;
 	};
-
-	// postscript: (unaligned activations):
-	{
-		size_t dError = (lError - cError);
-		float activationPrime;
-		switch(dError)
-		{
-		case 3:
-			neuralNet::activationPrime(cActivation + 2, &activationPrime);
-			cError[2] *= activationPrime;
-		case 2:
-			neuralNet::activationPrime(cActivation + 1, &activationPrime);
-			cError[1] *= activationPrime;
-		case 1:
-			neuralNet::activationPrime(cActivation + 0, &activationPrime);
-			cError[0] *= activationPrime;
-		case 0:
-			break;
-		}
-	}
 };
 
 void backpropNet::updateDeltaWeights_layer(rLayerIterator_t nLayer)
 {
 	floatIterator_t cWeight, lWeight, cDeltaWeight, pActivation;
 	neuronIterator_t cNeuron = nLayer->begin();
-	__m128 *vDeltaWeight, *vPActivation, *vEndDeltaWeight;
-	__m128 vNeuronError, vSub0, vSub1, vSub2, vSub3;
+	float *vDeltaWeight, *vPActivation, *vEndDeltaWeight;
+	float vNeuronError, vSub0, vSub1, vSub2, vSub3;
 
 	for (neuronIterator_t lNeuron = nLayer->end(); 
 		cNeuron != lNeuron; 
@@ -202,12 +174,12 @@ void backpropNet::updateDeltaWeights_layer(rLayerIterator_t nLayer)
 		// modified error of k neuron
 		float& cNeuronError = cErrors[cNeuron->iNeuronIndex];
 		// activation of j neuron
-		vPActivation = (__m128*)&*(cNet.activations.begin() + (nLayer + 1)->front().iNeuronIndex);
+		vPActivation = (float*)&*(cNet.activations.begin() + (nLayer + 1)->front().iNeuronIndex);
 		// deltaWeights dW[j,k]
-		vDeltaWeight = (__m128*)&*(deltaWeights.begin() + cNeuron->iWeightBegin);
-		vEndDeltaWeight = (__m128*)&*(deltaWeights.begin() + cNeuron->iWeightEnd);
+		vDeltaWeight = (float*)&*(deltaWeights.begin() + cNeuron->iWeightBegin);
+		vEndDeltaWeight = (float*)&*(deltaWeights.begin() + cNeuron->iWeightEnd);
 
-		vNeuronError = _mm_load_ps1(&cNeuronError);
+		vNeuronError = cNeuronError;
 
 		// update each neuron's weight:
 		do
@@ -216,16 +188,16 @@ void backpropNet::updateDeltaWeights_layer(rLayerIterator_t nLayer)
 			 * dWeight[j,k] += activation[j] * modifiedError[k]
 			 */
 			// multiply:
-			vSub0 = _mm_mul_ps(vPActivation[0], vNeuronError);
-			vSub1 = _mm_mul_ps(vPActivation[1], vNeuronError);
-			vSub2 = _mm_mul_ps(vPActivation[2], vNeuronError);
-			vSub3 = _mm_mul_ps(vPActivation[3], vNeuronError);
+			vSub0 = vPActivation[0] * vNeuronError;
+			vSub1 = vPActivation[1] * vNeuronError;
+			vSub2 = vPActivation[2] * vNeuronError;
+			vSub3 = vPActivation[3] * vNeuronError;
 
 			// add to error accumulators:
-			vDeltaWeight[0] = _mm_add_ps(vDeltaWeight[0], vSub0);
-			vDeltaWeight[1] = _mm_add_ps(vDeltaWeight[1], vSub1);
-			vDeltaWeight[2] = _mm_add_ps(vDeltaWeight[2], vSub2);
-			vDeltaWeight[3] = _mm_add_ps(vDeltaWeight[3], vSub3);
+			vDeltaWeight[0] = vDeltaWeight[0] + vSub0;
+			vDeltaWeight[1] = vDeltaWeight[1] + vSub1;
+			vDeltaWeight[2] = vDeltaWeight[2] + vSub2;
+			vDeltaWeight[3] = vDeltaWeight[3] + vSub3;
 
 			// increment pointers:
 			vDeltaWeight += 4;
@@ -233,8 +205,8 @@ void backpropNet::updateDeltaWeights_layer(rLayerIterator_t nLayer)
 		}while(vDeltaWeight != vEndDeltaWeight);
 
 		// update bias weight: (activation of this neuron is always 1, so we can skip multiply by vPActivation)
-		vSub0 = _mm_add_ss(vDeltaWeight[0], vNeuronError);
-		_mm_store_ss((float*)vDeltaWeight, vSub0);
+		vSub0 = vDeltaWeight[0] + vNeuronError;
+		*vDeltaWeight = vSub0;
 	}
 };
 

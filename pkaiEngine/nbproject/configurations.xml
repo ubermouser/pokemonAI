@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="84">
+<configurationDescriptor version="100">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
@@ -97,11 +97,13 @@
   <confs>
     <conf name="Debug" type="3">
       <toolsSet>
-        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
         <ccTool>
+          <commandLine>-O0</commandLine>
           <preprocessorList>
             <Elem>DOUBLEPRECISION</Elem>
             <Elem>PKAI_EXPORT</Elem>
@@ -115,11 +117,114 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="../inc/ability.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/environment_nonvolatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/environment_possible.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/environment_volatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/fp_compare.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/init_toolbox.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/item.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/move.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/move_nonvolatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/move_volatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/name.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/nature.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/orphan.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/pkCU.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/pkai.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/pluggable.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/pluggable_types.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/plugin.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/pokedex.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/pokemon_base.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/pokemon_nonvolatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/pokemon_volatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/signature.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/team_nonvolatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/team_volatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/type.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/ability.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/environment_nonvolatile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/environment_possible.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/environment_volatile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/fixedpoint/fixed_class.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/fixedpoint/fixed_func.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/fixedpoint/fixed_func.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/fixedpoint/fixsintab.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/init_toolbox.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/item.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/move.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/move_nonvolatile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/move_volatile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/name.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/nature.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/pkCU.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/pluggable.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/pokedex.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/pokemon_base.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/pokemon_nonvolatile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/pokemon_volatile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/signature.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/team_nonvolatile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/team_volatile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/type.cpp" ex="false" tool="1" flavor2="0">
+      </item>
     </conf>
     <conf name="Release" type="3">
       <toolsSet>
-        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
         <cTool>
@@ -148,6 +253,108 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="../inc/ability.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/environment_nonvolatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/environment_possible.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/environment_volatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/fp_compare.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/init_toolbox.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/item.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/move.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/move_nonvolatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/move_volatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/name.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/nature.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/orphan.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/pkCU.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/pkai.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/pluggable.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/pluggable_types.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/plugin.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/pokedex.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/pokemon_base.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/pokemon_nonvolatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/pokemon_volatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/signature.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/team_nonvolatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/team_volatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/type.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/ability.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/environment_nonvolatile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/environment_possible.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/environment_volatile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/fixedpoint/fixed_class.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/fixedpoint/fixed_func.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/fixedpoint/fixed_func.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/fixedpoint/fixsintab.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/init_toolbox.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/item.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/move.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/move_nonvolatile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/move_volatile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/name.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/nature.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/pkCU.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/pluggable.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/pokedex.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/pokemon_base.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/pokemon_nonvolatile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/pokemon_volatile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/signature.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/team_nonvolatile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/team_volatile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/type.cpp" ex="false" tool="1" flavor2="0">
+      </item>
     </conf>
   </confs>
 </configurationDescriptor>

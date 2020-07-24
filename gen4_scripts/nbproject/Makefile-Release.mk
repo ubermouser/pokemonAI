@@ -21,7 +21,7 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-Linux-x86
+CND_PLATFORM=GNU-Linux
 CND_DLIB_EXT=so
 CND_CONF=Release
 CND_DISTDIR=dist
@@ -35,7 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/_ext/1360937237/gen4_scripts.o
+	${OBJECTDIR}/_ext/511e4115/gen4_scripts.o
 
 
 # C Compiler Flags
@@ -60,12 +60,12 @@ LDLIBSOPTIONS=-L../dist/Release/GNU-Linux-x86/
 
 ../plugins/libgen4_scripts.so: ${OBJECTFILES}
 	${MKDIR} -p ../plugins
-	${LINK.cc} -shared -o ../plugins/libgen4_scripts.so -fPIC ${OBJECTFILES} ${LDLIBSOPTIONS} 
+	${LINK.cc} -o ../plugins/libgen4_scripts.so ${OBJECTFILES} ${LDLIBSOPTIONS} -shared -fPIC
 
-${OBJECTDIR}/_ext/1360937237/gen4_scripts.o: ../src/gen4_scripts.cpp 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1360937237
-	${RM} $@.d
-	$(COMPILE.cc) -O3 -DDOUBLEPRECISION -DGEN4_SCRIPTS_EXPORTS -DNDEBUG -DTOLUA_RELEASE -D_LINUX -fPIC  -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1360937237/gen4_scripts.o ../src/gen4_scripts.cpp
+${OBJECTDIR}/_ext/511e4115/gen4_scripts.o: ../src/gen4_scripts.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -DDOUBLEPRECISION -DGEN4_SCRIPTS_EXPORTS -DNDEBUG -DTOLUA_RELEASE -D_LINUX -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/gen4_scripts.o ../src/gen4_scripts.cpp
 
 # Subprojects
 .build-subprojects:
@@ -73,7 +73,6 @@ ${OBJECTDIR}/_ext/1360937237/gen4_scripts.o: ../src/gen4_scripts.cpp
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
-	${RM} ../plugins/libgen4_scripts.so
 
 # Subprojects
 .clean-subprojects:

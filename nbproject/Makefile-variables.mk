@@ -7,21 +7,21 @@ CND_BASEDIR=`pwd`
 CND_BUILDDIR=build
 CND_DISTDIR=dist
 # Debug configuration
-CND_PLATFORM_Debug=GNU-Linux-x86
-CND_ARTIFACT_DIR_Debug=dist/Debug/GNU-Linux-x86
+CND_PLATFORM_Debug=GNU-Linux
+CND_ARTIFACT_DIR_Debug=dist/Debug/GNU-Linux
 CND_ARTIFACT_NAME_Debug=pokemonai
-CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-Linux-x86/pokemonai
-CND_PACKAGE_DIR_Debug=dist/Debug/GNU-Linux-x86/package
+CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-Linux/pokemonai
+CND_PACKAGE_DIR_Debug=dist/Debug/GNU-Linux/package
 CND_PACKAGE_NAME_Debug=pokemonai.tar
-CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux-x86/package/pokemonai.tar
+CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux/package/pokemonai.tar
 # Release configuration
-CND_PLATFORM_Release=GNU-Linux-x86
-CND_ARTIFACT_DIR_Release=dist/Release/GNU-Linux-x86
+CND_PLATFORM_Release=GNU-Linux
+CND_ARTIFACT_DIR_Release=dist/Release/GNU-Linux
 CND_ARTIFACT_NAME_Release=pokemonai
-CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux-x86/pokemonai
-CND_PACKAGE_DIR_Release=dist/Release/GNU-Linux-x86/package
+CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux/pokemonai
+CND_PACKAGE_DIR_Release=dist/Release/GNU-Linux/package
 CND_PACKAGE_NAME_Release=pokemonai.tar
-CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux-x86/package/pokemonai.tar
+CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux/package/pokemonai.tar
 #
 # include compiler specific variables
 #

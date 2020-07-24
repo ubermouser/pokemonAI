@@ -1,4 +1,4 @@
-#include <boost/extension/shared_library.hpp>
+#include <boost/dll/shared_library.hpp>
 
 #include <boost/foreach.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -30,7 +30,7 @@
 #include "../inc/orphan.h"
 //#undef PKAI_STATIC
 
-using namespace boost::extensions;
+//using namespace boost::extensions;
 
 // globals:
 
@@ -117,14 +117,15 @@ pokemonAI::~pokemonAI()
 	//TODO: unload all plugins:
 	for (size_t iPlugin = 0; iPlugin != plugins.size(); ++iPlugin)
 	{
-		shared_library* cPlugin = plugins[iPlugin];
-		if (!cPlugin->close())
+		boost::dll::shared_library* cPlugin = plugins[iPlugin];
+		cPlugin->unload();
+		/*if (!cPlugin->close())
 		{
 			std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
 				": could not unregister unacceptable plugin index" << iPlugin << 
 				"!\n";
 			continue;
-		}
+		}*/
 		delete cPlugin;
 	}
 

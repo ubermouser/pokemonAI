@@ -5,15 +5,6 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <cstring>
 
-#ifdef WIN32
-#include <xmmintrin.h>
-#else // probably linux
-#include <x86intrin.h>
-#endif
-
-// we need a define rule to determine whether the supporting system has AVX
-#include <avxintrin-emu.h>
-
 #include <boost/foreach.hpp>
 #include <boost/static_assert.hpp>
 
@@ -101,90 +92,6 @@ void neuralNet::activation_approx(const float* _neuronOutput, float* result)
 	*result = tmp;
 };
 
-void neuralNet::activation_approx_sse(const float* _neuronOutput, float* result)
-{
-	BOOST_STATIC_ASSERT(SIGMOIDCOEFFICIENT == 4.0f);
-	// code adapted from http://ybeernet.blogspot.com/2011/03/speeding-up-sigmoid-function-by.html
-	// approximates sigmoid function with coefficient 4.0f
-	static const __m128 ones = _mm_set1_ps(1.0f);
-	static const __m128 oneFourths = _mm_set1_ps(0.25f);
-	static const __m128 fours = _mm_set1_ps(4.0f);
-
-	__m128 temp;
-	const __m128* vOutput = (__m128*)_neuronOutput;
-
-	// min (output, 4.0)
-	temp = _mm_min_ps(*vOutput, fours);
-	// multiply by 0.25
-	temp = _mm_mul_ps(temp, oneFourths);
-	// 1 - ans
-	temp = _mm_sub_ps(ones, temp);
-	// ans^16
-	temp = _mm_mul_ps(temp, temp);
-	temp = _mm_mul_ps(temp, temp);
-	temp = _mm_mul_ps(temp, temp);
-	temp = _mm_mul_ps(temp, temp);
-	// 1 + ans
-	temp = _mm_add_ps(ones, temp);
-	// 1 / ans
-	temp = _mm_rcp_ps(temp);
-
-#ifndef NDEBUG
-	const float* _temp = (float*)&temp;
-	assert(fastabs(_temp[0] - activation(_neuronOutput[0])) < 0.05f);
-	assert(fastabs(_temp[1] - activation(_neuronOutput[1])) < 0.05f);
-	assert(fastabs(_temp[2] - activation(_neuronOutput[2])) < 0.05f);
-	assert(fastabs(_temp[3] - activation(_neuronOutput[3])) < 0.05f);
-#endif
-
-	// return ans
-	_mm_store_ps(result, temp);
-};
-
-void neuralNet::activation_approx_avx(const float* _neuronOutput, float* result)
-{
-	BOOST_STATIC_ASSERT(SIGMOIDCOEFFICIENT == 4.0f);
-	// code adapted from http://ybeernet.blogspot.com/2011/03/speeding-up-sigmoid-function-by.html
-	// approximates sigmoid function with coefficient 4.0f
-	static const __m256 ones = _mm256_set1_ps(1.0f);
-	static const __m256 oneFourths = _mm256_set1_ps(0.25f);
-	static const __m256 fours = _mm256_set1_ps(4.0f);
-
-	__m256 temp;
-	const __m256* vOutput = (__m256*)_neuronOutput;
-
-	// min (output, 4.0)
-	temp = _mm256_min_ps(*vOutput, fours);
-	// multiply by 0.25
-	temp = _mm256_mul_ps(temp, oneFourths);
-	// 1 - ans
-	temp = _mm256_sub_ps(ones, temp);
-	// ans^16
-	temp = _mm256_mul_ps(temp, temp);
-	temp = _mm256_mul_ps(temp, temp);
-	temp = _mm256_mul_ps(temp, temp);
-	temp = _mm256_mul_ps(temp, temp);
-	// 1 + ans
-	temp = _mm256_add_ps(ones, temp);
-	// 1 / ans
-	temp = _mm256_rcp_ps(temp);
-
-#ifndef NDEBUG
-	const float* _temp = (float*)&temp;
-	assert(fastabs(_temp[0] - activation(_neuronOutput[0])) < 0.05f);
-	assert(fastabs(_temp[1] - activation(_neuronOutput[1])) < 0.05f);
-	assert(fastabs(_temp[2] - activation(_neuronOutput[2])) < 0.05f);
-	assert(fastabs(_temp[3] - activation(_neuronOutput[3])) < 0.05f);
-	assert(fastabs(_temp[4] - activation(_neuronOutput[4])) < 0.05f);
-	assert(fastabs(_temp[5] - activation(_neuronOutput[5])) < 0.05f);
-	assert(fastabs(_temp[6] - activation(_neuronOutput[6])) < 0.05f);
-	assert(fastabs(_temp[7] - activation(_neuronOutput[7])) < 0.05f);
-#endif
-
-	// return ans
-	_mm256_store_ps(result, temp);
-};
-
 
 
 
@@ -199,63 +106,6 @@ void neuralNet::activationPrime(const float* neuronOutput, float* result)
 	*result = SIGMOIDCOEFFICIENT * *neuronOutput * (1.0f - *neuronOutput);
 };
 
-void neuralNet::activationPrime_sse(const float* neuronOutput, float* result)
-{
-	static const __m128 ones = _mm_set1_ps(1.0f);
-	static const __m128 sigCoefficients = _mm_set1_ps(SIGMOIDCOEFFICIENT);
-
-	__m128 temp;
-	const __m128* vOutput = (__m128*)neuronOutput;
-
-	// 1 - ans
-	temp = _mm_sub_ps(ones, *vOutput);
-	// (1-ans) * ans
-	temp = _mm_mul_ps(temp, *vOutput);
-	// ans * coefficient
-	temp = _mm_mul_ps(temp, sigCoefficients);
-
-#ifndef NDEBUG
-	const float* _temp = (float*)&temp;
-	assert(fastabs(_temp[0] - activationPrime(neuronOutput[0])) < 0.05f);
-	assert(fastabs(_temp[1] - activationPrime(neuronOutput[1])) < 0.05f);
-	assert(fastabs(_temp[2] - activationPrime(neuronOutput[2])) < 0.05f);
-	assert(fastabs(_temp[3] - activationPrime(neuronOutput[3])) < 0.05f);
-#endif
-
-	// return ans
-	_mm_store_ps(result, temp);
-};
-
-void neuralNet::activationPrime_avx(const float* neuronOutput, float* result)
-{
-	static const __m256 ones = _mm256_set1_ps(1.0f);
-	static const __m256 sigCoefficients = _mm256_set1_ps(SIGMOIDCOEFFICIENT);
-
-	__m256 temp;
-	const __m256* vOutput = (__m256*)neuronOutput;
-
-	// 1 - ans
-	temp = _mm256_sub_ps(ones, *vOutput);
-	// (1-ans) * ans
-	temp = _mm256_mul_ps(temp, *vOutput);
-	// ans * coefficient
-	temp = _mm256_mul_ps(temp, sigCoefficients);
-
-#ifndef NDEBUG
-	const float* _temp = (float*)&temp;
-	assert(fastabs(_temp[0] - activationPrime(neuronOutput[0])) < 0.05f);
-	assert(fastabs(_temp[1] - activationPrime(neuronOutput[1])) < 0.05f);
-	assert(fastabs(_temp[2] - activationPrime(neuronOutput[2])) < 0.05f);
-	assert(fastabs(_temp[3] - activationPrime(neuronOutput[3])) < 0.05f);
-	assert(fastabs(_temp[4] - activationPrime(neuronOutput[4])) < 0.05f);
-	assert(fastabs(_temp[5] - activationPrime(neuronOutput[5])) < 0.05f);
-	assert(fastabs(_temp[6] - activationPrime(neuronOutput[6])) < 0.05f);
-	assert(fastabs(_temp[7] - activationPrime(neuronOutput[7])) < 0.05f);
-#endif
-
-	// return ans
-	_mm256_store_ps(result, temp);
-};
 
 
 
@@ -270,8 +120,8 @@ void neuralNet::feedForward()
 void neuralNet::feedForward_layer(layerIterator_t nLayer)
 {
 	constFloatIterator_t pActivations, cWeight, endWeight;
-	__m256 vTotal, vSub0, vSub1;
-	__m256 *vWeight, *vAct, *vEndWeight;
+	float vTotal, vSub0, vSub1;
+	const float *vWeight, *vAct, *vEndWeight;
 
 	// summate each neuron's contribution
 	for (neuronIterator_t cNeuron = nLayer->begin(), end = nLayer->end(); 
@@ -286,31 +136,31 @@ void neuralNet::feedForward_layer(layerIterator_t nLayer)
 		// (first 15 neurons) (TODO: redesign preamble and remove assertions for multiple of 16 size widths in neuralNet.h!)
 
 		// summate all neurons of previous layer: (remaining batches of 8 neurons)
-		vWeight = (__m256*)&cWeight[0];
-		vAct = (__m256*)&pActivations[0];
+		vWeight = &cWeight[0];
+		vAct = &pActivations[0];
 
-		vEndWeight = (__m256*)&endWeight[0];
+		vEndWeight = &endWeight[0];
 
 		// initialize the activation of this neuron to its bias weight. The bias weight's neuron is always on:
-		vTotal = _mm256_set_ps(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, *endWeight); // can this be made with an aligned load?
+		vTotal = *endWeight; // can this be made with an aligned load?
 
-		do // Take advantage of SIMD instructions by doing 16 multiplies per iteration
+		do // Take advantage of SIMD instructions by doing 16 (now 2) multiplies per iteration
 		{
 			/* 
 			 * each neuron's contribution is:
 			 * input[j] += weight[i,j] * activation[i]
 			 */
 			// multiply:
-			vSub0 = _mm256_mul_ps(vWeight[0], vAct[0]);
-			vSub1 = _mm256_mul_ps(vWeight[1], vAct[1]);
+			vSub0 = vWeight[0] * vAct[0];
+			vSub1 = vWeight[1] * vAct[1];
 
 			// prefetch next values: (these don't appear to help, are the networks too small for this to matter?)
 			//_mm_prefetch((char*)(vWeight0+4), _MM_HINT_T0);
 			//_mm_prefetch((char*)(vAct0+4), _MM_HINT_T0);
 
 			// add to accumulator:
-			vTotal = _mm256_add_ps(vTotal, vSub0);
-			vTotal = _mm256_add_ps(vTotal, vSub1);
+			vTotal = vTotal + vSub0;
+			vTotal = vTotal + vSub1;
 
 			// increment pointers:
 			vWeight += 2;
@@ -318,16 +168,8 @@ void neuralNet::feedForward_layer(layerIterator_t nLayer)
 		}
 		while (vWeight != vEndWeight);
 
-		//finalize: (combine all 4 accumulators)
-		{
-			vTotal = _mm256_hadd_ps(vTotal, vTotal);
-			vTotal = _mm256_hadd_ps(vTotal, vTotal);
-			__m128 vUpperTotal = _mm256_extractf128_ps(vTotal, 1);
-			vUpperTotal = _mm_add_ps(vUpperTotal, _mm256_castps256_ps128(vTotal));
-
-			// store the lowest float into cInput:
-			_mm_store_ss(&activations[cNeuron->iNeuronIndex], vUpperTotal);
-		}
+		//finalize:
+		activations[cNeuron->iNeuronIndex] = vTotal;
 	}
 
 	// activate all neurons in this layer:
@@ -338,8 +180,8 @@ void neuralNet::feedForward_layer(layerIterator_t nLayer)
 	// aligned activations:
 	while (cActivation != lVectorActivation)
 	{
-		activation_approx_avx(cActivation, cActivation);
-		cActivation += ALIGN_SIZE;
+		activation_approx(cActivation, cActivation);
+		cActivation += 1;
 	};
 
 	// postscript: (unaligned activations):
@@ -354,8 +196,7 @@ void neuralNet::feedForward_layer(layerIterator_t nLayer)
 		case 5:
 			activation_approx(cActivation+4,cActivation+4);
 		case 4:
-			activation_approx_sse(cActivation+0,cActivation+0);
-			break;
+			activation_approx(cActivation+3,cActivation+3);
 		case 3:
 			activation_approx(cActivation+2, cActivation+2);
 		case 2:

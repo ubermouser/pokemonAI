@@ -3,7 +3,7 @@
 
 // we use C limits instead of C++ limits, so define our usage of them
 #define __STDC_LIMIT_MACROS
-#define BOOST_FILESYSTEM_VERSION 2
+#define BOOST_FILESYSTEM_VERSION 3
 
 // standard C libraries:
 #include <stddef.h>

@@ -61,14 +61,10 @@ private:
 
 	static float activation_approx(float neuronOutput);
 	static void activation_approx(const float* neuronOutput, float* result);
-	static void activation_approx_sse(const float* neuronOutput, float* result);
-	static void activation_approx_avx(const float* neuronOutput, float* result);
 
 	/* inverse of the activation function */
 	static float activationPrime(float neuronOutput);
 	static void activationPrime(const float* neuronOutput, float* result);
-	static void activationPrime_sse(const float* neuronOutput, float* result);
-	static void activationPrime_avx(const float* neuronOutput, float* result);
 public:
 	/* generates an empty invalid neural network */
 	neuralNet() 

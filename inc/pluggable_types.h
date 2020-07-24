@@ -162,6 +162,6 @@ typedef int (*onInitMove_rawType)
 
 typedef void (*voidFunction_rawType)(void*);
 
-typedef bool (*regExtension_rawType)(const pokedex&, std::vector<plugin>&);
+//typedef bool (*regExtension_rawType)(const pokedex&, std::vector<plugin>&);
 
 #endif /* PLUGGABLE_TYPES_H */

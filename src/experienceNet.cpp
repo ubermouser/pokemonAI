@@ -5,16 +5,6 @@
 #include <boost/math/distributions/normal.hpp>
 #include <math.h>
 
-#ifdef WIN32
-#include <xmmintrin.h>
-#include <ia32intrin.h>
-#else // probably linux
-#include <amdlibm.h>
-#include <x86intrin.h>
-
-#define _mm_exp_ps amd_vrs4_expf
-#endif
-
 #include "../inc/fp_compare.h"
 
 #include "../inc/evaluator_featureVector.h"
@@ -113,14 +103,14 @@ void experienceNet::resize(size_t _numFeatures)
 
 void experienceNet::decayExperience()
 {
-	if (mostlyEQ(eSet.decay, 1.0f)) { return; } // exit early if no change
+	/*if (mostlyEQ(eSet.decay, 1.0f)) { return; } // exit early if no change
 
 	const __m128 decays = _mm_load_ps1(&eSet.decay);
 
 	for (__m128* cVal = (__m128*)&vals.front(), *endVal = (__m128*)(&vals.front()+vals.size()); cVal != endVal; ++cVal)
 	{
 		*cVal = _mm_mul_ps(*cVal, decays);
-	};
+	};*/
 	/*// TODO: SIMD
 	for (size_t iVal = 0; iVal != vals.size(); ++iVal)
 	{
@@ -238,6 +228,12 @@ float experienceNet::getExperience_feature(float cValue, size_t iFeature) const
 
 
 #define M_PI 3.14159265358979323846
+/*void experienceNet::normalPDF(float* result, const float* _partitions, float _mean, float _stdDev)
+{
+	boost::math::normal_distribution<float> cNormal(_mean, _stdDev);
+	result[0] = boost::math::pdf(cNormal, _partitions[0]));
+}*/
+
 void experienceNet::normalPDF_sse(float* result, const float* _partitions, float _mean, float _stdDev)
 {
 	/* 
@@ -252,52 +248,17 @@ void experienceNet::normalPDF_sse(float* result, const float* _partitions, float
 
 	return result;
 	*/
-	const __m128& partitions = *(__m128*)_partitions;
-	__m128 exponent, tmp, mean, sd;
-
-	/* CODE ADAPTED FROM http://fastcpp.blogspot.com/2011/03/changing-sign-of-float-values-using-sse.html */
-	static const __m128 signmask = _mm_castsi128_ps(_mm_set1_epi32(0x80000000));
-
-	static const __m128 twos = _mm_set_ps1(2.0f);
-	static const __m128 sqrt_pi_2_s = _mm_set_ps1(sqrt(2.0 * M_PI));
-
-	// store mean and sd:
-	mean = _mm_load_ps1(&_mean);
-	sd = _mm_load_ps1(&_stdDev);
-
-	// exponent = x - mean
-	exponent = _mm_sub_ps(partitions, mean);
-	// exponent *= -exponent;
-	tmp = _mm_xor_ps(exponent, signmask);
-	exponent = _mm_mul_ps(exponent, tmp);
-	// exponent /= 2 * sd * sd;
-	tmp = _mm_mul_ps(sd, sd);
-	tmp = _mm_mul_ps(tmp, twos);
-	exponent = _mm_div_ps(exponent, tmp);
-	// exponent = exp(exponent);
-	exponent = _mm_exp_ps(exponent);
-	// exponent /= sd * sqrt(2 * pi)
-	tmp = _mm_mul_ps(sd, sqrt_pi_2_s);
-	tmp = _mm_div_ps(exponent, tmp);
-
-
-#ifndef NDEBUG
-	const float* _result = (float*)&tmp;
 	boost::math::normal_distribution<float> cNormal(_mean, _stdDev);
-	assert(fastabs(_result[0] - boost::math::pdf(cNormal, _partitions[0])) < 0.001f);
-	assert(fastabs(_result[1] - boost::math::pdf(cNormal, _partitions[1])) < 0.001f);
-	assert(fastabs(_result[2] - boost::math::pdf(cNormal, _partitions[2])) < 0.001f);
-	assert(fastabs(_result[3] - boost::math::pdf(cNormal, _partitions[3])) < 0.001f);
-#endif
-
-	// return result:
-	_mm_store_ps(result, tmp);
+	result[0] = boost::math::pdf(cNormal, _partitions[0]);
+	result[1] = boost::math::pdf(cNormal, _partitions[1]);
+	result[2] = boost::math::pdf(cNormal, _partitions[2]);
+	result[3] = boost::math::pdf(cNormal, _partitions[3]);
 };
 #undef M_PI
 
 void experienceNet::addExperience_feature_sse(float cVal, float magnitude, size_t iFeature)
 {
-	assert(cVal >= 0 && cVal <= 1.0);
+	/*assert(cVal >= 0 && cVal <= 1.0);
 
 	static const __m128 addOffsets = _mm_set_ps(0.0, 1.0, 2.0, 3.0);
 	floatIterator_t cVals = vals.begin() + offsets[iFeature];
@@ -305,7 +266,7 @@ void experienceNet::addExperience_feature_sse(float cVal, float magnitude, size_
 	const __m128 maxNormalRecips = _mm_load_ps1(&maxNormalRecip);
 	const __m128 magnitudes = _mm_load_ps1(&magnitude);
 
-	__m128 cPartitions, result;
+	float cPartitions, result;
 
 	for (size_t iTap = 0; iTap < eSet.numTaps; iTap +=4, cVals += 4)
 	{
@@ -317,15 +278,15 @@ void experienceNet::addExperience_feature_sse(float cVal, float magnitude, size_
 		cPartitions = _mm_mul_ps(cPartitions, partitions);
 
 		// compute PDF of the normal distribution:
-		normalPDF_sse((float*)&result, (float*)&cPartitions, cVal, eSet.extrapolation);
+		normalPDF((float*)&result, (float*)&cPartitions, cVal, eSet.extrapolation);
 
 		// divide by maxNormal, multiply by magnitude:
-		result = _mm_mul_ps(result, maxNormalRecips);
-		result = _mm_mul_ps(result, magnitudes);
+		result *= maxNormalRecip;
+		result *= magnitude;
 
 		// add recency/histogram:
 		expAdd((float*)&*cVals, (float*)&*cVals, (float*)&result);
-	}
+	}*/
 }
 
 
@@ -335,7 +296,7 @@ void experienceNet::addExperience_feature_sse(float cVal, float magnitude, size_
 
 void experienceNet::recencyAdd_sse(float* cResult, const float* cVal, const float* addedVal)
 {
-	// increase value bounded to 1.0:
+	/*// increase value bounded to 1.0:
 	static const __m128 ones = _mm_set1_ps(1.0f);
 	const __m128* addedVals = (__m128*)addedVal;
 	const __m128* cVals = (__m128*)cVal;
@@ -346,12 +307,12 @@ void experienceNet::recencyAdd_sse(float* cResult, const float* cVal, const floa
 	result = _mm_min_ps(result, ones);
 
 	// return result:
-	_mm_store_ps(cResult, result);
+	_mm_store_ps(cResult, result);*/
 }
 
 void experienceNet::frequencyAdd_sse(float* cResult, const float* cVal, const float* addedVal)
 {
-	// increase value:
+	/*// increase value:
 	const __m128* addedVals = (__m128*)addedVal;
 	const __m128* cVals = (__m128*)cVal;
 
@@ -359,5 +320,5 @@ void experienceNet::frequencyAdd_sse(float* cResult, const float* cVal, const fl
 	__m128 result = _mm_add_ps(*cVals, *addedVals);
 
 	// return result:
-	_mm_store_ps(cResult, result);
+	_mm_store_ps(cResult, result);*/
 }

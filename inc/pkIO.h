@@ -16,8 +16,6 @@
 
 #include <boost/tokenizer.hpp>
 
-#define BOOST_FILESYSTEM_VERSION 2
-
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>

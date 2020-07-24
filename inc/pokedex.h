@@ -13,8 +13,9 @@
 #include "../inc/move.h"
 #include "../inc/pokemon_base.h"
 #include "../inc/pluggable_types.h"
+#include "../inc/plugin.h"
 
-namespace boost { namespace extensions { class shared_library; } }
+namespace boost { namespace dll { class shared_library; } }
 
 class PKAISHARED pokedex
 {
@@ -33,7 +34,7 @@ private:
 
 	virtual enginePlugins& getExtensions() = 0;
 
-	virtual std::vector<boost::extensions::shared_library*>& getPlugins() = 0;
+	virtual std::vector<boost::dll::shared_library*>& getPlugins() = 0;
 
 public:
 	virtual const std::vector<move>& getMoves() const = 0;
@@ -52,7 +53,7 @@ public:
 
 	bool inputPlugins(const std::string& input_pluginFolder);
 	bool registerPlugin(
-		regExtension_rawType registerExtensions,
+		regExtension_type registerExtensions,
 		size_t* numExtensions = NULL,
 		size_t* numOverwritten = NULL,
 		std::vector<std::string>* mismatchedItems = NULL,
