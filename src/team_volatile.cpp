@@ -8,15 +8,15 @@
 
 #include <boost/static_assert.hpp>
 
-BOOST_STATIC_ASSERT(sizeof(team_volatile) == (sizeof(uint64_t)*8));
-BOOST_STATIC_ASSERT(sizeof(volatileStatus) == (sizeof(uint32_t)*3));
-BOOST_STATIC_ASSERT(sizeof(nonvolatileStatus) == (sizeof(uint32_t)*1));
+BOOST_STATIC_ASSERT(sizeof(TeamVolatile) == (sizeof(uint64_t)*8));
+BOOST_STATIC_ASSERT(sizeof(VolatileStatus) == (sizeof(uint32_t)*3));
+BOOST_STATIC_ASSERT(sizeof(NonVolatileStatus) == (sizeof(uint32_t)*1));
 
 
 
 
 
-bool team_volatile::operator ==(const team_volatile& other) const
+bool TeamVolatile::operator ==(const TeamVolatile& other) const
 {	
   bool result = true;
 
@@ -36,7 +36,7 @@ bool team_volatile::operator ==(const team_volatile& other) const
 
 
 
-bool team_volatile::operator !=(const team_volatile& other) const
+bool TeamVolatile::operator !=(const TeamVolatile& other) const
 {
   return !(*this == other);
 }
@@ -45,7 +45,7 @@ bool team_volatile::operator !=(const team_volatile& other) const
 
 
 
-void team_volatile::initialize(const team_nonvolatile& nv)
+void TeamVolatile::initialize(const TeamNonVolatile& nv)
 {
   // status and all other variables have been zeroed from a different context 
   for (size_t iTeammate = 0, _numTeammates = nv.getNumTeammates(); iTeammate != _numTeammates; ++iTeammate)
@@ -58,7 +58,7 @@ void team_volatile::initialize(const team_nonvolatile& nv)
 
 
 
-int32_t team_volatile::cGetBoost(size_t type) const
+int32_t TeamVolatile::cGetBoost(size_t type) const
 {
   switch(type)
   {
@@ -88,7 +88,7 @@ int32_t team_volatile::cGetBoost(size_t type) const
 
 
 
-void team_volatile::cSetBoost(size_t type, int32_t value)
+void TeamVolatile::cSetBoost(size_t type, int32_t value)
 {
   switch(type)
   {
@@ -118,30 +118,30 @@ void team_volatile::cSetBoost(size_t type, int32_t value)
 
 
 
-uint32_t team_volatile::cGetFV_boosted(const team_nonvolatile& tNV, size_t type, int32_t tempBoost) const
+uint32_t TeamVolatile::cGetFV_boosted(const TeamNonVolatile& tNV, size_t type, int32_t tempBoost) const
 {
   return cGetFV_boosted(tNV.getPKNV(*this), type, tempBoost);
 }
 
-uint32_t team_volatile::cGetFV_boosted(const pokemon_nonvolatile& cPKNV, size_t type, int32_t tempBoost) const
+uint32_t TeamVolatile::cGetFV_boosted(const PokemonNonVolatile& cPKNV, size_t type, int32_t tempBoost) const
 {
   int32_t cBoost = cGetBoost(type) + tempBoost;
   cBoost = std::min(std::max(cBoost, -6), 6);
   return cPKNV.FV_base[type][cBoost + 6];
 }
 
-fpType team_volatile::cGetAccuracy_boosted(size_t type, int32_t tempBoost) const
+fpType TeamVolatile::cGetAccuracy_boosted(size_t type, int32_t tempBoost) const
 {
   int32_t cBoost = cGetBoost(type) + tempBoost;
   cBoost = std::min(std::max(cBoost, -6), 6);
-  return pokemon_nonvolatile::aFV_base[type - 6][cBoost + 6];
+  return PokemonNonVolatile::aFV_base[type - 6][cBoost + 6];
 }
 
 
 
 
 
-uint32_t team_volatile::numTeammatesAlive() const
+uint32_t TeamVolatile::numTeammatesAlive() const
 {
   uint32_t result = 0; // accumulate living teammates
 
@@ -159,7 +159,7 @@ uint32_t team_volatile::numTeammatesAlive() const
 
 
 
-bool team_volatile::swapPokemon(size_t iAction, bool preserveVolatile)
+bool TeamVolatile::swapPokemon(size_t iAction, bool preserveVolatile)
 {
   size_t iPokemon = iAction - AT_SWITCH_0;
 
@@ -179,7 +179,7 @@ bool team_volatile::swapPokemon(size_t iAction, bool preserveVolatile)
 
 
 
-void team_volatile::resetVolatile()
+void TeamVolatile::resetVolatile()
 {
   // completely zero bitset
   data.status.data.cTeammate.raw[0] = 0; // zero all boosts
@@ -191,7 +191,7 @@ void team_volatile::resetVolatile()
 
 
 
-bool team_volatile::cModBoost(size_t type, int quantity)
+bool TeamVolatile::cModBoost(size_t type, int quantity)
 {
   int32_t _buff = cGetBoost(type) + quantity;
   
@@ -218,10 +218,10 @@ bool team_volatile::cModBoost(size_t type, int quantity)
 
 
 
-bool team_volatile::cHasPP() const
+bool TeamVolatile::cHasPP() const
 {
   bool result = true;
-  const pokemon_volatile& cPKV = getPKV();
+  const PokemonVolatile& cPKV = getPKV();
 
   result =  
     (cPKV.getMV(AT_MOVE_0).hasPP()) ||
@@ -236,7 +236,7 @@ bool team_volatile::cHasPP() const
 
 
 
-bool team_volatile::cIsAlive() const
+bool TeamVolatile::cIsAlive() const
 {
   return getPKV().isAlive();
 }
@@ -245,30 +245,30 @@ bool team_volatile::cIsAlive() const
 
 
 
-void team_volatile::cModHP(const pokemon_nonvolatile& nv, int32_t quantity)
+void TeamVolatile::cModHP(const PokemonNonVolatile& nv, int32_t quantity)
 {
-  pokemon_volatile& cPKV = getPKV();
+  PokemonVolatile& cPKV = getPKV();
   cPKV.modHP(nv, quantity);
   if (!cPKV.isAlive()) { resetVolatile(); }
 }
 
-void team_volatile::cSetHP(const pokemon_nonvolatile& nv, uint32_t amt)
+void TeamVolatile::cSetHP(const PokemonNonVolatile& nv, uint32_t amt)
 {
-  pokemon_volatile& cPKV = getPKV();
+  PokemonVolatile& cPKV = getPKV();
   cPKV.setHP(nv, amt);
   if (!cPKV.isAlive()) { resetVolatile(); }
 }
 
-void team_volatile::cSetPercentHP(const pokemon_nonvolatile& nv, fpType percent)
+void TeamVolatile::cSetPercentHP(const PokemonNonVolatile& nv, fpType percent)
 {
-  pokemon_volatile& cPKV = getPKV();
+  PokemonVolatile& cPKV = getPKV();
   cPKV.setPercentHP(nv, percent);
   if (!cPKV.isAlive()) { resetVolatile(); }
 }
 
-void team_volatile::cModPercentHP(const pokemon_nonvolatile& nv, fpType percent)
+void TeamVolatile::cModPercentHP(const PokemonNonVolatile& nv, fpType percent)
 {
-  pokemon_volatile& cPKV = getPKV();
+  PokemonVolatile& cPKV = getPKV();
   cPKV.modPercentHP(nv, percent);
   if (!cPKV.isAlive()) { resetVolatile(); }
 }

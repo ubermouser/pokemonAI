@@ -39,7 +39,7 @@ typedef std::vector<plugin_t>::const_iterator pluginIt;
   }\
 }
 
-pkCU::pkCU(const environment_nonvolatile& _nv, size_t engineAccuracy)
+PkCU::PkCU(const EnvironmentNonvolatile& _nv, size_t engineAccuracy)
   : nv(&_nv),
   pluginSets(),
   cPluginSet(NULL),
@@ -53,15 +53,15 @@ pkCU::pkCU(const environment_nonvolatile& _nv, size_t engineAccuracy)
   prevStackCapacity(0),
   numRandomEnvironments((engineAccuracy>16)?1:engineAccuracy)
 {
-  iTeams.assign(SIZE_MAX);
-  iActions.assign(SIZE_MAX);
+  iTeams.fill(SIZE_MAX);
+  iActions.fill(SIZE_MAX);
   if (!initialize())
   {
     assert(false && "PKCU could not generate valid script database!");
   }
 };
 
-pkCU::pkCU(const pkCU& other)
+PkCU::PkCU(const PkCU& other)
   : nv(other.nv),
   pluginSets(other.pluginSets),
   cPluginSet(NULL),
@@ -75,11 +75,11 @@ pkCU::pkCU(const pkCU& other)
   prevStackCapacity(0),
   numRandomEnvironments(other.numRandomEnvironments)
 {
-  iTeams.assign(SIZE_MAX);
-  iActions.assign(SIZE_MAX);
+  iTeams.fill(SIZE_MAX);
+  iActions.fill(SIZE_MAX);
 };
 
-void pkCU::setEnvironment(const environment_nonvolatile& _envNV)
+void PkCU::setEnvironment(const EnvironmentNonvolatile& _envNV)
 {
   nv = &_envNV;
   if (!initialize())
@@ -88,7 +88,7 @@ void pkCU::setEnvironment(const environment_nonvolatile& _envNV)
   }
 };
 
-void pkCU::setAccuracy(size_t accuracy)
+void PkCU::setAccuracy(size_t accuracy)
 {
   numRandomEnvironments = std::max((size_t)1, std::min((size_t)16, accuracy));
 };
@@ -97,7 +97,7 @@ void pkCU::setAccuracy(size_t accuracy)
 
 
 
-pkCU::~pkCU()
+PkCU::~PkCU()
 {
 };
 
@@ -105,7 +105,7 @@ pkCU::~pkCU()
 
 
 
-bool pkCU::initialize()
+bool PkCU::initialize()
 {
   size_t numPlugins = 0;
   // clear plugin arrays:
@@ -113,7 +113,7 @@ bool pkCU::initialize()
   {
     for (size_t iOTeammate = 0; iOTeammate != pluginSets[iNCTeammate].size(); ++iOTeammate)
     {
-      boost::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>& _cPluginSet = pluginSets[iNCTeammate][iOTeammate];
+      std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>& _cPluginSet = pluginSets[iNCTeammate][iOTeammate];
       for (size_t iPlugin = 0; iPlugin != _cPluginSet.size(); ++iPlugin)
       {
         _cPluginSet[iPlugin].clear();
@@ -129,12 +129,12 @@ bool pkCU::initialize()
     // don't add to a teammate that doesn't exist:
     if ((iCTeammate) >= getNV().getTeam(iCTeam).getNumTeammates()) { continue; }
     // current nonvolatile teammate:
-    const pokemon_nonvolatile& cPKNV = getNV().getTeam(iCTeam).teammate(iCTeammate);
+    const PokemonNonVolatile& cPKNV = getNV().getTeam(iCTeam).teammate(iCTeammate);
 
     // plugins for moves:
     for (size_t iCMove = 0; iCMove != cPKNV.getNumMoves(); ++iCMove)
     {
-      const pluggable& cPluggable = cPKNV.getMove_base(iCMove);
+      const Pluggable& cPluggable = cPKNV.getMove_base(iCMove);
       for (size_t iPlugin = 0; iPlugin != PLUGIN_MAXSIZE; ++iPlugin)
       {
         plugin_t cPlugin = cPluggable.getPlugin(iPlugin);
@@ -147,7 +147,7 @@ bool pkCU::initialize()
     // plugins for abilities:
     if (cPKNV.abilityExists()) 
     { 
-      const pluggable& cPluggable = cPKNV.getAbility();
+      const Pluggable& cPluggable = cPKNV.getAbility();
       for (size_t iPlugin = 0; iPlugin != PLUGIN_MAXSIZE; ++iPlugin)
       {
         plugin_t cPlugin = cPluggable.getPlugin(iPlugin);
@@ -160,7 +160,7 @@ bool pkCU::initialize()
     // plugins for items: TODO: what if the items switch teammates?
     if (cPKNV.hasInitialItem())
     { 
-      const pluggable& cPluggable = cPKNV.getInitialItem();
+      const Pluggable& cPluggable = cPKNV.getInitialItem();
       for (size_t iPlugin = 0; iPlugin != PLUGIN_MAXSIZE; ++iPlugin)
       {
         plugin_t cPlugin = cPluggable.getPlugin(iPlugin);
@@ -190,7 +190,7 @@ bool pkCU::initialize()
   {
     for (size_t iOTeammate = 0; iOTeammate != pluginSets[iNCTeammate].size(); ++iOTeammate)
     {
-      boost::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>& _cPluginSet = pluginSets[iNCTeammate][iOTeammate];
+      std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>& _cPluginSet = pluginSets[iNCTeammate][iOTeammate];
       for (size_t iPlugin = 0; iPlugin != _cPluginSet.size(); ++iPlugin)
       {
         std::sort(_cPluginSet[iPlugin].begin(), _cPluginSet[iPlugin].end());
@@ -206,7 +206,7 @@ bool pkCU::initialize()
 
 
 
-size_t pkCU::insertPluginHandler(plugin_t& cPlugin, size_t pluginType, size_t iNTeammate)
+size_t PkCU::insertPluginHandler(plugin_t& cPlugin, size_t pluginType, size_t iNTeammate)
 {
   size_t numAdded = 0;
 
@@ -248,11 +248,11 @@ size_t pkCU::insertPluginHandler(plugin_t& cPlugin, size_t pluginType, size_t iN
 
 
 
-uint32_t pkCU::movePriority_Speed()
+uint32_t PkCU::movePriority_Speed()
 {
-  const team_volatile& cTMV = getTMV();
-  const pokemon_volatile& cPKV = getPKV();
-  const pokemon_nonvolatile& cPKNV = getPKNV();
+  const TeamVolatile& cTMV = getTMV();
+  const PokemonVolatile& cPKV = getPKV();
+  const PokemonNonVolatile& cPKNV = getPKNV();
 
   // grab FV_boosted speed
   uint32_t cSpeed = cTMV.cGetFV_boosted(cPKNV, FV_SPEED);
@@ -268,7 +268,7 @@ uint32_t pkCU::movePriority_Speed()
 
 
 
-int32_t pkCU::movePriority_Bracket()
+int32_t PkCU::movePriority_Bracket()
 {
   // SOURCE: http://www.smogon.com/dp/articles/move_priority
   
@@ -285,7 +285,7 @@ int32_t pkCU::movePriority_Bracket()
   // 1 - b
 
   int32_t actionResult = 0;
-  const environment_volatile& base = getBase().getEnv();
+  const EnvironmentVolatile& base = getBase().getEnv();
   size_t iCAction = getICAction();
   size_t iCTeam = getICTeam();
   
@@ -331,9 +331,9 @@ int32_t pkCU::movePriority_Bracket()
 
 
 
-uint32_t pkCU::movePriority()
+uint32_t PkCU::movePriority()
 {
-  boost::array<_moveBracket, 2> moveBracket;
+  std::array<_moveBracket, 2> moveBracket;
 
   size_t iCTeam = getICTeam();
   size_t iOTeam = getIOTeam();
@@ -379,7 +379,7 @@ uint32_t pkCU::movePriority()
 
 
 
-void pkCU::evaluateRound_end()
+void PkCU::evaluateRound_end()
 {
   iBase = 0;
 
@@ -411,7 +411,7 @@ void pkCU::evaluateRound_end()
 
 
 
-void pkCU::evaluateMove()
+void PkCU::evaluateMove()
 {
   // NOTE: ONLY ONE stage is set to preturn at a time
   assert(getStackStage() == STAGE_PRETURN);
@@ -458,12 +458,12 @@ void pkCU::evaluateMove()
 
     // POSSIBLE THAT POKEMON MIGHT HAVE DIED IN PREVIOUS STEP
 
-    const move& cMove = getPKNV().getMove_base(iCAction);
-    void (pkCU::*evaluate_t)();
+    const Move& cMove = getPKNV().getMove_base(iCAction);
+    void (PkCU::*evaluate_t)();
     if ( cMove.damageType == ATK_PHYSICAL || cMove.damageType == ATK_SPECIAL)
-    { evaluate_t = &pkCU::evaluateMove_damage;}
+    { evaluate_t = &PkCU::evaluateMove_damage;}
     else
-    { evaluate_t = &pkCU::evaluateMove_script;}
+    { evaluate_t = &PkCU::evaluateMove_script;}
 
     // evaluate either move or plugin move: (increment with iNBase, as evaluateMove_damage will manipulate stack)
     for (iNBase = baseFloor, iBase = iNBase, baseCeil = getStack().size(); iNBase != baseCeil; ++iNBase, iBase = iNBase)
@@ -507,7 +507,7 @@ void pkCU::evaluateMove()
 
 
 
-void pkCU::evaluateMove_switch()
+void PkCU::evaluateMove_switch()
 {
   assert(getStackStage() == STAGE_PRESWITCH);
 
@@ -528,7 +528,7 @@ void pkCU::evaluateMove_switch()
     if (!getPKV().isAlive()) { getBase().setFreeMove(iCTeam); }
     else
     {
-      const pokemon_nonvolatile* cPKNV = &getPKNV();
+      const PokemonNonVolatile* cPKNV = &getPKNV();
 
       // pre-move switch scripts:
       int result = 0;
@@ -550,7 +550,7 @@ void pkCU::evaluateMove_switch()
     // reset memoized plugin:
     setPKV();
 
-    const pokemon_nonvolatile* cPKNV = &getPKNV();
+    const PokemonNonVolatile* cPKNV = &getPKNV();
     
     int result = 0;
     CALLPLUGIN(result, PLUGIN_ON_SWITCHIN, onSwitch_rawType, 
@@ -563,7 +563,7 @@ void pkCU::evaluateMove_switch()
 
 
 
-void pkCU::evaluateMove_preMove()
+void PkCU::evaluateMove_preMove()
 {
   assert(getStackStage() == STAGE_STATUS);
 
@@ -576,7 +576,7 @@ void pkCU::evaluateMove_preMove()
 
 
 
-void pkCU::evaluateMove_postMove()
+void PkCU::evaluateMove_postMove()
 {
   assert(getStackStage() == STAGE_POSTMOVE);
 
@@ -584,10 +584,10 @@ void pkCU::evaluateMove_postMove()
   size_t baseFloor = iBase, baseCeil = getStack().size();
 
   // the current environment we are evaluating upon. Will be copied, modified and pushed back eventually
-  const pokemon_nonvolatile& cPKNV = getPKNV();
-  const pokemon_nonvolatile& tPKNV = getTPKNV();
-  const move_nonvolatile& cMNV = cPKNV.getMove(getICAction());
-  const move& cMove = cMNV.getBase();
+  const PokemonNonVolatile& cPKNV = getPKNV();
+  const PokemonNonVolatile& tPKNV = getTPKNV();
+  const MoveNonVolatile& cMNV = cPKNV.getMove(getICAction());
+  const Move& cMove = cMNV.getBase();
   size_t iCTeam = getICTeam();
 
   // effects which occur regardless of a secondary effect occuring, but only if the move hit:
@@ -632,7 +632,7 @@ void pkCU::evaluateMove_postMove()
     if (getStackStage() != STAGE_MODIFYSECONDARYHITCHANCE) { continue; }
     advanceStackStage();
 
-    boost::array<size_t, 2> iREnv = {{ getIBase() , SIZE_MAX }};
+    std::array<size_t, 2> iREnv = {{ getIBase() , SIZE_MAX }};
 
     fpType& secondaryHitProbability = getDamageComponent().tProbability;
 
@@ -680,7 +680,7 @@ void pkCU::evaluateMove_postMove()
 
 
 
-void pkCU::evaluateMove_postTurn()
+void PkCU::evaluateMove_postTurn()
 {
   // parse end of turn plugins:
   int result = 0;
@@ -692,7 +692,7 @@ void pkCU::evaluateMove_postTurn()
 
 
 
-void pkCU::evaluateMove_damage()
+void PkCU::evaluateMove_damage()
 {
   assert(getStackStage() == STAGE_MOVEBASE);
   assert(getTPKV().isAlive() && getPKV().isAlive());
@@ -700,12 +700,12 @@ void pkCU::evaluateMove_damage()
   // the floor of the stack: everything below this stack value has been evaluated
   size_t baseFloor = iBase, baseCeil = getStack().size();
 
-  const pokemon_nonvolatile& cPKNV = getPKNV();
-  const pokemon_nonvolatile& tPKNV = getTPKNV();
-  const move_nonvolatile& cMNV = cPKNV.getMove(getICAction());
-  const pokemon_base& cPKB = cPKNV.getBase();
-  const pokemon_base& tPKB = tPKNV.getBase();
-  const move& cMove = cMNV.getBase();
+  const PokemonNonVolatile& cPKNV = getPKNV();
+  const PokemonNonVolatile& tPKNV = getTPKNV();
+  const MoveNonVolatile& cMNV = cPKNV.getMove(getICAction());
+  const PokemonBase& cPKB = cPKNV.getBase();
+  const PokemonBase& tPKB = tPKNV.getBase();
+  const Move& cMove = cMNV.getBase();
   
   //Source: http://www.smogon.com/dp/articles/damage_formula
 
@@ -732,7 +732,7 @@ void pkCU::evaluateMove_damage()
     if (getStackStage() != STAGE_SETBASEPOWER) { continue; }
     advanceStackStage();
 
-    const type*& cType = getDamageComponent().mType;
+    const Type*& cType = getDamageComponent().mType;
     cType = &cMove.getType();
 
     int result = 0;
@@ -763,7 +763,7 @@ void pkCU::evaluateMove_damage()
     if (getStackStage() != STAGE_MODIFYBASEPOWER) { continue; }
     advanceStackStage();
 
-    damageComponents_t& cDamage = getDamageComponent();
+    DamageComponents_t& cDamage = getDamageComponent();
 
     size_t attackType;
     size_t defenseType;
@@ -803,7 +803,7 @@ void pkCU::evaluateMove_damage()
     if (getStackStage() != STAGE_MODIFYATTACKPOWER) { continue; }
     advanceStackStage();
 
-    damageComponents_t& cDamage = getDamageComponent();
+    DamageComponents_t& cDamage = getDamageComponent();
 
     /* CH - Critical Hit modifier
       3 if has sniper ability AND critical hit (mult 1.5)
@@ -825,7 +825,7 @@ void pkCU::evaluateMove_damage()
     if (getStackStage() != STAGE_MODIFYCRITICALPOWER) { continue; }
     advanceStackStage();
 
-    damageComponents_t& cDamage = getDamageComponent();
+    DamageComponents_t& cDamage = getDamageComponent();
 
     /* Mod2 = Other modifier
       1.3 if item = life orb
@@ -849,7 +849,7 @@ void pkCU::evaluateMove_damage()
     if (getStackStage() != STAGE_MODIFYRAWDAMAGE) { continue; }
     advanceStackStage();
 
-    damageComponents_t& cDamage = getDamageComponent();
+    DamageComponents_t& cDamage = getDamageComponent();
 
     bool hasStab = ((&cPKB.getType(0) == cDamage.mType) || (&cPKB.getType(1) == cDamage.mType));
     fpType STABMultiplier = hasStab?1.5:1.0;
@@ -868,7 +868,7 @@ void pkCU::evaluateMove_damage()
     if (getStackStage() != STAGE_MODIFYSTAB) { continue; }
     advanceStackStage();
 
-    damageComponents_t& cDamage = getDamageComponent();
+    DamageComponents_t& cDamage = getDamageComponent();
 
     fpType typeModifier = 1.0;
     {
@@ -892,7 +892,7 @@ void pkCU::evaluateMove_damage()
     if (getStackStage() != STAGE_MODIFYTYPERESISTANCE) { continue; }
     advanceStackStage();
 
-    damageComponents_t& cDamage = getDamageComponent();
+    DamageComponents_t& cDamage = getDamageComponent();
 
     /* Mod3 = SRF × EB × TL × TRB */
     fpType itemModifier = 1.0;
@@ -939,7 +939,7 @@ void pkCU::evaluateMove_damage()
     // bound at MIN 0.033~ ... MAX 1.0
     probabilityToHit = std::max(std::min(probabilityToHit, (fpType)1.0), (fpType)0.0);
 
-    boost::array<size_t, 2> iHEnv = {{ getIBase(), SIZE_MAX }};
+    std::array<size_t, 2> iHEnv = {{ getIBase(), SIZE_MAX }};
     // did the move hit its target? Is it possible for the move to miss?
     if (mostlyGT(probabilityToHit, 0.0))
     {
@@ -991,7 +991,7 @@ void pkCU::evaluateMove_damage()
     fpType& probabilityToCrit = getDamageComponent().tProbability;
 
     // determine the possibility that the move crit:
-    boost::array<size_t, 2> iCEnv = {{ SIZE_MAX, getIBase() }};
+    std::array<size_t, 2> iCEnv = {{ SIZE_MAX, getIBase() }};
     
     if (mostlyGT(probabilityToCrit, 0.0) )
     {
@@ -1023,15 +1023,15 @@ void pkCU::evaluateMove_damage()
 
 
 
-void pkCU::evaluateMove_script()
+void PkCU::evaluateMove_script()
 {
   assert(getStackStage() == STAGE_MOVEBASE);
   assert(getTPKV().isAlive() && getPKV().isAlive());
 
-  const pokemon_nonvolatile& cPKNV = getPKNV();
-  const pokemon_nonvolatile& tPKNV = getTPKNV();
-  const move_nonvolatile& cMNV = cPKNV.getMove(getICAction());
-  const move& cMove = cMNV.getBase();
+  const PokemonNonVolatile& cPKNV = getPKNV();
+  const PokemonNonVolatile& tPKNV = getTPKNV();
+  const MoveNonVolatile& cMNV = cPKNV.getMove(getICAction());
+  const Move& cMove = cMNV.getBase();
 
   // the floor of the stack: everything below this stack value has been evaluated
   size_t baseFloor = iBase, baseCeil = getStack().size();
@@ -1075,7 +1075,7 @@ void pkCU::evaluateMove_script()
     // bound at MIN 0.033~ ... MAX 1.0
     probabilityToHit = std::max(std::min(probabilityToHit, (fpType)1.0), (fpType)0.0);
 
-    boost::array<size_t, 2> iHEnv = {{ getIBase(), SIZE_MAX }};
+    std::array<size_t, 2> iHEnv = {{ getIBase(), SIZE_MAX }};
     // did the move hit its target? Is it possible for the move to miss?
     if (mostlyGT(probabilityToHit, 0.0))
     {
@@ -1118,18 +1118,18 @@ void pkCU::evaluateMove_script()
 
 
 
-void pkCU::calculateDamage(bool hasCrit)
+void PkCU::calculateDamage(bool hasCrit)
 {
-  const pokemon_nonvolatile& cPKNV = getPKNV();
-  const pokemon_nonvolatile& tPKNV = getTPKNV();
-  const move_nonvolatile& cMNV = cPKNV.getMove(getICAction());
+  const PokemonNonVolatile& cPKNV = getPKNV();
+  const PokemonNonVolatile& tPKNV = getTPKNV();
+  const MoveNonVolatile& cMNV = cPKNV.getMove(getICAction());
 
   fpType partitionEnvironmentProbability = (1.0 / (fpType) numRandomEnvironments);
-  damageComponents_t& cDMG = getDamageComponent();
+  DamageComponents_t& cDMG = getDamageComponent();
 
   uint32_t power = (hasCrit)?cDMG.damageCrit:cDMG.damage;
 
-  boost::array<size_t, 2> iREnv = {{ SIZE_MAX, getIBase() }};
+  std::array<size_t, 2> iREnv = {{ SIZE_MAX, getIBase() }};
   for (size_t iEnv = 0; iEnv != numRandomEnvironments; ++iEnv )
   {
     if (numRandomEnvironments > 1) 
@@ -1160,9 +1160,9 @@ void pkCU::calculateDamage(bool hasCrit)
 
 
 
-size_t pkCU::combineSimilarEnvironments()
+size_t PkCU::combineSimilarEnvironments()
 {
-  std::vector<environment_possible>& stack = getStack();
+  std::vector<EnvironmentPossible>& stack = getStack();
   size_t numUnique = stack.size();
 
 #ifndef NDEBUG
@@ -1174,7 +1174,7 @@ size_t pkCU::combineSimilarEnvironments()
   // hash environments (and summate probabilities for check):
   for (iBase = 0; iBase != numUnique; ++iBase)
   {
-    environment_possible& cEnvironment = getBase();
+    EnvironmentPossible& cEnvironment = getBase();
 
     // assert that each of these environments is getting hashed:
     assert(getStackStage() == STAGE_FINAL);
@@ -1187,7 +1187,7 @@ size_t pkCU::combineSimilarEnvironments()
   // compare environment hashes:
   for (size_t iOEnv = 0, iSize = numUnique; iOEnv != iSize; iOEnv++)
   {
-    environment_possible& oEnv = stack[iOEnv];
+    EnvironmentPossible& oEnv = stack[iOEnv];
     fpType& oProbability = damageComponents[iOEnv].cProbability;
 
     // don't attempt to merge pruned environments
@@ -1195,7 +1195,7 @@ size_t pkCU::combineSimilarEnvironments()
 
     for (size_t iIEnv = iOEnv + 1; iIEnv != iSize; iIEnv++)
     {
-      environment_possible& iEnv = stack[iIEnv];
+      EnvironmentPossible& iEnv = stack[iIEnv];
       fpType& iProbability = damageComponents[iIEnv].cProbability;
 
       // don't re-prune already pruned environments
@@ -1246,7 +1246,7 @@ size_t pkCU::combineSimilarEnvironments()
 
 
 
-void pkCU::updateState_move()
+void PkCU::updateState_move()
 {
   assert(getStackStage() == STAGE_SEEDED);
   advanceStackStage();
@@ -1289,7 +1289,7 @@ void pkCU::updateState_move()
 
 
 
-size_t pkCU::updateState(const environment_volatile& cEnv, std::vector<environment_possible>& rEnv, size_t actionA, size_t actionB)
+size_t PkCU::updateState(const EnvironmentVolatile& cEnv, std::vector<EnvironmentPossible>& rEnv, size_t actionA, size_t actionB)
 {
   // set stack callback value:
   _stack = &rEnv;
@@ -1319,7 +1319,7 @@ size_t pkCU::updateState(const environment_volatile& cEnv, std::vector<environme
   case 2:
     {
       // both teams are moving:
-      boost::array<size_t, 2> iStages;
+      std::array<size_t, 2> iStages;
       duplicateState(iStages, 0.5);
 
       // first team moves first:
@@ -1349,7 +1349,7 @@ size_t pkCU::updateState(const environment_volatile& cEnv, std::vector<environme
 
 
 
-matchState pkCU::isGameOver(const environment_volatile& envV)
+MatchState PkCU::isGameOver(const EnvironmentVolatile& envV)
 {
   bool teamAisDead = envV.getTeam(TEAM_A).numTeammatesAlive() == 0;
   bool teamBisDead = envV.getTeam(TEAM_B).numTeammatesAlive() == 0;
@@ -1378,12 +1378,12 @@ matchState pkCU::isGameOver(const environment_volatile& envV)
 
 
 
-bool pkCU::isValidAction(const environment_volatile& envV, size_t action, size_t iTeam)
+bool PkCU::isValidAction(const EnvironmentVolatile& envV, size_t action, size_t iTeam)
 {
-  const team_volatile& cTV = envV.getTeam(iTeam);
-  const team_volatile& oTV = envV.getOtherTeam(iTeam);
-  const team_nonvolatile& cTNV = getNV().getTeam(iTeam);
-  const pokemon_nonvolatile& cPokemon = cTNV.getPKNV(cTV);
+  const TeamVolatile& cTV = envV.getTeam(iTeam);
+  const TeamVolatile& oTV = envV.getOtherTeam(iTeam);
+  const TeamNonVolatile& cTNV = getNV().getTeam(iTeam);
+  const PokemonNonVolatile& cPokemon = cTNV.getPKNV(cTV);
   
   switch(action)
   {
@@ -1468,9 +1468,9 @@ bool pkCU::isValidAction(const environment_volatile& envV, size_t action, size_t
 
 
 
-void pkCU::seedCurrentState(const environment_volatile& cEnv)
+void PkCU::seedCurrentState(const EnvironmentVolatile& cEnv)
 {
-  std::vector<environment_possible>& stack = getStack();
+  std::vector<EnvironmentPossible>& stack = getStack();
 
   size_t numRandomSquared = numRandomEnvironments * numRandomEnvironments;
 
@@ -1489,12 +1489,12 @@ void pkCU::seedCurrentState(const environment_volatile& cEnv)
   iBase = stack.size();
 
   // actually push back stack var:
-  stack.push_back(environment_possible::create(cEnv));
+  stack.push_back(EnvironmentPossible::create(cEnv));
 
   // push back memoization vars:
   stackStage.push_back(STAGE_SEEDED);
   
-  damageComponents.push_back(damageComponents_t());
+  damageComponents.push_back(DamageComponents_t());
   damageComponents.back().cProbability = 1.0;
 
   pushPKV();
@@ -1504,10 +1504,10 @@ void pkCU::seedCurrentState(const environment_volatile& cEnv)
 
 
 
-bool saneStackProbability(std::vector<damageComponents_t>& dComponents)
+bool saneStackProbability(std::vector<DamageComponents_t>& dComponents)
 {
   fpType sum = 0.0;
-  for (std::vector<damageComponents_t>::const_iterator begin = dComponents.begin(), end = dComponents.end(); begin != end; ++begin)
+  for (std::vector<DamageComponents_t>::const_iterator begin = dComponents.begin(), end = dComponents.end(); begin != end; ++begin)
   {
     sum += begin->cProbability;
     if (!mostlyGT(begin->cProbability, 0.0) || !mostlyLTE(begin->cProbability, 1.0)) { return false; }
@@ -1516,7 +1516,7 @@ bool saneStackProbability(std::vector<damageComponents_t>& dComponents)
   return mostlyEQ(sum, 1.0);
 }
 
-void pkCU::duplicateState(boost::array<size_t, 2>& result, fpType _probability, size_t iState)
+void PkCU::duplicateState(std::array<size_t, 2>& result, fpType _probability, size_t iState)
 {
   assert(mostlyLTE(_probability, 1.0));
 
@@ -1535,7 +1535,7 @@ void pkCU::duplicateState(boost::array<size_t, 2>& result, fpType _probability, 
 
 
 
-void pkCU::triplicateState(boost::array<size_t, 3>& result, fpType _probability, fpType _oProbability, size_t iState)
+void PkCU::triplicateState(std::array<size_t, 3>& result, fpType _probability, fpType _oProbability, size_t iState)
 {
   assert(mostlyLTE(_probability + _oProbability, 1.0));
 
@@ -1555,7 +1555,7 @@ void pkCU::triplicateState(boost::array<size_t, 3>& result, fpType _probability,
 
 
 
-const pokemon_nonvolatile& pkCU::getPKNV()
+const PokemonNonVolatile& PkCU::getPKNV()
 {
   return getNV().getTeam(getICTeam()).getPKNV(getBase().getEnv().getTeam(getICTeam()));
 }
@@ -1563,13 +1563,13 @@ const pokemon_nonvolatile& pkCU::getPKNV()
 
 
 
-void pkCU::setPKV(size_t iState)
+void PkCU::setPKV(size_t iState)
 {
   if (iState == SIZE_MAX) { iState = iBase; }
   PKVOffsets[iState] = &getStack()[iState].getEnv().getTeam(getICTeam()).getPKV();
 }
 
-void pkCU::setPKV()
+void PkCU::setPKV()
 {
   PKVOffsets[iBase] = &getStack()[iBase].getEnv().getTeam(getICTeam()).getPKV();
 }
@@ -1578,7 +1578,7 @@ void pkCU::setPKV()
 
 
 
-void pkCU::pushPKV()
+void PkCU::pushPKV()
 {
   PKVOffsets.push_back(NULL);
 }
@@ -1587,13 +1587,13 @@ void pkCU::pushPKV()
 
 
 
-pokemon_volatile& pkCU::getPKV(size_t iState)
+PokemonVolatile& PkCU::getPKV(size_t iState)
 {
   if (PKVOffsets[iState] == NULL) { setPKV(iState); }
   return *PKVOffsets[iState]; // memoized method
 }
 
-pokemon_volatile& pkCU::getPKV()
+PokemonVolatile& PkCU::getPKV()
 {
   if (PKVOffsets[iBase] == NULL) { setPKV(); }
   return *PKVOffsets[iBase]; // memoized method
@@ -1603,9 +1603,9 @@ pokemon_volatile& pkCU::getPKV()
 
 
 
-void pkCU::resetPKVArray()
+void PkCU::resetPKVArray()
 {
-  memset(PKVOffsets.data(), 0, sizeof(pokemon_volatile*)*PKVOffsets.size());
+  memset(PKVOffsets.data(), 0, sizeof(PokemonVolatile*)*PKVOffsets.size());
   /*for (std::vector<pokemon_volatile*>::iterator begin = PKVOffsets.begin(), end = PKVOffsets.end(); begin != end; ++begin)
   {
     *begin = NULL;
@@ -1616,7 +1616,7 @@ void pkCU::resetPKVArray()
 
 
 
-const pokemon_nonvolatile& pkCU::getTPKNV()
+const PokemonNonVolatile& PkCU::getTPKNV()
 {
   return getNV().getTeam(getIOTeam()).getPKNV(getBase().getEnv().getTeam(getIOTeam()));
 }
@@ -1625,12 +1625,12 @@ const pokemon_nonvolatile& pkCU::getTPKNV()
 
 
 
-pokemon_volatile& pkCU::getTPKV(size_t iState)
+PokemonVolatile& PkCU::getTPKV(size_t iState)
 {
   return getStack()[iState].getEnv().getTeam(getIOTeam()).getPKV();
 }
 
-pokemon_volatile& pkCU::getTPKV()
+PokemonVolatile& PkCU::getTPKV()
 {
   return getStack()[iBase].getEnv().getTeam(getIOTeam()).getPKV();
 }
@@ -1638,22 +1638,22 @@ pokemon_volatile& pkCU::getTPKV()
 
 
 
-team_volatile& pkCU::getTMV()
+TeamVolatile& PkCU::getTMV()
 {
   return getStack()[iBase].getEnv().getTeam(getICTeam());
 }
 
-team_volatile& pkCU::getTTMV()
+TeamVolatile& PkCU::getTTMV()
 {
   return getStack()[iBase].getEnv().getTeam(getIOTeam());
 }
 
-team_volatile& pkCU::getTMV(size_t iState)
+TeamVolatile& PkCU::getTMV(size_t iState)
 {
   return getStack()[iState].getEnv().getTeam(getICTeam());
 }
 
-team_volatile& pkCU::getTTMV(size_t iState)
+TeamVolatile& PkCU::getTTMV(size_t iState)
 {
   return getStack()[iState].getEnv().getTeam(getIOTeam());
 }
@@ -1662,7 +1662,7 @@ team_volatile& pkCU::getTTMV(size_t iState)
 
 
 
-boost::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>& pkCU::getCPluginSet()
+std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>& PkCU::getCPluginSet()
 {
   return *cPluginSet;
 };
@@ -1671,7 +1671,7 @@ boost::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>& pkCU::getCPluginSet()
 
 
 
-void pkCU::setCPluginSet()
+void PkCU::setCPluginSet()
 {
   size_t iCPokemon = getBase().getEnv().getTeam(getICTeam()).getICPKV();
   size_t iOPokemon = getBase().getEnv().getTeam(getIOTeam()).getICPKV();

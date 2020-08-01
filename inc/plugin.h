@@ -9,14 +9,14 @@
 
 #include "../inc/pluggable_types.h"
 
-class pokedex;
+class Pokedex;
 class plugin;
-class move_nonvolatile;
-class pokemon_nonvolatile;
-union team_volatile;
-union pokemon_volatile;
+class MoveNonVolatile;
+class PokemonNonVolatile;
+union TeamVolatile;
+union PokemonVolatile;
 
-typedef boost::function<bool (const pokedex&, std::vector<plugin>&)> regExtension_type;
+typedef boost::function<bool (const Pokedex&, std::vector<plugin>&)> regExtension_type;
 
 static const std::string MOVE_PLUGIN = "move";
 static const std::string ITEM_PLUGIN = "item";
@@ -32,7 +32,7 @@ static const std::string ENGINE_PLUGIN = "engine";
 extern "C"
 {
   /* register all functions from this dll's extension library */
-  extern GEN4SHARED bool registerExtensions(const pokedex& pkAI, std::vector<plugin>& extensions);
+  extern GEN4SHARED bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions);
 };
 #endif
 

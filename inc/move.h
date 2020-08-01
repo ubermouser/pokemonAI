@@ -5,19 +5,19 @@
 
 #include <stdint.h>
 #include <string>
-#include <boost/array.hpp>
+#include <array>
 
 #include "../inc/name.h"
 #include "../inc/pluggable.h"
 
-class type;
-class pokedex;
+class Type;
+class Pokedex;
 
-class PKAISHARED move: public name, public pluggable
+class PKAISHARED Move: public Name, public Pluggable
 {
 public:
-  static const move* move_struggle;
-  static const move* move_none;
+  static const Move* move_struggle;
+  static const Move* move_none;
 
   /*
    * the index of the move's type.
@@ -27,7 +27,7 @@ public:
    *       or the type isn't referenced in combat.
    *       May also be an orphan type
    */
-  const type* cType;
+  const Type* cType;
   
   /*
    * base accuracy of this ability. Usually applies to damage, or a buff /
@@ -98,7 +98,7 @@ public:
    * 5: Evasion (de)buff
    * 6: Critical Hit (de)buff
    */
-  boost::array<int8_t, 9> selfBuff; //TODO: standardize buffs and debuffs
+  std::array<int8_t, 9> selfBuff; //TODO: standardize buffs and debuffs
   
   /*
    *targetDebuff: positive implies a debuff
@@ -112,7 +112,7 @@ public:
    * 5: Evasion (de)buff
    * 6: Accuracy (de)buff
    */
-  boost::array<int8_t, 9> targetDebuff;
+  std::array<int8_t, 9> targetDebuff;
   
   /*
    * targetAilment:
@@ -150,10 +150,10 @@ public:
 
   bool isImplemented() const
   {
-    return pluggable::isImplemented() && !lostChild;
+    return Pluggable::isImplemented() && !lostChild;
   };
 
-  const type& getType() const;
+  const Type& getType() const;
 
   bool targetsEnemy() const { return primaryAccuracy > 100; };
 
@@ -176,11 +176,11 @@ public:
   fpType getSecondaryAccuracy() const { return (fpType)secondaryAccuracy / 100.0; };
 
 
-  void init(const move& source);
-  move();
-  move(const move& source);
-  move& operator=(const move& source);
-  ~move();
+  void init(const Move& source);
+  Move();
+  Move(const Move& source);
+  Move& operator=(const Move& source);
+  ~Move();
 };
 
 #endif	/* MOVE_H */

@@ -4,46 +4,46 @@
 #include "../inc/pkai.h"
 
 #include <stdint.h>
-#include <boost/array.hpp>
+#include <array>
 
 #include "../inc/team_nonvolatile.h"
 
-class PKAISHARED environment_nonvolatile
+class PKAISHARED EnvironmentNonvolatile
 {
 private:
-  boost::array<team_nonvolatile, 2> teams;
+  std::array<TeamNonVolatile, 2> teams;
 
 public:
 
-  environment_nonvolatile()
+  EnvironmentNonvolatile()
     : teams()
   {
   };
 
-  environment_nonvolatile(const team_nonvolatile& _teamA, const team_nonvolatile& _teamB, bool init = false)
+  EnvironmentNonvolatile(const TeamNonVolatile& _teamA, const TeamNonVolatile& _teamB, bool init = false)
   {
     teams[0] = _teamA;
     teams[1] = _teamB;
     if (init) { initialize(); };
   };
 
-  environment_nonvolatile(const environment_nonvolatile& other)
+  EnvironmentNonvolatile(const EnvironmentNonvolatile& other)
     : teams(other.teams)
   {
   };
 
-  team_nonvolatile& getTeam(size_t movesFirst)
+  TeamNonVolatile& getTeam(size_t movesFirst)
   {
     return teams[movesFirst];
   };
 
-  team_nonvolatile& getOtherTeam(size_t movesFirst)
+  TeamNonVolatile& getOtherTeam(size_t movesFirst)
   {
 
     return teams[(movesFirst+1)&1];
   };
 
-  friend union environment_volatile;
+  friend union EnvironmentVolatile;
 
 public:
 
@@ -51,17 +51,17 @@ public:
 
   void uninitialize();
 
-  const team_nonvolatile& getTeam(size_t movesFirst) const
+  const TeamNonVolatile& getTeam(size_t movesFirst) const
   {
     return teams[movesFirst];
   };
 
-  const team_nonvolatile& getOtherTeam(size_t movesFirst) const
+  const TeamNonVolatile& getOtherTeam(size_t movesFirst) const
   {
     return teams[(movesFirst+1)&1];
   };
 
-  void setTeam(size_t iTeam, const team_nonvolatile& cTeam, bool init = false);
+  void setTeam(size_t iTeam, const TeamNonVolatile& cTeam, bool init = false);
 
 };
 

@@ -31,13 +31,13 @@ bool planner_human::isInitialized() const
   return true; 
 }
 
-void planner_human::setEnvironment(pkCU& _cu, size_t _agentTeam)
+void planner_human::setEnvironment(PkCU& _cu, size_t _agentTeam)
 {
   cu = &_cu;
   agentTeam = _agentTeam;
 };
 
-uint32_t planner_human::generateSolution(const environment_possible& origin)
+uint32_t planner_human::generateSolution(const EnvironmentPossible& origin)
 {
   std::cout << envP_print(cu->getNV(), origin, agentTeam);
   printActions(origin.getEnv());
@@ -45,20 +45,20 @@ uint32_t planner_human::generateSolution(const environment_possible& origin)
   return actionSelect(origin.getEnv());
 };
 
-void planner_human::printActions(const environment_volatile& env)
+void planner_human::printActions(const EnvironmentVolatile& env)
 {
-  const environment_nonvolatile& envNV = cu->getNV();
-  const team_nonvolatile& cTeam = envNV.getTeam(agentTeam);
-  const team_volatile& currentTeam = env.getTeam(agentTeam);
-  const pokemon_nonvolatile& cPokemon = cTeam.getPKNV(currentTeam);
+  const EnvironmentNonvolatile& envNV = cu->getNV();
+  const TeamNonVolatile& cTeam = envNV.getTeam(agentTeam);
+  const TeamVolatile& currentTeam = env.getTeam(agentTeam);
+  const PokemonNonVolatile& cPokemon = cTeam.getPKNV(currentTeam);
   std::cout << "Active pokemon: \n";
   
   // if this is false, then the only move this pokemon may use is "thrash"
   for (unsigned int iAction = 0; iAction < cPokemon.getNumMoves(); iAction++)
   {
-    const move_nonvolatile& cMove = cTeam.getPKNV(currentTeam).getMove(AT_MOVE_0 + iAction);
+    const MoveNonVolatile& cMove = cTeam.getPKNV(currentTeam).getMove(AT_MOVE_0 + iAction);
     
-    const move_volatile& currentMove = currentTeam.getPKV().getMV(AT_MOVE_0 + iAction);
+    const MoveVolatile& currentMove = currentTeam.getPKV().getMV(AT_MOVE_0 + iAction);
 
     if (cu->isValidAction(env, AT_MOVE_0 + iAction, agentTeam) == false) { continue; }
     
@@ -87,7 +87,7 @@ void planner_human::printActions(const environment_volatile& env)
   }
 };
 
-uint32_t planner_human::actionSelect(const environment_volatile& env)
+uint32_t planner_human::actionSelect(const EnvironmentVolatile& env)
 {
   std::string input;
   uint32_t action;

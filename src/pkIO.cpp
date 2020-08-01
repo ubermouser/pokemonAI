@@ -30,7 +30,7 @@
 using namespace INI;
 using namespace orphan;
 
-pkIO::pkIO(class pokemonAI* _parent)
+PkIO::PkIO(class PokemonAI* _parent)
   : parent(_parent)
 {
 }
@@ -39,7 +39,7 @@ pkIO::pkIO(class pokemonAI* _parent)
 
 
 
-bool pkIO::parseArg(const std::string& input, pkIO*& target)
+bool PkIO::parseArg(const std::string& input, PkIO*& target)
 {
 #define genericArg( commandName, argLocation) \
 else if (expression.compare(#commandName) == 0)\
@@ -260,7 +260,7 @@ return true;\
 
 
 
-bool pkIO::inputMoves()
+bool PkIO::inputMoves()
 {
   /*
    * Header data:
@@ -292,7 +292,7 @@ bool pkIO::inputMoves()
 
 
 
-bool pkIO::inputItems()
+bool PkIO::inputItems()
 {
   /*
    * Header data:
@@ -324,7 +324,7 @@ bool pkIO::inputItems()
 
 
 
-bool pkIO::inputTypes()
+bool PkIO::inputTypes()
 {
   /*
    * Header data:
@@ -356,7 +356,7 @@ bool pkIO::inputTypes()
 
 
 
-bool pkIO::inputNatures()
+bool PkIO::inputNatures()
 {
   /*
    * Header data:
@@ -388,7 +388,7 @@ bool pkIO::inputNatures()
 
 
 
-bool pkIO::inputPokemon()
+bool PkIO::inputPokemon()
 {
   /*
    * Header data:
@@ -420,7 +420,7 @@ bool pkIO::inputPokemon()
 
 
 
-bool pkIO::inputMovelist()
+bool PkIO::inputMovelist()
 {
   /*
    * Header data:
@@ -449,7 +449,7 @@ bool pkIO::inputMovelist()
 
 }//endof import movelist
 
-bool pkIO::inputAbilities()
+bool PkIO::inputAbilities()
 {
   /*
    * Header data:
@@ -481,7 +481,7 @@ bool pkIO::inputAbilities()
 
 
 
-bool pkIO::inputRankedNetwork(const boost::filesystem::path& path, ranked_neuralNet& cNet)
+bool PkIO::inputRankedNetwork(const boost::filesystem::path& path, ranked_neuralNet& cNet)
 {
   std::vector<std::string> lines;
   {
@@ -500,7 +500,7 @@ bool pkIO::inputRankedNetwork(const boost::filesystem::path& path, ranked_neural
   return cNet.input(lines, iLine);
 } // endOf inputRankedTeam
 
-bool pkIO::inputPlayerNetwork(const boost::filesystem::path& path, neuralNet& cResult)
+bool PkIO::inputPlayerNetwork(const boost::filesystem::path& path, neuralNet& cResult)
 {
   /*
    * Header data:
@@ -553,7 +553,7 @@ bool pkIO::inputPlayerNetwork(const boost::filesystem::path& path, neuralNet& cR
 
 
 
-bool pkIO::inputRankedTeam(const boost::filesystem::path& path, ranked_team& cTeam)
+bool PkIO::inputRankedTeam(const boost::filesystem::path& path, ranked_team& cTeam)
 {
   std::vector<std::string> lines;
   {
@@ -572,7 +572,7 @@ bool pkIO::inputRankedTeam(const boost::filesystem::path& path, ranked_team& cTe
   return cTeam.input(lines, iLine);
 } // endOf inputRankedTeam
 
-bool pkIO::inputPlayerTeam(const boost::filesystem::path& path, team_nonvolatile& cResult)
+bool PkIO::inputPlayerTeam(const boost::filesystem::path& path, TeamNonVolatile& cResult)
 {
   size_t iLine = 0;
   std::vector<std::string> lines;
@@ -618,7 +618,7 @@ bool pkIO::inputPlayerTeam(const boost::filesystem::path& path, team_nonvolatile
 
 
 
-bool pkIO::inputPlugins()
+bool PkIO::inputPlugins()
 {
   return parent->inputPlugins(input_pluginFolder);
 } // endOf inputPlugins

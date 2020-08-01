@@ -10,10 +10,10 @@
 #include "../inc/pokedex.h"
 //#undef PKAI_STATIC
 
-const move* move::move_struggle = NULL;
-const move* move::move_none = NULL;
+const Move* Move::move_struggle = NULL;
+const Move* Move::move_none = NULL;
 
-void move::init(const move& source)
+void Move::init(const Move& source)
 {
   cType = source.cType;
   
@@ -49,9 +49,9 @@ void move::init(const move& source)
 
 
 
-move::move()
-  : name(),
-  pluggable(),
+Move::Move()
+  : Name(),
+  Pluggable(),
   description()
 {
   cType = NULL;
@@ -70,8 +70,8 @@ move::move()
   priority = 0;
   
   // buffs
-  selfBuff.assign(0);
-  targetDebuff.assign(0);
+  selfBuff.fill(0);
+  targetDebuff.fill(0);
   
   targetAilment = AIL_NV_NONE;
   targetVolatileAilment = AIL_V_NONE;
@@ -83,9 +83,9 @@ move::move()
 
 
 
-move::move(const move& source)
-  : name(source),
-  pluggable(source)
+Move::Move(const Move& source)
+  : Name(source),
+  Pluggable(source)
 {
   init(source);
 }
@@ -94,13 +94,13 @@ move::move(const move& source)
 
 
 
-move& move::operator=(const move& source)
+Move& Move::operator=(const Move& source)
 {
   // identity theorem - simply return what we have now if equal address
   if (this == &source) { return *this; } 
   
-  name::operator=(source);
-  pluggable::operator=(source);
+  Name::operator=(source);
+  Pluggable::operator=(source);
   
   init(source);
   
@@ -111,7 +111,7 @@ move& move::operator=(const move& source)
 
 
 
-move::~move()
+Move::~Move()
 {
   description.clear();
 }
@@ -120,7 +120,7 @@ move::~move()
 
 
 
-const type& move::getType() const
+const Type& Move::getType() const
 {
   assert(cType != NULL);
   return *cType;

@@ -4,20 +4,20 @@
 #include "../inc/pkai.h"
 #include "../inc/planner.h"
 
-class evaluator;
-class pkCU;
+class Evaluator;
+class PkCU;
 
-class planner_max : public planner
+class planner_max : public Planner
 {
 private:
   std::string ident;
 
-  std::vector<plannerResult> results;
+  std::vector<PlannerResult> results;
 
-  pkCU* cu;
+  PkCU* cu;
 
   /* evaluator being used by this planner */
-  evaluator* eval;
+  Evaluator* eval;
 
   size_t agentTeam;
 
@@ -25,7 +25,7 @@ private:
 
 public:
   planner_max(size_t engineAccuracy = 1);
-  planner_max(const evaluator& evalType, size_t engineAccuracy = 1);
+  planner_max(const Evaluator& evalType, size_t engineAccuracy = 1);
 
   planner_max(const planner_max& other);
   
@@ -37,16 +37,16 @@ public:
 
   const std::string& getName() const { return ident; };
 
-  void setEvaluator(const evaluator& evalType);
-  const evaluator* getEvaluator() const { return eval; }
+  void setEvaluator(const Evaluator& evalType);
+  const Evaluator* getEvaluator() const { return eval; }
 
-  void setEnvironment(pkCU& _cu, size_t _agentTeam);
+  void setEnvironment(PkCU& _cu, size_t _agentTeam);
 
-  uint32_t generateSolution(const environment_possible& origin);
+  uint32_t generateSolution(const EnvironmentPossible& origin);
 
-  static uint32_t generateSolution(pkCU& _cu, evaluator& eval, const environment_possible& origin, size_t _agentTeam, size_t* nodesEvaluated = NULL, std::vector<plannerResult>* results = NULL);
+  static uint32_t generateSolution(PkCU& _cu, Evaluator& eval, const EnvironmentPossible& origin, size_t _agentTeam, size_t* nodesEvaluated = NULL, std::vector<PlannerResult>* results = NULL);
 
-  const std::vector<plannerResult>& getDetailedResults() const { return results; };
+  const std::vector<PlannerResult>& getDetailedResults() const { return results; };
   void clearResults() { results.clear(); };
 };
 

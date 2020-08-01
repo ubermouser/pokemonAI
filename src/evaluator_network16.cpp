@@ -96,7 +96,7 @@ void evaluator_network16::resetNetwork(const neuralNet& cNet)
   }
 }
 
-void evaluator_network16::resetEvaluator(const environment_nonvolatile& _envNV)
+void evaluator_network16::resetEvaluator(const EnvironmentNonvolatile& _envNV)
 {
   envNV = &_envNV;
   // reset memoized data:
@@ -105,12 +105,12 @@ void evaluator_network16::resetEvaluator(const environment_nonvolatile& _envNV)
   if (network != NULL) { network->clearInput(); }
 };
 
-evalResult_t evaluator_network16::calculateFitness(const environment_volatile& env, size_t iTeam)
+EvalResult_t evaluator_network16::calculateFitness(const EnvironmentVolatile& env, size_t iTeam)
 {
   return calculateFitness(*network, env, iTeam);
 };
 
-evalResult_t evaluator_network16::calculateFitness(neuralNet& cNet, const environment_volatile& env, size_t iTeam)
+EvalResult_t evaluator_network16::calculateFitness(neuralNet& cNet, const EnvironmentVolatile& env, size_t iTeam)
 {
   // seed network with values:
   seed(&*cNet.inputBegin(), env, iTeam);
@@ -122,7 +122,7 @@ evalResult_t evaluator_network16::calculateFitness(neuralNet& cNet, const enviro
   fpType fitness = *output;
   fitness = std::max(0.0, std::min(1.0, scale(fitness, 0.85, 0.15)));
 
-  evalResult_t result= { fitness , -1/*agentMove*/ , -1/*otherMove*/ };
+  EvalResult_t result= { fitness , -1/*agentMove*/ , -1/*otherMove*/ };
   return result;
 };
 
@@ -130,18 +130,18 @@ evalResult_t evaluator_network16::calculateFitness(neuralNet& cNet, const enviro
 
 
 
-void evaluator_network16::seed(float* inputBegin, const environment_volatile& env, size_t _iTeam) const
+void evaluator_network16::seed(float* inputBegin, const EnvironmentVolatile& env, size_t _iTeam) const
 {
   float* cInput;
 
   for (size_t iNTeam = 0; iNTeam < 2; ++iNTeam)
   {
     size_t iTeam = (_iTeam + iNTeam) & 1;
-    const team_volatile& cTV = env.getTeam(iTeam);
-    const team_nonvolatile& cTNV = envNV->getTeam(iTeam);
+    const TeamVolatile& cTV = env.getTeam(iTeam);
+    const TeamNonVolatile& cTNV = envNV->getTeam(iTeam);
 
     // order of inputs:
-    const boost::array<uint8_t, 6>& iTeammates = orders[iTeam][cTV.getICPKV()];
+    const std::array<uint8_t, 6>& iTeammates = orders[iTeam][cTV.getICPKV()];
 
     cInput = inputBegin + (NEURONSPERTEAM * iNTeam);
 
@@ -150,7 +150,7 @@ void evaluator_network16::seed(float* inputBegin, const environment_volatile& en
     for (size_t iNTeammate = 0; iNTeammate != cTNV.getNumTeammates(); ++iNTeammate)
     {
       size_t iTeammate = iTeammates[iNTeammate];
-      const pokemon_volatile& cPKV = cTV.teammate(iTeammate);
+      const PokemonVolatile& cPKV = cTV.teammate(iTeammate);
       if (!cPKV.isAlive()) 
       {
         // special case when this is the first teammate
@@ -158,7 +158,7 @@ void evaluator_network16::seed(float* inputBegin, const environment_volatile& en
         else { numTeammatesAlive--; }
         continue; 
       }
-      const pokemon_nonvolatile& cPKNV = cTNV.teammate(iTeammate);
+      const PokemonNonVolatile& cPKNV = cTNV.teammate(iTeammate);
 
       // percent hitpoints of pokemon: (guaranteed to be nonzero)
       float percentHP = (float)cPKV.getPercentHP(cPKNV);
@@ -175,7 +175,7 @@ void evaluator_network16::seed(float* inputBegin, const environment_volatile& en
     // volatile status:
     {
       assert((cInput - inputBegin) == ((NEURONSPERTEAM * iNTeam) + (NEURONSPERTEAMMATE * 6)));
-      const pokemon_volatile& cPKV = cTV.getPKV();
+      const PokemonVolatile& cPKV = cTV.getPKV();
 
       // 2 neurons per status:
       // if pokemon has been statused:
@@ -206,17 +206,17 @@ const float* evaluator_network16::getInput() const
 
 void evaluator_network16::generateOrders()
 {
-  boost::array< uint8_t , 6> preOrder;
+  std::array< uint8_t , 6> preOrder;
   // seed the unmodified order into preOrders:
   for (size_t iTeammate = 0; iTeammate != 6; ++iTeammate) { preOrder[iTeammate] = iTeammate; }
 
   // place modified order into orders:
   for (size_t iTeam = 0; iTeam < 2; ++iTeam)
   {
-    boost::array< boost::array< uint8_t , 6> , 6>& cOrders = orders[iTeam];
+    std::array< std::array< uint8_t , 6> , 6>& cOrders = orders[iTeam];
     for (size_t iTeammate = 0; iTeammate != 6; ++iTeammate)
     {
-      boost::array<uint8_t, 6>::iterator cTeammate = cOrders[iTeammate].begin();
+      std::array<uint8_t, 6>::iterator cTeammate = cOrders[iTeammate].begin();
       *cTeammate++ = iTeammate;
       for (size_t iNTeammate = 0; iNTeammate != 6; ++iNTeammate)
       {

@@ -9,7 +9,7 @@
 #include "../inc/team_nonvolatile.h"
 //#undef PKAI_STATIC
 
-void environment_nonvolatile::initialize()
+void EnvironmentNonvolatile::initialize()
 {
   for (size_t iTeam = 0; iTeam < teams.size(); ++iTeam)
   {
@@ -21,7 +21,7 @@ void environment_nonvolatile::initialize()
 
 
 
-void environment_nonvolatile::uninitialize()
+void EnvironmentNonvolatile::uninitialize()
 {
     for (size_t iTeam = 0; iTeam < teams.size(); ++iTeam)
   {
@@ -33,7 +33,7 @@ void environment_nonvolatile::uninitialize()
 
 
 
-void environment_nonvolatile::setTeam(size_t iTeam, const team_nonvolatile& cTeam, bool init)
+void EnvironmentNonvolatile::setTeam(size_t iTeam, const TeamNonVolatile& cTeam, bool init)
 {
   assert(iTeam < 2);
   teams[iTeam] = cTeam;

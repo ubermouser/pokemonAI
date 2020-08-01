@@ -12,7 +12,7 @@
 #endif
 
 #include <stdint.h>
-#include <boost/array.hpp>
+#include <array>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
 
@@ -21,7 +21,7 @@
 class minimax_threadArg;
 class ply;
 class otherMove;
-union environment_possible;
+union EnvironmentPossible;
 
 class agentMove : public vertex
 {
@@ -63,7 +63,7 @@ private:
   /* status of this node - may be fully evaluated, cutoff evaluated, or not evaluated at all */
   uint8_t status;
 
-  boost::array<uint8_t, AT_ITEM_USE+1> order;
+  std::array<uint8_t, AT_ITEM_USE+1> order;
   
   agentMove();
   agentMove(const agentMove& other);
@@ -80,7 +80,7 @@ private:
   bool generateChildren_backwards(minimax_threadArg& _planner, std::vector<ply*>& _children);
 
   agentMove(
-    const std::vector<environment_possible>& possibleEnvironments, 
+    const std::vector<EnvironmentPossible>& possibleEnvironments, 
     minimax_threadArg& _planner, 
     unsigned int numUnique, 
     ply& _parent, 

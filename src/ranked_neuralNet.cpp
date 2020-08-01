@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <math.h>
 
-#include <boost/array.hpp>
+#include <array>
 #include <boost/foreach.hpp>
 #include <boost/scoped_ptr.hpp>
 
@@ -31,7 +31,7 @@ void ranked_neuralNet::initStatic(size_t numRollouts)
 
   // rollouts:
 #ifdef _DISABLETEMPORALDIFFERENCE
-  rolloutGame = new game(MAXPLIES, numRollouts, 1, true);
+  rolloutGame = new Game(MAXPLIES, numRollouts, 1, true);
 #endif
 };
 
@@ -139,7 +139,7 @@ void ranked_neuralNet::jitter(const trueSkillSettings& settings)
   stateSaved = false;
 }
 
-size_t ranked_neuralNet::update(const game& cGame, const trueSkillTeam& cTeam, size_t iTeam, bool updateWeights)
+size_t ranked_neuralNet::update(const Game& cGame, const trueSkillTeam& cTeam, size_t iTeam, bool updateWeights)
 {
   // update ranked vars:
   ranked::update(cGame, cTeam, iTeam);
@@ -191,19 +191,19 @@ float continuousClassifier(float desired)
 
 
 #ifdef _DISABLETEMPORALDIFFERENCE
-game* ranked_neuralNet::rolloutGame = NULL;
+Game* ranked_neuralNet::rolloutGame = NULL;
 std::vector<float> ranked_neuralNet::rolloutFitnesses;
 
 void ranked_neuralNet::propagate(
-    const std::vector<turn>& turns, 
-    const environment_nonvolatile& envNV,
+    const std::vector<Turn>& turns, 
+    const EnvironmentNonvolatile& envNV,
     ranked_neuralNet& rankedNet, 
     size_t agentTeam)
 {
   network_t& bNet = rankedNet.bNet;
   if (mostlyEQ(bNet.getSettings().learningRate, 0.0f)) { return; } // don't perform learning if learnrate is zero
   //std::vector<float> desiredFitnesses;
-  boost::array<float, EVAL_OUTPUTNEURONS> resultVector;
+  std::array<float, EVAL_OUTPUTNEURONS> resultVector;
 
   netEvaluator->resetEvaluator(envNV);
 
@@ -216,7 +216,7 @@ void ranked_neuralNet::propagate(
     rolloutGame->setEnvironment(envNV);
 
     rolloutFitnesses.reserve(turns.size());
-    BOOST_FOREACH(const turn& cTurn, turns)
+    BOOST_FOREACH(const Turn& cTurn, turns)
     {
       float desiredFitness;
       if (&cTurn != &turns.back())
@@ -226,7 +226,7 @@ void ranked_neuralNet::propagate(
         rolloutGame->setInitialState(cTurn.env);
         rolloutGame->run();
 
-        const heatResult& cRolloutResult = rolloutGame->getResult();
+        const HeatResult& cRolloutResult = rolloutGame->getResult();
         desiredFitness = ((float)cRolloutResult.score[TEAM_A]) / (float)(cRolloutResult.score[TEAM_A]+cRolloutResult.score[TEAM_B]);
       }
       else
@@ -279,8 +279,8 @@ void ranked_neuralNet::propagate(
     {
       size_t iTurn = order[iNTurn];
 
-      const turn& cTurn = turns[iTurn];
-      const environment_volatile& cEnv = cTurn.env;
+      const Turn& cTurn = turns[iTurn];
+      const EnvironmentVolatile& cEnv = cTurn.env;
 
       // feed forward with cEnv and envNV feature vector, but do not interpret output:
       netEvaluator->seed(bNet.getNeuralNet(), cEnv, iTeam);
@@ -288,7 +288,7 @@ void ranked_neuralNet::propagate(
 
       // backpropagate a terminal result:
       constFloatIterator_t cOutValue = bNet.getNeuralNet().outputBegin();
-      boost::array<float, EVAL_OUTPUTNEURONS>::iterator cRValue = resultVector.begin();
+      std::array<float, EVAL_OUTPUTNEURONS>::iterator cRValue = resultVector.begin();
       // find aggregate variables:
       // target fitness is the fitness (at maximum depth) returned by the next ply:
       float desiredFitness = rolloutFitnesses[iTurn];
@@ -323,14 +323,14 @@ void ranked_neuralNet::propagate(
 
 
 void ranked_neuralNet::propagate(
-    const std::vector<turn>& turns, 
-    const environment_nonvolatile& envNV,
+    const std::vector<Turn>& turns, 
+    const EnvironmentNonvolatile& envNV,
     ranked_neuralNet& rankedNet, 
     size_t agentTeam)
 {
   network_t& bNet = rankedNet.bNet;
   if (mostlyEQ(bNet.getSettings().learningRate, 0.0f)) { return; } // don't perform learning if learnrate is zero
-  //boost::array<float, evaluator_network_t::numOutputNeurons> resultVector;
+  //std::array<float, evaluator_network_t::numOutputNeurons> resultVector;
   std::vector<float> resultVector(bNet.getNeuralNet().numOutputs(), 0.0f);
   
   boost::scoped_ptr<evaluator_featureVector> netEvaluator(rankedNet.getEvaluator());
@@ -355,8 +355,8 @@ void ranked_neuralNet::propagate(
     {
       size_t iTurn = order[iNTurn];
 
-      const turn& cTurn = turns[iTurn];
-      const environment_volatile& cEnv = cTurn.env;
+      const Turn& cTurn = turns[iTurn];
+      const EnvironmentVolatile& cEnv = cTurn.env;
 
       // terminal turn first:
       //if ((iNTurn + 1) == turns.size()) // forward
@@ -403,7 +403,7 @@ void ranked_neuralNet::propagate(
         }
 
         // calculate previous node weights and output:
-        const turn& pTurn = turns[iTurn-1];
+        const Turn& pTurn = turns[iTurn-1];
         // determine previous node output
         netEvaluator->seed(bNet.getNeuralNet(), pTurn.env, iTeam);
         bNet.getNeuralNet().feedForward();
@@ -432,8 +432,8 @@ void ranked_neuralNet::propagate(
 
 
 void ranked_neuralNet::updateExperience(
-  const std::vector<turn>& turns, 
-  const environment_nonvolatile& envNV,
+  const std::vector<Turn>& turns, 
+  const EnvironmentNonvolatile& envNV,
   ranked_neuralNet& rankedNet, 
   size_t agentTeam)
 {
@@ -444,7 +444,7 @@ void ranked_neuralNet::updateExperience(
   if (netEvaluator == NULL) { return; }
   netEvaluator->resetEvaluator(envNV);
 
-  BOOST_FOREACH(const turn& cTurn, turns)
+  BOOST_FOREACH(const Turn& cTurn, turns)
   {
     // seed to buffer:
     netEvaluator->seed(resultVector.begin(), cTurn.env, agentTeam);

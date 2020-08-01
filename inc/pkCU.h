@@ -5,20 +5,20 @@
 
 #include <stdint.h>
 #include <vector>
-#include <boost/array.hpp>
+#include <array>
 #include <assert.h>
 
 #include "../inc/environment_possible.h"
 #include "../inc/pluggable.h"
 
-class environment_nonvolatile;
-class pokemon_nonvolatile;
-class team_nonvolatile;
+class EnvironmentNonvolatile;
+class PokemonNonVolatile;
+class TeamNonVolatile;
 
-union environment_possible;
-union environment_volatile;
-union team_volatile;
-union pokemon_volatile;
+union EnvironmentPossible;
+union EnvironmentVolatile;
+union TeamVolatile;
+union PokemonVolatile;
 
 // seed and priority evaluation:
 #define STAGE_DNE 0
@@ -58,11 +58,11 @@ union pokemon_volatile;
 #define STAGE_FINAL 28
 #define STAGE_HASH 29
 
-struct damageComponents_t
+struct DamageComponents_t
 {
   uint32_t damage;
   uint32_t damageCrit;
-  const type* mType;
+  const Type* mType;
   fpType cProbability;
   fpType tProbability;
 };
@@ -73,35 +73,35 @@ struct _moveBracket
   unsigned int speed;
 };
 
-class PKAISHARED pkCU
+class PKAISHARED PkCU
 {
 private:
   /* the current nonvolatile environment; pkCU loads plugins only for these two teams to fight */
-  const environment_nonvolatile* nv;
+  const EnvironmentNonvolatile* nv;
 
   /* array containing all possible matchups and the plugins they may call upon */
-  boost::array< boost::array< boost::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>, 6>, 12> pluginSets;
+  std::array< std::array< std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>, 6>, 12> pluginSets;
 
   /* the current matchup, based on which two pokemon are active */
-  boost::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>* cPluginSet;
+  std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>* cPluginSet;
 
   /* stack of environment_possible objects */
-  std::vector<environment_possible>* _stack;
+  std::vector<EnvironmentPossible>* _stack;
 
   /* the stage of computation each element on the stack is in */
   std::vector<uint32_t> stackStage;
   
   /* memoized array of all current pokemon volatile object pointers */
-  std::vector<pokemon_volatile*> PKVOffsets;
+  std::vector<PokemonVolatile*> PKVOffsets;
 
   /* when executing the default damage pathway, these components are used for persistent data */
-  std::vector<damageComponents_t> damageComponents;
+  std::vector<DamageComponents_t> damageComponents;
 
   /* an array of which team is going when. 0 is current team, 1 is other team */
-  boost::array<size_t, 2> iTeams;
+  std::array<size_t, 2> iTeams;
 
   /* an array of each team's action. 0 is current team, 1 is other team */
-  boost::array<size_t, 2> iActions;
+  std::array<size_t, 2> iActions;
 
   /* iterator - the environment that the current operation is creating values from */
   size_t iBase;
@@ -173,7 +173,7 @@ private:
   /* returns the number of unique environments in the result array, applies the isPruned tag to pruned environments */
   size_t combineSimilarEnvironments();
 
-  void seedCurrentState(const environment_volatile& cEnv);
+  void seedCurrentState(const EnvironmentVolatile& cEnv);
 
   void swapTeamIndexes() 
   { 
@@ -190,26 +190,26 @@ private:
     resetPKVArray();
   };
 
-  boost::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>& getCPluginSet();
+  std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>& getCPluginSet();
 
   void setCPluginSet();
 
   /* fully seeds the pluginset vector */
   bool initialize();
 
-  pkCU();
+  PkCU();
 public:
 
-  pkCU(const environment_nonvolatile& _nv, size_t engineAccuracy = SIZE_MAX);
-  pkCU(const pkCU& other);
+  PkCU(const EnvironmentNonvolatile& _nv, size_t engineAccuracy = SIZE_MAX);
+  PkCU(const PkCU& other);
 
   /* pkCU stores a reference to the environment at cEnvironment. This reference must not be destroyed */
-  void setEnvironment(const environment_nonvolatile& _cEnvironment);
+  void setEnvironment(const EnvironmentNonvolatile& _cEnvironment);
 
   /* sets accuracy of pkCU */
   void setAccuracy(size_t engineAccuracy);
 
-  ~pkCU();
+  ~PkCU();
   
   /* 
    * Determine who goes first, given two pokemon and their move
@@ -269,27 +269,27 @@ public:
    * 
    * returns: number of unique environments in vector
    */
-  size_t updateState(const environment_volatile& currentEnvironment, std::vector<environment_possible>& resultEnvironments, size_t actionA, size_t actionB);
+  size_t updateState(const EnvironmentVolatile& currentEnvironment, std::vector<EnvironmentPossible>& resultEnvironments, size_t actionA, size_t actionB);
 
   /* determines whether a given action is a selectable one, given the current state */
-  bool isValidAction(const environment_volatile& envV, size_t action, size_t iTeam);
+  bool isValidAction(const EnvironmentVolatile& envV, size_t action, size_t iTeam);
 
   /* determines whether a game has ended, given the current state. Returns an enum of the game's current status */
-  matchState isGameOver(const environment_volatile& envV);
+  MatchState isGameOver(const EnvironmentVolatile& envV);
 
-  std::vector<environment_possible>& getStack() { return *_stack; };
+  std::vector<EnvironmentPossible>& getStack() { return *_stack; };
 
-  const std::vector<environment_possible>& getStack() const { assert(_stack != NULL); return *_stack; };
+  const std::vector<EnvironmentPossible>& getStack() const { assert(_stack != NULL); return *_stack; };
 
-  damageComponents_t& getDamageComponent(size_t iStack) { return damageComponents[iStack]; };
+  DamageComponents_t& getDamageComponent(size_t iStack) { return damageComponents[iStack]; };
 
-  damageComponents_t& getDamageComponent() { return damageComponents[iBase]; };
+  DamageComponents_t& getDamageComponent() { return damageComponents[iBase]; };
 
-  const damageComponents_t& getDamageComponent() const { return damageComponents[iBase]; };
+  const DamageComponents_t& getDamageComponent() const { return damageComponents[iBase]; };
 
-  environment_possible& getBase() { return getStack()[iBase]; };
+  EnvironmentPossible& getBase() { return getStack()[iBase]; };
 
-  const environment_possible& getBase() const { return getStack()[iBase]; };
+  const EnvironmentPossible& getBase() const { return getStack()[iBase]; };
 
   size_t getICTeam() const { return iTeams[0]; };
 
@@ -311,18 +311,18 @@ public:
     return (iAction >= AT_SWITCH_0 && iAction <= AT_SWITCH_5);
   };
 
-  void duplicateState(boost::array<size_t, 2>& result, fpType probability, size_t iState = SIZE_MAX);
+  void duplicateState(std::array<size_t, 2>& result, fpType probability, size_t iState = SIZE_MAX);
 
-  void triplicateState(boost::array<size_t, 3>& result, fpType probabilityA, fpType probabilityB, size_t iState = SIZE_MAX);
+  void triplicateState(std::array<size_t, 3>& result, fpType probabilityA, fpType probabilityB, size_t iState = SIZE_MAX);
 
   uint32_t getStackStage() const { return stackStage[iBase]; };
 
   void advanceStackStage() { ++stackStage[iBase]; };
 
-  const environment_nonvolatile& getNV() const { return *nv; };
+  const EnvironmentNonvolatile& getNV() const { return *nv; };
 
-  const pokemon_nonvolatile& getPKNV();
-  const pokemon_nonvolatile& getTPKNV();
+  const PokemonNonVolatile& getPKNV();
+  const PokemonNonVolatile& getTPKNV();
 
   void setPKV(size_t iState);
 
@@ -332,26 +332,26 @@ public:
 
   void resetPKVArray();
 
-  team_volatile& getTMV();
-  team_volatile& getTTMV();
-  team_volatile& getTMV(size_t iState);
-  team_volatile& getTTMV(size_t iState);
-  pokemon_volatile& getPKV();
-  pokemon_volatile& getTPKV();
-  pokemon_volatile& getPKV(size_t iState);
-  pokemon_volatile& getTPKV(size_t iState);
+  TeamVolatile& getTMV();
+  TeamVolatile& getTTMV();
+  TeamVolatile& getTMV(size_t iState);
+  TeamVolatile& getTTMV(size_t iState);
+  PokemonVolatile& getPKV();
+  PokemonVolatile& getTPKV();
+  PokemonVolatile& getPKV(size_t iState);
+  PokemonVolatile& getTPKV(size_t iState);
 
   template<size_t numEnvironments>
-  void nPlicateState(boost::array<size_t, numEnvironments>& result, size_t iState = SIZE_MAX)
+  void nPlicateState(std::array<size_t, numEnvironments>& result, size_t iState = SIZE_MAX)
   {
     if (iState == SIZE_MAX) { iState = iBase; }
-    std::vector<environment_possible>& stack = getStack();
+    std::vector<EnvironmentPossible>& stack = getStack();
 
     //assert((stack.size() + numEnvironments) <= MAXSTACKSIZE);
 
     result[0] = iState;
     uint32_t baseStage = stackStage[iState];
-    const damageComponents_t& baseComponent = damageComponents[iState];
+    const DamageComponents_t& baseComponent = damageComponents[iState];
     for (size_t iEnvironment = 1; iEnvironment < numEnvironments; ++iEnvironment)
     {
       size_t cSize = stack.size();

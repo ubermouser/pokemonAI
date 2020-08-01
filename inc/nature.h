@@ -11,14 +11,14 @@
 #include "../inc/pkai.h"
 
 #include <stdint.h>
-#include <boost/array.hpp>
+#include <array>
 
 #include "../inc/name.h"
 
-class PKAISHARED nature: public name
+class PKAISHARED Nature: public Name
 {
 public:
-  static const nature* no_nature;
+  static const Nature* no_nature;
 
   /*
    * FV_ATTACK - attack
@@ -29,7 +29,7 @@ public:
    * 
    * other FV values are not allocated
    */
-  boost::array<uint8_t, 5> modTable;
+  std::array<uint8_t, 5> modTable;
 };
 
 #endif	/* NATURE_H */

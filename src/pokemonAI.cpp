@@ -35,7 +35,7 @@
 // globals:
 
 
-pokemonAI::pokemonAI()
+PokemonAI::PokemonAI()
 {
   verbose = 2;
   warning = 0;
@@ -44,9 +44,9 @@ pokemonAI::pokemonAI()
   
   pkdex = this;
   
-  pokemonIO = new pkIO(this);
-  Trainer = NULL;
-  Game = NULL;
+  pokemonIO = new PkIO(this);
+  trainer = NULL;
+  game = NULL;
 
   // invocation:
   gameType = GT_DIAG_HUVSHU;
@@ -110,7 +110,7 @@ pokemonAI::pokemonAI()
   evaluator_featureVector::initStatic();
 }
 
-pokemonAI::~pokemonAI()
+PokemonAI::~PokemonAI()
 {
   evaluator_featureVector::uninitStatic();
 
@@ -129,13 +129,13 @@ pokemonAI::~pokemonAI()
     delete cPlugin;
   }
 
-  if (Game != NULL) { delete Game; }
-  if (Trainer != NULL) { delete Trainer; }
+  if (game != NULL) { delete game; }
+  if (trainer != NULL) { delete trainer; }
   
   if (pokemonIO != NULL) delete pokemonIO;
 }
 
-bool pokemonAI::init()
+bool PokemonAI::init()
 {
   bool result = 0;
   //load data from disk:
@@ -158,7 +158,7 @@ bool pokemonAI::init()
   //std::sort(types.begin(), types.end());
   {
     // find type special case
-    type::no_type = orphan::orphanCheck_ptr(types, NULL, "none");
+    Type::no_type = orphan::orphanCheck_ptr(types, NULL, "none");
   }
 
   //NATURE library
@@ -180,7 +180,7 @@ bool pokemonAI::init()
 
   {
     // find special case no nature:
-    nature::no_nature = orphan::orphanCheck_ptr(natures, NULL, "none");
+    Nature::no_nature = orphan::orphanCheck_ptr(natures, NULL, "none");
   }
 
   //MOVE library
@@ -201,11 +201,11 @@ bool pokemonAI::init()
   std::sort(moves.begin(), moves.end());
   
   {
-    move::move_none = orphan::orphanCheck_ptr(moves, NULL, "none");
+    Move::move_none = orphan::orphanCheck_ptr(moves, NULL, "none");
 
     // find special cases struggle and hurt confusion, set the pointers to them
-    move::move_struggle = orphan::orphanCheck_ptr(moves, NULL, "struggle");
-    if (move::move_struggle != NULL) { move_nonvolatile::mNV_struggle = new move_nonvolatile(*move::move_struggle); }
+    Move::move_struggle = orphan::orphanCheck_ptr(moves, NULL, "struggle");
+    if (Move::move_struggle != NULL) { MoveNonVolatile::mNV_struggle = new MoveNonVolatile(*Move::move_struggle); }
   }
 
   //ABILITY library
@@ -227,7 +227,7 @@ bool pokemonAI::init()
 
   {
     // find special case no ability:
-    ability::no_ability = orphan::orphanCheck_ptr(abilities, NULL, "none");
+    Ability::no_ability = orphan::orphanCheck_ptr(abilities, NULL, "none");
   }
 
   //ITEM library
@@ -249,7 +249,7 @@ bool pokemonAI::init()
 
   {
     // find special case no item:
-    item::no_item = orphan::orphanCheck_ptr(items, NULL, "none");
+    Item::no_item = orphan::orphanCheck_ptr(items, NULL, "none");
   }
 
   //POKEMON library (requires sorted input of abilities and types!)
@@ -271,7 +271,7 @@ bool pokemonAI::init()
 
   {
     // find special case no base:
-    pokemon_base::no_base = orphan::orphanCheck_ptr(pokemon, NULL, "none");
+    PokemonBase::no_base = orphan::orphanCheck_ptr(pokemon, NULL, "none");
   }
 
   //MOVELIST library (requires sorted input of pokemon and moves!)
@@ -320,7 +320,7 @@ bool pokemonAI::init()
     if (verbose >= 1) std::cout << " Loading Pokemon teams...\n";
     for (size_t indexTeam = 0; indexTeam < pokemonIO->input_teams.size(); indexTeam++)
     {
-      team_nonvolatile cTeam;
+      TeamNonVolatile cTeam;
       result = pokemonIO->inputPlayerTeam(pokemonIO->input_teams.at(indexTeam), cTeam);
       if (result != true)
       {
@@ -438,11 +438,11 @@ bool pokemonAI::init()
 
 
 
-void pokemonAI::printTeams(bool printTeammates) const
+void PokemonAI::printTeams(bool printTeammates) const
 {
   for (size_t iTeam = 0; iTeam != teams.size(); ++iTeam)
   {
-    const team_nonvolatile& cTNV = teams.at(iTeam);
+    const TeamNonVolatile& cTNV = teams.at(iTeam);
     
     // print out index and name of team
     std::cout 
@@ -455,14 +455,14 @@ void pokemonAI::printTeams(bool printTeammates) const
       // print out the name followed by the species of pokemon on this team
       for (size_t iPokemon = 0; iPokemon != cTNV.getNumTeammates(); ++iPokemon)
       {
-        const pokemon_nonvolatile& cPKNV = cTNV.teammate(iPokemon);
+        const PokemonNonVolatile& cPKNV = cTNV.teammate(iPokemon);
         std::cout << cPKNV;
       }
     }
   }
 } // end of printTeams
 
-const team_nonvolatile* pokemonAI::teamSelect(char playerID)
+const TeamNonVolatile* PokemonAI::teamSelect(char playerID)
 {
   std::string input;
   int32_t iTeam;
@@ -487,7 +487,7 @@ const team_nonvolatile* pokemonAI::teamSelect(char playerID)
       std::cout << "Please enter a path:\npath> ";
       input.clear();
       getline(std::cin, input);
-      team_nonvolatile cTeam;
+      TeamNonVolatile cTeam;
       if (pokemonIO->inputPlayerTeam(input, cTeam)) { teams.push_back(cTeam); teamsPrinted = false; }
       continue;
     }
@@ -513,7 +513,7 @@ const team_nonvolatile* pokemonAI::teamSelect(char playerID)
 
 
 
-void pokemonAI::printEvaluators() const
+void PokemonAI::printEvaluators() const
 {
   // print neural evaluators:
   for (size_t iNetwork = 0; iNetwork != networks.size(); ++iNetwork)
@@ -536,7 +536,7 @@ void pokemonAI::printEvaluators() const
     << "-\"randomEval\"\n";
 };
 
-evaluator* pokemonAI::evaluatorSelect(char playerID)
+Evaluator* PokemonAI::evaluatorSelect(char playerID)
 {
   std::string input;
   int32_t iEvaluator;
@@ -599,7 +599,7 @@ evaluator* pokemonAI::evaluatorSelect(char playerID)
 
 
 
-void pokemonAI::printPlanners() const
+void PokemonAI::printPlanners() const
 {
   std::cout
     << "0-\"planner_max\"\n"
@@ -610,7 +610,7 @@ void pokemonAI::printPlanners() const
     << "5-\"planner_minimax\"\n";
 };
 
-planner* pokemonAI::plannerSelect(char playerID)
+Planner* PokemonAI::plannerSelect(char playerID)
 {
   std::string input;
   int32_t iPlanner;
@@ -668,7 +668,7 @@ planner* pokemonAI::plannerSelect(char playerID)
 
 
 
-bool pokemonAI::run()
+bool PokemonAI::run()
 {
   // run game (or drop to console):
   if (gameType == GT_OTHER_CONSOLE)
@@ -681,7 +681,7 @@ bool pokemonAI::run()
   }
   else if (gameType >= GT_OTHER_EVOTEAMS && gameType <= GT_OTHER_GAUNTLET_BOTH)
   {
-    Trainer = new trainer(gameType,
+    trainer = new Trainer(gameType,
       maxPlies,
       maxMatches,
       gameAccuracy,
@@ -707,24 +707,24 @@ bool pokemonAI::run()
       teamDirectory,
       networkDirectory);
 
-    if (seedDumbEvaluator) { Trainer->seedEvaluator(evaluator_simple()); }
-    if (seedRandomEvaluator) { Trainer->seedEvaluator(evaluator_random()); }
+    if (seedDumbEvaluator) { trainer->seedEvaluator(evaluator_simple()); }
+    if (seedRandomEvaluator) { trainer->seedEvaluator(evaluator_random()); }
 
     // TODO: gauntlet mode
 
     if (seedTeams)
     {
-      BOOST_FOREACH(const team_nonvolatile& cTeam, teams) { Trainer->seedTeam(cTeam); }
+      BOOST_FOREACH(const TeamNonVolatile& cTeam, teams) { trainer->seedTeam(cTeam); }
     }
 
     if (seedNetworks)
     {
-      BOOST_FOREACH(const neuralNet& cNet, networks) { Trainer->seedNetwork(cNet); }
+      BOOST_FOREACH(const neuralNet& cNet, networks) { trainer->seedNetwork(cNet); }
     }
 
     //Trainer->outputFeaturesToStream(new std::ofstream("output.csv", std::ios::out | std::ios::trunc));
 
-    if (!Trainer->initialize()) 
+    if (!trainer->initialize()) 
     { 
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
         " The PokemonAI genetic trainer engine was not successfully initialized.\n";
@@ -732,32 +732,32 @@ bool pokemonAI::run()
     }
 
     if (verbose >= 0) std::cout << "Starting Pokemon trainer...\n";
-    Trainer->evolve();
+    trainer->evolve();
   }
   else if (gameType >= GT_DIAG_HUVSHU && gameType <= GT_NORM_CPUVSHU)
   {
     if (gameType == GT_DIAG_BENCHMARK) { maxPlies = 1; maxMatches = 1; }
 
-    Game = new game(maxPlies, maxMatches, gameAccuracy);
+    game = new Game(maxPlies, maxMatches, gameAccuracy);
     // set teams using user data:
     if (teams.size() != 2) 
     {
       for (size_t iTeam = 0; iTeam != 2; ++iTeam)
       {
-        const team_nonvolatile* cTeam = teamSelect('A' + iTeam);
-        if (cTeam != NULL) { Game->setTeam(iTeam, *cTeam); }
+        const TeamNonVolatile* cTeam = teamSelect('A' + iTeam);
+        if (cTeam != NULL) { game->setTeam(iTeam, *cTeam); }
         else { return false; }
       }
     }
     else
     {
-      Game->setTeam(TEAM_A, teams.front());
-      Game->setTeam(TEAM_B, teams.back());
+      game->setTeam(TEAM_A, teams.front());
+      game->setTeam(TEAM_B, teams.back());
     }
 
     
     // set planners using user data:
-    boost::array<bool, 2> humanPlanner =
+    std::array<bool, 2> humanPlanner =
     {{ (gameType == GT_DIAG_HUVSCPU || 
       gameType == GT_DIAG_HUVSHU || 
       gameType == GT_DIAG_HUVSHU_UNCERTAIN ||
@@ -769,18 +769,18 @@ bool pokemonAI::run()
     }};
     for (size_t iTeam = 0; iTeam != 2; ++iTeam)
     {
-      if (humanPlanner[iTeam]) { Game->setPlanner(iTeam, planner_human()); }
+      if (humanPlanner[iTeam]) { game->setPlanner(iTeam, planner_human()); }
       else
       {
-        boost::scoped_ptr<planner> cPlanner(plannerSelect('A' + iTeam));
-        if (cPlanner != NULL) { Game->setPlanner(iTeam, *cPlanner); }
+        boost::scoped_ptr<Planner> cPlanner(plannerSelect('A' + iTeam));
+        if (cPlanner != NULL) { game->setPlanner(iTeam, *cPlanner); }
         else { return false; }
       }
     }
 
     // make sure we know where the human planners are (in case the user selected a human planner without choosing a human gamemode
-    humanPlanner[TEAM_A] = (dynamic_cast<const planner_human*>(Game->getPlanner(TEAM_A)) != NULL);
-    humanPlanner[TEAM_B] = (dynamic_cast<const planner_human*>(Game->getPlanner(TEAM_B)) != NULL);
+    humanPlanner[TEAM_A] = (dynamic_cast<const planner_human*>(game->getPlanner(TEAM_A)) != NULL);
+    humanPlanner[TEAM_B] = (dynamic_cast<const planner_human*>(game->getPlanner(TEAM_B)) != NULL);
     bool oneHumanPlanner = humanPlanner[0] ^ humanPlanner[1];
     // set evaluators using user data:
     if (humanPlanner[TEAM_A] && humanPlanner[TEAM_B]) // no evaluators needed, two humans playing
@@ -789,27 +789,27 @@ bool pokemonAI::run()
     if (oneHumanPlanner && (networks.size() == 1)) // one evaluator needed, one human playing
     {
       boost::scoped_ptr<evaluator_featureVector> hEval(evaluator_featureVector::getEvaluator(networks.front()));
-      Game->setEvaluator(humanPlanner[TEAM_A]?TEAM_B:TEAM_A, *hEval);
+      game->setEvaluator(humanPlanner[TEAM_A]?TEAM_B:TEAM_A, *hEval);
     }
     else if (!oneHumanPlanner && networks.size() == 2) // two evaluators needed, no humans playing (but two evaluators defined)
     {
       boost::scoped_ptr<evaluator_featureVector> evalA(evaluator_featureVector::getEvaluator(networks.front()));
       boost::scoped_ptr<evaluator_featureVector> evalB(evaluator_featureVector::getEvaluator(networks.back()));
-      Game->setEvaluator(TEAM_A, *evalA); 
-      Game->setEvaluator(TEAM_B, *evalB);
+      game->setEvaluator(TEAM_A, *evalA); 
+      game->setEvaluator(TEAM_B, *evalB);
     }
     else // two evaluators needed, no humans playing (no evaluators defined)
     {
       for (size_t iTeam = 0; iTeam != 2; ++iTeam)
       {
         if (humanPlanner[iTeam]) { continue; } // don't bother adding an evaluator if none will be used
-        boost::scoped_ptr<evaluator> cEval(evaluatorSelect('A' + iTeam));
-        if (cEval != NULL) { Game->setEvaluator(iTeam, *cEval); }
+        boost::scoped_ptr<Evaluator> cEval(evaluatorSelect('A' + iTeam));
+        if (cEval != NULL) { game->setEvaluator(iTeam, *cEval); }
         else { return false; }
       }
     }
 
-    if (!Game->initialize()) 
+    if (!game->initialize()) 
     { 
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
         " The PokemonAI game engine was not successfully initialized.\n";
@@ -817,7 +817,7 @@ bool pokemonAI::run()
     }
 
     if (verbose >= 0) std::cout << "Starting Pokemon game...\n";
-    Game->run();
+    game->run();
   }
   else
   {

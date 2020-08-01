@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <boost/smart_ptr/detail/spinlock.hpp>
 #include <boost/thread/locks.hpp>
-#include <boost/array.hpp>
+#include <array>
 #include <boost/static_assert.hpp>
 #include <vector>
 //#include <math.h>
@@ -19,7 +19,7 @@ typedef boost::detail::spinlock spinlock;
 #include "environment_volatile.h"
 #endif
 
-union environment_possible;
+union EnvironmentPossible;
 
 #define ISOLD_SHIFT 7
 #define STATUS_SHIFT 5
@@ -41,7 +41,7 @@ union table_entry
     fixType probability;
 
     /* 40 bits of the 64 bit signature of this position's internal state. */
-    boost::array<uint8_t, 5> hash;
+    std::array<uint8_t, 5> hash;
 
     /* the best evaluated agent move as of the current state */
     int8_t bestAgentMove;
@@ -62,7 +62,7 @@ union table_entry
 
   static table_entry createEmpty();
 
-  static table_entry create(const environment_possible& _element, 
+  static table_entry create(const EnvironmentPossible& _element, 
   int8_t _bestAgentMove, 
   int8_t _bestOtherMove, 
   uint8_t _depth, 
@@ -178,9 +178,9 @@ bool operator==(const table_entry& other) const
     return !(*this == other);
   };
 
-  bool operator==(const environment_possible& other) const;
+  bool operator==(const EnvironmentPossible& other) const;
 
-  bool operator!=(const environment_possible& other) const
+  bool operator!=(const EnvironmentPossible& other) const
   {
     return !(*this == other);
   };
@@ -208,7 +208,7 @@ private:
   static table_entry entry_deleted;
 
   /* locked when the table needs to be grown or shrunk */
-  boost::array<spinlock, NUMSPINLOCKS> locks;
+  std::array<spinlock, NUMSPINLOCKS> locks;
 
   /* heap allocated table containing pointers to all valid hash table entries */
   std::vector<table_entry> hashTable;
@@ -309,14 +309,14 @@ public:
   void clear();
 
   /* simply returns if a given element is stored within the transposition table, does not attempt to return any values */
-  table_entry findElement(const environment_possible& _element);
+  table_entry findElement(const EnvironmentPossible& _element);
 
   /* attempts to find the element _element, returning the values from its entry in the hash table, or FALSE if it does not exist. */
-  table_entry* findElement_nonlocking(const environment_possible& _element);
+  table_entry* findElement_nonlocking(const EnvironmentPossible& _element);
 
   /* populates a table entry with _element and the given values. Returns FALSE if an insertion was impossible */
   bool updateElement(
-    const environment_possible& _element, 
+    const EnvironmentPossible& _element, 
     int8_t _bestAgentMove, 
     int8_t _bestOtherMove, 
     uint8_t _depth, 

@@ -6,10 +6,10 @@
 
 #include <stdint.h>
 
-class move_nonvolatile;
-class move;
+class MoveNonVolatile;
+class Move;
 
-union PKAISHARED move_volatile
+union PKAISHARED MoveVolatile
 {
   uint8_t raw;
   struct 
@@ -21,17 +21,17 @@ union PKAISHARED move_volatile
   /* Compares values of selected move. Base values are compared by
    * pointer, volatile values are compared by value
    * DEPRECIATED: hash and compare environment_volatile instead! */
-  bool operator==(const move_volatile& other) const;
-  bool operator!=(const move_volatile& other) const;
+  bool operator==(const MoveVolatile& other) const;
+  bool operator!=(const MoveVolatile& other) const;
 
   /* resets values of PPcurrent and PPmax */
-  void initialize(const move_nonvolatile& cMove);
+  void initialize(const MoveNonVolatile& cMove);
 
   /* returns count of this move's PP */
   uint32_t getPP() const { return data.PPcurrent; };
   
   /* modifies this move's PP by value */
-  bool modPP(const move_nonvolatile& cMove, int32_t value);
+  bool modPP(const MoveNonVolatile& cMove, int32_t value);
   
   /* can a pokemon use this move during its next turn? */
   bool hasPP() const;

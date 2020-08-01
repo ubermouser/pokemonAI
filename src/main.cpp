@@ -11,7 +11,7 @@
 
 int main(int argc, char** argv)
 {
-  class pokemonAI PokemonAI;
+  class PokemonAI PokemonAI;
 
   int indexArg;
   int loadSuccess;
@@ -22,7 +22,7 @@ int main(int argc, char** argv)
   //parse command line args next:
   for (indexArg = 1; indexArg < argc; indexArg++)
   {
-    if (pkIO::parseArg(argv[indexArg], PokemonAI.getIO()) == false)
+    if (PkIO::parseArg(argv[indexArg], PokemonAI.getIO()) == false)
     {
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
           ": Unrecognized argument in command line \"" << argv[indexArg] << "\"! See readme and pkai.ini file for information about the operation of this program.\n";

@@ -15,29 +15,29 @@
 #include "../inc/name.h"
 #include "../inc/pluggable.h"
 
-class type;
+class Type;
 
-class PKAISHARED item : public name, public pluggable
+class PKAISHARED Item : public Name, public Pluggable
 {
 public:
-  static const item* no_item;
+  static const Item* no_item;
 
   bool isImplemented() const
   {
-    return pluggable::isImplemented() && !lostChild;
+    return Pluggable::isImplemented() && !lostChild;
   };
 
-  const type& getBoostedType() const
+  const Type& getBoostedType() const
   {
     return *boostedType;
   };
 
-  const type& getResistedType() const
+  const Type& getResistedType() const
   {
     return *resistedType;
   };
 
-  const type& getNaturalGiftType() const
+  const Type& getNaturalGiftType() const
   {
     return *naturalGift_type;
   };
@@ -52,19 +52,19 @@ public:
     return flingPower;
   };
 
-  item();
-  item(const item& source);
-  ~item() { };
+  Item();
+  Item(const Item& source);
+  ~Item() { };
   
 private:
   /* the type of move whose power is boosted by 20% when this object is held */
-  const type* boostedType;
+  const Type* boostedType;
 
   /* type of natural gift when used with this item */
-  const type* naturalGift_type;
+  const Type* naturalGift_type;
 
   /* the type of move whose super effective damage is reduced by 50% when this object is held */
-  const type* resistedType;
+  const Type* resistedType;
 
   /* amount of damage dealt when fling is used with this object held */
   uint8_t flingPower;
@@ -74,7 +74,7 @@ private:
 
   bool lostChild;
 
-  friend class pokedex;
+  friend class Pokedex;
 };
 
 #endif	/* ITEM_H */

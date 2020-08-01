@@ -13,7 +13,7 @@ table_entry transposition_table::entry_deleted = table_entry();
 
 
 
-table_entry table_entry::create(const environment_possible& _element, 
+table_entry table_entry::create(const EnvironmentPossible& _element, 
   int8_t _bestAgentMove, 
   int8_t _bestOtherMove, 
   uint8_t _depth, 
@@ -25,7 +25,7 @@ table_entry table_entry::create(const environment_possible& _element,
   {{ 
     fixedpoint::create<30>(_lbFitness),
     fixedpoint::create<30>(_probability),
-    boost::array<uint8_t, 5>(),
+    std::array<uint8_t, 5>(),
     _bestAgentMove, 
     _bestOtherMove, 
     _depth, 
@@ -65,7 +65,7 @@ void table_entry::delEntry()
 
 
 
-bool table_entry::operator==(const environment_possible& other) const
+bool table_entry::operator==(const EnvironmentPossible& other) const
 {
   return getHashPart() == ((other.getHash() >> HASH_SHIFT) & HASH_MASK);
 };
@@ -127,7 +127,7 @@ bool table_entry::update(const table_entry& other)
 
 
 bool transposition_table::updateElement(
-  const environment_possible& _element, 
+  const EnvironmentPossible& _element, 
   int8_t _bestAgentMove, 
   int8_t _bestOtherMove, 
   uint8_t _depth, 
@@ -278,7 +278,7 @@ bool transposition_table::updateElement(const table_entry& cEntry, uint64_t hash
 
 
 
-table_entry transposition_table::findElement(const environment_possible& element)
+table_entry transposition_table::findElement(const EnvironmentPossible& element)
 {
   uint64_t iLock = hbin(element.getHash());
   boost::unique_lock<spinlock> _lock(locks[iLock]);
@@ -299,7 +299,7 @@ table_entry transposition_table::findElement(const environment_possible& element
 
 
 table_entry* transposition_table::findElement_nonlocking(
-  const environment_possible& _element)
+  const EnvironmentPossible& _element)
 {
   assert(_element.getHash() != UINT64_MAX);
   uint64_t key = h(_element.getHash()); // generate array index

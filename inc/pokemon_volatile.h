@@ -8,23 +8,23 @@
 
 #include "../inc/move_volatile.h"
 
-class item;
-class pokedex;
+class Item;
+class Pokedex;
 class pokemon_print;
-class pokemon_nonvolatile;
+class PokemonNonVolatile;
 
-union move_volatile;
+union MoveVolatile;
 
 /*
  * contains only the metrics of a given pokemon that may change in battle, and of that set, only those
  * that are maintained when a pokemon switches out
  */
-union PKAISHARED pokemon_volatile
+union PKAISHARED PokemonVolatile
 {
   uint64_t raw;
   struct
   {
-    move_volatile actions[4];
+    MoveVolatile actions[4];
 
     /*
      * value for status ailment. 0 is no status.
@@ -55,27 +55,27 @@ union PKAISHARED pokemon_volatile
 
   /* Compares values of selected pokemon. Base values are compared by
    * pointer, volatile values are compared by value DEPRECIATED, use hash instead! */
-  bool operator==(const pokemon_volatile& other) const;
-  bool operator!=(const pokemon_volatile& other) const;
+  bool operator==(const PokemonVolatile& other) const;
+  bool operator!=(const PokemonVolatile& other) const;
   
-  const move_volatile& getMV(size_t index) const;
+  const MoveVolatile& getMV(size_t index) const;
 
-  move_volatile& getMV(size_t index);
+  MoveVolatile& getMV(size_t index);
 
   /* increment target's hp by quantity. */
-  void modHP(const pokemon_nonvolatile& nonvolatile, int32_t quantity);
+  void modHP(const PokemonNonVolatile& nonvolatile, int32_t quantity);
 
   /* set target's hp to quantity. */
-  void setHP(const pokemon_nonvolatile& nonvolatile, uint32_t amt);
+  void setHP(const PokemonNonVolatile& nonvolatile, uint32_t amt);
 
   /* set target's hp to % quantity of total */
-  void setPercentHP(const pokemon_nonvolatile& nonvolatile, fpType percent);
+  void setPercentHP(const PokemonNonVolatile& nonvolatile, fpType percent);
   
   /* increment target's HP by percent of total. */
-  void modPercentHP(const pokemon_nonvolatile& nonvolatile, fpType percent);
+  void modPercentHP(const PokemonNonVolatile& nonvolatile, fpType percent);
   
   /* return the proportion of this pokemon's HP that remains, from 0..1*/
-  fpType getPercentHP(const pokemon_nonvolatile& nonvolatile) const;
+  fpType getPercentHP(const PokemonNonVolatile& nonvolatile) const;
 
   /* return the integer amount of this pokemon's HP that remains, from 0..<max hp> */
   uint32_t getHP() const;
@@ -91,18 +91,18 @@ union PKAISHARED pokemon_volatile
   /* clears the nonvolatile status condition of a pokemon */
   void clearStatusAilment();
 
-  bool hasItem(const pokemon_nonvolatile& nv) const { return data.iHeldItem != 0; }; 
+  bool hasItem(const PokemonNonVolatile& nv) const { return data.iHeldItem != 0; }; 
 
-  const item& getItem(const pokemon_nonvolatile& nv) const;
+  const Item& getItem(const PokemonNonVolatile& nv) const;
 
-  void setNoItem(const pokemon_nonvolatile& nv);
+  void setNoItem(const PokemonNonVolatile& nv);
 
   /*
    * initialize an empty pokemon_volatile for combat, zeroing
    * all status conditions, increasing all PP back to max, 
    * and raising HP back to normal.
    */
-  void initialize(const pokemon_nonvolatile& nonvolatile);
+  void initialize(const PokemonNonVolatile& nonvolatile);
 };
 
 #endif	/* POKEMON_VOLATILE_H */

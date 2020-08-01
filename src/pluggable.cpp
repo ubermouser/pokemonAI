@@ -7,9 +7,9 @@
 #include "../inc/plugin.h"
 //#undef PKAI_STATIC
 
-plugin_t pluggable::emptyPlugin = { NULL, 0, 0 };
+plugin_t Pluggable::emptyPlugin = { NULL, 0, 0 };
 
-bool pluggable::registerPlugin_void(
+bool Pluggable::registerPlugin_void(
   pluginType pType, 
   voidFunction_rawType _function, 
   int32_t _priority, 
@@ -31,7 +31,7 @@ bool pluggable::registerPlugin_void(
 
 
 
-bool pluggable::registerPlugin(const plugin& cPlugin, bool setImp)
+bool Pluggable::registerPlugin(const plugin& cPlugin, bool setImp)
 {
   return registerPlugin_void(cPlugin.getType(), cPlugin.getFunction(), cPlugin.getPriority(), cPlugin.getTarget(), setImp);
 }
@@ -40,7 +40,7 @@ bool pluggable::registerPlugin(const plugin& cPlugin, bool setImp)
 
 
 
-bool enginePlugins::registerPlugin(const plugin& cPlugin, bool setImp)
+bool EnginePlugins::registerPlugin(const plugin& cPlugin, bool setImp)
 {
   {
     plugin_t result = { cPlugin.getFunction(), cPlugin.getPriority(), cPlugin.getTarget() };

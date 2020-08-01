@@ -17,39 +17,39 @@
 
 namespace boost { namespace dll { class shared_library; } }
 
-class PKAISHARED pokedex
+class PKAISHARED Pokedex
 {
 private:
-  virtual std::vector<move>& getMoves() = 0;
+  virtual std::vector<Move>& getMoves() = 0;
 
-  virtual std::vector<type>& getTypes() = 0;
+  virtual std::vector<Type>& getTypes() = 0;
 
-  virtual std::vector<pokemon_base>& getPokemon() = 0;
+  virtual std::vector<PokemonBase>& getPokemon() = 0;
 
-  virtual std::vector<ability>& getAbilities() = 0;
+  virtual std::vector<Ability>& getAbilities() = 0;
 
-  virtual std::vector<nature>& getNatures() = 0;
+  virtual std::vector<Nature>& getNatures() = 0;
 
-  virtual std::vector<item>& getItems() = 0;
+  virtual std::vector<Item>& getItems() = 0;
 
-  virtual enginePlugins& getExtensions() = 0;
+  virtual EnginePlugins& getExtensions() = 0;
 
   virtual std::vector<boost::dll::shared_library*>& getPlugins() = 0;
 
 public:
-  virtual const std::vector<move>& getMoves() const = 0;
+  virtual const std::vector<Move>& getMoves() const = 0;
 
-  virtual const std::vector<type>& getTypes() const = 0;
+  virtual const std::vector<Type>& getTypes() const = 0;
 
-  virtual const std::vector<pokemon_base>& getPokemon() const = 0;
+  virtual const std::vector<PokemonBase>& getPokemon() const = 0;
 
-  virtual const std::vector<ability>& getAbilities() const = 0;
+  virtual const std::vector<Ability>& getAbilities() const = 0;
 
-  virtual const std::vector<nature>& getNatures() const = 0;
+  virtual const std::vector<Nature>& getNatures() const = 0;
 
-  virtual const std::vector<item>& getItems() const = 0;
+  virtual const std::vector<Item>& getItems() const = 0;
 
-  virtual const enginePlugins& getExtensions() const = 0;
+  virtual const EnginePlugins& getExtensions() const = 0;
 
   bool inputPlugins(const std::string& input_pluginFolder);
   bool registerPlugin(

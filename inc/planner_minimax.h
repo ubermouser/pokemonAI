@@ -23,15 +23,15 @@
 
 #include "../inc/planner_minimax_thread.h"
 
-class pkCU;
+class PkCU;
 class ply;
-class environment_nonvolatile;
-class team_nonvolatile;
-class evaluator;
+class EnvironmentNonvolatile;
+class TeamNonVolatile;
+class Evaluator;
 
-union environment_possible;
-union environment_volatile;
-union team_volatile;
+union EnvironmentPossible;
+union EnvironmentVolatile;
+union TeamVolatile;
 
 
 
@@ -101,7 +101,7 @@ public:
 
 
 
-class planner_minimax : public planner
+class planner_minimax : public Planner
 {
 private:
   std::string ident;
@@ -125,7 +125,7 @@ private:
 
   // search result variables:
   /* result vector */
-  std::vector<plannerResult> plannerResults;
+  std::vector<PlannerResult> plannerResults;
 
   /* number of nodes evaluated by generateSolution */
   uint64_t nodesEvaluated;
@@ -192,7 +192,7 @@ private:
 public:
   planner_minimax(const planner_minimax& source);
   planner_minimax(
-    const evaluator& eval,
+    const Evaluator& eval,
     size_t _numThreads = 1, 
     size_t _engineAccuracy = 1,
     size_t _maxDepth = 31,
@@ -208,10 +208,10 @@ public:
     size_t _binSize = 2);
   ~planner_minimax();
 
-  void setEvaluator(const evaluator& evalType);
-  const evaluator* getEvaluator() const;
+  void setEvaluator(const Evaluator& evalType);
+  const Evaluator* getEvaluator() const;
 
-  void setEnvironment(pkCU& _cu, size_t _agentTeam);
+  void setEnvironment(PkCU& _cu, size_t _agentTeam);
 
   bool isInitialized() const;
 
@@ -221,9 +221,9 @@ public:
 
   /* determine the best choice of action for agentTeam from the
    * given environment. Spend MAX seconds time doing it. */
-  uint32_t generateSolution(const environment_possible& origin);
+  uint32_t generateSolution(const EnvironmentPossible& origin);
 
-  const std::vector<plannerResult>& getDetailedResults() const;
+  const std::vector<PlannerResult>& getDetailedResults() const;
   void clearResults();
 
   friend class ply;

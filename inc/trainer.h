@@ -4,7 +4,7 @@
 #include "../inc/pkai.h"
 
 #include <stdint.h>
-#include <boost/array.hpp>
+#include <array>
 #include <vector>
 #include <string>
 
@@ -17,19 +17,19 @@
 #include "../inc/ranked_neuralNet.h"
 #include "../inc/ranked_evaluator.h"
 
-class game;
-class evaluator;
+class Game;
+class Evaluator;
 
 struct teamTrainerResult
 {
   // averages: (rank, mean, stdDev, plies, games, wins, draws)
-  boost::array<fpType, 7> averages;
+  std::array<fpType, 7> averages;
   // stdDevs:
-  boost::array<fpType, 7> stdDevs;
+  std::array<fpType, 7> stdDevs;
   // minimums:
-  boost::array<fpType, 7> mins;
+  std::array<fpType, 7> mins;
   // maximums:
-  boost::array<fpType, 7> maxes;
+  std::array<fpType, 7> maxes;
   // highest counts:
   size_t iHighestPokemon, highestPokemonCount;
   size_t iHighestAbility, highestAbilityCount;
@@ -42,18 +42,18 @@ struct teamTrainerResult
 struct networkTrainerResult
 {
   // averages: (rank, mean, stdDev, plies, wins, draws, games)
-  boost::array<fpType, 7> averages;
+  std::array<fpType, 7> averages;
   // stdDevs:
-  boost::array<fpType, 7> stdDevs;
+  std::array<fpType, 7> stdDevs;
   // minimums:
-  boost::array<fpType, 7> mins;
+  std::array<fpType, 7> mins;
   // maximums:
-  boost::array<fpType, 7> maxes;
+  std::array<fpType, 7> maxes;
   // meansquared error: (average, stdDev, min, max)
-  boost::array<fpType, 4> meanSquaredError;
+  std::array<fpType, 4> meanSquaredError;
 };
 
-class trainer
+class Trainer
 {
   /* what do we intend for trainer to do? */
   uint32_t gameType;
@@ -110,7 +110,7 @@ class trainer
   fpType plannerTemperature;
 
   /* sizes of the six populations aka "leagues" */
-  boost::array<size_t, 6> teamPopulationSize;
+  std::array<size_t, 6> teamPopulationSize;
 
   /* size of the network population */
   size_t networkPopulationSize;
@@ -124,10 +124,10 @@ class trainer
   size_t generationsCompleted;
 
   /* amount of heats performed in each league */
-  boost::array<size_t, 6> heatsCompleted;
+  std::array<size_t, 6> heatsCompleted;
 
   /* population of teams to be run on. 0 implies no work will be done on the league */
-  boost::array<std::vector<ranked_team>, 6> leagues;
+  std::array<std::vector<ranked_team>, 6> leagues;
 
   /* population of networks to be run on. May possibly be 0 */
   std::vector<ranked_neuralNet> networks;
@@ -140,10 +140,10 @@ class trainer
   ranked_neuralNet* trialNet;
 
   /* game instance used for evaluation */
-  game* cGame;
+  Game* cGame;
 
   /* select two parents, weighted by fitness */
-  boost::array<size_t, 2> selectParent_Roulette(const std::vector<const ranked_team>& cLeague) const;
+  std::array<size_t, 2> selectParent_Roulette(const std::vector<const ranked_team>& cLeague) const;
 
   /* generate an array of teams which are contained within the current team. Will always return an empty set if the team contains one pokemon */
   void findSubteams(trueSkillTeam& cTeam, size_t iTeam);
@@ -202,9 +202,9 @@ class trainer
   
 public:
 
-  static const boost::array< size_t, 6 > defaultTeamPopulations;
+  static const std::array< size_t, 6 > defaultTeamPopulations;
 
-  trainer(
+  Trainer(
     uint32_t gameType = GT_OTHER_EVOBOTH, 
     size_t _maxPlies = 1560, 
     size_t _maxMatches = 1, 
@@ -223,21 +223,21 @@ public:
     size_t networkPopulations = 5,
     const networkSettings_t& _netSettings = networkSettings_t::defaultSettings,
     const std::vector<size_t>& networkLayerSize = std::vector<size_t>(),
-    const boost::array<size_t, 6>& teamPopulations = defaultTeamPopulations,
+    const std::array<size_t, 6>& teamPopulations = defaultTeamPopulations,
     fpType _seedNetworkProbability = 0.0,
     size_t _jitterEpoch = 2500,
     size_t _numRollouts = 1000,
     size_t _writeoutInterval = 0,
     const std::string& teamPath = std::string(),
     const std::string& networkPath = std::string());
-  ~trainer();
+  ~Trainer();
 
-  void setGauntletTeam(const team_nonvolatile& cTeam);
+  void setGauntletTeam(const TeamNonVolatile& cTeam);
   void setGauntletNetwork(const neuralNet& cNet);
 
-  bool seedEvaluator(const evaluator& _eval);
+  bool seedEvaluator(const Evaluator& _eval);
 
-  bool seedTeam(const team_nonvolatile& cTeam);
+  bool seedTeam(const TeamNonVolatile& cTeam);
   bool seedNetwork(const neuralNet& cNet);
 
   /* create all variables, prepare trainer for running */

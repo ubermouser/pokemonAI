@@ -3,11 +3,11 @@
 #include "../inc/ability.h"
 //#undef PKAI_EXPORT
 
-const ability* ability::no_ability = NULL;
+const Ability* Ability::no_ability = NULL;
 
-ability::ability() 
-  : name(), 
-  pluggable(),
+Ability::Ability() 
+  : Name(), 
+  Pluggable(),
   script()
 {
 }
@@ -16,9 +16,9 @@ ability::ability()
 
 
 
-ability::ability(const ability& source) 
-  : name(source), 
-  pluggable(source),
+Ability::Ability(const Ability& source) 
+  : Name(source), 
+  Pluggable(source),
   script(source.script)
 {
 }
@@ -27,7 +27,7 @@ ability::ability(const ability& source)
 
 
 
-ability::~ability() 
+Ability::~Ability() 
 {
   script.clear();
 }

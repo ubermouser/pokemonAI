@@ -1,7 +1,7 @@
 #include "../inc/trueSkill.h"
 
 #include <vector>
-#include <boost/array.hpp>
+#include <array>
 #include <boost/math/distributions/normal.hpp>
 #include <boost/foreach.hpp>
 #include <ostream>
@@ -71,9 +71,9 @@ trueSkillTeam::trueSkillTeam(ranked_team& cTeam, ranked& cEvaluator, const trueS
 
 void trueSkillTeam::finalize(const trueSkillSettings& settings)
 {
-  static const boost::array<fpType, 2> proportion = {{ 1.0, 1.0 }};
+  static const std::array<fpType, 2> proportion = {{ 1.0, 1.0 }};
 
-  const boost::array<const ranked*, 2> components = {{ baseEvaluator, baseTeam }};
+  const std::array<const ranked*, 2> components = {{ baseEvaluator, baseTeam }};
   // scale evaluation function's trueskill by the team's size: (evaluation function is always half the total trueskill)
   //proportion[0] *= baseTeam->team.getNumTeammates();
 
@@ -332,15 +332,15 @@ fpType trueSkill::matchQuality(
 size_t trueSkill::update(
   trueSkillTeam& team_A,
   trueSkillTeam& team_B,
-  const gameResult& gResult,
+  const GameResult& gResult,
   const trueSkillSettings& s)
 {
   int outcome = gResult.endStatus;
-  boost::array< trueSkillTeam*, 2 > teams = 
+  std::array< trueSkillTeam*, 2 > teams = 
     {{ &team_A, &team_B }};
-  boost::array<trueSkill*, 2> ratings = 
+  std::array<trueSkill*, 2> ratings = 
     {{ &team_A.aggregateSkill , &team_B.aggregateSkill }};
-  boost::array<fpType, 2> rankMultiplier;
+  std::array<fpType, 2> rankMultiplier;
 
   fpType c, cSquared, v, w, winningMean, losingMean, meanDelta;
   
@@ -423,7 +423,7 @@ size_t trueSkill::update(
     /*size_t iComponent = 0;
     BOOST_FOREACH(ranked_team* componentTeam, tTeam.subTeams)
     {
-      const boost::array<size_t, 6>& correspondence = tTeam.correspondencies[iComponent];
+      const std::array<size_t, 6>& correspondence = tTeam.correspondencies[iComponent];
       size_t oNumTeammates = componentTeam->team.getNumTeammates();
       // find contribution of this team:
       fpType contribution = 0;

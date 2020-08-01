@@ -19,14 +19,14 @@
 
 using namespace orphan;
 
-boost::array< boost::array<fpType, 13>, 3> pokemon_nonvolatile::aFV_base;
+std::array< std::array<fpType, 13>, 3> PokemonNonVolatile::aFV_base;
 
-pokemon_nonvolatile::pokemon_nonvolatile() 
-  : name(),
-  signature<pokemon_nonvolatile, POKEMON_NONVOLATILE_DIGESTSIZE>(),
-  base(pokemon_base::no_base),
-  chosenAbility(ability::no_ability), 
-  chosenNature(nature::no_nature), 
+PokemonNonVolatile::PokemonNonVolatile() 
+  : Name(),
+  Signature<PokemonNonVolatile, POKEMON_NONVOLATILE_DIGESTSIZE>(),
+  base(PokemonBase::no_base),
+  chosenAbility(Ability::no_ability), 
+  chosenNature(Nature::no_nature), 
   actions(),
   numMoves(0),
   initialItem(-1),
@@ -34,13 +34,13 @@ pokemon_nonvolatile::pokemon_nonvolatile()
   sex(SEX_NEUTER)
 {	
   // zero IV and EV
-  IV.assign(0);
-  EV.assign(0);
+  IV.fill(0);
+  EV.fill(0);
   
   // zero FV
   for (size_t iFV = 0; iFV < FV_base.size(); iFV++)
   {
-    FV_base[iFV].assign(0);
+    FV_base[iFV].fill(0);
   }
   
 }
@@ -49,9 +49,9 @@ pokemon_nonvolatile::pokemon_nonvolatile()
 
 
 
-pokemon_nonvolatile::pokemon_nonvolatile(const pokemon_nonvolatile& orig) 
-  : name(orig),
-  signature<pokemon_nonvolatile, POKEMON_NONVOLATILE_DIGESTSIZE>(orig),
+PokemonNonVolatile::PokemonNonVolatile(const PokemonNonVolatile& orig) 
+  : Name(orig),
+  Signature<PokemonNonVolatile, POKEMON_NONVOLATILE_DIGESTSIZE>(orig),
   base(orig.base),
   chosenAbility(orig.chosenAbility), 
   chosenNature(orig.chosenNature), 
@@ -66,13 +66,13 @@ pokemon_nonvolatile::pokemon_nonvolatile(const pokemon_nonvolatile& orig)
 {
 }
 
-pokemon_nonvolatile& pokemon_nonvolatile::operator=(const pokemon_nonvolatile& other)
+PokemonNonVolatile& PokemonNonVolatile::operator=(const PokemonNonVolatile& other)
 {
   // identity theorem - simply return what we have now if equal address
   if (this == &other) { return *this; } 
   
-  name::operator=(other);
-  signature<pokemon_nonvolatile, POKEMON_NONVOLATILE_DIGESTSIZE>::operator=(other);
+  Name::operator=(other);
+  Signature<PokemonNonVolatile, POKEMON_NONVOLATILE_DIGESTSIZE>::operator=(other);
   base = other.base;
   chosenAbility = other.chosenAbility;
   chosenNature = other.chosenNature;
@@ -92,11 +92,11 @@ pokemon_nonvolatile& pokemon_nonvolatile::operator=(const pokemon_nonvolatile& o
 
 
 
-void pokemon_nonvolatile::initialize()
+void PokemonNonVolatile::initialize()
 {
   for (size_t iAction = 0; iAction < getNumMoves(); iAction++)
   {
-    move_nonvolatile& cMove = getMove(iAction);
+    MoveNonVolatile& cMove = getMove(iAction);
 
     // do not initialize if the move_nonvolatile object does not reference a valid move
     if (!cMove.moveExists()) { continue; }
@@ -110,11 +110,11 @@ void pokemon_nonvolatile::initialize()
 
 
 
-void pokemon_nonvolatile::uninitialize()
+void PokemonNonVolatile::uninitialize()
 {
   for (size_t iAction = 0; iAction < getNumMoves(); iAction++)
   {
-    move_nonvolatile& cMove = getMove(iAction);
+    MoveNonVolatile& cMove = getMove(iAction);
 
     // do not initialize if the move_nonvolatile object does not reference a valid move
     if (!cMove.moveExists()) { continue; }
@@ -127,22 +127,22 @@ void pokemon_nonvolatile::uninitialize()
 
 
 
-void pokemon_nonvolatile::createDigest_impl(boost::array<uint8_t, POKEMON_NONVOLATILE_DIGESTSIZE>& digest) const
+void PokemonNonVolatile::createDigest_impl(std::array<uint8_t, POKEMON_NONVOLATILE_DIGESTSIZE>& digest) const
 {
-  digest.assign(0);
+  digest.fill(0);
 
-  boost::array<bool, 4> hashedMoves;
-  hashedMoves.assign(false);
+  std::array<bool, 4> hashedMoves;
+  hashedMoves.fill(false);
   size_t iDigest = 0;
 
   // hash by a useful order:
   for (size_t iOrder = 0, iSize = getNumMoves(); iOrder < iSize; ++iOrder)
   {
     size_t iBestMove = SIZE_MAX;
-    const move_nonvolatile* bestMove = NULL;
+    const MoveNonVolatile* bestMove = NULL;
     for (size_t iAction = 0; iAction != iSize; ++iAction)
     {
-      const move_nonvolatile& cMove = getMove(iAction + AT_MOVE_0);
+      const MoveNonVolatile& cMove = getMove(iAction + AT_MOVE_0);
 
       // don't hash a move that has already been hashed:
       if (hashedMoves[iAction] == true) { continue; }
@@ -160,7 +160,7 @@ void pokemon_nonvolatile::createDigest_impl(boost::array<uint8_t, POKEMON_NONVOL
     hashedMoves[iBestMove] = true;
 
     // hash action:
-    boost::array<uint8_t, MOVE_NONVOLATILE_DIGESTSIZE> bMoveDigest;
+    std::array<uint8_t, MOVE_NONVOLATILE_DIGESTSIZE> bMoveDigest;
     bestMove->createDigest(bMoveDigest);
 
     // copy action to pokemon digest:
@@ -172,26 +172,26 @@ void pokemon_nonvolatile::createDigest_impl(boost::array<uint8_t, POKEMON_NONVOL
   if (pokemonExists())
   {
     // pack first 20 characters of name:
-    getBase().getName().copy((char *)(digest.c_array() + iDigest), 20, 0);
+    getBase().getName().copy((char *)(digest.data() + iDigest), 20, 0);
   }
   iDigest += 20;
 
   if (abilityExists())
   { // pack 20 characters of ability:
-    getAbility().getName().copy((char *)(digest.c_array() + iDigest), 20, 0);
+    getAbility().getName().copy((char *)(digest.data() + iDigest), 20, 0);
   }
   iDigest += 20;
 
   if (natureExists())
   { // pack 20 characters of nature:
-    getNature().getName().copy((char *)(digest.c_array() + iDigest), 20, 0);
+    getNature().getName().copy((char *)(digest.data() + iDigest), 20, 0);
   }
   iDigest += 20;
 
   if (hasInitialItem())
   {
     // pack 20 characters of item, if it exists:
-    getInitialItem().getName().copy((char *)(digest.c_array() + iDigest), 20, 0);
+    getInitialItem().getName().copy((char *)(digest.data() + iDigest), 20, 0);
   }
   iDigest += 20;
 
@@ -215,25 +215,25 @@ void pokemon_nonvolatile::createDigest_impl(boost::array<uint8_t, POKEMON_NONVOL
 
 
 
-bool pokemon_nonvolatile::pokemonExists() const
+bool PokemonNonVolatile::pokemonExists() const
 {
-  return (base!=pokemon_base::no_base)?true:false;
+  return (base!=PokemonBase::no_base)?true:false;
 };
 
 
 
 
 
-bool pokemon_nonvolatile::abilityExists() const
+bool PokemonNonVolatile::abilityExists() const
 {
-  return (chosenAbility!=ability::no_ability)?true:false;
+  return (chosenAbility!=Ability::no_ability)?true:false;
 };
 
 
 
 
 
-void pokemon_nonvolatile::setAbility(const ability& _chosenAbility)
+void PokemonNonVolatile::setAbility(const Ability& _chosenAbility)
 {
   assert(pokemonExists());
   assert(_chosenAbility.isImplemented());
@@ -246,34 +246,34 @@ void pokemon_nonvolatile::setAbility(const ability& _chosenAbility)
 
 
 
-void pokemon_nonvolatile::setNoAbility()
+void PokemonNonVolatile::setNoAbility()
 {
-  chosenAbility = ability::no_ability;
+  chosenAbility = Ability::no_ability;
 };
 
 
 
 
 
-void pokemon_nonvolatile::setNoNature()
+void PokemonNonVolatile::setNoNature()
 {
-  chosenNature = nature::no_nature;
+  chosenNature = Nature::no_nature;
 };
 
 
 
 
 
-bool pokemon_nonvolatile::natureExists() const
+bool PokemonNonVolatile::natureExists() const
 {
-  return (chosenNature!=nature::no_nature)?true:false;
+  return (chosenNature!=Nature::no_nature)?true:false;
 };
 
 
 
 
 
-void pokemon_nonvolatile::setNature(const nature& _chosenNature)
+void PokemonNonVolatile::setNature(const Nature& _chosenNature)
 {
   assert(((size_t)(&_chosenNature - &pkdex->getNatures().front())) < pkdex->getNatures().size());
   chosenNature = &_chosenNature;
@@ -283,7 +283,7 @@ void pokemon_nonvolatile::setNature(const nature& _chosenNature)
 
 
 
-void pokemon_nonvolatile::setNoInitialItem()
+void PokemonNonVolatile::setNoInitialItem()
 {
   initialItem = UINT8_MAX;
 };
@@ -292,7 +292,7 @@ void pokemon_nonvolatile::setNoInitialItem()
 
 
 
-void pokemon_nonvolatile::setInitialItem(const item& _chosenItem)
+void PokemonNonVolatile::setInitialItem(const Item& _chosenItem)
 {
   size_t iItem = &_chosenItem - &pkdex->getItems().front();
   assert (iItem < pkdex->getItems().size());
@@ -304,7 +304,7 @@ void pokemon_nonvolatile::setInitialItem(const item& _chosenItem)
 
 
 
-bool pokemon_nonvolatile::hasInitialItem() const
+bool PokemonNonVolatile::hasInitialItem() const
 {
   return initialItem != UINT8_MAX;
 }
@@ -313,7 +313,7 @@ bool pokemon_nonvolatile::hasInitialItem() const
 
 
 
-const item& pokemon_nonvolatile::getInitialItem() const
+const Item& PokemonNonVolatile::getInitialItem() const
 {
   return pkdex->getItems()[initialItem];
 }
@@ -322,7 +322,7 @@ const item& pokemon_nonvolatile::getInitialItem() const
 
 
 
-bool pokemon_nonvolatile::isLegalAdd(const move_nonvolatile& candidate) const
+bool PokemonNonVolatile::isLegalAdd(const MoveNonVolatile& candidate) const
 {
   if ( !candidate.moveExists() ) { return false; }
   return isLegalAdd(candidate.getBase());
@@ -333,7 +333,7 @@ bool pokemon_nonvolatile::isLegalAdd(const move_nonvolatile& candidate) const
 
 
 
-bool pokemon_nonvolatile::isLegalSet(size_t iAction, const move_nonvolatile& candidate) const
+bool PokemonNonVolatile::isLegalSet(size_t iAction, const MoveNonVolatile& candidate) const
 {
   if ( !candidate.moveExists() ) { return false; }
   return isLegalSet(iAction, candidate.getBase());
@@ -343,7 +343,7 @@ bool pokemon_nonvolatile::isLegalSet(size_t iAction, const move_nonvolatile& can
 
 
 
-bool pokemon_nonvolatile::isLegalAdd(const move& candidate) const
+bool PokemonNonVolatile::isLegalAdd(const Move& candidate) const
 {
   if ((getNumMoves() + 1) > getMaxNumMoves()) { return false; }
   return isLegalSet(SIZE_MAX, candidate);
@@ -354,7 +354,7 @@ bool pokemon_nonvolatile::isLegalAdd(const move& candidate) const
 
 
 
-bool pokemon_nonvolatile::isLegalSet(size_t iAction, const move& candidate) const
+bool PokemonNonVolatile::isLegalSet(size_t iAction, const Move& candidate) const
 {
   size_t iPosition = iAction - AT_MOVE_0;
   if (!pokemonExists()) { return false; }
@@ -377,7 +377,7 @@ bool pokemon_nonvolatile::isLegalSet(size_t iAction, const move& candidate) cons
 
 
 
-void pokemon_nonvolatile::addMove(const move_nonvolatile& _cMove)
+void PokemonNonVolatile::addMove(const MoveNonVolatile& _cMove)
 {
   assert(isLegalAdd(_cMove));
 
@@ -388,14 +388,14 @@ void pokemon_nonvolatile::addMove(const move_nonvolatile& _cMove)
 
 
 
-move_nonvolatile& pokemon_nonvolatile::getMove(size_t index)
+MoveNonVolatile& PokemonNonVolatile::getMove(size_t index)
 {
   switch(index)
   {
     default:
       assert(false && "attempted to get volatile move of non-move action");
     case AT_MOVE_STRUGGLE:
-      return *move_nonvolatile::mNV_struggle;
+      return *MoveNonVolatile::mNV_struggle;
     case AT_MOVE_0:
     case AT_MOVE_1:
     case AT_MOVE_2:
@@ -409,14 +409,14 @@ move_nonvolatile& pokemon_nonvolatile::getMove(size_t index)
 
 
 
-const move_nonvolatile& pokemon_nonvolatile::getMove(size_t index) const
+const MoveNonVolatile& PokemonNonVolatile::getMove(size_t index) const
 {
   switch(index)
   {
     default:
       assert(false && "attempted to get volatile move of non-move action");
     case AT_MOVE_STRUGGLE:
-      return *move_nonvolatile::mNV_struggle;
+      return *MoveNonVolatile::mNV_struggle;
     case AT_MOVE_0:
     case AT_MOVE_1:
     case AT_MOVE_2:
@@ -430,7 +430,7 @@ const move_nonvolatile& pokemon_nonvolatile::getMove(size_t index) const
 
 
 
-void pokemon_nonvolatile::setMove(size_t iAction, const move_nonvolatile& _cMove)
+void PokemonNonVolatile::setMove(size_t iAction, const MoveNonVolatile& _cMove)
 {
   assert(isLegalSet(iAction - AT_MOVE_0, _cMove));
   getMove(iAction) = _cMove;
@@ -440,29 +440,29 @@ void pokemon_nonvolatile::setMove(size_t iAction, const move_nonvolatile& _cMove
 
 
 
-void pokemon_nonvolatile::removeMove(size_t iRemovedAction)
+void PokemonNonVolatile::removeMove(size_t iRemovedAction)
 {
   // don't bother removing a move that doesn't exist
   if ((iRemovedAction - AT_MOVE_0) >= getNumMoves()) { return; }
 
   {
-    move_nonvolatile& removedMove = getMove(iRemovedAction);
+    MoveNonVolatile& removedMove = getMove(iRemovedAction);
 
     // remove move:
-    removedMove = move_nonvolatile();
+    removedMove = MoveNonVolatile();
   }
 
   // there's a "hole" in the contiguous move array now, so 
   // refactor moves above the removed move:
   for (size_t iSource = (iRemovedAction - AT_MOVE_0) + 1; iSource < getNumMoves(); iSource++)
   {
-    move_nonvolatile& source = getMove(AT_MOVE_0 + iSource);
+    MoveNonVolatile& source = getMove(AT_MOVE_0 + iSource);
 
     for (size_t iNDestination = 0; iNDestination < iSource; iNDestination++)
     {
       size_t iDestination = (iSource - iNDestination - 1);
 
-      move_nonvolatile& destination = actions[iDestination];
+      MoveNonVolatile& destination = actions[iDestination];
 
       // don't replace a move that exists already
       if (destination.moveExists()) { continue; }
@@ -470,7 +470,7 @@ void pokemon_nonvolatile::removeMove(size_t iRemovedAction)
       // perform copy
       destination = source;
       // delete source (no duplicates)
-      source = move_nonvolatile();
+      source = MoveNonVolatile();
       break;
     }
   }
@@ -483,7 +483,7 @@ void pokemon_nonvolatile::removeMove(size_t iRemovedAction)
 
 
 
-void pokemon_nonvolatile::setFV(unsigned int targetFV)
+void PokemonNonVolatile::setFV(unsigned int targetFV)
 {	
 
   // set default value:
@@ -606,7 +606,7 @@ void pokemon_nonvolatile::setFV(unsigned int targetFV)
 
 
 
-void pokemon_nonvolatile::initFV()
+void PokemonNonVolatile::initFV()
 {
   // generate final values for a pokemon
   for (unsigned int indexFV = 0; indexFV < 9; indexFV++)
@@ -619,7 +619,7 @@ void pokemon_nonvolatile::initFV()
 
 
 
-const move& pokemon_nonvolatile::getMove_base(size_t index) const
+const Move& PokemonNonVolatile::getMove_base(size_t index) const
 {
   switch(index)
   {
@@ -627,9 +627,9 @@ const move& pokemon_nonvolatile::getMove_base(size_t index) const
     case AT_MOVE_CONFUSED:
     default:
       assert(false && "attempted to get base of non-move action");
-      return *move::move_none;
+      return *Move::move_none;
     case AT_MOVE_STRUGGLE:
-      return *move::move_struggle;
+      return *Move::move_struggle;
     case AT_MOVE_0:
     case AT_MOVE_1:
     case AT_MOVE_2:
@@ -641,7 +641,7 @@ const move& pokemon_nonvolatile::getMove_base(size_t index) const
 
 
 
-std::ostream& operator <<(std::ostream& os, const pokemon_nonvolatile& cPKNV)
+std::ostream& operator <<(std::ostream& os, const PokemonNonVolatile& cPKNV)
 {
   os << "\"" << cPKNV.getName() << "\"-\"" << cPKNV.getBase().getName();
   os << " " << (cPKNV.abilityExists()?cPKNV.getAbility().getName():"NO_ABILITY");
@@ -763,7 +763,7 @@ std::ostream& operator <<(std::ostream& os, const pokemon_print& cP)
 
 static const std::string header = "PKAIP0";
 
-void pokemon_nonvolatile::output(std::ostream& oFile, bool printHeader) const
+void PokemonNonVolatile::output(std::ostream& oFile, bool printHeader) const
 {
   // header:
   if (printHeader)
@@ -804,7 +804,7 @@ void pokemon_nonvolatile::output(std::ostream& oFile, bool printHeader) const
   oFile << "\n";
 } // endOf outputPokemon
 
-bool pokemon_nonvolatile::input(
+bool PokemonNonVolatile::input(
     const std::vector<std::string>& lines, 
     size_t& iLine, 
     std::vector<std::string>* mismatchedPokemon,
@@ -843,7 +843,7 @@ bool pokemon_nonvolatile::input(
   // find species index:
   iToken = 2;
   {
-    const pokemon_base* cSpecies = orphanCheck_ptr(pkdex->getPokemon(), mismatchedPokemon, tokens.at(iToken));
+    const PokemonBase* cSpecies = orphanCheck_ptr(pkdex->getPokemon(), mismatchedPokemon, tokens.at(iToken));
     if (cSpecies == NULL) 
     { } //orphan!
     else 
@@ -862,7 +862,7 @@ bool pokemon_nonvolatile::input(
   // find item index:
   iToken = 4;
   {
-    const item* cItem = NULL;
+    const Item* cItem = NULL;
 
     if (tokens.at(iToken).compare("NONE") != 0)
     {
@@ -905,7 +905,7 @@ bool pokemon_nonvolatile::input(
   // find ability index:
   iToken = 6;
   {
-    const ability* cAbility = NULL;
+    const Ability* cAbility = NULL;
 
     if (pokemonExists())
     {
@@ -914,7 +914,7 @@ bool pokemon_nonvolatile::input(
         cAbility = orphan::orphanCheck_ptr(pkdex->getAbilities(), mismatchedAbilities, tokens.at(iToken));
       }
 
-      const pokemon_base& cBase = getBase();
+      const PokemonBase& cBase = getBase();
       if (cAbility == NULL) { } // orphan!
       else if (!std::binary_search(cBase.abilities.begin(), cBase.abilities.end(), cAbility))
       {
@@ -954,7 +954,7 @@ bool pokemon_nonvolatile::input(
   // find nature index:
   iToken = 7;
   {
-    const nature* cNature = NULL;
+    const Nature* cNature = NULL;
 
     if (tokens.at(iToken).compare("NONE") != 0)
     {
@@ -979,7 +979,7 @@ bool pokemon_nonvolatile::input(
     {
       continue;
     }
-    const move* cMove = orphanCheck_ptr(pkdex->getMoves(), mismatchedMoves, tokens.at(iToken + iAction));
+    const Move* cMove = orphanCheck_ptr(pkdex->getMoves(), mismatchedMoves, tokens.at(iToken + iAction));
     if (cMove == NULL) 
     { 
       if (verbose >= 5)
@@ -1014,7 +1014,7 @@ bool pokemon_nonvolatile::input(
 #endif
     // add move, only if all preconditions for its being added have been met:
     {
-      addMove(move_nonvolatile(*cMove)); 
+      addMove(MoveNonVolatile(*cMove)); 
     }
   } //end of move indecies
 

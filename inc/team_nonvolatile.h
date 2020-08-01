@@ -13,35 +13,35 @@
 #include <stdint.h>
 #include <ostream>
 #include <vector>
-#include <boost/array.hpp>
+#include <array>
 
 #include "../inc/signature.h"
 
 #include "../inc/pokemon_nonvolatile.h"
 #include "../inc/name.h"
 
-union team_volatile;
+union TeamVolatile;
 
 #define TEAM_NONVOLATILE_DIGESTSIZE (POKEMON_NONVOLATILE_DIGESTSIZE * 6 + 1)
 
-class PKAISHARED team_nonvolatile : public name, public signature<team_nonvolatile, TEAM_NONVOLATILE_DIGESTSIZE> 
+class PKAISHARED TeamNonVolatile : public Name, public Signature<TeamNonVolatile, TEAM_NONVOLATILE_DIGESTSIZE> 
 {
 
 private:
   /* nonvolatile teammmates of this team */ 
-  boost::array<pokemon_nonvolatile, 6> teammates;
+  std::array<PokemonNonVolatile, 6> teammates;
 
   /* number of pokemon in this team */
   uint8_t numTeammates;
   
 public:
-  team_nonvolatile();
-  team_nonvolatile(const team_nonvolatile& orig);
-  ~team_nonvolatile() { };
+  TeamNonVolatile();
+  TeamNonVolatile(const TeamNonVolatile& orig);
+  ~TeamNonVolatile() { };
 
-  pokemon_nonvolatile& teammate(size_t iTeammate);
+  PokemonNonVolatile& teammate(size_t iTeammate);
 
-  const pokemon_nonvolatile& getPKNV(const team_volatile& source) const;
+  const PokemonNonVolatile& getPKNV(const TeamVolatile& source) const;
 
   /* returns number of teammates current pokemon team has */
   size_t getNumTeammates() const
@@ -55,22 +55,22 @@ public:
   }
 
   /* is this pokemon allowed to be on the given team according to the current ruleset? */
-  bool isLegalAdd(const pokemon_nonvolatile& cPokemon) const;
+  bool isLegalAdd(const PokemonNonVolatile& cPokemon) const;
 
-  bool isLegalSet(size_t iPosition, const pokemon_nonvolatile& cBase) const;
+  bool isLegalSet(size_t iPosition, const PokemonNonVolatile& cBase) const;
 
-  bool isLegalAdd(const pokemon_base& cPokemon) const;
+  bool isLegalAdd(const PokemonBase& cPokemon) const;
 
-  bool isLegalSet(size_t iPosition, const pokemon_base& cBase) const;
+  bool isLegalSet(size_t iPosition, const PokemonBase& cBase) const;
 
   /* add a pokemon to the array of pokemon in this team */
-  void addPokemon(const pokemon_nonvolatile& cPokemon);
+  void addPokemon(const PokemonNonVolatile& cPokemon);
 
   /* remove a pokemon from the array of pokemon in this team */
   void removePokemon(size_t iPokemon);
 
   /* sets pokemon to swappedPokemon */
-  void setPokemon(size_t iPokemon, const pokemon_nonvolatile& swappedPokemon);
+  void setPokemon(size_t iPokemon, const PokemonNonVolatile& swappedPokemon);
 
   /* sets the lead pokemon. The pokemon that was the lead pokemon takes the index of the switched pokemon */
   void setLeadPokemon(size_t iPokemon);
@@ -79,16 +79,16 @@ public:
 
   void uninitialize();
   
-  const pokemon_nonvolatile& teammate(size_t iTeammate) const;
+  const PokemonNonVolatile& teammate(size_t iTeammate) const;
   
   void output(std::ostream& oFile, bool printHeader = true) const;
 
   bool input(const std::vector<std::string>& lines, size_t& iLine);
   
-  void createDigest_impl(boost::array<uint8_t, TEAM_NONVOLATILE_DIGESTSIZE>& digest) const;
+  void createDigest_impl(std::array<uint8_t, TEAM_NONVOLATILE_DIGESTSIZE>& digest) const;
 
-  friend class pkIO;
-  friend union team_volatile;
+  friend class PkIO;
+  friend union TeamVolatile;
 
 };
 

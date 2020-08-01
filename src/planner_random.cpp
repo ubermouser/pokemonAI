@@ -18,7 +18,7 @@ planner_random::planner_random(const planner_random& other)
 {
 };
 
-void planner_random::setEnvironment(pkCU& _cu, size_t _agentTeam)
+void planner_random::setEnvironment(PkCU& _cu, size_t _agentTeam)
 {
   cu = &_cu;
   agentTeam = _agentTeam;
@@ -32,7 +32,7 @@ bool planner_random::isInitialized() const
   return true; 
 }
 
-uint32_t planner_random::generateSolution(const environment_possible& origin)
+uint32_t planner_random::generateSolution(const EnvironmentPossible& origin)
 {
   // choose a completely random action to return:
   size_t iNAction = rand() % AT_ITEM_USE;

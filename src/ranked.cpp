@@ -28,9 +28,9 @@ const std::string& ranked::getName() const
   return unnamed;
 };
 
-size_t ranked::update(const game& cGame, const trueSkillTeam& cTeam, size_t iTeam)
+size_t ranked::update(const Game& cGame, const trueSkillTeam& cTeam, size_t iTeam)
 {
-  BOOST_FOREACH(const gameResult& cGameResult, cGame.getGameResults())
+  BOOST_FOREACH(const GameResult& cGameResult, cGame.getGameResults())
   {
     // update plies
     numPlies += cGameResult.numPlies;

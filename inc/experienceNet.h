@@ -4,7 +4,7 @@
 #include "../inc/pkai.h"
 
 #include <vector>
-#include <boost/array.hpp>
+#include <array>
 #include <assert.h>
 
 typedef std::vector<float>::const_iterator constFloatIterator_t;

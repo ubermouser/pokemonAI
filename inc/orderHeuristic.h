@@ -15,7 +15,7 @@
 #include <vector>
 
 //#include <boost/interprocess/detail/atomic.hpp>
-#include <boost/array.hpp>
+#include <array>
 #include <boost/thread/locks.hpp>
 #include <boost/smart_ptr/detail/spinlock.hpp>
 
@@ -50,10 +50,10 @@ public:
 class orderHeuristic
 {
 private:
-  boost::array<spinlock, 36> locks;
+  std::array<spinlock, 36> locks;
 
-  boost::array<boost::array<path, AT_ITEM_USE + 1>, 36> paths;
-  boost::array<boost::array<uint8_t, AT_ITEM_USE + 1>, 36> orders;
+  std::array<std::array<path, AT_ITEM_USE + 1>, 36> paths;
+  std::array<std::array<uint8_t, AT_ITEM_USE + 1>, 36> orders;
 
 private:
   /* call sortIniital_perPath on all paths */
@@ -66,8 +66,8 @@ public:
   void incrementCutoff(uint8_t depth, size_t cPokemon, size_t oPokemon, uint8_t iAction);
   void incrementUse(uint8_t depth, size_t cPokemon, size_t oPokemon, uint8_t iAction);
   void reset(bool randomize = false);
-  void seedOrdering(boost::array<uint8_t, AT_ITEM_USE+1>& ordering, size_t cPokemon, size_t oPokemon, int8_t killerMove = -1);
-  bool isValidOrder(boost::array<uint8_t, AT_ITEM_USE+1>& ordering);
+  void seedOrdering(std::array<uint8_t, AT_ITEM_USE+1>& ordering, size_t cPokemon, size_t oPokemon, int8_t killerMove = -1);
+  bool isValidOrder(std::array<uint8_t, AT_ITEM_USE+1>& ordering);
 };
 
 #endif

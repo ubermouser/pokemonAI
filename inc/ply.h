@@ -25,7 +25,7 @@
 
 #include "../inc/vertex.h"
 
-union environment_possible;
+union EnvironmentPossible;
 union table_entry;
 class minimax_threadArg;
 class agentMove;
@@ -53,7 +53,7 @@ private:
   otherMove& parent;
 
   /* the current environment this environment possible represents */
-  const environment_possible& envP;
+  const EnvironmentPossible& envP;
 
   /* transposition table entry that this node refers to, or NULL if so far unique */
   table_entry tNode;
@@ -95,7 +95,7 @@ private:
    * with respect to agent team, maximizing other team fitness */
   int8_t bestChildAction;
 
-  boost::array<uint8_t, AT_ITEM_USE+1> order;
+  std::array<uint8_t, AT_ITEM_USE+1> order;
   
   ply();
   ply(const ply& orig);
@@ -211,7 +211,7 @@ public:
     return status;
   };
 
-  const environment_possible& getEnvP() const
+  const EnvironmentPossible& getEnvP() const
   {
     return envP;
   }
@@ -271,7 +271,7 @@ public:
   
   /* generates child, no lower level propagation */
   ply(
-    const environment_possible& possibleEnvironment, 
+    const EnvironmentPossible& possibleEnvironment, 
     minimax_threadArg& _planner, 
     ply& _randomMove, 
     agentMove& _agentMove, 
@@ -282,7 +282,7 @@ public:
 
   /* generates a root node */
   ply (
-    const environment_possible& rootEnvironment, 
+    const EnvironmentPossible& rootEnvironment, 
     minimax_threadArg& _planner,
     fpType _alphaBound = -std::numeric_limits<fpType>::infinity(),
     fpType _betaBound = std::numeric_limits<fpType>::infinity());

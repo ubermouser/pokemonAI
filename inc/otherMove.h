@@ -37,7 +37,7 @@ private:
   std::vector<ply*> children;
 
   /* vector containing the actual environments of each of this ply's children */
-  std::vector<environment_possible> possibleEnvironments;
+  std::vector<EnvironmentPossible> possibleEnvironments;
   
   /* vector containing this node's parent */
   agentMove& parent;

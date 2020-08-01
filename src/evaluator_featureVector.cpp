@@ -117,48 +117,48 @@ void featureVector::outputNames(std::ostream& oS) const
 
 
 
-void featureVector_impl::generateBestMoves(const environment_nonvolatile& envNV, bestMoveOrders_t& iBestMoves, bestMoveDamages_t& dBestMoves)
+void featureVector_impl::generateBestMoves(const EnvironmentNonvolatile& envNV, bestMoveOrders_t& iBestMoves, bestMoveDamages_t& dBestMoves)
 {
   for (size_t iTeam = 0; iTeam < 2; ++iTeam)
   {
-    const team_nonvolatile& cTNV = envNV.getTeam(iTeam);
-    const team_nonvolatile& tTNV = envNV.getOtherTeam(iTeam);
+    const TeamNonVolatile& cTNV = envNV.getTeam(iTeam);
+    const TeamNonVolatile& tTNV = envNV.getOtherTeam(iTeam);
 
     for (size_t iTeammate = 0; iTeammate != 6; ++iTeammate)
     {
       // zero the array:
       for (size_t iOTeammate = 0; iOTeammate != 6; ++iOTeammate)
       {
-        boost::array<uint8_t, 4>& cIBestMoves = iBestMoves[iTeam][iTeammate][iOTeammate];
-        boost::array<float, 4>& cBestMoves = dBestMoves[iTeam][iTeammate][iOTeammate];
+        std::array<uint8_t, 4>& cIBestMoves = iBestMoves[iTeam][iTeammate][iOTeammate];
+        std::array<float, 4>& cBestMoves = dBestMoves[iTeam][iTeammate][iOTeammate];
 
-        cBestMoves.assign(0.0f);
-        cIBestMoves.assign(UINT8_MAX);
+        cBestMoves.fill(0.0f);
+        cIBestMoves.fill(UINT8_MAX);
       }
 
       if (iTeammate >= cTNV.getNumTeammates())  { continue; }
 
-      const pokemon_nonvolatile& cPKNV = cTNV.teammate(iTeammate);
-      const pokemon_base& cPKB = cPKNV.getBase();
+      const PokemonNonVolatile& cPKNV = cTNV.teammate(iTeammate);
+      const PokemonBase& cPKB = cPKNV.getBase();
 
       // level modifier, RNG modifier
       float levelModifier = (((((float)cPKNV.getLevel() * 2.0f) / 5.0f) + 2.0f) / 50.0f) * 0.85f;
 
       for (size_t iOTeammate = 0; iOTeammate != 6; ++iOTeammate)
       {
-        boost::array<uint8_t, 4>& cIBestMoves = iBestMoves[iTeam][iTeammate][iOTeammate];
-        boost::array<float, 4>& cBestMoves = dBestMoves[iTeam][iTeammate][iOTeammate];
-        boost::array<bool, 4> valid;
-        valid.assign(true);
+        std::array<uint8_t, 4>& cIBestMoves = iBestMoves[iTeam][iTeammate][iOTeammate];
+        std::array<float, 4>& cBestMoves = dBestMoves[iTeam][iTeammate][iOTeammate];
+        std::array<bool, 4> valid;
+        valid.fill(true);
 
-        cBestMoves.assign(0.0f);
-        cIBestMoves.assign(UINT8_MAX);
+        cBestMoves.fill(0.0f);
+        cIBestMoves.fill(UINT8_MAX);
 
         // zero element if pokemon does not exist:
         if (iOTeammate >= tTNV.getNumTeammates()) { continue; }
 
-        const pokemon_nonvolatile& tPKNV = tTNV.teammate(iOTeammate);
-        const pokemon_base& tPKB = tPKNV.getBase();
+        const PokemonNonVolatile& tPKNV = tTNV.teammate(iOTeammate);
+        const PokemonBase& tPKB = tPKNV.getBase();
 
         float physicalDamage = levelModifier * ((float)cPKNV.getFV_base(FV_ATTACK)) / ((float)tPKNV.getFV_base(FV_DEFENSE));
         float specialDamage = levelModifier * ((float)cPKNV.getFV_base(FV_SPATTACK)) / ((float)tPKNV.getFV_base(FV_SPDEFENSE));
@@ -175,8 +175,8 @@ void featureVector_impl::generateBestMoves(const environment_nonvolatile& envNV,
           {
             if (!valid[iMove]) { continue; }
 
-            const move& cMove = cPKNV.getMove_base(iMove + AT_MOVE_0);
-            const type& cType = cMove.getType();
+            const Move& cMove = cPKNV.getMove_base(iMove + AT_MOVE_0);
+            const Type& cType = cMove.getType();
 
             bool hasStab = ((&cPKB.getType(0) == &cType) || (&cPKB.getType(1) == &cType));
 
@@ -211,14 +211,14 @@ void featureVector_impl::generateBestMoves(const environment_nonvolatile& envNV,
 
 void featureVector_impl::generateOrders(const bestMoveDamages_t& dBestMoves, orders_t& orders)
 {
-  boost::array< boost::array< uint8_t , 6> , 2> preOrders;
+  std::array< std::array< uint8_t , 6> , 2> preOrders;
   // seed the unmodified order into preOrders:
   for (size_t iTeam = 0; iTeam < 2; ++iTeam)
   {
-    boost::array<uint8_t, 6>& cOrder = preOrders[iTeam];
+    std::array<uint8_t, 6>& cOrder = preOrders[iTeam];
 
     //size_t iOTeam = (iTeam + 1) % 2;
-    boost::array<bool, 6> valid; valid.assign(true);
+    std::array<bool, 6> valid; valid.fill(true);
     for (size_t iNTeammate = 0; iNTeammate != 6; ++iNTeammate)
     {
       float bestCoverage = -std::numeric_limits<float>::infinity();
@@ -243,11 +243,11 @@ void featureVector_impl::generateOrders(const bestMoveDamages_t& dBestMoves, ord
   // place modified order into orders:
   for (size_t iTeam = 0; iTeam < 2; ++iTeam)
   {
-    boost::array< boost::array< uint8_t , 6> , 6>& cOrders = orders[iTeam];
-    boost::array< uint8_t , 6>& preOrder = preOrders[iTeam];
+    std::array< std::array< uint8_t , 6> , 6>& cOrders = orders[iTeam];
+    std::array< uint8_t , 6>& preOrder = preOrders[iTeam];
     for (size_t iTeammate = 0; iTeammate != 6; ++iTeammate)
     {
-      boost::array<uint8_t, 6>::iterator cTeammate = cOrders[iTeammate].begin();
+      std::array<uint8_t, 6>::iterator cTeammate = cOrders[iTeammate].begin();
       *cTeammate++ = iTeammate;
       for (size_t iNTeammate = 0; iNTeammate != 6; ++iNTeammate)
       {

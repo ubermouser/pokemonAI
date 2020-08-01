@@ -5,10 +5,10 @@
 
 #include <string>
 
-class PKAISHARED hasName
+class PKAISHARED HasName
 {
 public:
-  virtual ~hasName() {}
+  virtual ~HasName() {}
 
   virtual const std::string& getName() const = 0;
 
@@ -16,7 +16,7 @@ public:
 };
 
 
-class PKAISHARED name : public hasName
+class PKAISHARED Name : public HasName
 {
 
 private:
@@ -33,16 +33,16 @@ public:
     return _name;
   };
 
-  bool operator <(const name& other) const;
+  bool operator <(const Name& other) const;
 
-  name();
-  name(const std::string& source);
-  name(const name& orig);
-  ~name() {};
+  Name();
+  Name(const std::string& source);
+  Name(const Name& orig);
+  ~Name() {};
 
-  name& operator=(const name& source);
+  Name& operator=(const Name& source);
 
-  bool operator >(const name& other) const;
+  bool operator >(const Name& other) const;
   
   const char* getCName() const
   {
@@ -55,7 +55,7 @@ public:
   };
 
 private:
-  void init(const name& source);
+  void init(const Name& source);
 
 };
 

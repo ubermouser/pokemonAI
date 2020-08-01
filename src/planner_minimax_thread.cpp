@@ -24,7 +24,7 @@ eval(NULL)
 {
 };
 
-minimax_threadArg::minimax_threadArg(planner_minimax& _base, const evaluator& _eval)
+minimax_threadArg::minimax_threadArg(planner_minimax& _base, const Evaluator& _eval)
 : base(&_base),
 plyQueue(),
 root(NULL),
@@ -37,20 +37,20 @@ minimax_threadArg::minimax_threadArg(const minimax_threadArg& other)
   : base(other.base),
   plyQueue(),
   root(NULL),
-  cu(other.cu!=NULL?new pkCU(*other.cu):NULL),
+  cu(other.cu!=NULL?new PkCU(*other.cu):NULL),
   eval(other.eval!=NULL?other.eval->clone():NULL)
 {
 };
 
-const environment_nonvolatile& minimax_threadArg::getNV() const { return cu->getNV(); };
+const EnvironmentNonvolatile& minimax_threadArg::getNV() const { return cu->getNV(); };
 
-pkCU& minimax_threadArg::getCU() { return *cu; };
+PkCU& minimax_threadArg::getCU() { return *cu; };
 
 transposition_table& minimax_threadArg::getTTable() { return base->ttable; }
 const transposition_table& minimax_threadArg::getTTable() const { return base->ttable; }
 
-evaluator& minimax_threadArg::getEval() { return *eval; }
-const evaluator& minimax_threadArg::getEval() const { return *eval; }
+Evaluator& minimax_threadArg::getEval() { return *eval; }
+const Evaluator& minimax_threadArg::getEval() const { return *eval; }
 
 size_t minimax_threadArg::getAgentTeam() { return base->agentTeam; }
 size_t minimax_threadArg::getOtherTeam() { return base->otherTeam; }
@@ -78,16 +78,16 @@ bool minimax_threadArg::isInitialized() const
   return true;
 }
 
-void minimax_threadArg::setEvaluator(const evaluator& evalType)
+void minimax_threadArg::setEvaluator(const Evaluator& evalType)
 {
   if (eval != NULL) { delete eval; }
   eval = evalType.clone();
   if (cu != NULL) { eval->resetEvaluator(cu->getNV()); };
 };
 
-void minimax_threadArg::setEnvironment(pkCU& _cu, size_t _agentTeam)
+void minimax_threadArg::setEnvironment(PkCU& _cu, size_t _agentTeam)
 {
-  if (cu == NULL) { cu = new pkCU(_cu); cu->setAccuracy(base->engineAccuracy); }
+  if (cu == NULL) { cu = new PkCU(_cu); cu->setAccuracy(base->engineAccuracy); }
   else { cu->setEnvironment(_cu.getNV()); }
 
   // assign new evaluator of the same type:
@@ -97,7 +97,7 @@ void minimax_threadArg::setEnvironment(pkCU& _cu, size_t _agentTeam)
   cleanUp();
 };
 
-void minimax_threadArg::setRoot(const environment_possible& origin)
+void minimax_threadArg::setRoot(const EnvironmentPossible& origin)
 {
   cleanUp();
   root = new ply(origin, *this);
@@ -238,7 +238,7 @@ bool minimax_threadArg::evaluateVertex_IDDFS_Fitness(ply& current, std::vector<p
     else
     {
       // calculate fitness
-      evalResult_t evalResult;
+      EvalResult_t evalResult;
       if (current.getStatus() != NODET_FULLEVAL)
       {
         // use the heuristic evaluator for cutoff nodes

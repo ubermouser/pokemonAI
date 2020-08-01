@@ -15,16 +15,16 @@
 #include "../inc/name.h"
 #include "../inc/pluggable.h"
 
-class PKAISHARED ability: public name, public pluggable
+class PKAISHARED Ability: public Name, public Pluggable
 {
 public:
-  static const ability* no_ability;
+  static const Ability* no_ability;
 
-  ability();
-  ability(const ability& source);
-  ~ability();
+  Ability();
+  Ability(const Ability& source);
+  ~Ability();
 
-  friend class pokedex;
+  friend class Pokedex;
 private:
 
   std::string script;

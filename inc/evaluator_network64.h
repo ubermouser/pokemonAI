@@ -12,7 +12,7 @@ class evaluator_network64: public evaluator_featureVector
 {
   std::string ident;
 
-  const environment_nonvolatile* envNV;
+  const EnvironmentNonvolatile* envNV;
   neuralNet* network;
 
   bestMoveOrders_t iBestMoves;
@@ -37,12 +37,12 @@ public:
   bool isInitialized() const;
 
   void resetNetwork(const neuralNet& cNet);
-  void resetEvaluator(const environment_nonvolatile& envNV);
-  evalResult_t calculateFitness(const environment_volatile& env, size_t iTeam);
+  void resetEvaluator(const EnvironmentNonvolatile& envNV);
+  EvalResult_t calculateFitness(const EnvironmentVolatile& env, size_t iTeam);
 
-  evalResult_t calculateFitness(neuralNet& cNet, const environment_volatile& env, size_t iTeam);
+  EvalResult_t calculateFitness(neuralNet& cNet, const EnvironmentVolatile& env, size_t iTeam);
 
-  void seed(float* cInput, const environment_volatile& env, size_t iTeam) const;
+  void seed(float* cInput, const EnvironmentVolatile& env, size_t iTeam) const;
   size_t inputSize() const { return numInputNeurons; };
   size_t outputSize() const { return numOutputNeurons; };
   const float* getInput() const;

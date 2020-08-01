@@ -8,10 +8,10 @@
 #include "../inc/move_volatile.h"
 //#undef PKAI_STATIC
 
-move_nonvolatile* move_nonvolatile::mNV_struggle = NULL;
+MoveNonVolatile* MoveNonVolatile::mNV_struggle = NULL;
 
-move_nonvolatile::move_nonvolatile(const move& _base, unsigned int PPmultiplier)
-  : signature<move_nonvolatile, MOVE_NONVOLATILE_DIGESTSIZE>(),
+MoveNonVolatile::MoveNonVolatile(const Move& _base, unsigned int PPmultiplier)
+  : Signature<MoveNonVolatile, MOVE_NONVOLATILE_DIGESTSIZE>(),
   base(&_base),
   scriptVal_a(0),
   scriptVal_b(0),
@@ -23,7 +23,7 @@ move_nonvolatile::move_nonvolatile(const move& _base, unsigned int PPmultiplier)
 
 
 
-void move_nonvolatile::initialize(pokemon_nonvolatile& cPokemon)
+void MoveNonVolatile::initialize(PokemonNonVolatile& cPokemon)
 {
   onInitMove_rawType cPlugin = (onInitMove_rawType)getBase().getFunction(PLUGIN_ON_INIT);
   if (cPlugin == NULL) { return; }
@@ -36,7 +36,7 @@ void move_nonvolatile::initialize(pokemon_nonvolatile& cPokemon)
 
 
 
-void move_nonvolatile::uninitialize(pokemon_nonvolatile& cPokemon)
+void MoveNonVolatile::uninitialize(PokemonNonVolatile& cPokemon)
 {
   //int cScript = getBase().scripts[SCRIPT_ON_UNINIT];
 
@@ -52,13 +52,13 @@ void move_nonvolatile::uninitialize(pokemon_nonvolatile& cPokemon)
 
 
 
-void move_nonvolatile::createDigest_impl(boost::array<uint8_t, MOVE_NONVOLATILE_DIGESTSIZE>& digest) const
+void MoveNonVolatile::createDigest_impl(std::array<uint8_t, MOVE_NONVOLATILE_DIGESTSIZE>& digest) const
 {
-  digest.assign(0);
+  digest.fill(0);
 
   size_t iDigest = 0;
   // pack first 20 characters of name:
-  getBase().getName().copy((char *)(digest.c_array() + iDigest), 20, 0);
+  getBase().getName().copy((char *)(digest.data() + iDigest), 20, 0);
   iDigest += 20;
   /*// pack scriptvals:
   pack(scriptVal_a, digest, iDigest);

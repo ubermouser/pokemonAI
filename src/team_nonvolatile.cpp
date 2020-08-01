@@ -8,17 +8,17 @@
 //#undef PKAI_STATIC
 #include "../inc/init_toolbox.h"
 
-team_nonvolatile::team_nonvolatile()
-  : name(), 
-  signature<team_nonvolatile, TEAM_NONVOLATILE_DIGESTSIZE>(),
+TeamNonVolatile::TeamNonVolatile()
+  : Name(), 
+  Signature<TeamNonVolatile, TEAM_NONVOLATILE_DIGESTSIZE>(),
   teammates(),
   numTeammates(0)
 {
 }
 
-team_nonvolatile::team_nonvolatile(const team_nonvolatile& orig)
-  : name(orig), 
-  signature<team_nonvolatile, TEAM_NONVOLATILE_DIGESTSIZE>(orig),
+TeamNonVolatile::TeamNonVolatile(const TeamNonVolatile& orig)
+  : Name(orig), 
+  Signature<TeamNonVolatile, TEAM_NONVOLATILE_DIGESTSIZE>(orig),
   teammates(orig.teammates),
   numTeammates(orig.numTeammates)
 { 
@@ -28,7 +28,7 @@ team_nonvolatile::team_nonvolatile(const team_nonvolatile& orig)
 
 
 
-pokemon_nonvolatile& team_nonvolatile::teammate(size_t iTeammate)
+PokemonNonVolatile& TeamNonVolatile::teammate(size_t iTeammate)
 {
   assert(iTeammate < getNumTeammates());
   return teammates[iTeammate];
@@ -38,7 +38,7 @@ pokemon_nonvolatile& team_nonvolatile::teammate(size_t iTeammate)
 
 
 
-const pokemon_nonvolatile& team_nonvolatile::teammate(size_t iTeammate) const
+const PokemonNonVolatile& TeamNonVolatile::teammate(size_t iTeammate) const
 {
   assert(iTeammate < getNumTeammates());
   return teammates[iTeammate];
@@ -48,7 +48,7 @@ const pokemon_nonvolatile& team_nonvolatile::teammate(size_t iTeammate) const
 
 
 
-const pokemon_nonvolatile& team_nonvolatile::getPKNV(const team_volatile& source) const
+const PokemonNonVolatile& TeamNonVolatile::getPKNV(const TeamVolatile& source) const
 {
   return teammates[source.getICPKV()];
 };
@@ -56,7 +56,7 @@ const pokemon_nonvolatile& team_nonvolatile::getPKNV(const team_volatile& source
 
 
 
-void team_nonvolatile::addPokemon(const pokemon_nonvolatile& cPokemon)
+void TeamNonVolatile::addPokemon(const PokemonNonVolatile& cPokemon)
 {
   assert(isLegalAdd(cPokemon));
 
@@ -68,7 +68,7 @@ void team_nonvolatile::addPokemon(const pokemon_nonvolatile& cPokemon)
 
 
 
-void team_nonvolatile::setPokemon(size_t iPokemon, const pokemon_nonvolatile& swappedPokemon)
+void TeamNonVolatile::setPokemon(size_t iPokemon, const PokemonNonVolatile& swappedPokemon)
 {
   assert(isLegalSet(iPokemon, swappedPokemon));
   teammate(iPokemon) = swappedPokemon;
@@ -78,14 +78,14 @@ void team_nonvolatile::setPokemon(size_t iPokemon, const pokemon_nonvolatile& sw
 
 
 
-void team_nonvolatile::setLeadPokemon(size_t iTeammate)
+void TeamNonVolatile::setLeadPokemon(size_t iTeammate)
 {
   assert(iTeammate < getNumTeammates());
 
   // asked to switch lead pokemon with lead pokemon
   if (iTeammate == 0) return;
 
-  pokemon_nonvolatile switchedPokemon = teammate(0);
+  PokemonNonVolatile switchedPokemon = teammate(0);
   teammate(0) = teammate(iTeammate);
   teammate(iTeammate) = switchedPokemon;
 }
@@ -94,7 +94,7 @@ void team_nonvolatile::setLeadPokemon(size_t iTeammate)
 
 
 
-bool team_nonvolatile::isLegalAdd(const pokemon_nonvolatile& candidate) const
+bool TeamNonVolatile::isLegalAdd(const PokemonNonVolatile& candidate) const
 {
   if ( !candidate.pokemonExists() ) { return false; }
   return isLegalAdd(candidate.getBase());
@@ -105,7 +105,7 @@ bool team_nonvolatile::isLegalAdd(const pokemon_nonvolatile& candidate) const
 
 
 
-bool team_nonvolatile::isLegalSet(size_t iPosition, const pokemon_nonvolatile& candidate) const
+bool TeamNonVolatile::isLegalSet(size_t iPosition, const PokemonNonVolatile& candidate) const
 {
   if ( !candidate.pokemonExists() ) { return false; }
   return isLegalSet(iPosition, candidate.getBase());
@@ -115,7 +115,7 @@ bool team_nonvolatile::isLegalSet(size_t iPosition, const pokemon_nonvolatile& c
 
 
 
-bool team_nonvolatile::isLegalAdd(const pokemon_base& candidate) const
+bool TeamNonVolatile::isLegalAdd(const PokemonBase& candidate) const
 {
   if ((getNumTeammates() + 1) > getMaxNumTeammates()) { return false; }
   return isLegalSet(SIZE_MAX, candidate);
@@ -126,7 +126,7 @@ bool team_nonvolatile::isLegalAdd(const pokemon_base& candidate) const
 
 
 
-bool team_nonvolatile::isLegalSet(size_t iPosition, const pokemon_base& candidate) const
+bool TeamNonVolatile::isLegalSet(size_t iPosition, const PokemonBase& candidate) const
 {
   if ((iPosition != SIZE_MAX) && (iPosition >= getNumTeammates()) ) { return false; }
   if (candidate.lostChild == true) { return false; }
@@ -143,29 +143,29 @@ bool team_nonvolatile::isLegalSet(size_t iPosition, const pokemon_base& candidat
 
 
 
-void team_nonvolatile::removePokemon(size_t iRemovedPokemon)
+void TeamNonVolatile::removePokemon(size_t iRemovedPokemon)
 {
   // don't bother removing a pokemon that doesn't exist
   if (iRemovedPokemon >= getNumTeammates()) { return; }
 
   {
-    pokemon_nonvolatile& removedPokemon = teammate(iRemovedPokemon);
+    PokemonNonVolatile& removedPokemon = teammate(iRemovedPokemon);
 
     // remove pokemon:
-    removedPokemon = pokemon_nonvolatile();
+    removedPokemon = PokemonNonVolatile();
   }
 
   // there's a "hole" in the contiguous teammate array now, so 
   // refactor pokemon above the removed pokemon:
   for (size_t iSource = iRemovedPokemon + 1; iSource < getNumTeammates(); iSource++)
   {
-    pokemon_nonvolatile& source = teammate(iSource);
+    PokemonNonVolatile& source = teammate(iSource);
 
     for (size_t iNDestination = 0; iNDestination < (iRemovedPokemon + 1); iNDestination++)
     {
       size_t iDestination = (iSource - iNDestination - 1);
 
-      pokemon_nonvolatile& destination = teammates[iDestination];
+      PokemonNonVolatile& destination = teammates[iDestination];
 
       // don't replace a pokemon that exists already
       if (destination.pokemonExists()) { continue; }
@@ -173,7 +173,7 @@ void team_nonvolatile::removePokemon(size_t iRemovedPokemon)
       // perform copy
       destination = source;
       // delete source (no duplicates)
-      source = pokemon_nonvolatile();
+      source = PokemonNonVolatile();
       break;
     }
   }
@@ -186,7 +186,7 @@ void team_nonvolatile::removePokemon(size_t iRemovedPokemon)
 
 
 
-void team_nonvolatile::initialize()
+void TeamNonVolatile::initialize()
 {
   for (size_t iPokemon = 0; iPokemon < getNumTeammates(); iPokemon++)
   {
@@ -198,7 +198,7 @@ void team_nonvolatile::initialize()
 
 
 
-void team_nonvolatile::uninitialize()
+void TeamNonVolatile::uninitialize()
 {
   for (size_t iPokemon = 0; iPokemon < getNumTeammates(); iPokemon++)
   {
@@ -210,23 +210,23 @@ void team_nonvolatile::uninitialize()
 
 
 
-void team_nonvolatile::createDigest_impl(boost::array<uint8_t, TEAM_NONVOLATILE_DIGESTSIZE>& digest) const
+void TeamNonVolatile::createDigest_impl(std::array<uint8_t, TEAM_NONVOLATILE_DIGESTSIZE>& digest) const
 {
-  digest.assign(0);
+  digest.fill(0);
 
-  boost::array<bool, 6> packedPokemon;
-  packedPokemon.assign(false);
+  std::array<bool, 6> packedPokemon;
+  packedPokemon.fill(false);
   size_t iDigest = 0;
 
   // do NOT pack the name of the team:
 
   // always hash the first pokemon first:
   {
-    const pokemon_nonvolatile& firstPokemon = teammate(0);
+    const PokemonNonVolatile& firstPokemon = teammate(0);
     packedPokemon[0] = true;
 
     // pack pokemon:
-    boost::array<uint8_t, POKEMON_NONVOLATILE_DIGESTSIZE> fPokemonDigest;
+    std::array<uint8_t, POKEMON_NONVOLATILE_DIGESTSIZE> fPokemonDigest;
     firstPokemon.createDigest(fPokemonDigest);
 
     // copy action to pokemon digest:
@@ -237,10 +237,10 @@ void team_nonvolatile::createDigest_impl(boost::array<uint8_t, TEAM_NONVOLATILE_
   for (size_t iOrder = 1, iSize = getNumTeammates(); iOrder < iSize; ++iOrder)
   {
     size_t iBestPokemon = SIZE_MAX;
-    const pokemon_nonvolatile* bestPokemon = NULL;
+    const PokemonNonVolatile* bestPokemon = NULL;
     for (size_t iPokemon = 0; iPokemon != iSize; ++iPokemon)
     {
-      const pokemon_nonvolatile& cPokemon = teammate(iPokemon);
+      const PokemonNonVolatile& cPokemon = teammate(iPokemon);
 
       // don't pack a pokemon that has already been packed:
       if (packedPokemon[iPokemon] == true) { continue; }
@@ -258,7 +258,7 @@ void team_nonvolatile::createDigest_impl(boost::array<uint8_t, TEAM_NONVOLATILE_
     packedPokemon[iBestPokemon] = true;
 
     // pack pokemon:
-    boost::array<uint8_t, POKEMON_NONVOLATILE_DIGESTSIZE> bPokemonDigest;
+    std::array<uint8_t, POKEMON_NONVOLATILE_DIGESTSIZE> bPokemonDigest;
     bestPokemon->createDigest(bPokemonDigest);
 
     // copy action to pokemon digest:
@@ -276,7 +276,7 @@ void team_nonvolatile::createDigest_impl(boost::array<uint8_t, TEAM_NONVOLATILE_
 
 static const std::string header = "PKAIE0";
 
-void team_nonvolatile::output(std::ostream& oFile, bool printHeader) const
+void TeamNonVolatile::output(std::ostream& oFile, bool printHeader) const
 {
   // header:
   if (printHeader)
@@ -291,12 +291,12 @@ void team_nonvolatile::output(std::ostream& oFile, bool printHeader) const
   // output team pokemon:
   for (size_t iTeammate = 0; iTeammate != getNumTeammates(); ++iTeammate)
   {
-    const pokemon_nonvolatile& cTeammate = teammate(iTeammate);
+    const PokemonNonVolatile& cTeammate = teammate(iTeammate);
     cTeammate.output(oFile);
   }
 } // endOf outputTeam
 
-bool team_nonvolatile::input(const std::vector<std::string>& lines, size_t& iLine)
+bool TeamNonVolatile::input(const std::vector<std::string>& lines, size_t& iLine)
 {
   /*
    * Header data:
@@ -345,7 +345,7 @@ bool team_nonvolatile::input(const std::vector<std::string>& lines, size_t& iLin
   iLine++;
   for (size_t iTeammate = 0; iTeammate < _numTeammates; ++iTeammate)
   {
-    pokemon_nonvolatile cTeammate;
+    PokemonNonVolatile cTeammate;
     if (!cTeammate.input(lines, iLine, &mismatchedPokemon, &mismatchedItems, &mismatchedAbilities, &mismatchedNatures, &mismatchedMoves)) { return false; }
 
     // check for duplicate teammate names:

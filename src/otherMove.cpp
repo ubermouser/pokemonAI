@@ -41,7 +41,7 @@ void otherMove::pushbackChildren_nonLocking(minimax_threadArg& _planner, size_t 
   fpType maxProbability = -std::numeric_limits<fpType>::max();
   for (size_t iEnv = 0; iEnv != iSize; iEnv++)
   {
-    const environment_possible& cEnvironment = possibleEnvironments[iEnv];
+    const EnvironmentPossible& cEnvironment = possibleEnvironments[iEnv];
     fpType cProbability = cEnvironment.getProbability().to_double();
 
     if (cProbability > maxProbability) { maxProbability = cProbability; }
@@ -58,7 +58,7 @@ void otherMove::pushbackChildren_nonLocking(minimax_threadArg& _planner, size_t 
 
   for (size_t iEnv = 0; iEnv != iSize; ++iEnv)
   {
-    const environment_possible& cEnvironment = possibleEnvironments[iEnv];
+    const EnvironmentPossible& cEnvironment = possibleEnvironments[iEnv];
     fpType cProbability = cEnvironment.getProbability().to_double();
 
     // don't add pruned environments

@@ -17,14 +17,14 @@
 
 typedef fixedpoint::fixed_point<30> fixType;
 
-union PKAISHARED environment_possible
+union PKAISHARED EnvironmentPossible
 {
   struct
   {
     /*
      * the environment this possible_environment represents
      */
-    environment_volatile env;
+    EnvironmentVolatile env;
 
     /* the hashed value of this completed environment_possible. Environment should NOT BE CHANGED once hashed! */
     uint64_t hash;
@@ -64,15 +64,15 @@ union PKAISHARED environment_possible
   } data;
   uint64_t raw[18];
 
-  static environment_possible create(const environment_volatile& source, bool doHash = false);
+  static EnvironmentPossible create(const EnvironmentVolatile& source, bool doHash = false);
 
   /* Is the probability of this entity occuring less than the probability of 
    the other entity occuring?*/
-  bool operator<(const environment_possible& other) const;
+  bool operator<(const EnvironmentPossible& other) const;
 
-  const environment_volatile& getEnv() const { return data.env; };
+  const EnvironmentVolatile& getEnv() const { return data.env; };
 
-  environment_volatile& getEnv() { return data.env; }
+  EnvironmentVolatile& getEnv() { return data.env; }
 
   const fixType& getProbability() const { return data.probability; };
 
@@ -187,12 +187,12 @@ union PKAISHARED environment_possible
 class PKAISHARED envP_print
 {
 private:
-  const environment_nonvolatile& envNV;
-  const environment_possible& envP;
+  const EnvironmentNonvolatile& envNV;
+  const EnvironmentPossible& envP;
   size_t agentTeam;
 
 public:
-  envP_print(const environment_nonvolatile& _envNV, const environment_possible& _envP, size_t _agentTeam = TEAM_A)
+  envP_print(const EnvironmentNonvolatile& _envNV, const EnvironmentPossible& _envP, size_t _agentTeam = TEAM_A)
     : envNV(_envNV),
     envP(_envP),
     agentTeam(_agentTeam)

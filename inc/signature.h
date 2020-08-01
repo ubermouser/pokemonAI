@@ -4,7 +4,7 @@
 #include "../inc/pkai.h"
 
 #include <stdint.h>
-#include <boost/array.hpp>
+#include <array>
 #include <assert.h>
 
 namespace hashes
@@ -17,11 +17,11 @@ namespace hashes
 };
 
 template<class derived, size_t digestSize = 0>
-class signature
+class Signature
 {
 public:
 
-  void createDigest(boost::array<uint8_t, digestSize>& digest) const
+  void createDigest(std::array<uint8_t, digestSize>& digest) const
   {
     static_cast<const derived*>(this)->createDigest_impl(digest);
   };
@@ -30,7 +30,7 @@ public:
   {
     if (digestSize > 0)
     {
-      boost::array<uint8_t, digestSize> digest;
+      std::array<uint8_t, digestSize> digest;
 
       createDigest(digest);
 
@@ -54,7 +54,7 @@ public:
   };
 
   template<class unknownType, class signatureWidth> 
-  static void pack(const unknownType& _data, boost::array<signatureWidth, digestSize>& signature, size_t& iSignature)
+  static void pack(const unknownType& _data, std::array<signatureWidth, digestSize>& signature, size_t& iSignature)
   {
     // size in bytes of the data we're packing into signature
     size_t size = sizeof(unknownType) / sizeof(signatureWidth);

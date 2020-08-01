@@ -3,7 +3,7 @@
 
 #include "../inc/evaluator.h"
 
-class evaluator_random: public evaluator
+class evaluator_random: public Evaluator
 {
 private:
   static const std::string ident;
@@ -15,7 +15,7 @@ public:
 
   evaluator_random* clone() const { return new evaluator_random(*this); }
 
-  evalResult_t calculateFitness(const environment_volatile& env, size_t iTeam);
+  EvalResult_t calculateFitness(const EnvironmentVolatile& env, size_t iTeam);
 };
 
 #endif /* RANDOM_EVALUATOR_H */

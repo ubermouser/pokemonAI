@@ -43,7 +43,7 @@ public:
   neuron(neuralNet& parent, size_t numWeights);
 };
 
-class neuralNet: public name
+class neuralNet: public Name
 {
 private:
   /* highest level is each row, each row has a column, and 

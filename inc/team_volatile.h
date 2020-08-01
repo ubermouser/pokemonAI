@@ -11,14 +11,14 @@
 #include "../inc/pkai.h"
 
 #include <stdint.h>
-#include <boost/array.hpp>
+#include <array>
 
 #include "../inc/pokemon_volatile.h"
 
-class team_nonvolatile;
-class pokemon_nonvolatile;
+class TeamNonVolatile;
+class PokemonNonVolatile;
 
-struct volatileStatus
+struct VolatileStatus
 {
   // boost array
   union
@@ -73,7 +73,7 @@ struct volatileStatus
   // END OF THIRD WORD
 };
 
-struct nonvolatileStatus
+struct NonVolatileStatus
 {
   // index of the current pokemon
   uint32_t iCPokemon : 3;
@@ -95,13 +95,13 @@ struct nonvolatileStatus
   uint32_t mist : 1;
 };
 
-union PKAISHARED team_volatile
+union PKAISHARED TeamVolatile
 {
   uint64_t raw[8];
   struct
   {
     /* storage for 6 pokemon. Unused pokemon are zeroed */
-    pokemon_volatile teammates[6];
+    PokemonVolatile teammates[6];
 
     union
     {
@@ -111,43 +111,43 @@ union PKAISHARED team_volatile
         union
         {
           uint32_t raw[3];
-          volatileStatus data;
+          VolatileStatus data;
         } cTeammate;
         union
         {
           uint32_t raw;
-          nonvolatileStatus data;
+          NonVolatileStatus data;
         } nonvolatile;
       } data;
     } status;
   } data;
 
-  pokemon_volatile& teammate(size_t iTeammate) 
+  PokemonVolatile& teammate(size_t iTeammate) 
   { 
     return data.teammates[iTeammate]; 
   };
 
-  const pokemon_volatile& teammate(size_t iTeammate) const 
+  const PokemonVolatile& teammate(size_t iTeammate) const 
   { 
     return data.teammates[iTeammate]; 
   };
 
   void resetVolatile();
 
-  volatileStatus& getVolatile() { return data.status.data.cTeammate.data; };
-  const volatileStatus& getVolatile() const { return data.status.data.cTeammate.data; };
+  VolatileStatus& getVolatile() { return data.status.data.cTeammate.data; };
+  const VolatileStatus& getVolatile() const { return data.status.data.cTeammate.data; };
 
-  nonvolatileStatus& getNonVolatile() { return data.status.data.nonvolatile.data; };
-  const nonvolatileStatus& getNonVolatile() const { return data.status.data.nonvolatile.data; };
+  NonVolatileStatus& getNonVolatile() { return data.status.data.nonvolatile.data; };
+  const NonVolatileStatus& getNonVolatile() const { return data.status.data.nonvolatile.data; };
 
   /* Resets all pokemon in this team */
-  void initialize(const team_nonvolatile& nv);
+  void initialize(const TeamNonVolatile& nv);
 
   /* Retrieves a pointer to the current pokemon active on this team */
-  const pokemon_volatile& getPKV() const { return data.teammates[getICPKV()]; };
+  const PokemonVolatile& getPKV() const { return data.teammates[getICPKV()]; };
   
   /* Retrieves a pointer to the current pokemon active on this team */
-  pokemon_volatile& getPKV() { return data.teammates[getICPKV()]; };
+  PokemonVolatile& getPKV() { return data.teammates[getICPKV()]; };
 
   /* gets current index of pokemon volatile on this team */
   size_t getICPKV() const { return data.status.data.nonvolatile.data.iCPokemon; };
@@ -164,8 +164,8 @@ union PKAISHARED team_volatile
 
   bool cModBoost(size_t type, int32_t amt);
 
-  uint32_t cGetFV_boosted(const team_nonvolatile& tNV, size_t type, int32_t tempBoost = 0) const;
-  uint32_t cGetFV_boosted(const pokemon_nonvolatile& tNV, size_t type, int32_t tempBoost = 0) const;
+  uint32_t cGetFV_boosted(const TeamNonVolatile& tNV, size_t type, int32_t tempBoost = 0) const;
+  uint32_t cGetFV_boosted(const PokemonNonVolatile& tNV, size_t type, int32_t tempBoost = 0) const;
 
   fpType cGetAccuracy_boosted(size_t type, int32_t tempBoost = 0) const;
 
@@ -175,21 +175,21 @@ union PKAISHARED team_volatile
   bool cIsAlive() const;
 
   /* increment target's hp by quantity. */
-  void cModHP(const pokemon_nonvolatile& nonvolatile, int32_t quantity);
+  void cModHP(const PokemonNonVolatile& nonvolatile, int32_t quantity);
 
   /* set target's hp to quantity. */
-  void cSetHP(const pokemon_nonvolatile& nonvolatile, uint32_t amt);
+  void cSetHP(const PokemonNonVolatile& nonvolatile, uint32_t amt);
 
   /* set target's hp to % quantity of total */
-  void cSetPercentHP(const pokemon_nonvolatile& nonvolatile, fpType percent);
+  void cSetPercentHP(const PokemonNonVolatile& nonvolatile, fpType percent);
   
   /* increment target's HP by percent of total. */
-  void cModPercentHP(const pokemon_nonvolatile& nonvolatile, fpType percent);
+  void cModPercentHP(const PokemonNonVolatile& nonvolatile, fpType percent);
   
   /* Compares values of selected team. Base values are compared by
     * pointer, volatile values are compared by value */
-  bool operator==(const team_volatile& other) const;
-  bool operator!=(const team_volatile& other) const;
+  bool operator==(const TeamVolatile& other) const;
+  bool operator!=(const TeamVolatile& other) const;
 };
 
 #endif	/* TEAM_VOLATILE_H */

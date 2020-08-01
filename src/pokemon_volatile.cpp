@@ -17,13 +17,13 @@
 
 #include <boost/static_assert.hpp>
 
-BOOST_STATIC_ASSERT(sizeof(pokemon_volatile) == sizeof(uint64_t));
+BOOST_STATIC_ASSERT(sizeof(PokemonVolatile) == sizeof(uint64_t));
 
 
 
 
 
-bool pokemon_volatile::operator ==(const pokemon_volatile& other) const
+bool PokemonVolatile::operator ==(const PokemonVolatile& other) const
 {		
   if (raw != other.raw) { return false; }
   
@@ -34,7 +34,7 @@ bool pokemon_volatile::operator ==(const pokemon_volatile& other) const
 
 
 
-bool pokemon_volatile::operator !=(const pokemon_volatile& other) const
+bool PokemonVolatile::operator !=(const PokemonVolatile& other) const
 {
   return !(*this == other);
 }
@@ -43,7 +43,7 @@ bool pokemon_volatile::operator !=(const pokemon_volatile& other) const
 
 
 
-void pokemon_volatile::initialize(const pokemon_nonvolatile& nonvolatile)
+void PokemonVolatile::initialize(const PokemonNonVolatile& nonvolatile)
 {
   // zero data: (zeroed from context environment_volatile)
   //raw = 0;
@@ -66,7 +66,7 @@ void pokemon_volatile::initialize(const pokemon_nonvolatile& nonvolatile)
 
 
 
-void pokemon_volatile::modHP(const pokemon_nonvolatile& nv, int32_t quantity)
+void PokemonVolatile::modHP(const PokemonNonVolatile& nv, int32_t quantity)
 {
   int32_t _HP = data.HPcurrent + quantity; // an integer type so std::max will accept 0 if _HP is below 0
   
@@ -84,7 +84,7 @@ void pokemon_volatile::modHP(const pokemon_nonvolatile& nv, int32_t quantity)
 
 
 
-void pokemon_volatile::setHP(const pokemon_nonvolatile& nv, uint32_t _HP)
+void PokemonVolatile::setHP(const PokemonNonVolatile& nv, uint32_t _HP)
 {
   
   data.HPcurrent = (uint16_t) std::min((uint32_t)std::max(_HP,0U), nv.getFV_base(FV_HITPOINTS));
@@ -101,7 +101,7 @@ void pokemon_volatile::setHP(const pokemon_nonvolatile& nv, uint32_t _HP)
 
 
 
-void pokemon_volatile::modPercentHP(const pokemon_nonvolatile& nv, fpType percent)
+void PokemonVolatile::modPercentHP(const PokemonNonVolatile& nv, fpType percent)
 {
   int32_t quantity = percent * (fpType)nv.getFV_base(FV_HITPOINTS);
   
@@ -111,7 +111,7 @@ void pokemon_volatile::modPercentHP(const pokemon_nonvolatile& nv, fpType percen
 
 
 
-void pokemon_volatile::setPercentHP(const pokemon_nonvolatile& nv, fpType percent)
+void PokemonVolatile::setPercentHP(const PokemonNonVolatile& nv, fpType percent)
 {
   uint32_t quantity = percent * (fpType)nv.getFV_base(FV_HITPOINTS);
 
@@ -122,7 +122,7 @@ void pokemon_volatile::setPercentHP(const pokemon_nonvolatile& nv, fpType percen
 
 
 
-void pokemon_volatile::setStatusAilment(uint32_t statusCondition)
+void PokemonVolatile::setStatusAilment(uint32_t statusCondition)
 {
   data.status_nonvolatile = statusCondition;
 }
@@ -131,7 +131,7 @@ void pokemon_volatile::setStatusAilment(uint32_t statusCondition)
 
 
 
-void pokemon_volatile::clearStatusAilment()
+void PokemonVolatile::clearStatusAilment()
 {
   data.status_nonvolatile = AIL_NV_NONE;
 }
@@ -140,7 +140,7 @@ void pokemon_volatile::clearStatusAilment()
 
 
 
-bool pokemon_volatile::isAlive() const
+bool PokemonVolatile::isAlive() const
 {
   return (data.HPcurrent>0);
 }
@@ -148,8 +148,8 @@ bool pokemon_volatile::isAlive() const
 
 
 
-static move_volatile standardMove = { 0 };
-const move_volatile& pokemon_volatile::getMV(size_t index) const
+static MoveVolatile standardMove = { 0 };
+const MoveVolatile& PokemonVolatile::getMV(size_t index) const
 {
   switch(index)
   {
@@ -169,7 +169,7 @@ const move_volatile& pokemon_volatile::getMV(size_t index) const
 
 
 
-move_volatile& pokemon_volatile::getMV(size_t index)
+MoveVolatile& PokemonVolatile::getMV(size_t index)
 {
   switch(index)
   {
@@ -190,7 +190,7 @@ move_volatile& pokemon_volatile::getMV(size_t index)
 
 
 
-fpType pokemon_volatile::getPercentHP(const pokemon_nonvolatile& nv) const
+fpType PokemonVolatile::getPercentHP(const PokemonNonVolatile& nv) const
 {
   return ((fpType) data.HPcurrent) / ((fpType)nv.getFV_base(FV_HITPOINTS));
 }
@@ -199,7 +199,7 @@ fpType pokemon_volatile::getPercentHP(const pokemon_nonvolatile& nv) const
 
 
 
-uint32_t pokemon_volatile::getHP() const
+uint32_t PokemonVolatile::getHP() const
 {
   return data.HPcurrent;
 }
@@ -208,7 +208,7 @@ uint32_t pokemon_volatile::getHP() const
 
 
 
-const item& pokemon_volatile::getItem(const pokemon_nonvolatile& nv) const
+const Item& PokemonVolatile::getItem(const PokemonNonVolatile& nv) const
 {
   assert(hasItem(nv));
   return pkdex->getItems()[data.iHeldItem - 1];
@@ -218,7 +218,7 @@ const item& pokemon_volatile::getItem(const pokemon_nonvolatile& nv) const
 
 
 
-void pokemon_volatile::setNoItem(const pokemon_nonvolatile& nv)
+void PokemonVolatile::setNoItem(const PokemonNonVolatile& nv)
 {
   data.iHeldItem = 0; 
 }

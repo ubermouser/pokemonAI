@@ -5,7 +5,7 @@
 
 #include <stdint.h>
 #include <vector>
-#include <boost/array.hpp>
+#include <array>
 #include <ostream>
 
 class league;
@@ -13,8 +13,8 @@ class ranked_team;
 class ranked;
 class trueSkill;
 class trueSkillTeam;
-struct heatResult;
-struct gameResult;
+struct HeatResult;
+struct GameResult;
 
 
 class trueSkillSettings
@@ -148,7 +148,7 @@ public:
   static size_t update(
     trueSkillTeam& team_A,
     trueSkillTeam& team_B,
-    const gameResult& gResult,
+    const GameResult& gResult,
     const trueSkillSettings& settings = trueSkillSettings::defaultSettings);
 
   static void update_ranked(
@@ -197,7 +197,7 @@ public:
   void feather(const trueSkillSettings& settings = trueSkillSettings::defaultSettings);
 
   friend class trueSkillSettings;
-  friend class pkIO;
+  friend class PkIO;
 };
 
 class trueSkillTeam
@@ -207,12 +207,12 @@ public:
   ranked* baseEvaluator;
   trueSkill aggregateSkill;
   std::vector<ranked_team*> subTeams;
-  std::vector< boost::array<size_t, 6> > correspondencies;
+  std::vector< std::array<size_t, 6> > correspondencies;
 
   trueSkillTeam();
   trueSkillTeam(ranked_team& cTeam, ranked& cEvaluator, const trueSkillSettings& settings = trueSkillSettings::defaultSettings);
 
-  void push_back(ranked_team& teammate, boost::array<size_t, 6>& _correspondencies)
+  void push_back(ranked_team& teammate, std::array<size_t, 6>& _correspondencies)
   {
     subTeams.push_back(&teammate);
     correspondencies.push_back(_correspondencies);

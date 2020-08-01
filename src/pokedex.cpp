@@ -19,10 +19,10 @@ using namespace orphan;
 
 int verbose = 0;
 int warning = 0;
-const pokedex* pkdex = NULL;
+const Pokedex* pkdex = NULL;
 
 
-bool pokedex::inputMovelist(const std::vector<std::string>& lines, size_t& iLine)
+bool Pokedex::inputMovelist(const std::vector<std::string>& lines, size_t& iLine)
 {
   static const std::string header = "PKAIZ";
   /*
@@ -78,8 +78,8 @@ bool pokedex::inputMovelist(const std::vector<std::string>& lines, size_t& iLine
   std::vector<std::string> mismatchedPokemon;
   std::vector<std::string> mismatchedMoves;
 
-  std::vector<pokemon_base>::iterator cPokemon = getPokemon().begin();
-  std::vector<move>::iterator cMove = getMoves().begin();
+  std::vector<PokemonBase>::iterator cPokemon = getPokemon().begin();
+  std::vector<Move>::iterator cMove = getMoves().begin();
   
   for (size_t iPair = 0; iPair < lines.size() - 2; ++iPair, ++iLine)
   {
@@ -142,7 +142,7 @@ bool pokedex::inputMovelist(const std::vector<std::string>& lines, size_t& iLine
   // mark orphans with no movesets, sort the movesets of bases which have them:
   for (size_t iPokemon = 0; iPokemon != getPokemon().size(); ++iPokemon)
   {
-    pokemon_base& cBase = getPokemon()[iPokemon];
+    PokemonBase& cBase = getPokemon()[iPokemon];
     if (cBase.movelist.empty()) { cBase.lostChild = true; continue;}
     std::sort(cBase.movelist.begin(), cBase.movelist.end());
   }
@@ -180,7 +180,7 @@ bool pokedex::inputMovelist(const std::vector<std::string>& lines, size_t& iLine
 
 
 
-bool pokedex::inputPokemon(const std::vector<std::string>& lines, size_t& iLine)
+bool Pokedex::inputPokemon(const std::vector<std::string>& lines, size_t& iLine)
 {
   static const std::string header = "PKAIS";
   /*
@@ -233,7 +233,7 @@ bool pokedex::inputPokemon(const std::vector<std::string>& lines, size_t& iLine)
   for (size_t iPokemon = 0; iPokemon < getPokemon().size(); ++iPokemon, ++iLine)
   {
     std::vector<std::string> tokens = tokenize(lines.at(iLine), "\t");
-    class pokemon_base& cPokemon = getPokemon()[iPokemon];
+    class PokemonBase& cPokemon = getPokemon()[iPokemon];
     if (tokens.size() != 12)
     {
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
@@ -286,7 +286,7 @@ bool pokedex::inputPokemon(const std::vector<std::string>& lines, size_t& iLine)
     //first ability choice
     iToken = 10;
     {
-      const ability* cAbility = orphanCheck_ptr(getAbilities(), &mismatchedAbilities, tokens.at(iToken));
+      const Ability* cAbility = orphanCheck_ptr(getAbilities(), &mismatchedAbilities, tokens.at(iToken));
       if (cAbility == NULL) { cPokemon.lostChild = true; } //orphan!
       else { cPokemon.abilities.push_back(cAbility); }
     }
@@ -296,7 +296,7 @@ bool pokedex::inputPokemon(const std::vector<std::string>& lines, size_t& iLine)
     if (tokens.at(iToken).compare("---") != 0)
     {
       //strncpy(currentPokemon->secondaryAbilityName,tokens.at(11),20);
-      const ability* cAbility = orphanCheck_ptr(getAbilities(), &mismatchedAbilities, tokens.at(iToken));
+      const Ability* cAbility = orphanCheck_ptr(getAbilities(), &mismatchedAbilities, tokens.at(iToken));
       if (cAbility == NULL) { cPokemon.lostChild = true; } //orphan!
       else { cPokemon.abilities.push_back(cAbility); }
     }
@@ -341,7 +341,7 @@ bool pokedex::inputPokemon(const std::vector<std::string>& lines, size_t& iLine)
 
 
 
-bool pokedex::inputAbilities(const std::vector<std::string>& lines, size_t& iLine)
+bool Pokedex::inputAbilities(const std::vector<std::string>& lines, size_t& iLine)
 {
   static const std::string header = "PKAIA";
   /*
@@ -391,7 +391,7 @@ bool pokedex::inputAbilities(const std::vector<std::string>& lines, size_t& iLin
   for (size_t iAbility = 0; iAbility < getAbilities().size(); ++iAbility, ++iLine)
   {
     std::vector<std::string> tokens = tokenize(lines.at(iLine), "\t");
-    class ability& cAbility = getAbilities()[iAbility];
+    class Ability& cAbility = getAbilities()[iAbility];
     if (tokens.size() != 2)
     {
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
@@ -428,7 +428,7 @@ bool pokedex::inputAbilities(const std::vector<std::string>& lines, size_t& iLin
 
 
 
-bool pokedex::inputTypes(const std::vector<std::string>& lines, size_t& iLine)
+bool Pokedex::inputTypes(const std::vector<std::string>& lines, size_t& iLine)
 {
   static const std::string header = "PKAIT";
   /*
@@ -478,7 +478,7 @@ bool pokedex::inputTypes(const std::vector<std::string>& lines, size_t& iLine)
   for (size_t iType = 0; iType < getTypes().size(); ++iType, ++iLine)
   {
     std::vector<std::string> tokens = tokenize(lines.at(iLine), "\t");
-    class type& cType = getTypes()[iType];
+    class Type& cType = getTypes()[iType];
     if (tokens.size() != getTypes().size()+1)
     {
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
@@ -511,7 +511,7 @@ bool pokedex::inputTypes(const std::vector<std::string>& lines, size_t& iLine)
 
 
 
-bool pokedex::inputNatures(const std::vector<std::string>& lines, size_t& iLine)
+bool Pokedex::inputNatures(const std::vector<std::string>& lines, size_t& iLine)
 {
   static const std::string header = "PKAIN";
   /*
@@ -561,7 +561,7 @@ bool pokedex::inputNatures(const std::vector<std::string>& lines, size_t& iLine)
   for (size_t iNature = 0; iNature < getNatures().size(); ++iNature, ++iLine)
   {
     std::vector<std::string> tokens = tokenize(lines.at(iLine), "\t");
-    class nature& cNature = getNatures()[iNature];
+    class Nature& cNature = getNatures()[iNature];
     if (tokens.size() != 6)
     {
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
@@ -591,7 +591,7 @@ bool pokedex::inputNatures(const std::vector<std::string>& lines, size_t& iLine)
 
 
 
-bool pokedex::inputItems(const std::vector<std::string>& lines, size_t& iLine)
+bool Pokedex::inputItems(const std::vector<std::string>& lines, size_t& iLine)
 {
   static const std::string header = "PKAII";
   /*
@@ -643,7 +643,7 @@ bool pokedex::inputItems(const std::vector<std::string>& lines, size_t& iLine)
   for (size_t iItem = 0; iItem < getItems().size(); ++iItem, ++iLine)
   {
     std::vector<std::string> tokens = tokenize(lines.at(iLine), "\t");
-    class item& cItem = getItems()[iItem];
+    class Item& cItem = getItems()[iItem];
     if (tokens.size() != 8)
     {
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
@@ -673,10 +673,10 @@ bool pokedex::inputItems(const std::vector<std::string>& lines, size_t& iLine)
     // boosted type:
     iToken = 2;
     if (tokens.at(iToken).compare("---") == 0)
-    { cItem.boostedType = type::no_type; }
+    { cItem.boostedType = Type::no_type; }
     else
     {
-      const type* cType = orphanCheck_ptr(getTypes(), &mismatchedTypes, tokens.at(iToken));
+      const Type* cType = orphanCheck_ptr(getTypes(), &mismatchedTypes, tokens.at(iToken));
       if (cType == NULL) { cItem.lostChild = true; } //orphan!
       cItem.boostedType = cType;
     }
@@ -698,10 +698,10 @@ bool pokedex::inputItems(const std::vector<std::string>& lines, size_t& iLine)
     // natural gift type:
     iToken = 5;
     if (tokens.at(iToken).compare("---") == 0)
-    { cItem.naturalGift_type = type::no_type; }
+    { cItem.naturalGift_type = Type::no_type; }
     else
     {
-      const type* cType = orphanCheck_ptr(getTypes(), &mismatchedTypes, tokens.at(iToken));
+      const Type* cType = orphanCheck_ptr(getTypes(), &mismatchedTypes, tokens.at(iToken));
       if (cType == NULL) { cItem.lostChild = true; } //orphan!
       cItem.naturalGift_type = cType;
     }
@@ -709,10 +709,10 @@ bool pokedex::inputItems(const std::vector<std::string>& lines, size_t& iLine)
     // resisted type:
     iToken = 6;
     if (tokens.at(iToken).compare("---") == 0)
-    { cItem.resistedType = type::no_type; }
+    { cItem.resistedType = Type::no_type; }
     else
     {
-      const type* cType = orphanCheck_ptr(getTypes(), &mismatchedTypes, tokens.at(iToken));
+      const Type* cType = orphanCheck_ptr(getTypes(), &mismatchedTypes, tokens.at(iToken));
       if (cType == NULL) { cItem.lostChild = true; } //orphan!
       cItem.resistedType = cType;
     }
@@ -755,7 +755,7 @@ bool pokedex::inputItems(const std::vector<std::string>& lines, size_t& iLine)
 
 
 
-bool pokedex::inputMoves(const std::vector<std::string>& lines, size_t& iLine)
+bool Pokedex::inputMoves(const std::vector<std::string>& lines, size_t& iLine)
 {
   static const std::string header = "PKAIM";
   /*
@@ -807,7 +807,7 @@ bool pokedex::inputMoves(const std::vector<std::string>& lines, size_t& iLine)
   for (size_t iMove = 0; iMove < getMoves().size(); ++iMove, ++iLine)
   {
     std::vector<std::string> tokens = tokenize(lines.at(iLine), "\t");
-    move& cMove = getMoves()[iMove];
+    Move& cMove = getMoves()[iMove];
     if (tokens.size() != 41)
     {
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
@@ -1095,7 +1095,7 @@ bool pokedex::inputMoves(const std::vector<std::string>& lines, size_t& iLine)
 
 
 
-bool pokedex::inputPlugins(const std::string& input_pluginFolder)
+bool Pokedex::inputPlugins(const std::string& input_pluginFolder)
 {
 #ifndef _DISABLEPLUGINS
   std::vector<std::string> mismatchedItems;
@@ -1158,7 +1158,7 @@ bool pokedex::inputPlugins(const std::string& input_pluginFolder)
 
     // attempt to find function which enumerates scripts within this plugin:
     //regExtension_type registerExtensions = NULL;
-    regExtension_type registerExtensions(cPlugin->get<bool(const pokedex&, std::vector<plugin>&)>("registerExtensions"));
+    regExtension_type registerExtensions(cPlugin->get<bool(const Pokedex&, std::vector<plugin>&)>("registerExtensions"));
     if (!registerExtensions)
     {
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
@@ -1277,7 +1277,7 @@ bool pokedex::inputPlugins(const std::string& input_pluginFolder)
   return true;
 } // endOf inputScript
 
-bool pokedex::registerPlugin(
+bool Pokedex::registerPlugin(
   regExtension_type registerExtensions,
   size_t* _numExtensions,
   size_t* _numOverwritten,
@@ -1307,7 +1307,7 @@ bool pokedex::registerPlugin(
   // load in all functions from this module:
   for (size_t iCPlugin = 0; iCPlugin != collectedPlugins.size(); ++iCPlugin)
   {
-    pluggableInterface* element = NULL;
+    PluggableInterface* element = NULL;
 
     // find which element this plugin refers to
     plugin& cCPlugin = collectedPlugins[iCPlugin];

@@ -5,7 +5,7 @@
 #include "../inc/pluggable_types.h"
 
 #include <vector>
-#include <boost/array.hpp>
+#include <array>
 #include <boost/function.hpp>
 
 class plugin;
@@ -32,17 +32,17 @@ struct plugin_t
   };
 };
 
-class PKAISHARED pluggableInterface
+class PKAISHARED PluggableInterface
 {
 public:
   virtual bool registerPlugin(const plugin& cPlugin, bool setImp = true) = 0;
 };
 
-class PKAISHARED pluggable : public pluggableInterface
+class PKAISHARED Pluggable : public PluggableInterface
 {
 private:
   static plugin_t emptyPlugin;
-  boost::array<plugin_t, PLUGIN_MAXSIZE> plugins;
+  std::array<plugin_t, PLUGIN_MAXSIZE> plugins;
   bool implemented;
 
   bool registerPlugin_void(
@@ -53,18 +53,18 @@ private:
     bool setIsImplemented = true);
 protected:
 public:
-  pluggable()
+  Pluggable()
     : plugins(),
     implemented(false)
   {
-    plugins.assign(emptyPlugin);
+    plugins.fill(emptyPlugin);
   };
 
   bool registerPlugin(const plugin& cPlugin, bool setImp);
 
   void setHasNoPlugins()
   {
-    plugins.assign(emptyPlugin);
+    plugins.fill(emptyPlugin);
     implemented = true;
   };
 
@@ -99,14 +99,14 @@ public:
   };
 };
 
-class PKAISHARED enginePlugins : public pluggableInterface
+class PKAISHARED EnginePlugins : public PluggableInterface
 {
 private:
-  boost::array<std::vector<plugin_t>, PLUGIN_MAXSIZE> plugins;
+  std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE> plugins;
 
 protected:
 public:
-  enginePlugins()
+  EnginePlugins()
     : plugins()
   {
   };

@@ -8,7 +8,7 @@
 
 #include "../inc/trueSkill.h"
 
-class game;
+class Game;
 class trueSkillTeam;
 
 class ranked
@@ -121,7 +121,7 @@ public:
     return !(*this == other);
   };
 
-  size_t update(const game& cGame, const trueSkillTeam& cTeam, size_t iTeam);
+  size_t update(const Game& cGame, const trueSkillTeam& cTeam, size_t iTeam);
 
   virtual void resetRecord()
   {

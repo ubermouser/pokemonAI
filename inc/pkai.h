@@ -9,7 +9,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <vector>
-#include <boost/array.hpp>
+#include <array>
 #include "../src/fixedpoint/fixed_class.h"
 
 // C++ libraries:
@@ -161,7 +161,7 @@ typedef fixedpoint::fixed_point<30> fixType;
 #define TEAM_B 1
 
 // win conditions:
-enum matchState
+enum MatchState
 {
   MATCH_MIDGAME = -1,
   MATCH_TEAM_A_WINS = TEAM_A,
@@ -194,7 +194,7 @@ enum matchState
 #define THREADS_KILL 4 // kill ALL the threads
 
 // game type:
-enum gameType_t
+enum GameType_t
 {
   GT_DIAG_HUVSHU = 0 , // diagnostic-human , human (known) vs human (known)
   GT_DIAG_HUVSHU_UNCERTAIN = 1, // diagnostic-uncertainty , human (known) vs human (unknown)
@@ -225,8 +225,8 @@ extern int warning;
 // 1 - warning
 // 2 - error
 
-class pokedex;
-extern const pokedex* pkdex;
+class Pokedex;
+extern const Pokedex* pkdex;
 
 #if defined(WIN32)
 #pragma warning( disable: 4251 )

@@ -25,7 +25,7 @@
 
 
 
-game::game(size_t _maxPlies, size_t _maxMatches, size_t _gameAccuracy, bool _rollout)
+Game::Game(size_t _maxPlies, size_t _maxMatches, size_t _gameAccuracy, bool _rollout)
   : agents(),
   gameLog(),
   gameResults(),
@@ -38,17 +38,17 @@ game::game(size_t _maxPlies, size_t _maxMatches, size_t _gameAccuracy, bool _rol
   rollout(_rollout),
   allowStateSelection(false),
   isInitialized(false),
-  initialEnvP(environment_possible::create(environment_volatile())),
+  initialEnvP(EnvironmentPossible::create(EnvironmentVolatile())),
   cEnvP()
 {
-  agents.assign(NULL);
+  agents.fill(NULL);
 }
 
 
 
 
 
-void game::cleanUp()
+void Game::cleanUp()
 {
   isInitialized = false;
 
@@ -65,7 +65,7 @@ void game::cleanUp()
 
 
 
-game::~game()
+Game::~Game()
 {
   // order in which elements are deleted is important
   for (size_t iAgent = 0; iAgent < 2; iAgent++)
@@ -78,21 +78,21 @@ game::~game()
   // cu and agents reference the nonvolatile environment cEnvNV
 }
 
-void game::setEnvironment(const environment_nonvolatile& _envNV)
+void Game::setEnvironment(const EnvironmentNonvolatile& _envNV)
 {
   cEnvNV = _envNV;
   cEnvNV.initialize();
   isInitialized = false;
 }
 
-void game::setTeam(size_t iAgent, const team_nonvolatile& cTeam)
+void Game::setTeam(size_t iAgent, const TeamNonVolatile& cTeam)
 {
   assert(iAgent < 2);
   cEnvNV.setTeam(iAgent, cTeam, true);
   isInitialized = false;
 }
 
-void game::setEvaluator(size_t iAgent, const evaluator& cEval)
+void Game::setEvaluator(size_t iAgent, const Evaluator& cEval)
 {
   assert(iAgent < 2);
   if (agents[iAgent] == NULL) 
@@ -106,7 +106,7 @@ void game::setEvaluator(size_t iAgent, const evaluator& cEval)
   isInitialized = false;
 }
 
-void game::setPlanner(size_t iAgent, const planner& cPlanner)
+void Game::setPlanner(size_t iAgent, const Planner& cPlanner)
 {
   assert(iAgent < 2);
   if (agents[iAgent] != NULL) { delete agents[iAgent]; }
@@ -114,27 +114,27 @@ void game::setPlanner(size_t iAgent, const planner& cPlanner)
   isInitialized = false;
 }
 
-const planner* game::getPlanner(size_t iAgent) const
+const Planner* Game::getPlanner(size_t iAgent) const
 {
   assert(iAgent < 2);
   return agents[iAgent];
 }
 
-void game::setInitialState(const environment_volatile& rolloutState)
+void Game::setInitialState(const EnvironmentVolatile& rolloutState)
 {
   if (rollout != true && verbose >= 5) 
   { 
     std::cerr << "WAR " << __FILE__ << "." << __LINE__ << 
       ": An initial rollout state was defined, but rollout mode was not enabled. The state will not be used.\n";
   }
-  initialEnvP = environment_possible::create(rolloutState, true);
+  initialEnvP = EnvironmentPossible::create(rolloutState, true);
 }
 
 
 
 
 
-bool game::initialize()
+bool Game::initialize()
 {
   // teams must be set before initialize is called
   if (cEnvNV.getTeam(TEAM_A).getNumTeammates() == 0 || cEnvNV.getTeam(TEAM_B).getNumTeammates() == 0) 
@@ -167,11 +167,11 @@ bool game::initialize()
       std::cerr << "WAR " << __FILE__ << "." << __LINE__ << 
         ": Rollout mode was enabled, but an initial rollout state was not defined.\n";
     }
-    initialEnvP = environment_possible::create(environment_volatile::create(cEnvNV), true);
+    initialEnvP = EnvironmentPossible::create(EnvironmentVolatile::create(cEnvNV), true);
   }
 
   // initialize pkCU engine
-  if (cu == NULL) { cu = new pkCU(cEnvNV, gameAccuracy); }
+  if (cu == NULL) { cu = new PkCU(cEnvNV, gameAccuracy); }
   else { cu->setEnvironment(cEnvNV); cu->setAccuracy(gameAccuracy); }
 
   // initialize agents:
@@ -195,27 +195,27 @@ bool game::initialize()
 
 
 
-void game::run()
+void Game::run()
 {
   assert(isInitialized);
 
   gameLog.clear();
   gameResults.clear();
-  hResult = heatResult();
+  hResult = HeatResult();
 
   // used to determine if a team wins the bestOf by majority instead of the bestOf running to completion
   bool heatOver = false;
   int32_t matchState;
-  boost::array<unsigned int, 2> numWins;
-  numWins.assign(0);
+  std::array<unsigned int, 2> numWins;
+  numWins.fill(0);
   
   for (size_t iMatch = 0; iMatch != maxMatches; ++iMatch)
   {
     // initialize match metrics:
-    std::vector<turn>* cLog = NULL;
+    std::vector<Turn>* cLog = NULL;
     if (!rollout) 
     {
-      gameLog.push_back(std::vector<turn>());
+      gameLog.push_back(std::vector<Turn>());
       cLog = &gameLog.back(); 
     }
 
@@ -247,7 +247,7 @@ void game::run()
       matchState = cu->isGameOver(cEnvP.getEnv());
 
       // determine which move the teams will use:
-      boost::array<uint32_t, 2> actions;
+      std::array<uint32_t, 2> actions;
       if (matchState == MATCH_MIDGAME)
       {
         for (size_t iTeam = 0; iTeam != 2; ++iTeam)
@@ -272,7 +272,7 @@ void game::run()
         }
 
         // predict what will occur given these actions and their probabilities
-        std::vector<environment_possible> possibleEnvironments;
+        std::vector<EnvironmentPossible> possibleEnvironments;
     
         // determine what will happen and at what probability
         size_t numUnique = cu->updateState(cEnvP.getEnv(), possibleEnvironments, actions[TEAM_A], actions[TEAM_B]);
@@ -292,7 +292,7 @@ void game::run()
         // perform state transition:
         if (iEnvironment != SIZE_MAX) 
         {
-          const environment_possible& switchedEnvironment = possibleEnvironments.at(iEnvironment);
+          const EnvironmentPossible& switchedEnvironment = possibleEnvironments.at(iEnvironment);
 
           // create a log of this turn:
           if (!rollout) { digestTurn(*cLog, actions[TEAM_A], actions[TEAM_B], iLastEnvironment, cEnvP); }
@@ -361,7 +361,7 @@ void game::run()
     } //endOf game loop
 
     // digest the last game state:
-    BOOST_FOREACH(planner* cPlanner, agents)
+    BOOST_FOREACH(Planner* cPlanner, agents)
     {
       cPlanner->clearResults();
     }
@@ -480,7 +480,7 @@ void game::run()
 
 
 
-const environment_volatile& game::stateSelect(const std::vector<environment_possible>& possibleEnvironments)
+const EnvironmentVolatile& Game::stateSelect(const std::vector<EnvironmentPossible>& possibleEnvironments)
 {
   size_t state = stateSelect_index(possibleEnvironments);
   if (state == SIZE_MAX) return cEnvP.getEnv();
@@ -491,7 +491,7 @@ const environment_volatile& game::stateSelect(const std::vector<environment_poss
 
 
 
-size_t game::stateSelect_index(const std::vector<environment_possible>& possibleEnvironments)
+size_t Game::stateSelect_index(const std::vector<EnvironmentPossible>& possibleEnvironments)
 {
   std::string input = "";
   int32_t state;
@@ -545,16 +545,16 @@ size_t game::stateSelect_index(const std::vector<environment_possible>& possible
 class sortByProbability
 {
 public:
-  static fpType getValue (const environment_possible& cEnvP)
+  static fpType getValue (const EnvironmentPossible& cEnvP)
   {
     if (cEnvP.isPruned()) { return std::numeric_limits<fpType>::quiet_NaN(); }
     return cEnvP.getProbability().to_double();
   };
 };
 
-size_t game::stateSelect_Roulette(const std::vector<environment_possible>& possibleEnvironments)
+size_t Game::stateSelect_Roulette(const std::vector<EnvironmentPossible>& possibleEnvironments)
 {
-  size_t result = roulette<environment_possible, sortByProbability>::select(possibleEnvironments, sortByProbability());
+  size_t result = roulette<EnvironmentPossible, sortByProbability>::select(possibleEnvironments, sortByProbability());
 
   assert((result != SIZE_MAX) && "roulette selection did not produce a reachable state!");
 
@@ -565,18 +565,18 @@ size_t game::stateSelect_Roulette(const std::vector<environment_possible>& possi
 
 
 
-void game::digestTurn(
-  std::vector<turn>& cLog, 
+void Game::digestTurn(
+  std::vector<Turn>& cLog, 
   unsigned int actionTeamA, 
   unsigned int actionTeamB, 
   size_t resultingState, 
-  const environment_possible& envP)
+  const EnvironmentPossible& envP)
 {
   // do not create a digest of a dummy move:
   //if (envP.hasFreeMove(TEAM_A) || envP.hasFreeMove(TEAM_B)) { return; }
   
-  cLog.push_back(turn());
-  turn& cTurn = cLog.back();
+  cLog.push_back(Turn());
+  Turn& cTurn = cLog.back();
 
   for (size_t iTeam = 0; iTeam < 2; iTeam++)
   {
@@ -585,13 +585,13 @@ void game::digestTurn(
     fpType initialFitness, finalFitness;
     if (agents[iTeam] != NULL)
     {
-      const std::vector<plannerResult>& results = agents[iTeam]->getDetailedResults();
+      const std::vector<PlannerResult>& results = agents[iTeam]->getDetailedResults();
       // if the agent for this team has been initialized, grab its collected fitnesses:
       if (results.empty()) { initialFitness = simpleFitness; finalFitness = simpleFitness; }
       else
       {
-        const plannerResult& iResult = results.front();
-        const plannerResult& fResult = results.back();
+        const PlannerResult& iResult = results.front();
+        const PlannerResult& fResult = results.back();
 
         initialFitness = (iResult.lbFitness + iResult.ubFitness) / 2.0;
         finalFitness = (fResult.lbFitness + fResult.ubFitness) / 2.0;
@@ -621,40 +621,40 @@ void game::digestTurn(
 
 
 
-void game::digestGame(const std::vector<turn>& cLog, int endStatus)
+void Game::digestGame(const std::vector<Turn>& cLog, int endStatus)
 {
-  gameResults.push_back(gameResult());
-  gameResult& cResult = gameResults.back();
+  gameResults.push_back(GameResult());
+  GameResult& cResult = gameResults.back();
 
   // initialize collected data:
-  boost::array<boost::array<boost::array<uint32_t, 5>, 6>, 2>& moveUse = cResult.moveUse;
-  boost::array<boost::array<uint32_t, 6>, 2>& participation = cResult.participation;
-  boost::array<boost::array<fpType, 6>, 2>& aggregateContribution = cResult.aggregateContribution;
-  boost::array<boost::array<fpType, 6>, 2>& simpleContribution = cResult.simpleContribution;
-  boost::array<boost::array<fpType, 6>, 2>& d0Contribution = cResult.d0Contribution;
-  boost::array<boost::array<fpType, 6>, 2>& dMaxContribution = cResult.dMaxContribution;
-  boost::array<boost::array<uint32_t, 6>, 2>& ranking = cResult.ranking;
+  std::array<std::array<std::array<uint32_t, 5>, 6>, 2>& moveUse = cResult.moveUse;
+  std::array<std::array<uint32_t, 6>, 2>& participation = cResult.participation;
+  std::array<std::array<fpType, 6>, 2>& aggregateContribution = cResult.aggregateContribution;
+  std::array<std::array<fpType, 6>, 2>& simpleContribution = cResult.simpleContribution;
+  std::array<std::array<fpType, 6>, 2>& d0Contribution = cResult.d0Contribution;
+  std::array<std::array<fpType, 6>, 2>& dMaxContribution = cResult.dMaxContribution;
+  std::array<std::array<uint32_t, 6>, 2>& ranking = cResult.ranking;
   for (size_t iTeam = 0; iTeam < 2; ++iTeam)
   {
     for (size_t iTeammate = 0; iTeammate < 6; ++iTeammate)
     {
-      moveUse[iTeam][iTeammate].assign(0);
+      moveUse[iTeam][iTeammate].fill(0);
     }
     
-    participation[iTeam].assign(0);
-    aggregateContribution[iTeam].assign(std::numeric_limits<fpType>::quiet_NaN());
-    simpleContribution[iTeam].assign(0);
-    d0Contribution[iTeam].assign(0);
-    dMaxContribution[iTeam].assign(0);
-    ranking[iTeam].assign(7);
+    participation[iTeam].fill(0);
+    aggregateContribution[iTeam].fill(std::numeric_limits<fpType>::quiet_NaN());
+    simpleContribution[iTeam].fill(0);
+    d0Contribution[iTeam].fill(0);
+    dMaxContribution[iTeam].fill(0);
+    ranking[iTeam].fill(7);
   }
 
   // initialize prevFitnesses
-  boost::array<fpType, 2> prevSimpleFitness;
-  boost::array<fpType, 2> prev0Fitness;
-  boost::array<fpType, 2> prevMaxFitness;
+  std::array<fpType, 2> prevSimpleFitness;
+  std::array<fpType, 2> prev0Fitness;
+  std::array<fpType, 2> prevMaxFitness;
   { // first turn:
-    const turn& fTurn = cLog[0];
+    const Turn& fTurn = cLog[0];
     for (size_t iTeam = 0; iTeam < 2; ++iTeam)
     {
       // set previous values to fitnesses of the first ply:
@@ -665,7 +665,7 @@ void game::digestGame(const std::vector<turn>& cLog, int endStatus)
       // add participation for first moving pokemon: (or lead twice)
       participation[iTeam][fTurn.activePokemon[iTeam]] += 1;
       // add a move increment for the first moving pokemon:
-      if (pkCU::isMoveAction(fTurn.action[iTeam]))
+      if (PkCU::isMoveAction(fTurn.action[iTeam]))
       {
         moveUse[iTeam][fTurn.activePokemon[iTeam]][ fTurn.action[iTeam] - AT_MOVE_0 ] += 1;
       }
@@ -676,9 +676,9 @@ void game::digestGame(const std::vector<turn>& cLog, int endStatus)
   for (size_t iPly = 1; iPly < cLog.size(); ++iPly)
   {
     // the previous turn. The previous turn was responsible for the delta between turn n-1 and n
-    const turn& bTurn = cLog[iPly -1];
+    const Turn& bTurn = cLog[iPly -1];
     // the current turn. Used for updating delta
-    const turn& cTurn = cLog[iPly];
+    const Turn& cTurn = cLog[iPly];
 
     for (size_t iTeam = 0; iTeam < 2; ++iTeam)
     {
@@ -691,7 +691,7 @@ void game::digestGame(const std::vector<turn>& cLog, int endStatus)
       participation[iTeam][cTurn.activePokemon[iTeam]]+= 1;
       
       // add a move increment for the current pokemon's move
-      if (pkCU::isMoveAction(cTurn.action[iTeam]))
+      if (PkCU::isMoveAction(cTurn.action[iTeam]))
       {
         moveUse[iTeam][cTurn.activePokemon[iTeam]][cTurn.action[iTeam] - AT_MOVE_0] += 1;
       }
@@ -729,8 +729,8 @@ void game::digestGame(const std::vector<turn>& cLog, int endStatus)
   // create ranking:
   for (size_t iTeam = 0; iTeam < 2; ++iTeam)
   {
-    boost::array<bool, 6> rankedPokemon;
-    rankedPokemon.assign(false);
+    std::array<bool, 6> rankedPokemon;
+    rankedPokemon.fill(false);
     for (size_t iRank = 0; iRank < cEnvNV.getTeam(iTeam).getNumTeammates(); ++iRank)
     {
       fpType currentBestA = -std::numeric_limits<fpType>::infinity();
@@ -771,26 +771,26 @@ void game::digestGame(const std::vector<turn>& cLog, int endStatus)
 
 
 
-void game::digestMatch(const std::vector<gameResult>& gLog, const boost::array<unsigned int, 2>& numWins, int matchResult)
+void Game::digestMatch(const std::vector<GameResult>& gLog, const std::array<unsigned int, 2>& numWins, int matchResult)
 {
   // initialize heatResult:
-  boost::array<boost::array<fpType, 6>, 2>& participation = hResult.participation;
-  boost::array<boost::array<fpType, 6>, 2>& aggregateContribution = hResult.aggregateContribution;
-  boost::array<boost::array<fpType, 6>, 2> avgRanking;
-  boost::array<boost::array<uint32_t, 6>, 2>& ranking = hResult.ranking;
+  std::array<std::array<fpType, 6>, 2>& participation = hResult.participation;
+  std::array<std::array<fpType, 6>, 2>& aggregateContribution = hResult.aggregateContribution;
+  std::array<std::array<fpType, 6>, 2> avgRanking;
+  std::array<std::array<uint32_t, 6>, 2>& ranking = hResult.ranking;
   for (size_t iTeam = 0; iTeam < 2; ++iTeam)
   {
-    avgRanking[iTeam].assign(0);
-    participation[iTeam].assign(0);
-    aggregateContribution[iTeam].assign(0);
-    ranking[iTeam].assign(7);
+    avgRanking[iTeam].fill(0);
+    participation[iTeam].fill(0);
+    aggregateContribution[iTeam].fill(0);
+    ranking[iTeam].fill(7);
   }
 
   // generate average numPlies:
   hResult.numPlies = 0;
   for (size_t iLog = 0; iLog != gLog.size(); ++iLog)
   {
-    const gameResult& cLog = gLog[iLog];
+    const GameResult& cLog = gLog[iLog];
 
     hResult.numPlies += (fpType) cLog.numPlies;
   }
@@ -806,7 +806,7 @@ void game::digestMatch(const std::vector<gameResult>& gLog, const boost::array<u
     {
       for (size_t iLog = 0; iLog != gLog.size(); ++iLog)
       {
-        const gameResult& cLog = gLog[iLog];
+        const GameResult& cLog = gLog[iLog];
 
         participation[iTeam][iPokemon] += (fpType) ((fpType)cLog.participation[iTeam][iPokemon] / (fpType)cLog.numPlies);
         avgRanking[iTeam][iPokemon] += (fpType)cLog.ranking[iTeam][iPokemon];
@@ -823,8 +823,8 @@ void game::digestMatch(const std::vector<gameResult>& gLog, const boost::array<u
   // create aggregate ranking:
   for (size_t iTeam = 0; iTeam < 2; ++iTeam)
   {
-    boost::array<bool, 6> rankedPokemon;
-    rankedPokemon.assign(false);
+    std::array<bool, 6> rankedPokemon;
+    rankedPokemon.fill(false);
     for (size_t iRank = 0; iRank < cEnvNV.getTeam(iTeam).getNumTeammates(); ++iRank)
     {
       fpType currentBestR = std::numeric_limits<fpType>::infinity();
@@ -866,25 +866,25 @@ void game::digestMatch(const std::vector<gameResult>& gLog, const boost::array<u
 
 
 
-const heatResult& game::getResult() const
+const HeatResult& Game::getResult() const
 {
   assert(rollout || !gameResults.empty());
   return hResult;
 };
 
-const std::vector<gameResult>& game::getGameResults() const
+const std::vector<GameResult>& Game::getGameResults() const
 {
   assert(!gameResults.empty());
   return gameResults;
 };
 
-const std::vector<turn>& game::getGameLog(size_t iGame) const
+const std::vector<Turn>& Game::getGameLog(size_t iGame) const
 {
   assert(!gameLog.empty() && (iGame < gameLog.size()));
   return gameLog[iGame];
 };
 
-const environment_nonvolatile& game::getEnvNV() const
+const EnvironmentNonvolatile& Game::getEnvNV() const
 {
   return cEnvNV;
 };
@@ -893,7 +893,7 @@ const environment_nonvolatile& game::getEnvNV() const
 
 
 
-void game::printStates(const std::vector<environment_possible>& possibleEnvironments, size_t numUnique)
+void Game::printStates(const std::vector<EnvironmentPossible>& possibleEnvironments, size_t numUnique)
 {
   std::cout << numUnique << "(" << possibleEnvironments.size() << ") possible states!\n";
   for (size_t iState = 0; iState < possibleEnvironments.size(); iState++)
@@ -910,7 +910,7 @@ void game::printStates(const std::vector<environment_possible>& possibleEnvironm
 
 
 
-void game::printState(const environment_possible& possible, size_t iState, size_t iPly)
+void Game::printState(const EnvironmentPossible& possible, size_t iState, size_t iPly)
 {
   // print ply index if we have a valid one:
   if (iPly != SIZE_MAX) { std::cout << "ply " << iPly << ", "; }
@@ -979,12 +979,12 @@ void game::printState(const environment_possible& possible, size_t iState, size_
 
 
 
-void game::printTeam(const team_volatile& currentTeam, unsigned int iTeam, unsigned int verbosity)
+void Game::printTeam(const TeamVolatile& currentTeam, unsigned int iTeam, unsigned int verbosity)
 {
-  const team_nonvolatile& cTeam = cEnvNV.getTeam(iTeam);
+  const TeamNonVolatile& cTeam = cEnvNV.getTeam(iTeam);
   for (unsigned int indexPokemon = 0; indexPokemon < cTeam.getNumTeammates(); indexPokemon++)
   {
-    const pokemon_volatile& currentPokemon = currentTeam.teammate(indexPokemon);
+    const PokemonVolatile& currentPokemon = currentTeam.teammate(indexPokemon);
     
     // print out index of pokemon
     if (verbosity >= 1) { std::cout << indexPokemon << "-"; }
@@ -997,9 +997,9 @@ void game::printTeam(const team_volatile& currentTeam, unsigned int iTeam, unsig
 
 
 
-void game::printAction(const team_volatile& currentTeam, unsigned int indexAction, unsigned int iTeam)
+void Game::printAction(const TeamVolatile& currentTeam, unsigned int indexAction, unsigned int iTeam)
 {
-  const team_nonvolatile& cTeam = cEnvNV.getTeam(iTeam);
+  const TeamNonVolatile& cTeam = cEnvNV.getTeam(iTeam);
   if (indexAction >= AT_MOVE_0 && indexAction <= AT_MOVE_3)
   {
     std::clog 
@@ -1056,7 +1056,7 @@ void game::printAction(const team_volatile& currentTeam, unsigned int indexActio
 
 
 
-void game::printGameOutline(const gameResult& gResult, const std::vector<turn>& gLog, const environment_nonvolatile& cEnv)
+void Game::printGameOutline(const GameResult& gResult, const std::vector<Turn>& gLog, const EnvironmentNonvolatile& cEnv)
 {
   std::clog 
     << "--- GAME STATISTICS ---\n "
@@ -1065,7 +1065,7 @@ void game::printGameOutline(const gameResult& gResult, const std::vector<turn>& 
 
   for (size_t iTeam = 0; iTeam < 2; iTeam++)
   {
-    const team_nonvolatile& cTeam = cEnv.getTeam(iTeam);
+    const TeamNonVolatile& cTeam = cEnv.getTeam(iTeam);
     std::clog 
       << "  T" << (iTeam==TEAM_A?"A":"B") <<": " 
       << cTeam.getName() << ":"
@@ -1091,7 +1091,7 @@ void game::printGameOutline(const gameResult& gResult, const std::vector<turn>& 
 
 
 
-void game::printMatchOutline(const environment_nonvolatile& cEnv)
+void Game::printMatchOutline(const EnvironmentNonvolatile& cEnv)
 {
   std::clog 
     << "--- MATCH STATISTICS ---\n "
@@ -1102,7 +1102,7 @@ void game::printMatchOutline(const environment_nonvolatile& cEnv)
 
   for (size_t iTeam = 0; iTeam < 2; iTeam++)
   {
-    const team_nonvolatile& cTeam = cEnv.getTeam(iTeam);
+    const TeamNonVolatile& cTeam = cEnv.getTeam(iTeam);
     std::clog 
       << "  T" << (iTeam==TEAM_A?"A":"B") <<": " 
       << cTeam.getName() << ":"

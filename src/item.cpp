@@ -5,14 +5,14 @@
 
 #include "../inc/type.h"
 
-const item* item::no_item = NULL;
+const Item* Item::no_item = NULL;
 
-item::item() 
-  : name(), 
-  pluggable(),
-  boostedType(type::no_type),
-  naturalGift_type(type::no_type),
-  resistedType(type::no_type),
+Item::Item() 
+  : Name(), 
+  Pluggable(),
+  boostedType(Type::no_type),
+  naturalGift_type(Type::no_type),
+  resistedType(Type::no_type),
   flingPower(0),
   naturalGift_power(0),
   lostChild(true)
@@ -23,9 +23,9 @@ item::item()
 
 
 
-item::item(const item& source) 
-  : name(source), 
-  pluggable(source),
+Item::Item(const Item& source) 
+  : Name(source), 
+  Pluggable(source),
   boostedType(source.boostedType),
   naturalGift_type(source.naturalGift_type),
   resistedType(source.resistedType),

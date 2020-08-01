@@ -19,7 +19,7 @@
 
 
 planner_minimax::planner_minimax(
-    const evaluator& _eval,
+    const Evaluator& _eval,
     size_t _numThreads, 
     size_t _engineAccuracy,
     size_t _maxDepth,
@@ -156,7 +156,7 @@ bool planner_minimax::isInitialized() const
   return true; 
 }
 
-void planner_minimax::setEvaluator(const evaluator& evalType)
+void planner_minimax::setEvaluator(const Evaluator& evalType)
 {
   BOOST_FOREACH(minimax_threadArg& cThread, threadArgs)
   {
@@ -169,13 +169,13 @@ void planner_minimax::setEvaluator(const evaluator& evalType)
   }
 };
 
-const evaluator* planner_minimax::getEvaluator() const
+const Evaluator* planner_minimax::getEvaluator() const
 {
   if (threadArgs.empty()) { return NULL; }
   return &threadArgs.front().getEval();
 }
 
-void planner_minimax::setEnvironment(pkCU& _cu, size_t _agentTeam)
+void planner_minimax::setEnvironment(PkCU& _cu, size_t _agentTeam)
 {
   // set agent
   agentTeam = _agentTeam;
@@ -326,13 +326,13 @@ bool planner_minimax::waitForPost(unsigned int msec)
 
 
 
-uint32_t planner_minimax::generateSolution(const environment_possible& _origin)
+uint32_t planner_minimax::generateSolution(const EnvironmentPossible& _origin)
 {
   // reset result vector:
   plannerResults.clear();
 
   // seed origin to each thread:
-  const environment_possible origin = environment_possible::create(_origin.getEnv(), true);
+  const EnvironmentPossible origin = EnvironmentPossible::create(_origin.getEnv(), true);
   BOOST_FOREACH(minimax_threadArg& cThread, threadArgs)
   {
     cThread.setRoot(origin);
@@ -378,7 +378,7 @@ uint32_t planner_minimax::generateSolution(const environment_possible& _origin)
 
       bestAction = (unsigned) result->getBestAction();
       plannerResults.push_back(
-        plannerResult(
+        PlannerResult(
         iDepth, 
         result->getBestAction(), 
         result->getBestChildAction(), 
@@ -434,7 +434,7 @@ uint32_t planner_minimax::generateSolution(const environment_possible& _origin)
         }
         else
         {
-          const plannerResult& cResult = plannerResults.back();
+          const PlannerResult& cResult = plannerResults.back();
 
           boost::unique_lock<boost::mutex> lock(stdioLock); 
           std::clog << "~~~~T" << (agentTeam==TEAM_A?"A":"B") <<
@@ -583,7 +583,7 @@ ply* planner_minimax::generateSolution_multiThread(const boost::timer& totalTime
 
 
 
-const std::vector<plannerResult>& planner_minimax::getDetailedResults() const
+const std::vector<PlannerResult>& planner_minimax::getDetailedResults() const
 {
   return plannerResults;
 };

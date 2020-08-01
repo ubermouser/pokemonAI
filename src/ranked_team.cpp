@@ -31,7 +31,7 @@ for (size_t iComponentTeam = 0; iComponentTeam != componentTeams.size(); ++iComp
 
 
 
-ranked_team::ranked_team(const team_nonvolatile& cTeam, size_t _generation, const trueSkillSettings& cSettings)
+ranked_team::ranked_team(const TeamNonVolatile& cTeam, size_t _generation, const trueSkillSettings& cSettings)
   : ranked(_generation, cSettings),
   team(cTeam),
   hash(),
@@ -40,12 +40,12 @@ ranked_team::ranked_team(const team_nonvolatile& cTeam, size_t _generation, cons
   numMoves()
 {
   getSkill() = trueSkill(1, cSettings);
-  hash.assign(ranked::defaultHash);
-  numPlies.assign(0);
-  rankPoints.assign(0);
+  hash.fill(ranked::defaultHash);
+  numPlies.fill(0);
+  rankPoints.fill(0);
   for (size_t iTeammate = 0; iTeammate != team.getMaxNumTeammates(); ++iTeammate)
   {
-    numMoves[iTeammate].assign(0);
+    numMoves[iTeammate].fill(0);
   }
 };
 
@@ -300,7 +300,7 @@ void ranked_team::defineNames()
   // set names of created pokemon based on hashes:
   for (size_t iTeammate = 0; iTeammate < numPokemon; ++iTeammate)
   {
-    pokemon_nonvolatile& cPokemon = team.teammate(iTeammate);
+    PokemonNonVolatile& cPokemon = team.teammate(iTeammate);
 
     std::ostringstream tName(std::ostringstream::out);
     tName << "" << iTeammate << numPokemon << "-x" << std::setfill('0') << std::setw(16) << std::hex << getTeammateHash(iTeammate);
@@ -312,10 +312,10 @@ void ranked_team::defineNames()
 
 
 
-size_t ranked_team::update(const game& cGame, const trueSkillTeam& cTeam, size_t iTeam)
+size_t ranked_team::update(const Game& cGame, const trueSkillTeam& cTeam, size_t iTeam)
 {
   size_t numUpdates = 0;
-  const std::vector<gameResult>& gameResults = cGame.getGameResults();
+  const std::vector<GameResult>& gameResults = cGame.getGameResults();
 
   // update ranked vars:
   ranked::update(cGame, cTeam, iTeam);
@@ -325,14 +325,14 @@ size_t ranked_team::update(const game& cGame, const trueSkillTeam& cTeam, size_t
   }
 
   // update ranked_team specific vars:
-  BOOST_FOREACH(const gameResult& cGameResult, gameResults)
+  BOOST_FOREACH(const GameResult& cGameResult, gameResults)
   {
-    const boost::array<boost::array<uint32_t, 5>, 6>& cTeamMoves = cGameResult.moveUse[iTeam];
-    const boost::array<uint32_t, 6>& cTeamRanks = cGameResult.ranking[iTeam];
-    const boost::array<uint32_t, 6>& cTeamPlies = cGameResult.participation[iTeam];
+    const std::array<std::array<uint32_t, 5>, 6>& cTeamMoves = cGameResult.moveUse[iTeam];
+    const std::array<uint32_t, 6>& cTeamRanks = cGameResult.ranking[iTeam];
+    const std::array<uint32_t, 6>& cTeamPlies = cGameResult.participation[iTeam];
     for (size_t iTeammate = 0; iTeammate != team.getNumTeammates(); ++iTeammate)
     {
-      const boost::array<uint32_t, 5>& cTeammateMoves = cTeamMoves[iTeammate];
+      const std::array<uint32_t, 5>& cTeammateMoves = cTeamMoves[iTeammate];
 
       // main team:
       for (size_t iMove = 0, iMoveSize = team.teammate(iTeammate).getNumMoves(); iMove != iMoveSize; ++iMove)
@@ -353,13 +353,13 @@ size_t ranked_team::update(const game& cGame, const trueSkillTeam& cTeam, size_t
     size_t iComponent = 0;
     BOOST_FOREACH(ranked_team* componentTeam, cTeam.subTeams)
     {
-      const boost::array<size_t, 6>& correspondence = cTeam.correspondencies[iComponent];
+      const std::array<size_t, 6>& correspondence = cTeam.correspondencies[iComponent];
 
       for (size_t iOTeammate = 0; iOTeammate != componentTeam->team.getNumTeammates(); ++iOTeammate)
       {
         assert(correspondence[iOTeammate] != SIZE_MAX);
 
-        const boost::array<uint32_t, 5>& cTeammateMoves = cTeamMoves[correspondence[iOTeammate]];
+        const std::array<uint32_t, 5>& cTeammateMoves = cTeamMoves[correspondence[iOTeammate]];
           
         // increment plies:
         componentTeam->numPlies[iOTeammate] += cTeamPlies[correspondence[iOTeammate]];
@@ -389,14 +389,14 @@ size_t ranked_team::update(const game& cGame, const trueSkillTeam& cTeam, size_t
 
 ranked_team ranked_team::selectRandom(
   const trueSkillSettings& settings,
-  const boost::array<std::vector<ranked_team>, 6>& league, 
+  const std::array<std::vector<ranked_team>, 6>& league, 
   size_t numPokemon)
 {
   std::vector<const ranked*> componentTeams;
   std::vector<bool> createdTeams;
   std::vector<fpType> numCTeam;
   ranked_team cRankTeam;
-  team_nonvolatile& cTeam = cRankTeam.team;
+  TeamNonVolatile& cTeam = cRankTeam.team;
   size_t maxGeneration = 0;
 
   if (numPokemon > 1)
@@ -406,7 +406,7 @@ ranked_team ranked_team::selectRandom(
     for (size_t numTries = 0; (numTries != MAXTRIES) && (!isSuccessful); ++numTries)
     {
       // select a random team either via roulette or completely randomly:
-      boost::array<size_t, 2> iRandomTeam = selectRandom_single(cRankTeam, league, std::min(numPokemonLeft, numPokemon - 1));
+      std::array<size_t, 2> iRandomTeam = selectRandom_single(cRankTeam, league, std::min(numPokemonLeft, numPokemon - 1));
 
       // if we were unable to generate a team:
       const ranked_team* targetTeam = (iRandomTeam[0] == SIZE_MAX || iRandomTeam[1] == SIZE_MAX)
@@ -422,7 +422,7 @@ ranked_team ranked_team::selectRandom(
       // add collected pokemon to cRankTeam
       for (size_t iTeammate = 0, iSize = targetTeam->team.getNumTeammates(); iTeammate != iSize; ++iTeammate)
       {
-        const pokemon_nonvolatile& cTeammate = targetTeam->team.teammate(iTeammate);
+        const PokemonNonVolatile& cTeammate = targetTeam->team.teammate(iTeammate);
 
         // determine if pokemon is legal add: (selectRandom_single should guarantee this)
         if (!cTeam.isLegalAdd(cTeammate)) { continue; }
@@ -495,9 +495,9 @@ ranked_team ranked_team::selectRandom(
 
 
 
-boost::array<size_t, 2> ranked_team::selectRandom_single(
+std::array<size_t, 2> ranked_team::selectRandom_single(
   const ranked_team& existing,
-  const boost::array<std::vector<ranked_team>, 6>& league,
+  const std::array<std::vector<ranked_team>, 6>& league,
   size_t numPokemon,
   bool allowLess)
 {
@@ -533,11 +533,11 @@ boost::array<size_t, 2> ranked_team::selectRandom_single(
   if (!isSuccessful)
   {
     // failed result:
-    boost::array<size_t, 2> failedResult = {{ SIZE_MAX, SIZE_MAX }};
+    std::array<size_t, 2> failedResult = {{ SIZE_MAX, SIZE_MAX }};
     return failedResult;
   }
 
-  boost::array<size_t, 2> successfulResult = {{ iLeague, iTeam }};
+  std::array<size_t, 2> successfulResult = {{ iLeague, iTeam }};
   return successfulResult;
 } // endOf selectRandom_single
 
@@ -563,10 +563,10 @@ ranked_team ranked_team::createRandom(
   return cRankteam;
 } //endOf createRandom 
 
-team_nonvolatile ranked_team::createRandom(size_t numPokemon)
+TeamNonVolatile ranked_team::createRandom(size_t numPokemon)
 {
-  assert(numPokemon >= 1 && numPokemon <= team_nonvolatile::getMaxNumTeammates());
-  team_nonvolatile cTeam;
+  assert(numPokemon >= 1 && numPokemon <= TeamNonVolatile::getMaxNumTeammates());
+  TeamNonVolatile cTeam;
 
   for (size_t iTeammate = 0; iTeammate < numPokemon; ++iTeammate)
   {
@@ -582,7 +582,7 @@ team_nonvolatile ranked_team::createRandom(size_t numPokemon)
 
 ranked_team ranked_team::mutate(
   const trueSkillSettings& settings,
-  const boost::array<std::vector<ranked_team>, 6>& league, 
+  const std::array<std::vector<ranked_team>, 6>& league, 
   const ranked_team& parent,
   size_t numMutations)
 {
@@ -607,7 +607,7 @@ ranked_team ranked_team::mutate(
   case 28:
     {
       // select a random team via roulette:
-      boost::array<size_t, 2> iRandomTeam = selectRandom_single(mutatedTeam, league, (numTeammates - 1), true);
+      std::array<size_t, 2> iRandomTeam = selectRandom_single(mutatedTeam, league, (numTeammates - 1), true);
 
       // if we were unable to generate a team:
       const ranked_team targetTeam = (iRandomTeam[0] == SIZE_MAX || iRandomTeam[1] == SIZE_MAX)
@@ -631,7 +631,7 @@ ranked_team ranked_team::mutate(
           iTarget = (iTarget + 1) % numTeammates;
         };
 
-        const pokemon_nonvolatile& swappedTeammate = targetTeam.team.teammate(iOTeammate);
+        const PokemonNonVolatile& swappedTeammate = targetTeam.team.teammate(iOTeammate);
 
         // determine if pokemon is legal add: (selectRandom_single should guarantee this)
         if (!mutatedTeam.team.isLegalAdd(swappedTeammate)) { continue; }
@@ -721,7 +721,7 @@ ranked_team ranked_team::crossover(
   size_t numTeammates = parentA.team.getNumTeammates();
 
   {
-    team_nonvolatile& cTeam = crossedTeam.team;
+    TeamNonVolatile& cTeam = crossedTeam.team;
     // first element of each team to begin crossover loop with:
     size_t iParentA = rand() % numTeammates; 
     size_t iParentB = rand() % numTeammates;
@@ -736,15 +736,15 @@ ranked_team ranked_team::crossover(
       case 0: // fully expressed parent A
         {
           // try adding parentA's pokemon first:
-          const pokemon_nonvolatile& candidate = parentA.team.teammate(iParentA);
+          const PokemonNonVolatile& candidate = parentA.team.teammate(iParentA);
           if (crossedTeam.team.isLegalAdd(candidate)) { cTeam.addPokemon(candidate); numCTeam[0]+= 1.0; break; }
 
           // try adding parentB's pokemon:
-          const pokemon_nonvolatile& backup = parentB.team.teammate(iParentB);
+          const PokemonNonVolatile& backup = parentB.team.teammate(iParentB);
           if (crossedTeam.team.isLegalAdd(backup)) { cTeam.addPokemon(backup); numCTeam[1]+= 1.0; break; }
 
           // try adding a random pokemon: (guaranteed to be a legal add by createRandom_single)
-          pokemon_nonvolatile cTeammate = createRandom_single(crossedTeam.team);
+          PokemonNonVolatile cTeammate = createRandom_single(crossedTeam.team);
           if (!cTeam.isLegalAdd(cTeammate)) { return createRandom(settings, numTeammates, 0); }
           cTeam.addPokemon(cTeammate);
           break;
@@ -752,15 +752,15 @@ ranked_team ranked_team::crossover(
       case 1: // fully expressed parent B
         {
           // try adding parentB's pokemon first:
-          const pokemon_nonvolatile& candidate = parentB.team.teammate(iParentB);
+          const PokemonNonVolatile& candidate = parentB.team.teammate(iParentB);
           if (crossedTeam.team.isLegalAdd(candidate)) { cTeam.addPokemon(candidate); numCTeam[TEAM_B]+= 1.0; break; }
 
           // try adding parentA's pokemon:
-          const pokemon_nonvolatile& backup = parentA.team.teammate(iParentA);
+          const PokemonNonVolatile& backup = parentA.team.teammate(iParentA);
           if (crossedTeam.team.isLegalAdd(backup)) { cTeam.addPokemon(backup); numCTeam[TEAM_A]+= 1.0; break; }
 
           // try adding a random pokemon: (guaranteed to be a legal add by createRandom_single)
-          pokemon_nonvolatile cTeammate = createRandom_single(crossedTeam.team);
+          PokemonNonVolatile cTeammate = createRandom_single(crossedTeam.team);
           if (!cTeam.isLegalAdd(cTeammate)) { return createRandom(settings, numTeammates, 0); }
           cTeam.addPokemon(cTeammate);
           break;
@@ -770,7 +770,7 @@ ranked_team ranked_team::crossover(
       case 3:
         {
           // generate a crossover of parentA and parentB's pokemon:
-          pokemon_nonvolatile candidate = crossover_single(parentA.team.teammate(iParentA), parentB.team.teammate(iParentB));
+          PokemonNonVolatile candidate = crossover_single(parentA.team.teammate(iParentA), parentB.team.teammate(iParentB));
           if (crossedTeam.team.isLegalAdd(candidate)) { cTeam.addPokemon(candidate); break; }
           // try adding a random pokemon: (guaranteed to be a legal add by createRandom_single)
           candidate = createRandom_single(crossedTeam.team);
@@ -818,9 +818,9 @@ ranked_team ranked_team::crossover(
 
 
 
-pokemon_nonvolatile ranked_team::createRandom_single(const team_nonvolatile& cTeam, size_t iReplace)
+PokemonNonVolatile ranked_team::createRandom_single(const TeamNonVolatile& cTeam, size_t iReplace)
 {
-  pokemon_nonvolatile cPokemon;
+  PokemonNonVolatile cPokemon;
 
   // determine species:
   randomSpecies(cTeam, cPokemon, iReplace);
@@ -858,13 +858,13 @@ pokemon_nonvolatile ranked_team::createRandom_single(const team_nonvolatile& cTe
 
 void ranked_team::mutate_single(ranked_team& cRankteam, size_t iTeammate, size_t numMutations)
 {
-  pokemon_nonvolatile& cPokemon = cRankteam.team.teammate(iTeammate);
+  PokemonNonVolatile& cPokemon = cRankteam.team.teammate(iTeammate);
 
   // if it's requested that we perform more than 8 unique mutations, just create a random teammate
   if (numMutations > 8) { cPokemon = cPokemon = createRandom_single(cRankteam.team, iTeammate); return; }
 
-  boost::array<bool, 9> isMutated;
-  isMutated.assign(false);
+  std::array<bool, 9> isMutated;
+  isMutated.fill(false);
   
   for (size_t iMutation = 0; iMutation != numMutations; ++iMutation)
   {
@@ -934,15 +934,15 @@ void ranked_team::mutate_single(ranked_team& cRankteam, size_t iTeammate, size_t
 
 
 
-pokemon_nonvolatile ranked_team::crossover_single(
-  const pokemon_nonvolatile& parentA, 
-  const pokemon_nonvolatile& parentB)
+PokemonNonVolatile ranked_team::crossover_single(
+  const PokemonNonVolatile& parentA, 
+  const PokemonNonVolatile& parentB)
 {
-  const pokemon_nonvolatile& basePokemon = (((rand()%2)==TEAM_A)?parentA:parentB);
-  const pokemon_nonvolatile& otherPokemon = (&basePokemon==&parentA)?parentB:parentA;
+  const PokemonNonVolatile& basePokemon = (((rand()%2)==TEAM_A)?parentA:parentB);
+  const PokemonNonVolatile& otherPokemon = (&basePokemon==&parentA)?parentB:parentA;
 
   // basePokemon maintains species, ability, moveset
-  pokemon_nonvolatile crossedPokemon(basePokemon);
+  PokemonNonVolatile crossedPokemon(basePokemon);
 
   // otherokemon maintains EV, IV, nature, gender, item
   for (size_t iIEV = 0; iIEV != 6; ++iIEV)
@@ -972,7 +972,7 @@ pokemon_nonvolatile ranked_team::crossover_single(
 
 
 
-void ranked_team::randomSpecies(const team_nonvolatile& cTeam, pokemon_nonvolatile& cPokemon, size_t iReplace)
+void ranked_team::randomSpecies(const TeamNonVolatile& cTeam, PokemonNonVolatile& cPokemon, size_t iReplace)
 {
   bool revalidate = cPokemon.pokemonExists();
   bool isSuccessful = false;
@@ -981,7 +981,7 @@ void ranked_team::randomSpecies(const team_nonvolatile& cTeam, pokemon_nonvolati
   for (size_t iNSpecies = 0; iNSpecies != pkdex->getPokemon().size(); ++iNSpecies)
   {
     iSpecies = (iSpecies + 1) % pkdex->getPokemon().size();
-    const pokemon_base& candidateBase = pkdex->getPokemon()[iSpecies];
+    const PokemonBase& candidateBase = pkdex->getPokemon()[iSpecies];
 
     // don't include a species already on the team:
     if ((iReplace == SIZE_MAX) && !cTeam.isLegalAdd(candidateBase)) { continue; }
@@ -1024,7 +1024,7 @@ void ranked_team::randomSpecies(const team_nonvolatile& cTeam, pokemon_nonvolati
     // determine if ability is invalid:
     if (cPokemon.abilityExists())
     {
-      const pokemon_base& cBase = cPokemon.getBase();
+      const PokemonBase& cBase = cPokemon.getBase();
       bool isMatched = std::binary_search(cBase.abilities.begin(), cBase.abilities.end(), &cPokemon.getAbility());
       if (!isMatched)
       {
@@ -1041,9 +1041,9 @@ void ranked_team::randomSpecies(const team_nonvolatile& cTeam, pokemon_nonvolati
 
 
 
-void ranked_team::randomAbility(pokemon_nonvolatile& cPokemon)
+void ranked_team::randomAbility(PokemonNonVolatile& cPokemon)
 {
-  const pokemon_base& cBase = cPokemon.getBase();
+  const PokemonBase& cBase = cPokemon.getBase();
 
   size_t iAbility = rand() % cBase.getNumAbilities();
   for (size_t iNAbility = 0; iNAbility != cBase.getNumAbilities(); ++iNAbility)
@@ -1068,7 +1068,7 @@ void ranked_team::randomAbility(pokemon_nonvolatile& cPokemon)
 
 
 
-void ranked_team::randomNature(pokemon_nonvolatile& cPokemon)
+void ranked_team::randomNature(PokemonNonVolatile& cPokemon)
 {
   size_t iNature = rand() % pkdex->getNatures().size();
   cPokemon.setNature(pkdex->getNatures()[iNature]);
@@ -1078,7 +1078,7 @@ void ranked_team::randomNature(pokemon_nonvolatile& cPokemon)
 
 
 
-void ranked_team::randomItem(pokemon_nonvolatile& cPokemon)
+void ranked_team::randomItem(PokemonNonVolatile& cPokemon)
 {
   size_t iNSize = (pkdex->getItems().size() + 1);
   size_t iItem = (rand() % iNSize) - 1;
@@ -1107,10 +1107,10 @@ void ranked_team::randomItem(pokemon_nonvolatile& cPokemon)
 
 
 
-void ranked_team::randomIV(pokemon_nonvolatile& cPokemon, size_t numIVs)
+void ranked_team::randomIV(PokemonNonVolatile& cPokemon, size_t numIVs)
 {
-  boost::array<bool, 6> isValid;
-  isValid.assign(true);
+  std::array<bool, 6> isValid;
+  isValid.fill(true);
   bool isSuccessful;
   for (size_t _iIV = 0; _iIV != std::max(numIVs, (size_t)6); ++_iIV)
   {
@@ -1174,9 +1174,9 @@ void ranked_team::randomIV(pokemon_nonvolatile& cPokemon, size_t numIVs)
 
 
 
-void ranked_team::randomEV(pokemon_nonvolatile& cPokemon)
+void ranked_team::randomEV(PokemonNonVolatile& cPokemon)
 {
-  boost::array<unsigned int, 6> tempEV;
+  std::array<unsigned int, 6> tempEV;
   uint32_t evAccumulator;
   bool isSuccessful = false;
   for (size_t numTries = 0; (numTries != MAXTRIES) && (!isSuccessful); ++numTries)
@@ -1220,7 +1220,7 @@ void ranked_team::randomEV(pokemon_nonvolatile& cPokemon)
 
 
 
-void ranked_team::randomMove(pokemon_nonvolatile& cPokemon, size_t numMoves)
+void ranked_team::randomMove(PokemonNonVolatile& cPokemon, size_t numMoves)
 {
   const std::vector<size_t>& cMovelist = cPokemon.getBase().movelist;
   std::vector<bool> isValid(cMovelist.size(), true);
@@ -1249,7 +1249,7 @@ void ranked_team::randomMove(pokemon_nonvolatile& cPokemon, size_t numMoves)
     {
       iMove = rand() % cMovelist.size();
 
-      const move& possibleMove = pkdex->getMoves().at(cMovelist.at(iMove));
+      const Move& possibleMove = pkdex->getMoves().at(cMovelist.at(iMove));
 
       // has this move been used before?
       if (!isValid.at(iMove))
@@ -1273,7 +1273,7 @@ void ranked_team::randomMove(pokemon_nonvolatile& cPokemon, size_t numMoves)
 
     isValid.at(iMove) = false;
     validMoves--;
-    move_nonvolatile cMove(pkdex->getMoves().at(cMovelist.at(iMove)));
+    MoveNonVolatile cMove(pkdex->getMoves().at(cMovelist.at(iMove)));
 
     if ((cPokemon.getNumMoves() < numMoves) || (iSlot >= cPokemon.getNumMoves()))
     {
@@ -1292,7 +1292,7 @@ void ranked_team::randomMove(pokemon_nonvolatile& cPokemon, size_t numMoves)
 
 
 
-void ranked_team::randomGender(pokemon_nonvolatile& cPokemon)
+void ranked_team::randomGender(PokemonNonVolatile& cPokemon)
 {
   unsigned int gender = rand() % 3;
   // TODO: allowed genders based on species

@@ -13,7 +13,7 @@ orderHeuristic::orderHeuristic(bool randomize)
     // foreach pokemon we need a path for:
     for (size_t iPath = 0; iPath < paths.size(); iPath++)
     {
-      boost::array<path, AT_ITEM_USE+1>& cPath = paths[iPath];
+      std::array<path, AT_ITEM_USE+1>& cPath = paths[iPath];
 
       // assign each action a randomish value in order:
       
@@ -41,7 +41,7 @@ void orderHeuristic::reset(bool randomize)
   // foreach pokemon we need a path for:
   for (size_t iPath = 0; iPath < paths.size(); iPath++)
   {
-    boost::array<path, AT_ITEM_USE+1>& cPath = paths[iPath];
+    std::array<path, AT_ITEM_USE+1>& cPath = paths[iPath];
 
     // assign each action in order:
     for (size_t iAction = 0; iAction < cPath.size(); iAction++)
@@ -73,8 +73,8 @@ void orderHeuristic::incrementCutoff(uint8_t depth, size_t cPokemon, size_t oPok
   assert(iAction < AT_ITEM_USE + 1);
 
   size_t iPath = getPath(cPokemon, oPokemon);
-  boost::array<path, AT_ITEM_USE+1>& cPath = paths[iPath];
-  boost::array<uint8_t, AT_ITEM_USE+1>& cOrder = orders[iPath];
+  std::array<path, AT_ITEM_USE+1>& cPath = paths[iPath];
+  std::array<uint8_t, AT_ITEM_USE+1>& cOrder = orders[iPath];
 
   path* currentPath = &cPath[iAction];
 
@@ -120,8 +120,8 @@ void orderHeuristic::incrementUse(uint8_t depth, size_t cPokemon, size_t oPokemo
   assert(iAction < AT_ITEM_USE + 1);
 
   size_t iPath = getPath(cPokemon, oPokemon);
-  boost::array<path, AT_ITEM_USE+1>& cPath = paths[iPath];
-  boost::array<uint8_t, AT_ITEM_USE+1>& cOrder = orders[iPath];
+  std::array<path, AT_ITEM_USE+1>& cPath = paths[iPath];
+  std::array<uint8_t, AT_ITEM_USE+1>& cOrder = orders[iPath];
 
   path* currentPath = &cPath[iAction];
 
@@ -160,7 +160,7 @@ void orderHeuristic::incrementUse(uint8_t depth, size_t cPokemon, size_t oPokemo
 
 
 
-void orderHeuristic::seedOrdering(boost::array<uint8_t, AT_ITEM_USE+1>& ordering, size_t cPokemon, size_t oPokemon, int8_t killerMove)
+void orderHeuristic::seedOrdering(std::array<uint8_t, AT_ITEM_USE+1>& ordering, size_t cPokemon, size_t oPokemon, int8_t killerMove)
 {
   assert(cPokemon < 6);
   assert(oPokemon < 6);
@@ -176,7 +176,7 @@ void orderHeuristic::seedOrdering(boost::array<uint8_t, AT_ITEM_USE+1>& ordering
   }
 
   size_t iPath = getPath(cPokemon, oPokemon);
-  boost::array<uint8_t, AT_ITEM_USE+1>& cOrder = orders[iPath];
+  std::array<uint8_t, AT_ITEM_USE+1>& cOrder = orders[iPath];
 
   // lock the value while we seed:
   boost::unique_lock<spinlock> _lock(locks[iPath]);
@@ -212,11 +212,11 @@ void orderHeuristic::sortInitial()
 
 void orderHeuristic::sortInitial_perPath(size_t iPath)
 {
-  boost::array<path, AT_ITEM_USE+1>& cPath = paths[iPath];
-  boost::array<uint8_t, AT_ITEM_USE+1>& cOrder = orders[iPath];
+  std::array<path, AT_ITEM_USE+1>& cPath = paths[iPath];
+  std::array<uint8_t, AT_ITEM_USE+1>& cOrder = orders[iPath];
 
-  boost::array<bool, AT_ITEM_USE+1> isChosen;
-  isChosen.assign(false);
+  std::array<bool, AT_ITEM_USE+1> isChosen;
+  isChosen.fill(false);
 
   // WARNING: O(N^2) algorithm!
 
@@ -246,10 +246,10 @@ void orderHeuristic::sortInitial_perPath(size_t iPath)
 
 
 
-bool orderHeuristic::isValidOrder(boost::array<uint8_t, AT_ITEM_USE+1>& ordering)
+bool orderHeuristic::isValidOrder(std::array<uint8_t, AT_ITEM_USE+1>& ordering)
 {
-  boost::array<bool, AT_ITEM_USE+1> isChosen;
-  isChosen.assign(false);
+  std::array<bool, AT_ITEM_USE+1> isChosen;
+  isChosen.fill(false);
   unsigned int numChosen = 0;
 
   // for each index in the sorted list ordering:

@@ -6,18 +6,18 @@
 #include <queue>
 #include <vector>
 
-class pokemonAI;
-class environment_nonvolatile;
+class PokemonAI;
+class EnvironmentNonvolatile;
 class planner_minimax;
 class ply;
-class pkCU;
-class evaluator;
+class PkCU;
+class Evaluator;
 class transposition_table;
 class orderHeuristic;
 namespace boost { class mutex; };
 
-union environment_volatile;
-union environment_possible;
+union EnvironmentVolatile;
+union EnvironmentPossible;
 
 class plyComparison
 {
@@ -38,10 +38,10 @@ private:
   ply* root;
 
   /* this threads CU engine */
-  pkCU* cu;
+  PkCU* cu;
 
   /* evaluator being used by this thread */
-  evaluator* eval;
+  Evaluator* eval;
 
   minimax_threadArg(); // default constructor should NOT be called
 
@@ -49,26 +49,26 @@ private:
   int evaluateVertex_IDDFS();
 
 public:
-  minimax_threadArg(planner_minimax& _base, const evaluator& eval);
+  minimax_threadArg(planner_minimax& _base, const Evaluator& eval);
   minimax_threadArg(planner_minimax& _base);
   ~minimax_threadArg();
 
   minimax_threadArg(const minimax_threadArg& other);
 
-  const environment_nonvolatile& getNV() const;
+  const EnvironmentNonvolatile& getNV() const;
 
-  pkCU& getCU();
+  PkCU& getCU();
 
   transposition_table& getTTable();
   const transposition_table& getTTable() const;
 
-  evaluator& getEval();
-  const evaluator& getEval() const;
+  Evaluator& getEval();
+  const Evaluator& getEval() const;
 
   size_t getAgentTeam();
   size_t getOtherTeam();
 
-  void setEvaluator(const evaluator& evalType);
+  void setEvaluator(const Evaluator& evalType);
 
   orderHeuristic& getAgentOrder();
   orderHeuristic& getOtherOrder();
@@ -80,9 +80,9 @@ public:
 
   boost::mutex& getStdioLock();
 
-  void setEnvironment(pkCU& _cu, size_t _agentTeam);
+  void setEnvironment(PkCU& _cu, size_t _agentTeam);
 
-  void setRoot(const environment_possible& origin);
+  void setRoot(const EnvironmentPossible& origin);
 
   void cleanUp();
   

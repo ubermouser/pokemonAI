@@ -6,18 +6,18 @@
 #include "../inc/planner.h"
 #include "../inc/experienceNet.h"
 
-class evaluator;
+class Evaluator;
 class experienceNet;
 class evaluator_featureVector;
 
-class planner_directed : public planner
+class planner_directed : public Planner
 {
 private:
   std::string ident;
 
-  std::vector<plannerResult> results;
+  std::vector<PlannerResult> results;
 
-  pkCU* cu;
+  PkCU* cu;
 
   /* evaluator being used by this planner */
   evaluator_featureVector* eval;
@@ -56,18 +56,18 @@ public:
 
   const std::string& getName() const { return ident; };
 
-  void setEvaluator(const evaluator& evalType);
-  const evaluator* getEvaluator() const;
+  void setEvaluator(const Evaluator& evalType);
+  const Evaluator* getEvaluator() const;
 
-  void setEnvironment(pkCU& _cu, size_t _agentTeam);
+  void setEnvironment(PkCU& _cu, size_t _agentTeam);
 
   void setExperience(const experienceNet& _exp);
   const experienceNet& getExperience() const { return exp; };
   void clearExperience() { exp.clear(); };
 
-  uint32_t generateSolution(const environment_possible& origin);
+  uint32_t generateSolution(const EnvironmentPossible& origin);
 
-  const std::vector<plannerResult>& getDetailedResults() const { return results; };
+  const std::vector<PlannerResult>& getDetailedResults() const { return results; };
   void clearResults() { results.clear(); };
 };
 

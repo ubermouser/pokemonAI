@@ -5,15 +5,15 @@
 
 #include "../inc/ranked.h"
 
-class evaluator;
+class Evaluator;
 
 class ranked_evaluator : public ranked
 {
 private:
-  evaluator* eval;
+  Evaluator* eval;
 public:
   ranked_evaluator(
-    const evaluator& _eval,
+    const Evaluator& _eval,
     size_t generation = 0, 
     const trueSkillSettings& settings = trueSkillSettings::defaultSettings);
 
@@ -23,7 +23,7 @@ public:
 
   const std::string& getName() const;
 
-  const evaluator& getEvaluator() const { return *eval; };
+  const Evaluator& getEvaluator() const { return *eval; };
 
   friend std::ostream& operator <<(std::ostream& os, const ranked_evaluator& tR);
 };

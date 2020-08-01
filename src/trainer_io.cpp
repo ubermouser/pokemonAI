@@ -86,7 +86,7 @@ void printLeaderboard(const std::vector<dataType>& data, size_t numToPrint)
   }
 };
 
-void trainer::printNetworkStatistics(size_t numMembers, const networkTrainerResult& cResult) const
+void Trainer::printNetworkStatistics(size_t numMembers, const networkTrainerResult& cResult) const
 {
   size_t numToPrint = std::min(numMembers, networks.size());
   std::clog << "---- DESCRIPTIVE STATISTICS OF NETWORKS ----\n";
@@ -125,7 +125,7 @@ void trainer::printNetworkStatistics(size_t numMembers, const networkTrainerResu
   std::clog.flush();
 };
 
-void trainer::printLeagueStatistics(size_t iLeague, size_t numMembers, const teamTrainerResult& cResult) const
+void Trainer::printLeagueStatistics(size_t iLeague, size_t numMembers, const teamTrainerResult& cResult) const
 {
   const std::vector<ranked_team>& cLeague = leagues[iLeague];
 
@@ -175,15 +175,15 @@ void trainer::printLeagueStatistics(size_t iLeague, size_t numMembers, const tea
 template<class dataType, class result_t>
 void calculateRankedDescriptiveStatistics(const std::vector<dataType>& data, result_t& cR)
 {
-  boost::array< std::vector<fpType> , 7> aggData;
+  std::array< std::vector<fpType> , 7> aggData;
   // averages:
-  cR.averages.assign(0.0);
+  cR.averages.fill(0.0);
   // stdDevs:
-  cR.stdDevs.assign(0.0);
+  cR.stdDevs.fill(0.0);
   // minimums:
-  cR.mins.assign(std::numeric_limits<fpType>::infinity());
+  cR.mins.fill(std::numeric_limits<fpType>::infinity());
   // maximums:
-  cR.maxes.assign(-std::numeric_limits<fpType>::infinity());
+  cR.maxes.fill(-std::numeric_limits<fpType>::infinity());
 
   // reserve space for descriptives:
   BOOST_FOREACH(std::vector<fpType>& cAggData, aggData)
@@ -257,12 +257,12 @@ void calculateRankedDescriptiveStatistics(const std::vector<dataType>& data, res
   }
 }
 
-void trainer::calculateDescriptiveStatistics(networkTrainerResult& cR) const
+void Trainer::calculateDescriptiveStatistics(networkTrainerResult& cR) const
 {
   // calculate ranked vars:
   calculateRankedDescriptiveStatistics(networks, cR);
   // initialize:
-  cR.meanSquaredError.assign(0.0);
+  cR.meanSquaredError.fill(0.0);
   cR.meanSquaredError[2] = std::numeric_limits<fpType>::infinity();
   cR.meanSquaredError[3] = -std::numeric_limits<fpType>::infinity();
   // calculate mean squared errors:
@@ -278,7 +278,7 @@ void trainer::calculateDescriptiveStatistics(networkTrainerResult& cR) const
 
   if (aggData.empty())
   {
-    cR.meanSquaredError.assign(0.0);
+    cR.meanSquaredError.fill(0.0);
     return;
   }
 
@@ -308,7 +308,7 @@ void trainer::calculateDescriptiveStatistics(networkTrainerResult& cR) const
   assert(!boost::math::isnan(cR.meanSquaredError[0]) || !boost::math::isnan(cR.meanSquaredError[1]));
 }
 
-void trainer::calculateDescriptiveStatistics(size_t iLeague, teamTrainerResult& cR) const
+void Trainer::calculateDescriptiveStatistics(size_t iLeague, teamTrainerResult& cR) const
 {
   // initialize:
   const std::vector<ranked_team>& cLeague = leagues[iLeague];
@@ -333,12 +333,12 @@ void trainer::calculateDescriptiveStatistics(size_t iLeague, teamTrainerResult& 
   size_t iTeam = 0;
   BOOST_FOREACH(const ranked_team& cRTeam, cLeague)
   {
-    const team_nonvolatile& cTeam = cRTeam.team;
+    const TeamNonVolatile& cTeam = cRTeam.team;
 
     // foreach pokemon:
     for (size_t iTeammate = 0; iTeammate != cTeam.getNumTeammates(); ++iTeammate)
     {
-      const pokemon_nonvolatile& cTeammate = cTeam.teammate(iTeammate);
+      const PokemonNonVolatile& cTeammate = cTeam.teammate(iTeammate);
 
       // pokemon counts:
       if (cTeammate.pokemonExists())
@@ -390,7 +390,7 @@ void trainer::calculateDescriptiveStatistics(size_t iLeague, teamTrainerResult& 
 
       // type counts:
       {
-        if (&cTeammate.getBase().getType(0) != type::no_type)
+        if (&cTeammate.getBase().getType(0) != Type::no_type)
         {
           // type 1:
           size_t iCType = &cTeammate.getBase().getType(0) - &pkdex->getTypes().front();
@@ -401,7 +401,7 @@ void trainer::calculateDescriptiveStatistics(size_t iLeague, teamTrainerResult& 
             cR.highestTypeCount = typeCounts[iCType]; 
           }
         }
-        if (&cTeammate.getBase().getType(1) != type::no_type)
+        if (&cTeammate.getBase().getType(1) != Type::no_type)
         {
           // type 2:
           size_t iCType = &cTeammate.getBase().getType(1) - &pkdex->getTypes().front();
@@ -417,7 +417,7 @@ void trainer::calculateDescriptiveStatistics(size_t iLeague, teamTrainerResult& 
       // foreach move:
       for (size_t iMove = 0; iMove != cTeammate.getNumMoves(); ++iMove)
       {
-        const move& cMove = cTeammate.getMove_base(iMove + AT_MOVE_0);
+        const Move& cMove = cTeammate.getMove_base(iMove + AT_MOVE_0);
         size_t iCMove = &cMove - &pkdex->getMoves().front();
 
         // move counts:
@@ -518,7 +518,7 @@ void saveElements(
   } // endOf foreach team
 }
 
-bool trainer::saveTeamPopulation()
+bool Trainer::saveTeamPopulation()
 {
   // assure path exists:
   boost::filesystem::path pPath(teamPath);
@@ -655,7 +655,7 @@ bool trainer::saveTeamPopulation()
   return true;
 } // endOf savePopulation
 
-bool trainer::loadTeamPopulation()
+bool Trainer::loadTeamPopulation()
 {
   // assure path exists:
   boost::filesystem::path pPath(teamPath);
@@ -709,8 +709,8 @@ bool trainer::loadTeamPopulation()
     numTotalTeams++;
 
     // read file from disk
-    ranked_team cTeam(team_nonvolatile(), 0, tSettings);
-    isSuccessful = pkIO::inputRankedTeam(cTeamFile->path(), cTeam);
+    ranked_team cTeam(TeamNonVolatile(), 0, tSettings);
+    isSuccessful = PkIO::inputRankedTeam(cTeamFile->path(), cTeam);
 
     if (!isSuccessful)
     {
@@ -766,7 +766,7 @@ bool trainer::loadTeamPopulation()
 
 
 
-bool trainer::saveNetworkPopulation()
+bool Trainer::saveNetworkPopulation()
 {
   // assure path exists:
   boost::filesystem::path pPath(networkPath);
@@ -891,7 +891,7 @@ bool trainer::saveNetworkPopulation()
   return true;
 } // endOf savePopulation
 
-bool trainer::loadNetworkPopulation()
+bool Trainer::loadNetworkPopulation()
 {
   // assure path exists:
   boost::filesystem::path pPath(networkPath);
@@ -946,7 +946,7 @@ bool trainer::loadNetworkPopulation()
 
     // read file from disk
     ranked_neuralNet cNetwork(neuralNet(), 0, netSettings, expSettings, tSettings);
-    isSuccessful = pkIO::inputRankedNetwork(cNetworkFile->path(), cNetwork);
+    isSuccessful = PkIO::inputRankedNetwork(cNetworkFile->path(), cNetwork);
 
     if (!isSuccessful)
     {

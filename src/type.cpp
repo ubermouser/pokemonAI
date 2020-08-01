@@ -7,11 +7,11 @@
 #include "../inc/pokedex.h"
 //#undef PKAI_STATIC
 
-const type* type::no_type = NULL;
+const Type* Type::no_type = NULL;
 
 
 
-type::type() 
+Type::Type() 
   : modTable()
 {
 }
@@ -20,7 +20,7 @@ type::type()
 
 
 
-type::type(const type& source) 
+Type::Type(const Type& source) 
   : modTable(source.modTable)
 {
 }
@@ -29,7 +29,7 @@ type::type(const type& source)
 
 
 
-fpType type::getModifier(const type& other) const
+fpType Type::getModifier(const Type& other) const
 {
   size_t iOType = &other - &pkdex->getTypes().front();
 

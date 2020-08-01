@@ -22,7 +22,7 @@ ply* ply::dummyRoot = NULL;
 
 
 ply::ply(
-  const environment_possible& possibleEnvironment, 
+  const EnvironmentPossible& possibleEnvironment, 
   minimax_threadArg& _planner, 
   ply& _randomMove, 
   agentMove& _agentMove, 
@@ -79,7 +79,7 @@ ply::ply(
 } // endOf ply constructor
 
 ply::ply (
-  const environment_possible& rootEnvironment, 
+  const EnvironmentPossible& rootEnvironment, 
   minimax_threadArg& _planner,
   fpType _alphaBound,
   fpType _betaBound)

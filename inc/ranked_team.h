@@ -4,7 +4,7 @@
 #include "../inc/pkai.h"
 
 #include <stdint.h>
-#include <boost/array.hpp>
+#include <array>
 #include <vector>
 
 #include "ranked.h"
@@ -13,39 +13,39 @@
 
 #include "../inc/team_nonvolatile.h"
 
-class pokedex;
-class game;
+class Pokedex;
+class Game;
 
 
 class ranked_team : public ranked
 {
 public:
   /* team that this ranked_team represents */
-  team_nonvolatile team;
+  TeamNonVolatile team;
 
 private:
   /* hashes of team_nonvolatile object and the pokemon in the array */
-  boost::array<uint64_t, 7> hash;
+  std::array<uint64_t, 7> hash;
 
   /* sum of the each pokemon's rank from game results */
-  boost::array<uint32_t, 6> rankPoints;
+  std::array<uint32_t, 6> rankPoints;
 
   /* number of plies a given pokemon has been active in */
-  boost::array<uint32_t, 6> numPlies;
+  std::array<uint32_t, 6> numPlies;
   
   /* number of times a given move has been used */
-  boost::array< boost::array<uint32_t, 5>, 6> numMoves;
+  std::array< std::array<uint32_t, 5>, 6> numMoves;
 
   void resetRecord()
   {
     ranked::resetRecord();
     
-    rankPoints.assign(0);
-    numPlies.assign(0);
+    rankPoints.fill(0);
+    numPlies.fill(0);
     
     for (size_t iTeammate = 0; iTeammate != team.getMaxNumTeammates(); ++iTeammate)
     {
-      numMoves[iTeammate].assign(0);
+      numMoves[iTeammate].fill(0);
     }
   };
 
@@ -53,7 +53,7 @@ public:
   static const std::string header;
 
   ~ranked_team() { };
-  ranked_team(const team_nonvolatile& cTeam = team_nonvolatile(), size_t generation = 0, const trueSkillSettings& settings = trueSkillSettings::defaultSettings);
+  ranked_team(const TeamNonVolatile& cTeam = TeamNonVolatile(), size_t generation = 0, const trueSkillSettings& settings = trueSkillSettings::defaultSettings);
   ranked_team(const ranked_team& other);
 
   /* define the names of the team and its pokemon given the hash */
@@ -115,37 +115,37 @@ public:
 
 private:
 
-  static pokemon_nonvolatile createRandom_single(const team_nonvolatile& cTeam, size_t iReplace = SIZE_MAX);
+  static PokemonNonVolatile createRandom_single(const TeamNonVolatile& cTeam, size_t iReplace = SIZE_MAX);
 
   /* randomize a pokemon's species */
-  static void randomSpecies(const team_nonvolatile& cTeam, pokemon_nonvolatile& cPokemon, size_t iReplace = SIZE_MAX);
+  static void randomSpecies(const TeamNonVolatile& cTeam, PokemonNonVolatile& cPokemon, size_t iReplace = SIZE_MAX);
 
-  static void randomAbility(pokemon_nonvolatile& cPokemon);
+  static void randomAbility(PokemonNonVolatile& cPokemon);
 
-  static void randomNature(pokemon_nonvolatile& cPokemon);
+  static void randomNature(PokemonNonVolatile& cPokemon);
 
-  static void randomItem(pokemon_nonvolatile& cPokemon);
+  static void randomItem(PokemonNonVolatile& cPokemon);
 
   /* randomize a number of the pokemon's IVs */
-  static void randomIV(pokemon_nonvolatile& cPokemon, size_t numIVs = 1);
+  static void randomIV(PokemonNonVolatile& cPokemon, size_t numIVs = 1);
 
-  static void randomEV(pokemon_nonvolatile& cPokemon);
+  static void randomEV(PokemonNonVolatile& cPokemon);
 
-  static void randomGender(pokemon_nonvolatile& cPokemon);
+  static void randomGender(PokemonNonVolatile& cPokemon);
 
   /* randomize a number of the pokemon's moves */
-  static void randomMove(pokemon_nonvolatile& cPokemon, size_t numMoves = 1);
+  static void randomMove(PokemonNonVolatile& cPokemon, size_t numMoves = 1);
 
   static void mutate_single(ranked_team& cRankteam, size_t iTeammate, size_t numMutations);
 
-  static pokemon_nonvolatile crossover_single(
-    const pokemon_nonvolatile& parentA, 
-    const pokemon_nonvolatile& parentB);
+  static PokemonNonVolatile crossover_single(
+    const PokemonNonVolatile& parentA, 
+    const PokemonNonVolatile& parentB);
 
   /* select a new team based on roulette selection; the team selected will consist of at or less than numPokemon teammates */
-  static boost::array<size_t, 2> selectRandom_single(
+  static std::array<size_t, 2> selectRandom_single(
     const ranked_team& existing,
-    const boost::array<std::vector<ranked_team>, 6>& league, 
+    const std::array<std::vector<ranked_team>, 6>& league, 
     size_t numPokemon,
     bool allowLess = true);
 
@@ -157,10 +157,10 @@ public:
     size_t numPokemon, 
     size_t _generation);
 
-  static team_nonvolatile createRandom(size_t numPokemon);
+  static TeamNonVolatile createRandom(size_t numPokemon);
 
   /* update two team rankings */
-  size_t update(const game& cGame, const trueSkillTeam& cTeam, size_t iTeam);
+  size_t update(const Game& cGame, const trueSkillTeam& cTeam, size_t iTeam);
 
   /* generate a child through sexual reproduction of two ranked_team objects with the same number of teammates */
   static ranked_team crossover(
@@ -171,18 +171,18 @@ public:
   /* generate a child through asexual reproduction of two ranked objects */
   static ranked_team mutate(
     const trueSkillSettings& settings,
-    const boost::array<std::vector<ranked_team>, 6>& league, 
+    const std::array<std::vector<ranked_team>, 6>& league, 
     const ranked_team& parent, 
     size_t numMutations = 1);
 
   /* generate a new team based on roulette selection from smaller leagues */
   static ranked_team selectRandom(
     const trueSkillSettings& settings,
-    const boost::array<std::vector<ranked_team>, 6>& league, 
+    const std::array<std::vector<ranked_team>, 6>& league, 
     size_t numPokemon);
 
-  friend class pokemonAI;
-  friend class pkIO;
+  friend class PokemonAI;
+  friend class PkIO;
   friend std::ostream& operator <<(std::ostream& os, const ranked_team& tR);
 };
 

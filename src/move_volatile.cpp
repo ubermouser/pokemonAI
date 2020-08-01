@@ -10,13 +10,13 @@
 
 #include <boost/static_assert.hpp>
 
-BOOST_STATIC_ASSERT(sizeof(move_volatile) == sizeof(uint8_t));
+BOOST_STATIC_ASSERT(sizeof(MoveVolatile) == sizeof(uint8_t));
 
 
 
 
 
-bool move_volatile::operator ==(const move_volatile& other) const
+bool MoveVolatile::operator ==(const MoveVolatile& other) const
 {
   if (raw != other.raw) { return false; }
   
@@ -27,7 +27,7 @@ bool move_volatile::operator ==(const move_volatile& other) const
 
 
 
-bool move_volatile::operator !=(const move_volatile& other) const
+bool MoveVolatile::operator !=(const MoveVolatile& other) const
 {
   return !(*this == other);
 }
@@ -36,7 +36,7 @@ bool move_volatile::operator !=(const move_volatile& other) const
 
 
 
-void move_volatile::initialize(const move_nonvolatile& cMove)
+void MoveVolatile::initialize(const MoveNonVolatile& cMove)
 {
   // set PP:
   data.PPcurrent = cMove.getPPMax();
@@ -49,7 +49,7 @@ void move_volatile::initialize(const move_nonvolatile& cMove)
 
 
 
-bool move_volatile::modPP(const move_nonvolatile& cMove, int32_t value)
+bool MoveVolatile::modPP(const MoveNonVolatile& cMove, int32_t value)
 {
   int32_t _PPcurrent = data.PPcurrent + value;
   
@@ -62,7 +62,7 @@ bool move_volatile::modPP(const move_nonvolatile& cMove, int32_t value)
 
 
 
-bool move_volatile::hasPP() const
+bool MoveVolatile::hasPP() const
 {
   // is move out of PP?
   return data.PPcurrent > 0;

@@ -8,24 +8,24 @@
 #include <map>
 
 //#include <boost/ptr_container/ptr_map.hpp>
-#include <boost/array.hpp>
+#include <array>
 
 #include "../inc/evaluator.h"
 #include "../inc/neuralNet.h"
 
-union environment_volatile;
+union EnvironmentVolatile;
 class evaluator_featureVector;
 class featureVector;
 class neuralNet;
 typedef std::map<size_t, evaluator_featureVector*> evaluatorMap_t;
 //typedef boost::ptr_map<size_t, evaluator_featureVector> evaluatorMap_t;
-typedef boost::array< boost::array< boost::array< boost::array<uint8_t, 4> , 6> , 6>, 2> bestMoveOrders_t;
-typedef boost::array< boost::array< boost::array< boost::array<float, 4> , 6> , 6>, 2> bestMoveDamages_t;
-typedef boost::array< boost::array< boost::array< uint8_t, 6> , 6> , 2> orders_t;
+typedef std::array< std::array< std::array< std::array<uint8_t, 4> , 6> , 6>, 2> bestMoveOrders_t;
+typedef std::array< std::array< std::array< std::array<float, 4> , 6> , 6>, 2> bestMoveDamages_t;
+typedef std::array< std::array< std::array< uint8_t, 6> , 6> , 2> orders_t;
 
 namespace featureVector_impl
 {
-  void generateBestMoves(const environment_nonvolatile& envNV, bestMoveOrders_t& iBestMoves, bestMoveDamages_t& dBestMoves);
+  void generateBestMoves(const EnvironmentNonvolatile& envNV, bestMoveOrders_t& iBestMoves, bestMoveDamages_t& dBestMoves);
   void generateOrders(const bestMoveDamages_t& dBestMoves, orders_t& orders);
 };
 
@@ -35,22 +35,22 @@ public:
   /* delete evaluator */
   virtual ~featureVector() { };
 
-  void seed(neuralNet& cNet, const environment_volatile& env, size_t iTeam) const
+  void seed(neuralNet& cNet, const EnvironmentVolatile& env, size_t iTeam) const
   {
     assert(cNet.numInputs() >= inputSize());
     seed(cNet.inputBegin(), env, iTeam);
   };
   
   /* output feature vector defined by env starting at cInput */
-  virtual void seed(float* cInput, const environment_volatile& env, size_t iTeam) const = 0;
+  virtual void seed(float* cInput, const EnvironmentVolatile& env, size_t iTeam) const = 0;
 
-  void seed(floatIterator_t cInput, const environment_volatile& env, size_t iTeam) const
+  void seed(floatIterator_t cInput, const EnvironmentVolatile& env, size_t iTeam) const
   {
     seed(&*cInput, env, iTeam);
   };
 
   /*template< size_t bufferSize >
-  void seed(boost::array< float, bufferSize >::iterator cInput, const environment_volatile& env, size_t iTeam) const
+  void seed(std::array< float, bufferSize >::iterator cInput, const environment_volatile& env, size_t iTeam) const
   {
     assert(bufferSize >= size());
     seed(&*cInput, env, iTeam);
@@ -94,7 +94,7 @@ public:
   };
 };
 
-class evaluator_featureVector : public evaluator, public featureVector
+class evaluator_featureVector : public Evaluator, public featureVector
 {
 private:
   static evaluatorMap_t evaluators;

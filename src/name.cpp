@@ -3,7 +3,7 @@
 
 #include <algorithm>
 
-name::name()
+Name::Name()
 : _name()
 {
 }
@@ -12,7 +12,7 @@ name::name()
 
 
 
-name::name(const std::string& source)
+Name::Name(const std::string& source)
   : _name(source)
 {
 }
@@ -21,7 +21,7 @@ name::name(const std::string& source)
 
 
 
-name::name(const name& source)
+Name::Name(const Name& source)
   : _name(source._name)
 {
 }
@@ -30,7 +30,7 @@ name::name(const name& source)
 
 
 
-name& name::operator=(const name& source)
+Name& Name::operator=(const Name& source)
 {
   // identity theorem - simply return what we have now if equal address
   if (this == &source) { return *this; }
@@ -44,7 +44,7 @@ name& name::operator=(const name& source)
 
 
 
-bool name::operator <(const name& other) const
+bool Name::operator <(const Name& other) const
 {
   std::string cName(_name);
   std::string oName(other._name);
@@ -59,7 +59,7 @@ bool name::operator <(const name& other) const
 
 
 
-bool name::operator >(const name& other) const
+bool Name::operator >(const Name& other) const
 {
   std::string cName(_name);
   std::string oName(other._name);

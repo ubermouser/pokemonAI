@@ -12,7 +12,7 @@
 
 #include <stdint.h>
 #include <ostream>
-#include <boost/array.hpp>
+#include <array>
 #include <vector>
 
 #include "../inc/signature.h"
@@ -22,35 +22,35 @@
 
 #define STAGE0 6
 
-class pokedex;
-class item;
-class ability;
-class nature;
+class Pokedex;
+class Item;
+class Ability;
+class Nature;
 class pokemon_print;
-class pokemon_base;
+class PokemonBase;
 
-union team_volatile;
-union pokemon_volatile;
+union TeamVolatile;
+union PokemonVolatile;
 
 #define POKEMON_NONVOLATILE_DIGESTSIZE (MOVE_NONVOLATILE_DIGESTSIZE*4 + 94)
 
 /* contains metrics that the user can modify, but are not modified in combat */
-class PKAISHARED pokemon_nonvolatile : public name, public signature<pokemon_nonvolatile, POKEMON_NONVOLATILE_DIGESTSIZE>
+class PKAISHARED PokemonNonVolatile : public Name, public Signature<PokemonNonVolatile, POKEMON_NONVOLATILE_DIGESTSIZE>
 {
 
 private:
 
   /* The pokemon in which this volatile set is based off of*/
-  const pokemon_base* base; 
+  const PokemonBase* base; 
   
   /* Pointer to the ability that the pokemon has currently */
-  const ability* chosenAbility; 
+  const Ability* chosenAbility; 
   
   /* Pointer to the nature that the pokemon has */
-  const nature* chosenNature;
+  const Nature* chosenNature;
 
   /* pointers to actions the pokemon may perform in combat */
-  boost::array<move_nonvolatile, 4> actions;
+  std::array<MoveNonVolatile, 4> actions;
 
   uint8_t numMoves;
 
@@ -69,10 +69,10 @@ private:
   uint8_t sex;
   
   /* Pokemon's individual values (never referenced in combat) */
-  boost::array<uint8_t, 6> IV;
+  std::array<uint8_t, 6> IV;
   
   /* Pokemon's effort values (never referenced in combat) */
-  boost::array<uint8_t, 6> EV;
+  std::array<uint8_t, 6> EV;
   
   /*
    * pokemon's final values, or values used for computation.
@@ -85,9 +85,9 @@ private:
    * CRIT = .0625 * ACCURACY_EVASION_INTEGER
    * Formula: http://www.smogon.com/dp/articles/stats
    */
-  boost::array< boost::array<uint16_t, 13>, 6> FV_base;
+  std::array< std::array<uint16_t, 13>, 6> FV_base;
 
-  static boost::array< boost::array<fpType, 13>, 3> aFV_base;
+  static std::array< std::array<fpType, 13>, 3> aFV_base;
 
   /*
    * update the final value of a given pokemon_base, a value referenced in combat
@@ -112,16 +112,16 @@ private:
 public:
 
   //friend class pkIO;
-  friend union pokemon_volatile;
-  friend union team_volatile;
+  friend union PokemonVolatile;
+  friend union TeamVolatile;
   friend PKAISHARED std::ostream& operator <<(std::ostream& os, const pokemon_print& combinedPokemon);
-  friend PKAISHARED std::ostream& operator <<(std::ostream& os, const pokemon_nonvolatile& cPKNV);
+  friend PKAISHARED std::ostream& operator <<(std::ostream& os, const PokemonNonVolatile& cPKNV);
 
-  pokemon_nonvolatile& operator=(const pokemon_nonvolatile& other);
+  PokemonNonVolatile& operator=(const PokemonNonVolatile& other);
 
-  pokemon_nonvolatile();
-  pokemon_nonvolatile(const pokemon_nonvolatile& orig);
-  ~pokemon_nonvolatile() {};
+  PokemonNonVolatile();
+  PokemonNonVolatile(const PokemonNonVolatile& orig);
+  ~PokemonNonVolatile() {};
 
   bool pokemonExists() const;
 
@@ -129,13 +129,13 @@ public:
 
   bool natureExists() const;
   
-  const pokemon_base& getBase() const
+  const PokemonBase& getBase() const
   {
     assert(pokemonExists());
     return *base;
   };
 
-  void setBase(const pokemon_base& _base)
+  void setBase(const PokemonBase& _base)
   {
     base = &_base;
   };
@@ -160,32 +160,32 @@ public:
     sex = _sex;
   };
 
-  const ability& getAbility() const
+  const Ability& getAbility() const
   {
     assert(abilityExists());
     return *chosenAbility;
   };
 
-  void setAbility(const ability& _chosenAbility);
+  void setAbility(const Ability& _chosenAbility);
 
   void setNoAbility();
 
-  const nature& getNature() const
+  const Nature& getNature() const
   {
     return *chosenNature;
   };
 
   void setNoNature();
 
-  void setNature(const nature& _chosenNature);
+  void setNature(const Nature& _chosenNature);
 
-  void setInitialItem(const item& _chosenItem);
+  void setInitialItem(const Item& _chosenItem);
 
   void setNoInitialItem();
 
   bool hasInitialItem() const;
 
-  const item& getInitialItem() const;
+  const Item& getInitialItem() const;
 
   void setIV(size_t type, unsigned int value)
   {
@@ -218,18 +218,18 @@ public:
   };
 
   /* is this pokemon allowed to be on the given team according to the current ruleset? */
-  bool isLegalAdd(const move_nonvolatile& cPokemon) const;
+  bool isLegalAdd(const MoveNonVolatile& cPokemon) const;
 
-  bool isLegalSet(size_t iAction, const move_nonvolatile& cBase) const;
+  bool isLegalSet(size_t iAction, const MoveNonVolatile& cBase) const;
 
-  bool isLegalAdd(const move& cPokemon) const;
+  bool isLegalAdd(const Move& cPokemon) const;
 
-  bool isLegalSet(size_t iAction, const move& cBase) const;
+  bool isLegalSet(size_t iAction, const Move& cBase) const;
 
-  void addMove(const move_nonvolatile& cMove);
+  void addMove(const MoveNonVolatile& cMove);
 
   /* set a pre-existing move to something else */
-  void setMove(size_t iAction, const move_nonvolatile& _cMove);
+  void setMove(size_t iAction, const MoveNonVolatile& _cMove);
 
   void removeMove(size_t iAction);
 
@@ -238,18 +238,18 @@ public:
    * move "hurt confusion" if AT_MOVE_CONFUSED,
    * move "struggle" if AT_MOVE_STRUGGLE,
    * NULL if AT_MOVE_NOTHING */
-  move_nonvolatile& getMove(size_t index);
+  MoveNonVolatile& getMove(size_t index);
 
-  const move& getMove_base(size_t index) const;
+  const Move& getMove_base(size_t index) const;
 
-  const move_nonvolatile& getMove(size_t index) const;
+  const MoveNonVolatile& getMove(size_t index) const;
 
   uint32_t getFV_base(size_t type) const
   {
     return FV_base[type][STAGE0];
   };
 
-  void createDigest_impl(boost::array<uint8_t, POKEMON_NONVOLATILE_DIGESTSIZE>& digest) const;
+  void createDigest_impl(std::array<uint8_t, POKEMON_NONVOLATILE_DIGESTSIZE>& digest) const;
 
   /* recursively initializes this pokemon_nonvolatile and all of its moves */
   void initialize();
@@ -275,18 +275,18 @@ public:
     std::vector<std::string>* mismatchedMoves = NULL);
 };
 
-PKAISHARED std::ostream& operator <<(std::ostream& os, const pokemon_nonvolatile& cPKNV);
+PKAISHARED std::ostream& operator <<(std::ostream& os, const PokemonNonVolatile& cPKNV);
 
 
 class PKAISHARED pokemon_print
 {
 private:
-  const pokemon_nonvolatile& cPokemon;
-  const team_volatile& cTeam;
-  const pokemon_volatile& currentPokemon;
+  const PokemonNonVolatile& cPokemon;
+  const TeamVolatile& cTeam;
+  const PokemonVolatile& currentPokemon;
 
 public:
-  pokemon_print(const pokemon_nonvolatile& _cPokemon, const team_volatile& _cTeam, const pokemon_volatile& _currentPokemon)
+  pokemon_print(const PokemonNonVolatile& _cPokemon, const TeamVolatile& _cTeam, const PokemonVolatile& _currentPokemon)
     : cPokemon(_cPokemon),
     cTeam(_cTeam),
     currentPokemon(_currentPokemon)

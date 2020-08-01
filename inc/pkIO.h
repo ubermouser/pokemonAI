@@ -22,19 +22,19 @@
 
 // C:
 
-class pokemonAI;
-class team_nonvolatile;
+class PokemonAI;
+class TeamNonVolatile;
 class ranked_team;
 class ranked_neuralNet;
 class neuralNet;
 
 // CLASS / FUNCTION LIST:
-class pkIO
+class PkIO
 {
 private:
-  class pokemonAI* parent;
+  class PokemonAI* parent;
   
-  pkIO() { };
+  PkIO() { };
 public:
   std::string input_moveLibrary;
   std::string input_pokemonLibrary;
@@ -48,10 +48,10 @@ public:
   std::vector<std::string> input_teams;
   std::vector<std::string> input_networks;
 
-  pkIO(class pokemonAI* _parent);
-  ~pkIO() { };
+  PkIO(class PokemonAI* _parent);
+  ~PkIO() { };
 
-  static bool parseArg(const std::string& input, pkIO*& target);
+  static bool parseArg(const std::string& input, PkIO*& target);
 
 
   bool inputMoves(); // the moves themselves
@@ -63,7 +63,7 @@ public:
   bool inputMovelist(); // the moves that each pokemon has
   
   static bool inputRankedTeam(const boost::filesystem::path& path, ranked_team& cTeam); 
-  static bool inputPlayerTeam(const boost::filesystem::path& path, team_nonvolatile& cTeam);
+  static bool inputPlayerTeam(const boost::filesystem::path& path, TeamNonVolatile& cTeam);
 
   static bool inputRankedNetwork(const boost::filesystem::path& path, ranked_neuralNet& cNet);
   static bool inputPlayerNetwork(const boost::filesystem::path& path, neuralNet& cNet);

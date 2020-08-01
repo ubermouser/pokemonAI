@@ -3,15 +3,15 @@
 
 #include "../inc/planner.h"
 
-class pokemonAI;
-class pkCU;
+class PokemonAI;
+class PkCU;
 
-class planner_random : public planner
+class planner_random : public Planner
 {
 private:
   static const std::string ident;
 
-  pkCU* cu;
+  PkCU* cu;
 
   size_t agentTeam;
 
@@ -28,12 +28,12 @@ public:
 
   const std::string& getName() const { return ident; };
 
-  void setEvaluator(const evaluator& evalType) { /* we're not going to use the evaluator, so do nothing with it */ };
-  const evaluator* getEvaluator() const { return NULL; }
+  void setEvaluator(const Evaluator& evalType) { /* we're not going to use the evaluator, so do nothing with it */ };
+  const Evaluator* getEvaluator() const { return NULL; }
 
-  void setEnvironment(pkCU& _cu, size_t _agentTeam);
+  void setEnvironment(PkCU& _cu, size_t _agentTeam);
 
-  uint32_t generateSolution(const environment_possible& origin);
+  uint32_t generateSolution(const EnvironmentPossible& origin);
 };
 
 #endif /* PLANNER_RANDOM_H */

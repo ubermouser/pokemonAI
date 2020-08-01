@@ -15,20 +15,20 @@
 
 #include "name.h"
 
-class pokedex;
+class Pokedex;
 
-class PKAISHARED type: public name 
+class PKAISHARED Type: public Name 
 {
 public:
-  static const type* no_type;
+  static const Type* no_type;
 
   std::vector<uint8_t> modTable; // type's values
   
-  type();
-  type(const type& source);
-  ~type() { };
+  Type();
+  Type(const Type& source);
+  ~Type() { };
 
-  fpType getModifier(const type& other) const;
+  fpType getModifier(const Type& other) const;
 private:
 
 };

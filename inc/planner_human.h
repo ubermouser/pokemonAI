@@ -3,18 +3,18 @@
 
 #include "../inc/planner.h"
 
-class pokemonAI;
-class pkCU;
+class PokemonAI;
+class PkCU;
 
-class environment_nonvolatile;
-union environment_volatile;
+class EnvironmentNonvolatile;
+union EnvironmentVolatile;
 
-class planner_human : public planner
+class planner_human : public Planner
 {
 private:
   static const std::string ident;
 
-  pkCU* cu;
+  PkCU* cu;
 
   size_t agentTeam;
 
@@ -25,12 +25,12 @@ private:
    * AT_SWITCH_0-5: pokemon switches out for pokemon n-6
    * AT_ITEM_USE: pokemon uses an item (not implemented)
    */
-  unsigned int actionSelect(const environment_volatile& env);
+  unsigned int actionSelect(const EnvironmentVolatile& env);
 
   /*
    * Prints all possible actions a given pokemon may take to stdout
    */
-  void printActions(const environment_volatile& env);
+  void printActions(const EnvironmentVolatile& env);
 
 public:
   planner_human();
@@ -45,12 +45,12 @@ public:
 
   const std::string& getName() const { return ident; };
 
-  void setEvaluator(const evaluator& evalType) { /* we're not going to use the evaluator, so do nothing with it */ };
-  const evaluator* getEvaluator() const { return NULL; }
+  void setEvaluator(const Evaluator& evalType) { /* we're not going to use the evaluator, so do nothing with it */ };
+  const Evaluator* getEvaluator() const { return NULL; }
 
-  void setEnvironment(pkCU& _cu, size_t _agentTeam);
+  void setEnvironment(PkCU& _cu, size_t _agentTeam);
 
-  uint32_t generateSolution(const environment_possible& origin);
+  uint32_t generateSolution(const EnvironmentPossible& origin);
 };
 
 #endif /* PLANNER_HUMAN_H */

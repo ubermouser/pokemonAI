@@ -12,14 +12,14 @@
 
 #include <boost/static_assert.hpp>
 
-BOOST_STATIC_ASSERT(sizeof(environment_volatile) == (sizeof(uint64_t)*16));
+BOOST_STATIC_ASSERT(sizeof(EnvironmentVolatile) == (sizeof(uint64_t)*16));
 
 
 
-void environment_volatile::initialize(const environment_nonvolatile& envNV)
+void EnvironmentVolatile::initialize(const EnvironmentNonvolatile& envNV)
 {
   // zero datastructure:
-  memset(raw, 0, sizeof(environment_volatile));
+  memset(raw, 0, sizeof(EnvironmentVolatile));
   // initialize:
   data.teams[0].initialize(envNV.getTeam(0));
   data.teams[1].initialize(envNV.getTeam(1));
@@ -29,9 +29,9 @@ void environment_volatile::initialize(const environment_nonvolatile& envNV)
 
 
 
-environment_volatile environment_volatile::create(const environment_nonvolatile& envNV)
+EnvironmentVolatile EnvironmentVolatile::create(const EnvironmentNonvolatile& envNV)
 {
-  environment_volatile result;
+  EnvironmentVolatile result;
   result.initialize(envNV);
   return result;
 };
@@ -40,7 +40,7 @@ environment_volatile environment_volatile::create(const environment_nonvolatile&
 
 
 
-bool environment_volatile::operator ==(const environment_volatile& other) const
+bool EnvironmentVolatile::operator ==(const EnvironmentVolatile& other) const
 {
   bool result = true;
 
@@ -68,7 +68,7 @@ bool environment_volatile::operator ==(const environment_volatile& other) const
 
 
 
-bool environment_volatile::operator !=(const environment_volatile& other) const
+bool EnvironmentVolatile::operator !=(const EnvironmentVolatile& other) const
 {
   return !(*this == other);
 }
@@ -77,7 +77,7 @@ bool environment_volatile::operator !=(const environment_volatile& other) const
 
 
 
-const team_volatile& environment_volatile::getTeam(size_t movesFirst) const
+const TeamVolatile& EnvironmentVolatile::getTeam(size_t movesFirst) const
 {
   return data.teams[movesFirst];
 }
@@ -86,7 +86,7 @@ const team_volatile& environment_volatile::getTeam(size_t movesFirst) const
 
 
 
-const team_volatile& environment_volatile::getOtherTeam(size_t movesFirst) const
+const TeamVolatile& EnvironmentVolatile::getOtherTeam(size_t movesFirst) const
 {
   return data.teams[(movesFirst + 1) & 1];
 }
@@ -95,7 +95,7 @@ const team_volatile& environment_volatile::getOtherTeam(size_t movesFirst) const
 
 
 
-team_volatile& environment_volatile::getTeam(size_t movesFirst)
+TeamVolatile& EnvironmentVolatile::getTeam(size_t movesFirst)
 {
   return data.teams[movesFirst];
 }
@@ -104,7 +104,7 @@ team_volatile& environment_volatile::getTeam(size_t movesFirst)
 
 
 
-team_volatile& environment_volatile::getOtherTeam(size_t movesFirst)
+TeamVolatile& EnvironmentVolatile::getOtherTeam(size_t movesFirst)
 {
   return data.teams[(movesFirst + 1) & 1];
 }

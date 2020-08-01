@@ -6,13 +6,13 @@
 #include <stdint.h>
 
 class plugin;
-class move_nonvolatile;
-class pokemon_nonvolatile;
-class type;
-class pkCU;
+class MoveNonVolatile;
+class PokemonNonVolatile;
+class Type;
+class PkCU;
 
-union pokemon_volatile;
-union team_volatile;
+union PokemonVolatile;
+union TeamVolatile;
 
 // script types:
 #define PLUGIN_MAXSIZE 26
@@ -48,117 +48,117 @@ enum pluginType
 
 typedef int (*onSwitch_rawType)
   (
-  pkCU&,
-  const pokemon_nonvolatile&, 
-  team_volatile&,
-  pokemon_volatile&);
+  PkCU&,
+  const PokemonNonVolatile&, 
+  TeamVolatile&,
+  PokemonVolatile&);
 
 typedef int (*onEvaluateMove_rawType)
   (
-  pkCU&,
-  const move_nonvolatile&, 
-  const pokemon_nonvolatile&, 
-  const pokemon_nonvolatile&,
-  team_volatile&,
-  team_volatile&,
-  pokemon_volatile&,
-  pokemon_volatile&);
+  PkCU&,
+  const MoveNonVolatile&, 
+  const PokemonNonVolatile&, 
+  const PokemonNonVolatile&,
+  TeamVolatile&,
+  TeamVolatile&,
+  PokemonVolatile&,
+  PokemonVolatile&);
 
 typedef int (*onModifyBracket_rawType)
-  (pkCU&,
-  const move_nonvolatile&,
-  const pokemon_nonvolatile&,
-  const team_volatile&,
-  const pokemon_volatile&,
+  (PkCU&,
+  const MoveNonVolatile&,
+  const PokemonNonVolatile&,
+  const TeamVolatile&,
+  const PokemonVolatile&,
   int32_t&);
 
 typedef int (*onModifySpeed_rawType)
-  (pkCU&,
-  const pokemon_nonvolatile&,
-  const team_volatile&,
-  const pokemon_volatile&,
+  (PkCU&,
+  const PokemonNonVolatile&,
+  const TeamVolatile&,
+  const PokemonVolatile&,
   uint32_t&);
 
 typedef int (*onEndOfRound_rawType)
-  (pkCU&,
-  const pokemon_nonvolatile&,
-  team_volatile&,
-  pokemon_volatile&
+  (PkCU&,
+  const PokemonNonVolatile&,
+  TeamVolatile&,
+  PokemonVolatile&
   );
 
 typedef int (*onBeginningOfTurn_rawType)
-  (pkCU&,
-  const pokemon_nonvolatile&,
-  team_volatile&,
-  pokemon_volatile&
+  (PkCU&,
+  const PokemonNonVolatile&,
+  TeamVolatile&,
+  PokemonVolatile&
   );
 
 typedef int (*onSetPower_rawType)
-  (pkCU&,
-  const move_nonvolatile&,
-  const pokemon_nonvolatile&,
-  const pokemon_nonvolatile&,
-  team_volatile&,
-  team_volatile&,
-  pokemon_volatile&,
-  pokemon_volatile&,
+  (PkCU&,
+  const MoveNonVolatile&,
+  const PokemonNonVolatile&,
+  const PokemonNonVolatile&,
+  TeamVolatile&,
+  TeamVolatile&,
+  PokemonVolatile&,
+  PokemonVolatile&,
   uint32_t&);
 
 typedef int (*onModifyBasePower_rawType)
-  (pkCU&,
-  const move_nonvolatile&,
-  const pokemon_nonvolatile&,
-  const pokemon_nonvolatile&,
-  team_volatile&,
-  team_volatile&,
-  pokemon_volatile&,
-  pokemon_volatile&,
+  (PkCU&,
+  const MoveNonVolatile&,
+  const PokemonNonVolatile&,
+  const PokemonNonVolatile&,
+  TeamVolatile&,
+  TeamVolatile&,
+  PokemonVolatile&,
+  PokemonVolatile&,
   uint32_t&);
 
 typedef int (*onModifyPower_rawType)
-  (pkCU&,
-  const move_nonvolatile&,
-  const pokemon_nonvolatile&,
-  const pokemon_nonvolatile&,
-  team_volatile&,
-  team_volatile&,
-  pokemon_volatile&,
-  pokemon_volatile&,
+  (PkCU&,
+  const MoveNonVolatile&,
+  const PokemonNonVolatile&,
+  const PokemonNonVolatile&,
+  TeamVolatile&,
+  TeamVolatile&,
+  PokemonVolatile&,
+  PokemonVolatile&,
   fpType&);
 
 typedef int (*onModifyTypePower_rawType)
-  (pkCU&,
-  const move_nonvolatile&,
-  const pokemon_nonvolatile&,
-  const pokemon_nonvolatile&,
-  const type&,
-  team_volatile&,
-  team_volatile&,
-  pokemon_volatile&,
-  pokemon_volatile&,
+  (PkCU&,
+  const MoveNonVolatile&,
+  const PokemonNonVolatile&,
+  const PokemonNonVolatile&,
+  const Type&,
+  TeamVolatile&,
+  TeamVolatile&,
+  PokemonVolatile&,
+  PokemonVolatile&,
   fpType&);
 
 typedef int (*onModifyMoveType_rawType)
-  (pkCU&,
-  const move_nonvolatile&,
-  const pokemon_nonvolatile&,
-  const pokemon_nonvolatile&,
-  team_volatile&,
-  team_volatile&,
-  pokemon_volatile&,
-  pokemon_volatile&,
-  const type*&);
+  (PkCU&,
+  const MoveNonVolatile&,
+  const PokemonNonVolatile&,
+  const PokemonNonVolatile&,
+  TeamVolatile&,
+  TeamVolatile&,
+  PokemonVolatile&,
+  PokemonVolatile&,
+  const Type*&);
 
 typedef int (*onEndOfTurn_rawType)
-  (pkCU&,
-  const pokemon_nonvolatile&,
-  team_volatile&,
-  pokemon_volatile&
+  (PkCU&,
+  const PokemonNonVolatile&,
+  TeamVolatile&,
+  PokemonVolatile&
   );
 
 typedef int (*onInitMove_rawType)
-  (pokemon_nonvolatile&,
-  move_nonvolatile&);
+  (PokemonNonVolatile&,
+  MoveNonVolatile&);
 
 typedef void (*voidFunction_rawType)(void*);
 

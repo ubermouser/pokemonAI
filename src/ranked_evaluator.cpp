@@ -6,7 +6,7 @@
 #include "../inc/evaluator.h"
 
 ranked_evaluator::ranked_evaluator(
-  const evaluator& _eval,
+  const Evaluator& _eval,
   size_t generation, 
   const trueSkillSettings& settings)
   : ranked(generation, settings),

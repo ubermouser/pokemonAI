@@ -10,11 +10,11 @@
 
 #include <boost/static_assert.hpp>
 
-BOOST_STATIC_ASSERT(sizeof(environment_possible) == (sizeof(uint64_t)*18));
+BOOST_STATIC_ASSERT(sizeof(EnvironmentPossible) == (sizeof(uint64_t)*18));
 
-environment_possible environment_possible::create(const environment_volatile& source, bool doHash)
+EnvironmentPossible EnvironmentPossible::create(const EnvironmentVolatile& source, bool doHash)
 {	
-  environment_possible result = { { source, UINT64_MAX, fixedpoint::create<30>(1.0), 0 } };
+  EnvironmentPossible result = { { source, UINT64_MAX, fixedpoint::create<30>(1.0), 0 } };
   if (doHash) { result.generateHash(); }
 
   return result;
@@ -24,7 +24,7 @@ environment_possible environment_possible::create(const environment_volatile& so
 
 
 
-bool environment_possible::operator <(const environment_possible& other) const
+bool EnvironmentPossible::operator <(const EnvironmentPossible& other) const
 {
   return data.probability < other.data.probability;
 }
@@ -33,14 +33,14 @@ bool environment_possible::operator <(const environment_possible& other) const
 
 
 
-void environment_possible::generateHash()
+void EnvironmentPossible::generateHash()
 {
 #if defined(_USEFNVHASH)
-    data.hash = hashes::hash_fnv(&getEnv(), sizeof(environment_volatile));
+    data.hash = hashes::hash_fnv(&getEnv(), sizeof(EnvironmentVolatile));
 #elif defined(_USEMURMUR2)
-    data.hash = hashes::hash_murmur2(&getEnv(), sizeof(environment_volatile));
+    data.hash = hashes::hash_murmur2(&getEnv(), sizeof(EnvironmentVolatile));
 #else
-    data.hash = hashes::hash_murmur3(&getEnv(), sizeof(environment_volatile));
+    data.hash = hashes::hash_murmur3(&getEnv(), sizeof(EnvironmentVolatile));
 #endif
 }
 

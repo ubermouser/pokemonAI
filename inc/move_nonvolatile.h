@@ -9,28 +9,28 @@
 
 #include "../inc/signature.h"
 
-class pkIO;
-class move;
-class pokemon_nonvolatile;
+class PkIO;
+class Move;
+class PokemonNonVolatile;
 
-union move_volatile;
+union MoveVolatile;
 
 #define MOVE_NONVOLATILE_DIGESTSIZE 21
 
-class PKAISHARED move_nonvolatile : public signature<move_nonvolatile, MOVE_NONVOLATILE_DIGESTSIZE>
+class PKAISHARED MoveNonVolatile : public Signature<MoveNonVolatile, MOVE_NONVOLATILE_DIGESTSIZE>
 {
 
 private:
-  const move* base;
+  const Move* base;
   uint16_t scriptVal_a;
   uint16_t scriptVal_b;
   uint8_t PPmax;
 
 public:
-  static move_nonvolatile* mNV_struggle;
+  static MoveNonVolatile* mNV_struggle;
 
-  move_nonvolatile()
-    : signature<move_nonvolatile, MOVE_NONVOLATILE_DIGESTSIZE>(),
+  MoveNonVolatile()
+    : Signature<MoveNonVolatile, MOVE_NONVOLATILE_DIGESTSIZE>(),
     base(NULL),
     scriptVal_a(0),
     scriptVal_b(0),
@@ -38,8 +38,8 @@ public:
   {
   };
 
-  move_nonvolatile(const move_nonvolatile& orig)
-    : signature<move_nonvolatile, MOVE_NONVOLATILE_DIGESTSIZE>(orig),
+  MoveNonVolatile(const MoveNonVolatile& orig)
+    : Signature<MoveNonVolatile, MOVE_NONVOLATILE_DIGESTSIZE>(orig),
     base(orig.base),
     scriptVal_a(orig.scriptVal_a),
     scriptVal_b(orig.scriptVal_b),
@@ -47,12 +47,12 @@ public:
   {
   };
 
-  move_nonvolatile& operator=(const move_nonvolatile& source)
+  MoveNonVolatile& operator=(const MoveNonVolatile& source)
   {
     // identity theorem - simply return what we have now if equal address
     if (this == &source) { return *this; } 
 
-    signature<move_nonvolatile, MOVE_NONVOLATILE_DIGESTSIZE>::operator=(source);
+    Signature<MoveNonVolatile, MOVE_NONVOLATILE_DIGESTSIZE>::operator=(source);
     base = source.base;
     scriptVal_a = source.scriptVal_a;
     scriptVal_b = source.scriptVal_b;
@@ -61,22 +61,22 @@ public:
     return *this;
   };
 
-  move_nonvolatile(const move& _base, unsigned int PPmultiplier = 16);
+  MoveNonVolatile(const Move& _base, unsigned int PPmultiplier = 16);
 
-  ~move_nonvolatile() { };
+  ~MoveNonVolatile() { };
   
   bool moveExists() const
   {
     return (base!=NULL)?true:false;
   };
 
-  const move& getBase() const
+  const Move& getBase() const
   {
     assert(moveExists());
     return *base;
   };
 
-  void setBase(const move& _base)
+  void setBase(const Move& _base)
   {
     base = &_base;
   };
@@ -96,18 +96,18 @@ public:
     return scriptVal_b;
   };
 
-  friend class pkIO;
+  friend class PkIO;
   friend class move_print;
 
-  friend union move_volatile;
+  friend union MoveVolatile;
 
 public:
 
-  void createDigest_impl(boost::array<uint8_t, MOVE_NONVOLATILE_DIGESTSIZE>& digest) const;
+  void createDigest_impl(std::array<uint8_t, MOVE_NONVOLATILE_DIGESTSIZE>& digest) const;
 
-  void initialize(pokemon_nonvolatile& cPokemon);
+  void initialize(PokemonNonVolatile& cPokemon);
 
-  void uninitialize(pokemon_nonvolatile& cPokemon);
+  void uninitialize(PokemonNonVolatile& cPokemon);
 
   void setScriptVal_a(uint16_t newVal)
   {
@@ -124,11 +124,11 @@ public:
 class PKAISHARED move_print
 {
 private:
-  const move_nonvolatile& cMove;
-  const move_volatile& currentMove;
+  const MoveNonVolatile& cMove;
+  const MoveVolatile& currentMove;
 
 public:
-  move_print(const move_nonvolatile& _cMove, const move_volatile& _currentMove)
+  move_print(const MoveNonVolatile& _cMove, const MoveVolatile& _currentMove)
     : cMove(_cMove),
     currentMove(_currentMove)
   {

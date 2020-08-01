@@ -4,20 +4,20 @@
 #include "../inc/pkai.h"
 #include "../inc/planner.h"
 
-class evaluator;
-class pkCU;
+class Evaluator;
+class PkCU;
 
-class planner_stochastic : public planner
+class planner_stochastic : public Planner
 {
 private:
   std::string ident;
 
-  std::vector<plannerResult> results;
+  std::vector<PlannerResult> results;
 
-  pkCU* cu;
+  PkCU* cu;
 
   /* evaluator being used by this planner */
-  evaluator* eval;
+  Evaluator* eval;
 
   size_t agentTeam;
 
@@ -34,7 +34,7 @@ private:
 
 public:
   planner_stochastic(size_t _engineAccuracy = 1, fpType _temperature = 1.0, fpType _exploration = 0.5);
-  planner_stochastic(const evaluator& _eval, size_t _engineAccuracy = 1, fpType _temperature = 1.0, fpType _exploration = 0.5);
+  planner_stochastic(const Evaluator& _eval, size_t _engineAccuracy = 1, fpType _temperature = 1.0, fpType _exploration = 0.5);
 
   planner_stochastic(const planner_stochastic& other);
   
@@ -46,14 +46,14 @@ public:
 
   const std::string& getName() const { return ident; };
 
-  void setEvaluator(const evaluator& evalType);
-  const evaluator* getEvaluator() const { return eval; }
+  void setEvaluator(const Evaluator& evalType);
+  const Evaluator* getEvaluator() const { return eval; }
 
-  void setEnvironment(pkCU& _cu, size_t _agentTeam);
+  void setEnvironment(PkCU& _cu, size_t _agentTeam);
 
-  uint32_t generateSolution(const environment_possible& origin);
+  uint32_t generateSolution(const EnvironmentPossible& origin);
 
-  const std::vector<plannerResult>& getDetailedResults() const { return results; };
+  const std::vector<PlannerResult>& getDetailedResults() const { return results; };
   void clearResults() { results.clear(); };
 };
 

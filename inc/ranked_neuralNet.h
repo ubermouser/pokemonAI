@@ -25,17 +25,17 @@ typedef temporalpropNet network_t;
 #endif
 
 class evaluator_featureVector;
-class environment_nonvolatile;
+class EnvironmentNonvolatile;
 class ranked_team;
 class trueSkillTeam;
-class game;
-struct turn;
+class Game;
+struct Turn;
 
 class ranked_neuralNet: public ranked
 {
 public:
 #ifdef _DISABLETEMPORALDIFFERENCE
-  static game* rolloutGame;
+  static Game* rolloutGame;
   static std::vector<float> rolloutFitnesses;
 #endif
 
@@ -106,20 +106,20 @@ public:
   };
 
   /* update two neural network rankings with TD */
-  size_t update(const game& cGame, const trueSkillTeam& cTeam, size_t iTeam, bool updateWeights = true);
+  size_t update(const Game& cGame, const trueSkillTeam& cTeam, size_t iTeam, bool updateWeights = true);
 
   /* performs monte-carlo backpropagation on bNet. Returns the error if an update was performed, or 0.0 if none */
   /* performs temporal difference learning on bNet. Returns the error if an update was performed, or 0.0 if none */
   static void propagate(
-    const std::vector<turn>& turns, 
-    const environment_nonvolatile& envNV,
+    const std::vector<Turn>& turns, 
+    const EnvironmentNonvolatile& envNV,
     ranked_neuralNet& rankedNet, 
     size_t iTeam);
 
   /* updates the experience vector in the ranked_object based upon the game's trace */
   static void updateExperience(
-    const std::vector<turn>& turns, 
-    const environment_nonvolatile& envNV,
+    const std::vector<Turn>& turns, 
+    const EnvironmentNonvolatile& envNV,
     ranked_neuralNet& rankedNet, 
     size_t iTeam);
 

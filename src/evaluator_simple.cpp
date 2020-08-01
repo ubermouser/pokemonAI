@@ -41,13 +41,13 @@ bool evaluator_simple::isInitialized() const
   return true;
 }
 
-fpType evaluator_simple::fitness_team(const team_volatile& tV, const team_nonvolatile& tNV)
+fpType evaluator_simple::fitness_team(const TeamVolatile& tV, const TeamNonVolatile& tNV)
 {
   fpType accumulator = 0.0;
   
   for (size_t iTeammate = 0, _numTeammates = tNV.getNumTeammates(); iTeammate != _numTeammates; ++iTeammate)
   {
-    const pokemon_volatile& cPKV = tV.teammate(iTeammate);
+    const PokemonVolatile& cPKV = tV.teammate(iTeammate);
 
     accumulator += 900 * cPKV.getPercentHP(tNV.teammate(iTeammate)) + (cPKV.isAlive()?50:0);
   }
@@ -60,7 +60,7 @@ fpType evaluator_simple::fitness_team(const team_volatile& tV, const team_nonvol
   return accumulator;
 };
 
-fpType evaluator_simple::calculateFitness(const environment_nonvolatile& envNV, const environment_volatile& env, size_t iTeam, fpType bias)
+fpType evaluator_simple::calculateFitness(const EnvironmentNonvolatile& envNV, const EnvironmentVolatile& env, size_t iTeam, fpType bias)
 {
   // calculate fitness
   fpType agentFitness = (bias)		*	fitness_team(env.getTeam(iTeam), envNV.getTeam(iTeam));
@@ -79,9 +79,9 @@ fpType evaluator_simple::calculateFitness(const environment_nonvolatile& envNV, 
   return fitness;
 };
 
-evalResult_t evaluator_simple::calculateFitness(const environment_volatile& env, size_t iTeam)
+EvalResult_t evaluator_simple::calculateFitness(const EnvironmentVolatile& env, size_t iTeam)
 {
-  evalResult_t result = { calculateFitness(*envNV, env, iTeam, bias), -1, -1 };
+  EvalResult_t result = { calculateFitness(*envNV, env, iTeam, bias), -1, -1 };
   return result;
 };
 

@@ -5,7 +5,7 @@
 
 #include <stdint.h>
 #include <vector>
-#include <boost/array.hpp>
+#include <array>
 #include "fp_compare.h"
 #include <boost/math/special_functions/fpclassify.hpp>
 
@@ -54,34 +54,34 @@ public:
     const std::vector<unknownType>& values,
     const typeValue& comparator = basicSortBySize<unknownType>())
   {
-    boost::array<size_t, 1> result;
-    result.assign(SIZE_MAX);
-    _selectN< boost::array<size_t, 1> >(values, result, comparator);
+    std::array<size_t, 1> result;
+    result.fill(SIZE_MAX);
+    _selectN< std::array<size_t, 1> >(values, result, comparator);
 
     return result[0];
   };
 
-  static boost::array<size_t, 2> selectTwo(
+  static std::array<size_t, 2> selectTwo(
     const std::vector<unknownType>& values,
     const typeValue& comparator = basicSortBySize<unknownType>())
   {
-    boost::array<size_t, 2> result;
-    result.assign(SIZE_MAX);
+    std::array<size_t, 2> result;
+    result.fill(SIZE_MAX);
 
-    _selectN< boost::array<size_t, 2> >(values, result, comparator);
+    _selectN< std::array<size_t, 2> >(values, result, comparator);
 
     return result;
   };
 
   template<size_t numValues>
-  static boost::array<size_t, numValues> selectN(
+  static std::array<size_t, numValues> selectN(
     const std::vector<unknownType>& values,
     const typeValue& comparator = basicSortBySize<unknownType>())
   {
-    boost::array<size_t, numValues> result;
-    result.assign(SIZE_MAX);
+    std::array<size_t, numValues> result;
+    result.fill(SIZE_MAX);
 
-    _selectN< boost::array<size_t, numValues> >(values, result, comparator);
+    _selectN< std::array<size_t, numValues> >(values, result, comparator);
 
     return result;
   };
