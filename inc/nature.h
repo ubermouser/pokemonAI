@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 #include <array>
+#include <vector>
 
 #include "../inc/name.h"
 
@@ -30,6 +31,17 @@ public:
    * other FV values are not allocated
    */
   std::array<uint8_t, 5> modTable;
+};
+
+
+class PKAISHARED Natures: public std::vector<Nature>
+{
+public:
+  bool initialize(const std::string& path);
+
+protected:
+  bool loadFromFile(const std::string& path);
+  bool loadFromFile_lines(const std::vector<std::string>& lines, size_t& iLine);
 };
 
 #endif	/* NATURE_H */

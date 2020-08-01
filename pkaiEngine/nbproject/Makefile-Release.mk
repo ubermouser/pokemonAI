@@ -50,6 +50,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/511e4115/pkCU.o \
 	${OBJECTDIR}/_ext/511e4115/pluggable.o \
 	${OBJECTDIR}/_ext/511e4115/pokedex.o \
+	${OBJECTDIR}/_ext/511e4115/pokedex_dynamic.o \
 	${OBJECTDIR}/_ext/511e4115/pokemon_base.o \
 	${OBJECTDIR}/_ext/511e4115/pokemon_nonvolatile.o \
 	${OBJECTDIR}/_ext/511e4115/pokemon_volatile.o \
@@ -159,6 +160,11 @@ ${OBJECTDIR}/_ext/511e4115/pokedex.o: ../src/pokedex.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pokedex.o ../src/pokedex.cpp
+
+${OBJECTDIR}/_ext/511e4115/pokedex_dynamic.o: ../src/pokedex_dynamic.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pokedex_dynamic.o ../src/pokedex_dynamic.cpp
 
 ${OBJECTDIR}/_ext/511e4115/pokemon_base.o: ../src/pokemon_base.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115

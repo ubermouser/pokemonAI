@@ -1,3 +1,5 @@
+#include <memory>
+
 #include <boost/dll/shared_library.hpp>
 
 #include <boost/foreach.hpp>
@@ -41,8 +43,6 @@ PokemonAI::PokemonAI()
   warning = 0;
   
   isInitialized = false;
-  
-  pkdex = this;
   
   pokemonIO = new PkIO(this);
   trainer = NULL;
@@ -114,21 +114,6 @@ PokemonAI::~PokemonAI()
 {
   evaluator_featureVector::uninitStatic();
 
-  //TODO: unload all plugins:
-  for (size_t iPlugin = 0; iPlugin != plugins.size(); ++iPlugin)
-  {
-    boost::dll::shared_library* cPlugin = plugins[iPlugin];
-    cPlugin->unload();
-    /*if (!cPlugin->close())
-    {
-      std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": could not unregister unacceptable plugin index" << iPlugin << 
-        "!\n";
-      continue;
-    }*/
-    delete cPlugin;
-  }
-
   if (game != NULL) { delete game; }
   if (trainer != NULL) { delete trainer; }
   
@@ -138,181 +123,9 @@ PokemonAI::~PokemonAI()
 bool PokemonAI::init()
 {
   bool result = 0;
-  //load data from disk:
 
-  //TYPE library
-  if (pokemonIO->input_typeLibrary.empty())
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": An item list has not been defined!\n";
-    return false;
-  }
-  if (verbose >= 1) std::cout << " Loading Pokemon type library...\n";
-  result = pokemonIO->inputTypes();
-  if (!result)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": InputTypes failed to populate an array of types.\n";
-    return false;
-  }
-  //std::sort(types.begin(), types.end());
-  {
-    // find type special case
-    Type::no_type = orphan::orphanCheck_ptr(types, NULL, "none");
-  }
-
-  //NATURE library
-  if (pokemonIO->input_natureLibrary.empty())
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": A nature list has not been defined!\n";
-    return false;
-  }
-  if (verbose >= 1) std::cout << " Loading Pokemon nature library...\n";
-  result = pokemonIO->inputNatures();
-  if (!result)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": inputNatures failed to populate a list of natures.\n";
-    return false;
-  }
-  std::sort(natures.begin(), natures.end());
-
-  {
-    // find special case no nature:
-    Nature::no_nature = orphan::orphanCheck_ptr(natures, NULL, "none");
-  }
-
-  //MOVE library
-  if (pokemonIO->input_moveLibrary.empty())
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": A move list has not been defined!\n";
-    return false;
-  }
-  if (verbose >= 1) std::cout << " Loading Pokemon move library...\n";
-  result = pokemonIO->inputMoves();
-  if (!result)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": inputMoves failed to populate a list of moves.\n";
-    return false;
-  }
-  std::sort(moves.begin(), moves.end());
-  
-  {
-    Move::move_none = orphan::orphanCheck_ptr(moves, NULL, "none");
-
-    // find special cases struggle and hurt confusion, set the pointers to them
-    Move::move_struggle = orphan::orphanCheck_ptr(moves, NULL, "struggle");
-    if (Move::move_struggle != NULL) { MoveNonVolatile::mNV_struggle = new MoveNonVolatile(*Move::move_struggle); }
-  }
-
-  //ABILITY library
-  if (pokemonIO->input_abilityLibrary.empty())
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": An ability list has not been defined!\n";
-    return false;
-  }
-  if (verbose >= 1) std::cout << " Loading Pokemon ability library...\n";
-  result = pokemonIO->inputAbilities();
-  if (!result)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": inputAbilities failed to populate a list of pokemon abilities.\n";
-    return false;
-  }
-  std::sort(abilities.begin(), abilities.end());
-
-  {
-    // find special case no ability:
-    Ability::no_ability = orphan::orphanCheck_ptr(abilities, NULL, "none");
-  }
-
-  //ITEM library
-  if (pokemonIO->input_itemLibrary.empty())
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": An item list has not been defined!\n";
-    return false;
-  }
-  if (verbose >= 1) std::cout << " Loading Pokemon item library...\n";
-  result = pokemonIO->inputItems();
-  if (!result)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": inputItems failed to populate a list of pokemon items.\n";
-    return false;
-  }
-  std::sort(items.begin(), items.end());
-
-  {
-    // find special case no item:
-    Item::no_item = orphan::orphanCheck_ptr(items, NULL, "none");
-  }
-
-  //POKEMON library (requires sorted input of abilities and types!)
-  if (pokemonIO->input_pokemonLibrary.empty())
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": A species list has not been defined!\n";
-    return false;
-  }
-  if (verbose >= 1) std::cout << " Loading species library...\n";
-  result = pokemonIO->inputPokemon();
-  if (!result)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": inputPokemon failed to populate a list of pokemon.\n";
-    return false;
-  }
-  std::sort(pokemon.begin(), pokemon.end());
-
-  {
-    // find special case no base:
-    PokemonBase::no_base = orphan::orphanCheck_ptr(pokemon, NULL, "none");
-  }
-
-  //MOVELIST library (requires sorted input of pokemon and moves!)
-  if (pokemonIO->input_movelistLibrary.empty())
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": A movelist array has not been defined!\n";
-    return false;
-  }
-  if (verbose >= 1) std::cout << " Loading Pokemon move arrays...\n";
-  result = pokemonIO->inputMovelist();
-  if (!result)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": inputMoveList failed to populate an acceptable list of pokemon moves.\n";
-    return false;
-  }
-
-#ifndef _DISABLEPLUGINS
-  // initialize scripts:
-  if (pokemonIO->input_pluginFolder.empty())
-  {
-    if (verbose >= 6)
-    {
-      std::cerr << "INF " << __FILE__ << "." << __LINE__ << 
-        ": A plugins root directory has not been defined. No plugins will be loaded.\n";
-    }
-  }
-  else
-  {
-    if (verbose >= 1) std::cout << " Loading Plugins...\n";
-    result = pokemonIO->inputPlugins();
-    if (!result)
-    {
-      std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-          ": inputPlugins failed to initialize an acceptable set of plugins!\n";
-      return false;
-    }
-  }
-#endif /* _DISABLESCRIPTS */
-  
+  pokedex = std::make_unique<PokedexDynamic>(pokedex_config);
+  pkdex = pokedex.get();
   
   //Teams:
   if (pokemonIO->input_teams.size() > 0)

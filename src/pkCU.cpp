@@ -15,15 +15,7 @@
 
 //#define PKAI_STATIC
 #include "../inc/plugin.h"
-#include "../inc/environment_possible.h"
-#include "../inc/pokemon_volatile.h"
-#include "../inc/pokemon_nonvolatile.h"
-#include "../inc/move_nonvolatile.h"
-#include "../inc/move_volatile.h"
-#include "../inc/move.h"
-#include "../inc/environment_volatile.h"
-#include "../inc/environment_nonvolatile.h"
-#include "../inc/pokedex.h"
+#include "../inc/engine.h"
 //#undef PKAI_STATIC
 
 typedef std::vector<plugin_t>::const_iterator pluginIt;

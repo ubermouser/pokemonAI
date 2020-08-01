@@ -11,6 +11,7 @@
 #include <string>
 #include <boost/foreach.hpp>
 
+#include "../inc/engine.h"
 #include "../inc/game.h"
 #include "../inc/genetic.h"
 #include "../inc/roulette.h"
@@ -1222,18 +1223,18 @@ void ranked_team::randomEV(PokemonNonVolatile& cPokemon)
 
 void ranked_team::randomMove(PokemonNonVolatile& cPokemon, size_t numMoves)
 {
-  const std::vector<size_t>& cMovelist = cPokemon.getBase().movelist;
+  const std::vector<const Move*>& cMovelist = cPokemon.getBase().movelist;
   std::vector<bool> isValid(cMovelist.size(), true);
   size_t validMoves = cMovelist.size();
 
   // remove duplicate moves from the valid move array:
   for (size_t iMove = 0; iMove != cPokemon.getNumMoves(); ++iMove)
   {
-    size_t iBase = &cPokemon.getMove_base(iMove + AT_MOVE_0) - &pkdex->getMoves().front();
+    const Move* base = &cPokemon.getMove_base(iMove + AT_MOVE_0);
 
     for (size_t iValidMove = 0, iValidSize = cMovelist.size(); iValidMove != iValidSize; ++iValidMove)
     {
-      if (iBase == cMovelist[iValidMove]) { isValid[iValidMove] = false; validMoves--; break; }
+      if (base == cMovelist[iValidMove]) { isValid[iValidMove] = false; validMoves--; break; }
     }
   }
 
@@ -1249,7 +1250,7 @@ void ranked_team::randomMove(PokemonNonVolatile& cPokemon, size_t numMoves)
     {
       iMove = rand() % cMovelist.size();
 
-      const Move& possibleMove = pkdex->getMoves().at(cMovelist.at(iMove));
+      const Move& possibleMove = *cMovelist.at(iMove);
 
       // has this move been used before?
       if (!isValid.at(iMove))
@@ -1273,7 +1274,7 @@ void ranked_team::randomMove(PokemonNonVolatile& cPokemon, size_t numMoves)
 
     isValid.at(iMove) = false;
     validMoves--;
-    MoveNonVolatile cMove(pkdex->getMoves().at(cMovelist.at(iMove)));
+    MoveNonVolatile cMove(*cMovelist.at(iMove));
 
     if ((cPokemon.getNumMoves() < numMoves) || (iSlot >= cPokemon.getNumMoves()))
     {

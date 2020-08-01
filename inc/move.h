@@ -11,6 +11,7 @@
 #include "../inc/pluggable.h"
 
 class Type;
+class Types;
 class Pokedex;
 
 class PKAISHARED Move: public Name, public Pluggable
@@ -181,6 +182,17 @@ public:
   Move(const Move& source);
   Move& operator=(const Move& source);
   ~Move();
+};
+
+
+class PKAISHARED Moves: public std::vector<Move>
+{
+public:
+  bool initialize(const std::string& path, const Types& types);
+
+protected:
+  bool loadFromFile(const std::string& path, const Types& types);
+  bool loadFromFile_lines(const Types& types, const std::vector<std::string>& lines, size_t& iLine);
 };
 
 #endif	/* MOVE_H */

@@ -3,6 +3,7 @@
 
 #include "../inc/pkai.h"
 
+#include <memory>
 #include <vector>
 #include <stdint.h>
 
@@ -15,13 +16,13 @@
 #include "../inc/move.h"
 #include "../inc/pokemon_base.h"
 #include "../inc/pokedex.h"
+#include "../inc/pokedex_dynamic.h"
 #include "../inc/team_volatile.h"
 #include "../inc/trueSkill.h"
 #include "../inc/neuralNet.h"
 #include "../inc/temporalpropNet.h"
 #include "../inc/experienceNet.h"
 
-namespace boost { namespace dll { class shared_library; } }
 class PkIO;
 class Game;
 class Trainer;
@@ -29,7 +30,7 @@ class PokemonNonVolatile;
 class Evaluator;
 class Planner;
 
-class PokemonAI : public Pokedex
+class PokemonAI
 {
 private:
   friend class PkIO;
@@ -95,17 +96,12 @@ private:
   // game variables:
   size_t maxPlies;
   size_t maxMatches;
+  
+  PokedexDynamic::Config pokedex_config;
 
-  std::vector<Move> moves; // list of all acceptable moves
-  std::vector<Type> types; // list of all acceptable types
-  std::vector<PokemonBase> pokemon; // list of all acceptable pokemon
-  std::vector<Ability> abilities; // list of all acceptable abilities
-  std::vector<Nature> natures; // list of all acceptable natures
-  std::vector<Item> items; // list of all acceptable items
-  EnginePlugins engineExtensions; // list of engine extensions
+  std::unique_ptr<Pokedex> pokedex;
   std::vector<TeamNonVolatile> teams; // growable list of team_nonvolatile objects
   std::vector<neuralNet> networks; // growable list of neural network evaluation functions
-  std::vector<boost::dll::shared_library*> plugins; // growable list of plugins (need to be closed upon exiting program)
 
 public:
 
@@ -120,22 +116,6 @@ public:
   void printPlanners() const;
   /* returns a NEW planner */
   Planner* plannerSelect(char playerID);
-
-  std::vector<Move>& getMoves() { return moves; };
-  std::vector<Type>& getTypes() { return types; };
-  std::vector<PokemonBase>& getPokemon() { return pokemon; };
-  std::vector<Ability>& getAbilities() { return abilities; };
-  std::vector<Nature>& getNatures() { return natures; };
-  std::vector<Item>& getItems() { return items; };
-  EnginePlugins& getExtensions() { return engineExtensions; };
-  std::vector<boost::dll::shared_library*>& getPlugins() { return plugins; };
-  const std::vector<Move>& getMoves() const { return moves; };
-  const std::vector<Type>& getTypes() const { return types; };
-  const std::vector<PokemonBase>& getPokemon() const { return pokemon; };
-  const std::vector<Ability>& getAbilities() const { return abilities; };
-  const std::vector<Nature>& getNatures() const { return natures; };
-  const std::vector<Item>& getItems() const { return items; };
-  const EnginePlugins& getExtensions() const { return engineExtensions; };
 
   std::vector<TeamNonVolatile>& getTeams() { return teams; }; 
 

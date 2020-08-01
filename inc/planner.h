@@ -3,6 +3,8 @@
 
 #include "../inc/pkai.h"
 
+#include <vector>
+
 #include "../inc/name.h"
 
 class Evaluator;

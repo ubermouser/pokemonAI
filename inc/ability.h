@@ -24,10 +24,18 @@ public:
   Ability(const Ability& source);
   ~Ability();
 
-  friend class Pokedex;
-private:
-
   std::string script;
+};
+
+
+class PKAISHARED Abilities: public std::vector<Ability>
+{
+public:
+  bool initialize(const std::string& path);
+
+protected:
+  bool loadFromFile(const std::string& path);
+  bool loadFromFile_lines(const std::vector<std::string>& lines, size_t& iLine);
 };
 
 #endif	/* ABILITY_H */

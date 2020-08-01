@@ -11,11 +11,13 @@
 #include "../inc/pkai.h"
 
 #include <string>
+#include <vector>
 
 #include "../inc/name.h"
 #include "../inc/pluggable.h"
 
 class Type;
+class Types;
 
 class PKAISHARED Item : public Name, public Pluggable
 {
@@ -56,7 +58,6 @@ public:
   Item(const Item& source);
   ~Item() { };
   
-private:
   /* the type of move whose power is boosted by 20% when this object is held */
   const Type* boostedType;
 
@@ -73,8 +74,17 @@ private:
   uint8_t naturalGift_power;
 
   bool lostChild;
+};
 
-  friend class Pokedex;
+
+class PKAISHARED Items: public std::vector<Item>
+{
+public:
+  bool initialize(const std::string& path, const Types& types);
+
+protected:
+  bool loadFromFile(const std::string& path, const Types& types);
+  bool loadFromFile_lines(const Types& types, const std::vector<std::string>& lines, size_t& iLine);
 };
 
 #endif	/* ITEM_H */

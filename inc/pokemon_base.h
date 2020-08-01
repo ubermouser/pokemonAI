@@ -17,7 +17,11 @@
 #include "../inc/name.h"
 
 class Type;
+class Types;
 class Ability;
+class Abilities;
+class Move;
+class Moves;
 class Pokedex;
 
 /*
@@ -75,7 +79,7 @@ public:
 
   bool lostChild;
 
-  std::vector<size_t> movelist;
+  std::vector<const Move*> movelist;
 
   const Type& getType(size_t iType) const { return *types[iType]; };
 
@@ -83,6 +87,33 @@ public:
 
   const Ability& getAbility(size_t iAbility) const { return *abilities[iAbility]; }
 
+};
+
+
+class PKAISHARED Pokemons: public std::vector<PokemonBase>
+{
+public:
+  bool initialize(
+      const std::string& pokemonPath,
+      const std::string& movelistPath,
+      const Types& types,
+      const Abilities& abilities,
+      const Moves& moves);
+
+protected:
+  bool loadFromFile(
+      const std::string& path,
+      const Types& types,
+      const Abilities& abilities);
+  bool loadFromFile_lines(
+      const Types& types,
+      const Abilities& abilities,
+      const std::vector<std::string>& lines,
+      size_t& iLine);
+
+  bool loadMovelistFromFile(const std::string& path, const Moves& moves);
+  bool loadMovelistFromFile_lines(
+      const Moves& moves, const std::vector<std::string>& lines, size_t& iLine);
 };
 
 #endif	/* POKEMON_BASE_H */

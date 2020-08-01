@@ -11,7 +11,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
 
-#include "../inc/pokedex.h"
+#include "../inc/engine.h"
 #include "../inc/pkIO.h"
 
 template <class data_t>

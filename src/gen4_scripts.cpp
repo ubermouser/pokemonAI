@@ -8,17 +8,8 @@
 
 //#define PKAI_IMPORT
 #include "../inc/orphan.h"
-#include "../inc/type.h"
-#include "../inc/move.h"
-#include "../inc/move_volatile.h"
-#include "../inc/move_nonvolatile.h"
-#include "../inc/pokemon_volatile.h"
-#include "../inc/pokemon_nonvolatile.h"
-#include "../inc/environment_nonvolatile.h"
-#include "../inc/environment_volatile.h"
-#include "../inc/environment_possible.h"
+#include "../inc/engine.h"
 #include "../inc/pkCU.h"
-#include "../inc/pokedex.h"
 //#undef PKAI_IMPORT
 
 //#define PKAI_EXPORT

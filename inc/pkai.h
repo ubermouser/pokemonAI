@@ -8,8 +8,7 @@
 // standard C libraries:
 #include <stddef.h>
 #include <stdint.h>
-#include <vector>
-#include <array>
+
 #include "../src/fixedpoint/fixed_class.h"
 
 // C++ libraries:

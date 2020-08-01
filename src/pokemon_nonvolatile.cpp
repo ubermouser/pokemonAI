@@ -13,6 +13,7 @@
 #include "../inc/nature.h"
 #include "../inc/ability.h"
 #include "../inc/item.h"
+#include "../inc/move.h"
 //#undef PKAI_STATIC
 #include "../inc/init_toolbox.h"
 #include "../inc/orphan.h"
@@ -366,9 +367,8 @@ bool PokemonNonVolatile::isLegalSet(size_t iAction, const Move& candidate) const
     if (&getMove_base(AT_MOVE_0 + iMove) == &candidate) { return false; }
   }
 
-  size_t candidateIndex = (&candidate - &pkdex->getMoves().front());
-  const std::vector<size_t>& cMovelist = getBase().movelist;
-  if (!std::binary_search(cMovelist.begin(), cMovelist.end(), candidateIndex)) { return false; }
+  const std::vector<const Move*>& cMovelist = getBase().movelist;
+  if (!std::binary_search(cMovelist.begin(), cMovelist.end(), &candidate)) { return false; }
 
   return true;
 }
