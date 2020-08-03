@@ -11,11 +11,13 @@
 #include "../inc/pkai.h"
 
 #include <stdint.h>
+#include <vector>
 
 #include "../src/fixedpoint/fixed_class.h"
 #include "../inc/environment_volatile.h"
 
 typedef fixedpoint::fixed_point<30> fixType;
+class EnvironmentNonvolatile;
 
 union PKAISHARED EnvironmentPossible
 {
@@ -69,6 +71,10 @@ union PKAISHARED EnvironmentPossible
   /* Is the probability of this entity occuring less than the probability of 
    the other entity occuring?*/
   bool operator<(const EnvironmentPossible& other) const;
+  
+  /* print details of a single state */
+  void printState(
+      const EnvironmentNonvolatile& envNV, size_t iState=SIZE_MAX, size_t iPly=SIZE_MAX) const;
 
   const EnvironmentVolatile& getEnv() const { return data.env; };
 
@@ -184,6 +190,45 @@ union PKAISHARED EnvironmentPossible
   void generateHash();
 };
 
+
+class PKAISHARED PossibleEnvironments : public std::vector<EnvironmentPossible> {
+public:
+  using base_t = std::vector<EnvironmentPossible>;
+  
+  /* Print details of all possible states */
+  void printStates(const EnvironmentNonvolatile& envNV, size_t iPly=SIZE_MAX) const;
+  
+  /* Selects a state as per the user's choice to evaluate upon */
+  const EnvironmentPossible* stateSelect_index(const EnvironmentNonvolatile& envNV) const {
+    printStates(envNV);
+    return stateSelect_index();
+  }
+  const EnvironmentPossible* stateSelect_index() const {
+    size_t indexState;
+    return stateSelect_index(indexState);
+  }
+  const EnvironmentPossible* stateSelect_index(size_t& indexState) const;
+  
+  /* selects a state at random, giving greater odds to state with higher probabilities of occurence */
+  const EnvironmentPossible& stateSelect_roulette() const {
+    size_t indexState;
+    return stateSelect_roulette(indexState);
+  }
+  const EnvironmentPossible& stateSelect_roulette(size_t& indexState) const;
+  
+  size_t getNumUnique() const { return size() - numMerged; };
+  void decrementUnique() { numMerged++; }
+  
+  void clear() {
+    base_t::clear();
+    numMerged = 0;
+  }
+  
+protected:
+  size_t numMerged = 0;
+};
+
+
 class PKAISHARED envP_print
 {
 private:
@@ -201,6 +246,7 @@ public:
 
   friend PKAISHARED std::ostream& operator <<(std::ostream& os, const envP_print& environment);
 };
+
 
 PKAISHARED std::ostream& operator <<(std::ostream& os, const envP_print& environment);
 

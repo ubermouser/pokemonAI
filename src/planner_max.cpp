@@ -120,9 +120,6 @@ uint32_t planner_max::generateSolution(PkCU& cu, Evaluator& eval, const Environm
   // a count of the number of nodes evaluated:
   size_t nodesEvaluated = 0;
 
-  // generate array of all possible actions:
-  std::vector<EnvironmentPossible> rEnvP;
-
   // determine the best action based upon the evaluator's prediction:
   fpType bestFitness = -std::numeric_limits<double>::infinity();
   size_t iBestAction = SIZE_MAX;
@@ -132,8 +129,10 @@ uint32_t planner_max::generateSolution(PkCU& cu, Evaluator& eval, const Environm
     if (!cu.isValidAction(origin.getEnv(), iAction, agentTeam)) { continue; }
 
     // produce the resulting state of iAction:
-    rEnvP.clear();
-    cu.updateState(origin.getEnv(), rEnvP, agentTeam==TEAM_A?iAction:AT_MOVE_NOTHING, agentTeam==TEAM_B?iAction:AT_MOVE_NOTHING);
+    PossibleEnvironments rEnvP = cu.updateState(
+        origin.getEnv(),
+        agentTeam==TEAM_A?iAction:AT_MOVE_NOTHING,
+        agentTeam==TEAM_B?iAction:AT_MOVE_NOTHING);
 
     fpType lbFitness = 0.0;
     fpType uncertainty = 1.0;

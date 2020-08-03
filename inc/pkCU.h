@@ -3,12 +3,14 @@
 
 #include "../inc/pkai.h"
 
+#include <memory>
 #include <stdint.h>
 #include <vector>
 #include <array>
 #include <assert.h>
 
 #include "../inc/environment_possible.h"
+#include "../inc/environment_volatile.h"
 #include "../inc/pluggable.h"
 
 class EnvironmentNonvolatile;
@@ -86,7 +88,7 @@ private:
   std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>* cPluginSet;
 
   /* stack of environment_possible objects */
-  std::vector<EnvironmentPossible>* _stack;
+  PossibleEnvironments* _stack;
 
   /* the stage of computation each element on the stack is in */
   std::vector<uint32_t> stackStage;
@@ -269,7 +271,11 @@ public:
    * 
    * returns: number of unique environments in vector
    */
-  size_t updateState(const EnvironmentVolatile& currentEnvironment, std::vector<EnvironmentPossible>& resultEnvironments, size_t actionA, size_t actionB);
+  PossibleEnvironments updateState(const EnvironmentVolatile& currentEnvironment, size_t actionA, size_t actionB);
+  size_t updateState(const EnvironmentVolatile& currentEnvironment, PossibleEnvironments& resultEnvironments, size_t actionA, size_t actionB);
+
+  /* Seed an initial state from an EnvironmentNonvolatile, then return its volatile state. */
+  EnvironmentVolatile initialState() const;
 
   /* determines whether a given action is a selectable one, given the current state */
   bool isValidAction(const EnvironmentVolatile& envV, size_t action, size_t iTeam);
@@ -277,9 +283,9 @@ public:
   /* determines whether a game has ended, given the current state. Returns an enum of the game's current status */
   MatchState isGameOver(const EnvironmentVolatile& envV);
 
-  std::vector<EnvironmentPossible>& getStack() { return *_stack; };
+  PossibleEnvironments& getStack() { return *_stack; };
 
-  const std::vector<EnvironmentPossible>& getStack() const { assert(_stack != NULL); return *_stack; };
+  const PossibleEnvironments& getStack() const { assert(_stack != NULL); return *_stack; };
 
   DamageComponents_t& getDamageComponent(size_t iStack) { return damageComponents[iStack]; };
 
@@ -345,7 +351,7 @@ public:
   void nPlicateState(std::array<size_t, numEnvironments>& result, size_t iState = SIZE_MAX)
   {
     if (iState == SIZE_MAX) { iState = iBase; }
-    std::vector<EnvironmentPossible>& stack = getStack();
+    PossibleEnvironments& stack = getStack();
 
     //assert((stack.size() + numEnvironments) <= MAXSTACKSIZE);
 

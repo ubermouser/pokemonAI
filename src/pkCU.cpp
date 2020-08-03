@@ -1154,8 +1154,7 @@ void PkCU::calculateDamage(bool hasCrit)
 
 size_t PkCU::combineSimilarEnvironments()
 {
-  std::vector<EnvironmentPossible>& stack = getStack();
-  size_t numUnique = stack.size();
+  PossibleEnvironments& stack = getStack();
 
 #ifndef NDEBUG
 #ifndef _DISABLEPROBABILITYCHECK
@@ -1164,7 +1163,7 @@ size_t PkCU::combineSimilarEnvironments()
 #endif
 
   // hash environments (and summate probabilities for check):
-  for (iBase = 0; iBase != numUnique; ++iBase)
+  for (iBase = 0; iBase != stack.size(); ++iBase)
   {
     EnvironmentPossible& cEnvironment = getBase();
 
@@ -1177,7 +1176,7 @@ size_t PkCU::combineSimilarEnvironments()
   }
 
   // compare environment hashes:
-  for (size_t iOEnv = 0, iSize = numUnique; iOEnv != iSize; iOEnv++)
+  for (size_t iOEnv = 0, iSize = stack.size(); iOEnv != iSize; iOEnv++)
   {
     EnvironmentPossible& oEnv = stack[iOEnv];
     fpType& oProbability = damageComponents[iOEnv].cProbability;
@@ -1212,7 +1211,7 @@ size_t PkCU::combineSimilarEnvironments()
       iEnv.setPruned();
 
       // decrement number of unique values in vector
-      numUnique--;
+      stack.decrementUnique();
 
     } //endOf iInner
 
@@ -1231,7 +1230,7 @@ size_t PkCU::combineSimilarEnvironments()
   assert(mostlyEQ(probabilityAccumulator, 1.0));
 #endif
 
-  return numUnique;
+  return stack.getNumUnique();
 } //endOf combineSimilarEnvironments
 
 
@@ -1281,8 +1280,20 @@ void PkCU::updateState_move()
 
 
 
-size_t PkCU::updateState(const EnvironmentVolatile& cEnv, std::vector<EnvironmentPossible>& rEnv, size_t actionA, size_t actionB)
-{
+PossibleEnvironments PkCU::updateState(
+    const EnvironmentVolatile& currentEnvironment, size_t actionA, size_t actionB) {
+  PossibleEnvironments result;
+  updateState(currentEnvironment, result, actionA, actionB);
+  
+  return result;
+}
+
+
+size_t PkCU::updateState(
+    const EnvironmentVolatile& cEnv, 
+    PossibleEnvironments& rEnv,
+    size_t actionA, 
+    size_t actionB) {
   // set stack callback value:
   _stack = &rEnv;
 
@@ -1336,6 +1347,14 @@ size_t PkCU::updateState(const EnvironmentVolatile& cEnv, std::vector<Environmen
   
   return numUnique;
 }; // end of updateState
+
+
+
+
+
+EnvironmentVolatile PkCU::initialState() const {
+  return EnvironmentVolatile::create(*nv);
+}
 
 
 
@@ -1462,7 +1481,7 @@ bool PkCU::isValidAction(const EnvironmentVolatile& envV, size_t action, size_t 
 
 void PkCU::seedCurrentState(const EnvironmentVolatile& cEnv)
 {
-  std::vector<EnvironmentPossible>& stack = getStack();
+  PossibleEnvironments& stack = getStack();
 
   size_t numRandomSquared = numRandomEnvironments * numRandomEnvironments;
 

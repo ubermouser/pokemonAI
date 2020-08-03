@@ -189,9 +189,6 @@ uint32_t planner_directed::generateSolution(const EnvironmentPossible& origin)
   // a count of the number of nodes evaluated:
   size_t nodesEvaluated = 0;
 
-  // generate array of all possible actions:
-  std::vector<EnvironmentPossible> rEnvP;
-
   // determine the best action based upon the evaluator's prediction:
   fpType bestModFitness = -std::numeric_limits<double>::infinity();
   fpType bestExperience, bestFitness;
@@ -203,8 +200,10 @@ uint32_t planner_directed::generateSolution(const EnvironmentPossible& origin)
     if (!cu->isValidAction(origin.getEnv(), iAction, agentTeam)) { continue; }
 
     // produce the resulting state of iAction:
-    rEnvP.clear();
-    cu->updateState(origin.getEnv(), rEnvP, agentTeam==TEAM_A?iAction:AT_MOVE_NOTHING, agentTeam==TEAM_B?iAction:AT_MOVE_NOTHING);
+    PossibleEnvironments rEnvP = cu->updateState(
+        origin.getEnv(), 
+        agentTeam==TEAM_A?iAction:AT_MOVE_NOTHING,
+        agentTeam==TEAM_B?iAction:AT_MOVE_NOTHING);
 
     fpType lbModFitness = 0.0;
     fpType lbFitness = 0.0;

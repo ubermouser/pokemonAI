@@ -113,15 +113,6 @@ private:
    * AT_ITEM_USE: pokemon uses an item (not implemented)
    */
   unsigned int actionSelect(const EnvironmentVolatile& env, unsigned int iTeam);
-  
-  /* Selects a state as per the user's choice to evaluate upon */
-  const EnvironmentVolatile& stateSelect(const std::vector<EnvironmentPossible>& possibleEnvironments);
-
-  /* Selects a state as per the user's choice to evaluate upon */
-  size_t stateSelect_index(const std::vector<EnvironmentPossible>& possibleEnvironments);
-  
-  /* selects a state at random, giving greater odds to state with higher probabilities of occurance */
-  size_t stateSelect_Roulette(const std::vector<EnvironmentPossible>& possibleEnvironments);
 
   /* Prints the pokemon of a given team to stdout 
    * @param verbosity - how verbose should the output of the printed teams be?
@@ -139,12 +130,6 @@ private:
 
   /* prints the current action */
   void printAction(const TeamVolatile& currentTeam, unsigned int indexAction, unsigned int iTeam);
-  
-  /* Print details of all possible states */
-  void printStates(const std::vector<EnvironmentPossible>& possibleEnvironments, size_t numUnique);
-
-  /* print details of a single state */
-  void printState(const EnvironmentPossible& possible, size_t iState, size_t iPly = SIZE_MAX);
 
   /* prints interesting facts about the game */
   void printGameOutline(const GameResult& gResult, const std::vector<Turn>& gLog, const EnvironmentNonvolatile& cEnv);

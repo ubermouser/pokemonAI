@@ -194,6 +194,12 @@
                    displayName="Test Files"
                    projectFiles="false"
                    kind="TEST_LOGICAL_FOLDER">
+      <logicalFolder name="f2"
+                     displayName="test_engine"
+                     projectFiles="true"
+                     kind="TEST">
+        <itemPath>src/tests/test_engine.cpp</itemPath>
+      </logicalFolder>
       <logicalFolder name="f1"
                      displayName="test_pokedex"
                      projectFiles="true"
@@ -314,6 +320,25 @@
           <linkerLibItems>
             <linkerOptionItem>-lgtest_main</linkerOptionItem>
             <linkerOptionItem>-lgtest</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
+      <folder path="TestFiles/f2">
+        <cTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </cTool>
+        <ccTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f2</output>
+          <linkerLibItems>
+            <linkerOptionItem>-lgtest</linkerOptionItem>
+            <linkerOptionItem>-lgtest_main</linkerOptionItem>
           </linkerLibItems>
         </linkerTool>
       </folder>
@@ -522,6 +547,8 @@
       <item path="src/signature.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/temporalpropNet.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/tests/test_engine.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/tests/test_pokedex.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -687,6 +714,21 @@
           <output>${TESTDIR}/TestFiles/f1</output>
         </linkerTool>
       </folder>
+      <folder path="TestFiles/f2">
+        <cTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </cTool>
+        <ccTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f2</output>
+        </linkerTool>
+      </folder>
       <item path="inc/ability.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/agentMove.h" ex="false" tool="3" flavor2="0">
@@ -892,6 +934,8 @@
       <item path="src/signature.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/temporalpropNet.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/tests/test_engine.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/tests/test_pokedex.cpp" ex="false" tool="1" flavor2="0">
       </item>

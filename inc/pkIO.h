@@ -44,7 +44,9 @@ public:
 
   static bool parseArg(const std::string& input, PkIO*& target);
   
-  static bool inputRankedTeam(const boost::filesystem::path& path, ranked_team& cTeam); 
+  static bool inputRankedTeam(const boost::filesystem::path& path, ranked_team& cTeam);
+
+  static TeamNonVolatile inputPlayerTeam(const std::string& path);
   static bool inputPlayerTeam(const boost::filesystem::path& path, TeamNonVolatile& cTeam);
 
   static bool inputRankedNetwork(const boost::filesystem::path& path, ranked_neuralNet& cNet);

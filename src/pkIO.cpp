@@ -2,6 +2,7 @@
 
 #include <ostream>
 #include <algorithm>
+#include <stdexcept>
 
 #include <boost/function.hpp>
 #include <boost/dll/shared_library.hpp>
@@ -350,6 +351,17 @@ bool PkIO::inputRankedTeam(const boost::filesystem::path& path, ranked_team& cTe
   size_t iLine = 0;
   return cTeam.input(lines, iLine);
 } // endOf inputRankedTeam
+
+
+TeamNonVolatile PkIO::inputPlayerTeam(const std::string& path) {
+  TeamNonVolatile result;
+
+  if (!inputPlayerTeam(path, result)) {
+    throw std::runtime_error("Failed to load team");
+  }
+
+  return result;
+}
 
 bool PkIO::inputPlayerTeam(const boost::filesystem::path& path, TeamNonVolatile& cResult)
 {

@@ -121,8 +121,6 @@ uint32_t planner_stochastic::generateSolution(const EnvironmentPossible& origin)
 
   if (explorationChance < exploration) // perform softmax via a boltzmann distribution:
   {
-    // generate array of all possible actions:
-    std::vector<EnvironmentPossible> rEnvP;
     // and store their full unpruned fitnesses:
     std::vector<fpType> fitnesses(AT_ITEM_USE, 0.0);
     fpType bestFitness = -std::numeric_limits<fpType>::infinity();
@@ -133,8 +131,10 @@ uint32_t planner_stochastic::generateSolution(const EnvironmentPossible& origin)
       if (!cu->isValidAction(origin.getEnv(), iAction, agentTeam)) { continue; }
 
       // produce the resulting state of iAction:
-      rEnvP.clear();
-      cu->updateState(origin.getEnv(), rEnvP, agentTeam==TEAM_A?iAction:AT_MOVE_NOTHING, agentTeam==TEAM_B?iAction:AT_MOVE_NOTHING);
+      PossibleEnvironments rEnvP = cu->updateState(
+          origin.getEnv(),
+          agentTeam==TEAM_A?iAction:AT_MOVE_NOTHING,
+          agentTeam==TEAM_B?iAction:AT_MOVE_NOTHING);
 
       fpType& fitness = fitnesses[iAction];
       BOOST_FOREACH(const EnvironmentPossible& cEnvP, rEnvP)

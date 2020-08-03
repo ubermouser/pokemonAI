@@ -7,7 +7,6 @@
 #include "../inc/evaluator.h"
 #include "../inc/evaluator_simple.h"
 #include "../inc/fp_compare.h"
-#include "../inc/roulette.h"
 
 #include "../inc/pkCU.h"
 #include "../inc/environment_nonvolatile.h"
@@ -270,29 +269,26 @@ void Game::run()
             printAction(cEnvP.getEnv().getTeam(iTeam), actions[iTeam], iTeam);
           }
         }
-
-        // predict what will occur given these actions and their probabilities
-        std::vector<EnvironmentPossible> possibleEnvironments;
     
-        // determine what will happen and at what probability
-        size_t numUnique = cu->updateState(cEnvP.getEnv(), possibleEnvironments, actions[TEAM_A], actions[TEAM_B]);
-        assert(numUnique > 0);
+        // predict what will occur given these actions and their probabilities
+        PossibleEnvironments possibleEnvironments = cu->updateState(
+            cEnvP.getEnv(), actions[TEAM_A], actions[TEAM_B]);
+        assert(possibleEnvironments.getNumUnique() > 0);
 
-        size_t iEnvironment;
+        const EnvironmentPossible* nextEnvironment;
         if (allowStateSelection)
         {
-          printStates(possibleEnvironments, numUnique);
-          iEnvironment = stateSelect_index(possibleEnvironments);
+          nextEnvironment = possibleEnvironments.stateSelect_index(cEnvNV);
         }
         else
         {
-          iEnvironment = stateSelect_Roulette(possibleEnvironments);
+          nextEnvironment = &possibleEnvironments.stateSelect_roulette();
         }
 
         // perform state transition:
-        if (iEnvironment != SIZE_MAX) 
+        if (nextEnvironment != NULL)
         {
-          const EnvironmentPossible& switchedEnvironment = possibleEnvironments.at(iEnvironment);
+          const EnvironmentPossible& switchedEnvironment = *nextEnvironment;
 
           // create a log of this turn:
           if (!rollout) { digestTurn(*cLog, actions[TEAM_A], actions[TEAM_B], iLastEnvironment, cEnvP); }
@@ -307,13 +303,14 @@ void Game::run()
           if (verbose >= 3)
           {
             if (verbose >= 4) { std::cout << "\n"; }
-            printState(switchedEnvironment, iEnvironment, iPly);
+            switchedEnvironment.printState(
+                cEnvNV, nextEnvironment - &possibleEnvironments.front(), iPly);
             std::cout << "\n";
           }
 
           // perform the state transition:
           cEnvP = switchedEnvironment;
-          iLastEnvironment = iEnvironment;
+          iLastEnvironment = nextEnvironment - &possibleEnvironments.front();
         }
       } // endOf if matchState isn't terminal
       else if (verbose >= 2 && maxMatches > 1)
@@ -475,91 +472,6 @@ void Game::run()
     hResult.score[TEAM_B] = numWins[TEAM_B];
   }
 } // endOf run
-
-
-
-
-
-const EnvironmentVolatile& Game::stateSelect(const std::vector<EnvironmentPossible>& possibleEnvironments)
-{
-  size_t state = stateSelect_index(possibleEnvironments);
-  if (state == SIZE_MAX) return cEnvP.getEnv();
-  return possibleEnvironments.at(state).getEnv();
-}
-
-
-
-
-
-size_t Game::stateSelect_index(const std::vector<EnvironmentPossible>& possibleEnvironments)
-{
-  std::string input = "";
-  int32_t state;
-  
-  do
-  {
-    std::cout << "Please select the index of the desired state for the player, -1 for a random state, or -2 to go discard these states\n";
-    getline(std::cin, input);
-    std::stringstream inputResult(input);
-    
-    // determine if state is valid:
-    
-    if (!(inputResult >> state) || 
-      !(state < (int32_t) possibleEnvironments.size() && state >= -2))
-    {
-      std::cout << "Invalid state \"" << input << "\"!\n";
-      
-      continue;
-    }
-
-    if ((state >= 0 && state < (int32_t) possibleEnvironments.size()) && possibleEnvironments.at(state).isPruned())
-    {
-      std::cout << "State " << input << " was pruned!\n";
-      continue;
-    }
-    
-    break;
-  }while(true);
-  
-  if (state == -2)
-  {
-    return SIZE_MAX;
-  }
-  
-  if (state == -1)
-  {
-    // choose random state
-    state = (int32_t) stateSelect_Roulette(possibleEnvironments);
-    
-    std::cout << "Randomly chose state " << state << "\n";
-  }
-  
-  // else
-  return (size_t) state;
-} // endOf stateSelect_index
-
-
-
-
-
-class sortByProbability
-{
-public:
-  static fpType getValue (const EnvironmentPossible& cEnvP)
-  {
-    if (cEnvP.isPruned()) { return std::numeric_limits<fpType>::quiet_NaN(); }
-    return cEnvP.getProbability().to_double();
-  };
-};
-
-size_t Game::stateSelect_Roulette(const std::vector<EnvironmentPossible>& possibleEnvironments)
-{
-  size_t result = roulette<EnvironmentPossible, sortByProbability>::select(possibleEnvironments, sortByProbability());
-
-  assert((result != SIZE_MAX) && "roulette selection did not produce a reachable state!");
-
-  return result;
-};
 
 
 
@@ -888,92 +800,6 @@ const EnvironmentNonvolatile& Game::getEnvNV() const
 {
   return cEnvNV;
 };
-
-
-
-
-
-void Game::printStates(const std::vector<EnvironmentPossible>& possibleEnvironments, size_t numUnique)
-{
-  std::cout << numUnique << "(" << possibleEnvironments.size() << ") possible states!\n";
-  for (size_t iState = 0; iState < possibleEnvironments.size(); iState++)
-  {
-    if (possibleEnvironments.at(iState).isPruned()) { continue; } // don't display pruned states
-
-    printState(possibleEnvironments.at(iState), iState);
-  }
-
-  std::cout << "\n";
-}
-
-
-
-
-
-void Game::printState(const EnvironmentPossible& possible, size_t iState, size_t iPly)
-{
-  // print ply index if we have a valid one:
-  if (iPly != SIZE_MAX) { std::cout << "ply " << iPly << ", "; }
-  // print state and probability:
-  std::cout << 
-    "s=" << iState << 
-    ", p=" << possible.getProbability().to_double();
-  // print status tokens:
-  for (unsigned int iTeam = 0; iTeam < 2; iTeam++)
-  {
-    if (possible.hasFreeMove(iTeam))
-    {
-      std::cout << " " << (iTeam==TEAM_A?"A":"B") << "-Free";
-    }
-    if (possible.hasSwitched(iTeam))
-    {
-      std::cout << " " << (iTeam==TEAM_A?"A":"B") << "-Switch";
-      continue;
-    }
-    if (possible.hasWaited(iTeam))
-    {
-      std::cout << " " << (iTeam==TEAM_A?"A":"B") << "-Wait";
-      continue;
-    }
-    if (!possible.hasHit(iTeam))
-    {
-      std::cout << " " << (iTeam==TEAM_A?"A":"B") << "-Miss";
-    }
-    if (possible.hasSecondary(iTeam))
-    {
-      std::cout << " " << (iTeam==TEAM_A?"A":"B") << "-Status";
-    }
-    if (possible.hasCrit(iTeam))
-    {
-      std::cout << " " << (iTeam==TEAM_A?"A":"B") << "-Crit";
-    }
-    if (possible.wasBlocked(iTeam))
-    {
-      std::cout << " " << (iTeam==TEAM_A?"A":"B") << "-Blocked";
-    }
-  } // endof foreach team
-
-  if (possible.isMerged())
-  {
-    std::cout << " (MERGED)";
-  }
-
-  if (possible.isPruned())
-  {
-    std::cout << " (PRUNED)";
-  }
-
-  // print active pokemon:
-  std::cout << "\n";
-  std::cout << "\ttA: " << pokemon_print(
-    cEnvNV.getTeam(0).getPKNV(possible.getEnv().getTeam(0)), 
-    possible.getEnv().getTeam(0),
-    possible.getEnv().getTeam(0).getPKV());
-  std::cout << "\ttB: " << pokemon_print(
-    cEnvNV.getTeam(1).getPKNV(possible.getEnv().getTeam(1)), 
-    possible.getEnv().getTeam(1),
-    possible.getEnv().getTeam(1).getPKV());
-}
 
 
 
