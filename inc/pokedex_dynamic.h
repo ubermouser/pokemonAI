@@ -21,9 +21,11 @@ public:
   struct Config: public PokedexStatic::Config {
     // location of the plugin library root directory
     std::string pluginsPath_ = "plugins";
+    
+    Config() {};
   };
   
-  PokedexDynamic(const Config& config, bool doInitialize=true) 
+  PokedexDynamic(const Config& config=Config(), bool doInitialize=true) 
     : PokedexStatic(config, doInitialize), config_(config) { }
   virtual ~PokedexDynamic() {};
     

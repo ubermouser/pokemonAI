@@ -86,7 +86,7 @@ TESTFILES= \
 
 # Test Object Files
 TESTOBJECTFILES= \
-	${TESTDIR}/src/tests/test_pkcu.o
+	${TESTDIR}/src/tests/test_pokedex.o
 
 # C Compiler Flags
 CFLAGS=
@@ -329,15 +329,15 @@ ${OBJECTDIR}/src/vertex.o: src/vertex.cpp
 .build-tests-conf: .build-tests-subprojects .build-conf ${TESTFILES}
 .build-tests-subprojects:
 
-${TESTDIR}/TestFiles/f1: ${TESTDIR}/src/tests/test_pkcu.o ${OBJECTFILES:%.o=%_nomain.o}
+${TESTDIR}/TestFiles/f1: ${TESTDIR}/src/tests/test_pokedex.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc} -o ${TESTDIR}/TestFiles/f1 $^ ${LDLIBSOPTIONS}   
 
 
-${TESTDIR}/src/tests/test_pkcu.o: src/tests/test_pkcu.cpp 
+${TESTDIR}/src/tests/test_pokedex.o: src/tests/test_pokedex.cpp 
 	${MKDIR} -p ${TESTDIR}/src/tests
 	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -I. -MMD -MP -MF "$@.d" -o ${TESTDIR}/src/tests/test_pkcu.o src/tests/test_pkcu.cpp
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -I. -MMD -MP -MF "$@.d" -o ${TESTDIR}/src/tests/test_pokedex.o src/tests/test_pokedex.cpp
 
 
 ${OBJECTDIR}/src/agentMove_nomain.o: ${OBJECTDIR}/src/agentMove.o src/agentMove.cpp 

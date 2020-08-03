@@ -42,10 +42,12 @@ public:
     std::string movelistsPath_ = "data/gen4_movelist.txt";
     // location of the plugin library root directory
     std::string pluginsPath_ = "plugins";
+    
+    Config(){};
   };
   
-  PokedexStatic(const Config& config, bool doInitialize=true);
-  virtual ~PokedexStatic() {};
+  PokedexStatic(const Config& config=Config(), bool doInitialize=true);
+  virtual ~PokedexStatic();
     
   virtual Moves& getMoves() { return moves_; };
   virtual const Moves& getMoves() const { return moves_; };
@@ -92,7 +94,6 @@ protected:
       const std::vector<std::string>& mismatchedCategories) const;
   
   Config config_;
-  bool initialized_;
 
   Moves moves_; // list of all acceptable moves
   Types types_; // list of all acceptable types

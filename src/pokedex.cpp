@@ -22,18 +22,28 @@ const Pokedex* pkdex = NULL;
 
 
 PokedexStatic::PokedexStatic(const Config& config, bool doInitialize)
- : Pokedex(), 
-   config_(config), 
-   initialized_(false) {
+ : Pokedex(), config_(config) {
   if (doInitialize && !initialize()) {
     throw std::runtime_error("Failed to Initialize Pokedex!");
   }
 }
 
 
-bool PokedexStatic::initialize() {
-  //load data from disk:
+PokedexStatic::~PokedexStatic() {
+  if (pkdex == this) {
+    pkdex = NULL;
+  }
+}
 
+
+bool PokedexStatic::initialize() {
+  // verify global pointer for pokedex is set:
+  // TODO(@drendleman) - remove the need for a global pointer
+  if (pkdex != NULL) {
+    throw std::runtime_error("Cannot initialize multiple pokedexes at a time!");
+  }
+
+  //load data from disk:
   //TYPE library
   if (!types_.initialize(config_.typesPath_)) {
     return false;
@@ -86,6 +96,7 @@ bool PokedexStatic::initialize() {
   }
 #endif /* _DISABLESCRIPTS */
 
+  pkdex = this;
   return true;
 }
 
