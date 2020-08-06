@@ -22,11 +22,11 @@ class PKAISHARED Type: public Name
 public:
   static const Type* no_type;
 
-  std::vector<uint8_t> modTable; // type's values
+  std::vector<uint8_t> modTable_; // type's values
   
-  Type();
-  Type(const Type& source);
-  ~Type() { };
+  Type() = default;
+  Type(const Type& source) = default;
+  virtual ~Type() override = default;
 
   fpType getModifier(const Type& other) const;
 private:

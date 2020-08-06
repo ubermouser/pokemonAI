@@ -11,52 +11,36 @@ public:
   virtual ~HasName() {}
 
   virtual const std::string& getName() const = 0;
-
-  const char* getCName() const { return getName().c_str(); };
 };
 
 
 class PKAISHARED Name : public HasName
 {
 
-private:
-  std::string _name;
+protected:
+  std::string name_;
 
 public:
   void setName(const std::string& source)
   {
-    _name = source;
+    name_ = source;
   };
 
-  const std::string& getName() const
+  virtual const std::string& getName() const override
   {
-    return _name;
+    return name_;
   };
 
   bool operator <(const Name& other) const;
 
-  Name();
-  Name(const std::string& source);
-  Name(const Name& orig);
-  ~Name() {};
+  Name() = default;
+  Name(const Name& orig) = default;
+  Name& operator=(const Name& source) = default;
+  virtual ~Name() override = default;
 
-  Name& operator=(const Name& source);
+  Name(const std::string& source) : name_(source) { };
 
   bool operator >(const Name& other) const;
-  
-  const char* getCName() const
-  {
-    return _name.c_str();
-  };
-  
-  void setName(const char* source)
-  {
-    _name = std::string(source);
-  };
-
-private:
-  void init(const Name& source);
-
 };
 
 #endif	/* NAME_H */

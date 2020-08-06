@@ -11,27 +11,6 @@ using namespace orphan;
 
 const Ability* Ability::no_ability = NULL;
 
-Ability::Ability() 
-  : Name(), 
-  Pluggable(),
-  script()
-{
-}
-
-
-Ability::Ability(const Ability& source) 
-  : Name(source), 
-  Pluggable(source),
-  script(source.script)
-{
-}
-
-
-Ability::~Ability() 
-{
-  script.clear();
-}
-
 
 bool Abilities::initialize(const std::string& path) {
   if (path.empty())
@@ -150,7 +129,7 @@ bool Abilities::loadFromFile_lines(const std::vector<std::string>& lines, size_t
 
     //ability script
     if (tokens.at(1).compare("---") == 0)
-    { cAbility.script.clear(); }
+    { cAbility.script_.clear(); }
     else
     {
       size_t tokenLength = tokens.at(1).size();
@@ -161,7 +140,7 @@ bool Abilities::loadFromFile_lines(const std::vector<std::string>& lines, size_t
         offset = 1;
       }
 
-      cAbility.script = std::string(tokens.at(1).substr(offset, tokenLength - offset));
+      cAbility.script_ = std::string(tokens.at(1).substr(offset, tokenLength - offset));
     }
 
   } //end of per-ability

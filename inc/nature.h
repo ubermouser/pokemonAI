@@ -30,7 +30,7 @@ public:
    * 
    * other FV values are not allocated
    */
-  std::array<uint8_t, 5> modTable;
+  std::array<uint8_t, 5> modTable_;
 };
 
 

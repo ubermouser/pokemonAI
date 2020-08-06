@@ -452,7 +452,7 @@ void PkCU::evaluateMove()
 
     const Move& cMove = getPKNV().getMove_base(iCAction);
     void (PkCU::*evaluate_t)();
-    if ( cMove.damageType == ATK_PHYSICAL || cMove.damageType == ATK_SPECIAL)
+    if ( cMove.damageType_ == ATK_PHYSICAL || cMove.damageType_ == ATK_SPECIAL)
     { evaluate_t = &PkCU::evaluateMove_damage;}
     else
     { evaluate_t = &PkCU::evaluateMove_script;}

@@ -131,7 +131,7 @@ bool Natures::loadFromFile_lines(const std::vector<std::string>& lines, size_t& 
       double cNatureVal;
       if (!setArg(tokens.at(indexMod+1), cNatureVal)) { incorrectArgs("cNatureVal", iLine, indexMod+1); return false; }
       checkRangeB(cNatureVal, 0.9, 1.1);
-      cNature.modTable[indexMod] = cNatureVal * FPMULTIPLIER;
+      cNature.modTable_[indexMod] = cNatureVal * FPMULTIPLIER;
     }
 
   } //end of per-nature

@@ -152,7 +152,7 @@ bool Pokemons::loadFromFile_lines(
       return false;
     }
     // init lostChild
-    cPokemon.lostChild = false;
+    cPokemon.lostChild_ = false;
 
     //pokemon name
     size_t iToken = 0;
@@ -162,16 +162,16 @@ bool Pokemons::loadFromFile_lines(
     iToken = 1;
     {
       size_t iType = orphanCheck(types, &mismatchedTypes, tokens.at(iToken));
-      if (iType == SIZE_MAX) { cPokemon.lostChild = true; } //orphan!
-      cPokemon.types[0] = &types[iType];
+      if (iType == SIZE_MAX) { cPokemon.lostChild_ = true; } //orphan!
+      cPokemon.types_[0] = &types[iType];
     }
 
     //pokemon secondary type
     iToken = 2;
     {
       size_t iType = orphanCheck(types, &mismatchedTypes, tokens.at(iToken));
-      if (iType == SIZE_MAX) { cPokemon.lostChild = true; } //orphan!
-      cPokemon.types[1] = &types[iType]; // notype = "None"
+      if (iType == SIZE_MAX) { cPokemon.lostChild_ = true; } //orphan!
+      cPokemon.types_[1] = &types[iType]; // notype = "None"
     }
 
     //base stats table
@@ -181,7 +181,7 @@ bool Pokemons::loadFromFile_lines(
       uint32_t cStat;
       if (!setArg(tokens.at(iToken + iStat), cStat)) { incorrectArgs("cStat", iLine, iToken + iStat); return false; }
       checkRangeB(cStat, (uint32_t)1, (uint32_t)255);
-      cPokemon.baseStats[iStat] = cStat;
+      cPokemon.baseStats_[iStat] = cStat;
     }
 
     //weight
@@ -190,15 +190,15 @@ bool Pokemons::loadFromFile_lines(
       fpType cWeight;
       if (!setArg(tokens.at(iToken), cWeight)) { incorrectArgs("cWeight", iLine, iToken); return false; }
       checkRangeB(cWeight, (fpType)0.1, (fpType)1000.0);
-      cPokemon.weight = cWeight * WEIGHTMULTIPLIER;
+      cPokemon.weight_ = cWeight * WEIGHTMULTIPLIER;
     }
 
     //first ability choice
     iToken = 10;
     {
       const Ability* cAbility = orphanCheck_ptr(abilities, &mismatchedAbilities, tokens.at(iToken));
-      if (cAbility == NULL) { cPokemon.lostChild = true; } //orphan!
-      else { cPokemon.abilities.push_back(cAbility); }
+      if (cAbility == NULL) { cPokemon.lostChild_ = true; } //orphan!
+      else { cPokemon.abilities_.push_back(cAbility); }
     }
 
     //second ability choice
@@ -207,13 +207,13 @@ bool Pokemons::loadFromFile_lines(
     {
       //strncpy(currentPokemon->secondaryAbilityName,tokens.at(11),20);
       const Ability* cAbility = orphanCheck_ptr(abilities, &mismatchedAbilities, tokens.at(iToken));
-      if (cAbility == NULL) { cPokemon.lostChild = true; } //orphan!
-      else { cPokemon.abilities.push_back(cAbility); }
+      if (cAbility == NULL) { cPokemon.lostChild_ = true; } //orphan!
+      else { cPokemon.abilities_.push_back(cAbility); }
     }
 
     // sort abilities (by pointer):
     {
-      std::sort(cPokemon.abilities.begin(), cPokemon.abilities.end());
+      std::sort(cPokemon.abilities_.begin(), cPokemon.abilities_.end());
     }
 
   } //end of per-pokemon
@@ -390,7 +390,7 @@ bool Pokemons::loadMovelistFromFile_lines(
       }
     }
     // add this name to the current Pokemon's move list.
-    cPokemon->movelist.push_back(&(*cMove));
+    cPokemon->movelist_.push_back(&(*cMove));
 
   outerWhile:
     std::cerr.flush(); // dummy function
@@ -400,8 +400,8 @@ bool Pokemons::loadMovelistFromFile_lines(
   for (size_t iPokemon = 0; iPokemon != size(); ++iPokemon)
   {
     PokemonBase& cBase = at(iPokemon);
-    if (cBase.movelist.empty()) { cBase.lostChild = true; continue;}
-    std::sort(cBase.movelist.begin(), cBase.movelist.end());
+    if (cBase.movelist_.empty()) { cBase.lostChild_ = true; continue;}
+    std::sort(cBase.movelist_.begin(), cBase.movelist_.end());
   }
 
   //output orphans

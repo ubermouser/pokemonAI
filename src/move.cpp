@@ -13,102 +13,11 @@ using namespace orphan;
 const Move* Move::move_struggle = NULL;
 const Move* Move::move_none = NULL;
 
-void Move::init(const Move& source)
-{
-  cType = source.cType;
-  
-  primaryAccuracy = source.primaryAccuracy;
-  secondaryAccuracy = source.secondaryAccuracy;
-  
-  power = source.power;
-  
-  PP = source.PP;
-  
-  damageType = source.damageType;
-  
-  target = source.target;
-  
-  priority = source.priority;
-  
-  // buffs
-  for (unsigned int indexBuff = 0; indexBuff < 9; indexBuff++)
-  {
-    selfBuff[indexBuff] = source.selfBuff[indexBuff];
-    targetDebuff[indexBuff] = source.targetDebuff[indexBuff];
-  }
-  
-  targetAilment = source.targetAilment;
-  targetVolatileAilment = source.targetVolatileAilment;
-  
-  description = source.description;
-  
-  lostChild = source.lostChild;
-}
-
-
-Move::Move()
-  : Name(),
-  Pluggable(),
-  description()
-{
-  cType = NULL;
-  
-  primaryAccuracy = UINT8_MAX;
-  secondaryAccuracy = -1;
-  
-  power = 0;
-  
-  PP = 0;
-  
-  damageType = 0;
-  
-  target = -1;
-  
-  priority = 0;
-  
-  // buffs
-  selfBuff.fill(0);
-  targetDebuff.fill(0);
-  
-  targetAilment = AIL_NV_NONE;
-  targetVolatileAilment = AIL_V_NONE;
-  
-  lostChild = true;
-}
-
-
-Move::Move(const Move& source)
-  : Name(source),
-  Pluggable(source)
-{
-  init(source);
-}
-
-
-Move& Move::operator=(const Move& source)
-{
-  // identity theorem - simply return what we have now if equal address
-  if (this == &source) { return *this; } 
-  
-  Name::operator=(source);
-  Pluggable::operator=(source);
-  
-  init(source);
-  
-  return *this;
-}
-
-
-Move::~Move()
-{
-  description.clear();
-}
-
 
 const Type& Move::getType() const
 {
-  assert(cType != NULL);
-  return *cType;
+  assert(type_ != NULL);
+  return *type_;
 }
 
 
@@ -242,11 +151,11 @@ bool Moves::loadFromFile_lines(
       if (iType == SIZE_MAX)
       {
         //incorrectArgs("type", iMove, iToken);
-        cMove.cType = NULL;
+        cMove.type_ = NULL;
         cMove.lostChild = true;
         //return false;
       } //orphan!
-      else { cMove.cType = &types[iType]; }
+      else { cMove.type_ = &types[iType]; }
     }
 
     // move base PP
@@ -255,31 +164,31 @@ bool Moves::loadFromFile_lines(
       uint32_t currentPP;
       if (!setArg(tokens.at(iToken), currentPP)) { incorrectArgs("currentPP", iLine, iToken); return false; }
       checkRangeB(currentPP, (uint32_t)5, (uint32_t)40);
-      cMove.PP = currentPP;
+      cMove.PP_ = currentPP;
     }
 
     // move primary accuracy
     iToken = 3;
     if (tokens.at(iToken).compare("---") == 0)
-    { cMove.primaryAccuracy = UINT8_MAX; }
+    { cMove.primaryAccuracy_ = UINT8_MAX; }
     else
     {
       uint32_t cPrimaryAccuracy;
       if (!setArg(tokens.at(iToken), cPrimaryAccuracy)) { incorrectArgs("cPrimaryAccuracy", iLine, iToken); return false; }
       checkRangeB(cPrimaryAccuracy, (uint32_t)1, (uint32_t)100);
-      cMove.primaryAccuracy = cPrimaryAccuracy;
+      cMove.primaryAccuracy_ = cPrimaryAccuracy;
     }
 
     // move power
     iToken = 4;
     if (tokens.at(iToken).compare("Var") == 0 || tokens.at(iToken).compare("---") == 0)
-    { cMove.power = 0; }
+    { cMove.power_ = 0; }
     else
     {
       uint32_t cPower;
       if (!setArg(tokens.at(iToken), cPower)) { incorrectArgs("cPower", iLine, iToken); return false; }
       checkRangeB(cPower, (uint32_t)0, (uint32_t)254);
-      cMove.power = cPower;
+      cMove.power_ = cPower;
     }
 
     // move damage type
@@ -288,19 +197,19 @@ bool Moves::loadFromFile_lines(
       uint32_t cDamageType;
       if (!setArg(tokens.at(iToken), cDamageType)) { incorrectArgs("cDamageType", iLine, iToken); return false; }
       checkRangeB(cDamageType, (uint32_t)0, (uint32_t)3);
-      cMove.damageType = cDamageType;
+      cMove.damageType_ = cDamageType;
     }
 
     // move target
     iToken = 6;
     if (tokens.at(iToken).compare("Var") == 0 || tokens.at(iToken).compare("---") == 0)
-    { cMove.target = -1; }
+    { cMove.target_ = -1; }
     else
     {
       uint32_t cTarget;
       if (!setArg(tokens.at(iToken), cTarget)) { incorrectArgs("cTarget", iLine, iToken); return false; }
       checkRangeB(cTarget, (uint32_t)0, (uint32_t)7);
-      cMove.target = cTarget;
+      cMove.target_ = cTarget;
     }
 
     // move priority
@@ -309,7 +218,7 @@ bool Moves::loadFromFile_lines(
       int32_t cPriority;
       if (!setArg(tokens.at(iToken), cPriority)) { incorrectArgs("cPriority", iLine, iToken); return false; }
       checkRangeB(cPriority, (int32_t)-5, (int32_t)5);
-      cMove.priority = cPriority;
+      cMove.priority_ = cPriority;
     }
 
     // buffs
@@ -320,19 +229,19 @@ bool Moves::loadFromFile_lines(
       int32_t tempBuff;
       if (!setArg(tokens.at(iToken + iBuff), tempBuff)) { incorrectArgs("buff", iLine, iToken + iBuff); return false; }
       checkRangeB(tempBuff, (int32_t)-12, (int32_t)12);
-      cMove.selfBuff[iBuff] = tempBuff;
+      cMove.selfBuff_[iBuff] = tempBuff;
     }
 
     // move secondary accuracy
     iToken = 17;
     if (tokens.at(iToken).compare("---") == 0)
-    { cMove.secondaryAccuracy = -1; }
+    { cMove.secondaryAccuracy_ = -1; }
     else
     {
       uint32_t cSecondaryAccuracy;
       if (!setArg(tokens.at(iToken), cSecondaryAccuracy)) { incorrectArgs("cSecondaryAccuracy", iLine, iToken); return false; }
       checkRangeB(cSecondaryAccuracy, (uint32_t)1, (uint32_t)100);
-      cMove.secondaryAccuracy = cSecondaryAccuracy;
+      cMove.secondaryAccuracy_ = cSecondaryAccuracy;
     }
 
     // debuffs
@@ -343,18 +252,18 @@ bool Moves::loadFromFile_lines(
       int32_t tempBuff;
       if (!setArg(tokens.at(iToken + iBuff), tempBuff)) { incorrectArgs("debuff", iLine, iToken + iBuff); return false; }
       checkRangeB(tempBuff, (int32_t)-12, (int32_t)12);
-      cMove.targetDebuff[iBuff] = tempBuff;
+      cMove.targetDebuff_[iBuff] = tempBuff;
     }
 
     uint32_t ailment;
-    cMove.targetAilment = AIL_NV_NONE;
+    cMove.targetAilment_ = AIL_NV_NONE;
 
     // ailment,target,burn
     iToken = 27;
     if (setArg(tokens.at(iToken), ailment))
     {
       checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetAilment = AIL_NV_BURN; goto endAilment; }
+      if (ailment == 1) { cMove.targetAilment_ = AIL_NV_BURN; goto endAilment; }
     }
     else { incorrectArgs("AIL_NV_BURN", iLine, iToken); return false; }
 
@@ -363,7 +272,7 @@ bool Moves::loadFromFile_lines(
     if (setArg(tokens.at(iToken), ailment))
     {
       checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetAilment = AIL_NV_FREEZE; goto endAilment; }
+      if (ailment == 1) { cMove.targetAilment_ = AIL_NV_FREEZE; goto endAilment; }
     }
     else { incorrectArgs("AIL_NV_FREEZE", iLine, iToken); return false; }
 
@@ -372,7 +281,7 @@ bool Moves::loadFromFile_lines(
     if (setArg(tokens.at(iToken), ailment))
     {
       checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetAilment = AIL_NV_PARALYSIS; goto endAilment; }
+      if (ailment == 1) { cMove.targetAilment_ = AIL_NV_PARALYSIS; goto endAilment; }
     }
     else { incorrectArgs("AIL_NV_PARALYSIS", iLine, iToken); return false; }
 
@@ -381,8 +290,8 @@ bool Moves::loadFromFile_lines(
     if (setArg(tokens.at(iToken), ailment))
     {
       checkRangeB(ailment, (uint32_t)0, (uint32_t)2);
-      if (ailment == 1) { cMove.targetAilment = AIL_NV_POISON; goto endAilment; }
-      else if(ailment == 2) { cMove.targetAilment = AIL_NV_POISON_TOXIC; goto endAilment; }
+      if (ailment == 1) { cMove.targetAilment_ = AIL_NV_POISON; goto endAilment; }
+      else if(ailment == 2) { cMove.targetAilment_ = AIL_NV_POISON_TOXIC; goto endAilment; }
     }
     else { incorrectArgs("AIL_NV_POISON/AIL_NV_POISON_TOXIC", iLine, iToken); return false; }
 
@@ -391,19 +300,19 @@ bool Moves::loadFromFile_lines(
     if (setArg(tokens.at(iToken), ailment))
     {
       checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetAilment = AIL_NV_SLEEP; goto endAilment; }
+      if (ailment == 1) { cMove.targetAilment_ = AIL_NV_SLEEP; goto endAilment; }
     }
     else { incorrectArgs("AIL_NV_SLEEP", iLine, iToken); return false; }
 
     endAilment:
 
-    cMove.targetVolatileAilment = AIL_V_NONE;
+    cMove.targetVolatileAilment_ = AIL_V_NONE;
     // volatileAilment,target,confusion
     iToken = 32;
     if (setArg(tokens.at(iToken), ailment))
     {
       checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetVolatileAilment = AIL_V_CONFUSED; goto endVolatile; }
+      if (ailment == 1) { cMove.targetVolatileAilment_ = AIL_V_CONFUSED; goto endVolatile; }
     }
     else { incorrectArgs("AIL_V_CONFUSED", iLine, iToken); return false; }
 
@@ -412,7 +321,7 @@ bool Moves::loadFromFile_lines(
     if (setArg(tokens.at(iToken), ailment))
     {
       checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetVolatileAilment = AIL_V_FLINCH; goto endVolatile; }
+      if (ailment == 1) { cMove.targetVolatileAilment_ = AIL_V_FLINCH; goto endVolatile; }
     }
     else { incorrectArgs("AIL_V_FLINCH", iLine, iToken); return false; }
 
@@ -421,7 +330,7 @@ bool Moves::loadFromFile_lines(
     if (setArg(tokens.at(iToken), ailment))
     {
       checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetVolatileAilment = 110; goto endVolatile; }
+      if (ailment == 1) { cMove.targetVolatileAilment_ = 110; goto endVolatile; }
     }
     else { incorrectArgs("AIL_V_IDENTIFY", iLine, iToken); return false; }
 
@@ -430,7 +339,7 @@ bool Moves::loadFromFile_lines(
     if (setArg(tokens.at(iToken), ailment))
     {
       checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetVolatileAilment = AIL_V_INFATUATED; goto endVolatile; }
+      if (ailment == 1) { cMove.targetVolatileAilment_ = AIL_V_INFATUATED; goto endVolatile; }
     }
     else { incorrectArgs("AIL_V_INFATUATED", iLine, iToken); return false; }
 
@@ -439,7 +348,7 @@ bool Moves::loadFromFile_lines(
     if (setArg(tokens.at(iToken), ailment))
     {
       checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetVolatileAilment = 111; goto endVolatile; }
+      if (ailment == 1) { cMove.targetVolatileAilment_ = 111; goto endVolatile; }
     }
     else { incorrectArgs("AIL_V_LOCKON", iLine, iToken); return false; }
 
@@ -448,7 +357,7 @@ bool Moves::loadFromFile_lines(
     if (setArg(tokens.at(iToken), ailment))
     {
       checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetVolatileAilment = 112; goto endVolatile; }
+      if (ailment == 1) { cMove.targetVolatileAilment_ = 112; goto endVolatile; }
     }
     else { incorrectArgs("AIL_V_NIGHTMARE", iLine, iToken); return false; }
 
@@ -457,7 +366,7 @@ bool Moves::loadFromFile_lines(
     if (setArg(tokens.at(iToken), ailment))
     {
       checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetVolatileAilment = 113; goto endVolatile; }
+      if (ailment == 1) { cMove.targetVolatileAilment_ = 113; goto endVolatile; }
     }
     else { incorrectArgs("AIL_V_PARTIALTRAP", iLine, iToken); return false; }
 
@@ -471,7 +380,7 @@ bool Moves::loadFromFile_lines(
     //description
     iToken = 40;
     if (tokens.at(iToken).compare("---") == 0)
-    { cMove.description.clear(); }
+    { cMove.description_.clear(); }
     else
     {
       size_t tokenLength = tokens.at(iToken).size();
@@ -482,7 +391,7 @@ bool Moves::loadFromFile_lines(
         offset = 1;
       }
 
-      cMove.description = std::string(tokens.at(iToken).substr(offset, tokenLength - offset));
+      cMove.description_ = std::string(tokens.at(iToken).substr(offset, tokenLength - offset));
     }
     if (verbose >= 6) std::cout << "\tLoaded move " << iMove << "-\"" << cMove.getName() << "\"\n";
 

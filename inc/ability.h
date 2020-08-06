@@ -20,11 +20,12 @@ class PKAISHARED Ability: public Name, public Pluggable
 public:
   static const Ability* no_ability;
 
-  Ability();
-  Ability(const Ability& source);
-  ~Ability();
+  Ability() = default;
+  Ability(const Ability& source) = default;
+  Ability& operator=(const Ability& source) = default;
+  virtual ~Ability() override = default;
 
-  std::string script;
+  std::string script_;
 };
 
 

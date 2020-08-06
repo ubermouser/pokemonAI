@@ -53,12 +53,12 @@ public:
    * 15: dark
    * 16: steel
    */
-  std::array<const Type*, 2> types;
+  std::array<const Type*, 2> types_;
 
   /*
    * the weight / heftiness of the pokemon. Used for some damage calculations
    */
-  uint16_t weight;
+  uint16_t weight_;
   
   /*
    * baseStats:
@@ -69,23 +69,25 @@ public:
    * 4: Speed
    * 5: Hit-Points
    */
-  std::array<uint8_t, 6> baseStats; // pokemon's basic stats
+  std::array<uint8_t, 6> baseStats_; // pokemon's basic stats
 
   /* 
    * primary and secondary ability
    * NULL if not a choice
    */
-  std::vector<const Ability*> abilities;
+  std::vector<const Ability*> abilities_;
 
-  bool lostChild;
+  /* pointers to actions the pokemon may perform in combat */
+  std::vector<const Move*> movelist_;
 
-  std::vector<const Move*> movelist;
+  bool lostChild_;
 
-  const Type& getType(size_t iType) const { return *types[iType]; };
 
-  size_t getNumAbilities() const { return abilities.size(); }
+  const Type& getType(size_t iType) const { return *types_[iType]; };
 
-  const Ability& getAbility(size_t iAbility) const { return *abilities[iAbility]; }
+  size_t getNumAbilities() const { return abilities_.size(); }
+
+  const Ability& getAbility(size_t iAbility) const { return *abilities_[iAbility]; }
 
 };
 

@@ -16,25 +16,12 @@ const Item* Item::no_item = NULL;
 Item::Item() 
   : Name(), 
   Pluggable(),
-  boostedType(Type::no_type),
-  naturalGift_type(Type::no_type),
-  resistedType(Type::no_type),
-  flingPower(0),
-  naturalGift_power(0),
-  lostChild(true)
-{
-};
-
-
-Item::Item(const Item& source) 
-  : Name(source), 
-  Pluggable(source),
-  boostedType(source.boostedType),
-  naturalGift_type(source.naturalGift_type),
-  resistedType(source.resistedType),
-  flingPower(source.flingPower),
-  naturalGift_power(source.naturalGift_power),
-  lostChild(source.lostChild)
+  boostedType_(Type::no_type),
+  naturalGiftType_(Type::no_type),
+  resistedType_(Type::no_type),
+  flingPower_(0),
+  naturalGiftPower_(0),
+  lostChild_(true)
 {
 };
 
@@ -153,7 +140,7 @@ bool Items::loadFromFile_lines(
       return false;
     }
 
-    cItem.lostChild = false;
+    cItem.lostChild_ = false;
 
     //item name
     size_t iToken =  0;
@@ -162,24 +149,24 @@ bool Items::loadFromFile_lines(
     // fling power:
     iToken = 1;
     if (tokens.at(iToken).compare("---") == 0)
-    { cItem.flingPower = 0; }
+    { cItem.flingPower_ = 0; }
     else
     {
       uint32_t cPower;
       if (!setArg(tokens.at(iToken), cPower)) { incorrectArgs("fling power", iLine, iToken); return false; }
       checkRangeB(cPower, 1U, 255U);
-      cItem.flingPower = (uint8_t) cPower;
+      cItem.flingPower_ = (uint8_t) cPower;
     }
 
     // boosted type:
     iToken = 2;
     if (tokens.at(iToken).compare("---") == 0)
-    { cItem.boostedType = Type::no_type; }
+    { cItem.boostedType_ = Type::no_type; }
     else
     {
       const Type* cType = orphanCheck_ptr(types, &mismatchedTypes, tokens.at(iToken));
-      if (cType == NULL) { cItem.lostChild = true; } //orphan!
-      cItem.boostedType = cType;
+      if (cType == NULL) { cItem.lostChild_ = true; } //orphan!
+      cItem.boostedType_ = cType;
     }
 
     // IGNORED: pokemon affected
@@ -187,35 +174,35 @@ bool Items::loadFromFile_lines(
     // natural gift power:
     iToken = 4;
     if (tokens.at(iToken).compare("---") == 0)
-    { cItem.naturalGift_power = 0; }
+    { cItem.naturalGiftPower_ = 0; }
     else
     {
       uint32_t cPower;
       if (!setArg(tokens.at(iToken), cPower)) { incorrectArgs("natural gift power", iLine, iToken); return false; }
       checkRangeB(cPower, 1U, 255U);
-      cItem.naturalGift_power = (uint8_t) cPower;
+      cItem.naturalGiftPower_ = (uint8_t) cPower;
     }
 
     // natural gift type:
     iToken = 5;
     if (tokens.at(iToken).compare("---") == 0)
-    { cItem.naturalGift_type = Type::no_type; }
+    { cItem.naturalGiftType_ = Type::no_type; }
     else
     {
       const Type* cType = orphanCheck_ptr(types, &mismatchedTypes, tokens.at(iToken));
-      if (cType == NULL) { cItem.lostChild = true; } //orphan!
-      cItem.naturalGift_type = cType;
+      if (cType == NULL) { cItem.lostChild_ = true; } //orphan!
+      cItem.naturalGiftType_ = cType;
     }
 
     // resisted type:
     iToken = 6;
     if (tokens.at(iToken).compare("---") == 0)
-    { cItem.resistedType = Type::no_type; }
+    { cItem.resistedType_ = Type::no_type; }
     else
     {
       const Type* cType = orphanCheck_ptr(types, &mismatchedTypes, tokens.at(iToken));
-      if (cType == NULL) { cItem.lostChild = true; } //orphan!
-      cItem.resistedType = cType;
+      if (cType == NULL) { cItem.lostChild_ = true; } //orphan!
+      cItem.resistedType_ = cType;
     }
 
     // item script

@@ -988,7 +988,7 @@ void ranked_team::randomSpecies(const TeamNonVolatile& cTeam, PokemonNonVolatile
     if ((iReplace == SIZE_MAX) && !cTeam.isLegalAdd(candidateBase)) { continue; }
     else if (!cTeam.isLegalSet(iReplace, candidateBase)) { continue; }
     // don't include any pokemon species with lost children: (no moves, no ability, no types)
-    if (candidateBase.lostChild == true) { continue; }
+    if (candidateBase.lostChild_ == true) { continue; }
     
     isSuccessful = true;
     cPokemon.setBase(pkdex->getPokemon()[iSpecies]);
@@ -1026,7 +1026,7 @@ void ranked_team::randomSpecies(const TeamNonVolatile& cTeam, PokemonNonVolatile
     if (cPokemon.abilityExists())
     {
       const PokemonBase& cBase = cPokemon.getBase();
-      bool isMatched = std::binary_search(cBase.abilities.begin(), cBase.abilities.end(), &cPokemon.getAbility());
+      bool isMatched = std::binary_search(cBase.abilities_.begin(), cBase.abilities_.end(), &cPokemon.getAbility());
       if (!isMatched)
       {
         // and update with a new ability if it is
@@ -1223,7 +1223,7 @@ void ranked_team::randomEV(PokemonNonVolatile& cPokemon)
 
 void ranked_team::randomMove(PokemonNonVolatile& cPokemon, size_t numMoves)
 {
-  const std::vector<const Move*>& cMovelist = cPokemon.getBase().movelist;
+  const std::vector<const Move*>& cMovelist = cPokemon.getBase().movelist_;
   std::vector<bool> isValid(cMovelist.size(), true);
   size_t validMoves = cMovelist.size();
 

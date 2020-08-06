@@ -12,13 +12,13 @@ const Type* Type::no_type = NULL;
 
 
 Type::Type() 
-  : modTable()
+  : modTable_()
 {
 }
 
 
 Type::Type(const Type& source) 
-  : modTable(source.modTable)
+  : modTable_(source.modTable_)
 {
 }
 
@@ -27,7 +27,7 @@ fpType Type::getModifier(const Type& other) const
 {
   size_t iOType = &other - &pkdex->getTypes().front();
 
-  return (fpType)modTable[iOType] / (fpType) FPMULTIPLIER;
+  return (fpType)modTable_[iOType] / (fpType) FPMULTIPLIER;
 }
 
 
@@ -143,7 +143,7 @@ bool Types::loadFromFile_lines(const std::vector<std::string>& lines, size_t& iL
     }
 
     //allocate dynamic modtable
-    cType.modTable.resize(size(), 0);
+    cType.modTable_.resize(size(), 0);
 
     //type name
     cType.setName(tokens.at(0));
@@ -154,7 +154,7 @@ bool Types::loadFromFile_lines(const std::vector<std::string>& lines, size_t& iL
       double cTypeVal;
       if (!setArg(tokens.at(indexInnerType+1), cTypeVal)) { incorrectArgs("cTypeVal", iLine, indexInnerType+1); return false; }
       checkRangeB(cTypeVal, 0.0, 2.0);
-      cType.modTable[indexInnerType] = cTypeVal * FPMULTIPLIER;
+      cType.modTable_[indexInnerType] = cTypeVal * FPMULTIPLIER;
     }
 
   } //end of per-type

@@ -238,7 +238,7 @@ void PokemonNonVolatile::setAbility(const Ability& _chosenAbility)
 {
   assert(pokemonExists());
   assert(_chosenAbility.isImplemented());
-  assert(std::binary_search(getBase().abilities.begin(), getBase().abilities.end(), &_chosenAbility));
+  assert(std::binary_search(getBase().abilities_.begin(), getBase().abilities_.end(), &_chosenAbility));
 
   chosenAbility = &_chosenAbility;
 };
@@ -367,7 +367,7 @@ bool PokemonNonVolatile::isLegalSet(size_t iAction, const Move& candidate) const
     if (&getMove_base(AT_MOVE_0 + iMove) == &candidate) { return false; }
   }
 
-  const std::vector<const Move*>& cMovelist = getBase().movelist;
+  const std::vector<const Move*>& cMovelist = getBase().movelist_;
   if (!std::binary_search(cMovelist.begin(), cMovelist.end(), &candidate)) { return false; }
 
   return true;
@@ -489,7 +489,7 @@ void PokemonNonVolatile::setFV(unsigned int targetFV)
   // set default value:
   if (targetFV == FV_HITPOINTS)
   {
-    unsigned int baseStat = base->baseStats[targetFV];
+    unsigned int baseStat = base->baseStats_[targetFV];
     unsigned int iv = IV[targetFV];
     unsigned int ev = EV[targetFV];
     
@@ -506,10 +506,10 @@ void PokemonNonVolatile::setFV(unsigned int targetFV)
   }
   else // for atk, spa, def, spd, spe
   {
-    unsigned int baseStat = base->baseStats[targetFV];
+    unsigned int baseStat = base->baseStats_[targetFV];
     unsigned int iv = IV[targetFV];
     unsigned int ev = EV[targetFV];
-    unsigned int natureModification = chosenNature->modTable[targetFV];
+    unsigned int natureModification = chosenNature->modTable_[targetFV];
     
     unsigned int base_FV = ((((2 * baseStat + iv + (ev / 4)) * level / 100 + 5) * natureModification) / FPMULTIPLIER);
     FV_base[targetFV][STAGE0] = base_FV;
@@ -916,7 +916,7 @@ bool PokemonNonVolatile::input(
 
       const PokemonBase& cBase = getBase();
       if (cAbility == NULL) { } // orphan!
-      else if (!std::binary_search(cBase.abilities.begin(), cBase.abilities.end(), cAbility))
+      else if (!std::binary_search(cBase.abilities_.begin(), cBase.abilities_.end(), cAbility))
       {
         if (mismatchedAbilities != NULL) { orphanAddToVector(*mismatchedAbilities, tokens.at(iToken)); }
         if (verbose >= 5)

@@ -245,11 +245,6 @@
             <pElem>${CND_DISTDIR}/pkaiEngine/${CND_CONF}/${CND_PLATFORM}/</pElem>
           </linkerAddLib>
           <linkerLibItems>
-            <linkerOptionItem>-lboost_thread</linkerOptionItem>
-            <linkerOptionItem>-lboost_system</linkerOptionItem>
-            <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
-            <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
-            <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
             <linkerLibProjectItem>
               <makeArtifact PL="pkaiEngine"
                             CT="3"
@@ -262,6 +257,11 @@
                             OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libpkaiengine.a">
               </makeArtifact>
             </linkerLibProjectItem>
+            <linkerOptionItem>-lboost_thread</linkerOptionItem>
+            <linkerOptionItem>-lboost_system</linkerOptionItem>
+            <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
+            <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
+            <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
           </linkerLibItems>
           <commandLine>-Wl,--export-dynamic</commandLine>
         </linkerTool>
@@ -640,11 +640,6 @@
             <pElem>${CND_DISTDIR}/pkaiEngine/${CND_CONF}/${CND_PLATFORM}/</pElem>
           </linkerAddLib>
           <linkerLibItems>
-            <linkerOptionItem>-lboost_thread</linkerOptionItem>
-            <linkerOptionItem>-lboost_system</linkerOptionItem>
-            <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
-            <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
-            <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
             <linkerLibProjectItem>
               <makeArtifact PL="pkaiEngine"
                             CT="3"
@@ -657,6 +652,11 @@
                             OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libpkaiengine.a">
               </makeArtifact>
             </linkerLibProjectItem>
+            <linkerOptionItem>-lboost_thread</linkerOptionItem>
+            <linkerOptionItem>-lboost_system</linkerOptionItem>
+            <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
+            <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
+            <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
           </linkerLibItems>
           <commandLine>-Wl,--export-dynamic</commandLine>
         </linkerTool>

@@ -129,7 +129,7 @@ bool TeamNonVolatile::isLegalAdd(const PokemonBase& candidate) const
 bool TeamNonVolatile::isLegalSet(size_t iPosition, const PokemonBase& candidate) const
 {
   if ((iPosition != SIZE_MAX) && (iPosition >= getNumTeammates()) ) { return false; }
-  if (candidate.lostChild == true) { return false; }
+  if (candidate.lostChild_ == true) { return false; }
   for (size_t iTeammate = 0; iTeammate != getNumTeammates(); ++iTeammate)
   {
     if (iPosition == iTeammate) { continue; }

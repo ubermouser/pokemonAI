@@ -15,7 +15,7 @@ MoveNonVolatile::MoveNonVolatile(const Move& _base, unsigned int PPmultiplier)
   base(&_base),
   scriptVal_a(0),
   scriptVal_b(0),
-  PPmax(moveExists() ? ((_base.PP * PPmultiplier) / 10) : 0)
+  PPmax(moveExists() ? ((_base.PP_ * PPmultiplier) / 10) : 0)
 {
 };
 

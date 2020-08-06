@@ -26,54 +26,54 @@ public:
 
   bool isImplemented() const
   {
-    return Pluggable::isImplemented() && !lostChild;
+    return Pluggable::isImplemented() && !lostChild_;
   };
 
   const Type& getBoostedType() const
   {
-    return *boostedType;
+    return *boostedType_;
   };
 
   const Type& getResistedType() const
   {
-    return *resistedType;
+    return *resistedType_;
   };
 
   const Type& getNaturalGiftType() const
   {
-    return *naturalGift_type;
+    return *naturalGiftType_;
   };
 
   uint8_t getNaturalGiftPower() const
   {
-    return naturalGift_power;
+    return naturalGiftPower_;
   };
 
   uint8_t getFlingPower() const
   {
-    return flingPower;
+    return flingPower_;
   };
 
   Item();
-  Item(const Item& source);
-  ~Item() { };
+  Item(const Item& source) = default;
+  virtual ~Item() override = default;
   
   /* the type of move whose power is boosted by 20% when this object is held */
-  const Type* boostedType;
+  const Type* boostedType_;
 
   /* type of natural gift when used with this item */
-  const Type* naturalGift_type;
+  const Type* naturalGiftType_;
 
   /* the type of move whose super effective damage is reduced by 50% when this object is held */
-  const Type* resistedType;
+  const Type* resistedType_;
 
   /* amount of damage dealt when fling is used with this object held */
-  uint8_t flingPower;
+  uint8_t flingPower_;
 
   /* basepower of natural gift when used with this item */
-  uint8_t naturalGift_power;
+  uint8_t naturalGiftPower_;
 
-  bool lostChild;
+  bool lostChild_ = true;
 };
 
 
