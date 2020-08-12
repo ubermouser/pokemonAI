@@ -127,42 +127,41 @@ int move_hiddenPower_calculate(
     ) * 40) / 63) + 30;
 
   // pointer arithmetic
-  const Type* front = &pkdex->getTypes().front();
   switch(cType)
   {
   case 0:
-    cType = (uint16_t)(fighting_t - front); break;
+    cType = (uint16_t)fighting_t->index_; break;
   case 1:
-    cType = (uint16_t)(flying_t - front); break;
+    cType = (uint16_t)flying_t->index_; break;
   case 2:
-    cType = (uint16_t)(poison_t - front); break;
+    cType = (uint16_t)poison_t->index_; break;
   case 3:
-    cType = (uint16_t)(ground_t - front); break;
+    cType = (uint16_t)ground_t->index_; break;
   case 4:
-    cType = (uint16_t)(rock_t - front); break;
+    cType = (uint16_t)rock_t->index_; break;
   case 5:
-    cType = (uint16_t)(bug_t - front); break;
+    cType = (uint16_t)bug_t->index_; break;
   case 6:
-    cType = (uint16_t)(ghost_t - front); break;
+    cType = (uint16_t)ghost_t->index_; break;
   case 7:
-    cType = (uint16_t)(steel_t - front); break;
+    cType = (uint16_t)steel_t->index_; break;
   case 8:
-    cType = (uint16_t)(fire_t - front); break;
+    cType = (uint16_t)fire_t->index_; break;
   case 9:
-    cType = (uint16_t)(water_t - front); break;
+    cType = (uint16_t)water_t->index_; break;
   case 10:
-    cType = (uint16_t)(grass_t - front); break;
+    cType = (uint16_t)grass_t->index_; break;
   case 11:
-    cType = (uint16_t)(electric_t - front); break;
+    cType = (uint16_t)electric_t->index_; break;
   case 12:
-    cType = (uint16_t)(psychic_t - front); break;
+    cType = (uint16_t)psychic_t->index_; break;
   case 13:
-    cType = (uint16_t)(ice_t - front); break;
+    cType = (uint16_t)ice_t->index_; break;
   case 14:
-    cType = (uint16_t)(dragon_t - front); break;
+    cType = (uint16_t)dragon_t->index_; break;
   default:
   case 15:
-    cType = (uint16_t)(dark_t - front); break;
+    cType = (uint16_t)dark_t->index_; break;
   };
 
   assert((cType < pkdex->getTypes().size()) && cPower <= 70);
@@ -186,8 +185,7 @@ int move_hiddenPower_setType(
 {
   if (&mNV.getBase() != hiddenPower_t) { return 0; }
 
-  // pointer arithmetic
-  cType = &pkdex->getTypes().front() + mNV.getScriptVal_a();
+  cType = pkdex->getTypes().atByIndex(mNV.getScriptVal_a());
   return 1;
 };
 
@@ -1288,88 +1286,88 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   pkdex = &pkAI;
 #endif
   //moves:
-  const std::vector<Move>& moves = pkdex->getMoves();
-  absorb_t = orphan::orphanCheck_ptr(moves, NULL, "absorb");
-  aerialAce_t = orphan::orphanCheck_ptr(moves, NULL, "aerial ace");
-  airCutter_t = orphan::orphanCheck_ptr(moves, NULL, "air cutter");
-  aromatherapy_t = orphan::orphanCheck_ptr(moves, NULL, "aromatherapy");
-  attackOrder_t = orphan::orphanCheck_ptr(moves, NULL, "attack order");
-  auraSphere_t = orphan::orphanCheck_ptr(moves, NULL, "aura sphere");
-  blazeKick_t = orphan::orphanCheck_ptr(moves, NULL, "blaze kick");
-  braveBird_t = orphan::orphanCheck_ptr(moves, NULL, "brave bird");
-  crabHammer_t = orphan::orphanCheck_ptr(moves, NULL, "crabhammer");
-  crossChop_t = orphan::orphanCheck_ptr(moves, NULL, "cross chop");
-  crossPoison_t = orphan::orphanCheck_ptr(moves, NULL, "cross poison");
-  doubleEdge_t = orphan::orphanCheck_ptr(moves, NULL, "double-edge");
-  drainPunch_t = orphan::orphanCheck_ptr(moves, NULL, "drain punch");
-  explosion_t = orphan::orphanCheck_ptr(moves, NULL, "explosion");
-  faintAttack_t = orphan::orphanCheck_ptr(moves, NULL, "faint attack");
-  flareBlitz_t = orphan::orphanCheck_ptr(moves, NULL, "flare blitz");
-  gigaDrain_t = orphan::orphanCheck_ptr(moves, NULL, "giga drain");
-  healBell_t = orphan::orphanCheck_ptr(moves, NULL, "heal bell");
-  healOrder_t = orphan::orphanCheck_ptr(moves, NULL, "heal order");
-  hiddenPower_t = orphan::orphanCheck_ptr(moves, NULL, "hidden power");
-  leafBlade_t = orphan::orphanCheck_ptr(moves, NULL, "leaf blade");
-  leechLife_t = orphan::orphanCheck_ptr(moves, NULL, "leech life");
-  magicalLeaf_t = orphan::orphanCheck_ptr(moves, NULL, "magical leaf");
-  magnetBomb_t = orphan::orphanCheck_ptr(moves, NULL, "magnet bomb");
-  megaDrain_t = orphan::orphanCheck_ptr(moves, NULL, "mega drain");
-  memento_t = orphan::orphanCheck_ptr(moves, NULL, "memento");
-  milkDrink_t = orphan::orphanCheck_ptr(moves, NULL, "milk drink");
-  nightShade_t = orphan::orphanCheck_ptr(moves, NULL, "night shade");
-  nightSlash_t = orphan::orphanCheck_ptr(moves, NULL, "night slash");
-  painSplit_t = orphan::orphanCheck_ptr(moves, NULL, "pain split");
-  psychoCut_t = orphan::orphanCheck_ptr(moves, NULL, "psycho cut");
-  rapidSpin_t = orphan::orphanCheck_ptr(moves, NULL, "rapid spin");
-  razorLeaf_t = orphan::orphanCheck_ptr(moves, NULL, "razor leaf");
-  roost_t = orphan::orphanCheck_ptr(moves, NULL, "roost");
-  seismicToss_t = orphan::orphanCheck_ptr(moves, NULL, "seismic toss");
-  selfDestruct_t = orphan::orphanCheck_ptr(moves, NULL, "selfdestruct");
-  shadowClaw_t = orphan::orphanCheck_ptr(moves, NULL, "shadow claw");
-  shadowPunch_t = orphan::orphanCheck_ptr(moves, NULL, "shadow punch");
-  shockWave_t = orphan::orphanCheck_ptr(moves, NULL, "shock wave");
-  slackOff_t = orphan::orphanCheck_ptr(moves, NULL, "slack off");
-  slash_t = orphan::orphanCheck_ptr(moves, NULL, "slash");
-  spikes_t = orphan::orphanCheck_ptr(moves, NULL, "spikes");
-  softBoiled_t = orphan::orphanCheck_ptr(moves, NULL, "softboiled");
-  stealthRock_t = orphan::orphanCheck_ptr(moves, NULL, "stealth rock");
-  stoneEdge_t = orphan::orphanCheck_ptr(moves, NULL, "stone edge");
-  struggle_t = orphan::orphanCheck_ptr(moves, NULL, "struggle");
-  swift_t = orphan::orphanCheck_ptr(moves, NULL, "swift");
-  toxicSpikes_t = orphan::orphanCheck_ptr(moves, NULL, "toxic spikes");
-  voltTackle_t = orphan::orphanCheck_ptr(moves, NULL, "volt tackle");
-  woodHammer_t = orphan::orphanCheck_ptr(moves, NULL, "wood hammer");
+  const Moves& moves = pkdex->getMoves();
+  absorb_t = orphan::orphanCheck(moves, "absorb");
+  aerialAce_t = orphan::orphanCheck(moves, "aerial ace");
+  airCutter_t = orphan::orphanCheck(moves, "air cutter");
+  aromatherapy_t = orphan::orphanCheck(moves, "aromatherapy");
+  attackOrder_t = orphan::orphanCheck(moves, "attack order");
+  auraSphere_t = orphan::orphanCheck(moves, "aura sphere");
+  blazeKick_t = orphan::orphanCheck(moves, "blaze kick");
+  braveBird_t = orphan::orphanCheck(moves, "brave bird");
+  crabHammer_t = orphan::orphanCheck(moves, "crabhammer");
+  crossChop_t = orphan::orphanCheck(moves, "cross chop");
+  crossPoison_t = orphan::orphanCheck(moves, "cross poison");
+  doubleEdge_t = orphan::orphanCheck(moves, "double-edge");
+  drainPunch_t = orphan::orphanCheck(moves, "drain punch");
+  explosion_t = orphan::orphanCheck(moves, "explosion");
+  faintAttack_t = orphan::orphanCheck(moves, "faint attack");
+  flareBlitz_t = orphan::orphanCheck(moves, "flare blitz");
+  gigaDrain_t = orphan::orphanCheck(moves, "giga drain");
+  healBell_t = orphan::orphanCheck(moves, "heal bell");
+  healOrder_t = orphan::orphanCheck(moves, "heal order");
+  hiddenPower_t = orphan::orphanCheck(moves, "hidden power");
+  leafBlade_t = orphan::orphanCheck(moves, "leaf blade");
+  leechLife_t = orphan::orphanCheck(moves, "leech life");
+  magicalLeaf_t = orphan::orphanCheck(moves, "magical leaf");
+  magnetBomb_t = orphan::orphanCheck(moves, "magnet bomb");
+  megaDrain_t = orphan::orphanCheck(moves, "mega drain");
+  memento_t = orphan::orphanCheck(moves, "memento");
+  milkDrink_t = orphan::orphanCheck(moves, "milk drink");
+  nightShade_t = orphan::orphanCheck(moves, "night shade");
+  nightSlash_t = orphan::orphanCheck(moves, "night slash");
+  painSplit_t = orphan::orphanCheck(moves, "pain split");
+  psychoCut_t = orphan::orphanCheck(moves, "psycho cut");
+  rapidSpin_t = orphan::orphanCheck(moves, "rapid spin");
+  razorLeaf_t = orphan::orphanCheck(moves, "razor leaf");
+  roost_t = orphan::orphanCheck(moves, "roost");
+  seismicToss_t = orphan::orphanCheck(moves, "seismic toss");
+  selfDestruct_t = orphan::orphanCheck(moves, "selfdestruct");
+  shadowClaw_t = orphan::orphanCheck(moves, "shadow claw");
+  shadowPunch_t = orphan::orphanCheck(moves, "shadow punch");
+  shockWave_t = orphan::orphanCheck(moves, "shock wave");
+  slackOff_t = orphan::orphanCheck(moves, "slack off");
+  slash_t = orphan::orphanCheck(moves, "slash");
+  spikes_t = orphan::orphanCheck(moves, "spikes");
+  softBoiled_t = orphan::orphanCheck(moves, "softboiled");
+  stealthRock_t = orphan::orphanCheck(moves, "stealth rock");
+  stoneEdge_t = orphan::orphanCheck(moves, "stone edge");
+  struggle_t = orphan::orphanCheck(moves, "struggle");
+  swift_t = orphan::orphanCheck(moves, "swift");
+  toxicSpikes_t = orphan::orphanCheck(moves, "toxic spikes");
+  voltTackle_t = orphan::orphanCheck(moves, "volt tackle");
+  woodHammer_t = orphan::orphanCheck(moves, "wood hammer");
   //items:
-  const std::vector<Item>& items = pkdex->getItems();
-  leftovers_t = orphan::orphanCheck_ptr(items, NULL, "leftovers");
-  lifeOrb_t = orphan::orphanCheck_ptr(items, NULL, "life orb");
-  lumBerry_t = orphan::orphanCheck_ptr(items, NULL, "lum berry");
+  const Items& items = pkdex->getItems();
+  leftovers_t = orphan::orphanCheck(items, "leftovers");
+  lifeOrb_t = orphan::orphanCheck(items, "life orb");
+  lumBerry_t = orphan::orphanCheck(items, "lum berry");
   //abilities:
-  const std::vector<Ability>& abilities = pkdex->getAbilities();
-  levitate_t = orphan::orphanCheck_ptr(abilities, NULL, "levitate");
-  naturalCure_t = orphan::orphanCheck_ptr(abilities, NULL, "natural cure");
-  noGuard_t = orphan::orphanCheck_ptr(abilities, NULL, "no guard");
-  technician_t = orphan::orphanCheck_ptr(abilities, NULL, "technician");
-  sereneGrace_t = orphan::orphanCheck_ptr(abilities, NULL, "serene grace");
+  const Abilities& abilities = pkdex->getAbilities();
+  levitate_t = orphan::orphanCheck(abilities, "levitate");
+  naturalCure_t = orphan::orphanCheck(abilities, "natural cure");
+  noGuard_t = orphan::orphanCheck(abilities, "no guard");
+  technician_t = orphan::orphanCheck(abilities, "technician");
+  sereneGrace_t = orphan::orphanCheck(abilities, "serene grace");
   //types:
-  const std::vector<Type>& types = pkdex->getTypes();
-  normal_t = orphan::orphanCheck_ptr(types, NULL, "normal");
-  fighting_t = orphan::orphanCheck_ptr(types, NULL, "fighting");
-  flying_t = orphan::orphanCheck_ptr(types, NULL, "flying");
-  poison_t = orphan::orphanCheck_ptr(types, NULL, "poison");
-  ground_t = orphan::orphanCheck_ptr(types, NULL, "ground");
-  rock_t = orphan::orphanCheck_ptr(types, NULL, "rock");
-  bug_t = orphan::orphanCheck_ptr(types, NULL, "bug");
-  ghost_t = orphan::orphanCheck_ptr(types, NULL, "ghost");
-  steel_t = orphan::orphanCheck_ptr(types, NULL, "steel");
-  fire_t = orphan::orphanCheck_ptr(types, NULL, "fire");
-  water_t = orphan::orphanCheck_ptr(types, NULL, "water");
-  grass_t = orphan::orphanCheck_ptr(types, NULL, "grass");
-  electric_t = orphan::orphanCheck_ptr(types, NULL, "electric");
-  psychic_t = orphan::orphanCheck_ptr(types, NULL, "psychic");
-  ice_t = orphan::orphanCheck_ptr(types, NULL, "ice");
-  dragon_t = orphan::orphanCheck_ptr(types, NULL, "dragon");
-  dark_t = orphan::orphanCheck_ptr(types, NULL, "dark");
+  const Types& types = pkdex->getTypes();
+  normal_t = orphan::orphanCheck(types, "normal");
+  fighting_t = orphan::orphanCheck(types, "fighting");
+  flying_t = orphan::orphanCheck(types, "flying");
+  poison_t = orphan::orphanCheck(types, "poison");
+  ground_t = orphan::orphanCheck(types, "ground");
+  rock_t = orphan::orphanCheck(types, "rock");
+  bug_t = orphan::orphanCheck(types, "bug");
+  ghost_t = orphan::orphanCheck(types, "ghost");
+  steel_t = orphan::orphanCheck(types, "steel");
+  fire_t = orphan::orphanCheck(types, "fire");
+  water_t = orphan::orphanCheck(types, "water");
+  grass_t = orphan::orphanCheck(types, "grass");
+  electric_t = orphan::orphanCheck(types, "electric");
+  psychic_t = orphan::orphanCheck(types, "psychic");
+  ice_t = orphan::orphanCheck(types, "ice");
+  dragon_t = orphan::orphanCheck(types, "dragon");
+  dark_t = orphan::orphanCheck(types, "dark");
 
   // move effects:
   extensions.push_back(plugin(MOVE_PLUGIN, "absorb", PLUGIN_ON_ENDOFMOVE, move_lifeLeech50, 0, 0));

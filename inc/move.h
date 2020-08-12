@@ -8,6 +8,7 @@
 #include <array>
 
 #include "../inc/name.h"
+#include "../inc/collection.h"
 #include "../inc/pluggable.h"
 
 class Type;
@@ -17,7 +18,7 @@ class Pokedex;
 class PKAISHARED Move: public Name, public Pluggable
 {
 public:
-  using BuffModArray = std::array<int8_t, 9>;
+  using BuffModArray = std::array<int32_t, 9>;
 
   static const Move* move_struggle;
   static const Move* move_none;
@@ -39,7 +40,7 @@ public:
    * -1: accuracy varies, or is undefined
    * >0: base accuracy of move
    */
-  uint8_t primaryAccuracy_ = UINT8_MAX; // base accuracy of this ability. -1 for varies, undefined
+  int32_t primaryAccuracy_ = -1; // base accuracy of this ability. -1 for varies, undefined
   
   /*
    * base power this ability has.
@@ -47,14 +48,14 @@ public:
    * -1: untyped, varies, undefined
    * >0: base power of move
    */
-  uint8_t power_ = 0;
+  uint32_t power_ = 0;
   
   /*
    * base number of uses this ability may have. 
    *
    * >0: number moves allowed
    */
-  uint8_t PP_ = 0;
+  uint32_t PP_ = 0;
   
   /*
    * 0 - does not cause damage
@@ -62,7 +63,7 @@ public:
    * 2 - causes special damage
    * 3 - damage not boosted by atk or spa (exceptional)
    */
-  uint8_t damageType_ = 0;
+  uint32_t damageType_ = 0;
   
   /*
    * -1: varies / unknown
@@ -75,19 +76,19 @@ public:
    *  6: targets all currently deployed pokemon except for the self
    *  7: targets all pokemon, including the self
    */
-  int8_t target_ = -1;
+  int32_t target_ = -1;
   
   /*
    * the priority ranking of the move.
    * Positive numbers go first, usually ranges from +6 to -7. 
    * Exceptions exist
    */
-  int8_t priority_ = 0;
+  int32_t priority_ = 0;
   
   /*
    * secondary accuracy of this ability. -1 for undefined, -2 for varies
    */
-  int8_t secondaryAccuracy_ = -1;
+  int32_t secondaryAccuracy_ = -1;
   
   /*
    *selfBuff: positive implies a buff
@@ -126,7 +127,7 @@ public:
    * AIL_NV_POISON: Poison
    * AIL_NV_SLEEP: Sleep
    */
-  uint8_t targetAilment_ = AIL_NV_NONE;
+  uint32_t targetAilment_ = AIL_NV_NONE;
   
   /*
    * targetVolatileAilment:
@@ -140,7 +141,7 @@ public:
    * ?: Nightmare
    * ?: Partial Trap
    */
-  uint8_t targetVolatileAilment_ = AIL_V_NONE;
+  uint32_t targetVolatileAilment_ = AIL_V_NONE;
   
   /*
    * this move's plaintext pokedex description
@@ -158,27 +159,43 @@ public:
 
   const Type& getType() const;
 
-  bool targetsEnemy() const { return primaryAccuracy_ > 100; };
+  bool targetsEnemy() const { return primaryAccuracy_ > 0; };
 
-  int8_t getSpeedPriority() const { return priority_; }
+  int32_t getSpeedPriority() const { return priority_; }
 
-  int8_t getSelfBuff(size_t iBuff) const { return selfBuff_[iBuff]; };
+  int32_t getSelfBuff(size_t iBuff) const { return selfBuff_[iBuff]; };
 
-  int8_t getTargetDebuff(size_t iBuff) const { return targetDebuff_[iBuff]; };
+  int32_t getTargetDebuff(size_t iBuff) const { return targetDebuff_[iBuff]; };
 
-  uint8_t getTargetAilment() const { return targetAilment_; };
+  uint32_t getTargetAilment() const { return targetAilment_; };
 
-  uint8_t getTargetVolatileAilment() const { return targetVolatileAilment_; };
+  uint32_t getTargetVolatileAilment() const { return targetVolatileAilment_; };
 
-  uint8_t getPower() const { return power_; };
+  uint32_t getPower() const { return power_; };
   
-  uint8_t getDamageType() const { return damageType_; };
+  uint32_t getDamageType() const { return damageType_; };
 
   fpType getPrimaryAccuracy() const { return (fpType)primaryAccuracy_ / 100.0; };
 
   fpType getSecondaryAccuracy() const { return (fpType)secondaryAccuracy_ / 100.0; };
 
 
+  Move(
+    const std::string& name,
+    const Type* type,
+    int32_t primaryAccuracy,
+    uint32_t power,
+    uint32_t PP,
+    uint32_t damageType,
+    int32_t target,
+    int32_t priority,
+    int32_t secondaryAccuracy,
+    const BuffModArray& selfBuff,
+    const BuffModArray& targetDebuff,
+    uint32_t targetAilment,
+    uint32_t targetVolatileAilment,
+    bool hasPlugins,
+    const std::string& description);
   Move() = default;
   Move(const Move& source) = default;
   Move& operator=(const Move& source) = default;
@@ -186,7 +203,7 @@ public:
 };
 
 
-class PKAISHARED Moves: public std::vector<Move>
+class PKAISHARED Moves: public Collection<Move>
 {
 public:
   bool initialize(const std::string& path, const Types& types);

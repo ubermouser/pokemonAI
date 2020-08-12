@@ -12,6 +12,22 @@ using namespace orphan;
 
 const PokemonBase* PokemonBase::no_base = NULL;
 
+PokemonBase::PokemonBase(
+    const std::string& name,
+    const TypeArray& types,
+    uint16_t weight,
+    const StatsArray& stats,
+    const AbilitySet& abilities,
+    const MoveSet& moves) :
+    Name(name),
+    types_(types),
+    weight_(weight),
+    baseStats_(stats),
+    abilities_(abilities),
+    moves_(moves) {
+  checkRangeB(weight, (fpType)0.1, (fpType)1000.0);
+}
+
 
 bool Pokemons::initialize(
     const std::string& pokemonPath,
@@ -32,14 +48,13 @@ bool Pokemons::initialize(
         ": inputPokemon failed to populate a list of pokemon.\n";
     return false;
   }
-  std::sort(begin(), end());
 
   {
     // find special case no base:
-    PokemonBase::no_base = orphan::orphanCheck_ptr(*this, NULL, "none");
+    PokemonBase::no_base = count("none")?&at("none"):new PokemonBase();
   }
 
-  //MOVELIST library (requires sorted input of pokemon and moves!)
+  //MOVELIST library
   if (movelistPath.empty())
   {
     std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
@@ -126,24 +141,22 @@ bool Pokemons::loadFromFile_lines(
     if (!INI::checkRangeB(tokens.size(), (size_t)2, tokens.max_size())) { return false; }
 
     if (!INI::setArgAndPrintError("pokemon numElements", tokens.at(1), _numElements, iLine, 1)) { return false; }
-
-    if (!INI::checkRangeB(_numElements, (size_t)0, (size_t)MAXPOKEMON)) { return false; }
   }
 
   // ignore fluff line
   iLine+=2;
 
   // make sure number of lines in the file is correct for the number of moves we were given:
-  if (!INI::checkRangeB(lines.size() - iLine, (size_t)_numElements, (size_t)MAXPOKEMON)) { return false; }
-  resize(_numElements);
+  if (!INI::checkRangeB(lines.size() - iLine, (size_t)_numElements, (size_t)SIZE_MAX)) { return false; }
+  reserve(_numElements);
 
-  std::vector<std::string> mismatchedTypes;
-  std::vector<std::string> mismatchedAbilities;
+  OrphanSet orphanedTypes;
+  OrphanSet orphanedAbilities;
 
-  for (size_t iPokemon = 0; iPokemon < size(); ++iPokemon, ++iLine)
+  for (size_t iPokemon = 0; iLine < lines.size(); ++iPokemon, ++iLine)
   {
     std::vector<std::string> tokens = tokenize(lines.at(iLine), "\t");
-    class PokemonBase& cPokemon = at(iPokemon);
+    PokemonBase cPokemon;
     if (tokens.size() != 12)
     {
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
@@ -156,22 +169,22 @@ bool Pokemons::loadFromFile_lines(
 
     //pokemon name
     size_t iToken = 0;
-    cPokemon.setName(tokens.at(iToken));
+    cPokemon.setName(lowerCase(tokens.at(iToken)));
 
     //pokemon primary type
     iToken = 1;
     {
-      size_t iType = orphanCheck(types, &mismatchedTypes, tokens.at(iToken));
-      if (iType == SIZE_MAX) { cPokemon.lostChild_ = true; } //orphan!
-      cPokemon.types_[0] = &types[iType];
+      const Type* type = orphanCheck(types, tokens.at(iToken), &orphanedTypes);
+      if (type == NULL) { cPokemon.lostChild_ = true; } //orphan!
+      cPokemon.types_[0] = type;
     }
 
     //pokemon secondary type
     iToken = 2;
     {
-      size_t iType = orphanCheck(types, &mismatchedTypes, tokens.at(iToken));
-      if (iType == SIZE_MAX) { cPokemon.lostChild_ = true; } //orphan!
-      cPokemon.types_[1] = &types[iType]; // notype = "None"
+      const Type* type = orphanCheck(types, tokens.at(iToken), &orphanedTypes);
+      if (type == NULL) { cPokemon.lostChild_ = true; } //orphan!
+      cPokemon.types_[1] = type; // notype = "None"
     }
 
     //base stats table
@@ -196,54 +209,27 @@ bool Pokemons::loadFromFile_lines(
     //first ability choice
     iToken = 10;
     {
-      const Ability* cAbility = orphanCheck_ptr(abilities, &mismatchedAbilities, tokens.at(iToken));
+      const Ability* cAbility = orphanCheck(abilities, tokens.at(iToken), &orphanedAbilities);
       if (cAbility == NULL) { cPokemon.lostChild_ = true; } //orphan!
-      else { cPokemon.abilities_.push_back(cAbility); }
+      else { cPokemon.abilities_.insert(cAbility); }
     }
 
     //second ability choice
     iToken = 11;
-    if (tokens.at(iToken).compare("---") != 0)
+    if (tokens.at(iToken) != "---")
     {
       //strncpy(currentPokemon->secondaryAbilityName,tokens.at(11),20);
-      const Ability* cAbility = orphanCheck_ptr(abilities, &mismatchedAbilities, tokens.at(iToken));
+      const Ability* cAbility = orphanCheck(abilities, tokens.at(iToken), &orphanedAbilities);
       if (cAbility == NULL) { cPokemon.lostChild_ = true; } //orphan!
-      else { cPokemon.abilities_.push_back(cAbility); }
+      else { cPokemon.abilities_.insert(cAbility); }
     }
 
-    // sort abilities (by pointer):
-    {
-      std::sort(cPokemon.abilities_.begin(), cPokemon.abilities_.end());
-    }
-
+    insert({cPokemon.getName(), cPokemon});
   } //end of per-pokemon
 
   //output orphans
-  if (mismatchedTypes.size() != 0)
-  {
-    if (verbose >= 5) std::cerr << "WAR " << __FILE__ << "." << __LINE__ <<
-      ": pokemon inputStream - " << mismatchedTypes.size() << " Orphaned pokemon-types!\n";
-    if (verbose >= 6)
-    {
-      for (size_t indexOrphan = 0; indexOrphan < mismatchedTypes.size(); indexOrphan++)
-      {
-        std::cout << "\tOrphaned type \"" << mismatchedTypes.at(indexOrphan) << "\"\n";
-      }
-    }
-  }
-  if (mismatchedAbilities.size() != 0)
-  {
-    if (verbose >= 5) std::cerr << "WAR " << __FILE__ << "." << __LINE__ <<
-      ": pokemon inputStream  - " << mismatchedAbilities.size() << " Orphaned pokemon-abilities!\n";
-    if (verbose >= 6)
-    {
-      for (size_t indexOrphan = 0; indexOrphan < mismatchedAbilities.size(); indexOrphan++)
-      {
-        std::cout << "\tOrphaned ability \"" << mismatchedAbilities.at(indexOrphan) << "\"\n";
-      }
-    }
-  }
-
+  printOrphans(orphanedTypes, "pokemon inputStream", "pokemon-types", "type");
+  printOrphans(orphanedTypes, "pokemon inputStream", "pokemon-abilities", "ability");
   return true; // import success
 } // endof import pokemon
 
@@ -332,11 +318,8 @@ bool Pokemons::loadMovelistFromFile_lines(
     return false;
   }
 
-  std::vector<std::string> mismatchedPokemon;
-  std::vector<std::string> mismatchedMoves;
-
-  Pokemons::iterator cPokemon = begin();
-  Moves::const_iterator cMove = moves.begin();
+  OrphanSet orphanedPokemon;
+  OrphanSet orphanedMoves;
 
   for (size_t iPair = 0; iPair < lines.size() - 2; ++iPair, ++iLine)
   {
@@ -349,86 +332,22 @@ bool Pokemons::loadMovelistFromFile_lines(
       return false;
     }
 
-    //find pokemon referred to by this pair
-    //TODO: make sure this is actually faster than binary search
-    //WARNING: THIS CODE ASSUMES: NO DUPLICATES, ALPHABETICAL ORDER OF POKEMON
-    while(cPokemon->getName().compare(tokens.at(0)) != 0)
-    {
-      cPokemon++;
-      if (cPokemon != end())
-      {
-        cMove = moves.begin(); // reset moves
-      }
-      else // unable to find target pokemon in move pair:
-      {
-        // add orphan:
-        orphanAddToVector(mismatchedPokemon, tokens.at(0));
+    PokemonBase* cPokemon = orphanCheck(*this, tokens.at(0), &orphanedPokemon);
+    const Move* cMove = orphanCheck(moves, tokens.at(1), &orphanedMoves);
 
-        // reset pokemon and moves:
-        cPokemon = begin();
-        cMove = moves.begin();
-
-        goto outerWhile;
-      }
-    }
-
-    //find move referred to by this pair
-    //TODO: make sure this is actually faster than binary search
-    //WARNING: THIS CODE ASSUMES: NO DUPLICATES, ALPHABETICAL ORDER OF MOVES
-    while(cMove->getName().compare(tokens.at(1)) != 0)
-    {
-      cMove++;
-      if (cMove == moves.end())
-      {
-        // add orphan:
-        orphanAddToVector(mismatchedMoves, tokens.at(1));
-
-        // reset moves
-        cMove = moves.begin();
-
-        goto outerWhile;
-      }
-    }
+    // ignore orphan pairs
+    if (cPokemon == NULL || cMove == NULL) { continue; }
     // add this name to the current Pokemon's move list.
-    cPokemon->movelist_.push_back(&(*cMove));
-
-  outerWhile:
-    std::cerr.flush(); // dummy function
+    cPokemon->moves_.insert(cMove);
   } //end of per-pair
 
-  // mark orphans with no movesets, sort the movesets of bases which have them:
-  for (size_t iPokemon = 0; iPokemon != size(); ++iPokemon)
-  {
-    PokemonBase& cBase = at(iPokemon);
-    if (cBase.movelist_.empty()) { cBase.lostChild_ = true; continue;}
-    std::sort(cBase.movelist_.begin(), cBase.movelist_.end());
+  // mark orphans with no movesets:
+  for (auto& cBase : *this) {
+    if (cBase.second.moves_.empty()) { cBase.second.lostChild_ = true; continue;}
   }
 
   //output orphans
-  if (mismatchedPokemon.size() != 0)
-  {
-    if (verbose >= 5) std::cerr << "WAR " << __FILE__ << "." << __LINE__ <<
-      ": movelist inputStream - " << mismatchedPokemon.size() << " Orphaned movelist-pokemon!\n";
-    if (verbose >= 6)
-    {
-      for (size_t indexOrphan = 0; indexOrphan < mismatchedPokemon.size(); indexOrphan++)
-      {
-        std::cout << "\tOrphaned pokemon \"" << mismatchedPokemon.at(indexOrphan) << "\"\n";
-      }
-    }
-  }
-  if (mismatchedMoves.size() != 0)
-  {
-    if (verbose >= 5) std::cerr << "WAR " << __FILE__ << "." << __LINE__ <<
-      ": movelist inputStream - " << mismatchedMoves.size() << " Orphaned movelist-moves!\n";
-    if (verbose >= 6)
-    {
-      for (size_t indexOrphan = 0; indexOrphan < mismatchedMoves.size(); indexOrphan++)
-      {
-        std::cout << "\tOrphaned move \"" << mismatchedMoves.at(indexOrphan) << "\"\n";
-      }
-    }
-  }
-
+  printOrphans(orphanedPokemon, "movelist inputStream", "movelist-pokemon", "pokemon");
+  printOrphans(orphanedPokemon, "movelist inputStream", "movelist-moves", "move");
   return true; // import success
 }//endof import movelist

@@ -110,10 +110,10 @@ namespace INI
     return true;
   };
 
-  template <class unknownType>
-  bool checkRangeB(const unknownType& value, const unknownType& min, const unknownType& max)
+  template <class unknownType, class valueType>
+  bool checkRangeB(const unknownType& value, const valueType& min, const valueType& max)
   {
-    if ((value >= min) && (value <= max)) { return true; }
+    if ((value >= unknownType(min)) && (value <= unknownType(max))) { return true; }
 
     std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
       ": " << typeid(value).name() << "=" << value << "; Range " << min << ".." << max << " \n";

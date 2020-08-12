@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "../inc/name.h"
+#include "../inc/collection.h"
 
 class PKAISHARED Nature: public Name
 {
@@ -34,7 +35,7 @@ public:
 };
 
 
-class PKAISHARED Natures: public std::vector<Nature>
+class PKAISHARED Natures: public Collection<Nature>
 {
 public:
   bool initialize(const std::string& path);

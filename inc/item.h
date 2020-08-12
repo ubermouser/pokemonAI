@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "../inc/name.h"
+#include "../inc/collection.h"
 #include "../inc/pluggable.h"
 
 class Type;
@@ -67,6 +68,9 @@ public:
   /* the type of move whose super effective damage is reduced by 50% when this object is held */
   const Type* resistedType_;
 
+  /* TODO: delete. The index of insertion of this item. */
+  size_t index_;
+
   /* amount of damage dealt when fling is used with this object held */
   uint8_t flingPower_;
 
@@ -77,14 +81,18 @@ public:
 };
 
 
-class PKAISHARED Items: public std::vector<Item>
+class PKAISHARED Items: public Collection<Item>
 {
 public:
   bool initialize(const std::string& path, const Types& types);
 
+  const Item* atByIndex(size_t index) const { return byIndex_.at(index); }
+
 protected:
   bool loadFromFile(const std::string& path, const Types& types);
   bool loadFromFile_lines(const Types& types, const std::vector<std::string>& lines, size_t& iLine);
+
+  std::unordered_map<size_t, const Item*> byIndex_;
 };
 
 #endif	/* ITEM_H */

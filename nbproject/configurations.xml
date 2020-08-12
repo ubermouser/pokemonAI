@@ -172,6 +172,7 @@
         </logicalFolder>
         <itemPath>src/init_toolbox.cpp</itemPath>
         <itemPath>src/name.cpp</itemPath>
+        <itemPath>src/orphan.cpp</itemPath>
         <itemPath>src/signature.cpp</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="trainer" projectFiles="true">
@@ -511,6 +512,8 @@
       <item path="src/neuralNet.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/orderHeuristic.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/orphan.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/otherMove.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -898,6 +901,8 @@
       <item path="src/neuralNet.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/orderHeuristic.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/orphan.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/otherMove.cpp" ex="false" tool="1" flavor2="0">
       </item>

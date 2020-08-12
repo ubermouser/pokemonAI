@@ -11,10 +11,12 @@
 #include "../inc/pkai.h"
 
 #include <stdint.h>
+#include <unordered_set>
 #include <vector>
 #include <array>
 
 #include "../inc/name.h"
+#include "../inc/collection.h"
 
 class Type;
 class Types;
@@ -31,6 +33,11 @@ class Pokedex;
 class PKAISHARED PokemonBase: public Name
 {
 public:
+  using TypeArray = std::array<const Type*, 2>;
+  using AbilitySet = std::unordered_set<const Ability*>;
+  using MoveSet = std::unordered_set<const Move*>;
+  using StatsArray = std::array<uint8_t, 6>;
+
   static const PokemonBase* no_base;
   /*
    * pokemon's typeage, lostChild is true if either of these types don't exist
@@ -53,7 +60,7 @@ public:
    * 15: dark
    * 16: steel
    */
-  std::array<const Type*, 2> types_;
+  TypeArray types_;
 
   /*
    * the weight / heftiness of the pokemon. Used for some damage calculations
@@ -69,30 +76,36 @@ public:
    * 4: Speed
    * 5: Hit-Points
    */
-  std::array<uint8_t, 6> baseStats_; // pokemon's basic stats
+  StatsArray baseStats_; // pokemon's basic stats
 
   /* 
    * primary and secondary ability
    * NULL if not a choice
    */
-  std::vector<const Ability*> abilities_;
+  AbilitySet abilities_;
 
   /* pointers to actions the pokemon may perform in combat */
-  std::vector<const Move*> movelist_;
+  MoveSet moves_;
 
   bool lostChild_;
 
 
   const Type& getType(size_t iType) const { return *types_[iType]; };
 
-  size_t getNumAbilities() const { return abilities_.size(); }
+  const AbilitySet& getAbilities() const { return abilities_; }
 
-  const Ability& getAbility(size_t iAbility) const { return *abilities_[iAbility]; }
-
+  PokemonBase() = default;
+  PokemonBase(
+    const std::string& name,
+    const TypeArray& types,
+    uint16_t weight,
+    const StatsArray& stats,
+    const AbilitySet& abilities,
+    const MoveSet& moves);
 };
 
 
-class PKAISHARED Pokemons: public std::vector<PokemonBase>
+class PKAISHARED Pokemons: public Collection<PokemonBase>
 {
 public:
   bool initialize(

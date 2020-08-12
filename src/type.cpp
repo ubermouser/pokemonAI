@@ -1,7 +1,8 @@
 #include "../inc/type.h"
 
-#include "../inc/pokedex.h"
+#include <vector>
 
+#include "../inc/pokedex.h"
 #include "../inc/init_toolbox.h"
 #include "../inc/orphan.h"
 
@@ -11,23 +12,9 @@ using namespace orphan;
 const Type* Type::no_type = NULL;
 
 
-Type::Type() 
-  : modTable_()
-{
-}
-
-
-Type::Type(const Type& source) 
-  : modTable_(source.modTable_)
-{
-}
-
-
 fpType Type::getModifier(const Type& other) const
 {
-  size_t iOType = &other - &pkdex->getTypes().front();
-
-  return (fpType)modTable_[iOType] / (fpType) FPMULTIPLIER;
+  return (fpType)modTable_.at(&other) / (fpType) FPMULTIPLIER;
 }
 
 
@@ -46,11 +33,9 @@ bool Types::initialize(const std::string& path) {
         ": InputTypes failed to populate an array of types.\n";
     return false;
   }
-  //std::sort(types.begin(), types.end());
-  {
-    // find type special case
-    Type::no_type = orphan::orphanCheck_ptr(*this, NULL, "none");
-  }
+  
+  // find type special case
+  Type::no_type = count("none")?&at("none"):new Type();
   
   return true;
 }
@@ -119,34 +104,46 @@ bool Types::loadFromFile_lines(const std::vector<std::string>& lines, size_t& iL
     if (!INI::checkRangeB(tokens.size(), (size_t)2, tokens.max_size())) { return false; }
 
     if (!INI::setArgAndPrintError("types numElements", tokens.at(1), _numElements, iLine, 1)) { return false; }
-
-    if (!INI::checkRangeB(_numElements, (size_t)0, (size_t)MAXTYPES)) { return false; }
   }
 
   // ignore fluff line
   iLine+=2;
 
   // make sure number of lines in the file is correct for the number of moves we were given:
-  if (!INI::checkRangeB(lines.size() - iLine, (size_t)_numElements, (size_t)MAXTYPES)) { return false; }
-  resize(_numElements);
+  if (!INI::checkRangeB(lines.size() - iLine, (size_t)_numElements, (size_t)SIZE_MAX)) { return false; }
+  reserve(_numElements);
 
-  for (size_t iType = 0; iType < size(); ++iType, ++iLine)
+  // pre-insert the types by name:
+  std::vector<const Type*> typeNames;
+  for (size_t iType = 0, iCLine=iLine; iCLine < lines.size(); ++iType, ++iCLine) {
+    std::vector<std::string> tokens = tokenize(lines.at(iCLine), "\t");
+
+    Type cType;
+    //type name
+    cType.setName(lowerCase(tokens.at(0)));
+
+    insert({cType.getName(), cType});
+    typeNames.push_back(&at(cType.getName()));
+  }
+
+  // insert modtable types after we have a fully allocated type map:
+  for (size_t iType = 0; iLine < lines.size(); ++iType, ++iLine)
   {
     std::vector<std::string> tokens = tokenize(lines.at(iLine), "\t");
-    class Type& cType = at(iType);
-    if (tokens.size() != size()+1)
-    {
+    Type& cType = at(lowerCase(tokens.at(0)));
+
+    if (tokens.size() != size()+1) {
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
         ": types inputStream has malformed line #" << iLine <<
         " with " << tokens.size() << " values!\n";
       return false;
     }
 
-    //allocate dynamic modtable
-    cType.modTable_.resize(size(), 0);
+    cType.index_ = iType;
+    byIndex_.insert({cType.index_, &cType});
 
-    //type name
-    cType.setName(tokens.at(0));
+    //allocate dynamic modtable
+    cType.modTable_.reserve(size());
 
     //dynamic modtable
     for (size_t indexInnerType = 0; indexInnerType < size(); indexInnerType++)
@@ -154,9 +151,8 @@ bool Types::loadFromFile_lines(const std::vector<std::string>& lines, size_t& iL
       double cTypeVal;
       if (!setArg(tokens.at(indexInnerType+1), cTypeVal)) { incorrectArgs("cTypeVal", iLine, indexInnerType+1); return false; }
       checkRangeB(cTypeVal, 0.0, 2.0);
-      cType.modTable_[indexInnerType] = cTypeVal * FPMULTIPLIER;
+      cType.modTable_[typeNames[indexInnerType]] = cTypeVal * FPMULTIPLIER;
     }
-
   } //end of per-type
 
   return true; // import success

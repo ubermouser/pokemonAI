@@ -1,6 +1,5 @@
 #include "../inc/ability.h"
 
-#include <algorithm>
 #include <ostream>
 
 #include "../inc/init_toolbox.h"
@@ -26,12 +25,9 @@ bool Abilities::initialize(const std::string& path) {
         ": inputAbilities failed to populate a list of pokemon abilities.\n";
     return false;
   }
-  std::sort(begin(), end());
 
-  {
-    // find special case no ability:
-    Ability::no_ability = orphan::orphanCheck_ptr(*this, NULL, "none");
-  }
+  // find special case no ability:
+  Ability::no_ability = count("none")?&at("none"):new Ability();
   
   return true;
 }
@@ -101,21 +97,19 @@ bool Abilities::loadFromFile_lines(const std::vector<std::string>& lines, size_t
     if (!INI::checkRangeB(tokens.size(), (size_t)2, tokens.max_size())) { return false; }
 
     if (!INI::setArgAndPrintError("abilities numElements", tokens.at(1), _numElements, iLine, 1)) { return false; }
-
-    if (!INI::checkRangeB(_numElements, (size_t)0, (size_t)MAXABILITIES)) { return false; }
   }
 
   // ignore fluff line
   iLine+=2;
 
   // make sure number of lines in the file is correct for the number of moves we were given:
-  if (!INI::checkRangeB(lines.size() - iLine, (size_t)_numElements, (size_t)MAXABILITIES)) { return false; }
-  resize(_numElements);
+  if (!INI::checkRangeB(lines.size() - iLine, (size_t)_numElements, (size_t)SIZE_MAX)) { return false; }
+  reserve(_numElements);
 
-  for (size_t iAbility = 0; iAbility < size(); ++iAbility, ++iLine)
+  for (size_t iAbility = 0; iLine < lines.size(); ++iAbility, ++iLine)
   {
     std::vector<std::string> tokens = tokenize(lines.at(iLine), "\t");
-    class Ability& cAbility = at(iAbility);
+    Ability cAbility;
     if (tokens.size() != 2)
     {
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
@@ -125,7 +119,7 @@ bool Abilities::loadFromFile_lines(const std::vector<std::string>& lines, size_t
     }
 
     //ability name
-    cAbility.setName(tokens.at(0));
+    cAbility.setName(lowerCase(tokens.at(0)));
 
     //ability script
     if (tokens.at(1).compare("---") == 0)
@@ -143,6 +137,7 @@ bool Abilities::loadFromFile_lines(const std::vector<std::string>& lines, size_t
       cAbility.script_ = std::string(tokens.at(1).substr(offset, tokenLength - offset));
     }
 
+    insert({cAbility.getName(), cAbility});
   } //end of per-ability
 
   return true; // import success

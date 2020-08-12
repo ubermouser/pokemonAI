@@ -6,16 +6,27 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 
+#include "../inc/orphan.h"
+
 using namespace boost::dll;
+using namespace orphan;
+
+
+PokedexDynamic::PokedexDynamic(const Config& config, bool doInitialize)
+ : PokedexStatic(config, false), config_(config) {
+  if (doInitialize && !initialize()) {
+    throw std::runtime_error("Failed to Initialize Pokedex!");
+  }
+}
+
 
 bool PokedexDynamic::inputPlugins()
 {
-#ifndef _DISABLEPLUGINS
-  std::vector<std::string> mismatchedItems;
-  std::vector<std::string> mismatchedAbilities;
-  std::vector<std::string> mismatchedMoves;
+  OrphanSet mismatchedItems;
+  OrphanSet mismatchedAbilities;
+  OrphanSet mismatchedMoves;
   //std::vector<std::string> mismatchedGears; // engine components
-  std::vector<std::string> mismatchedCategories;
+  OrphanSet mismatchedCategories;
   size_t numOverwritten = 0;
   size_t numExtensions = 0;
   size_t numPluginsLoaded = 0;
@@ -42,7 +53,7 @@ bool PokedexDynamic::inputPlugins()
   // iterate through all files in moves directory:
   for ( boost::filesystem::directory_iterator iPlugin(pluginLocation), endPlugin; iPlugin != endPlugin; ++iPlugin)
   {
-    // ignore directories
+    // ignore subdirectories
     if (boost::filesystem::is_directory(*iPlugin)) { continue; }
 
     // make sure extension is that of a plugin:
@@ -116,6 +127,5 @@ bool PokedexDynamic::inputPlugins()
       mismatchedMoves, 
       mismatchedCategories);
 
-#endif /* _DISABLEPLUGINS */
   return true;
 } // endOf inputScript

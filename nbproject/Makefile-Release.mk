@@ -53,6 +53,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/name.o \
 	${OBJECTDIR}/src/neuralNet.o \
 	${OBJECTDIR}/src/orderHeuristic.o \
+	${OBJECTDIR}/src/orphan.o \
 	${OBJECTDIR}/src/otherMove.o \
 	${OBJECTDIR}/src/pkIO.o \
 	${OBJECTDIR}/src/planner.o \
@@ -205,6 +206,11 @@ ${OBJECTDIR}/src/orderHeuristic.o: src/orderHeuristic.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/orderHeuristic.o src/orderHeuristic.cpp
+
+${OBJECTDIR}/src/orphan.o: src/orphan.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/orphan.o src/orphan.cpp
 
 ${OBJECTDIR}/src/otherMove.o: src/otherMove.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -584,6 +590,19 @@ ${OBJECTDIR}/src/orderHeuristic_nomain.o: ${OBJECTDIR}/src/orderHeuristic.o src/
 	    $(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/orderHeuristic_nomain.o src/orderHeuristic.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/orderHeuristic.o ${OBJECTDIR}/src/orderHeuristic_nomain.o;\
+	fi
+
+${OBJECTDIR}/src/orphan_nomain.o: ${OBJECTDIR}/src/orphan.o src/orphan.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/orphan.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/orphan_nomain.o src/orphan.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/src/orphan.o ${OBJECTDIR}/src/orphan_nomain.o;\
 	fi
 
 ${OBJECTDIR}/src/otherMove_nomain.o: ${OBJECTDIR}/src/otherMove.o src/otherMove.cpp 

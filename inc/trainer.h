@@ -17,6 +17,7 @@
 #include "../inc/ranked_neuralNet.h"
 #include "../inc/ranked_evaluator.h"
 
+class Type;
 class Game;
 class Evaluator;
 
@@ -31,12 +32,13 @@ struct teamTrainerResult
   // maximums:
   std::array<fpType, 7> maxes;
   // highest counts:
-  size_t iHighestPokemon, highestPokemonCount;
-  size_t iHighestAbility, highestAbilityCount;
-  size_t iHighestItem, highestItemCount;
-  size_t iHighestType, highestTypeCount;
-  size_t iHighestNature, highestNatureCount;
-  size_t iHighestMove, highestMoveCount;
+  const PokemonBase* highestPokemon;
+  const Ability* highestAbility;
+  const Item* highestItem;
+  const Type* highestType;
+  const Nature* highestNature;
+  const Move* highestMove;
+  size_t highestPokemonCount, highestAbilityCount, highestItemCount, highestTypeCount, highestNatureCount, highestMoveCount;
 };
 
 struct networkTrainerResult

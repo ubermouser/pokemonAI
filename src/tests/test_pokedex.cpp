@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 
+#include <inc/pokedex_static.h>
 #include <inc/pokedex_dynamic.h>
 #include <inc/pkIO.h>
 
@@ -15,13 +16,25 @@ protected:
   std::shared_ptr<PokedexDynamic> pokedex;
 };
 
-TEST_F(PokedexTest, LoadsGen4Items) {
-  EXPECT_EQ(pokedex->getAbilities().size(), 123);
-  EXPECT_EQ(pokedex->getItems().size(), 97);
-  EXPECT_EQ(pokedex->getNatures().size(), 26);
-  EXPECT_EQ(pokedex->getMoves().size(), 383);
-  EXPECT_EQ(pokedex->getPokemon().size(), 505);
-  EXPECT_EQ(pokedex->getTypes().size(), 18);
+void validateGen4Counts(const Pokedex& pkdex) {
+  EXPECT_EQ(pkdex.getAbilities().size(), 123);
+  EXPECT_EQ(pkdex.getItems().size(), 97);
+  EXPECT_EQ(pkdex.getNatures().size(), 26);
+  EXPECT_EQ(pkdex.getMoves().size(), 383);
+  EXPECT_EQ(pkdex.getPokemon().size(), 505);
+  EXPECT_EQ(pkdex.getTypes().size(), 18);
+}
+
+TEST(StaticPokedexTest, LoadsGen4Items) {
+  PokedexStatic pkdex;
+  validateGen4Counts(pkdex);
+  EXPECT_EQ(pkdex.getExtensions().getNumPlugins(), 0);
+}
+
+TEST(DynamicPokedexTest, LoadsGen4Items) {
+  PokedexDynamic pkdex;
+  validateGen4Counts(pkdex);
+  EXPECT_GE(pkdex.getExtensions().getNumPlugins(), 50);
 }
 
 TEST_F(PokedexTest, PrintsTeamWithoutCrashing) {

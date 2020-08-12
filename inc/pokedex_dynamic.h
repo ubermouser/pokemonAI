@@ -25,11 +25,10 @@ public:
     Config() {};
   };
   
-  PokedexDynamic(const Config& config=Config(), bool doInitialize=true) 
-    : PokedexStatic(config, doInitialize), config_(config) { }
-  virtual ~PokedexDynamic() {};
+  PokedexDynamic(const Config& config=Config(), bool doInitialize=true);
+  virtual ~PokedexDynamic() override {};
     
-  virtual bool inputPlugins(); // input scripts for registered moves
+  virtual bool inputPlugins() override; // input scripts for registered moves
   
 protected:
 

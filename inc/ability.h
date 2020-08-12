@@ -13,6 +13,7 @@
 #include <string>
 
 #include "../inc/name.h"
+#include "../inc/collection.h"
 #include "../inc/pluggable.h"
 
 class PKAISHARED Ability: public Name, public Pluggable
@@ -29,7 +30,7 @@ public:
 };
 
 
-class PKAISHARED Abilities: public std::vector<Ability>
+class PKAISHARED Abilities: public Collection<Ability>
 {
 public:
   bool initialize(const std::string& path);

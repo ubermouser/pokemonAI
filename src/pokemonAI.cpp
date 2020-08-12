@@ -125,7 +125,6 @@ bool PokemonAI::init()
   bool result = 0;
 
   pokedex = std::make_unique<PokedexDynamic>(pokedex_config);
-  pkdex = pokedex.get();
   
   //Teams:
   if (pokemonIO->input_teams.size() > 0)

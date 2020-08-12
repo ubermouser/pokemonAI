@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <iostream>
 #include <assert.h>
+#include <unordered_map>
 
 #include <boost/foreach.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -136,17 +137,17 @@ void Trainer::printLeagueStatistics(size_t iLeague, size_t numMembers, const tea
   std::clog << "---- DESCRIPTIVE STATISTICS OF LEAGUE " << iLeague + 1 << " ----\n";
   printRankedStatistics(cResult);
   std::clog 
-    << " most popular pokemon is \"" << ((cResult.iHighestPokemon<pkdex->getPokemon().size())?(pkdex->getPokemon()[cResult.iHighestPokemon].getName()):"NULL")
+    << " most popular pokemon is \"" << cResult.highestPokemon->getName()
     << "\" with " << cResult.highestPokemonCount
-    << " showings\n most popular move is \"" << ((cResult.iHighestMove<pkdex->getMoves().size())?(pkdex->getMoves()[cResult.iHighestMove].getName()):"NULL")
+    << " showings\n most popular move is \"" << cResult.highestMove->getName()
     << "\" with " << cResult.highestMoveCount 
-    << " showings\n most popular ability is \"" << ((cResult.iHighestAbility<pkdex->getAbilities().size())?(pkdex->getAbilities()[cResult.iHighestAbility].getName()):"NULL")
+    << " showings\n most popular ability is \"" << cResult.highestAbility->getName()
     << "\" with " << cResult.highestAbilityCount
-    << " showings\n most popular item is \"" << ((cResult.iHighestItem<pkdex->getItems().size())?(pkdex->getItems()[cResult.iHighestItem].getName()):"NULL")
+    << " showings\n most popular item is \"" << cResult.highestItem->getName()
     << "\" with " << cResult.highestItemCount 
-    << " showings\n most popular type is \"" << ((cResult.iHighestType<pkdex->getTypes().size())?(pkdex->getTypes()[cResult.iHighestType].getName()):"NULL")
+    << " showings\n most popular type is \"" << cResult.highestType->getName()
     << "\" with " << cResult.highestTypeCount
-    << " showings\n most popular nature is \"" << ((cResult.iHighestNature<pkdex->getNatures().size())?(pkdex->getNatures()[cResult.iHighestNature].getName()):"NULL")
+    << " showings\n most popular nature is \"" << cResult.highestNature->getName()
     << "\" with " << cResult.highestNatureCount
     << " showings\n";
 
@@ -315,19 +316,19 @@ void Trainer::calculateDescriptiveStatistics(size_t iLeague, teamTrainerResult& 
   // calculate ranked vars:
   calculateRankedDescriptiveStatistics(cLeague, cR);
 
-  std::vector<size_t> pokemonCounts(pkdex->getPokemon().size(), 0);
-  std::vector<size_t> abilityCounts(pkdex->getAbilities().size(), 0);
-  std::vector<size_t> itemCounts(pkdex->getItems().size(), 0);
-  std::vector<size_t> moveCounts(pkdex->getMoves().size(), 0);
-  std::vector<size_t> typeCounts(pkdex->getTypes().size(), 0);
-  std::vector<size_t> natureCounts(pkdex->getNatures().size(), 0);
+  std::unordered_map<const PokemonBase*, size_t> pokemonCounts;
+  std::unordered_map<const Ability*, size_t> abilityCounts;
+  std::unordered_map<const Item*, size_t> itemCounts;
+  std::unordered_map<const Move*, size_t> moveCounts;
+  std::unordered_map<const Type*, size_t> typeCounts;
+  std::unordered_map<const Nature*, size_t> natureCounts;
   // highest counts:
-  cR.iHighestPokemon = SIZE_MAX; cR.highestPokemonCount = 0;
-  cR.iHighestMove = SIZE_MAX; cR.highestMoveCount = 0;
-  cR.iHighestItem = SIZE_MAX; cR.highestItemCount = 0;
-  cR.iHighestAbility = SIZE_MAX; cR.highestAbilityCount = 0;
-  cR.iHighestNature = SIZE_MAX; cR.highestNatureCount = 0;
-  cR.iHighestType = SIZE_MAX; cR.highestTypeCount = 0;
+  cR.highestPokemon = PokemonBase::no_base; cR.highestPokemonCount = 0;
+  cR.highestMove = Move::move_none; cR.highestMoveCount = 0;
+  cR.highestItem = Item::no_item; cR.highestItemCount = 0;
+  cR.highestAbility = Ability::no_ability; cR.highestAbilityCount = 0;
+  cR.highestNature = Nature::no_nature; cR.highestNatureCount = 0;
+  cR.highestType = Type::no_type; cR.highestTypeCount = 0;
 
   // foreach team:
   size_t iTeam = 0;
@@ -343,48 +344,48 @@ void Trainer::calculateDescriptiveStatistics(size_t iLeague, teamTrainerResult& 
       // pokemon counts:
       if (cTeammate.pokemonExists())
       {
-        size_t iCPokemon = &cTeammate.getBase() - &pkdex->getPokemon().front();
-        pokemonCounts[iCPokemon]++;
-        if (pokemonCounts[iCPokemon] > cR.highestPokemonCount) 
+        const PokemonBase* cPokemon = &cTeammate.getBase();
+        pokemonCounts[cPokemon]++;
+        if (pokemonCounts[cPokemon] > cR.highestPokemonCount)
         { 
-          cR.iHighestPokemon = iCPokemon; 
-          cR.highestPokemonCount = pokemonCounts[iCPokemon]; 
+          cR.highestPokemon = cPokemon;
+          cR.highestPokemonCount = pokemonCounts[cPokemon];
         }
       }
 
       // item counts:
       if (cTeammate.hasInitialItem())
       {
-        size_t iCItem = &cTeammate.getInitialItem() - &pkdex->getItems().front();
-        itemCounts[iCItem]++;
-        if (itemCounts[iCItem] > cR.highestItemCount) 
+        const Item* cItem = &cTeammate.getInitialItem();
+        itemCounts[cItem]++;
+        if (itemCounts[cItem] > cR.highestItemCount)
         { 
-          cR.iHighestItem = iCItem; 
-          cR.highestItemCount = itemCounts[iCItem]; 
+          cR.highestItem = cItem;
+          cR.highestItemCount = itemCounts[cItem];
         }
       }
 
       // ability counts:
       if (cTeammate.abilityExists())
       {
-        size_t iCAbility = &cTeammate.getAbility() - &pkdex->getAbilities().front();
-        abilityCounts[iCAbility]++;
-        if (abilityCounts[iCAbility] > cR.highestAbilityCount) 
+        const Ability* cAbility = &cTeammate.getAbility();
+        abilityCounts[cAbility]++;
+        if (abilityCounts[cAbility] > cR.highestAbilityCount)
         { 
-          cR.iHighestAbility = iCAbility; 
-          cR.highestAbilityCount = abilityCounts[iCAbility]; 
+          cR.highestAbility = cAbility;
+          cR.highestAbilityCount = abilityCounts[cAbility];
         }
       }
 
       // nature counts:
       if (cTeammate.natureExists())
       {
-        size_t iCNature = &cTeammate.getNature() - &pkdex->getNatures().front();
-        natureCounts[iCNature]++;
-        if (natureCounts[iCNature] > cR.highestNatureCount) 
+        const Nature* cNature = &cTeammate.getNature();
+        natureCounts[cNature]++;
+        if (natureCounts[cNature] > cR.highestNatureCount)
         { 
-          cR.iHighestNature = iCNature; 
-          cR.highestNatureCount = natureCounts[iCNature]; 
+          cR.highestNature = cNature;
+          cR.highestNatureCount = natureCounts[cNature];
         }
       }
 
@@ -393,23 +394,23 @@ void Trainer::calculateDescriptiveStatistics(size_t iLeague, teamTrainerResult& 
         if (&cTeammate.getBase().getType(0) != Type::no_type)
         {
           // type 1:
-          size_t iCType = &cTeammate.getBase().getType(0) - &pkdex->getTypes().front();
-          typeCounts[iCType]++;
-          if (typeCounts[iCType] > cR.highestTypeCount) 
+          const Type* cType = &cTeammate.getBase().getType(0);
+          typeCounts[cType]++;
+          if (typeCounts[cType] > cR.highestTypeCount)
           { 
-            cR.iHighestType = iCType; 
-            cR.highestTypeCount = typeCounts[iCType]; 
+            cR.highestType = cType;
+            cR.highestTypeCount = typeCounts[cType];
           }
         }
         if (&cTeammate.getBase().getType(1) != Type::no_type)
         {
           // type 2:
-          size_t iCType = &cTeammate.getBase().getType(1) - &pkdex->getTypes().front();
-          typeCounts[iCType]++;
-          if (typeCounts[iCType] > cR.highestTypeCount) 
+          const Type* cType = &cTeammate.getBase().getType(1);
+          typeCounts[cType]++;
+          if (typeCounts[cType] > cR.highestTypeCount)
           { 
-            cR.iHighestType = iCType; 
-            cR.highestTypeCount = typeCounts[iCType]; 
+            cR.highestType = cType;
+            cR.highestTypeCount = typeCounts[cType];
           }
         }
       }
@@ -417,16 +418,15 @@ void Trainer::calculateDescriptiveStatistics(size_t iLeague, teamTrainerResult& 
       // foreach move:
       for (size_t iMove = 0; iMove != cTeammate.getNumMoves(); ++iMove)
       {
-        const Move& cMove = cTeammate.getMove_base(iMove + AT_MOVE_0);
-        size_t iCMove = &cMove - &pkdex->getMoves().front();
+        const Move* cMove = &cTeammate.getMove_base(iMove + AT_MOVE_0);
 
         // move counts:
-        moveCounts[iCMove]++;
+        moveCounts[cMove]++;
 
-        if (moveCounts[iCMove] > cR.highestMoveCount) 
+        if (moveCounts[cMove] > cR.highestMoveCount)
         { 
-          cR.iHighestMove = iCMove; 
-          cR.highestMoveCount = moveCounts[iCMove]; 
+          cR.highestMove = cMove;
+          cR.highestMoveCount = moveCounts[cMove];
         }
 
       } // endOf foreach move

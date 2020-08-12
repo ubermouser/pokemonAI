@@ -7,6 +7,10 @@
 #include "../inc/team_volatile.h"
 //#undef PKAI_STATIC
 #include "../inc/init_toolbox.h"
+#include "../inc/orphan.h"
+
+using namespace orphan;
+
 
 TeamNonVolatile::TeamNonVolatile()
   : Name(), 
@@ -304,11 +308,11 @@ bool TeamNonVolatile::input(const std::vector<std::string>& lines, size_t& iLine
    * <nickname> <species> <level> <item> <gender> <ability> <nature> <hp.type> <hp.dmg> <move 1> <move 2> <move 3> <move 4> <atk.iv> <spatck.iv> <def.iv> <spdef.iv> <spd.iv> <hp.iv> <atk.ev> <spatck.ev> <def.ev> <spdef.ev> <spd.ev> <hp.ev>
    */
 
-  std::vector<std::string> mismatchedPokemon;
-  std::vector<std::string> mismatchedItems;
-  std::vector<std::string> mismatchedAbilities;
-  std::vector<std::string> mismatchedNatures;
-  std::vector<std::string> mismatchedMoves;
+  OrphanSet mismatchedPokemon;
+  OrphanSet mismatchedItems;
+  OrphanSet mismatchedAbilities;
+  OrphanSet mismatchedNatures;
+  OrphanSet mismatchedMoves;
 
   // are the enough lines in the input stream:
   if ((lines.size() - iLine) < 2U)
@@ -384,83 +388,18 @@ bool TeamNonVolatile::input(const std::vector<std::string>& lines, size_t& iLine
   }
 
   // print mismatched pokemon
-  if (mismatchedPokemon.size() != 0)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": \"" << getName() <<
-      "\" - " << mismatchedPokemon.size() << " Orphaned team-pokemon!\n";
-    if (verbose >= 4)
-    {
-      for (size_t iOrphan = 0; iOrphan < mismatchedPokemon.size(); iOrphan++)
-      {
-        std::cerr << "\tOrphaned pokemon \"" << mismatchedPokemon.at(iOrphan) << "\"\n";
-      }
-    }
-    //result = false;
-  }
+  printOrphans(mismatchedPokemon, getName(), "team-pokemon", "pokemon", 4);
 
   // print mismatched items
-  if (mismatchedItems.size() != 0)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": \"" << getName() <<
-      "\" - " << mismatchedItems.size() << " Orphaned team-items!\n";
-    if (verbose >= 4)
-    {
-      for (size_t iOrphan = 0; iOrphan < mismatchedItems.size(); iOrphan++)
-      {
-        std::cerr << "\tOrphaned item \"" << mismatchedItems.at(iOrphan) << "\"\n";
-      }
-    }
-    //result = false;
-  }
+  printOrphans(mismatchedItems, getName(), "team-items", "item", 4);
 
   // print mismatched abilities
-  if (mismatchedAbilities.size() != 0)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": \"" << getName() <<
-      "\" - " << mismatchedAbilities.size() << " Orphaned team-abilities!\n";
-    if (verbose >= 4)
-    {
-      for (size_t iOrphan = 0; iOrphan < mismatchedAbilities.size(); iOrphan++)
-      {
-        std::cerr << "\tOrphaned ability \"" << mismatchedAbilities.at(iOrphan) << "\"\n";
-      }
-    }
-    //result = false;
-  }
+  printOrphans(mismatchedAbilities, getName(), "team-abilities", "ability", 4);
 
   // print mismatched natures
-  if (mismatchedNatures.size() != 0)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": \"" << getName() <<
-      "\" - " << mismatchedNatures.size() << " Orphaned team-natures!\n";
-    if (verbose >= 4)
-    {
-      for (size_t iOrphan = 0; iOrphan < mismatchedNatures.size(); iOrphan++)
-      {
-        std::cerr << "\tOrphaned nature \"" << mismatchedNatures.at(iOrphan) << "\"\n";
-      }
-    }
-    //result = false;
-  }
+  printOrphans(mismatchedNatures, getName(), "team-natures", "nature", 4);
 
   // print mismatched moves
-  if (mismatchedMoves.size() != 0)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": \"" << getName() <<
-      "\" - " << mismatchedMoves.size() << " Orphaned team-moves!\n";
-    if (verbose >= 4)
-    {
-      for (size_t iOrphan = 0; iOrphan < mismatchedMoves.size(); iOrphan++)
-      {
-        std::cerr << "\tOrphaned move \"" << mismatchedMoves.at(iOrphan) << "\"\n";
-      }
-    }
-    //result = false;
-  }
+  printOrphans(mismatchedMoves, getName(), "team-moves", "move", 4);
   return result; // import success or failure, depending on if we have orphans
 } // endof import team

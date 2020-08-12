@@ -154,6 +154,7 @@ typedef fixedpoint::fixed_point<30> fixType;
 #define AIL_NV_BURN 10
 #define AIL_NV_POISON 11
 #define AIL_NV_POISON_TOXIC 12 // has 15 possible stages from 1/16 hp to 15/16 hp. This is stage 1/16
+#define AIL_NV_MAX 12
 
 // teams:
 #define TEAM_A 0

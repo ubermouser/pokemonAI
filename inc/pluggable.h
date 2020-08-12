@@ -113,6 +113,15 @@ public:
 
   bool registerPlugin(const plugin& cPlugin, bool setImp);
 
+  size_t getNumPlugins() const {
+    size_t count = 0;
+    for (const auto& pluginset: plugins) {
+      count += pluginset.size();
+    }
+
+    return count;
+  }
+
   size_t getNumPlugins(size_t pType) const
   {
     return plugins[pType].size();

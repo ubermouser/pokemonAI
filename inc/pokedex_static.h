@@ -22,9 +22,12 @@
 #include "../inc/pokemon_base.h"
 #include "../inc/pluggable_types.h"
 #include "../inc/plugin.h"
+#include "../inc/orphan.h"
 
 class PKAISHARED PokedexStatic: public Pokedex {
 public:
+  using OrphanSet = orphan::OrphanSet;
+
   struct Config {
     // location of the move library
     std::string movesPath_ = "data/gen4_moves.txt";
@@ -78,20 +81,20 @@ protected:
     regExtension_type registerExtensions,
     size_t* numExtensions = NULL,
     size_t* numOverwritten = NULL,
-    std::vector<std::string>* mismatchedItems = NULL,
-    std::vector<std::string>* mismatchedAbilities = NULL,
-    std::vector<std::string>* mismatchedMoves = NULL,
-    std::vector<std::string>* mismatchedCategories = NULL);
+    OrphanSet* mismatchedItems = NULL,
+    OrphanSet* mismatchedAbilities = NULL,
+    OrphanSet* mismatchedMoves = NULL,
+    OrphanSet* mismatchedCategories = NULL);
   void registerPlugin_orphanCount(
       const std::string& source,
       const size_t& numExtensions,
       const size_t& numOverwritten,
       const size_t& numPluginsLoaded,
       const size_t& numPluginsTotal,
-      const std::vector<std::string>& mismatchedItems,
-      const std::vector<std::string>& mismatchedAbilities,
-      const std::vector<std::string>& mismatchedMoves,
-      const std::vector<std::string>& mismatchedCategories) const;
+      const OrphanSet& mismatchedItems,
+      const OrphanSet& mismatchedAbilities,
+      const OrphanSet& mismatchedMoves,
+      const OrphanSet& mismatchedCategories) const;
   
   Config config_;
 

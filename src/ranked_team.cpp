@@ -975,14 +975,15 @@ PokemonNonVolatile ranked_team::crossover_single(
 
 void ranked_team::randomSpecies(const TeamNonVolatile& cTeam, PokemonNonVolatile& cPokemon, size_t iReplace)
 {
+  std::vector<const PokemonBase*> pokemons = pkdex->getPokemon().toVector();
   bool revalidate = cPokemon.pokemonExists();
   bool isSuccessful = false;
-  size_t iSpecies = (rand() % pkdex->getPokemon().size()) - 1;
+  size_t iSpecies = (rand() % pokemons.size()) - 1;
   // find a pokemon with an existing movelist (non orphan)
-  for (size_t iNSpecies = 0; iNSpecies != pkdex->getPokemon().size(); ++iNSpecies)
+  for (size_t iNSpecies = 0; iNSpecies != pokemons.size(); ++iNSpecies)
   {
-    iSpecies = (iSpecies + 1) % pkdex->getPokemon().size();
-    const PokemonBase& candidateBase = pkdex->getPokemon()[iSpecies];
+    iSpecies = (iSpecies + 1) % pokemons.size();
+    const PokemonBase& candidateBase = *pokemons[iSpecies];
 
     // don't include a species already on the team:
     if ((iReplace == SIZE_MAX) && !cTeam.isLegalAdd(candidateBase)) { continue; }
@@ -991,7 +992,7 @@ void ranked_team::randomSpecies(const TeamNonVolatile& cTeam, PokemonNonVolatile
     if (candidateBase.lostChild_ == true) { continue; }
     
     isSuccessful = true;
-    cPokemon.setBase(pkdex->getPokemon()[iSpecies]);
+    cPokemon.setBase(candidateBase);
     break;
   }
   if (!isSuccessful)
@@ -1026,7 +1027,7 @@ void ranked_team::randomSpecies(const TeamNonVolatile& cTeam, PokemonNonVolatile
     if (cPokemon.abilityExists())
     {
       const PokemonBase& cBase = cPokemon.getBase();
-      bool isMatched = std::binary_search(cBase.abilities_.begin(), cBase.abilities_.end(), &cPokemon.getAbility());
+      bool isMatched = cBase.abilities_.count(&cPokemon.getAbility());
       if (!isMatched)
       {
         // and update with a new ability if it is
@@ -1046,22 +1047,23 @@ void ranked_team::randomAbility(PokemonNonVolatile& cPokemon)
 {
   const PokemonBase& cBase = cPokemon.getBase();
 
-  size_t iAbility = rand() % cBase.getNumAbilities();
-  for (size_t iNAbility = 0; iNAbility != cBase.getNumAbilities(); ++iNAbility)
+  std::vector<const Ability*> abilities{begin(cBase.getAbilities()), end(cBase.getAbilities())};
+  size_t iAbility = rand() % abilities.size();
+  for (size_t iNAbility = 0; iNAbility != abilities.size(); ++iNAbility)
   {
-    if (cBase.getAbility(iAbility).isImplemented()) { break; }
+    if (abilities[iAbility]->isImplemented()) { break; }
 
-    iAbility = (iAbility + 1) % cBase.getNumAbilities();
+    iAbility = (iAbility + 1) % abilities.size();
   }
     
   // if the ability does not have a script implemented:
-  if (!cBase.getAbility(iAbility).isImplemented())
+  if (!abilities[iAbility]->isImplemented())
   {
     cPokemon.setNoAbility();
   }
   else
   {
-    cPokemon.setAbility(cBase.getAbility(iAbility));
+    cPokemon.setAbility(*abilities[iAbility]);
   }
 } // endOf randomAbility
 
@@ -1071,8 +1073,9 @@ void ranked_team::randomAbility(PokemonNonVolatile& cPokemon)
 
 void ranked_team::randomNature(PokemonNonVolatile& cPokemon)
 {
-  size_t iNature = rand() % pkdex->getNatures().size();
-  cPokemon.setNature(pkdex->getNatures()[iNature]);
+  std::vector<const Nature*> natures = pkdex->getNatures().toVector();
+  size_t iNature = rand() % natures.size();
+  cPokemon.setNature(*natures[iNature]);
 }
 
 
@@ -1081,26 +1084,27 @@ void ranked_team::randomNature(PokemonNonVolatile& cPokemon)
 
 void ranked_team::randomItem(PokemonNonVolatile& cPokemon)
 {
-  size_t iNSize = (pkdex->getItems().size() + 1);
+  std::vector<const Item*> items = pkdex->getItems().toVector();
+  size_t iNSize = (items.size() + 1);
   size_t iItem = (rand() % iNSize) - 1;
   for (size_t iNItem = 0; iNItem != iNSize; ++iNItem)
   {
     // in this case, we choose no item:
     if (iItem == SIZE_MAX) { break; } 
 
-    if (pkdex->getItems()[iItem].isImplemented()) { break; }
+    if (items[iItem]->isImplemented()) { break; }
 
     iItem = ((iItem + 2) % iNSize) - 1;
   }
 
   // if the item does not have a script implemented or we explicitly chose no item:
-  if ((iItem == SIZE_MAX) || (!pkdex->getItems()[iItem].isImplemented()))
+  if ((iItem == SIZE_MAX) || (!items[iItem]->isImplemented()))
   {
     cPokemon.setNoInitialItem();
   }
   else
   {
-    cPokemon.setInitialItem(pkdex->getItems()[iItem]);
+    cPokemon.setInitialItem(*items[iItem]);
   }
 } // endOf randomItem
 
@@ -1223,7 +1227,8 @@ void ranked_team::randomEV(PokemonNonVolatile& cPokemon)
 
 void ranked_team::randomMove(PokemonNonVolatile& cPokemon, size_t numMoves)
 {
-  const std::vector<const Move*>& cMovelist = cPokemon.getBase().movelist_;
+  const std::vector<const Move*>& cMovelist{
+      begin(cPokemon.getBase().moves_), end(cPokemon.getBase().moves_)};
   std::vector<bool> isValid(cMovelist.size(), true);
   size_t validMoves = cMovelist.size();
 

@@ -23,11 +23,10 @@ bool Natures::initialize(const std::string& path) {
         ": inputNatures failed to populate a list of natures.\n";
     return false;
   }
-  std::sort(begin(), end());
 
   {
     // find special case no nature:
-    Nature::no_nature = orphan::orphanCheck_ptr(*this, NULL, "none");
+    Nature::no_nature = count("none")?&at("none"):new Nature();
   }
   
   return true;
@@ -99,21 +98,19 @@ bool Natures::loadFromFile_lines(const std::vector<std::string>& lines, size_t& 
     if (!INI::checkRangeB(tokens.size(), (size_t)2, tokens.max_size())) { return false; }
 
     if (!INI::setArgAndPrintError("natures numElements", tokens.at(1), _numElements, iLine, 1)) { return false; }
-
-    if (!INI::checkRangeB(_numElements, (size_t)0, (size_t)MAXNATURES)) { return false; }
   }
 
   // ignore fluff line
   iLine+=2;
 
   // make sure number of lines in the file is correct for the number of moves we were given:
-  if (!INI::checkRangeB(lines.size() - iLine, (size_t)_numElements, (size_t)MAXNATURES)) { return false; }
-  resize(_numElements);
+  if (!INI::checkRangeB(lines.size() - iLine, (size_t)_numElements, (size_t)SIZE_MAX)) { return false; }
+  reserve(_numElements);
 
-  for (size_t iNature = 0; iNature < size(); ++iNature, ++iLine)
+  for (size_t iNature = 0; iLine < lines.size(); ++iNature, ++iLine)
   {
     std::vector<std::string> tokens = tokenize(lines.at(iLine), "\t");
-    class Nature& cNature = at(iNature);
+    class Nature cNature;
     if (tokens.size() != 6)
     {
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
@@ -123,7 +120,7 @@ bool Natures::loadFromFile_lines(const std::vector<std::string>& lines, size_t& 
     }
 
     //nature name
-    cNature.setName(tokens.at(0));
+    cNature.setName(lowerCase(tokens.at(0)));
 
     //modtable
     for (size_t indexMod = 0; indexMod < 5; indexMod++)
@@ -134,6 +131,7 @@ bool Natures::loadFromFile_lines(const std::vector<std::string>& lines, size_t& 
       cNature.modTable_[indexMod] = cNatureVal * FPMULTIPLIER;
     }
 
+    insert({cNature.getName(), cNature});
   } //end of per-nature
 
   return true; // import success

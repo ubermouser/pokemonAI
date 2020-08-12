@@ -1,5 +1,7 @@
 #include "../inc/move.h"
 
+#include <algorithm>
+
 #include "../inc/init_toolbox.h"
 #include "../inc/orphan.h"
 
@@ -12,6 +14,53 @@ using namespace orphan;
 
 const Move* Move::move_struggle = NULL;
 const Move* Move::move_none = NULL;
+
+Move::Move(
+    const std::string& name,
+    const Type* type,
+    int32_t primaryAccuracy,
+    uint32_t power,
+    uint32_t PP,
+    uint32_t damageType,
+    int32_t target,
+    int32_t priority,
+    int32_t secondaryAccuracy,
+    const BuffModArray& selfBuff,
+    const BuffModArray& targetDebuff,
+    uint32_t targetAilment,
+    uint32_t targetVolatileAilment,
+    bool hasPlugins,
+    const std::string& description) :
+    Name(name),
+    Pluggable(),
+    type_(type),
+    primaryAccuracy_(primaryAccuracy),
+    power_(power),
+    PP_(PP),
+    damageType_(damageType),
+    target_(target),
+    priority_(priority),
+    secondaryAccuracy_(secondaryAccuracy),
+    selfBuff_(selfBuff),
+    targetDebuff_(targetDebuff),
+    targetAilment_(targetAilment),
+    targetVolatileAilment_(targetVolatileAilment),
+    description_(description)
+{
+  if (!hasPlugins) { setHasNoPlugins(); }
+  checkRangeB(primaryAccuracy, -1, 100);
+  checkRangeB(power, 0, 254);
+  checkRangeB(PP, 5, 40);
+  checkRangeB(damageType, 0, 3);
+  checkRangeB(target, -1, 7);
+  checkRangeB(priority, -5, 5);
+  checkRangeB(*std::max_element(begin(selfBuff), end(selfBuff)), -12, 12);
+  checkRangeB(*std::min_element(begin(selfBuff), end(selfBuff)), -12, 12);
+  checkRangeB(*std::max_element(begin(targetDebuff), end(targetDebuff)), -12, 12);
+  checkRangeB(*std::min_element(begin(targetDebuff), end(targetDebuff)), -12, 12);
+  checkRangeB(targetAilment, AIL_NV_NONE, AIL_NV_MAX);
+  if (type == NULL) { type_ = Type::no_type; lostChild = true; }
+}
 
 
 const Type& Move::getType() const
@@ -35,14 +84,11 @@ bool Moves::initialize(const std::string& path, const Types& types) {
         ": inputMoves failed to populate a list of moves.\n";
     return false;
   }
-  std::sort(begin(), end());
 
   {
-    Move::move_none = orphan::orphanCheck_ptr(*this, NULL, "none");
-
     // find special cases struggle and hurt confusion, set the pointers to them
-    Move::move_struggle = orphan::orphanCheck_ptr(*this, NULL, "struggle");
-    if (Move::move_struggle != NULL) { MoveNonVolatile::mNV_struggle = new MoveNonVolatile(*Move::move_struggle); }
+    Move::move_none = count("none")?&at("none"):new Move();
+    Move::move_struggle = &at("struggle");
   }
   
   return true;
@@ -75,6 +121,180 @@ bool Moves::loadFromFile(const std::string& path, const Types& types) {
   assert(iLine == lines.size());
   return result && (iLine == lines.size());
 } // end of inputMoves
+
+
+template<class IntegerType>
+bool intFromToken(
+    const std::vector<std::string> tokens,
+    size_t iLine,
+    size_t iToken,
+    const std::string& argName,
+    IntegerType& result,
+    IntegerType default_value=IntegerType(0)) {
+  const auto& token = tokens.at(iToken);
+  if (token == "---" || token == "Var") {
+    result = default_value;
+  } else if (!setArg(tokens.at(iToken), result)) {
+    incorrectArgs(argName, iLine, iToken);
+    return false;
+  }
+  return true;
+}
+
+
+template<size_t length, class IntegerType, class DefaultType>
+bool integerArrayFromTokens(
+    const std::vector<std::string> tokens,
+    size_t iLine,
+    size_t iToken,
+    const std::string& argName,
+    std::array<IntegerType, length>& result,
+    DefaultType default_value=0) {
+  for (size_t iElem = 0; iElem < length; iToken++, iElem++) {
+    if (!intFromToken(tokens, iLine, iToken, argName, result[iElem], IntegerType(default_value))) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+bool ailmentFromToken(
+    const std::vector<std::string> tokens,
+    size_t iLine,
+    size_t iStartToken,
+    uint32_t& result) {
+  uint32_t ailment;
+  result = AIL_NV_NONE;
+
+  // ailment,target,burn
+  size_t iToken = iStartToken + 0;
+  if (setArg(tokens.at(iToken), ailment))
+  {
+    checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
+    if (ailment == 1) { result = AIL_NV_BURN; goto endAilment; }
+  }
+  else { incorrectArgs("AIL_NV_BURN", iLine, iToken); return false; }
+
+  // ailment,target,Freeze
+  iToken = iStartToken + 1;
+  if (setArg(tokens.at(iToken), ailment))
+  {
+    checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
+    if (ailment == 1) { result = AIL_NV_FREEZE; goto endAilment; }
+  }
+  else { incorrectArgs("AIL_NV_FREEZE", iLine, iToken); return false; }
+
+  // ailment,target,paralysis
+  iToken = iStartToken + 2;
+  if (setArg(tokens.at(iToken), ailment))
+  {
+    checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
+    if (ailment == 1) { result = AIL_NV_PARALYSIS; goto endAilment; }
+  }
+  else { incorrectArgs("AIL_NV_PARALYSIS", iLine, iToken); return false; }
+
+  // ailment,target,poison
+  iToken = iStartToken + 3;
+  if (setArg(tokens.at(iToken), ailment))
+  {
+    checkRangeB(ailment, (uint32_t)0, (uint32_t)2);
+    if (ailment == 1) { result = AIL_NV_POISON; goto endAilment; }
+    else if(ailment == 2) { result = AIL_NV_POISON_TOXIC; goto endAilment; }
+  }
+  else { incorrectArgs("AIL_NV_POISON/AIL_NV_POISON_TOXIC", iLine, iToken); return false; }
+
+  // ailment,target,sleep
+  iToken = iStartToken + 4;
+  if (setArg(tokens.at(iToken), ailment))
+  {
+    checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
+    if (ailment == 1) { result = AIL_NV_SLEEP; goto endAilment; }
+  }
+  else { incorrectArgs("AIL_NV_SLEEP", iLine, iToken); return false; }
+
+  endAilment:
+
+  result = AIL_V_NONE;
+  return true;
+}
+
+
+bool volatileAilmentFromToken(
+    const std::vector<std::string> tokens,
+    size_t iLine,
+    size_t iStartToken,
+    uint32_t& result) {
+  uint32_t ailment;
+  result = AIL_V_NONE;
+  // volatileAilment,target,confusion
+  size_t iToken = iStartToken + 0;
+  if (setArg(tokens.at(iToken), ailment))
+  {
+    checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
+    if (ailment == 1) { result = AIL_V_CONFUSED; goto endVolatile; }
+  }
+  else { incorrectArgs("AIL_V_CONFUSED", iLine, iToken); return false; }
+
+  // volatileAilment,target,flinch
+  iToken = iStartToken + 1;
+  if (setArg(tokens.at(iToken), ailment))
+  {
+    checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
+    if (ailment == 1) { result = AIL_V_FLINCH; goto endVolatile; }
+  }
+  else { incorrectArgs("AIL_V_FLINCH", iLine, iToken); return false; }
+
+  // volatileAilment,target,identify
+  iToken = iStartToken + 2;
+  if (setArg(tokens.at(iToken), ailment))
+  {
+    checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
+    if (ailment == 1) { result = 110; goto endVolatile; }
+  }
+  else { incorrectArgs("AIL_V_IDENTIFY", iLine, iToken); return false; }
+
+  // volatileAilment,target,infatuation
+  iToken = iStartToken + 3;
+  if (setArg(tokens.at(iToken), ailment))
+  {
+    checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
+    if (ailment == 1) { result = AIL_V_INFATUATED; goto endVolatile; }
+  }
+  else { incorrectArgs("AIL_V_INFATUATED", iLine, iToken); return false; }
+
+  // volatileAilment,target,lock on
+  iToken = iStartToken + 4;
+  if (setArg(tokens.at(iToken), ailment))
+  {
+    checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
+    if (ailment == 1) { result = 111; goto endVolatile; }
+  }
+  else { incorrectArgs("AIL_V_LOCKON", iLine, iToken); return false; }
+
+  // volatileAilment,target,nightmare
+  iToken = iStartToken + 5;
+  if (setArg(tokens.at(iToken), ailment))
+  {
+    checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
+    if (ailment == 1) { result = 112; goto endVolatile; }
+  }
+  else { incorrectArgs("AIL_V_NIGHTMARE", iLine, iToken); return false; }
+
+  // volatileAilment,target,partial trap
+  iToken = iStartToken + 6;
+  if (setArg(tokens.at(iToken), ailment))
+  {
+    checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
+    if (ailment == 1) { result = 113; goto endVolatile; }
+  }
+  else { incorrectArgs("AIL_V_PARTIALTRAP", iLine, iToken); return false; }
+
+  endVolatile:
+
+  return true;
+}
 
 
 bool Moves::loadFromFile_lines(
@@ -113,23 +333,20 @@ bool Moves::loadFromFile_lines(
     if (!INI::checkRangeB(tokens.size(), (size_t)2, tokens.max_size())) { return false; }
 
     if (!INI::setArgAndPrintError("moves numElements", tokens.at(1), _numElements, iLine, 1)) { return false; }
-
-    if (!INI::checkRangeB(_numElements, (size_t)0, (size_t)MAXMOVES)) { return false; }
   }
 
   // ignore fluff line
   iLine+=2;
 
   // make sure number of lines in the file is correct for the number of moves we were given:
-  if (!INI::checkRangeB(lines.size() - iLine, (size_t)_numElements, (size_t)MAXMOVES)) { return false; }
-  resize(_numElements);
+  if (!INI::checkRangeB(lines.size() - iLine, (size_t)_numElements, (size_t)SIZE_MAX)) { return false; }
+  reserve(_numElements);
 
-  std::vector<std::string> mismatchedTypes;
+  orphan::OrphanSet orphanTypes;
 
-  for (size_t iMove = 0; iMove < size(); ++iMove, ++iLine)
+  for (size_t iMove = 0; iLine != lines.size(); ++iMove, ++iLine)
   {
     std::vector<std::string> tokens = tokenize(lines.at(iLine), "\t");
-    Move& cMove = at(iMove);
     if (tokens.size() != 41)
     {
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
@@ -137,275 +354,57 @@ bool Moves::loadFromFile_lines(
         " with " << tokens.size() << " values!\n";
       return false;
     }
-    cMove.lostChild = false;
+    std::string name, description;
+    bool hasPlugins;
+    const Type* type;
+    uint32_t PP, power, damageType, targetAilment, targetVolatileAilment;
+    int32_t target, priority, primaryAccuracy, secondaryAccuracy;
+    Move::BuffModArray selfBuff, targetDebuff;
 
-    // move name
-    size_t iToken = 0;
-    cMove.setName(tokens.at(iToken));
+    name = lowerCase(tokens.at(0)); // move name
+    type = orphanCheck(types, tokens.at(1), &orphanTypes); // type
+    if (!intFromToken(tokens, iLine, 2, "PP", PP)) { return false; }
+    if (!intFromToken(tokens, iLine, 3, "primaryAccuracy", primaryAccuracy, -1)) { return false; }
+    if (!intFromToken(tokens, iLine, 4, "Power", power)) { return false; }
+    if (!intFromToken(tokens, iLine, 5, "DamageType", damageType)) { return false; }
+    if (!intFromToken(tokens, iLine, 6, "Target", target, -1)) { return false; }
+    if (!intFromToken(tokens, iLine, 7, "Priority", priority, 0)) { return false; }
+    if (!integerArrayFromTokens(tokens, iLine, 8, "buff", selfBuff, 0)) { return false; }
+    if (!intFromToken(tokens, iLine, 17, "secondaryAccuracy", secondaryAccuracy, -1)) { return false; }
+    if (!integerArrayFromTokens(tokens, iLine, 18, "debuff", targetDebuff, 0)) { return false; }
+    if (!ailmentFromToken(tokens, iLine, 27, targetAilment)) { return false; }
+    if (!volatileAilmentFromToken(tokens, iLine, 32, targetVolatileAilment)) { return false; }
+    hasPlugins = tokens.at(39) != "---";
+    description = tokens.at(40);
 
-
-    // move type
-    iToken = 1;
-    {
-      size_t iType = orphanCheck(types, &mismatchedTypes, tokens.at(iToken));
-      if (iType == SIZE_MAX)
-      {
-        //incorrectArgs("type", iMove, iToken);
-        cMove.type_ = NULL;
-        cMove.lostChild = true;
-        //return false;
-      } //orphan!
-      else { cMove.type_ = &types[iType]; }
-    }
-
-    // move base PP
-    iToken = 2;
-    {
-      uint32_t currentPP;
-      if (!setArg(tokens.at(iToken), currentPP)) { incorrectArgs("currentPP", iLine, iToken); return false; }
-      checkRangeB(currentPP, (uint32_t)5, (uint32_t)40);
-      cMove.PP_ = currentPP;
-    }
-
-    // move primary accuracy
-    iToken = 3;
-    if (tokens.at(iToken).compare("---") == 0)
-    { cMove.primaryAccuracy_ = UINT8_MAX; }
-    else
-    {
-      uint32_t cPrimaryAccuracy;
-      if (!setArg(tokens.at(iToken), cPrimaryAccuracy)) { incorrectArgs("cPrimaryAccuracy", iLine, iToken); return false; }
-      checkRangeB(cPrimaryAccuracy, (uint32_t)1, (uint32_t)100);
-      cMove.primaryAccuracy_ = cPrimaryAccuracy;
-    }
-
-    // move power
-    iToken = 4;
-    if (tokens.at(iToken).compare("Var") == 0 || tokens.at(iToken).compare("---") == 0)
-    { cMove.power_ = 0; }
-    else
-    {
-      uint32_t cPower;
-      if (!setArg(tokens.at(iToken), cPower)) { incorrectArgs("cPower", iLine, iToken); return false; }
-      checkRangeB(cPower, (uint32_t)0, (uint32_t)254);
-      cMove.power_ = cPower;
-    }
-
-    // move damage type
-    iToken = 5;
-    {
-      uint32_t cDamageType;
-      if (!setArg(tokens.at(iToken), cDamageType)) { incorrectArgs("cDamageType", iLine, iToken); return false; }
-      checkRangeB(cDamageType, (uint32_t)0, (uint32_t)3);
-      cMove.damageType_ = cDamageType;
-    }
-
-    // move target
-    iToken = 6;
-    if (tokens.at(iToken).compare("Var") == 0 || tokens.at(iToken).compare("---") == 0)
-    { cMove.target_ = -1; }
-    else
-    {
-      uint32_t cTarget;
-      if (!setArg(tokens.at(iToken), cTarget)) { incorrectArgs("cTarget", iLine, iToken); return false; }
-      checkRangeB(cTarget, (uint32_t)0, (uint32_t)7);
-      cMove.target_ = cTarget;
-    }
-
-    // move priority
-    iToken = 7;
-    {
-      int32_t cPriority;
-      if (!setArg(tokens.at(iToken), cPriority)) { incorrectArgs("cPriority", iLine, iToken); return false; }
-      checkRangeB(cPriority, (int32_t)-5, (int32_t)5);
-      cMove.priority_ = cPriority;
-    }
-
-    // buffs
-    iToken = 8;
-    for (unsigned int iBuff = 0; iBuff < 9; iBuff++)
-    {
-      // buff, self
-      int32_t tempBuff;
-      if (!setArg(tokens.at(iToken + iBuff), tempBuff)) { incorrectArgs("buff", iLine, iToken + iBuff); return false; }
-      checkRangeB(tempBuff, (int32_t)-12, (int32_t)12);
-      cMove.selfBuff_[iBuff] = tempBuff;
-    }
-
-    // move secondary accuracy
-    iToken = 17;
-    if (tokens.at(iToken).compare("---") == 0)
-    { cMove.secondaryAccuracy_ = -1; }
-    else
-    {
-      uint32_t cSecondaryAccuracy;
-      if (!setArg(tokens.at(iToken), cSecondaryAccuracy)) { incorrectArgs("cSecondaryAccuracy", iLine, iToken); return false; }
-      checkRangeB(cSecondaryAccuracy, (uint32_t)1, (uint32_t)100);
-      cMove.secondaryAccuracy_ = cSecondaryAccuracy;
-    }
-
-    // debuffs
-    iToken = 18;
-    for (size_t iBuff = 0; iBuff < 9; iBuff++)
-    {
-      // debuff, target
-      int32_t tempBuff;
-      if (!setArg(tokens.at(iToken + iBuff), tempBuff)) { incorrectArgs("debuff", iLine, iToken + iBuff); return false; }
-      checkRangeB(tempBuff, (int32_t)-12, (int32_t)12);
-      cMove.targetDebuff_[iBuff] = tempBuff;
-    }
-
-    uint32_t ailment;
-    cMove.targetAilment_ = AIL_NV_NONE;
-
-    // ailment,target,burn
-    iToken = 27;
-    if (setArg(tokens.at(iToken), ailment))
-    {
-      checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetAilment_ = AIL_NV_BURN; goto endAilment; }
-    }
-    else { incorrectArgs("AIL_NV_BURN", iLine, iToken); return false; }
-
-    // ailment,target,Freeze
-    iToken = 28;
-    if (setArg(tokens.at(iToken), ailment))
-    {
-      checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetAilment_ = AIL_NV_FREEZE; goto endAilment; }
-    }
-    else { incorrectArgs("AIL_NV_FREEZE", iLine, iToken); return false; }
-
-    // ailment,target,paralysis
-    iToken = 29;
-    if (setArg(tokens.at(iToken), ailment))
-    {
-      checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetAilment_ = AIL_NV_PARALYSIS; goto endAilment; }
-    }
-    else { incorrectArgs("AIL_NV_PARALYSIS", iLine, iToken); return false; }
-
-    // ailment,target,poison
-    iToken = 30;
-    if (setArg(tokens.at(iToken), ailment))
-    {
-      checkRangeB(ailment, (uint32_t)0, (uint32_t)2);
-      if (ailment == 1) { cMove.targetAilment_ = AIL_NV_POISON; goto endAilment; }
-      else if(ailment == 2) { cMove.targetAilment_ = AIL_NV_POISON_TOXIC; goto endAilment; }
-    }
-    else { incorrectArgs("AIL_NV_POISON/AIL_NV_POISON_TOXIC", iLine, iToken); return false; }
-
-    // ailment,target,sleep
-    iToken = 31;
-    if (setArg(tokens.at(iToken), ailment))
-    {
-      checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetAilment_ = AIL_NV_SLEEP; goto endAilment; }
-    }
-    else { incorrectArgs("AIL_NV_SLEEP", iLine, iToken); return false; }
-
-    endAilment:
-
-    cMove.targetVolatileAilment_ = AIL_V_NONE;
-    // volatileAilment,target,confusion
-    iToken = 32;
-    if (setArg(tokens.at(iToken), ailment))
-    {
-      checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetVolatileAilment_ = AIL_V_CONFUSED; goto endVolatile; }
-    }
-    else { incorrectArgs("AIL_V_CONFUSED", iLine, iToken); return false; }
-
-    // volatileAilment,target,flinch
-    iToken = 33;
-    if (setArg(tokens.at(iToken), ailment))
-    {
-      checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetVolatileAilment_ = AIL_V_FLINCH; goto endVolatile; }
-    }
-    else { incorrectArgs("AIL_V_FLINCH", iLine, iToken); return false; }
-
-    // volatileAilment,target,identify
-    iToken = 34;
-    if (setArg(tokens.at(iToken), ailment))
-    {
-      checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetVolatileAilment_ = 110; goto endVolatile; }
-    }
-    else { incorrectArgs("AIL_V_IDENTIFY", iLine, iToken); return false; }
-
-    // volatileAilment,target,infatuation
-    iToken = 35;
-    if (setArg(tokens.at(iToken), ailment))
-    {
-      checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetVolatileAilment_ = AIL_V_INFATUATED; goto endVolatile; }
-    }
-    else { incorrectArgs("AIL_V_INFATUATED", iLine, iToken); return false; }
-
-    // volatileAilment,target,lock on
-    iToken = 36;
-    if (setArg(tokens.at(iToken), ailment))
-    {
-      checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetVolatileAilment_ = 111; goto endVolatile; }
-    }
-    else { incorrectArgs("AIL_V_LOCKON", iLine, iToken); return false; }
-
-    // volatileAilment,target,nightmare
-    iToken = 37;
-    if (setArg(tokens.at(iToken), ailment))
-    {
-      checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetVolatileAilment_ = 112; goto endVolatile; }
-    }
-    else { incorrectArgs("AIL_V_NIGHTMARE", iLine, iToken); return false; }
-
-    // volatileAilment,target,partial trap
-    iToken = 38;
-    if (setArg(tokens.at(iToken), ailment))
-    {
-      checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
-      if (ailment == 1) { cMove.targetVolatileAilment_ = 113; goto endVolatile; }
-    }
-    else { incorrectArgs("AIL_V_PARTIALTRAP", iLine, iToken); return false; }
-
-    endVolatile:
-
-    //hasScript
-    iToken = 39;
-    if (tokens.at(iToken).compare("---") == 0)
-    { cMove.setHasNoPlugins(); }
-
-    //description
-    iToken = 40;
-    if (tokens.at(iToken).compare("---") == 0)
-    { cMove.description_.clear(); }
-    else
-    {
-      size_t tokenLength = tokens.at(iToken).size();
-      size_t offset = 0;
-      //check for quotations, and if they exist remove them
-      if (tokens.at(iToken)[0] == '"' && tokens.at(iToken)[tokenLength-1] == '"')
-      {
-        offset = 1;
-      }
-
-      cMove.description_ = std::string(tokens.at(iToken).substr(offset, tokenLength - offset));
-    }
-    if (verbose >= 6) std::cout << "\tLoaded move " << iMove << "-\"" << cMove.getName() << "\"\n";
-
+    Move move(
+        name,
+        type,
+        primaryAccuracy,
+        power,
+        PP,
+        damageType,
+        target,
+        priority,
+        secondaryAccuracy,
+        selfBuff,
+        targetDebuff,
+        targetAilment,
+        targetVolatileAilment,
+        hasPlugins,
+        description);
+    insert({name, move});
+    if (verbose >= 6) std::cout << "\tLoaded move " << iMove << "-\"" << move.getName() << "\"\n";
   } //end of per-move
 
-  if (mismatchedTypes.size() != 0)
+  if (orphanTypes.size() != 0)
   {
     if (verbose >= 5) std::cerr << "WAR " << __FILE__ << "." << __LINE__ <<
-      ": move inputStream - " << mismatchedTypes.size() << " Orphaned move-types!\n";
+      ": move inputStream - " << orphanTypes.size() << " Orphaned move-types!\n";
     if (verbose >= 6)
     {
-      for (size_t indexOrphan = 0; indexOrphan < mismatchedTypes.size(); indexOrphan++)
-      {
-        std::cout << "\tOrphaned type \"" << mismatchedTypes.at(indexOrphan) << "\"\n";
+      for (auto orphan : orphanTypes) {
+        std::cout << "\tOrphaned type \"" << orphan << "\"\n";
       }
     }
   }

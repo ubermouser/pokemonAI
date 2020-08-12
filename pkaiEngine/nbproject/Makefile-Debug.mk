@@ -47,6 +47,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/511e4115/move_volatile.o \
 	${OBJECTDIR}/_ext/511e4115/name.o \
 	${OBJECTDIR}/_ext/511e4115/nature.o \
+	${OBJECTDIR}/_ext/511e4115/orphan.o \
 	${OBJECTDIR}/_ext/511e4115/pkCU.o \
 	${OBJECTDIR}/_ext/511e4115/pluggable.o \
 	${OBJECTDIR}/_ext/511e4115/pokedex.o \
@@ -145,6 +146,11 @@ ${OBJECTDIR}/_ext/511e4115/nature.o: ../src/nature.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/nature.o ../src/nature.cpp
+
+${OBJECTDIR}/_ext/511e4115/orphan.o: ../src/orphan.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/orphan.o ../src/orphan.cpp
 
 ${OBJECTDIR}/_ext/511e4115/pkCU.o: ../src/pkCU.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115

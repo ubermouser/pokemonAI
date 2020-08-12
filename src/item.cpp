@@ -1,7 +1,6 @@
 #include "../inc/item.h"
 
-#include <ostream>
-#include <algorithm>
+#include <iostream>
 
 #include "../inc/init_toolbox.h"
 #include "../inc/orphan.h"
@@ -40,11 +39,10 @@ bool Items::initialize(const std::string& path, const Types& types) {
         ": inputItems failed to populate a list of pokemon items.\n";
     return false;
   }
-  std::sort(begin(), end());
 
   {
     // find special case no item:
-    Item::no_item = orphan::orphanCheck_ptr(*this, NULL, "none");
+    Item::no_item = count("none")?&at("none"):new Item();
   }
   
   return true;
@@ -115,23 +113,21 @@ bool Items::loadFromFile_lines(
     if (!INI::checkRangeB(tokens.size(), (size_t)2, tokens.max_size())) { return false; }
 
     if (!INI::setArgAndPrintError("items numElements", tokens.at(1), _numElements, iLine, 1)) { return false; }
-
-    if (!INI::checkRangeB(_numElements, (size_t)0, (size_t)MAXITEMS)) { return false; }
   }
 
   // ignore fluff line
   iLine+=2;
 
   // make sure number of lines in the file is correct for the number of moves we were given:
-  if (!INI::checkRangeB(lines.size() - iLine, (size_t)_numElements, (size_t)MAXITEMS)) { return false; }
-  resize(_numElements);
+  if (!INI::checkRangeB(lines.size() - iLine, (size_t)_numElements, (size_t)SIZE_MAX)) { return false; }
+  reserve(_numElements);
 
-  std::vector<std::string> mismatchedTypes;
+  orphan::OrphanSet orphanTypes;
 
-  for (size_t iItem = 0; iItem < size(); ++iItem, ++iLine)
+  for (size_t iItem = 0; iLine < lines.size(); ++iItem, ++iLine)
   {
     std::vector<std::string> tokens = tokenize(lines.at(iLine), "\t");
-    class Item& cItem = at(iItem);
+    Item cItem;
     if (tokens.size() != 8)
     {
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
@@ -144,7 +140,8 @@ bool Items::loadFromFile_lines(
 
     //item name
     size_t iToken =  0;
-    cItem.setName(tokens.at(iToken));
+    cItem.setName(lowerCase(tokens.at(iToken)));
+    cItem.index_ = iItem;
 
     // fling power:
     iToken = 1;
@@ -164,7 +161,7 @@ bool Items::loadFromFile_lines(
     { cItem.boostedType_ = Type::no_type; }
     else
     {
-      const Type* cType = orphanCheck_ptr(types, &mismatchedTypes, tokens.at(iToken));
+      const Type* cType = orphanCheck(types, tokens.at(iToken), &orphanTypes);
       if (cType == NULL) { cItem.lostChild_ = true; } //orphan!
       cItem.boostedType_ = cType;
     }
@@ -189,9 +186,8 @@ bool Items::loadFromFile_lines(
     { cItem.naturalGiftType_ = Type::no_type; }
     else
     {
-      const Type* cType = orphanCheck_ptr(types, &mismatchedTypes, tokens.at(iToken));
-      if (cType == NULL) { cItem.lostChild_ = true; } //orphan!
-      cItem.naturalGiftType_ = cType;
+      cItem.naturalGiftType_ = orphanCheck(types, tokens.at(iToken), &orphanTypes);
+      if (cItem.naturalGiftType_ == NULL) { cItem.lostChild_ = true; } //orphan!
     }
 
     // resisted type:
@@ -200,41 +196,20 @@ bool Items::loadFromFile_lines(
     { cItem.resistedType_ = Type::no_type; }
     else
     {
-      const Type* cType = orphanCheck_ptr(types, &mismatchedTypes, tokens.at(iToken));
-      if (cType == NULL) { cItem.lostChild_ = true; } //orphan!
-      cItem.resistedType_ = cType;
+      cItem.resistedType_ = orphanCheck(types, tokens.at(iToken), &orphanTypes);
+      if (cItem.resistedType_ == NULL) { cItem.lostChild_ = true; } //orphan!
     }
 
     // item script
     iToken = 7;
-    if (tokens.at(iToken).compare("---") == 0)
-    { cItem.setHasNoPlugins(); }
-    /*else
-    {
-      size_t tokenLength = tokens.at(iToken).size();
-      size_t offset = 0;
-      //check for quotations, and if they exist remove them
-      if (tokens.at(1)[0] == '"' && tokens.at(iToken)[tokenLength-1] == '"')
-      {
-        offset = 1;
-      }
+    if (tokens.at(iToken).compare("---") == 0) {
+      cItem.setHasNoPlugins();
+    }
 
-      cItem.script = std::string(tokens.at(iToken).substr(offset, tokenLength - offset));
-    }*/
+    insert({cItem.getName(), cItem});
+    byIndex_.insert({cItem.index_, &at(cItem.getName())});
   } //end of per-item
 
-  if (mismatchedTypes.size() != 0)
-  {
-    if (verbose >= 5) std::cerr << "WAR " << __FILE__ << "." << __LINE__ <<
-      ": item inputStream - " << mismatchedTypes.size() << " Orphaned item-types!\n";
-    if (verbose >= 6)
-    {
-      for (size_t indexOrphan = 0; indexOrphan < mismatchedTypes.size(); indexOrphan++)
-      {
-        std::cout << "\tOrphaned type \"" << mismatchedTypes.at(indexOrphan) << "\"\n";
-      }
-    }
-  }
-
+  printOrphans(orphanTypes, "item inputStream", "item-types", "type");
   return true;
 } // end of importItem

@@ -17,6 +17,7 @@
 
 #include "../inc/signature.h"
 
+#include "../inc/orphan.h"
 #include "../inc/name.h"
 #include "../inc/move_nonvolatile.h"
 
@@ -37,9 +38,10 @@ union PokemonVolatile;
 /* contains metrics that the user can modify, but are not modified in combat */
 class PKAISHARED PokemonNonVolatile : public Name, public Signature<PokemonNonVolatile, POKEMON_NONVOLATILE_DIGESTSIZE>
 {
+public:
+  using OrphanSet = orphan::OrphanSet;
 
 private:
-
   /* The pokemon in which this volatile set is based off of*/
   const PokemonBase* base; 
   
@@ -49,13 +51,13 @@ private:
   /* Pointer to the nature that the pokemon has */
   const Nature* chosenNature;
 
+  /* Pointer to the initial item (may change in combat) */
+  const Item* initialItem;
+
   /* pointers to actions the pokemon may perform in combat */
   std::array<MoveNonVolatile, 4> actions;
 
   uint8_t numMoves;
-
-  /* index to the initial item (may change in combat) */
-  uint8_t initialItem;
   
   /* Pokemon's current level, from 1..100 */
   uint8_t level;
@@ -268,11 +270,11 @@ public:
   bool input(
     const std::vector<std::string>& lines, 
     size_t& iLine, 
-    std::vector<std::string>* mismatchedPokemon = NULL,
-    std::vector<std::string>* mismatchedItems = NULL,
-    std::vector<std::string>* mismatchedAbilities = NULL,
-    std::vector<std::string>* mismatchedNatures = NULL,
-    std::vector<std::string>* mismatchedMoves = NULL);
+    OrphanSet* mismatchedPokemon = NULL,
+    OrphanSet* mismatchedItems = NULL,
+    OrphanSet* mismatchedAbilities = NULL,
+    OrphanSet* mismatchedNatures = NULL,
+    OrphanSet* mismatchedMoves = NULL);
 };
 
 PKAISHARED std::ostream& operator <<(std::ostream& os, const PokemonNonVolatile& cPKNV);

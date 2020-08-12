@@ -49,7 +49,7 @@ void PokemonVolatile::initialize(const PokemonNonVolatile& nonvolatile)
   //raw = 0;
 
   // reassign initial item
-  data.iHeldItem = nonvolatile.hasInitialItem()?(nonvolatile.initialItem+1):0;
+  data.iHeldItem = nonvolatile.initialItem->index_;
   
   // raise HP back to normal
   data.HPcurrent = nonvolatile.getFV_base(FV_HITPOINTS);
@@ -211,14 +211,16 @@ uint32_t PokemonVolatile::getHP() const
 const Item& PokemonVolatile::getItem(const PokemonNonVolatile& nv) const
 {
   assert(hasItem(nv));
-  return pkdex->getItems()[data.iHeldItem - 1];
+  return *pkdex->getItems().atByIndex(data.iHeldItem);
 }
-
-
-
 
 
 void PokemonVolatile::setNoItem(const PokemonNonVolatile& nv)
 {
-  data.iHeldItem = 0; 
+  data.iHeldItem = Item::no_item->index_;
+}
+
+
+bool PokemonVolatile::hasItem(const PokemonNonVolatile& nv) const {
+  return data.iHeldItem != Item::no_item->index_;
 }

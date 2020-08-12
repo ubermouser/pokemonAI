@@ -88,7 +88,7 @@ bool PokedexStatic::initialize() {
     }
   } else {
     if (verbose >= 1) std::cout << " Loading Plugins...\n";
-    if (!inputPlugins()) {
+    if (!this->inputPlugins()) {
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
           ": inputPlugins failed to initialize an acceptable set of plugins!\n";
       return false;
@@ -102,12 +102,11 @@ bool PokedexStatic::initialize() {
 
 
 bool PokedexStatic::inputPlugins() {
-#ifndef _DISABLEPLUGINS
-  std::vector<std::string> mismatchedItems;
-  std::vector<std::string> mismatchedAbilities;
-  std::vector<std::string> mismatchedMoves;
+  OrphanSet mismatchedItems;
+  OrphanSet mismatchedAbilities;
+  OrphanSet mismatchedMoves;
   //std::vector<std::string> mismatchedGears; // engine components
-  std::vector<std::string> mismatchedCategories;
+  OrphanSet mismatchedCategories;
   size_t numOverwritten = 0;
   size_t numExtensions = 0;
   size_t numPluginsLoaded = 0;
@@ -133,26 +132,26 @@ bool PokedexStatic::inputPlugins() {
       mismatchedMoves,
       mismatchedCategories);
 
-#endif /* _DISABLEPLUGINS */
   return true;
 } // endOf inputScript
+
 
 
 bool PokedexStatic::registerPlugin(
   regExtension_type registerExtensions,
   size_t* _numExtensions,
   size_t* _numOverwritten,
-  std::vector<std::string>* _mismatchedItems,
-  std::vector<std::string>* _mismatchedAbilities,
-  std::vector<std::string>* _mismatchedMoves,
-  std::vector<std::string>* _mismatchedCategories)
+  OrphanSet* _orphanItems,
+  OrphanSet* _orphanAbilities,
+  OrphanSet* _orphanMoves,
+  OrphanSet* _orphanCategories)
 {
   assert(registerExtensions != NULL);
 
-  std::vector<std::string> mismatchedItems;
-  std::vector<std::string> mismatchedAbilities;
-  std::vector<std::string> mismatchedMoves;
-  std::vector<std::string> mismatchedCategories;
+  OrphanSet orphanItems;
+  OrphanSet orphanAbilities;
+  OrphanSet orphanMoves;
+  OrphanSet orphanCategories;
   size_t numOverwritten = 0;
   size_t numExtensions = 0;
 
@@ -174,29 +173,26 @@ bool PokedexStatic::registerPlugin(
     plugin& cCPlugin = collectedPlugins[iCPlugin];
     if (cCPlugin.getCategory().compare(MOVE_PLUGIN) == 0)
     {
-      size_t iMove = orphanCheck(getMoves(), &mismatchedMoves, cCPlugin.getName());
-      if (iMove == SIZE_MAX) { continue; } // orphan!
-      element = &getMoves()[iMove];
+      element = orphanCheck(getMoves(), cCPlugin.getName(), &orphanMoves);
+      if (element == NULL) { continue; } // orphan!
     }
     else if (cCPlugin.getCategory().compare(ABILITY_PLUGIN) == 0)
     {
-      size_t iAbility = orphanCheck(getAbilities(), &mismatchedAbilities, cCPlugin.getName());
-      if (iAbility == SIZE_MAX) { continue; } // orphan!
-      element = &getAbilities()[iAbility];
+      element = orphanCheck(getAbilities(), cCPlugin.getName(), &orphanAbilities);
+      if (element == NULL) { continue; } // orphan!
     }
     else if (cCPlugin.getCategory().compare(ITEM_PLUGIN) == 0)
     {
-      size_t iItem = orphanCheck(getItems(), &mismatchedItems, cCPlugin.getName());
-      if (iItem == SIZE_MAX) { continue; } // orphan!
-      element = &getItems()[iItem];
+      element = orphanCheck(getItems(), cCPlugin.getName(), &orphanItems);
+      if (element == NULL) { continue; } // orphan!
     }
-    else if (cCPlugin.getCategory().compare(ENGINE_PLUGIN) == 0)
+    else if (cCPlugin.getCategory() == ENGINE_PLUGIN)
     {
       element = &getExtensions();
     }
     else // unknown category:
     {
-      mismatchedCategories.push_back(cCPlugin.getCategory());
+      orphanCategories.insert(cCPlugin.getCategory());
       continue;
     }
 
@@ -222,10 +218,10 @@ bool PokedexStatic::registerPlugin(
   } // endOf foreach plugin element
 
   // add mismatched elements, if the user wants them:
-  if (_mismatchedItems != NULL) { _mismatchedItems->insert(_mismatchedItems->end(), mismatchedItems.begin(), mismatchedItems.end()); }
-  if (_mismatchedAbilities != NULL) { _mismatchedAbilities->insert(_mismatchedAbilities->end(), mismatchedAbilities.begin(), mismatchedAbilities.end()); }
-  if (_mismatchedMoves != NULL) { _mismatchedMoves->insert(_mismatchedMoves->end(), mismatchedMoves.begin(), mismatchedMoves.end()); }
-  if (_mismatchedCategories != NULL) { _mismatchedCategories->insert(_mismatchedCategories->end(), mismatchedCategories.begin(), mismatchedCategories.end()); }
+  if (_orphanItems != NULL) { _orphanItems->insert(orphanItems.begin(), orphanItems.end()); }
+  if (_orphanAbilities != NULL) { _orphanAbilities->insert(orphanAbilities.begin(), orphanAbilities.end()); }
+  if (_orphanMoves != NULL) { _orphanMoves->insert(orphanMoves.begin(), orphanMoves.end()); }
+  if (_orphanCategories != NULL) { _orphanCategories->insert(orphanCategories.begin(), orphanCategories.end()); }
 
   if (_numOverwritten != NULL) { *_numOverwritten += numOverwritten; }
   if (_numExtensions != NULL) { *_numExtensions += numExtensions; }
@@ -240,70 +236,22 @@ void PokedexStatic::registerPlugin_orphanCount(
     const size_t& numOverwritten,
     const size_t& numPluginsLoaded,
     const size_t& numPluginsTotal,
-    const std::vector<std::string>& mismatchedItems,
-    const std::vector<std::string>& mismatchedAbilities,
-    const std::vector<std::string>& mismatchedMoves,
-    const std::vector<std::string>& mismatchedCategories) const {
+    const OrphanSet& mismatchedItems,
+    const OrphanSet& mismatchedAbilities,
+    const OrphanSet& mismatchedMoves,
+    const OrphanSet& mismatchedCategories) const {
   // print orphans:
   // print mismatched items
-  if (mismatchedItems.size() != 0)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": \"" << source <<
-      "\" - " << mismatchedItems.size() << " Orphaned plugin-items!\n";
-    if (verbose >= 4)
-    {
-      for (size_t iOrphan = 0; iOrphan < mismatchedItems.size(); iOrphan++)
-      {
-        std::cerr << "\tOrphaned item \"" << mismatchedItems.at(iOrphan) << "\"\n";
-      }
-    }
-  }
+  printOrphans(mismatchedItems, source, "plugin-items", "item");
 
   // print mismatched abilities
-  if (mismatchedAbilities.size() != 0)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": \"" << source <<
-      "\" - " << mismatchedAbilities.size() << " Orphaned plugin-abilities!\n";
-    if (verbose >= 5)
-    {
-      for (size_t iOrphan = 0; iOrphan < mismatchedAbilities.size(); iOrphan++)
-      {
-        std::cerr << "\tOrphaned ability \"" << mismatchedAbilities.at(iOrphan) << "\"\n";
-      }
-    }
-  }
+  printOrphans(mismatchedAbilities, source, "plugin-abilities", "ability");
 
   // print mismatched moves
-  if (mismatchedMoves.size() != 0)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": \"" << source <<
-      "\" - " << mismatchedMoves.size() << " Orphaned plugin-moves!\n";
-    if (verbose >= 5)
-    {
-      for (size_t iOrphan = 0; iOrphan < mismatchedMoves.size(); iOrphan++)
-      {
-        std::cerr << "\tOrphaned move \"" << mismatchedMoves.at(iOrphan) << "\"\n";
-      }
-    }
-  }
+  printOrphans(mismatchedMoves, source, "plugin-moves", "move");
 
   // print mismatched categories
-  if (mismatchedCategories.size() != 0)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": \"" << source <<
-      "\" - " << mismatchedCategories.size() << " Orphaned plugin-categories!\n";
-    if (verbose >= 5)
-    {
-      for (size_t iOrphan = 0; iOrphan < mismatchedMoves.size(); iOrphan++)
-      {
-        std::cerr << "\tOrphaned category \"" << mismatchedCategories.at(iOrphan) << "\"\n";
-      }
-    }
-  }
+  printOrphans(mismatchedCategories, source, "plugin-categories", "category");
 
   if (verbose >= 6)
   {

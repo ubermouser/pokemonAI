@@ -91,7 +91,7 @@ union PKAISHARED PokemonVolatile
   /* clears the nonvolatile status condition of a pokemon */
   void clearStatusAilment();
 
-  bool hasItem(const PokemonNonVolatile& nv) const { return data.iHeldItem != 0; }; 
+  bool hasItem(const PokemonNonVolatile& nv) const; 
 
   const Item& getItem(const PokemonNonVolatile& nv) const;
 
