@@ -234,31 +234,34 @@ bool PokemonNonVolatile::abilityExists() const
 
 
 
-void PokemonNonVolatile::setAbility(const Ability& _chosenAbility)
+PokemonNonVolatile& PokemonNonVolatile::setAbility(const Ability& _chosenAbility)
 {
   assert(pokemonExists());
   assert(_chosenAbility.isImplemented());
   assert(getBase().abilities_.count(&_chosenAbility) > 0);
 
   chosenAbility = &_chosenAbility;
+  return *this;
 };
 
 
 
 
 
-void PokemonNonVolatile::setNoAbility()
+PokemonNonVolatile& PokemonNonVolatile::setNoAbility()
 {
   chosenAbility = Ability::no_ability;
+  return *this;
 };
 
 
 
 
 
-void PokemonNonVolatile::setNoNature()
+PokemonNonVolatile& PokemonNonVolatile::setNoNature()
 {
   chosenNature = Nature::no_nature;
+  return *this;
 };
 
 
@@ -274,30 +277,33 @@ bool PokemonNonVolatile::natureExists() const
 
 
 
-void PokemonNonVolatile::setNature(const Nature& _chosenNature)
+PokemonNonVolatile& PokemonNonVolatile::setNature(const Nature& _chosenNature)
 {
   assert(pkdex->getNatures().count(_chosenNature.getName()) > 0);
   chosenNature = &_chosenNature;
+  return *this;
 };
 
 
 
 
 
-void PokemonNonVolatile::setNoInitialItem()
+PokemonNonVolatile& PokemonNonVolatile::setNoInitialItem()
 {
   initialItem = Item::no_item;
+  return *this;
 };
 
 
 
 
 
-void PokemonNonVolatile::setInitialItem(const Item& _chosenItem)
+PokemonNonVolatile& PokemonNonVolatile::setInitialItem(const Item& _chosenItem)
 {
   assert(pkdex->getItems().count(_chosenItem.getName()) > 0);
   assert(_chosenItem.isImplemented());
   initialItem = &_chosenItem;
+  return *this;
 }
 
 
@@ -379,12 +385,13 @@ bool PokemonNonVolatile::isLegalSet(size_t iAction, const Move& candidate) const
 
 
 
-void PokemonNonVolatile::addMove(const MoveNonVolatile& _cMove)
+PokemonNonVolatile& PokemonNonVolatile::addMove(const MoveNonVolatile& _cMove)
 {
   assert(isLegalAdd(_cMove));
 
   actions[numMoves] = _cMove;
   numMoves++;
+  return *this;
 }
 
 
@@ -432,20 +439,21 @@ const MoveNonVolatile& PokemonNonVolatile::getMove(size_t index) const
 
 
 
-void PokemonNonVolatile::setMove(size_t iAction, const MoveNonVolatile& _cMove)
+PokemonNonVolatile& PokemonNonVolatile::setMove(size_t iAction, const MoveNonVolatile& _cMove)
 {
   assert(isLegalSet(iAction - AT_MOVE_0, _cMove));
   getMove(iAction) = _cMove;
+  return *this;
 };
 
 
 
 
 
-void PokemonNonVolatile::removeMove(size_t iRemovedAction)
+PokemonNonVolatile& PokemonNonVolatile::removeMove(size_t iRemovedAction)
 {
   // don't bother removing a move that doesn't exist
-  if ((iRemovedAction - AT_MOVE_0) >= getNumMoves()) { return; }
+  if ((iRemovedAction - AT_MOVE_0) >= getNumMoves()) { return *this; }
 
   {
     MoveNonVolatile& removedMove = getMove(iRemovedAction);
@@ -479,6 +487,7 @@ void PokemonNonVolatile::removeMove(size_t iRemovedAction)
 
   // update number of moves in move array:
   numMoves--;
+  return *this;
 };
 
 

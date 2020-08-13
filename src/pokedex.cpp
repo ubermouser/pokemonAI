@@ -13,6 +13,10 @@
 #include "../inc/orphan.h"
 #include "../inc/pluggable.h"
 
+#ifdef GEN4_STATIC
+#include "../inc/gen4_scripts.h"
+#endif
+
 using namespace INI;
 using namespace orphan;
 
@@ -112,14 +116,16 @@ bool PokedexStatic::inputPlugins() {
   size_t numPluginsLoaded = 0;
   size_t numPluginsTotal = 0;
 
-  /*bool success = registerPlugin(
+#ifdef GEN4_STATIC
+  bool success = registerPlugin(
     registerExtensions, 
     &numExtensions, 
     &numOverwritten, 
     &mismatchedItems, 
     &mismatchedAbilities, 
     &mismatchedMoves, 
-    &mismatchedCategories);*/
+    &mismatchedCategories);
+#endif
 
   registerPlugin_orphanCount(
       config_.pluginsPath_,

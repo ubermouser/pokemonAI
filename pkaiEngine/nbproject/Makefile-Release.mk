@@ -40,6 +40,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/511e4115/environment_possible.o \
 	${OBJECTDIR}/_ext/511e4115/environment_volatile.o \
 	${OBJECTDIR}/_ext/e96877d6/fixed_func.o \
+	${OBJECTDIR}/_ext/511e4115/gen4_scripts.o \
 	${OBJECTDIR}/_ext/511e4115/init_toolbox.o \
 	${OBJECTDIR}/_ext/511e4115/item.o \
 	${OBJECTDIR}/_ext/511e4115/move.o \
@@ -111,6 +112,11 @@ ${OBJECTDIR}/_ext/e96877d6/fixed_func.o: ../src/fixedpoint/fixed_func.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/e96877d6
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/e96877d6/fixed_func.o ../src/fixedpoint/fixed_func.cpp
+
+${OBJECTDIR}/_ext/511e4115/gen4_scripts.o: ../src/gen4_scripts.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/gen4_scripts.o ../src/gen4_scripts.cpp
 
 ${OBJECTDIR}/_ext/511e4115/init_toolbox.o: ../src/init_toolbox.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115

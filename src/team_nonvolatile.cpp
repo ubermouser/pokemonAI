@@ -60,38 +60,41 @@ const PokemonNonVolatile& TeamNonVolatile::getPKNV(const TeamVolatile& source) c
 
 
 
-void TeamNonVolatile::addPokemon(const PokemonNonVolatile& cPokemon)
+TeamNonVolatile& TeamNonVolatile::addPokemon(const PokemonNonVolatile& cPokemon)
 {
   assert(isLegalAdd(cPokemon));
 
   teammates[numTeammates] = cPokemon;
   numTeammates++;
+  return *this;
 }
 
 
 
 
 
-void TeamNonVolatile::setPokemon(size_t iPokemon, const PokemonNonVolatile& swappedPokemon)
+TeamNonVolatile& TeamNonVolatile::setPokemon(size_t iPokemon, const PokemonNonVolatile& swappedPokemon)
 {
   assert(isLegalSet(iPokemon, swappedPokemon));
   teammate(iPokemon) = swappedPokemon;
+  return *this;
 };
 
 
 
 
 
-void TeamNonVolatile::setLeadPokemon(size_t iTeammate)
+TeamNonVolatile& TeamNonVolatile::setLeadPokemon(size_t iTeammate)
 {
   assert(iTeammate < getNumTeammates());
 
   // asked to switch lead pokemon with lead pokemon
-  if (iTeammate == 0) return;
+  if (iTeammate == 0) return *this;
 
   PokemonNonVolatile switchedPokemon = teammate(0);
   teammate(0) = teammate(iTeammate);
   teammate(iTeammate) = switchedPokemon;
+  return *this;
 }
 
 
@@ -147,10 +150,10 @@ bool TeamNonVolatile::isLegalSet(size_t iPosition, const PokemonBase& candidate)
 
 
 
-void TeamNonVolatile::removePokemon(size_t iRemovedPokemon)
+TeamNonVolatile& TeamNonVolatile::removePokemon(size_t iRemovedPokemon)
 {
   // don't bother removing a pokemon that doesn't exist
-  if (iRemovedPokemon >= getNumTeammates()) { return; }
+  if (iRemovedPokemon >= getNumTeammates()) { return *this; }
 
   {
     PokemonNonVolatile& removedPokemon = teammate(iRemovedPokemon);
@@ -184,6 +187,7 @@ void TeamNonVolatile::removePokemon(size_t iRemovedPokemon)
 
   // update number of teammates in teammate array:
   numTeammates--;
+  return *this;
 }
 
 

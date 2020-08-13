@@ -79,6 +79,7 @@
         <itemPath>../src/orphan.cpp</itemPath>
         <itemPath>../src/signature.cpp</itemPath>
       </logicalFolder>
+      <itemPath>../src/gen4_scripts.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -101,7 +102,7 @@
   <confs>
     <conf name="Debug" type="3">
       <toolsSet>
-        <compilerSet>GNU|GNU</compilerSet>
+        <compilerSet>CLANG|CLang</compilerSet>
         <dependencyChecking>true</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
@@ -110,6 +111,7 @@
           <commandLine>-O0</commandLine>
           <preprocessorList>
             <Elem>DOUBLEPRECISION</Elem>
+            <Elem>GEN4_STATIC</Elem>
             <Elem>PKAI_EXPORT</Elem>
             <Elem>_DEBUG</Elem>
             <Elem>_DISABLEFINEGRAINEDLOCKING</Elem>
@@ -192,6 +194,8 @@
       <item path="../src/fixedpoint/fixed_func.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/fixedpoint/fixsintab.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/gen4_scripts.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/init_toolbox.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -336,6 +340,8 @@
       <item path="../src/fixedpoint/fixed_func.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/fixedpoint/fixsintab.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/gen4_scripts.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/init_toolbox.cpp" ex="false" tool="1" flavor2="0">
       </item>

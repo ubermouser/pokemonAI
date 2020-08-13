@@ -32,7 +32,26 @@ typedef std::vector<plugin_t>::const_iterator pluginIt;
   }\
 }
 
-PkCU::PkCU(const EnvironmentNonvolatile& _nv, size_t engineAccuracy)
+PkCU::PkCU(size_t engineAccuracy, bool allowInvalidMoves)
+  : nv(NULL),
+  pluginSets(),
+  cPluginSet(NULL),
+  _stack(NULL),
+  stackStage(),
+  PKVOffsets(),
+  damageComponents(),
+  iTeams(),
+  iActions(),
+  iBase(SIZE_MAX),
+  prevStackCapacity(0),
+  numRandomEnvironments((engineAccuracy>16)?1:engineAccuracy),
+  allowInvalidMoves_(allowInvalidMoves)
+{
+  iTeams.fill(SIZE_MAX);
+  iActions.fill(SIZE_MAX);
+};
+
+PkCU::PkCU(const EnvironmentNonvolatile& _nv, size_t engineAccuracy, bool allowInvalidMoves)
   : nv(&_nv),
   pluginSets(),
   cPluginSet(NULL),
@@ -45,7 +64,7 @@ PkCU::PkCU(const EnvironmentNonvolatile& _nv, size_t engineAccuracy)
   iBase(SIZE_MAX),
   prevStackCapacity(0),
   numRandomEnvironments((engineAccuracy>16)?1:engineAccuracy),
-  allowInvalidMoves_(false)
+  allowInvalidMoves_(allowInvalidMoves)
 {
   iTeams.fill(SIZE_MAX);
   iActions.fill(SIZE_MAX);

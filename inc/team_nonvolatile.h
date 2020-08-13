@@ -64,16 +64,16 @@ public:
   bool isLegalSet(size_t iPosition, const PokemonBase& cBase) const;
 
   /* add a pokemon to the array of pokemon in this team */
-  void addPokemon(const PokemonNonVolatile& cPokemon);
+  TeamNonVolatile& addPokemon(const PokemonNonVolatile& cPokemon);
 
   /* remove a pokemon from the array of pokemon in this team */
-  void removePokemon(size_t iPokemon);
+  TeamNonVolatile& removePokemon(size_t iPokemon);
 
   /* sets pokemon to swappedPokemon */
-  void setPokemon(size_t iPokemon, const PokemonNonVolatile& swappedPokemon);
+  TeamNonVolatile& setPokemon(size_t iPokemon, const PokemonNonVolatile& swappedPokemon);
 
   /* sets the lead pokemon. The pokemon that was the lead pokemon takes the index of the switched pokemon */
-  void setLeadPokemon(size_t iPokemon);
+  TeamNonVolatile& setLeadPokemon(size_t iPokemon);
 
   void initialize();
 

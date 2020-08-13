@@ -14,14 +14,14 @@ GREP=grep
 NM=nm
 CCADMIN=CCadmin
 RANLIB=ranlib
-CC=gcc
-CCC=g++
-CXX=g++
+CC=clang-9
+CCC=clang++-9
+CXX=clang++-9
 FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-Linux
+CND_PLATFORM=CLANG-Linux
 CND_DLIB_EXT=so
 CND_CONF=Debug
 CND_DISTDIR=dist
@@ -40,6 +40,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/511e4115/environment_possible.o \
 	${OBJECTDIR}/_ext/511e4115/environment_volatile.o \
 	${OBJECTDIR}/_ext/e96877d6/fixed_func.o \
+	${OBJECTDIR}/_ext/511e4115/gen4_scripts.o \
 	${OBJECTDIR}/_ext/511e4115/init_toolbox.o \
 	${OBJECTDIR}/_ext/511e4115/item.o \
 	${OBJECTDIR}/_ext/511e4115/move.o \
@@ -90,122 +91,127 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libpkaiengine.a: ${OBJECTFILES}
 ${OBJECTDIR}/_ext/511e4115/ability.o: ../src/ability.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ability.o ../src/ability.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ability.o ../src/ability.cpp
 
 ${OBJECTDIR}/_ext/511e4115/environment_nonvolatile.o: ../src/environment_nonvolatile.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/environment_nonvolatile.o ../src/environment_nonvolatile.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/environment_nonvolatile.o ../src/environment_nonvolatile.cpp
 
 ${OBJECTDIR}/_ext/511e4115/environment_possible.o: ../src/environment_possible.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/environment_possible.o ../src/environment_possible.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/environment_possible.o ../src/environment_possible.cpp
 
 ${OBJECTDIR}/_ext/511e4115/environment_volatile.o: ../src/environment_volatile.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/environment_volatile.o ../src/environment_volatile.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/environment_volatile.o ../src/environment_volatile.cpp
 
 ${OBJECTDIR}/_ext/e96877d6/fixed_func.o: ../src/fixedpoint/fixed_func.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/e96877d6
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/e96877d6/fixed_func.o ../src/fixedpoint/fixed_func.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/e96877d6/fixed_func.o ../src/fixedpoint/fixed_func.cpp
+
+${OBJECTDIR}/_ext/511e4115/gen4_scripts.o: ../src/gen4_scripts.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/gen4_scripts.o ../src/gen4_scripts.cpp
 
 ${OBJECTDIR}/_ext/511e4115/init_toolbox.o: ../src/init_toolbox.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/init_toolbox.o ../src/init_toolbox.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/init_toolbox.o ../src/init_toolbox.cpp
 
 ${OBJECTDIR}/_ext/511e4115/item.o: ../src/item.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/item.o ../src/item.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/item.o ../src/item.cpp
 
 ${OBJECTDIR}/_ext/511e4115/move.o: ../src/move.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/move.o ../src/move.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/move.o ../src/move.cpp
 
 ${OBJECTDIR}/_ext/511e4115/move_nonvolatile.o: ../src/move_nonvolatile.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/move_nonvolatile.o ../src/move_nonvolatile.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/move_nonvolatile.o ../src/move_nonvolatile.cpp
 
 ${OBJECTDIR}/_ext/511e4115/move_volatile.o: ../src/move_volatile.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/move_volatile.o ../src/move_volatile.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/move_volatile.o ../src/move_volatile.cpp
 
 ${OBJECTDIR}/_ext/511e4115/name.o: ../src/name.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/name.o ../src/name.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/name.o ../src/name.cpp
 
 ${OBJECTDIR}/_ext/511e4115/nature.o: ../src/nature.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/nature.o ../src/nature.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/nature.o ../src/nature.cpp
 
 ${OBJECTDIR}/_ext/511e4115/orphan.o: ../src/orphan.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/orphan.o ../src/orphan.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/orphan.o ../src/orphan.cpp
 
 ${OBJECTDIR}/_ext/511e4115/pkCU.o: ../src/pkCU.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pkCU.o ../src/pkCU.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pkCU.o ../src/pkCU.cpp
 
 ${OBJECTDIR}/_ext/511e4115/pluggable.o: ../src/pluggable.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pluggable.o ../src/pluggable.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pluggable.o ../src/pluggable.cpp
 
 ${OBJECTDIR}/_ext/511e4115/pokedex.o: ../src/pokedex.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pokedex.o ../src/pokedex.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pokedex.o ../src/pokedex.cpp
 
 ${OBJECTDIR}/_ext/511e4115/pokedex_dynamic.o: ../src/pokedex_dynamic.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pokedex_dynamic.o ../src/pokedex_dynamic.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pokedex_dynamic.o ../src/pokedex_dynamic.cpp
 
 ${OBJECTDIR}/_ext/511e4115/pokemon_base.o: ../src/pokemon_base.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pokemon_base.o ../src/pokemon_base.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pokemon_base.o ../src/pokemon_base.cpp
 
 ${OBJECTDIR}/_ext/511e4115/pokemon_nonvolatile.o: ../src/pokemon_nonvolatile.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pokemon_nonvolatile.o ../src/pokemon_nonvolatile.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pokemon_nonvolatile.o ../src/pokemon_nonvolatile.cpp
 
 ${OBJECTDIR}/_ext/511e4115/pokemon_volatile.o: ../src/pokemon_volatile.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pokemon_volatile.o ../src/pokemon_volatile.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pokemon_volatile.o ../src/pokemon_volatile.cpp
 
 ${OBJECTDIR}/_ext/511e4115/signature.o: ../src/signature.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/signature.o ../src/signature.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/signature.o ../src/signature.cpp
 
 ${OBJECTDIR}/_ext/511e4115/team_nonvolatile.o: ../src/team_nonvolatile.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/team_nonvolatile.o ../src/team_nonvolatile.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/team_nonvolatile.o ../src/team_nonvolatile.cpp
 
 ${OBJECTDIR}/_ext/511e4115/team_volatile.o: ../src/team_volatile.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/team_volatile.o ../src/team_volatile.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/team_volatile.o ../src/team_volatile.cpp
 
 ${OBJECTDIR}/_ext/511e4115/type.o: ../src/type.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/type.o ../src/type.cpp
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/type.o ../src/type.cpp
 
 # Subprojects
 .build-subprojects:

@@ -202,10 +202,10 @@ private:
   /* fully seeds the pluginset vector */
   bool initialize();
 
-  PkCU();
 public:
 
-  PkCU(const EnvironmentNonvolatile& _nv, size_t engineAccuracy = SIZE_MAX);
+  PkCU(size_t engineAccuracy = SIZE_MAX, bool allowInvalidMoves=false);
+  PkCU(const EnvironmentNonvolatile& _nv, size_t engineAccuracy = SIZE_MAX, bool allowInvalidMoves=false);
   PkCU(const PkCU& other);
 
   void setAllowInvalidMoves(bool allow = true) { allowInvalidMoves_ = allow; }

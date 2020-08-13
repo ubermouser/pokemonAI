@@ -2,6 +2,8 @@
 #include "../inc/pkai.h"
 //#undef PKAI_STATIC
 
+#include "../inc/gen4_scripts.h"
+
 #include <stdint.h>
 #include <vector>
 #include <algorithm>
@@ -16,89 +18,87 @@
 #include "../inc/plugin.h"
 //#undef PKAI_EXPORT
 
-#ifndef GEN4_SCRIPTS_STATIC
-const Pokedex* pkdex;
-#endif
+const Pokedex* dex;
 
-static const Move* airCutter_t;
-static const Move* absorb_t;
-static const Move* aerialAce_t;
-static const Move* attackOrder_t;
-static const Move* aromatherapy_t;
-static const Move* auraSphere_t;
-static const Move* blazeKick_t;
-static const Move* braveBird_t;
-static const Move* crabHammer_t;
-static const Move* crossChop_t;
-static const Move* crossPoison_t;
-static const Move* doubleEdge_t;
-static const Move* drainPunch_t;
-static const Move* explosion_t;
-static const Move* faintAttack_t;
-static const Move* flareBlitz_t;
-static const Move* gigaDrain_t;
-static const Move* healBell_t;
-static const Move* healOrder_t;
-static const Move* hiddenPower_t;
-static const Move* leafBlade_t;
-static const Move* leechLife_t;
-static const Move* magnetBomb_t;
-static const Move* magicalLeaf_t;
-static const Move* megaDrain_t;
-static const Move* memento_t;
-static const Move* milkDrink_t;
-static const Move* nightShade_t;
-static const Move* nightSlash_t;
-static const Move* painSplit_t;
-static const Move* psychoCut_t;
-static const Move* rapidSpin_t;
-static const Move* razorLeaf_t;
-static const Move* recover_t;
-static const Move* roost_t;
-static const Move* shadowClaw_t;
-static const Move* shadowPunch_t;
-static const Move* shockWave_t;
-static const Move* seismicToss_t;
-static const Move* selfDestruct_t;
-static const Move* softBoiled_t;
-static const Move* slackOff_t;
-static const Move* slash_t;
-static const Move* spikes_t;
-static const Move* stealthRock_t;
-static const Move* stoneEdge_t;
-static const Move* struggle_t;
-static const Move* swift_t;
-static const Move* toxicSpikes_t;
-static const Move* voltTackle_t;
-static const Move* woodHammer_t;
+const Move* airCutter_t;
+const Move* absorb_t;
+const Move* aerialAce_t;
+const Move* attackOrder_t;
+const Move* aromatherapy_t;
+const Move* auraSphere_t;
+const Move* blazeKick_t;
+const Move* braveBird_t;
+const Move* crabHammer_t;
+const Move* crossChop_t;
+const Move* crossPoison_t;
+const Move* doubleEdge_t;
+const Move* drainPunch_t;
+const Move* explosion_t;
+const Move* faintAttack_t;
+const Move* flareBlitz_t;
+const Move* gigaDrain_t;
+const Move* healBell_t;
+const Move* healOrder_t;
+const Move* hiddenPower_t;
+const Move* leafBlade_t;
+const Move* leechLife_t;
+const Move* magnetBomb_t;
+const Move* magicalLeaf_t;
+const Move* megaDrain_t;
+const Move* memento_t;
+const Move* milkDrink_t;
+const Move* nightShade_t;
+const Move* nightSlash_t;
+const Move* painSplit_t;
+const Move* psychoCut_t;
+const Move* rapidSpin_t;
+const Move* razorLeaf_t;
+const Move* recover_t;
+const Move* roost_t;
+const Move* shadowClaw_t;
+const Move* shadowPunch_t;
+const Move* shockWave_t;
+const Move* seismicToss_t;
+const Move* selfDestruct_t;
+const Move* softBoiled_t;
+const Move* slackOff_t;
+const Move* slash_t;
+const Move* spikes_t;
+const Move* stealthRock_t;
+const Move* stoneEdge_t;
+const Move* struggle_t;
+const Move* swift_t;
+const Move* toxicSpikes_t;
+const Move* voltTackle_t;
+const Move* woodHammer_t;
 
-static const Item* leftovers_t;
-static const Item* lifeOrb_t;
-static const Item* lumBerry_t;
+const Item* leftovers_t;
+const Item* lifeOrb_t;
+const Item* lumBerry_t;
 
-static const Ability* levitate_t;
-static const Ability* naturalCure_t;
-static const Ability* noGuard_t;
-static const Ability* technician_t;
-static const Ability* sereneGrace_t;
+const Ability* levitate_t;
+const Ability* naturalCure_t;
+const Ability* noGuard_t;
+const Ability* technician_t;
+const Ability* sereneGrace_t;
 
-static const Type* normal_t;
-static const Type* fighting_t;
-static const Type* flying_t;
-static const Type* poison_t;
-static const Type* ground_t;
-static const Type* rock_t;
-static const Type* bug_t;
-static const Type* ghost_t;
-static const Type* steel_t;
-static const Type* fire_t;
-static const Type* water_t;
-static const Type* grass_t;
-static const Type* electric_t;
-static const Type* psychic_t;
-static const Type* ice_t;
-static const Type* dragon_t;
-static const Type* dark_t;
+const Type* normal_t;
+const Type* fighting_t;
+const Type* flying_t;
+const Type* poison_t;
+const Type* ground_t;
+const Type* rock_t;
+const Type* bug_t;
+const Type* ghost_t;
+const Type* steel_t;
+const Type* fire_t;
+const Type* water_t;
+const Type* grass_t;
+const Type* electric_t;
+const Type* psychic_t;
+const Type* ice_t;
+const Type* dragon_t;
+const Type* dark_t;
 
 int move_hiddenPower_calculate(
   PokemonNonVolatile& cPKNV,
@@ -164,7 +164,7 @@ int move_hiddenPower_calculate(
     cType = (uint16_t)dark_t->index_; break;
   };
 
-  assert((cType < pkdex->getTypes().size()) && cPower <= 70);
+  assert((cType < dex->getTypes().size()) && cPower <= 70);
 
   cMNV.setScriptVal_a(cType);
   cMNV.setScriptVal_b(cPower);
@@ -185,7 +185,7 @@ int move_hiddenPower_setType(
 {
   if (&mNV.getBase() != hiddenPower_t) { return 0; }
 
-  cType = pkdex->getTypes().atByIndex(mNV.getScriptVal_a());
+  cType = dex->getTypes().atByIndex(mNV.getScriptVal_a());
   return 1;
 };
 
@@ -371,6 +371,7 @@ int move_cureNonVolatile_team(
   PokemonVolatile& cPKV,
   PokemonVolatile& tPKV)
 {
+  // TODO(@drendleman) - never called when aromatherapy is hit
   if (&mNV.getBase() != aromatherapy_t) { return 0; }
   const Move* tMove = &mNV.getBase();
   if (
@@ -1206,6 +1207,7 @@ int engine_decrementPP(
   PokemonVolatile& cPKV,
   PokemonVolatile& tPKV)
 {
+  // TODO(@drendleman) - never called when aromatherapy is hit
   if (!cu.getBase().hasHit(cu.getICTeam()) || (&mNV.getBase() == struggle_t)) { return 0; }
 
   cPKV.getMV(cu.getICAction()).modPP(mNV.getBase(), -1);
@@ -1281,12 +1283,10 @@ int engine_endRoundWeatherDamageEffect(
 
 bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
 {
-#ifndef GEN4_SCRIPTS_STATIC
   // register needed types:
-  pkdex = &pkAI;
-#endif
+  dex = &pkAI;
   //moves:
-  const Moves& moves = pkdex->getMoves();
+  const Moves& moves = dex->getMoves();
   absorb_t = orphan::orphanCheck(moves, "absorb");
   aerialAce_t = orphan::orphanCheck(moves, "aerial ace");
   airCutter_t = orphan::orphanCheck(moves, "air cutter");
@@ -1338,19 +1338,19 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   voltTackle_t = orphan::orphanCheck(moves, "volt tackle");
   woodHammer_t = orphan::orphanCheck(moves, "wood hammer");
   //items:
-  const Items& items = pkdex->getItems();
+  const Items& items = dex->getItems();
   leftovers_t = orphan::orphanCheck(items, "leftovers");
   lifeOrb_t = orphan::orphanCheck(items, "life orb");
   lumBerry_t = orphan::orphanCheck(items, "lum berry");
   //abilities:
-  const Abilities& abilities = pkdex->getAbilities();
+  const Abilities& abilities = dex->getAbilities();
   levitate_t = orphan::orphanCheck(abilities, "levitate");
   naturalCure_t = orphan::orphanCheck(abilities, "natural cure");
   noGuard_t = orphan::orphanCheck(abilities, "no guard");
   technician_t = orphan::orphanCheck(abilities, "technician");
   sereneGrace_t = orphan::orphanCheck(abilities, "serene grace");
   //types:
-  const Types& types = pkdex->getTypes();
+  const Types& types = dex->getTypes();
   normal_t = orphan::orphanCheck(types, "normal");
   fighting_t = orphan::orphanCheck(types, "fighting");
   flying_t = orphan::orphanCheck(types, "flying");

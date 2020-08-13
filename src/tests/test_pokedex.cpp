@@ -10,10 +10,10 @@
 class PokedexTest : public ::testing::Test {
 protected:
   void SetUp() override {
-    pokedex = std::make_shared<PokedexDynamic>();
+    pokedex = std::make_shared<PokedexStatic>();
   }
 
-  std::shared_ptr<PokedexDynamic> pokedex;
+  std::shared_ptr<PokedexStatic> pokedex;
 };
 
 void validateGen4Counts(const Pokedex& pkdex) {
@@ -28,13 +28,13 @@ void validateGen4Counts(const Pokedex& pkdex) {
 TEST(StaticPokedexTest, LoadsGen4Items) {
   PokedexStatic pkdex;
   validateGen4Counts(pkdex);
-  EXPECT_EQ(pkdex.getExtensions().getNumPlugins(), 0);
+  EXPECT_GE(pkdex.getExtensions().getNumPlugins(), 10);
 }
 
 TEST(DynamicPokedexTest, LoadsGen4Items) {
   PokedexDynamic pkdex;
   validateGen4Counts(pkdex);
-  EXPECT_GE(pkdex.getExtensions().getNumPlugins(), 50);
+  EXPECT_GE(pkdex.getExtensions().getNumPlugins(), 10);
 }
 
 TEST_F(PokedexTest, PrintsTeamWithoutCrashing) {

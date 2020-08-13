@@ -216,9 +216,9 @@ bool ailmentFromToken(
   }
   else { incorrectArgs("AIL_NV_SLEEP", iLine, iToken); return false; }
 
-  endAilment:
-
   result = AIL_V_NONE;
+
+  endAilment:
   return true;
 }
 
@@ -294,7 +294,6 @@ bool volatileAilmentFromToken(
   else { incorrectArgs("AIL_V_PARTIALTRAP", iLine, iToken); return false; }
 
   endVolatile:
-
   return true;
 }
 

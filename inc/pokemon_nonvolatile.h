@@ -137,9 +137,10 @@ public:
     return *base;
   };
 
-  void setBase(const PokemonBase& _base)
+  PokemonNonVolatile& setBase(const PokemonBase& _base)
   {
     base = &_base;
+    return *this;
   };
 
   unsigned int getLevel() const
@@ -147,9 +148,10 @@ public:
     return level;
   };
 
-  void setLevel(unsigned int _level)
+  PokemonNonVolatile& setLevel(unsigned int _level)
   {
     level = _level;
+    return *this;
   };
 
   unsigned int getSex() const
@@ -157,9 +159,10 @@ public:
     return sex;
   };
 
-  void setSex(unsigned int _sex)
+  PokemonNonVolatile& setSex(unsigned int _sex)
   {
     sex = _sex;
+    return *this;
   };
 
   const Ability& getAbility() const
@@ -168,30 +171,31 @@ public:
     return *chosenAbility;
   };
 
-  void setAbility(const Ability& _chosenAbility);
+  PokemonNonVolatile& setAbility(const Ability& _chosenAbility);
 
-  void setNoAbility();
+  PokemonNonVolatile& setNoAbility();
 
   const Nature& getNature() const
   {
     return *chosenNature;
   };
 
-  void setNoNature();
+  PokemonNonVolatile& setNoNature();
 
-  void setNature(const Nature& _chosenNature);
+  PokemonNonVolatile& setNature(const Nature& _chosenNature);
 
-  void setInitialItem(const Item& _chosenItem);
+  PokemonNonVolatile& setInitialItem(const Item& _chosenItem);
 
-  void setNoInitialItem();
+  PokemonNonVolatile& setNoInitialItem();
 
   bool hasInitialItem() const;
 
   const Item& getInitialItem() const;
 
-  void setIV(size_t type, unsigned int value)
+  PokemonNonVolatile& setIV(size_t type, unsigned int value)
   {
     IV[type] = value;
+    return *this;
   };
 
   unsigned int getIV(size_t type) const
@@ -199,9 +203,10 @@ public:
     return IV[type];
   };
 
-  void setEV(size_t type, unsigned int value)
+  PokemonNonVolatile& setEV(size_t type, unsigned int value)
   {
     EV[type] = value;
+    return *this;
   };
 
   unsigned int getEV(size_t type) const
@@ -228,12 +233,12 @@ public:
 
   bool isLegalSet(size_t iAction, const Move& cBase) const;
 
-  void addMove(const MoveNonVolatile& cMove);
+  PokemonNonVolatile& addMove(const MoveNonVolatile& cMove);
 
   /* set a pre-existing move to something else */
-  void setMove(size_t iAction, const MoveNonVolatile& _cMove);
+  PokemonNonVolatile& setMove(size_t iAction, const MoveNonVolatile& _cMove);
 
-  void removeMove(size_t iAction);
+  PokemonNonVolatile& removeMove(size_t iAction);
 
   /* get the pokemon's move pointed to by this index.
    * normally returns the index action move, but returns

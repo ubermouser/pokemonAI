@@ -4,16 +4,14 @@
 
 #include <boost/algorithm/string/case_conv.hpp>
 
-namespace orphan {
-
-std::string lowerCase(const std::string& source) {
+std::string orphan::lowerCase(const std::string& source) {
   std::string result(source);
   boost::to_lower(result);
   return result;
 }
 
 
-void printOrphans(
+void orphan::printOrphans(
     const OrphanSet& orphans,
     const std::string& source,
     const std::string& categoryName,
@@ -33,5 +31,3 @@ void printOrphans(
     }
   }
 }
-
-};

@@ -10,7 +10,6 @@
 
 #include "../inc/pkai.h"
 
-#include <vector>
 #include <string>
 
 #include "../inc/pokedex.h"

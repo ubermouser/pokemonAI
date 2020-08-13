@@ -7,13 +7,13 @@ CND_BASEDIR=`pwd`
 CND_BUILDDIR=build
 CND_DISTDIR=dist
 # Debug configuration
-CND_PLATFORM_Debug=GNU-Linux
-CND_ARTIFACT_DIR_Debug=dist/Debug/GNU-Linux
+CND_PLATFORM_Debug=CLANG-Linux
+CND_ARTIFACT_DIR_Debug=dist/Debug/CLANG-Linux
 CND_ARTIFACT_NAME_Debug=libpkaiengine.a
-CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-Linux/libpkaiengine.a
-CND_PACKAGE_DIR_Debug=dist/Debug/GNU-Linux/package
+CND_ARTIFACT_PATH_Debug=dist/Debug/CLANG-Linux/libpkaiengine.a
+CND_PACKAGE_DIR_Debug=dist/Debug/CLANG-Linux/package
 CND_PACKAGE_NAME_Debug=pkaiEngine.tar
-CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux/package/pkaiEngine.tar
+CND_PACKAGE_PATH_Debug=dist/Debug/CLANG-Linux/package/pkaiEngine.tar
 # Release configuration
 CND_PLATFORM_Release=GNU-Linux
 CND_ARTIFACT_DIR_Release=dist/Release/GNU-Linux

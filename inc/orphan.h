@@ -13,9 +13,9 @@ namespace orphan
 {
   using OrphanSet = std::unordered_set<std::string>;
 
-  std::string lowerCase(const std::string& source);
+  PKAISHARED std::string lowerCase(const std::string& source);
 
-  void printOrphans(
+  PKAISHARED void printOrphans(
       const OrphanSet& orphans,
       const std::string& source,
       const std::string& categoryName,

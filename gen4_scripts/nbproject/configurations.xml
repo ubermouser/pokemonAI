@@ -29,6 +29,7 @@
       <logicalFolder name="f2" displayName="toolbox" projectFiles="true">
         <itemPath>../inc/orphan.h</itemPath>
       </logicalFolder>
+      <itemPath>../inc/gen4_scripts.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -60,7 +61,7 @@
   <confs>
     <conf name="Debug" type="2">
       <toolsSet>
-        <compilerSet>GNU|GNU</compilerSet>
+        <compilerSet>CLANG|CLang</compilerSet>
         <dependencyChecking>true</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
@@ -87,6 +88,8 @@
       <item path="../inc/environment_possible.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/environment_volatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/gen4_scripts.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/item.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -166,6 +169,8 @@
       <item path="../inc/environment_possible.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/environment_volatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/gen4_scripts.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/item.h" ex="false" tool="3" flavor2="0">
       </item>
