@@ -238,7 +238,7 @@ void PokemonNonVolatile::setAbility(const Ability& _chosenAbility)
 {
   assert(pokemonExists());
   assert(_chosenAbility.isImplemented());
-  assert(std::binary_search(getBase().abilities_.begin(), getBase().abilities_.end(), &_chosenAbility));
+  assert(getBase().abilities_.count(&_chosenAbility) > 0);
 
   chosenAbility = &_chosenAbility;
 };

@@ -43,8 +43,8 @@ private:
   std::string pName;
   pluginType pType;
   voidFunction_rawType pFunction;
-  uint32_t priority;
-  int32_t target;
+  int32_t priority;
+  uint32_t target;
 
 public:
   plugin(const plugin& other)

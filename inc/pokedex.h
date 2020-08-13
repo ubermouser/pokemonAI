@@ -33,6 +33,8 @@ public:
   
   virtual EnginePlugins& getExtensions() = 0;
   virtual const EnginePlugins& getExtensions() const = 0;
+
+  virtual ~Pokedex() = default;
 };
 
 #endif /* POKDEX_H */

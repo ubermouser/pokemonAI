@@ -71,7 +71,7 @@ void planner_max::setEvaluator(const Evaluator& evalType)
 void planner_max::setEnvironment(PkCU& _cu, size_t _agentTeam)
 {
   agentTeam = _agentTeam;
-  if (cu == NULL) { cu = new PkCU(_cu); cu->setAccuracy(engineAccuracy); }
+  if (cu == NULL) { cu = new PkCU(_cu); cu->setAccuracy(engineAccuracy); cu->setAllowInvalidMoves(); }
   else { cu->setEnvironment(_cu.getNV()); }
   if (eval != NULL) { eval->resetEvaluator(_cu.getNV()); }
 }

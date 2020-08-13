@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 #include <math.h>
+#include <stdexcept>
 
 #include "../inc/fp_compare.h"
 #include "../src/fixedpoint/fixed_func.h"
@@ -43,7 +44,8 @@ PkCU::PkCU(const EnvironmentNonvolatile& _nv, size_t engineAccuracy)
   iActions(),
   iBase(SIZE_MAX),
   prevStackCapacity(0),
-  numRandomEnvironments((engineAccuracy>16)?1:engineAccuracy)
+  numRandomEnvironments((engineAccuracy>16)?1:engineAccuracy),
+  allowInvalidMoves_(false)
 {
   iTeams.fill(SIZE_MAX);
   iActions.fill(SIZE_MAX);
@@ -65,7 +67,8 @@ PkCU::PkCU(const PkCU& other)
   iActions(),
   iBase(SIZE_MAX),
   prevStackCapacity(0),
-  numRandomEnvironments(other.numRandomEnvironments)
+  numRandomEnvironments(other.numRandomEnvironments),
+  allowInvalidMoves_(other.allowInvalidMoves_)
 {
   iTeams.fill(SIZE_MAX);
   iActions.fill(SIZE_MAX);
@@ -1294,6 +1297,11 @@ size_t PkCU::updateState(
     PossibleEnvironments& rEnv,
     size_t actionA, 
     size_t actionB) {
+  if (!allowInvalidMoves_) {
+    if (!isValidAction(cEnv, actionA, TEAM_A) || !isValidAction(cEnv, actionB, TEAM_B)) {
+      throw std::runtime_error("Invalid Action");
+    }
+  }
   // set stack callback value:
   _stack = &rEnv;
 

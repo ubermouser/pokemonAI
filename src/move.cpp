@@ -45,7 +45,8 @@ Move::Move(
     targetDebuff_(targetDebuff),
     targetAilment_(targetAilment),
     targetVolatileAilment_(targetVolatileAilment),
-    description_(description)
+    description_(description),
+    lostChild(false)
 {
   if (!hasPlugins) { setHasNoPlugins(); }
   checkRangeB(primaryAccuracy, -1, 100);
@@ -89,6 +90,7 @@ bool Moves::initialize(const std::string& path, const Types& types) {
     // find special cases struggle and hurt confusion, set the pointers to them
     Move::move_none = count("none")?&at("none"):new Move();
     Move::move_struggle = &at("struggle");
+    MoveNonVolatile::mNV_struggle = new MoveNonVolatile(*Move::move_struggle);
   }
   
   return true;

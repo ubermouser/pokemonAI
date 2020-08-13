@@ -25,7 +25,7 @@ class PKAISHARED Item : public Name, public Pluggable
 public:
   static const Item* no_item;
 
-  bool isImplemented() const
+  bool isImplemented() const override
   {
     return Pluggable::isImplemented() && !lostChild_;
   };
@@ -69,7 +69,7 @@ public:
   const Type* resistedType_;
 
   /* TODO: delete. The index of insertion of this item. */
-  size_t index_;
+  size_t index_ = MAXITEMS;
 
   /* amount of damage dealt when fling is used with this object held */
   uint8_t flingPower_;

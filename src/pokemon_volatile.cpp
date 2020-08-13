@@ -217,7 +217,9 @@ const Item& PokemonVolatile::getItem(const PokemonNonVolatile& nv) const
 
 void PokemonVolatile::setNoItem(const PokemonNonVolatile& nv)
 {
+  // TODO(@drendleman) index_ of no_item is greater than the largest possible iHeldItem!
   data.iHeldItem = Item::no_item->index_;
+  assert(!hasItem(nv)); // may not be true because of narrowing
 }
 
 

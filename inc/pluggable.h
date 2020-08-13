@@ -16,10 +16,10 @@ struct plugin_t
   voidFunction_rawType pFunction;
 
   /* a lower priority function is executed first, and has the ability to stop higher priority functions fro executing */
-  uint32_t priority;
+  int32_t priority;
 
   /* may be one of TEAM_A(CTEAM), TEAM_B(OTEAM), or  2 (both) to register to all teammates in contact with this plugin */
-  int32_t target;
+  uint32_t target;
 
   bool operator== (const plugin_t& other) const
   {

@@ -114,6 +114,9 @@ private:
   /* number of random environments to create per hit/crit 1-16 */
   size_t numRandomEnvironments;
 
+  /* When true, providing invalid actions will not cause an exception to be thrown. */
+  bool allowInvalidMoves_;
+
   /* if iTeam = SIZE_MAX, insert for both teams. if iCTeammate =  SIZE_MAX, insert for all teammates. True if non-duplicate */
   size_t insertPluginHandler(plugin_t& cPlugin, size_t pluginType, size_t iNTeammate = SIZE_MAX);
 
@@ -204,6 +207,8 @@ public:
 
   PkCU(const EnvironmentNonvolatile& _nv, size_t engineAccuracy = SIZE_MAX);
   PkCU(const PkCU& other);
+
+  void setAllowInvalidMoves(bool allow = true) { allowInvalidMoves_ = allow; }
 
   /* pkCU stores a reference to the environment at cEnvironment. This reference must not be destroyed */
   void setEnvironment(const EnvironmentNonvolatile& _cEnvironment);
