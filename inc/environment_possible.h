@@ -76,6 +76,9 @@ union PKAISHARED EnvironmentPossible
   void printState(
       const EnvironmentNonvolatile& envNV, size_t iState=SIZE_MAX, size_t iPly=SIZE_MAX) const;
 
+  operator const EnvironmentVolatile&() const { return data.env; };
+  operator EnvironmentVolatile&() { return data.env; };
+
   const EnvironmentVolatile& getEnv() const { return data.env; };
 
   EnvironmentVolatile& getEnv() { return data.env; }

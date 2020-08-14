@@ -16,11 +16,6 @@
 BOOST_STATIC_ASSERT(sizeof(EnvironmentVolatile) == (sizeof(uint64_t)*16));
 
 
-EnvironmentVolatile::EnvironmentVolatile(
-    const EnvironmentPossible& other) : EnvironmentVolatile(other.getEnv()) {
-}
-
-
 void EnvironmentVolatile::initialize(const EnvironmentNonvolatile& envNV)
 {
   // zero datastructure:

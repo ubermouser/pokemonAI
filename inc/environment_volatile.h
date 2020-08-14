@@ -43,7 +43,6 @@ union PKAISHARED EnvironmentVolatile
 
   EnvironmentVolatile() = default;
   EnvironmentVolatile(const EnvironmentVolatile& other) = default;
-  EnvironmentVolatile(const EnvironmentPossible& other);
   EnvironmentVolatile& operator=(const EnvironmentVolatile& source) = default;
   
 };
