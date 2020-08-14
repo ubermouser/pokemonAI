@@ -1069,7 +1069,9 @@ void PkCU::evaluateMove_script()
     }
     else
     {
-      probabilityToHit = cMove.getPrimaryAccuracy();
+      // TODO(@drendleman) - the probabilityToHit of a move with no accuracy is always 100%
+      //probabilityToHit = cMove.getPrimaryAccuracy(); // REMOVED DUE TO ABOVE TODO
+      probabilityToHit = 1.;
     }
 
     // to-hit modifying values:

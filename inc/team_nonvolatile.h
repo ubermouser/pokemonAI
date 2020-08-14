@@ -75,7 +75,7 @@ public:
   /* sets the lead pokemon. The pokemon that was the lead pokemon takes the index of the switched pokemon */
   TeamNonVolatile& setLeadPokemon(size_t iPokemon);
 
-  void initialize();
+  TeamNonVolatile& initialize();
 
   void uninitialize();
   

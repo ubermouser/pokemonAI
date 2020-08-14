@@ -8,12 +8,17 @@
 //#define PKAI_STATIC
 #include "../inc/team_nonvolatile.h"
 #include "../inc/environment_nonvolatile.h"
+#include "../inc/environment_possible.h"
 //#undef PKAI_STATIC
 
 #include <boost/static_assert.hpp>
 
 BOOST_STATIC_ASSERT(sizeof(EnvironmentVolatile) == (sizeof(uint64_t)*16));
 
+
+EnvironmentVolatile::EnvironmentVolatile(
+    const EnvironmentPossible& other) : EnvironmentVolatile(other.getEnv()) {
+}
 
 
 void EnvironmentVolatile::initialize(const EnvironmentNonvolatile& envNV)

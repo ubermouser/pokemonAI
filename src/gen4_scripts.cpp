@@ -1207,7 +1207,6 @@ int engine_decrementPP(
   PokemonVolatile& cPKV,
   PokemonVolatile& tPKV)
 {
-  // TODO(@drendleman) - never called when aromatherapy is hit
   if (!cu.getBase().hasHit(cu.getICTeam()) || (&mNV.getBase() == struggle_t)) { return 0; }
 
   cPKV.getMV(cu.getICAction()).modPP(mNV.getBase(), -1);

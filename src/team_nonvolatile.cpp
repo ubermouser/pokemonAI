@@ -194,12 +194,13 @@ TeamNonVolatile& TeamNonVolatile::removePokemon(size_t iRemovedPokemon)
 
 
 
-void TeamNonVolatile::initialize()
+TeamNonVolatile& TeamNonVolatile::initialize()
 {
   for (size_t iPokemon = 0; iPokemon < getNumTeammates(); iPokemon++)
   {
     teammate(iPokemon).initialize();
   }
+  return *this;
 };
 
 

@@ -16,6 +16,7 @@
 #include "../inc/team_volatile.h"
 
 class EnvironmentNonvolatile;
+union EnvironmentPossible;
 
 union PKAISHARED EnvironmentVolatile
 {
@@ -39,6 +40,12 @@ union PKAISHARED EnvironmentVolatile
   static EnvironmentVolatile create(const EnvironmentNonvolatile& envNV);
   
   void initialize(const EnvironmentNonvolatile& envNV);
+
+  EnvironmentVolatile() = default;
+  EnvironmentVolatile(const EnvironmentVolatile& other) = default;
+  EnvironmentVolatile(const EnvironmentPossible& other);
+  EnvironmentVolatile& operator=(const EnvironmentVolatile& source) = default;
+  
 };
 
 #endif	/* ENVIRONMENT_VOLATILE_H */
