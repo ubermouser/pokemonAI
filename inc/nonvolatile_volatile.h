@@ -28,7 +28,7 @@ public:
 
   NonVolatileType& nv() const { return *nv_; }
   VolatileType& data() const { return *data_; }
-  //operator NonVolatileType&() const { return *nv_; };
+  //operator NonVolatileType&() const { return *nv_; }; // conversion produces ambiguous matches
   operator VolatileType&() { return *data_; };
 };
 

@@ -67,7 +67,7 @@ public:
   virtual void setEngine(std::shared_ptr<PkCU>& cu);
 
   /* generate an action */
-  virtual uint32_t generateSolution(const EnvironmentPossible& origin) = 0;
+  virtual uint32_t generateSolution(const ConstEnvironmentPossible& origin) = 0;
 
   virtual const std::vector<PlannerResult>& getDetailedResults() const { return emptyResults; };
   virtual void clearResults() { };

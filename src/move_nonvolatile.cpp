@@ -69,13 +69,3 @@ void MoveNonVolatile::createDigest_impl(std::array<uint8_t, MOVE_NONVOLATILE_DIG
   assert(iDigest == MOVE_NONVOLATILE_DIGESTSIZE);
 }
 
-
-
-
-
-std::ostream& operator <<(std::ostream& os, const move_print& cM)
-{
-  os << "\"" << cM.cMove.getBase().getName() << "\" " << (unsigned int)cM.currentMove.getPP() << "/" << cM.cMove.getPPMax();
-  
-  return os;
-}

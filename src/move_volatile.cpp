@@ -39,3 +39,11 @@ bool MoveVolatile::modPP(int32_t value)
 
   return _PPcurrent == (int32_t)data().PPcurrent; // will be inequal if _PPcurrent is -1 and PPcurrent is still 0
 }
+
+
+std::ostream& operator <<(std::ostream& os, const ConstMoveVolatile& cMV)
+{
+  os << "\"" << cMV.getBase().getName() << "\" " << (unsigned int)cMV.getPP() << "/" << cMV.nv().getPPMax();
+
+  return os;
+}

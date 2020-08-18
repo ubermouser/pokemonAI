@@ -112,22 +112,4 @@ public:
 
 };
 
-class PKAISHARED move_print
-{
-private:
-  const MoveNonVolatile& cMove;
-  const MoveVolatile& currentMove;
-
-public:
-  move_print(const MoveNonVolatile& _cMove, const MoveVolatile& _currentMove)
-    : cMove(_cMove),
-    currentMove(_currentMove)
-  {
-  };
-
-  friend PKAISHARED std::ostream& operator <<(std::ostream& os, const move_print& cM);
-};
-
-PKAISHARED std::ostream& operator <<(std::ostream& os, const move_print& cM);
-
 #endif /* MOVE_NONVOLATILE_H */

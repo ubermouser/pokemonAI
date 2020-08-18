@@ -24,119 +24,83 @@
 
 
 
-Game::Game(size_t _maxPlies, size_t _maxMatches, size_t _gameAccuracy, bool _rollout)
+Game::Game(size_t _maxPlies, size_t _maxMatches, bool _rollout)
   : agents(),
   gameLog(),
   gameResults(),
   hResult(),
-  cu(NULL),
-  cEnvNV(),
+  cu_(NULL),
+  nv_(NULL),
   maxPlies(_maxPlies),
   maxMatches(_maxMatches),
-  gameAccuracy(_gameAccuracy),
   rollout(_rollout),
   allowStateSelection(false),
   isInitialized(false),
-  initialEnvP(EnvironmentPossible::create(EnvironmentVolatile())),
-  cEnvP()
+  initialState_(EnvironmentVolatileData())
 {
   agents.fill(NULL);
 }
 
 
-
-
-
-void Game::cleanUp()
-{
-  isInitialized = false;
-
-  if (agents[TEAM_A] != NULL) { delete agents[TEAM_A]; agents[TEAM_A] = NULL; }
-  if (agents[TEAM_B] != NULL) { delete agents[TEAM_B]; agents[TEAM_B] = NULL; }
-
-  if (cu != NULL) { delete cu; cu = NULL; }
-
+void Game::cleanUp() {
   gameLog.clear();
   gameResults.clear();
 }
 
 
-
-
-
-Game::~Game()
-{
-  // order in which elements are deleted is important
-  for (size_t iAgent = 0; iAgent < 2; iAgent++)
-  {
-    if (agents[iAgent] != NULL) delete agents[iAgent];
+void Game::setEnvironment(const EnvironmentNonvolatile& envNV) {
+  nv_ = std::make_shared<const EnvironmentNonvolatile>(envNV);
+  
+  for(auto& planner: agents) {
+    if (planner == NULL) { continue; }
+    planner->setEnvironment(nv_);
+  }
+  if (eval_ != NULL) { eval_->setEnvironment(nv_); }
+  if (cu_ != NULL) {
+    cu_->setEnvironment(nv_);
+    initialState_ = cu_->initialState();
   }
 
-  if (cu != NULL) delete cu;
-
-  // cu and agents reference the nonvolatile environment cEnvNV
-}
-
-void Game::setEnvironment(const EnvironmentNonvolatile& _envNV)
-{
-  cEnvNV = _envNV;
-  cEnvNV.initialize();
   isInitialized = false;
 }
 
-void Game::setTeam(size_t iAgent, const TeamNonVolatile& cTeam)
-{
-  assert(iAgent < 2);
-  cEnvNV.setTeam(iAgent, cTeam, true);
-  isInitialized = false;
-}
 
-void Game::setEvaluator(size_t iAgent, const Evaluator& cEval)
-{
-  assert(iAgent < 2);
-  if (agents[iAgent] == NULL) 
-  { 
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": agent " << iAgent <<
-      " has not been initialized, and cannot accept an evaluator argument!\n";
-    return; 
+void Game::setEngine(const PkCU& cu) {
+  cu_ = std::make_shared<PkCU>(cu);
+
+  if (nv_ != NULL) {
+    cu_->setEnvironment(nv_);
+    initialState_ = cu_->initialState();
   }
-  agents[iAgent]->setEvaluator(cEval);
+
   isInitialized = false;
 }
 
-void Game::setPlanner(size_t iAgent, const Planner& cPlanner)
+
+void Game::setPlanner(size_t iAgent, const std::shared_ptr<Planner>& cPlanner)
 {
   assert(iAgent < 2);
-  if (agents[iAgent] != NULL) { delete agents[iAgent]; }
-  agents[iAgent] = cPlanner.clone();
+  agents[iAgent] = cPlanner;
+
+  if (nv_ != NULL) { agents[iAgent]->setEnvironment(nv_); }
   isInitialized = false;
 }
 
-const Planner* Game::getPlanner(size_t iAgent) const
-{
-  assert(iAgent < 2);
-  return agents[iAgent];
-}
-
-void Game::setInitialState(const EnvironmentVolatile& rolloutState)
+void Game::setInitialState(const EnvironmentVolatileData& rolloutState)
 {
   if (rollout != true && verbose >= 5) 
   { 
     std::cerr << "WAR " << __FILE__ << "." << __LINE__ << 
       ": An initial rollout state was defined, but rollout mode was not enabled. The state will not be used.\n";
   }
-  initialEnvP = EnvironmentPossible::create(rolloutState, true);
+  initialState_ = rolloutState;
 }
-
-
-
 
 
 bool Game::initialize()
 {
   // teams must be set before initialize is called
-  if (cEnvNV.getTeam(TEAM_A).getNumTeammates() == 0 || cEnvNV.getTeam(TEAM_B).getNumTeammates() == 0) 
+  if (nv_->getTeam(TEAM_A).getNumTeammates() == 0 || nv_->getTeam(TEAM_B).getNumTeammates() == 0)
   {
     std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
       ": One or more teams are undefined!\n";
@@ -154,29 +118,12 @@ bool Game::initialize()
   // number of matches to be played must be sane:
   if ((maxMatches & 1) == 0) { maxMatches += 1; }
 
-  /* initialize cEnvNV: */
-  //cEnvNV.initialize(); // initialized in setTeam and setEnvironment
-
-  // generate environment if the initial environment hasn't already been created:
-  bool genEnvP = (initialEnvP.getHash() == UINT64_MAX);
-  if (!rollout || genEnvP)
-  {
-    if (rollout && verbose >= 5)
-    {
-      std::cerr << "WAR " << __FILE__ << "." << __LINE__ << 
-        ": Rollout mode was enabled, but an initial rollout state was not defined.\n";
-    }
-    initialEnvP = EnvironmentPossible::create(EnvironmentVolatile::create(cEnvNV), true);
-  }
-
   // initialize pkCU engine
-  if (cu == NULL) { cu = new PkCU(cEnvNV, gameAccuracy); }
-  else { cu->setEnvironment(cEnvNV); cu->setAccuracy(gameAccuracy); }
+  if (cu_ == NULL) { setEngine(PkCU()); }
 
   // initialize agents:
   for (size_t iAgent = 0; iAgent < 2; ++iAgent)
   {
-    agents[iAgent]->setEnvironment(*cu, iAgent);
     if (!agents[iAgent]->isInitialized()) 
     {
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
@@ -189,9 +136,6 @@ bool Game::initialize()
   isInitialized = true;
   return true;
 }
-
-
-
 
 
 void Game::run()
@@ -219,7 +163,8 @@ void Game::run()
     }
 
     // initialize pokemon:
-    cEnvP = initialEnvP;
+    auto environmentData = EnvironmentPossibleData::create(initialState_, true);
+    ConstEnvironmentPossible cEnvP{*nv_, environmentData};
 
     if (verbose >= 3)
     {
@@ -227,9 +172,9 @@ void Game::run()
         "\nBegin game " << (iMatch+1) << 
         " of " << maxMatches <<
         " between teams TA: " << agents[TEAM_A]->getName() <<
-        " - " << cEnvNV.getTeam(TEAM_A).getName() << 
+        " - " << nv_->getTeam(TEAM_A).getName() <<
         " and TB: " << agents[TEAM_B]->getName() << 
-        " - "<< cEnvNV.getTeam(TEAM_B).getName() << 
+        " - "<< nv_->getTeam(TEAM_B).getName() <<
         ((verbose>=3)?"!\n\n":"!\n");
     }
 
@@ -239,62 +184,49 @@ void Game::run()
     size_t iLastEnvironment = 0;
 
     // begin combat:
-    for (iPly = 0; iPly < maxPlies && (matchState == MATCH_MIDGAME); ++iPly)
-    {
-
+    for (iPly = 0; iPly < maxPlies && (matchState == MATCH_MIDGAME); ++iPly) {
+      
       // determine if the current state is a terminal state, and if so end the game:
-      matchState = cu->isGameOver(cEnvP.getEnv());
+      matchState = cu_->isGameOver(cEnvP);
 
       // determine which move the teams will use:
       std::array<uint32_t, 2> actions;
-      if (matchState == MATCH_MIDGAME)
-      {
-        for (size_t iTeam = 0; iTeam != 2; ++iTeam)
-        {
+      if (matchState == MATCH_MIDGAME) {
+        for (size_t iTeam = 0; iTeam != 2; ++iTeam) {
           actions[iTeam] = agents[iTeam]->generateSolution(cEnvP);
-          if (actions[iTeam] >= AT_ITEM_USE)
-          {
+          if (actions[iTeam] >= AT_ITEM_USE) {
             matchState = (iTeam + 1) % 2; break;
           }
         }
       }
 
       // if both of the teams have valid moves:
-      if (matchState == MATCH_MIDGAME)
-      {
-        if (verbose >= 3)
-        {
-          for (size_t iTeam = 0; iTeam != 2; ++iTeam)
-          {
+      if (matchState == MATCH_MIDGAME) {
+        if (verbose >= 3) {
+          for (size_t iTeam = 0; iTeam != 2; ++iTeam) {
             printAction(cEnvP.getEnv().getTeam(iTeam), actions[iTeam], iTeam);
           }
         }
     
         // predict what will occur given these actions and their probabilities
-        PossibleEnvironments possibleEnvironments = cu->updateState(
-            cEnvP.getEnv(), actions[TEAM_A], actions[TEAM_B]);
+        PossibleEnvironments possibleEnvironments = cu_->updateState(
+            cEnvP, actions[TEAM_A], actions[TEAM_B]);
         assert(possibleEnvironments.getNumUnique() > 0);
 
-        const EnvironmentPossible* nextEnvironment;
-        if (allowStateSelection)
-        {
-          nextEnvironment = possibleEnvironments.stateSelect_index(cEnvNV);
-        }
-        else
-        {
-          nextEnvironment = &possibleEnvironments.stateSelect_roulette();
+        ConstEnvironmentPossible nextEnvironment{*nv_};
+        if (allowStateSelection) {
+          nextEnvironment = possibleEnvironments.stateSelect_index();
+        } else {
+          nextEnvironment = possibleEnvironments.stateSelect_roulette();
         }
 
         // perform state transition:
-        if (nextEnvironment != NULL)
-        {
-          const EnvironmentPossible& switchedEnvironment = *nextEnvironment;
-
+        if (!nextEnvironment.isEmpty()) {
           // create a log of this turn:
           if (!rollout) { digestTurn(*cLog, actions[TEAM_A], actions[TEAM_B], iLastEnvironment, cEnvP); }
 
           // remove a ply if the transition was a dummy move:
-          if (switchedEnvironment.hasFreeMove(TEAM_A) || switchedEnvironment.hasFreeMove(TEAM_B))
+          if (nextEnvironment.hasFreeMove(TEAM_A) || nextEnvironment.hasFreeMove(TEAM_B))
           {
             iPly--;
           }
@@ -303,51 +235,45 @@ void Game::run()
           if (verbose >= 3)
           {
             if (verbose >= 4) { std::cout << "\n"; }
-            switchedEnvironment.printState(
-                cEnvNV, nextEnvironment - &possibleEnvironments.front(), iPly);
+            nextEnvironment.printState(SIZE_MAX, iPly); // TODO(@drendleman) - which state is this?
             std::cout << "\n";
           }
 
           // perform the state transition:
-          cEnvP = switchedEnvironment;
-          iLastEnvironment = nextEnvironment - &possibleEnvironments.front();
+          environmentData = cEnvP.data();
+          cEnvP = ConstEnvironmentPossible{*nv_, environmentData};
+          iLastEnvironment = 0; // TODO(@drendleman) - which state is this?
         }
       } // endOf if matchState isn't terminal
-      else if (verbose >= 2 && maxMatches > 1)
-      {
+      else if (verbose >= 2 && maxMatches > 1) {
         // if a tie occurs: (all pokemon dead)
-        if (matchState == MATCH_TIE)
-        {
+        if (matchState == MATCH_TIE) {
           std::cout << 
             "Teams TA: " << agents[TEAM_A]->getName() <<
-            " - " << cEnvNV.getTeam(TEAM_A).getName() << 
+            " - " << nv_->getTeam(TEAM_A).getName() <<
             " and TB: " << agents[TEAM_B]->getName() << 
-            " - "<< cEnvNV.getTeam(TEAM_B).getName() << 
+            " - "<< nv_->getTeam(TEAM_B).getName() <<
             " have tied game " << (iMatch+1) << 
             " of " << maxMatches <<
             "!\n";
-        }
-        else if (matchState == MATCH_DRAW)
-        {
+        } else if (matchState == MATCH_DRAW) {
           std::cout << 
             "Teams TA: " << agents[TEAM_A]->getName() <<
-            " - " << cEnvNV.getTeam(TEAM_A).getName() << 
+            " - " << nv_->getTeam(TEAM_A).getName() <<
             " and TB: " << agents[TEAM_B]->getName() << 
-            " - "<< cEnvNV.getTeam(TEAM_B).getName() << 
+            " - "<< nv_->getTeam(TEAM_B).getName() <<
             " have drawn game " << (iMatch+1) << 
             " of " << maxMatches <<
             "!\n";
-        }
-        else
-        {
+        } else {
           size_t losingTeam = (matchState + 1) % 2;
           std::cout << 
             "Team " << "T" << (matchState==TEAM_A?"A":"B") <<
             ": " << agents[matchState]->getName() <<
-            " - " << cEnvNV.getTeam(matchState).getName() << 
+            " - " << nv_->getTeam(matchState).getName() <<
             " has beaten team " << "T" << (matchState==TEAM_A?"B":"A") <<
             ": " << agents[losingTeam]->getName() <<
-            " - " << cEnvNV.getTeam(losingTeam).getName() << 
+            " - " << nv_->getTeam(losingTeam).getName() <<
             " in game " << (iMatch+1) << 
             " of " << maxMatches <<
             " - " << (numWins[matchState]+1) <<
@@ -358,8 +284,7 @@ void Game::run()
     } //endOf game loop
 
     // digest the last game state:
-    BOOST_FOREACH(Planner* cPlanner, agents)
-    {
+    BOOST_FOREACH(auto& cPlanner, agents) {
       cPlanner->clearResults();
     }
     // by clearing these results, we force digestTurn to use only the simple evaluation of this turn (win, loss, tie)
@@ -371,7 +296,7 @@ void Game::run()
 
       if (verbose >= 2 && maxMatches > 1)
       {
-        printGameOutline(gameResults.back(), *cLog, cEnvNV);
+        printGameOutline(gameResults.back(), *cLog, *nv_);
       }
     }
 
@@ -410,10 +335,10 @@ void Game::run()
         ((verbose>=3)?"\n":"") <<
         "Team " << "T" << (matchState==TEAM_A?"A":"B") <<
         ": " << agents[matchState]->getName() <<
-        " - " << cEnvNV.getTeam(matchState).getName() << 
+        " - " << nv_->getTeam(matchState).getName() <<
         " has beaten team " << "T" << (matchState==TEAM_A?"B":"A") <<
         ": " << agents[losingTeam]->getName() <<
-        " - " << cEnvNV.getTeam(losingTeam).getName() << 
+        " - " << nv_->getTeam(losingTeam).getName() <<
         " , winning the bo" << maxMatches <<
         " series " << numWins[matchState] << 
         " to " << numWins[matchState==TEAM_A?TEAM_B:TEAM_A] <<
@@ -429,9 +354,9 @@ void Game::run()
       std::cout << 
         ((verbose>=3)?"\n":"") <<
         "Teams TA: " << agents[TEAM_A]->getName() <<
-        " - " << cEnvNV.getTeam(TEAM_A).getName() << 
+        " - " << nv_->getTeam(TEAM_A).getName() <<
         " and TB: " << agents[TEAM_B]->getName() << 
-        " - "<< cEnvNV.getTeam(TEAM_B).getName() << 
+        " - "<< nv_->getTeam(TEAM_B).getName() <<
         " have drawn the bo" << maxMatches << 
         " series " << numWins[TEAM_A] << 
         " to " << numWins[TEAM_B] <<
@@ -447,9 +372,9 @@ void Game::run()
       std::cout << 
         ((verbose>=3)?"\n":"") <<
         "Teams TA: " << agents[TEAM_A]->getName() <<
-        " - " << cEnvNV.getTeam(TEAM_A).getName() << 
+        " - " << nv_->getTeam(TEAM_A).getName() <<
         " and TB: " << agents[TEAM_B]->getName() << 
-        " - "<< cEnvNV.getTeam(TEAM_B).getName() << 
+        " - "<< nv_->getTeam(TEAM_B).getName() <<
         " have tied the bo" << maxMatches << 
         " series " << numWins[TEAM_A] << 
         " to " << numWins[TEAM_B] <<
@@ -463,7 +388,7 @@ void Game::run()
     digestMatch(gameResults, numWins, matchState);
     if (verbose >= 2)
     {
-      printMatchOutline(cEnvNV);
+      printMatchOutline(*nv_);
     }
   }
   else
@@ -474,15 +399,12 @@ void Game::run()
 } // endOf run
 
 
-
-
-
 void Game::digestTurn(
   std::vector<Turn>& cLog, 
   unsigned int actionTeamA, 
   unsigned int actionTeamB, 
   size_t resultingState, 
-  const EnvironmentPossible& envP)
+  const ConstEnvironmentPossible& envP)
 {
   // do not create a digest of a dummy move:
   //if (envP.hasFreeMove(TEAM_A) || envP.hasFreeMove(TEAM_B)) { return; }
@@ -490,27 +412,23 @@ void Game::digestTurn(
   cLog.push_back(Turn());
   Turn& cTurn = cLog.back();
 
-  for (size_t iTeam = 0; iTeam < 2; iTeam++)
-  {
+  for (size_t iTeam = 0; iTeam < 2; iTeam++) {
     // set simple fitness to fitness as it would be evaluated depth 0 by the simple non perceptron evaluation function
-    fpType simpleFitness = evaluator_simple::calculateFitness(cEnvNV, cEnvP.getEnv(), iTeam);
+    fpType simpleFitness = eval_->calculateFitness(envP.getEnv(), iTeam).fitness;
     fpType initialFitness, finalFitness;
-    if (agents[iTeam] != NULL)
-    {
+    if (agents[iTeam] != NULL) {
       const std::vector<PlannerResult>& results = agents[iTeam]->getDetailedResults();
       // if the agent for this team has been initialized, grab its collected fitnesses:
-      if (results.empty()) { initialFitness = simpleFitness; finalFitness = simpleFitness; }
-      else
-      {
+      if (results.empty()) {
+        initialFitness = simpleFitness; finalFitness = simpleFitness;
+      } else {
         const PlannerResult& iResult = results.front();
         const PlannerResult& fResult = results.back();
 
         initialFitness = (iResult.lbFitness + iResult.ubFitness) / 2.0;
         finalFitness = (fResult.lbFitness + fResult.ubFitness) / 2.0;
       }
-    }
-    else
-    {
+    } else {
       // or just use the simple evaluation function if no agent was created
       initialFitness = simpleFitness;
       finalFitness = simpleFitness;
@@ -526,11 +444,8 @@ void Game::digestTurn(
   cTurn.action[TEAM_B] = actionTeamB;
   cTurn.stateSelected = (uint32_t) resultingState;
   cTurn.probability = envP.getProbability().to_double();
-  cTurn.env = envP.getEnv();
+  cTurn.env = envP.getEnv().data();
 } // endOf digestTurn
-
-
-
 
 
 void Game::digestGame(const std::vector<Turn>& cLog, int endStatus)
@@ -623,7 +538,7 @@ void Game::digestGame(const std::vector<Turn>& cLog, int endStatus)
   // create scores:
   for (size_t iTeam = 0; iTeam < 2; ++iTeam)
   {
-    for (size_t iPokemon = 0; iPokemon < cEnvNV.getTeam(iTeam).getNumTeammates(); ++iPokemon)
+    for (size_t iPokemon = 0; iPokemon < nv_->getTeam(iTeam).getNumTeammates(); ++iPokemon)
     {
       aggregateContribution[iTeam][iPokemon] =
         (
@@ -643,13 +558,13 @@ void Game::digestGame(const std::vector<Turn>& cLog, int endStatus)
   {
     std::array<bool, 6> rankedPokemon;
     rankedPokemon.fill(false);
-    for (size_t iRank = 0; iRank < cEnvNV.getTeam(iTeam).getNumTeammates(); ++iRank)
+    for (size_t iRank = 0; iRank < nv_->getTeam(iTeam).getNumTeammates(); ++iRank)
     {
       fpType currentBestA = -std::numeric_limits<fpType>::infinity();
       fpType currentBestS = -std::numeric_limits<fpType>::infinity();
       size_t iCurrentBest = SIZE_MAX;
 
-      for (size_t iPokemon = 0; iPokemon < cEnvNV.getTeam(iTeam).getNumTeammates(); ++iPokemon)
+      for (size_t iPokemon = 0; iPokemon < nv_->getTeam(iTeam).getNumTeammates(); ++iPokemon)
       {
         // don't compare if already ranked:
         if (rankedPokemon[iPokemon] == true) { continue; }
@@ -683,8 +598,10 @@ void Game::digestGame(const std::vector<Turn>& cLog, int endStatus)
 
 
 
-void Game::digestMatch(const std::vector<GameResult>& gLog, const std::array<unsigned int, 2>& numWins, int matchResult)
-{
+void Game::digestMatch(
+    const std::vector<GameResult>& gLog,
+    const std::array<unsigned int, 2>& numWins,
+    int matchResult) {
   // initialize heatResult:
   std::array<std::array<fpType, 6>, 2>& participation = hResult.participation;
   std::array<std::array<fpType, 6>, 2>& aggregateContribution = hResult.aggregateContribution;
@@ -737,13 +654,13 @@ void Game::digestMatch(const std::vector<GameResult>& gLog, const std::array<uns
   {
     std::array<bool, 6> rankedPokemon;
     rankedPokemon.fill(false);
-    for (size_t iRank = 0; iRank < cEnvNV.getTeam(iTeam).getNumTeammates(); ++iRank)
+    for (size_t iRank = 0; iRank < nv_->getTeam(iTeam).getNumTeammates(); ++iRank)
     {
       fpType currentBestR = std::numeric_limits<fpType>::infinity();
       fpType currentBestA = -std::numeric_limits<fpType>::infinity();
       size_t iCurrentBest = SIZE_MAX;
 
-      for (size_t iPokemon = 0; iPokemon < cEnvNV.getTeam(iTeam).getNumTeammates(); ++iPokemon)
+      for (size_t iPokemon = 0; iPokemon < nv_->getTeam(iTeam).getNumTeammates(); ++iPokemon)
       {
         // don't compare if already ranked:
         if (rankedPokemon[iPokemon] == true) { continue; }
@@ -796,84 +713,47 @@ const std::vector<Turn>& Game::getGameLog(size_t iGame) const
   return gameLog[iGame];
 };
 
-const EnvironmentNonvolatile& Game::getEnvNV() const
-{
-  return cEnvNV;
-};
 
-
-
-
-
-void Game::printTeam(const TeamVolatile& currentTeam, unsigned int iTeam, unsigned int verbosity)
-{
-  const TeamNonVolatile& cTeam = cEnvNV.getTeam(iTeam);
-  for (unsigned int indexPokemon = 0; indexPokemon < cTeam.getNumTeammates(); indexPokemon++)
-  {
-    const PokemonVolatile& currentPokemon = currentTeam.teammate(indexPokemon);
-    
-    // print out index of pokemon
-    if (verbosity >= 1) { std::cout << indexPokemon << "-"; }
-    
-    std::cout << pokemon_print(cTeam.getPKNV(currentTeam), currentTeam, currentPokemon);
-  }
-} // end of printPokemon
-
-
-
-
-
-void Game::printAction(const TeamVolatile& currentTeam, unsigned int indexAction, unsigned int iTeam)
-{
-  const TeamNonVolatile& cTeam = cEnvNV.getTeam(iTeam);
-  if (indexAction >= AT_MOVE_0 && indexAction <= AT_MOVE_3)
-  {
+void Game::printAction(
+    const ConstTeamVolatile& cTeam, unsigned int indexAction, unsigned int iTeam) {
+  //const TeamNonVolatile& cTeam = nv_->getTeam(iTeam);
+  if (indexAction >= AT_MOVE_0 && indexAction <= AT_MOVE_3) {
     std::clog 
       << "T" << (iTeam==TEAM_A?"A":"B") <<": " 
-      << cTeam.getName() << " - "
-      << currentTeam.getICPKV() << ": "
-      << cTeam.getPKNV(currentTeam).getName() << " used " 
+      << cTeam.nv().getName() << " - "
+      << cTeam.getICPKV() << ": "
+      << cTeam.getPKV().nv().getName() << " used "
       << (indexAction - AT_MOVE_0) << "-" 
-      << move_print(cTeam.getPKNV(currentTeam).getMove_base(indexAction), currentTeam.getPKV().getMV(indexAction))
-      //<< cTeam.getCurrentPokemon(currentTeam).getMove_base(indexAction).getName() 
+      << cTeam.getPKV().getMV(indexAction)
       << "!\n";
-  }
-  else if (indexAction >= AT_SWITCH_0 && indexAction <= AT_SWITCH_5)
-  {
+  } else if (indexAction >= AT_SWITCH_0 && indexAction <= AT_SWITCH_5) {
     std::clog 
       << "T" << (iTeam==TEAM_A?"A":"B") <<": " 
-      << cTeam.getName() << " - "
-      << currentTeam.getICPKV() << ": "
-      << cTeam.getPKNV(currentTeam).getName() << " is switching out with " 
+      << cTeam.nv().getName() << " - "
+      << cTeam.getICPKV() << ": "
+      << cTeam.getPKV().nv().getName() << " is switching out with "
       << (indexAction - AT_SWITCH_0) << ": "
-      << cTeam.teammate(indexAction - AT_SWITCH_0).getName() << "!\n";
-  }
-  else if (indexAction == AT_MOVE_NOTHING)
-  {
+      << cTeam.teammate(indexAction - AT_SWITCH_0).nv().getName() << "!\n";
+  } else if (indexAction == AT_MOVE_NOTHING) {
     std::clog 
       << "T" << (iTeam==TEAM_A?"A":"B") <<": " 
-      << cTeam.getName() << " - "
-      << currentTeam.getICPKV() << ": "
-      << cTeam.getPKNV(currentTeam).getName() << " waited for a turn!\n";
-  }
-  else if (indexAction == AT_MOVE_STRUGGLE)
-  {
+      << cTeam.nv().getName() << " - "
+      << cTeam.getICPKV() << ": "
+      << cTeam.getPKV().nv().getName() << " waited for a turn!\n";
+  } else if (indexAction == AT_MOVE_STRUGGLE) {
     std::clog 
       << "T" << (iTeam==TEAM_A?"A":"B") <<": " 
-      << cTeam.getName() << " - "
-      << currentTeam.getICPKV() << ": "
-      << cTeam.getPKNV(currentTeam).getName() << " used X-" 
-      << move_print(cTeam.getPKNV(currentTeam).getMove_base(AT_MOVE_STRUGGLE), currentTeam.getPKV().getMV(AT_MOVE_STRUGGLE))
-      //<< cTeam.getCurrentPokemon(currentTeam).getMove_base(indexAction).getName() 
+      << cTeam.nv().getName() << " - "
+      << cTeam.getICPKV() << ": "
+      << cTeam.getPKV().nv().getName() << " used X-"
+      << cTeam.getPKV().getMV(AT_MOVE_STRUGGLE)
       << "!\n";
-  }
-  else
-  {
+  } else {
     std::clog 
       << "T" << (iTeam==TEAM_A?"A":"B") <<": " 
-      << cTeam.getName() << " - "
-      << currentTeam.getICPKV() << ": "
-      << cTeam.getPKNV(currentTeam).getName() << " chose unknown action " 
+      << cTeam.nv().getName() << " - "
+      << cTeam.getICPKV() << ": "
+      << cTeam.getPKV().nv().getName() << " chose unknown action "
       << indexAction << "!\n";
   }
 }

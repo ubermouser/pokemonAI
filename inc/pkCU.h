@@ -73,9 +73,9 @@ struct _moveBracket
 
 class PKAISHARED PkCU
 {
-private:
+protected:
   /* the current nonvolatile environment; pkCU loads plugins only for these two teams to fight */
-  std::shared_ptr<EnvironmentNonvolatile> nv_;
+  std::shared_ptr<const EnvironmentNonvolatile> nv_;
 
   /* array containing all possible matchups and the plugins they may call upon */
   std::array< std::array< std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>, 6>, 12> pluginSets;
@@ -253,8 +253,11 @@ public:
    * 
    * returns: number of unique environments in vector
    */
-  PossibleEnvironments updateState(const EnvironmentVolatileData& currentEnvironment, size_t actionA, size_t actionB);
-  size_t updateState(const EnvironmentVolatileData& currentEnvironment, PossibleEnvironments& resultEnvironments, size_t actionA, size_t actionB);
+  size_t updateState(const EnvironmentVolatileData& cEnv, PossibleEnvironments& resultEnvironments, size_t actionA, size_t actionB);
+  PossibleEnvironments updateState(const EnvironmentVolatileData& cEnv, size_t actionA, size_t actionB);
+  PossibleEnvironments updateState(const ConstEnvironmentVolatile& cEnv, size_t actionA, size_t actionB) {
+    return updateState(cEnv.data(), actionA, actionB);
+  };
 
   /* Seed an initial state from an EnvironmentNonvolatile, then return its volatile state. */
   EnvironmentVolatileData initialState() const;

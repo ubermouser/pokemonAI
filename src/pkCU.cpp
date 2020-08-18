@@ -104,7 +104,6 @@ PkCU::~PkCU()
 
 
 bool PkCU::initialize() {
-  nv_->initialize();
   size_t numPlugins = 0;
   // clear plugin arrays:
   for (size_t iNCTeammate = 0; iNCTeammate != pluginSets.size(); ++iNCTeammate)

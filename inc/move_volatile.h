@@ -4,6 +4,7 @@
 
 #include "pkai.h"
 
+#include <ostream>
 #include <stdint.h>
 
 #include "nonvolatile_volatile.h"
@@ -65,5 +66,8 @@ public:
   bool modPP(int32_t value);
 
 };
+
+
+PKAISHARED std::ostream& operator <<(std::ostream& os, const ConstMoveVolatile& cM);
 
 #endif	/* MOVE_VOLATILE_H */
