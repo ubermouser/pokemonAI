@@ -400,7 +400,7 @@ void Trainer::evolve()
     }
 
     
-    planner_max sPlanner(plannerAccuracy);
+    PlannerMax sPlanner(plannerAccuracy);
     //planner_stochastic sPlanner(plannerAccuracy, plannerTemperature, plannerExploration);
     planner_directed dPlanner(experienceNet(1, expSettings), plannerAccuracy, plannerExploration);
 

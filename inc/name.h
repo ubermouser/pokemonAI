@@ -33,12 +33,11 @@ public:
 
   bool operator <(const Name& other) const;
 
+  Name(const std::string& source) : name_(source) { };
   Name() = default;
   Name(const Name& orig) = default;
   Name& operator=(const Name& source) = default;
   virtual ~Name() override = default;
-
-  Name(const std::string& source) : name_(source) { };
 
   bool operator >(const Name& other) const;
 };

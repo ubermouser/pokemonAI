@@ -6,21 +6,17 @@
 #include <memory>
 #include <stdint.h>
 #include <vector>
+#include <deque>
 #include <array>
 #include <assert.h>
 
-#include "../inc/environment_possible.h"
-#include "../inc/environment_volatile.h"
-#include "../inc/pluggable.h"
+#include "environment_possible.h"
+#include "environment_volatile.h"
+#include "pluggable.h"
 
 class EnvironmentNonvolatile;
 class PokemonNonVolatile;
 class TeamNonVolatile;
-
-union EnvironmentPossible;
-union EnvironmentVolatile;
-union TeamVolatile;
-union PokemonVolatile;
 
 // seed and priority evaluation:
 #define STAGE_DNE 0
@@ -79,7 +75,7 @@ class PKAISHARED PkCU
 {
 private:
   /* the current nonvolatile environment; pkCU loads plugins only for these two teams to fight */
-  const EnvironmentNonvolatile* nv;
+  std::shared_ptr<EnvironmentNonvolatile> nv_;
 
   /* array containing all possible matchups and the plugins they may call upon */
   std::array< std::array< std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>, 6>, 12> pluginSets;
@@ -91,13 +87,10 @@ private:
   PossibleEnvironments* _stack;
 
   /* the stage of computation each element on the stack is in */
-  std::vector<uint32_t> stackStage;
-  
-  /* memoized array of all current pokemon volatile object pointers */
-  std::vector<PokemonVolatile*> PKVOffsets;
+  std::deque<uint32_t> stackStage;
 
   /* when executing the default damage pathway, these components are used for persistent data */
-  std::vector<DamageComponents_t> damageComponents;
+  std::deque<DamageComponents_t> damageComponents;
 
   /* an array of which team is going when. 0 is current team, 1 is other team */
   std::array<size_t, 2> iTeams;
@@ -107,9 +100,6 @@ private:
 
   /* iterator - the environment that the current operation is creating values from */
   size_t iBase;
-
-  /* used for detecting reallocations of the vector object */
-  size_t prevStackCapacity;
 
   /* number of random environments to create per hit/crit 1-16 */
   size_t numRandomEnvironments;
@@ -178,22 +168,9 @@ private:
   /* returns the number of unique environments in the result array, applies the isPruned tag to pruned environments */
   size_t combineSimilarEnvironments();
 
-  void seedCurrentState(const EnvironmentVolatile& cEnv);
+  void seedCurrentState(const EnvironmentVolatileData& cEnv);
 
-  void swapTeamIndexes() 
-  { 
-    size_t iCTeam = iTeams[0];
-    size_t iCAction = iActions[0];
-
-    iTeams[0] = iTeams[1];
-    iTeams[1] = iCTeam;
-    iActions[0] = iActions[1];
-    iActions[1] = iCAction;
-
-    setCPluginSet();
-    // reset the ENTIRE array, as we swapped the teams. Every PKV is invalid
-    resetPKVArray();
-  };
+  void swapTeamIndexes();
 
   std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>& getCPluginSet();
 
@@ -210,8 +187,8 @@ public:
 
   void setAllowInvalidMoves(bool allow = true) { allowInvalidMoves_ = allow; }
 
-  /* pkCU stores a reference to the environment at cEnvironment. This reference must not be destroyed */
-  void setEnvironment(const EnvironmentNonvolatile& _cEnvironment);
+  /* pkCU stores a reference to the environment at cEnvironment. */
+  void setEnvironment(std::shared_ptr<const EnvironmentNonvolatile>& cEnv);
 
   /* sets accuracy of pkCU */
   void setAccuracy(size_t engineAccuracy);
@@ -276,17 +253,23 @@ public:
    * 
    * returns: number of unique environments in vector
    */
-  PossibleEnvironments updateState(const EnvironmentVolatile& currentEnvironment, size_t actionA, size_t actionB);
-  size_t updateState(const EnvironmentVolatile& currentEnvironment, PossibleEnvironments& resultEnvironments, size_t actionA, size_t actionB);
+  PossibleEnvironments updateState(const EnvironmentVolatileData& currentEnvironment, size_t actionA, size_t actionB);
+  size_t updateState(const EnvironmentVolatileData& currentEnvironment, PossibleEnvironments& resultEnvironments, size_t actionA, size_t actionB);
 
   /* Seed an initial state from an EnvironmentNonvolatile, then return its volatile state. */
-  EnvironmentVolatile initialState() const;
+  EnvironmentVolatileData initialState() const;
 
   /* determines whether a given action is a selectable one, given the current state */
-  bool isValidAction(const EnvironmentVolatile& envV, size_t action, size_t iTeam);
+  bool isValidAction(const ConstEnvironmentVolatile& envV, size_t action, size_t iTeam);
+  bool isValidAction(const EnvironmentVolatileData& envV, size_t action, size_t iTeam) {
+    return isValidAction(ConstEnvironmentVolatile{getNV(), envV}, action, iTeam);
+  }
 
   /* determines whether a game has ended, given the current state. Returns an enum of the game's current status */
-  MatchState isGameOver(const EnvironmentVolatile& envV);
+  MatchState isGameOver(const ConstEnvironmentVolatile& envV) const;
+  MatchState isGameOver(const EnvironmentVolatileData& envV) const {
+    return isGameOver(ConstEnvironmentVolatile{getNV(), envV});
+  }
 
   PossibleEnvironments& getStack() { return *_stack; };
 
@@ -298,9 +281,9 @@ public:
 
   const DamageComponents_t& getDamageComponent() const { return damageComponents[iBase]; };
 
-  EnvironmentPossible& getBase() { return getStack()[iBase]; };
+  EnvironmentPossible getBase() { return getStack().atEnv(iBase); };
 
-  const EnvironmentPossible& getBase() const { return getStack()[iBase]; };
+  ConstEnvironmentPossible getBase() const { return getStack().atEnv(iBase); };
 
   size_t getICTeam() const { return iTeams[0]; };
 
@@ -330,27 +313,21 @@ public:
 
   void advanceStackStage() { ++stackStage[iBase]; };
 
-  const EnvironmentNonvolatile& getNV() const { return *nv; };
+  const EnvironmentNonvolatile& getNV() const { return *nv_; };
 
-  const PokemonNonVolatile& getPKNV();
-  const PokemonNonVolatile& getTPKNV();
-
-  void setPKV(size_t iState);
-
-  void setPKV();
-
-  void pushPKV();
-
-  void resetPKVArray();
-
-  TeamVolatile& getTMV();
-  TeamVolatile& getTTMV();
-  TeamVolatile& getTMV(size_t iState);
-  TeamVolatile& getTTMV(size_t iState);
-  PokemonVolatile& getPKV();
-  PokemonVolatile& getTPKV();
-  PokemonVolatile& getPKV(size_t iState);
-  PokemonVolatile& getTPKV(size_t iState);
+  // TODO(@drendleman) consider memoizing these in a stack (are they expensive to create?)
+  TeamVolatile getTV() { return getTV(iBase); }
+  TeamVolatile getTTV() { return getTTV(iBase); }
+  TeamVolatile getTV(size_t iState);
+  TeamVolatile getTTV(size_t iState);
+  PokemonVolatile getPKV() { return getPKV(iBase); }
+  PokemonVolatile getTPKV() { return getTPKV(iBase); }
+  PokemonVolatile getPKV(size_t iState);
+  PokemonVolatile getTPKV(size_t iState);
+  MoveVolatile getMV() { return getMV(iBase); }
+  MoveVolatile getMV(size_t iState);
+  MoveVolatile getTMV();
+  MoveVolatile getTMV(size_t iState);
 
   template<size_t numEnvironments>
   void nPlicateState(std::array<size_t, numEnvironments>& result, size_t iState = SIZE_MAX)
@@ -372,14 +349,6 @@ public:
       damageComponents.push_back(baseComponent);
 
       stack.push_back(stack[iState]);
-
-      pushPKV();
-    }
-    // re-memoize arrays of memoized pointer data:
-    if (stack.capacity() != prevStackCapacity)
-    {
-      resetPKVArray();
-      prevStackCapacity = stack.capacity();
     }
   };
 };

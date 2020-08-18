@@ -1,149 +1,143 @@
-
-//#define PKAI_EXPORT
 #include "../inc/environment_possible.h"
-//#undef PKAI_EXPORT
 
 #include <iostream>
+#include <boost/static_assert.hpp>
 
 #include "../inc/environment_nonvolatile.h"
 #include "../inc/roulette.h"
 #include "../inc/signature.h"
 
-#include <boost/static_assert.hpp>
 
-BOOST_STATIC_ASSERT(sizeof(EnvironmentPossible) == (sizeof(uint64_t)*18));
+BOOST_STATIC_ASSERT(sizeof(EnvironmentPossibleData) == (sizeof(uint64_t)*18));
 
-EnvironmentPossible EnvironmentPossible::create(const EnvironmentVolatile& source, bool doHash)
-{	
-  EnvironmentPossible result = { { source, UINT64_MAX, fixedpoint::create<30>(1.0), 0 } };
+EnvironmentPossibleData EnvironmentPossibleData::create(
+    const EnvironmentVolatileData& source, bool doHash) {
+  EnvironmentPossibleData result{ source, UINT64_MAX, fixedpoint::create<30>(1.0), 0 };
   if (doHash) { result.generateHash(); }
 
   return result;
 }
 
 
-
-
-
-bool EnvironmentPossible::operator <(const EnvironmentPossible& other) const
-{
-  return data.probability < other.data.probability;
+bool EnvironmentPossibleData::operator <(const EnvironmentPossibleData& other) const {
+  return probability < other.probability;
 }
 
 
-
-
-
-void EnvironmentPossible::generateHash()
-{
+void EnvironmentPossibleData::generateHash() {
 #if defined(_USEFNVHASH)
-    data.hash = hashes::hash_fnv(&getEnv(), sizeof(EnvironmentVolatile));
+    hash = hashes::hash_fnv(&env, sizeof(EnvironmentVolatileData));
 #elif defined(_USEMURMUR2)
-    data.hash = hashes::hash_murmur2(&getEnv(), sizeof(EnvironmentVolatile));
+    hash = hashes::hash_murmur2(&env, sizeof(EnvironmentVolatileData));
 #else
-    data.hash = hashes::hash_murmur3(&getEnv(), sizeof(EnvironmentVolatile));
+    hash = hashes::hash_murmur3(&env, sizeof(EnvironmentVolatileData));
 #endif
 }
 
 
-void EnvironmentPossible::printState(
-    const EnvironmentNonvolatile& envNV, size_t iState, size_t iPly) const {
+static EnvironmentPossibleData standardEnvironment;
+ConstEnvironmentPossible::ConstEnvironmentPossible(
+    nonvolatile_t& nv
+): impl_t(nv, standardEnvironment) {}
+
+
+bool ConstEnvironmentPossible::isEmpty() const {
+  return &data() == &standardEnvironment;
+}
+
+
+ENV_POSSIBLE_IMPL_TEMPLATE
+void ENV_POSSIBLE_IMPL::printState(size_t iState, size_t iPly) const {
   // print ply index if we have a valid one:
   if (iPly != SIZE_MAX) { std::cout << "ply " << iPly << ", "; }
   // print state and probability:
   if (iState != SIZE_MAX) { std::cout << "s=" << iState << ", "; }
   // print environment status:
-  std::cout << envP_print(envNV, *this);
+  std::cout << ConstEnvironmentPossible{nv(), data()};
 }
 
 
-std::ostream& operator <<(std::ostream& os, const envP_print& en)
-{
+ENV_POSSIBLE_IMPL_TEMPLATE
+void ENV_POSSIBLE_IMPL::printEnvironment(std::ostream& os) const {
   // print state and probability:
-  os << 
-    "p=" << en.envP.getProbability().to_double();
+  os <<
+    "p=" << getProbability().to_double();
   // print status tokens:
   for (unsigned int iTeam = 0; iTeam < 2; iTeam++)
   {
-    if (en.envP.hasFreeMove(iTeam))
+    if (hasFreeMove(iTeam))
     {
       os << " " << (iTeam==TEAM_A?"A":"B") << "-Free";
     }
-    if (en.envP.hasSwitched(iTeam))
+    if (hasSwitched(iTeam))
     {
       os << " " << (iTeam==TEAM_A?"A":"B") << "-Switch";
       continue;
     }
-    if (en.envP.hasWaited(iTeam))
+    if (hasWaited(iTeam))
     {
       os << " " << (iTeam==TEAM_A?"A":"B") << "-Wait";
       continue;
     }
-    if (!en.envP.hasHit(iTeam))
+    if (!hasHit(iTeam))
     {
       os << " " << (iTeam==TEAM_A?"A":"B") << "-Miss";
     }
-    if (en.envP.hasSecondary(iTeam))
+    if (hasSecondary(iTeam))
     {
       os << " " << (iTeam==TEAM_A?"A":"B") << "-Status";
     }
-    if (en.envP.hasCrit(iTeam))
+    if (hasCrit(iTeam))
     {
       os << " " << (iTeam==TEAM_A?"A":"B") << "-Crit";
     }
-    if (en.envP.wasBlocked(iTeam))
+    if (wasBlocked(iTeam))
     {
       os << " " << (iTeam==TEAM_A?"A":"B") << "-Blocked";
     }
   } // endof foreach team
 
-  if (en.envP.isMerged())
+  if (isMerged())
   {
     os << " (MERGED)";
   }
 
-  if (en.envP.isPruned())
+  if (isPruned())
   {
     os << " (PRUNED)";
   }
 
   // print active pokemon:
   os << "\n";
-  size_t otherTeam = (en.agentTeam + 1) % 2;
-  os << "\tagent: " << pokemon_print(
-    en.envNV.getTeam(en.agentTeam).getPKNV(en.envP.getEnv().getTeam(en.agentTeam)), 
-    en.envP.getEnv().getTeam(en.agentTeam),
-    en.envP.getEnv().getTeam(en.agentTeam).getPKV());
-  os << "\tother: " << pokemon_print(
-    en.envNV.getTeam(otherTeam).getPKNV(en.envP.getEnv().getTeam(otherTeam)), 
-    en.envP.getEnv().getTeam(otherTeam),
-    en.envP.getEnv().getTeam(otherTeam).getPKV());
+}
+
+
+std::ostream& operator <<(std::ostream& os, const ConstEnvironmentPossible& envP) {
+  envP.printEnvironment(os);
+  envP.getEnv().printActivePokemon(os);
   return os;
 };
 
 
-class SortByProbability
-{
+class SortByProbability {
 public:
-  static fpType getValue (const EnvironmentPossible& cEnvP)
+  static fpType getValue(const EnvironmentPossibleData& cEnvP)
   {
     if (cEnvP.isPruned()) { return std::numeric_limits<fpType>::quiet_NaN(); }
-    return cEnvP.getProbability().to_double();
+    return cEnvP.probability.to_double();
   };
 };
 
 
-const EnvironmentPossible& PossibleEnvironments::stateSelect_roulette(size_t& indexState) const
-{
-  indexState = roulette<EnvironmentPossible, SortByProbability>::select(
+ConstEnvironmentPossible PossibleEnvironments::stateSelect_roulette(size_t& indexState) const {
+  indexState = roulette<EnvironmentPossibleData, SortByProbability>::select(
       *this, SortByProbability());
 
-  return at(indexState);
+  return atEnv(indexState);
 };
 
 
-const EnvironmentPossible* PossibleEnvironments::stateSelect_index(size_t& indexResult) const
-{
+ConstEnvironmentPossible PossibleEnvironments::stateSelect_index(size_t& indexResult) const {
   std::string input;
   int32_t indexState;
   
@@ -162,7 +156,7 @@ const EnvironmentPossible* PossibleEnvironments::stateSelect_index(size_t& index
       continue;
     }
 
-    if ((indexState >= 0 && indexState < (int32_t) size()) && at(indexState).isPruned())
+    if ((indexState >= 0 && indexState < (int32_t) size()) && atEnv(indexState).isPruned())
     {
       std::cout << "State " << input << " was pruned!\n";
       continue;
@@ -173,33 +167,37 @@ const EnvironmentPossible* PossibleEnvironments::stateSelect_index(size_t& index
   
   if (indexState == -2)
   {
-    return NULL;
+    return ConstEnvironmentPossible{*nv_};
   }
   
   if (indexState == -1)
   {
     // choose random state
-    const EnvironmentPossible& result = stateSelect_roulette(indexResult);
+    ConstEnvironmentPossible result = stateSelect_roulette(indexResult);
     
     std::cout << "Randomly chose state " << indexResult << "\n";
-    return &result;
+    return result;
   }
   
   // else
   indexResult = indexState;
-  return &at(indexState);
+  return atEnv(indexState);
 } // endOf stateSelect_index
 
 
-void PossibleEnvironments::printStates(const EnvironmentNonvolatile& envNV, size_t iPly) const {
+void PossibleEnvironments::printStates(size_t iPly) const {
   std::cout << getNumUnique() << "(" << size() << ") possible states!\n";
   for (size_t iState = 0; iState < size(); iState++)
   {
-    const EnvironmentPossible& state = at(iState);
+    ConstEnvironmentPossible state = atEnv(iState);
     if (state.isPruned()) { continue; } // don't display pruned states
 
-    state.printState(envNV, iState, iPly);
+    state.printState(iState, iPly);
   }
 
   std::cout << "\n";
 }
+
+
+template class EnvironmentPossibleImpl<ConstEnvironmentVolatile, const EnvironmentPossibleData>;
+template class EnvironmentPossibleImpl<EnvironmentVolatile, EnvironmentPossibleData>;

@@ -13,20 +13,18 @@ class PkIO;
 class Move;
 class PokemonNonVolatile;
 
-union MoveVolatile;
+class MoveVolatile;
 
 #define MOVE_NONVOLATILE_DIGESTSIZE 21
 
 class PKAISHARED MoveNonVolatile : public Signature<MoveNonVolatile, MOVE_NONVOLATILE_DIGESTSIZE>
 {
-
-private:
+public:
   const Move* base;
   uint16_t scriptVal_a;
   uint16_t scriptVal_b;
   uint8_t PPmax;
 
-public:
   static MoveNonVolatile* mNV_struggle;
 
   MoveNonVolatile()
@@ -95,13 +93,6 @@ public:
   {
     return scriptVal_b;
   };
-
-  friend class PkIO;
-  friend class move_print;
-
-  friend union MoveVolatile;
-
-public:
 
   void createDigest_impl(std::array<uint8_t, MOVE_NONVOLATILE_DIGESTSIZE>& digest) const;
 

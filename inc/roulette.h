@@ -25,33 +25,37 @@ class roulette
 {
 private:
 
+  template<class UnknownTypeCollection>
   static void generatePartitionTable(
     std::vector<fpType>& partition, 
     std::vector<bool>& isValid,
     size_t& numValid,
     fpType& accumulator,
-    const std::vector<unknownType>& values,
+    const UnknownTypeCollection& values,
     const typeValue& comparator)
   {
     // set array of allowable values:
-    isValid.assign(values.size(), true);
-    numValid = values.size();
-    partition.assign(values.size(), std::numeric_limits<fpType>::quiet_NaN());
-    for (size_t iValue = 0, iSize = values.size(); iValue != iSize; ++iValue)
-    {
-      fpType cValue = comparator.getValue(values[iValue]);
+    size_t values_size = std::end(values) - std::begin(values);
+    isValid.assign(values_size, true);
+    partition.assign(values_size, std::numeric_limits<fpType>::quiet_NaN());
+    numValid = values_size;
+    auto partition_ptr = std::begin(partition);
+    auto value_ptr = std::begin(values);
+    auto isValid_ptr = std::begin(isValid);
+    for (; value_ptr != std::end(values); ++value_ptr, ++partition_ptr, ++isValid_ptr) {
+      fpType cValue = comparator.getValue(*value_ptr);
 
-      if (boost::math::isnan(cValue)) { isValid[iValue] = false; numValid--; continue; }
-      if (mostlyLTE(cValue, 0.0)) { isValid[iValue] = false; numValid--; continue; }
+      if (boost::math::isnan(cValue)) { *isValid_ptr = false; numValid--; continue; }
+      if (mostlyLTE(cValue, 0.0)) { *isValid_ptr = false; numValid--; continue; }
 
       accumulator += cValue;
-      partition[iValue] = cValue;
+      *partition_ptr = cValue;
     }
-
   };
+
 public:
-  static size_t select(
-    const std::vector<unknownType>& values,
+  template<class UnknownTypeCollection> static size_t select(
+    const UnknownTypeCollection& values,
     const typeValue& comparator = basicSortBySize<unknownType>())
   {
     std::array<size_t, 1> result;
@@ -61,33 +65,8 @@ public:
     return result[0];
   };
 
-  static std::array<size_t, 2> selectTwo(
-    const std::vector<unknownType>& values,
-    const typeValue& comparator = basicSortBySize<unknownType>())
-  {
-    std::array<size_t, 2> result;
-    result.fill(SIZE_MAX);
-
-    _selectN< std::array<size_t, 2> >(values, result, comparator);
-
-    return result;
-  };
-
-  template<size_t numValues>
-  static std::array<size_t, numValues> selectN(
-    const std::vector<unknownType>& values,
-    const typeValue& comparator = basicSortBySize<unknownType>())
-  {
-    std::array<size_t, numValues> result;
-    result.fill(SIZE_MAX);
-
-    _selectN< std::array<size_t, numValues> >(values, result, comparator);
-
-    return result;
-  };
-
-  static std::vector<size_t> selectDynamic(
-    const std::vector<unknownType>& values,
+  template<class UnknownTypeCollection> static std::vector<size_t> selectDynamic(
+    const UnknownTypeCollection& values,
     size_t numValues,
     const typeValue& comparator = basicSortBySize<unknownType>())
   {
@@ -99,10 +78,10 @@ public:
   };
 
 private:
-  template<class collectionType>
+  template<class ResultCollectionType, class UnknownCollectionType>
   static void _selectN(
-    const std::vector<unknownType>& values,
-    collectionType& results,
+    const UnknownCollectionType& values,
+    ResultCollectionType& results,
     const typeValue& comparator = basicSortBySize<unknownType>())
   {
     fpType accumulator = 0;
@@ -124,7 +103,7 @@ private:
 
       for (size_t iNValue = 0, iSize = values.size() * 2; iNValue != iSize; ++iNValue)
       {
-        // ignore partitions with values we've already used / no value / strang values, etc:
+        // ignore partitions with values we've already used / no value / string values, etc:
         if (!isValid[iValue]) { iValue = (iValue + 1) % values.size() ; continue; }
 
         cValue = partition[iValue];

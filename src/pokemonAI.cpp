@@ -11,16 +11,16 @@
 #include "../inc/init_toolbox.h"
 
 #include "../inc/planner_max.h"
-#include "../inc/planner_directed.h"
+//#include "../inc/planner_directed.h"
 #include "../inc/planner_random.h"
 #include "../inc/planner_human.h"
-#include "../inc/planner_stochastic.h"
-#include "../inc/planner_minimax.h"
+//#include "../inc/planner_stochastic.h"
+//#include "../inc/planner_minimax.h"
 
 #include "../inc/ranked_team.h"
 #include "../inc/evaluator_simple.h"
 #include "../inc/evaluator_random.h"
-#include "../inc/evaluator_featureVector.h"
+//#include "../inc/evaluator_featureVector.h"
 
 //#define PKAI_EXPORT
 #include "../inc/pokemonAI.h"
@@ -448,7 +448,7 @@ Planner* PokemonAI::plannerSelect(char playerID)
     switch(iPlanner)
     {
     case 0:
-      return new planner_max();
+      return new PlannerMax();
     case 1:
       return new planner_stochastic(engineAccuracy, plannerTemperature, plannerExploration);
     case 2:

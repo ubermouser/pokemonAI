@@ -1,18 +1,20 @@
 #ifndef PKAI_GAME_H
 #define	PKAI_GAME_H
 
-#include "../inc/pkai.h"
+#include "pkai.h"
 
-#include <vector>
 #include <array>
+#include <memory>
+#include <vector>
 #include <stdint.h>
 
-#include "../inc/environment_nonvolatile.h"
-#include "../inc/environment_possible.h"
-#include "../inc/environment_volatile.h"
+#include "environment_nonvolatile.h"
+#include "environment_possible.h"
+#include "environment_volatile.h"
+#include "pkCU.h"
+#include "planner.h"
 
 class Planner;
-class PkCU;
 class TeamNonVolatile;
 class Evaluator;
 
@@ -64,7 +66,7 @@ class Game
 {
 private:
   /* planner class for players */
-  std::array<Planner*, 2> agents;
+  std::array<std::shared_ptr<Planner>, 2> agents;
 
   /* record of pokemon moves, fitness result, etc */
   std::vector<std::vector<Turn> > gameLog;
@@ -75,9 +77,9 @@ private:
   HeatResult hResult;
 
   /* templated state transition engine, given an environment_nonvolatile provides state transitions of an environment_volatile */
-  PkCU* cu;
+  std::shared_ptr<PkCU> cu;
 
-  EnvironmentNonvolatile cEnvNV;
+  std::shared_ptr<EnvironmentNonvolatile> cEnvNV;
 
   /* maximum number of turns allowed before a draw occurs */
   size_t maxPlies;

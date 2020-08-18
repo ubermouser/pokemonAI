@@ -174,125 +174,100 @@ int move_hiddenPower_calculate(
 
 int move_hiddenPower_setType(
   PkCU& cu,
-  const MoveNonVolatile& mNV,
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV,
   const Type*& cType)
 {
-  if (&mNV.getBase() != hiddenPower_t) { return 0; }
+  if (&(mV.getBase()) != hiddenPower_t) { return 0; }
 
-  cType = dex->getTypes().atByIndex(mNV.getScriptVal_a());
+  cType = dex->getTypes().atByIndex(mV.nv().getScriptVal_a());
   return 1;
 };
 
 int move_hiddenPower_setPower(
   PkCU& cu,
-  const MoveNonVolatile& mNV,
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV,
   uint32_t& basePower)
 {
-  if (&mNV.getBase() != hiddenPower_t) { return 0; }
+  if (&mV.getBase() != hiddenPower_t) { return 0; }
 
-  basePower = mNV.getScriptVal_b();
+  basePower = mV.nv().getScriptVal_b();
   return 1;
 }
 
 int move_painSplit(
   PkCU& cu,
-  const MoveNonVolatile& mNV, 
-  const PokemonNonVolatile& cPKNV, 
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV)
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
 {
-  if (&mNV.getBase() != painSplit_t) { return 0; }
+  if (&mV.getBase() != painSplit_t) { return 0; }
 
   // calculate how much health total pokemon both have; average the two, rounding down
   uint32_t newHP = (cPKV.getHP() + tPKV.getHP() + 1) / 2;
 
-  cTMV.cSetHP(cPKNV, newHP);
-  tTMV.cSetHP(tPKNV, newHP);
+  cPKV.setHP(newHP);
+  tPKV.setHP(newHP);
 
   return 1;
 };
 
 int move_stealthRock_set(
   PkCU& cu,
-  const MoveNonVolatile& mNV, 
-  const PokemonNonVolatile& cPKNV, 
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV)
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
 {
-  if (&mNV.getBase() != stealthRock_t) { return 0; }
+  if (&mV.getBase() != stealthRock_t) { return 0; }
 
-  tTMV.getNonVolatile().stealthRock = 1;
+  tPKV.status().nonvolatile.stealthRock = 1;
 
   return 1;
 };
 
 int move_spikes_set(
   PkCU& cu,
-  const MoveNonVolatile& mNV, 
-  const PokemonNonVolatile& cPKNV, 
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV)
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
 {
-  if (&mNV.getBase() != spikes_t) { return 0; }
+  if (&mV.getBase() != spikes_t) { return 0; }
 
-  tTMV.getNonVolatile().spikes = std::min(3U, tTMV.getNonVolatile().spikes + 1U);
+  uint32_t initial_spikes = tPKV.status().nonvolatile.spikes;
+  tPKV.status().nonvolatile.spikes = std::min(3U, initial_spikes + 1U);
 
   return 1;
 };
 
 int move_toxicSpikes_set(
   PkCU& cu,
-  const MoveNonVolatile& mNV, 
-  const PokemonNonVolatile& cPKNV, 
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV)
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
 {
-  if (&mNV.getBase() != toxicSpikes_t) { return 0; }
+  if (&mV.getBase() != toxicSpikes_t) { return 0; }
 
-  tTMV.getNonVolatile().toxicSpikes = std::min(2U, tTMV.getNonVolatile().toxicSpikes + 1U);
+  uint32_t initial_toxic = tPKV.status().nonvolatile.toxicSpikes;
+  tPKV.status().nonvolatile.toxicSpikes = std::min(2U, initial_toxic + 1U);
 
   return 1;
 };
 
 int move_stealthRock_switch(
   PkCU& cu,
-  const PokemonNonVolatile& cPKNV, 
-  TeamVolatile& cTMV,
-  PokemonVolatile& cPKV)
+  PokemonVolatile cPKV)
 {
-  if (cTMV.getNonVolatile().stealthRock > 0)
-  {
+  if (cPKV.status().nonvolatile.stealthRock > 0) {
     // deal damage:
     fpType damage = 
       -0.125 * // base damage
-      rock_t->getModifier(cPKNV.getBase().getType(0)) *  // resistance to rock
-      rock_t->getModifier(cPKNV.getBase().getType(1));
+      rock_t->getModifier(cPKV.getBase().getType(0)) *  // resistance to rock
+      rock_t->getModifier(cPKV.getBase().getType(1));
 
-    cTMV.cModPercentHP(cPKNV, damage);
+    cPKV.modPercentHP(damage);
 
     return 1;
   }
@@ -302,18 +277,15 @@ int move_stealthRock_switch(
 
 int move_spikes_switch(
   PkCU& cu,
-  const PokemonNonVolatile& cPKNV, 
-  TeamVolatile& cTMV,
-  PokemonVolatile& cPKV)
+  PokemonVolatile cPKV)
 {
-  switch (cTMV.getNonVolatile().spikes)
-  {
+  switch (cPKV.status().nonvolatile.spikes) {
   case 3: // deal damage based on tier:
-    cTMV.cModPercentHP(cPKNV, -0.25); return 1;
+    cPKV.modPercentHP(-0.25); return 1;
   case 2:
-    cTMV.cModPercentHP(cPKNV, -0.1875); return 1;
+    cPKV.modPercentHP(-0.1875); return 1;
   case 1:
-    cTMV.cModPercentHP(cPKNV, -0.125); return 1;
+    cPKV.modPercentHP(-0.125); return 1;
   default:
   case 0:
     return 0;
@@ -322,13 +294,10 @@ int move_spikes_switch(
 
 int move_toxicSpikes_switch(
   PkCU& cu,
-  const PokemonNonVolatile& cPKNV, 
-  TeamVolatile& cTMV,
-  PokemonVolatile& cPKV)
+  PokemonVolatile cPKV)
 {
   if (cPKV.getStatusAilment() != AIL_NV_NONE) { return 0; }
-  switch (cTMV.getNonVolatile().toxicSpikes)
-  {
+  switch (cPKV.status().nonvolatile.toxicSpikes) {
   case 2: // inflict a type of poison based on tier:
     cPKV.setStatusAilment(AIL_NV_POISON_TOXIC); return 1;
   case 1:
@@ -341,44 +310,35 @@ int move_toxicSpikes_switch(
 
 int move_rapidSpin(
   PkCU& cu,
-  const MoveNonVolatile& mNV, 
-  const PokemonNonVolatile& cPKNV, 
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV)
+  MoveVolatile mV, 
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
 {
-  if (&mNV.getBase() != rapidSpin_t) { return 0; }
+  if (&mV.getBase() != rapidSpin_t) { return 0; }
 
   // clear trapped:
-  if (cTMV.getVolatile().trap < 7) { cTMV.getVolatile().trap = 0; }
+  if (cPKV.status().cTeammate.trap < 7) { cPKV.status().cTeammate.trap = 0; }
   // clear entry hazards:
-  cTMV.getNonVolatile().toxicSpikes = 0;
-  cTMV.getNonVolatile().spikes = 0;
-  cTMV.getNonVolatile().stealthRock = 0;
+  cPKV.status().nonvolatile.toxicSpikes = 0;
+  cPKV.status().nonvolatile.spikes = 0;
+  cPKV.status().nonvolatile.stealthRock = 0;
 
   return 1;
 };
 
 int move_cureNonVolatile_team(
   PkCU& cu,
-  const MoveNonVolatile& mNV, 
-  const PokemonNonVolatile& cPKNV, 
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV)
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
 {
-  // TODO(@drendleman) - never called when aromatherapy is hit
-  if (&mNV.getBase() != aromatherapy_t) { return 0; }
-  const Move* tMove = &mNV.getBase();
+  const Move* tMove = &mV.getBase();
   if (
     (tMove != aromatherapy_t) && 
     (tMove != healBell_t)) { return 0; }
 
   // clear nonvolatile:
+  TeamVolatile cTMV = cu.getTV();
   cTMV.teammate(0).clearStatusAilment();
   cTMV.teammate(1).clearStatusAilment();
   cTMV.teammate(2).clearStatusAilment();
@@ -387,22 +347,18 @@ int move_cureNonVolatile_team(
   cTMV.teammate(5).clearStatusAilment();
 
   // clear volatile confusion:
-  cTMV.getVolatile().confused = 0;
+  cTMV.status().cTeammate.confused = 0;
 
   return 1;
 };
 
 int move_heal50(
   PkCU& cu,
-  const MoveNonVolatile& mNV, 
-  const PokemonNonVolatile& cPKNV, 
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV)
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
 {
-  const Move* tMove = &mNV.getBase();
+  const Move* tMove = &mV.getBase();
   if (
     (tMove != recover_t) && 
     (tMove != milkDrink_t) &&
@@ -411,25 +367,21 @@ int move_heal50(
     (tMove != healOrder_t) && 
     (tMove != roost_t)) { return 0; }
 
-  cTMV.cModPercentHP(cPKNV, 0.50);
+  cPKV.modPercentHP(0.50);
 
   return 1;
 };
 
 int move_lifeLeech50(
   PkCU& cu,
-  const MoveNonVolatile& mNV, 
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV)
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
 {
   // this plugin_t only triggered if primary has hit
   if (!cu.getBase().hasHit(cu.getICTeam())) { return 0; }
 
-  const Move* cMove = &mNV.getBase();
+  const Move* cMove = &mV.getBase();
   if (
     (cMove != absorb_t) && 
     (cMove != leechLife_t) &&
@@ -438,25 +390,21 @@ int move_lifeLeech50(
     (cMove != drainPunch_t)) { return 0; }
 
   // add to hitpoints:
-  cTMV.cModHP(cPKNV, (cu.getDamageComponent().damage / 2));
+  cPKV.modHP(cu.getDamageComponent().damage / 2);
 
   return 1;
 };
 
 int move_recoil33(
   PkCU& cu,
-  const MoveNonVolatile& mNV, 
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV)
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
 {
   // this plugin_t only triggered if primary has hit
   if (!cu.getBase().hasHit(cu.getICTeam())) { return 0; }
 
-  const Move* cMove = &mNV.getBase();
+  const Move* cMove = &mV.getBase();
   if (
     (cMove != doubleEdge_t) && 
     (cMove != woodHammer_t) &&
@@ -465,48 +413,40 @@ int move_recoil33(
     (cMove != voltTackle_t)) { return 0; }
 
   // subtract hitpoints:
-  cTMV.cModHP(cPKNV, ((int32_t)cu.getDamageComponent().damage / -3));
+  cPKV.modHP((int32_t)cu.getDamageComponent().damage / -3);
 
   return cPKV.isAlive()?1:2;
 };
 
 int move_leveledDamage(
   PkCU& cu,
-  const MoveNonVolatile& mNV, 
-  const PokemonNonVolatile& cPKNV, 
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV)
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
 {
   const Type* resistedType;
-  const Move* tMove = &mNV.getBase();
+  const Move* tMove = &mV.getBase();
   if (tMove == seismicToss_t) { resistedType = ghost_t; }
   else if ( tMove == nightShade_t) { resistedType = normal_t; }
   else { return 0; }
 
   // no damage if pokemon's class is of the resited type:
-  const PokemonBase& tPKB = tPKNV.getBase();
+  const PokemonBase& tPKB = tPKV.getBase();
   if ((&tPKB.getType(0) == resistedType) || (&tPKB.getType(1) == resistedType)) { return 1; }
 
-  tTMV.cModHP(tPKNV, -1 * (int)cPKNV.getLevel());
+  tPKV.modHP(-1 * (int)cPKV.nv().getLevel());
 
   return 1;
 };
 
 int move_highCrit
   (PkCU& cu,
-  const MoveNonVolatile& mNV,
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV,
   fpType& probabilityToCrit)
 {
-  const Move* tMove = &mNV.getBase();
+  const Move* tMove = &mV.getBase();
   if (
     (tMove != airCutter_t) && 
     (tMove != attackOrder_t) &&
@@ -523,30 +463,24 @@ int move_highCrit
     (tMove != stoneEdge_t)) { return 0; }
 
   // raise move's crit stage by 1:
-  probabilityToCrit = cTMV.cGetAccuracy_boosted(FV_CRITICALHIT, 1);
+  probabilityToCrit = cPKV.getAccuracy_boosted(FV_CRITICALHIT, 1);
 
   return 1;
 }
 
 int move_suicide_modLife(
   PkCU& cu,
-  const MoveNonVolatile& mNV, 
-  const PokemonNonVolatile& cPKNV, 
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV)
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
 {
-  // occurs regardless of hit or miss:
-  //if (!cu.getBase().hasHit(cu.getICTeam())) { return 0; }
+  // suicide occurs regardless of hit or miss. No hasHit check.
 
-  const Move* cMove = &mNV.getBase();
-
+  const Move* cMove = &mV.getBase();
   if ((cMove != explosion_t) && (cMove != selfDestruct_t) && (cMove != memento_t)) { return 0; }
 
   // kill pokemon:
-  cTMV.cSetHP(cPKNV, 0);
+  cPKV.setHP(0);
 
   // always return 2, because we killed the pokemon
   return 2;
@@ -554,16 +488,12 @@ int move_suicide_modLife(
 
 int move_suicide_modPower
   (PkCU& cu,
-  const MoveNonVolatile& mNV,
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV,
   fpType& modifier)
 {
-  if ((&mNV.getBase() != explosion_t) && (&mNV.getBase() != selfDestruct_t)) { return 0; }
+  if ((&mV.getBase() != explosion_t) && (&mV.getBase() != selfDestruct_t)) { return 0; }
 
   modifier *= 2.0;
 
@@ -572,16 +502,12 @@ int move_suicide_modPower
 
 int move_alwaysHits
   (PkCU& cu,
-  const MoveNonVolatile& mNV,
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV,
   fpType& probabilityToHit)
 {
-  const Move* cMove = &mNV.getBase();
+  const Move* cMove = &mV.getBase();
   if (
     (cMove != auraSphere_t) && 
     (cMove != shockWave_t) && 
@@ -590,30 +516,27 @@ int move_alwaysHits
     (cMove != magicalLeaf_t) && 
     (cMove != aerialAce_t) && 
     (cMove != faintAttack_t) && 
-    (cMove != swift_t)) { return 0; }
+    (cMove != swift_t) &&
+    (cMove != struggle_t)) { return 0; }
 
   probabilityToHit = 1.0;
 
-  // do not allow anything to affect hit chance other than this if no guard occurs;
+  // do not allow anything to affect hit chance other than this if the move always hits:
   return 2;
 }
 
 int ability_noGuard
   (PkCU& cu,
-  const MoveNonVolatile& mNV,
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV,
   fpType& probabilityToHit)
 {
   bool doNoGuard = false;
   if  (
-      (cPKNV.abilityExists() && (&cPKNV.getAbility() == noGuard_t))
+      (cPKV.nv().abilityExists() && (&(cPKV.nv().getAbility()) == noGuard_t))
       ||
-      (tPKNV.abilityExists() && (&tPKNV.getAbility() == noGuard_t))
+      (tPKV.nv().abilityExists() && (&(tPKV.nv().getAbility()) == noGuard_t))
     ) 
   { doNoGuard = true; }
 
@@ -627,17 +550,13 @@ int ability_noGuard
 
 int ability_levitate
   (PkCU& cu,
-  const MoveNonVolatile& mNV,
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
   const Type& cType,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV,
   fpType& typeModifier)
 {
-  if (!tPKNV.abilityExists() || (&tPKNV.getAbility() != levitate_t)) { return 0; }
+  if (!tPKV.nv().abilityExists() || (&(tPKV.nv().getAbility()) != levitate_t)) { return 0; }
 
     // no effect if attack type isn't ground
   if (&cType != ground_t) { return 0; }
@@ -650,12 +569,10 @@ int ability_levitate
 
 int ability_levitate_switch(
   PkCU& cu,
-  const PokemonNonVolatile& cPKNV, 
-  TeamVolatile& cTMV,
-  PokemonVolatile& cPKV)
+  PokemonVolatile cPKV)
 {
 
-  if (!cPKNV.abilityExists() || (&cPKNV.getAbility() != levitate_t)) { return 0; }
+  if (!cPKV.nv().abilityExists() || (&(cPKV.nv().getAbility()) != levitate_t)) { return 0; }
   
   // preempt scripts which deal damage on switchin
   return 2;
@@ -663,11 +580,9 @@ int ability_levitate_switch(
 
 int ability_naturalCure(
   PkCU& cu,
-  const PokemonNonVolatile& cPKNV, 
-  TeamVolatile& cTMV,
-  PokemonVolatile& cPKV)
+  PokemonVolatile cPKV)
 {
-  if (!cPKNV.abilityExists() || (&cPKNV.getAbility() != naturalCure_t)) { return 0; }
+  if (!cPKV.nv().abilityExists() || (&(cPKV.nv().getAbility()) != naturalCure_t)) { return 0; }
 
   // clear status ailment on switchout
   cPKV.clearStatusAilment();
@@ -677,16 +592,12 @@ int ability_naturalCure(
 
 int ability_technician
   (PkCU& cu,
-  const MoveNonVolatile& mNV,
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV,
   fpType& basePowerModifier)
 {
-  if (!cPKNV.abilityExists() || (&cPKNV.getAbility() != technician_t)) { return 0; }
+  if (!cPKV.nv().abilityExists() || (&(cPKV.nv().getAbility()) != technician_t)) { return 0; }
 
   // no effect if base power above 60
   if (cu.getDamageComponent().damage > 60) { return 0; }
@@ -699,18 +610,14 @@ int ability_technician
 
 int ability_sereneGrace
   (PkCU& cu,
-  const MoveNonVolatile& mNV,
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV,
   fpType& probabilityToSecondary)
 {
-  if (!cPKNV.abilityExists() || (&cPKNV.getAbility() != sereneGrace_t)) { return 0; }
+  if (!cPKV.nv().abilityExists() || (&(cPKV.nv().getAbility()) != sereneGrace_t)) { return 0; }
 
-  uint8_t dType = mNV.getBase().getDamageType();
+  uint8_t dType = mV.getBase().getDamageType();
   // must have used a physical or special attack move
   if (!((dType == ATK_PHYSICAL) || (dType == ATK_SPECIAL))) { return 0; }
 
@@ -722,13 +629,11 @@ int ability_sereneGrace
 
 int item_leftovers(
   PkCU& cu,
-  const PokemonNonVolatile& cPKNV,
-  TeamVolatile& cTMV,
-  PokemonVolatile& cPKV)
+  PokemonVolatile cPKV)
 {
-  if (cPKV.hasItem(cPKNV) && (&cPKV.getItem(cPKNV) == leftovers_t))
+  if (cPKV.hasItem() && (&cPKV.getItem() == leftovers_t))
   {
-    cTMV.cModPercentHP(cPKNV, 0.0625);
+    cPKV.modPercentHP(0.0625);
     return 1;
   }
 
@@ -737,26 +642,22 @@ int item_leftovers(
 
 int item_lumBerry
   (PkCU& cu,
-  const PokemonNonVolatile& cPKNV,
-  TeamVolatile& cTMV,
-  PokemonVolatile& cPKV)
+  PokemonVolatile cPKV)
 {
-
-  const PokemonNonVolatile& tPKNV = cu.getTPKNV();
-  TeamVolatile& tTMV = cu.getTMV();
-  PokemonVolatile& tPKV = cu.getTPKV();
+  // TODO(@drendleman) - why does this affect target pokemon and not current pokemon?
+  PokemonVolatile tPKV = cu.getTPKV();
 
   // only affect targeted pokemon that have a lum berry
-  if (!tPKV.hasItem(tPKNV) || (&tPKV.getItem(tPKNV) != lumBerry_t)) { return 0; }
+  if (!tPKV.hasItem() || (&tPKV.getItem() != lumBerry_t)) { return 0; }
 
   // only affect living pokemon
   if (!tPKV.isAlive()) { return 0; }
 
   bool conditionCured = false;
   // volatile status condition confusion will be cured 
-  if (tTMV.getVolatile().confused > 0)
+  if (tPKV.status().cTeammate.confused > 0)
   {
-    tTMV.getVolatile().confused = 0;
+    tPKV.status().cTeammate.confused = 0;
     conditionCured = true;
   }
   // all nonvolatile status conditions will be cured:
@@ -767,22 +668,18 @@ int item_lumBerry
     conditionCured = true;
   }
 
-  if (conditionCured) { tPKV.setNoItem(tPKNV); return 1; }
+  if (conditionCured) { tPKV.setNoItem(); return 1; }
   return 0;
 }
 
 int item_lifeOrb_modPower
   (PkCU& cu,
-  const MoveNonVolatile& mNV,
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV,
   fpType& modifier)
 {
-  if (!cPKV.hasItem(cPKNV) || !(&cPKV.getItem(cPKNV) == lifeOrb_t)) { return 0; }
+  if (!cPKV.hasItem() || !(&cPKV.getItem() == lifeOrb_t)) { return 0; }
 
   modifier *= 1.3;
 
@@ -791,41 +688,33 @@ int item_lifeOrb_modPower
 
 int item_lifeOrb_modLife(
   PkCU& cu,
-  const MoveNonVolatile& mNV, 
-  const PokemonNonVolatile& cPKNV, 
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV)
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
 {
   // must have hit, must have life orb item
-  if (!cu.getBase().hasHit(cu.getICTeam()) || !cPKV.hasItem(cPKNV) || !(&cPKV.getItem(cPKNV) == lifeOrb_t)) { return 0; }
+  if (!cu.getBase().hasHit(cu.getICTeam()) || !cPKV.hasItem() || !(&cPKV.getItem() == lifeOrb_t)) { return 0; }
 
-  uint8_t dType = mNV.getBase().getDamageType();
+  uint8_t dType = mV.getBase().getDamageType();
   // must have used a physical or special attack move
   if (!((dType == ATK_PHYSICAL) || (dType == ATK_SPECIAL))) { return 0; }
 
   // subtract hitpoints:
-  cTMV.cModPercentHP(cPKNV, -0.1);
+  cPKV.modPercentHP(-0.1);
 
   return cPKV.isAlive()?1:2;
 };
 
 int engine_typeResistingBerry
   (PkCU& cu,
-  const MoveNonVolatile& mNV,
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
   const Type& cType,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV,
   fpType& typeModifier)
 {
-  if (!tPKV.hasItem(tPKNV)) { return 0; }
-  const Type* resistedType = &tPKV.getItem(tPKNV).getResistedType();
+  if (!tPKV.hasItem()) { return 0; }
+  const Type* resistedType = &tPKV.getItem().getResistedType();
 
   // no effect if attack type isn't of the resisted type
   if (&cType != resistedType) { return 0; }
@@ -833,25 +722,21 @@ int engine_typeResistingBerry
   // berry reduces the damage of the attack by 50%
   typeModifier *= 0.5;
   // berry consumed after use
-  tPKV.setNoItem(tPKNV);
+  tPKV.setNoItem();
 
   return 1;
 };
 
 int engine_typeBoostingItem
   (PkCU& cu,
-  const MoveNonVolatile& mNV,
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV,
   fpType& basePowerModifier)
 {
-  if (!cPKV.hasItem(cPKNV)) { return 0; }
+  if (!cPKV.hasItem()) { return 0; }
 
-  const Type* boostedType = &cPKV.getItem(cPKNV).getBoostedType();
+  const Type* boostedType = &cPKV.getItem().getBoostedType();
   const Type* moveType = cu.getDamageComponent().mType;
 
   // no effect if attack type isn't of the boosted type
@@ -865,68 +750,38 @@ int engine_typeBoostingItem
 
 int engine_move_struggle(
   PkCU& cu,
-  const MoveNonVolatile& mNV,
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV)
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
 {
   // this plugin_t only triggered if primary has hit
   if (!cu.getBase().hasHit(cu.getICTeam())) { return 0; }
 
-  const Move* cMove = &mNV.getBase();
+  const Move* cMove = &mV.getBase();
 
   if (cMove != struggle_t) { return 0; }
 
   // subtract hitpoints:
-  cTMV.cModPercentHP(cPKNV, -0.25);
+  cPKV.modPercentHP(-0.25);
 
   return cPKV.isAlive()?1:2;
 };
 
-int engine_move_struggle_alwaysHits
-  (PkCU& cu,
-  const MoveNonVolatile& mNV,
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV,
-  fpType& probabilityToHit)
-{
-  const Move* cMove = &mNV.getBase();
-  if (cMove != struggle_t) { return 0; }
-
-  probabilityToHit = 1.0;
-
-  // do not allow anything to affect hit chance other than this if no guard occurs;
-  return 2;
-}
-
 int engine_modifyAttackPower_burn
   (PkCU& cu,
-  const MoveNonVolatile& mNV,
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV,
   fpType& modifier)
 {
-  modifier *= ((cPKV.getStatusAilment() == AIL_NV_BURN) && (mNV.getBase().getDamageType() == ATK_PHYSICAL))?0.5:1.0;
+  modifier *= ((cPKV.getStatusAilment() == AIL_NV_BURN) && (mV.getBase().getDamageType() == ATK_PHYSICAL))?0.5:1.0;
 
   return 1;
 };
 
 int engine_onModifySpeed_paralyze
   (PkCU&,
-  const PokemonNonVolatile& cPKNV,
-  const TeamVolatile& cTMV,
-  const PokemonVolatile& cPKV,
+  PokemonVolatile cPKV,
   uint32_t& speed)
 {
   // divide by 4 if pokemon is paralyzed
@@ -937,42 +792,38 @@ int engine_onModifySpeed_paralyze
 
 int engine_endRoundDamageEffect(
   PkCU& cu,
-  const PokemonNonVolatile& cPKNV,
-  TeamVolatile& cTMV,
-  PokemonVolatile& cPKV)
+  PokemonVolatile cPKV)
 {
   // nonvolatile:
   uint32_t condition = cPKV.getStatusAilment();
   if (condition == AIL_NV_POISON || condition == AIL_NV_BURN)
   {
     // reduce HP of pokemon by (1/8) or .125
-    cTMV.cModPercentHP(cPKNV, -0.125);
+    cPKV.modPercentHP(-0.125);
   }
   else if (condition == AIL_NV_POISON_TOXIC)
   {
-    uint32_t toxicTier = cTMV.getVolatile().toxicPoison_tier;
+    uint32_t toxicTier = cPKV.status().cTeammate.toxicPoison_tier;
       
     // increment toxic tier, more added damage per round
     if (toxicTier < 15)
     {
-      cTMV.getVolatile().toxicPoison_tier++;
+      cPKV.status().cTeammate.toxicPoison_tier++;
     }
       
-    cTMV.cModPercentHP(cPKNV, -0.0625 * (fpType)(toxicTier + 1));
+    cPKV.modPercentHP(-0.0625 * (fpType)(toxicTier + 1));
   }
 
   // volatile: 
   // flinch only lasts for the current round. Only a pokemon moving first can flinch the other pokemon
-  cTMV.getVolatile().flinch = 0;
+  cPKV.status().cTeammate.flinch = 0;
 
   return (cPKV.isAlive()?1:2);
 };
 
 int engine_beginTurnNonvolatileEffect(
   PkCU& cu,
-  const PokemonNonVolatile& cPKNV,
-  TeamVolatile& cTMV,
-  PokemonVolatile& cPKV)
+  PokemonVolatile cPKV)
 {
   // Does this pokemon have a non-volatile condition?
   uint32_t cStatus = cPKV.getStatusAilment();
@@ -987,13 +838,12 @@ int engine_beginTurnNonvolatileEffect(
       // 80% chance for frozen status effect to prevent user from moving:
       {
         // modify the status environment:
-        EnvironmentPossible& statEnv = cu.getStack()[iREnv[1]];
+        EnvironmentPossible statEnv = cu.getStack().atEnv(iREnv[1]);
         statEnv.setBlocked(cu.getICTeam());
       }
       // 20% chance for pokemon to not be completely frozen:
       {
-        if (&cPKNV.getMove_base(cu.getICAction()).getType() == fire_t)
-        {
+        if (&cPKV.getMV(cu.getICAction()).getBase().getType() == fire_t) {
           cu.getPKV(iREnv[0]).clearStatusAilment();
         }
       }
@@ -1019,7 +869,7 @@ int engine_beginTurnNonvolatileEffect(
         cu.getPKV(iREnv[1]).clearStatusAilment();
       }
       // pokemon has a chance to move this turn:
-      cu.getStack()[iREnv[0]].setBlocked(cu.getICTeam());
+      cu.getStack().atEnv(iREnv[0]).setBlocked(cu.getICTeam());
       break;
     }
     case AIL_NV_PARALYSIS:
@@ -1028,7 +878,7 @@ int engine_beginTurnNonvolatileEffect(
       std::array<size_t, 2> iREnv;
       cu.duplicateState(iREnv, 0.25);
       // 25% chance to be paralyzed and not move
-      cu.getStack()[iREnv[1]].setBlocked(cu.getICTeam());
+      cu.getStack().atEnv(iREnv[1]).setBlocked(cu.getICTeam());
       break;
     }
     case AIL_NV_NONE:
@@ -1042,34 +892,32 @@ int engine_beginTurnNonvolatileEffect(
 
 int engine_beginTurnVolatileEffect(
   PkCU& cu,
-  const PokemonNonVolatile& cPKNV,
-  TeamVolatile& cTMV,
-  PokemonVolatile& cPKV)
+  PokemonVolatile cPKV)
 {
   // Does this pokemon have a volatile condition?
-  if (cTMV.getVolatile().flinch > 0)
-  {
+  if (cPKV.status().cTeammate.flinch > 0) {
     // set user blocked 100% of the time
     cu.getBase().setBlocked(cu.getICTeam());
   }
-  if (cTMV.getVolatile().confused > 0)
-  {
-    uint32_t iConfused = cTMV.getVolatile().confused;
+  if (cPKV.status().cTeammate.confused > 0) {
+    uint32_t iConfused = cPKV.status().cTeammate.confused;
     if (iConfused != AIL_V_CONFUSED_0T)
     {
       // 50% chance to move:
       std::array<size_t, 2> iREnv;
       cu.duplicateState(iREnv, 0.5);
 
+      PokemonVolatile cConfusedPKV = cu.getPKV(iREnv[1]);
+
       // 50% chance to not move:
       {
-        cu.getStack()[iREnv[1]].setBlocked(cu.getICTeam());
-        cu.getTMV(iREnv[1]).getVolatile().confused--;
+        cu.getStack().atEnv(iREnv[1]).setBlocked(cu.getICTeam());
+        cConfusedPKV.status().cTeammate.confused--;
         // TODO: actual damage calculation
-        cu.getTMV(iREnv[1]).cModHP(cPKNV, -40);
+        cConfusedPKV.modHP(-40);
       }
       // if pokemon did not kill its self with hurt confusion:
-      if (cu.getPKV(iREnv[1]).isAlive())
+      if (cConfusedPKV.isAlive())
       {
         uint32_t numTotalEnv = std::min((unsigned)4 , iConfused - AIL_V_CONFUSED_0T);
         uint32_t numTerminalEnv = ((iConfused - AIL_V_CONFUSED_0T)>=5)?0:1;
@@ -1077,19 +925,18 @@ int engine_beginTurnVolatileEffect(
 
         std::array<size_t, 2> iTEnv;
       
-        if ((numTerminalEnv > 0) && (numTotalEnv > numTerminalEnv))
-        {
+        if ((numTerminalEnv > 0) && (numTotalEnv > numTerminalEnv)) {
           cu.duplicateState(iTEnv, terminalProbability, iREnv[1]);
 
           // variable % chance for this env to be the last environment confused:
-          cu.getTMV(iREnv[1]).getVolatile().confused = 0;
+          cConfusedPKV.status().cTeammate.confused = 0;
         }
       }
     }
     else /* equals AIL_V_CONFUSED_0T */
     {
       // pokemon breaks out of confusion this round
-      cTMV.getVolatile().confused = 0;
+      cPKV.status().cTeammate.confused = 0;
     }
   } // end of confused
 
@@ -1098,34 +945,24 @@ int engine_beginTurnVolatileEffect(
 
 int engine_secondaryBoostEffect(
   PkCU& cu,
-  const MoveNonVolatile& mNV, 
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV)
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
 {
-  const Move& cMove = cPKNV.getMove_base(cu.getICAction());
+  const Move& cMove = mV.getBase();
 
   // apply buffs to the current pokemon, and debuffs to the other pokemon:
-  for (size_t iBuff = 0; iBuff != 9; ++iBuff)
-  {
-    if (cMove.getSelfBuff(iBuff) != 0) 
-    {
-      cTMV.cModBoost(iBuff, cMove.getSelfBuff(iBuff));
-    }
+  for (size_t iBuff = 0; iBuff != 9; ++iBuff) {
+    cPKV.modBoost(iBuff, cMove.getSelfBuff(iBuff));
   }
 
-  // all other effects modify the target pokemon, and we don't want to modify a dead one (this wills top all other plugins from running as well)
+  // all other effects modify the target pokemon, and we don't want to modify a dead one
+  //  (this will stop all other plugins from running as well)
   if (!tPKV.isAlive()) { return 2; }
 
   for (size_t iBuff = 0; iBuff != 9; ++iBuff)
   {
-    if (cMove.getTargetDebuff(iBuff) != 0) 
-    {
-      tTMV.cModBoost(iBuff, -1 * cMove.getTargetDebuff(iBuff));
-    }
+    tPKV.modBoost(iBuff, -1 * cMove.getTargetDebuff(iBuff));
   }
 
   return 1;
@@ -1133,15 +970,11 @@ int engine_secondaryBoostEffect(
 
 int engine_secondaryNonvolatileEffect(
   PkCU& cu,
-  const MoveNonVolatile& mNV, 
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV)
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
 {
-  const Move& cMove = cPKNV.getMove_base(cu.getICAction());
+  const Move& cMove = mV.getBase();
   
   if (tPKV.getStatusAilment() != AIL_NV_NONE) { return 0; }
 
@@ -1156,7 +989,7 @@ int engine_secondaryNonvolatileEffect(
     case AIL_NV_POISON:
     default:
       // reset toxic tier:
-      tTMV.getVolatile().toxicPoison_tier = 0;
+      tPKV.status().cTeammate.toxicPoison_tier = 0;
       // apply generic status condition
       tPKV.setStatusAilment(cMove.getTargetAilment());
       // implicitly push back bEnv status condition (already on array)
@@ -1169,26 +1002,20 @@ int engine_secondaryNonvolatileEffect(
 
 int engine_secondaryVolatileEffect(
   PkCU& cu,
-  const MoveNonVolatile& mNV, 
-  const PokemonNonVolatile& cPKNV,
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV)
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
 {
-  const Move& cMove = cPKNV.getMove_base(cu.getICAction());
-
   // apply volatile status conditions to the other pokemon:
-  switch(cMove.getTargetVolatileAilment())
+  switch(mV.getBase().getTargetVolatileAilment())
   {
     case AIL_V_CONFUSED:
       // confused for (at most) 5 turns, and (at least) 2 turns:
-      tTMV.getVolatile().confused = AIL_V_CONFUSED_5T;
+      tPKV.status().cTeammate.confused = AIL_V_CONFUSED_5T;
       // implicitly push back bEnv
       break;
     case AIL_V_FLINCH:
-      tTMV.getVolatile().flinch = 1;
+      tPKV.status().cTeammate.flinch = 1;
     case AIL_V_INFATUATED:
     default:
     case AIL_V_NONE:
@@ -1199,17 +1026,14 @@ int engine_secondaryVolatileEffect(
 
 int engine_decrementPP(
   PkCU& cu,
-  const MoveNonVolatile& mNV, 
-  const PokemonNonVolatile& cPKNV, 
-  const PokemonNonVolatile& tPKNV,
-  TeamVolatile& cTMV,
-  TeamVolatile& tTMV,
-  PokemonVolatile& cPKV,
-  PokemonVolatile& tPKV)
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
 {
-  if (!cu.getBase().hasHit(cu.getICTeam()) || (&mNV.getBase() == struggle_t)) { return 0; }
+  // don't decrement PP if this move is struggle_t or the move did not hit
+  if (!cu.getBase().hasHit(cu.getICTeam()) || (&mV.getBase() == struggle_t)) { return 0; }
 
-  cPKV.getMV(cu.getICAction()).modPP(mNV.getBase(), -1);
+  mV.modPP(-1);
 
   return 1;
 };
@@ -1444,7 +1268,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(ENGINE_PLUGIN, "type resisting berry effect", PLUGIN_ON_MODIFYITEMPOWER, engine_typeResistingBerry, 0, 2));
   extensions.push_back(plugin(ENGINE_PLUGIN, "move PP decrement effect", PLUGIN_ON_ENDOFMOVE, engine_decrementPP, 0, 2));
   extensions.push_back(plugin(ENGINE_PLUGIN, "struggle damage effect", PLUGIN_ON_ENDOFMOVE, engine_move_struggle, 0, 2));
-  extensions.push_back(plugin(ENGINE_PLUGIN, "struggle always hits effect", PLUGIN_ON_MODIFYHITPROBABILITY, engine_move_struggle_alwaysHits, -1, 2));
+  extensions.push_back(plugin(ENGINE_PLUGIN, "struggle always hits effect", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, 2));
   extensions.push_back(plugin(ENGINE_PLUGIN, "nonvolatile speed change", PLUGIN_ON_MODIFYSPEED, engine_onModifySpeed_paralyze, -1, 2));
   extensions.push_back(plugin(ENGINE_PLUGIN, "nonvolatile beginning-of-round damage", PLUGIN_ON_BEGINNINGOFTURN, engine_beginTurnNonvolatileEffect, -2, 2));
   extensions.push_back(plugin(ENGINE_PLUGIN, "volatile beginning-of-round damage", PLUGIN_ON_BEGINNINGOFTURN, engine_beginTurnVolatileEffect, -1, 2));

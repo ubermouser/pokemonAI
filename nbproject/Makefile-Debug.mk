@@ -38,11 +38,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/agentMove.o \
 	${OBJECTDIR}/src/backpropNet.o \
 	${OBJECTDIR}/src/evaluator.o \
-	${OBJECTDIR}/src/evaluator_featureVector.o \
-	${OBJECTDIR}/src/evaluator_network128.o \
-	${OBJECTDIR}/src/evaluator_network16.o \
-	${OBJECTDIR}/src/evaluator_network32.o \
-	${OBJECTDIR}/src/evaluator_network64.o \
 	${OBJECTDIR}/src/evaluator_random.o \
 	${OBJECTDIR}/src/evaluator_simple.o \
 	${OBJECTDIR}/src/experienceNet.o \
@@ -57,13 +52,11 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/otherMove.o \
 	${OBJECTDIR}/src/pkIO.o \
 	${OBJECTDIR}/src/planner.o \
-	${OBJECTDIR}/src/planner_directed.o \
 	${OBJECTDIR}/src/planner_human.o \
 	${OBJECTDIR}/src/planner_max.o \
 	${OBJECTDIR}/src/planner_minimax.o \
 	${OBJECTDIR}/src/planner_minimax_thread.o \
 	${OBJECTDIR}/src/planner_random.o \
-	${OBJECTDIR}/src/planner_stochastic.o \
 	${OBJECTDIR}/src/ply.o \
 	${OBJECTDIR}/src/pokemonAI.o \
 	${OBJECTDIR}/src/ranked.o \
@@ -131,31 +124,6 @@ ${OBJECTDIR}/src/evaluator.o: src/evaluator.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator.o src/evaluator.cpp
-
-${OBJECTDIR}/src/evaluator_featureVector.o: src/evaluator_featureVector.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_featureVector.o src/evaluator_featureVector.cpp
-
-${OBJECTDIR}/src/evaluator_network128.o: src/evaluator_network128.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_network128.o src/evaluator_network128.cpp
-
-${OBJECTDIR}/src/evaluator_network16.o: src/evaluator_network16.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_network16.o src/evaluator_network16.cpp
-
-${OBJECTDIR}/src/evaluator_network32.o: src/evaluator_network32.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_network32.o src/evaluator_network32.cpp
-
-${OBJECTDIR}/src/evaluator_network64.o: src/evaluator_network64.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_network64.o src/evaluator_network64.cpp
 
 ${OBJECTDIR}/src/evaluator_random.o: src/evaluator_random.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -227,11 +195,6 @@ ${OBJECTDIR}/src/planner.o: src/planner.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/planner.o src/planner.cpp
 
-${OBJECTDIR}/src/planner_directed.o: src/planner_directed.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/planner_directed.o src/planner_directed.cpp
-
 ${OBJECTDIR}/src/planner_human.o: src/planner_human.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
@@ -256,11 +219,6 @@ ${OBJECTDIR}/src/planner_random.o: src/planner_random.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/planner_random.o src/planner_random.cpp
-
-${OBJECTDIR}/src/planner_stochastic.o: src/planner_stochastic.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/planner_stochastic.o src/planner_stochastic.cpp
 
 ${OBJECTDIR}/src/ply.o: src/ply.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -395,71 +353,6 @@ ${OBJECTDIR}/src/evaluator_nomain.o: ${OBJECTDIR}/src/evaluator.o src/evaluator.
 	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_nomain.o src/evaluator.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/evaluator.o ${OBJECTDIR}/src/evaluator_nomain.o;\
-	fi
-
-${OBJECTDIR}/src/evaluator_featureVector_nomain.o: ${OBJECTDIR}/src/evaluator_featureVector.o src/evaluator_featureVector.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/evaluator_featureVector.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_featureVector_nomain.o src/evaluator_featureVector.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/evaluator_featureVector.o ${OBJECTDIR}/src/evaluator_featureVector_nomain.o;\
-	fi
-
-${OBJECTDIR}/src/evaluator_network128_nomain.o: ${OBJECTDIR}/src/evaluator_network128.o src/evaluator_network128.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/evaluator_network128.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_network128_nomain.o src/evaluator_network128.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/evaluator_network128.o ${OBJECTDIR}/src/evaluator_network128_nomain.o;\
-	fi
-
-${OBJECTDIR}/src/evaluator_network16_nomain.o: ${OBJECTDIR}/src/evaluator_network16.o src/evaluator_network16.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/evaluator_network16.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_network16_nomain.o src/evaluator_network16.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/evaluator_network16.o ${OBJECTDIR}/src/evaluator_network16_nomain.o;\
-	fi
-
-${OBJECTDIR}/src/evaluator_network32_nomain.o: ${OBJECTDIR}/src/evaluator_network32.o src/evaluator_network32.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/evaluator_network32.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_network32_nomain.o src/evaluator_network32.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/evaluator_network32.o ${OBJECTDIR}/src/evaluator_network32_nomain.o;\
-	fi
-
-${OBJECTDIR}/src/evaluator_network64_nomain.o: ${OBJECTDIR}/src/evaluator_network64.o src/evaluator_network64.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/evaluator_network64.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_network64_nomain.o src/evaluator_network64.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/evaluator_network64.o ${OBJECTDIR}/src/evaluator_network64_nomain.o;\
 	fi
 
 ${OBJECTDIR}/src/evaluator_random_nomain.o: ${OBJECTDIR}/src/evaluator_random.o src/evaluator_random.cpp 
@@ -644,19 +537,6 @@ ${OBJECTDIR}/src/planner_nomain.o: ${OBJECTDIR}/src/planner.o src/planner.cpp
 	    ${CP} ${OBJECTDIR}/src/planner.o ${OBJECTDIR}/src/planner_nomain.o;\
 	fi
 
-${OBJECTDIR}/src/planner_directed_nomain.o: ${OBJECTDIR}/src/planner_directed.o src/planner_directed.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/planner_directed.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/planner_directed_nomain.o src/planner_directed.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/planner_directed.o ${OBJECTDIR}/src/planner_directed_nomain.o;\
-	fi
-
 ${OBJECTDIR}/src/planner_human_nomain.o: ${OBJECTDIR}/src/planner_human.o src/planner_human.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/planner_human.o`; \
@@ -720,19 +600,6 @@ ${OBJECTDIR}/src/planner_random_nomain.o: ${OBJECTDIR}/src/planner_random.o src/
 	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/planner_random_nomain.o src/planner_random.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/planner_random.o ${OBJECTDIR}/src/planner_random_nomain.o;\
-	fi
-
-${OBJECTDIR}/src/planner_stochastic_nomain.o: ${OBJECTDIR}/src/planner_stochastic.o src/planner_stochastic.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/planner_stochastic.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/planner_stochastic_nomain.o src/planner_stochastic.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/planner_stochastic.o ${OBJECTDIR}/src/planner_stochastic_nomain.o;\
 	fi
 
 ${OBJECTDIR}/src/ply_nomain.o: ${OBJECTDIR}/src/ply.o src/ply.cpp 

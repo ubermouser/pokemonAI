@@ -11,10 +11,6 @@
 
 class Pokedex;
 class plugin;
-class MoveNonVolatile;
-class PokemonNonVolatile;
-union TeamVolatile;
-union PokemonVolatile;
 
 typedef boost::function<bool (const Pokedex&, std::vector<plugin>&)> regExtension_type;
 

@@ -6,14 +6,11 @@
 #include <stdint.h>
 #include <array>
 
-#include "../inc/team_nonvolatile.h"
+#include "team_nonvolatile.h"
 
-class PKAISHARED EnvironmentNonvolatile
-{
-private:
-  std::array<TeamNonVolatile, 2> teams;
-
+class PKAISHARED EnvironmentNonvolatile {
 public:
+  std::array<TeamNonVolatile, 2> teams;
 
   EnvironmentNonvolatile()
     : teams()
@@ -42,10 +39,6 @@ public:
 
     return teams[(movesFirst+1)&1];
   };
-
-  friend union EnvironmentVolatile;
-
-public:
 
   void initialize();
 

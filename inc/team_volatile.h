@@ -8,188 +8,123 @@
 #ifndef TEAM_VOLATILE_H
 #define	TEAM_VOLATILE_H
 
-#include "../inc/pkai.h"
+#include "pkai.h"
 
-#include <stdint.h>
 #include <array>
+#include <ostream>
+#include <stdint.h>
 
-#include "../inc/pokemon_volatile.h"
+#include "nonvolatile_volatile.h"
+#include "pokemon_volatile.h"
+#include "team_nonvolatile.h"
+#include "team_status.h"
 
 class TeamNonVolatile;
 class PokemonNonVolatile;
 
-struct VolatileStatus
+
+struct PKAISHARED TeamVolatileData
 {
-  // boost array
-  union
-  {
-    int32_t raw;
-    struct
-    {
-      int32_t B_ATK : 4;
-      int32_t B_SPA : 4;
-      int32_t B_DEF : 4;
-      int32_t B_SPD : 4;
-      int32_t B_SPE : 4;
-      int32_t B_ACC : 4;
-      int32_t B_EVA : 4;
-      int32_t B_CHT : 4;
-    } data;
-  } boosts;
-  // END OF FIRST WORD
-  // volatile status:
-  uint32_t confused : 3;
-  uint32_t disable_duration : 3;
-  uint32_t disable_action : 2; 
-  uint32_t healBlock : 3;
-  uint32_t encore_action : 2;
-  uint32_t encore_duration : 3;
-  // bit 1.16
-  uint32_t iLastAction : 4; // updated only when moves like encore/torment are in play on the other team
-  uint32_t curse : 1;
-  uint32_t flinch : 1;
-  uint32_t focusEnergy : 1;
-  uint32_t mudSport : 1;
-  uint32_t perishSong : 2;
-  uint32_t torment : 1;
-  uint32_t trap : 3; // partial trap 0-5, full trap 7
-  uint32_t lockOn : 1;
-  uint32_t identify : 1;
-  // END OF SECOND WORD
-  uint32_t substitute : 8;
-  uint32_t nightmare : 1;
-  uint32_t leechSeed : 1;
-  uint32_t waterSport : 1;
-  // bit 2.11
-  // values not transferrable via baton pass or any other method:
-  uint32_t itemScratch : 4; // free bits for the current item to use
-  uint32_t numRoundsInPlay : 4; // updated only when conditions like slow start are in play
-  uint32_t toxicPoison_tier : 4; // updated only when conditions like toxic poison are in play
-  uint32_t chargeMove : 3; // includes uproar, rampage, charge, and recharge
-  uint32_t defensiveCurl : 1;
-  uint32_t momentum : 3;
-  uint32_t imprison : 1;
-  uint32_t infatuate : 1;
-  // END OF THIRD WORD
+  /* storage for 6 pokemon. Unused pokemon are zeroed */
+  std::array<PokemonVolatileData, 6> teammates;
+
+  TeamStatus status;
+
+
+  /* Compares values of selected team. Base values are compared by
+    * pointer, volatile values are compared by value */
+  bool operator==(const TeamVolatileData& other) const;
+  bool operator!=(const TeamVolatileData& other) const;
 };
 
-struct NonVolatileStatus
-{
-  // index of the current pokemon
-  uint32_t iCPokemon : 3;
-  // weather effects:
-  uint32_t weather_duration : 3;
-  uint32_t weather_type : 3;
-  uint32_t room_duration : 3;
-  uint32_t room_type : 2;
-  uint32_t gravity : 3;
-  // entry hazards:
-  uint32_t spikes : 2;
-  // bit 0.16
-  uint32_t stealthRock : 1;
-  uint32_t toxicSpikes : 2;
-  // team protection:
-  uint32_t lightScreen : 3;
-  uint32_t reflect : 3;
-  uint32_t safeguard : 3;
-  uint32_t mist : 1;
-};
 
-union PKAISHARED TeamVolatile
-{
-  uint64_t raw[8];
-  struct
-  {
-    /* storage for 6 pokemon. Unused pokemon are zeroed */
-    PokemonVolatile teammates[6];
+#define TEAM_VOLATILE_IMPL_TEMPLATE template<typename PokemonVolatileType, typename VolatileType, typename StatusType>
+#define TEAM_VOLATILE_IMPL TeamVolatileImpl<PokemonVolatileType, VolatileType, StatusType>
 
-    union
-    {
-      uint64_t raw[2];
-      struct
-      {
-        union
-        {
-          uint32_t raw[3];
-          VolatileStatus data;
-        } cTeammate;
-        union
-        {
-          uint32_t raw;
-          NonVolatileStatus data;
-        } nonvolatile;
-      } data;
-    } status;
-  } data;
+TEAM_VOLATILE_IMPL_TEMPLATE
+class PKAISHARED TeamVolatileImpl: public NonvolatileVolatilePair<const TeamNonVolatile, VolatileType> {
+public:
+  using base_t = NonvolatileVolatilePair<const TeamNonVolatile, VolatileType>;
+  using impl_t = TEAM_VOLATILE_IMPL;
+  using pokemonvolatile_t = PokemonVolatileType;
+  using status_t = StatusType;
+  using base_t::base_t;
+  using base_t::data;
+  using base_t::nv;
 
-  PokemonVolatile& teammate(size_t iTeammate) 
-  { 
-    return data.teammates[iTeammate]; 
-  };
+  const VolatileStatus& getVolatile() const { return data().status.cTeammate; };
+  const NonVolatileStatus& getNonVolatile() const { return data().status.nonvolatile; };
 
-  const PokemonVolatile& teammate(size_t iTeammate) const 
-  { 
-    return data.teammates[iTeammate]; 
-  };
+  pokemonvolatile_t teammate(size_t iTeammate) const;
 
-  void resetVolatile();
-
-  VolatileStatus& getVolatile() { return data.status.data.cTeammate.data; };
-  const VolatileStatus& getVolatile() const { return data.status.data.cTeammate.data; };
-
-  NonVolatileStatus& getNonVolatile() { return data.status.data.nonvolatile.data; };
-  const NonVolatileStatus& getNonVolatile() const { return data.status.data.nonvolatile.data; };
-
-  /* Resets all pokemon in this team */
-  void initialize(const TeamNonVolatile& nv);
-
-  /* Retrieves a pointer to the current pokemon active on this team */
-  const PokemonVolatile& getPKV() const { return data.teammates[getICPKV()]; };
-  
-  /* Retrieves a pointer to the current pokemon active on this team */
-  PokemonVolatile& getPKV() { return data.teammates[getICPKV()]; };
-
-  /* gets current index of pokemon volatile on this team */
-  size_t getICPKV() const { return data.status.data.nonvolatile.data.iCPokemon; };
-  
-  /* Swaps the currently active pokemon with the target pokemon */
-  bool swapPokemon(size_t iAction, bool preserveVolatile = false);
-  
   /* returns number of teammates on this team that are still alive */
   uint32_t numTeammatesAlive() const;
 
-  int32_t cGetBoost(size_t type) const;
+  /* Retrieves a pointer to the current pokemon active on this team */
+  pokemonvolatile_t getPKV() const { return teammate(getICPKV()); }
 
-  void cSetBoost(size_t type, int32_t value);
+  /* gets current index of pokemon volatile on this team */
+  size_t getICPKV() const { return data().status.nonvolatile.iCPokemon; };
 
-  bool cModBoost(size_t type, int32_t amt);
+  status_t& status() const { return data().status; }
 
-  uint32_t cGetFV_boosted(const TeamNonVolatile& tNV, size_t type, int32_t tempBoost = 0) const;
-  uint32_t cGetFV_boosted(const PokemonNonVolatile& tNV, size_t type, int32_t tempBoost = 0) const;
+  int32_t cGetBoost(size_t type) const { return getPKV().getBoost(type); };
 
-  fpType cGetAccuracy_boosted(size_t type, int32_t tempBoost = 0) const;
+  uint32_t cGetFV_boosted(size_t type, int32_t tempBoost = 0) const {
+    return getPKV().getFV_boosted(type, tempBoost);
+  };
+  fpType cGetAccuracy_boosted(size_t type, int32_t tempBoost = 0) const {
+    return getPKV().getAccuracy_boosted(type, tempBoost);
+  };
 
-  bool cHasPP() const;
+  bool cHasPP() const { return getPKV().hasPP(); };
 
   /* returns TRUE if the pokemon has more than 0 hitpoints */
-  bool cIsAlive() const;
+  bool cIsAlive() const { return getPKV().isAlive(); }
+
+  void printTeam(std::ostream& os) const;
+};
+
+
+class PKAISHARED ConstTeamVolatile: public TeamVolatileImpl<ConstPokemonVolatile, const TeamVolatileData, const TeamStatus> {
+public:
+  using impl_t::impl_t;
+};
+
+
+class PKAISHARED TeamVolatile: public TeamVolatileImpl<PokemonVolatile, TeamVolatileData, TeamStatus> {
+public:
+  using impl_t::impl_t;
+
+  operator ConstTeamVolatile() { return ConstTeamVolatile{nv(), data()}; };
+
+  void resetVolatile();
+
+  
+  VolatileStatus& getVolatile() { return data().status.cTeammate; };
+  NonVolatileStatus& getNonVolatile() { return data().status.nonvolatile; };
+
+  /* Resets all pokemon in this team */
+  void initialize();
+  
+  /* Swaps the currently active pokemon with the target pokemon */
+  bool swapPokemon(size_t iAction, bool preserveVolatile = false);
+
+  void cSetBoost(size_t type, int32_t value) { getPKV().setBoost(type, value); }
+
+  bool cModBoost(size_t type, int32_t amt) { return getPKV().modBoost(type, amt); }
 
   /* increment target's hp by quantity. */
-  void cModHP(const PokemonNonVolatile& nonvolatile, int32_t quantity);
+  void cModHP(int32_t quantity) { getPKV().modHP(quantity); };
 
   /* set target's hp to quantity. */
-  void cSetHP(const PokemonNonVolatile& nonvolatile, uint32_t amt);
+  void cSetHP(uint32_t amt) { getPKV().setHP(amt); };
 
   /* set target's hp to % quantity of total */
-  void cSetPercentHP(const PokemonNonVolatile& nonvolatile, fpType percent);
+  void cSetPercentHP(fpType percent) { getPKV().setPercentHP(percent); };
   
   /* increment target's HP by percent of total. */
-  void cModPercentHP(const PokemonNonVolatile& nonvolatile, fpType percent);
-  
-  /* Compares values of selected team. Base values are compared by
-    * pointer, volatile values are compared by value */
-  bool operator==(const TeamVolatile& other) const;
-  bool operator!=(const TeamVolatile& other) const;
+  void cModPercentHP(fpType percent) { getPKV().modPercentHP(percent); };
 };
 
 #endif	/* TEAM_VOLATILE_H */

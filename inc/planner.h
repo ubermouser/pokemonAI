@@ -1,20 +1,16 @@
 #ifndef PLANNER_H
 #define PLANNER_H
 
-#include "../inc/pkai.h"
+#include "pkai.h"
 
+#include <memory>
 #include <vector>
 
-#include "../inc/name.h"
-
-class Evaluator;
-class EnvironmentNonvolatile;
-class PkCU;
-
-union EnvironmentPossible;
-
-
-
+#include "environment_nonvolatile.h"
+#include "environment_possible.h"
+#include "evaluator.h"
+#include "pkCU.h"
+#include "name.h"
 
 
 class PlannerResult
@@ -36,25 +32,39 @@ public:
   };
 };
 
-class Planner : public HasName
+class Planner : public Name
 {
 private:
   static const std::vector<PlannerResult> emptyResults;
+protected:
+  std::shared_ptr<PkCU> cu_;
+  std::shared_ptr<Evaluator> eval_;
+  std::shared_ptr<const EnvironmentNonvolatile> nv_;
+
+  size_t agentTeam_;
+
+  virtual std::string baseName() const { return "planner"; }
+  virtual void resetName();
+
 public:
+  Planner(const std::string& name, size_t agentTeam): Name(name), agentTeam_(agentTeam) {};
+
   virtual ~Planner() { };
 
   /* create a copy of the current planner (and its evaluator) */
   virtual Planner* clone() const = 0;
 
   /* does the planner have all acceptable data required to perform planning? */
-  virtual bool isInitialized() const { return true; }
+  virtual bool isInitialized() const;
 
   /* if the planner uses an evaluator, set the evaluator to evalType */
-  virtual void setEvaluator(const Evaluator& evalType) = 0;
-  virtual const Evaluator* getEvaluator() const = 0;
+  virtual void setEvaluator(std::shared_ptr<Evaluator>& evaluator);
+  virtual std::shared_ptr<const Evaluator> getEvaluator() const { return eval_; };
 
   /* sets the nonvolatile environment to _cEnvironment, the team being referenced */
-  virtual void setEnvironment(PkCU& _cu, size_t _agentTeam) = 0;
+  virtual void setEnvironment(std::shared_ptr<const EnvironmentNonvolatile>& env);
+
+  virtual void setEngine(std::shared_ptr<PkCU>& cu);
 
   /* generate an action */
   virtual uint32_t generateSolution(const EnvironmentPossible& origin) = 0;

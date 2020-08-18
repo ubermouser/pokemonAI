@@ -14,6 +14,7 @@
         <itemPath>../inc/move_nonvolatile.h</itemPath>
         <itemPath>../inc/move_volatile.h</itemPath>
         <itemPath>../inc/nature.h</itemPath>
+        <itemPath>../inc/nonvolatile_volatile.h</itemPath>
         <itemPath>../inc/pkCU.h</itemPath>
         <itemPath>../inc/pluggable.h</itemPath>
         <itemPath>../inc/pluggable_types.h</itemPath>
@@ -146,6 +147,8 @@
       <item path="../inc/name.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/nature.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/nonvolatile_volatile.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/orphan.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -292,6 +295,8 @@
       <item path="../inc/name.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/nature.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/nonvolatile_volatile.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/orphan.h" ex="false" tool="3" flavor2="0">
       </item>

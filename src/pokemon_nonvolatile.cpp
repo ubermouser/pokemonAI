@@ -1,11 +1,7 @@
-
-//#define PKAI_EXPORT
 #include "../inc/pokemon_nonvolatile.h"
-//#undef PKAI_EXPORT
 
 #include <algorithm>
 
-//#define PKAI_STATIC
 #include "../inc/pokedex.h"
 #include "../inc/pokemon_volatile.h"
 #include "../inc/team_volatile.h"
@@ -14,7 +10,7 @@
 #include "../inc/ability.h"
 #include "../inc/item.h"
 #include "../inc/move.h"
-//#undef PKAI_STATIC
+
 #include "../inc/init_toolbox.h"
 #include "../inc/orphan.h"
 
@@ -665,111 +661,6 @@ std::ostream& operator <<(std::ostream& os, const PokemonNonVolatile& cPKNV)
 
   return os;
 }
-
-std::ostream& operator <<(std::ostream& os, const pokemon_print& cP)
-{
-  os << "\"" << cP.cPokemon.getName() << "\"-\"" << cP.cPokemon.getBase().getName() << "\" " << cP.currentPokemon.getHP() << "/" << cP.cTeam.cGetFV_boosted(cP.cPokemon, FV_HITPOINTS);
-
-  // non-volatile ailments
-  switch(cP.currentPokemon.getStatusAilment())
-  {
-    case AIL_NV_BURN:
-      os << " BRN";
-      break;
-    case AIL_NV_FREEZE:
-      os << " FRZ";
-      break;
-    case AIL_NV_PARALYSIS:
-      os << " PAR";
-      break;
-    case AIL_NV_POISON_TOXIC:
-      os << " PST";
-      break;
-    case AIL_NV_POISON:
-      os << " PSN";
-      break;
-    case AIL_NV_REST_1T:
-    case AIL_NV_REST_2T:
-    case AIL_NV_REST_3T:
-    case AIL_NV_SLEEP_4T:
-    case AIL_NV_SLEEP_3T:
-    case AIL_NV_SLEEP_2T:
-    case AIL_NV_SLEEP_1T:
-      os << " SLP";
-      break;
-    case AIL_NV_NONE:
-    default:
-      break;
-  }
-  
-  // boosts:
-  if (cP.currentPokemon == cP.cTeam.getPKV())
-  {
-    // volatile ailments:
-    // target confused:
-    if (cP.cTeam.getVolatile().confused > 0)
-    {
-      os << " (CNFSD)";
-    }
-    // target infatuated:
-    if (cP.cTeam.getVolatile().infatuate > 0)
-    {
-      os << " (INFAT)";
-    }
-    /*// target flinched:
-    sA_V = AIL_V_FLINCH;
-    if (cP.currentPokemon.getVolatileStatusCondition(cP.cPokemon, sA_V))
-    {
-      os << " (FLNCH)";
-    }
-    // target flinched last turn:
-    sA_V = AIL_V_FLINCHED;
-    if (cP.currentPokemon.getVolatileStatusCondition(cP.cPokemon, sA_V))
-    {
-      os << " (FLNCH)";
-    }*/
-
-    os << std::showpos; // show the + or -
-    if (cP.cTeam.cGetBoost(FV_ATTACK) != 0)
-    {
-      os << " " << cP.cTeam.cGetBoost(FV_ATTACK) << "atk";
-    }
-    if (cP.cTeam.cGetBoost(FV_SPATTACK) != 0)
-    {
-      os << " " << cP.cTeam.cGetBoost(FV_SPATTACK) << "spa";
-    }
-    if (cP.cTeam.cGetBoost(FV_DEFENSE) != 0)
-    {
-      os << " " << cP.cTeam.cGetBoost(FV_DEFENSE) << "def";
-    }
-    if (cP.cTeam.cGetBoost(FV_SPDEFENSE) != 0)
-    {
-      os << " " << cP.cTeam.cGetBoost(FV_SPDEFENSE) << "spd";
-    }
-    if (cP.cTeam.cGetBoost(FV_SPEED) != 0)
-    {
-      os << " " << cP.cTeam.cGetBoost(FV_SPEED) << "spe";
-    }
-    if (cP.cTeam.cGetBoost(FV_EVASION) != 0)
-    {
-      os << " " << cP.cTeam.cGetBoost(FV_EVASION) << "eva";
-    }
-    if (cP.cTeam.cGetBoost(FV_ACCURACY) != 0)
-    {
-      os << " " << cP.cTeam.cGetBoost(FV_ACCURACY) << "acc";
-    }
-    if (cP.cTeam.cGetBoost(FV_CRITICALHIT) != 0)
-    {
-      os << " " << cP.cTeam.cGetBoost(FV_CRITICALHIT) << "crt";
-    }
-    os << std::noshowpos; // stop showing + or -
-  }
-  
-  os << "\n";
-  
-  return os;
-}
-
 
 
 static const std::string header = "PKAIP0";

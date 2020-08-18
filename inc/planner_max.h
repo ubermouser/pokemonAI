@@ -7,44 +7,34 @@
 class Evaluator;
 class PkCU;
 
-class planner_max : public Planner
+class PlannerMax : public Planner
 {
-private:
-  std::string ident;
-
+protected:
   std::vector<PlannerResult> results;
 
-  PkCU* cu;
-
-  /* evaluator being used by this planner */
-  Evaluator* eval;
-
-  size_t agentTeam;
-
-  size_t engineAccuracy;
+  size_t engineAccuracy_;
 
 public:
-  planner_max(size_t engineAccuracy = 1);
-  planner_max(const Evaluator& evalType, size_t engineAccuracy = 1);
-
-  planner_max(const planner_max& other);
+  PlannerMax(size_t agentTeam, size_t engineAccuracy = 1);
+  PlannerMax(const PlannerMax& other) = default;
   
-  ~planner_max();
+  ~PlannerMax() {};
 
-  planner_max* clone() const { return new planner_max(*this); }
+  virtual std::string baseName() const override { return "max_planner"; }
 
-  bool isInitialized() const;
+  PlannerMax* clone() const { return new PlannerMax(*this); }
 
-  const std::string& getName() const { return ident; };
-
-  void setEvaluator(const Evaluator& evalType);
-  const Evaluator* getEvaluator() const { return eval; }
-
-  void setEnvironment(PkCU& _cu, size_t _agentTeam);
+  void setEngine(std::shared_ptr<PkCU>& cu) override;
 
   uint32_t generateSolution(const EnvironmentPossible& origin);
 
-  static uint32_t generateSolution(PkCU& _cu, Evaluator& eval, const EnvironmentPossible& origin, size_t _agentTeam, size_t* nodesEvaluated = NULL, std::vector<PlannerResult>* results = NULL);
+  static uint32_t generateSolution(
+      PkCU& cu,
+      Evaluator& eval,
+      const ConstEnvironmentPossible& env,
+      size_t _agentTeam,
+      size_t* nodesEvaluated = NULL,
+      std::vector<PlannerResult>* results = NULL);
 
   const std::vector<PlannerResult>& getDetailedResults() const { return results; };
   void clearResults() { results.clear(); };

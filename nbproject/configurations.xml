@@ -134,11 +134,6 @@
                    projectFiles="true">
       <logicalFolder name="f1" displayName="evaluators" projectFiles="true">
         <itemPath>src/evaluator.cpp</itemPath>
-        <itemPath>src/evaluator_featureVector.cpp</itemPath>
-        <itemPath>src/evaluator_network128.cpp</itemPath>
-        <itemPath>src/evaluator_network16.cpp</itemPath>
-        <itemPath>src/evaluator_network32.cpp</itemPath>
-        <itemPath>src/evaluator_network64.cpp</itemPath>
         <itemPath>src/evaluator_random.cpp</itemPath>
         <itemPath>src/evaluator_simple.cpp</itemPath>
       </logicalFolder>
@@ -160,11 +155,9 @@
           <itemPath>src/vertex.cpp</itemPath>
         </logicalFolder>
         <itemPath>src/planner.cpp</itemPath>
-        <itemPath>src/planner_directed.cpp</itemPath>
         <itemPath>src/planner_human.cpp</itemPath>
         <itemPath>src/planner_max.cpp</itemPath>
         <itemPath>src/planner_random.cpp</itemPath>
-        <itemPath>src/planner_stochastic.cpp</itemPath>
       </logicalFolder>
       <logicalFolder name="f5" displayName="toolbox" projectFiles="true">
         <logicalFolder name="f1" displayName="fixedpoint" projectFiles="true">
@@ -477,16 +470,6 @@
       </item>
       <item path="src/evaluator.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/evaluator_featureVector.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/evaluator_network128.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/evaluator_network16.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/evaluator_network32.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/evaluator_network64.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/evaluator_random.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/evaluator_simple.cpp" ex="false" tool="1" flavor2="0">
@@ -521,8 +504,6 @@
       </item>
       <item path="src/planner.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/planner_directed.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/planner_human.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/planner_max.cpp" ex="false" tool="1" flavor2="0">
@@ -532,8 +513,6 @@
       <item path="src/planner_minimax_thread.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/planner_random.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/planner_stochastic.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/ply.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -866,16 +845,6 @@
       </item>
       <item path="src/evaluator.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/evaluator_featureVector.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/evaluator_network128.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/evaluator_network16.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/evaluator_network32.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/evaluator_network64.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/evaluator_random.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/evaluator_simple.cpp" ex="false" tool="1" flavor2="0">
@@ -910,8 +879,6 @@
       </item>
       <item path="src/planner.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/planner_directed.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/planner_human.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/planner_max.cpp" ex="false" tool="1" flavor2="0">
@@ -921,8 +888,6 @@
       <item path="src/planner_minimax_thread.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/planner_random.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/planner_stochastic.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/ply.cpp" ex="false" tool="1" flavor2="0">
       </item>

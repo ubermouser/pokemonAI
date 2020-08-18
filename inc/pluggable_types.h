@@ -11,8 +11,9 @@ class PokemonNonVolatile;
 class Type;
 class PkCU;
 
-union PokemonVolatile;
-union TeamVolatile;
+class MoveVolatile;
+class PokemonVolatile;
+class TeamVolatile;
 
 // script types:
 #define PLUGIN_MAXSIZE 26
@@ -49,116 +50,80 @@ enum pluginType
 typedef int (*onSwitch_rawType)
   (
   PkCU&,
-  const PokemonNonVolatile&, 
-  TeamVolatile&,
-  PokemonVolatile&);
+  PokemonVolatile);
 
 typedef int (*onEvaluateMove_rawType)
   (
   PkCU&,
-  const MoveNonVolatile&, 
-  const PokemonNonVolatile&, 
-  const PokemonNonVolatile&,
-  TeamVolatile&,
-  TeamVolatile&,
-  PokemonVolatile&,
-  PokemonVolatile&);
+  MoveVolatile,
+  PokemonVolatile,
+  PokemonVolatile);
 
 typedef int (*onModifyBracket_rawType)
   (PkCU&,
-  const MoveNonVolatile&,
-  const PokemonNonVolatile&,
-  const TeamVolatile&,
-  const PokemonVolatile&,
+  MoveVolatile,
+  PokemonVolatile,
   int32_t&);
 
 typedef int (*onModifySpeed_rawType)
   (PkCU&,
-  const PokemonNonVolatile&,
-  const TeamVolatile&,
-  const PokemonVolatile&,
+  PokemonVolatile,
   uint32_t&);
 
 typedef int (*onEndOfRound_rawType)
   (PkCU&,
-  const PokemonNonVolatile&,
-  TeamVolatile&,
-  PokemonVolatile&
+  PokemonVolatile
   );
 
 typedef int (*onBeginningOfTurn_rawType)
   (PkCU&,
-  const PokemonNonVolatile&,
-  TeamVolatile&,
-  PokemonVolatile&
+  PokemonVolatile
   );
 
 typedef int (*onSetPower_rawType)
   (PkCU&,
-  const MoveNonVolatile&,
-  const PokemonNonVolatile&,
-  const PokemonNonVolatile&,
-  TeamVolatile&,
-  TeamVolatile&,
-  PokemonVolatile&,
-  PokemonVolatile&,
+  MoveVolatile,
+  PokemonVolatile,
+  PokemonVolatile,
   uint32_t&);
 
 typedef int (*onModifyBasePower_rawType)
   (PkCU&,
-  const MoveNonVolatile&,
-  const PokemonNonVolatile&,
-  const PokemonNonVolatile&,
-  TeamVolatile&,
-  TeamVolatile&,
-  PokemonVolatile&,
-  PokemonVolatile&,
+  MoveVolatile,
+  PokemonVolatile,
+  PokemonVolatile,
   uint32_t&);
 
 typedef int (*onModifyPower_rawType)
   (PkCU&,
-  const MoveNonVolatile&,
-  const PokemonNonVolatile&,
-  const PokemonNonVolatile&,
-  TeamVolatile&,
-  TeamVolatile&,
-  PokemonVolatile&,
-  PokemonVolatile&,
+  MoveVolatile,
+  PokemonVolatile,
+  PokemonVolatile,
   fpType&);
 
 typedef int (*onModifyTypePower_rawType)
   (PkCU&,
-  const MoveNonVolatile&,
-  const PokemonNonVolatile&,
-  const PokemonNonVolatile&,
   const Type&,
-  TeamVolatile&,
-  TeamVolatile&,
-  PokemonVolatile&,
-  PokemonVolatile&,
+  MoveVolatile,
+  PokemonVolatile,
+  PokemonVolatile,
   fpType&);
 
 typedef int (*onModifyMoveType_rawType)
   (PkCU&,
-  const MoveNonVolatile&,
-  const PokemonNonVolatile&,
-  const PokemonNonVolatile&,
-  TeamVolatile&,
-  TeamVolatile&,
-  PokemonVolatile&,
-  PokemonVolatile&,
+  MoveVolatile,
+  PokemonVolatile,
+  PokemonVolatile,
   const Type*&);
 
 typedef int (*onEndOfTurn_rawType)
   (PkCU&,
-  const PokemonNonVolatile&,
-  TeamVolatile&,
-  PokemonVolatile&
+  PokemonVolatile
   );
 
 typedef int (*onInitMove_rawType)
-  (PokemonNonVolatile&,
-  MoveNonVolatile&);
+  (PokemonNonVolatile,
+  MoveNonVolatile);
 
 typedef void (*voidFunction_rawType)(void*);
 

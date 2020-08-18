@@ -8,18 +8,18 @@
 #ifndef POKEMON_NONVOLATILE_H
 #define	POKEMON_NONVOLATILE_H
 
-#include "../inc/pkai.h"
+#include "pkai.h"
 
 #include <stdint.h>
 #include <ostream>
 #include <array>
 #include <vector>
 
-#include "../inc/signature.h"
+#include "signature.h"
 
-#include "../inc/orphan.h"
-#include "../inc/name.h"
-#include "../inc/move_nonvolatile.h"
+#include "orphan.h"
+#include "name.h"
+#include "move_nonvolatile.h"
 
 #define STAGE0 6
 
@@ -27,11 +27,10 @@ class Pokedex;
 class Item;
 class Ability;
 class Nature;
-class pokemon_print;
 class PokemonBase;
 
-union TeamVolatile;
-union PokemonVolatile;
+class TeamVolatile;
+class PokemonVolatile;
 
 #define POKEMON_NONVOLATILE_DIGESTSIZE (MOVE_NONVOLATILE_DIGESTSIZE*4 + 94)
 
@@ -41,7 +40,6 @@ class PKAISHARED PokemonNonVolatile : public Name, public Signature<PokemonNonVo
 public:
   using OrphanSet = orphan::OrphanSet;
 
-private:
   /* The pokemon in which this volatile set is based off of*/
   const PokemonBase* base; 
   
@@ -110,14 +108,6 @@ private:
    * Source: http://www.smogon.com/dp/articles/stats
    */
   void setFV(unsigned int targetFV);
-
-public:
-
-  //friend class pkIO;
-  friend union PokemonVolatile;
-  friend union TeamVolatile;
-  friend PKAISHARED std::ostream& operator <<(std::ostream& os, const pokemon_print& combinedPokemon);
-  friend PKAISHARED std::ostream& operator <<(std::ostream& os, const PokemonNonVolatile& cPKNV);
 
   PokemonNonVolatile& operator=(const PokemonNonVolatile& other);
 
@@ -282,28 +272,9 @@ public:
     OrphanSet* mismatchedMoves = NULL);
 };
 
+
 PKAISHARED std::ostream& operator <<(std::ostream& os, const PokemonNonVolatile& cPKNV);
 
-
-class PKAISHARED pokemon_print
-{
-private:
-  const PokemonNonVolatile& cPokemon;
-  const TeamVolatile& cTeam;
-  const PokemonVolatile& currentPokemon;
-
-public:
-  pokemon_print(const PokemonNonVolatile& _cPokemon, const TeamVolatile& _cTeam, const PokemonVolatile& _currentPokemon)
-    : cPokemon(_cPokemon),
-    cTeam(_cTeam),
-    currentPokemon(_currentPokemon)
-  {
-  };
-
-  friend PKAISHARED std::ostream& operator <<(std::ostream& os, const pokemon_print& combinedPokemon);
-};
-
-PKAISHARED std::ostream& operator <<(std::ostream& os, const pokemon_print& combinedPokemon);
 
 #endif	/* POKEMON_NONVOLATILE_H */
 

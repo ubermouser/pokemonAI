@@ -15,26 +15,24 @@
 #include <vector>
 #include <array>
 
-#include "../inc/signature.h"
+#include "name.h"
+#include "pokemon_nonvolatile.h"
+#include "signature.h"
 
-#include "../inc/pokemon_nonvolatile.h"
-#include "../inc/name.h"
 
-union TeamVolatile;
+class TeamVolatile;
 
 #define TEAM_NONVOLATILE_DIGESTSIZE (POKEMON_NONVOLATILE_DIGESTSIZE * 6 + 1)
 
 class PKAISHARED TeamNonVolatile : public Name, public Signature<TeamNonVolatile, TEAM_NONVOLATILE_DIGESTSIZE> 
 {
-
-private:
+public:
   /* nonvolatile teammmates of this team */ 
   std::array<PokemonNonVolatile, 6> teammates;
 
   /* number of pokemon in this team */
   uint8_t numTeammates;
   
-public:
   TeamNonVolatile();
   TeamNonVolatile(const TeamNonVolatile& orig);
   ~TeamNonVolatile() { };
@@ -86,9 +84,6 @@ public:
   bool input(const std::vector<std::string>& lines, size_t& iLine);
   
   void createDigest_impl(std::array<uint8_t, TEAM_NONVOLATILE_DIGESTSIZE>& digest) const;
-
-  friend class PkIO;
-  friend union TeamVolatile;
 
 };
 
