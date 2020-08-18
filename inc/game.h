@@ -132,7 +132,7 @@ public:
 
   void setTeam(size_t iAgent, const TeamNonVolatile& cTeam);
 
-  void setEvaluator(size_t iAgent, const std::shared_ptr<Evaluator>& eval);
+  void setEvaluator(const std::shared_ptr<Evaluator>& eval);
   void setDigestEvaluator(const std::shared_ptr<Evaluator>& eval);
   void setPlanner(size_t iAgent, const std::shared_ptr<Planner>& cPlanner);
   void setInitialState(const EnvironmentVolatileData& rolloutState);

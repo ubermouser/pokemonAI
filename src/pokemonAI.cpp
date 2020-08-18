@@ -107,12 +107,12 @@ PokemonAI::PokemonAI()
   //trueskill defaults:
   tSettings = trueSkillSettings::defaultSettings;
 
-  evaluator_featureVector::initStatic();
+  //evaluator_featureVector::initStatic();
 }
 
 PokemonAI::~PokemonAI()
 {
-  evaluator_featureVector::uninitStatic();
+  //evaluator_featureVector::uninitStatic();
 
   if (game != NULL) { delete game; }
   if (trainer != NULL) { delete trainer; }
@@ -332,7 +332,8 @@ void PokemonAI::printEvaluators() const
   {
     const neuralNet& cNet = networks[iNetwork];
     if (!cNet.isInitialized()) { continue; }
-    const evaluator_featureVector* cEval = evaluator_featureVector::getEvaluator(cNet.numInputs(), cNet.numOutputs());
+    //const evaluator_featureVector* cEval = evaluator_featureVector::getEvaluator(cNet.numInputs(), cNet.numOutputs());
+    const Evaluator* cEval = NULL;
     if (cEval == NULL) { continue; }
     std::cout 
       << iNetwork
@@ -392,8 +393,8 @@ Evaluator* PokemonAI::evaluatorSelect(char playerID)
     }
     else if((size_t)iEvaluator < networks.size())
     {
-      return evaluator_featureVector::getEvaluator(networks[iEvaluator]);
-      //return &networks[iEvaluator];
+      //return evaluator_featureVector::getEvaluator(networks[iEvaluator]);
+      return NULL;
     }
     else
     { 
@@ -422,7 +423,8 @@ void PokemonAI::printPlanners() const
     << "5-\"planner_minimax\"\n";
 };
 
-Planner* PokemonAI::plannerSelect(char playerID)
+
+Planner* PokemonAI::plannerSelect(size_t iTeam, const std::string& teamName)
 {
   std::string input;
   int32_t iPlanner;
@@ -433,7 +435,7 @@ Planner* PokemonAI::plannerSelect(char playerID)
 
     std::cout 
       << "Please select index of the planner for player " 
-      << playerID 
+      << teamName
       << ":\n> ";
     getline(std::cin, input);
     std::stringstream inputResult(input);
@@ -448,23 +450,26 @@ Planner* PokemonAI::plannerSelect(char playerID)
     switch(iPlanner)
     {
     case 0:
-      return new PlannerMax();
+      return new PlannerMax(iTeam);
     case 1:
-      return new planner_stochastic(engineAccuracy, plannerTemperature, plannerExploration);
+      //return new planner_stochastic(engineAccuracy, plannerTemperature, plannerExploration);
+      return NULL;
     case 2:
-      return new planner_random();
+      return new planner_random(iTeam);
     case 3:
-      return new planner_directed(experienceNet(1, expSettings), engineAccuracy, plannerExploration);
+      //return new planner_directed(experienceNet(1, expSettings), engineAccuracy, plannerExploration);
+      return NULL;
     case 4:
-      return new planner_human();
+      return new PlannerHuman(iTeam);
     case 5:
-      return new planner_minimax(
+      /*return new planner_minimax(
         numThreads, 
         engineAccuracy, 
         maxSearchDepth, 
         secondsPerMove, 
         transpositionTableBins, 
-        transpositionTableBinSize);
+        transpositionTableBinSize);*/
+      return NULL;
     default:
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
         " index network out of bounds: " << iPlanner << "\n";
@@ -475,9 +480,6 @@ Planner* PokemonAI::plannerSelect(char playerID)
   // hopefully unreachable
   return NULL;
 };
-
-
-
 
 
 bool PokemonAI::run()
@@ -524,20 +526,17 @@ bool PokemonAI::run()
 
     // TODO: gauntlet mode
 
-    if (seedTeams)
-    {
+    if (seedTeams) {
       BOOST_FOREACH(const TeamNonVolatile& cTeam, teams) { trainer->seedTeam(cTeam); }
     }
 
-    if (seedNetworks)
-    {
+    if (seedNetworks) {
       BOOST_FOREACH(const neuralNet& cNet, networks) { trainer->seedNetwork(cNet); }
     }
 
     //Trainer->outputFeaturesToStream(new std::ofstream("output.csv", std::ios::out | std::ios::trunc));
 
-    if (!trainer->initialize()) 
-    { 
+    if (!trainer->initialize()) {
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
         " The PokemonAI genetic trainer engine was not successfully initialized.\n";
       return false;
@@ -545,12 +544,12 @@ bool PokemonAI::run()
 
     if (verbose >= 0) std::cout << "Starting Pokemon trainer...\n";
     trainer->evolve();
-  }
-  else if (gameType >= GT_DIAG_HUVSHU && gameType <= GT_NORM_CPUVSHU)
-  {
+  } else if (gameType >= GT_DIAG_HUVSHU && gameType <= GT_NORM_CPUVSHU) {
     if (gameType == GT_DIAG_BENCHMARK) { maxPlies = 1; maxMatches = 1; }
 
-    game = new Game(maxPlies, maxMatches, gameAccuracy);
+    game = std::make_shared<Game>(maxPlies, maxMatches);
+
+    
     // set teams using user data:
     if (teams.size() != 2) 
     {
@@ -581,18 +580,18 @@ bool PokemonAI::run()
     }};
     for (size_t iTeam = 0; iTeam != 2; ++iTeam)
     {
-      if (humanPlanner[iTeam]) { game->setPlanner(iTeam, planner_human()); }
+      if (humanPlanner[iTeam]) { game->setPlanner(iTeam, PlannerHuman()); }
       else
       {
-        boost::scoped_ptr<Planner> cPlanner(plannerSelect('A' + iTeam));
-        if (cPlanner != NULL) { game->setPlanner(iTeam, *cPlanner); }
+        std::shared_ptr<Planner> cPlanner(plannerSelect(iTeam));
+        if (cPlanner != NULL) { game->setPlanner(iTeam, cPlanner); }
         else { return false; }
       }
     }
 
     // make sure we know where the human planners are (in case the user selected a human planner without choosing a human gamemode
-    humanPlanner[TEAM_A] = (dynamic_cast<const planner_human*>(game->getPlanner(TEAM_A)) != NULL);
-    humanPlanner[TEAM_B] = (dynamic_cast<const planner_human*>(game->getPlanner(TEAM_B)) != NULL);
+    humanPlanner[TEAM_A] = (dynamic_cast<const PlannerHuman*>(game->getPlanner(TEAM_A)) != NULL);
+    humanPlanner[TEAM_B] = (dynamic_cast<const PlannerHuman*>(game->getPlanner(TEAM_B)) != NULL);
     bool oneHumanPlanner = humanPlanner[0] ^ humanPlanner[1];
     // set evaluators using user data:
     if (humanPlanner[TEAM_A] && humanPlanner[TEAM_B]) // no evaluators needed, two humans playing

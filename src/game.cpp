@@ -77,13 +77,19 @@ void Game::setEngine(const PkCU& cu) {
 }
 
 
-void Game::setPlanner(size_t iAgent, const std::shared_ptr<Planner>& cPlanner)
-{
+void Game::setPlanner(size_t iAgent, const std::shared_ptr<Planner>& cPlanner) {
   assert(iAgent < 2);
   agents[iAgent] = cPlanner;
 
   if (nv_ != NULL) { agents[iAgent]->setEnvironment(nv_); }
   isInitialized = false;
+}
+
+
+void Game::setEvaluator(const std::shared_ptr<Evaluator>& eval) {
+  eval_ = eval;
+
+  if (nv_ != NULL) { eval_->setEnvironment(nv_); }
 }
 
 void Game::setInitialState(const EnvironmentVolatileData& rolloutState)

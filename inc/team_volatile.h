@@ -96,7 +96,7 @@ class PKAISHARED TeamVolatile: public TeamVolatileImpl<PokemonVolatile, TeamVola
 public:
   using impl_t::impl_t;
 
-  operator ConstTeamVolatile() { return ConstTeamVolatile{nv(), data()}; };
+  operator ConstTeamVolatile() const { return ConstTeamVolatile{nv(), data()}; };
 
   void resetVolatile();
 

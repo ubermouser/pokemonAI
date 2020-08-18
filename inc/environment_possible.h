@@ -191,6 +191,8 @@ class PKAISHARED EnvironmentPossible: public EnvironmentPossibleImpl<Environment
 public:
   using impl_t::impl_t;
 
+  operator ConstEnvironmentPossible() const { return ConstEnvironmentPossible{nv(), data()}; };
+
   uint32_t& getBitmask() { return data().getBitmask(); };
 
   fixType& getProbability() { return data().getProbability(); };
@@ -257,18 +259,22 @@ public:
   }
   ConstEnvironmentPossible stateSelect_roulette(size_t& indexState) const;
 
-  EnvironmentPossible atEnv(size_t index) {
+  EnvironmentPossible at(size_t index) {
     return EnvironmentPossible{*nv_, base_t::at(index)};
   };
-  ConstEnvironmentPossible atEnv(size_t index) const {
+  ConstEnvironmentPossible at(size_t index) const {
     return ConstEnvironmentPossible{*nv_, base_t::at(index)};
   };
   
   size_t getNumUnique() const { return size() - numMerged_; };
   void decrementUnique() { numMerged_++; }
 
-  void setNonvolatileEnvironment(const EnvironmentNonvolatile& nv);
-  void setNonvolatileEnvironment(std::shared_ptr<const EnvironmentNonvolatile>& nv);
+  void setNonvolatileEnvironment(const EnvironmentNonvolatile& nv) {
+    nv_ = std::make_shared<const EnvironmentNonvolatile>(nv);
+  }
+  void setNonvolatileEnvironment(std::shared_ptr<const EnvironmentNonvolatile>& nv) {
+    nv_ = nv;
+  }
   
   void clear() {
     base_t::clear();

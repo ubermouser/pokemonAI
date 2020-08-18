@@ -135,7 +135,7 @@ class PKAISHARED PokemonVolatile: public PokemonVolatileImpl<MoveVolatile,
 public:
   using impl_t::impl_t;
 
-  operator ConstPokemonVolatile() { return ConstPokemonVolatile{nv(), data(), status()}; }
+  operator ConstPokemonVolatile() const { return ConstPokemonVolatile{nv(), data(), status()}; }
 
   /* increment target's hp by quantity. */
   void modHP(int32_t quantity);

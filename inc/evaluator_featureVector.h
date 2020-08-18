@@ -13,7 +13,7 @@
 #include "../inc/evaluator.h"
 #include "../inc/neuralNet.h"
 
-union EnvironmentVolatile;
+class EnvironmentVolatile;
 class evaluator_featureVector;
 class featureVector;
 class neuralNet;

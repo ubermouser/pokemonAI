@@ -9,7 +9,6 @@ protected:
   fpType bias;
   
 public:
-  evaluator_simple() = delete;
   evaluator_simple(fpType _bias = 0.5);
   ~evaluator_simple() = default;
   evaluator_simple(const evaluator_simple& other) = default;

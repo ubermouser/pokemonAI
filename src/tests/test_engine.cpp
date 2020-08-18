@@ -50,7 +50,7 @@ TEST_F(EngineTest, PainSplit) {
 
   auto split_pain = engine_->updateState(engine_->initialState(), AT_MOVE_0, AT_MOVE_1);
 
-  auto& result = split_pain.at(0).getEnv();
+  auto result = split_pain.at(0).getEnv();
   EXPECT_EQ(result.getTeam(0).teammate(0).getHP(), result.getTeam(1).teammate(0).getHP());
   EXPECT_EQ(result.getTeam(0).teammate(0).getMV(0).getPP(), 31);
 }

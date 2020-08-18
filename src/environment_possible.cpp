@@ -133,7 +133,7 @@ ConstEnvironmentPossible PossibleEnvironments::stateSelect_roulette(size_t& inde
   indexState = roulette<EnvironmentPossibleData, SortByProbability>::select(
       *this, SortByProbability());
 
-  return atEnv(indexState);
+  return at(indexState);
 };
 
 
@@ -156,7 +156,7 @@ ConstEnvironmentPossible PossibleEnvironments::stateSelect_index(size_t& indexRe
       continue;
     }
 
-    if ((indexState >= 0 && indexState < (int32_t) size()) && atEnv(indexState).isPruned())
+    if ((indexState >= 0 && indexState < (int32_t) size()) && at(indexState).isPruned())
     {
       std::cout << "State " << input << " was pruned!\n";
       continue;
@@ -181,7 +181,7 @@ ConstEnvironmentPossible PossibleEnvironments::stateSelect_index(size_t& indexRe
   
   // else
   indexResult = indexState;
-  return atEnv(indexState);
+  return at(indexState);
 } // endOf stateSelect_index
 
 
@@ -189,7 +189,7 @@ void PossibleEnvironments::printStates(size_t iPly) const {
   std::cout << getNumUnique() << "(" << size() << ") possible states!\n";
   for (size_t iState = 0; iState < size(); iState++)
   {
-    ConstEnvironmentPossible state = atEnv(iState);
+    ConstEnvironmentPossible state = at(iState);
     if (state.isPruned()) { continue; } // don't display pruned states
 
     state.printState(iState, iPly);

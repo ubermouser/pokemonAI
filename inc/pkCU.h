@@ -83,6 +83,9 @@ protected:
   /* the current matchup, based on which two pokemon are active */
   std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>* cPluginSet;
 
+  /* The default state for a given nonvolatile state */
+  EnvironmentVolatileData initialState_;
+
   /* stack of environment_possible objects */
   PossibleEnvironments* _stack;
 
@@ -168,7 +171,8 @@ protected:
   /* returns the number of unique environments in the result array, applies the isPruned tag to pruned environments */
   size_t combineSimilarEnvironments();
 
-  void seedCurrentState(const EnvironmentVolatileData& cEnv);
+  void seedCurrentState(
+      PossibleEnvironments& rEnv, const ConstEnvironmentVolatile& cEnv, size_t actionA, size_t actionB);
 
   void swapTeamIndexes();
 
@@ -183,12 +187,15 @@ public:
 
   PkCU(size_t engineAccuracy = SIZE_MAX, bool allowInvalidMoves=false);
   PkCU(const EnvironmentNonvolatile& _nv, size_t engineAccuracy = SIZE_MAX, bool allowInvalidMoves=false);
-  PkCU(const PkCU& other);
+  PkCU(const PkCU& other) = default;
 
   void setAllowInvalidMoves(bool allow = true) { allowInvalidMoves_ = allow; }
 
   /* pkCU stores a reference to the environment at cEnvironment. */
-  void setEnvironment(std::shared_ptr<const EnvironmentNonvolatile>& cEnv);
+  void setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& cEnv);
+  void setEnvironment(const EnvironmentNonvolatile& cEnv) {
+    return setEnvironment(std::make_shared<const EnvironmentNonvolatile>(cEnv));
+  };
 
   /* sets accuracy of pkCU */
   void setAccuracy(size_t engineAccuracy);
@@ -253,25 +260,25 @@ public:
    * 
    * returns: number of unique environments in vector
    */
-  size_t updateState(const EnvironmentVolatileData& cEnv, PossibleEnvironments& resultEnvironments, size_t actionA, size_t actionB);
-  PossibleEnvironments updateState(const EnvironmentVolatileData& cEnv, size_t actionA, size_t actionB);
-  PossibleEnvironments updateState(const ConstEnvironmentVolatile& cEnv, size_t actionA, size_t actionB) {
-    return updateState(cEnv.data(), actionA, actionB);
+  size_t updateState(const ConstEnvironmentVolatile& cEnv, PossibleEnvironments& resultEnvironments, size_t actionA, size_t actionB);
+  PossibleEnvironments updateState(const ConstEnvironmentVolatile& cEnv, size_t actionA, size_t actionB);
+  PossibleEnvironments updateState(const ConstEnvironmentPossible& cEnvP, size_t actionA, size_t actionB) {
+    return updateState(cEnvP.getEnv(), actionA, actionB);
   };
 
   /* Seed an initial state from an EnvironmentNonvolatile, then return its volatile state. */
-  EnvironmentVolatileData initialState() const;
+  ConstEnvironmentVolatile initialState() const;
 
   /* determines whether a given action is a selectable one, given the current state */
   bool isValidAction(const ConstEnvironmentVolatile& envV, size_t action, size_t iTeam);
-  bool isValidAction(const EnvironmentVolatileData& envV, size_t action, size_t iTeam) {
-    return isValidAction(ConstEnvironmentVolatile{getNV(), envV}, action, iTeam);
+  bool isValidAction(const ConstEnvironmentPossible& envV, size_t action, size_t iTeam) {
+    return isValidAction(envV.getEnv(), action, iTeam);
   }
 
   /* determines whether a game has ended, given the current state. Returns an enum of the game's current status */
   MatchState isGameOver(const ConstEnvironmentVolatile& envV) const;
-  MatchState isGameOver(const EnvironmentVolatileData& envV) const {
-    return isGameOver(ConstEnvironmentVolatile{getNV(), envV});
+  MatchState isGameOver(const ConstEnvironmentPossible& envV) const {
+    return isGameOver(envV.getEnv());
   }
 
   PossibleEnvironments& getStack() { return *_stack; };
@@ -284,9 +291,9 @@ public:
 
   const DamageComponents_t& getDamageComponent() const { return damageComponents[iBase]; };
 
-  EnvironmentPossible getBase() { return getStack().atEnv(iBase); };
+  EnvironmentPossible getBase() { return getStack().at(iBase); };
 
-  ConstEnvironmentPossible getBase() const { return getStack().atEnv(iBase); };
+  ConstEnvironmentPossible getBase() const { return getStack().at(iBase); };
 
   size_t getICTeam() const { return iTeams[0]; };
 

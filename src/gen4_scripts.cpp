@@ -339,12 +339,21 @@ int move_cureNonVolatile_team(
 
   // clear nonvolatile:
   TeamVolatile cTMV = cu.getTV();
-  cTMV.teammate(0).clearStatusAilment();
-  cTMV.teammate(1).clearStatusAilment();
-  cTMV.teammate(2).clearStatusAilment();
-  cTMV.teammate(3).clearStatusAilment();
-  cTMV.teammate(4).clearStatusAilment();
-  cTMV.teammate(5).clearStatusAilment();
+  switch(cTMV.nv().getNumTeammates()) {
+    case 6:
+        cTMV.teammate(5).clearStatusAilment();
+    case 5:
+        cTMV.teammate(4).clearStatusAilment();
+    case 4:
+        cTMV.teammate(3).clearStatusAilment();
+    case 3:
+        cTMV.teammate(2).clearStatusAilment();
+    case 2:
+        cTMV.teammate(1).clearStatusAilment();
+    case 1:
+    default:
+        cTMV.teammate(0).clearStatusAilment();
+  };
 
   // clear volatile confusion:
   cTMV.status().cTeammate.confused = 0;
@@ -838,7 +847,7 @@ int engine_beginTurnNonvolatileEffect(
       // 80% chance for frozen status effect to prevent user from moving:
       {
         // modify the status environment:
-        EnvironmentPossible statEnv = cu.getStack().atEnv(iREnv[1]);
+        EnvironmentPossible statEnv = cu.getStack().at(iREnv[1]);
         statEnv.setBlocked(cu.getICTeam());
       }
       // 20% chance for pokemon to not be completely frozen:
@@ -869,7 +878,7 @@ int engine_beginTurnNonvolatileEffect(
         cu.getPKV(iREnv[1]).clearStatusAilment();
       }
       // pokemon has a chance to move this turn:
-      cu.getStack().atEnv(iREnv[0]).setBlocked(cu.getICTeam());
+      cu.getStack().at(iREnv[0]).setBlocked(cu.getICTeam());
       break;
     }
     case AIL_NV_PARALYSIS:
@@ -878,7 +887,7 @@ int engine_beginTurnNonvolatileEffect(
       std::array<size_t, 2> iREnv;
       cu.duplicateState(iREnv, 0.25);
       // 25% chance to be paralyzed and not move
-      cu.getStack().atEnv(iREnv[1]).setBlocked(cu.getICTeam());
+      cu.getStack().at(iREnv[1]).setBlocked(cu.getICTeam());
       break;
     }
     case AIL_NV_NONE:
@@ -911,7 +920,7 @@ int engine_beginTurnVolatileEffect(
 
       // 50% chance to not move:
       {
-        cu.getStack().atEnv(iREnv[1]).setBlocked(cu.getICTeam());
+        cu.getStack().at(iREnv[1]).setBlocked(cu.getICTeam());
         cConfusedPKV.status().cTeammate.confused--;
         // TODO: actual damage calculation
         cConfusedPKV.modHP(-40);

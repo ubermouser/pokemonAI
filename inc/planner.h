@@ -32,14 +32,13 @@ public:
   };
 };
 
-class Planner : public Name
-{
-private:
-  static const std::vector<PlannerResult> emptyResults;
+class Planner : public Name {
 protected:
   std::shared_ptr<PkCU> cu_;
   std::shared_ptr<Evaluator> eval_;
   std::shared_ptr<const EnvironmentNonvolatile> nv_;
+
+  std::vector<PlannerResult> results_;
 
   size_t agentTeam_;
 
@@ -58,19 +57,19 @@ public:
   virtual bool isInitialized() const;
 
   /* if the planner uses an evaluator, set the evaluator to evalType */
-  virtual void setEvaluator(std::shared_ptr<Evaluator>& evaluator);
+  virtual void setEvaluator(const std::shared_ptr<Evaluator>& evaluator);
   virtual std::shared_ptr<const Evaluator> getEvaluator() const { return eval_; };
 
   /* sets the nonvolatile environment to _cEnvironment, the team being referenced */
-  virtual void setEnvironment(std::shared_ptr<const EnvironmentNonvolatile>& env);
+  virtual void setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& env);
 
-  virtual void setEngine(std::shared_ptr<PkCU>& cu);
+  virtual void setEngine(const std::shared_ptr<PkCU>& cu);
 
   /* generate an action */
   virtual uint32_t generateSolution(const ConstEnvironmentPossible& origin) = 0;
 
-  virtual const std::vector<PlannerResult>& getDetailedResults() const { return emptyResults; };
-  virtual void clearResults() { };
+  virtual const std::vector<PlannerResult>& getDetailedResults() const { return results_; };
+  virtual void clearResults() { results_.clear(); };
 };
 
 #endif /* PLANNER_H */

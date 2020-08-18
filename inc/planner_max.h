@@ -12,21 +12,19 @@ class PlannerMax : public Planner
 protected:
   std::vector<PlannerResult> results;
 
-  size_t engineAccuracy_;
-
 public:
-  PlannerMax(size_t agentTeam, size_t engineAccuracy = 1);
+  PlannerMax(size_t agentTeam) : Planner("max_planner-NULLEVAL", agentTeam) {};
   PlannerMax(const PlannerMax& other) = default;
   
   ~PlannerMax() {};
 
   virtual std::string baseName() const override { return "max_planner"; }
 
-  PlannerMax* clone() const { return new PlannerMax(*this); }
+  PlannerMax* clone() const override { return new PlannerMax(*this); }
 
-  void setEngine(std::shared_ptr<PkCU>& cu) override;
+  void setEngine(const std::shared_ptr<PkCU>& cu) override;
 
-  uint32_t generateSolution(const EnvironmentPossible& origin);
+  uint32_t generateSolution(const ConstEnvironmentPossible& origin) override;
 
   static uint32_t generateSolution(
       PkCU& cu,
@@ -35,9 +33,6 @@ public:
       size_t _agentTeam,
       size_t* nodesEvaluated = NULL,
       std::vector<PlannerResult>* results = NULL);
-
-  const std::vector<PlannerResult>& getDetailedResults() const { return results; };
-  void clearResults() { results.clear(); };
 };
 
 #endif /* PLANNER_MAX_H */

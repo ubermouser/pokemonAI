@@ -3,8 +3,6 @@
 
 #include <sstream>
 
-const std::vector<PlannerResult> Planner::emptyResults;
-
 
 bool Planner::isInitialized() const {
     if (agentTeam_ >= 2) { return false; }
@@ -17,20 +15,20 @@ bool Planner::isInitialized() const {
 }
 
 
-void Planner::setEnvironment(std::shared_ptr<const EnvironmentNonvolatile>& nv) {
+void Planner::setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& nv) {
   nv_ = nv;
   if (cu_ != NULL) { cu_->setEnvironment(nv); }
   if (eval_ != NULL) { eval_->setEnvironment(nv); }
 }
 
 
-void Planner::setEngine(std::shared_ptr<PkCU>& cu) {
+void Planner::setEngine(const std::shared_ptr<PkCU>& cu) {
   cu_ = cu;
   if (nv_ != NULL) { cu_->setEnvironment(nv_); }
-};
+}
 
 
-void Planner::setEvaluator(std::shared_ptr<Evaluator>& eval) {
+void Planner::setEvaluator(const std::shared_ptr<Evaluator>& eval) {
   eval_ = eval;
   if (nv_ != NULL) { eval_->setEnvironment(nv_); }
   resetName();

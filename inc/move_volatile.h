@@ -57,7 +57,7 @@ public:
   using base_t = MoveVolatileImpl<MoveVolatileData>;
   using base_t::base_t;
 
-  operator ConstMoveVolatile() { return ConstMoveVolatile{nv(), data()}; };
+  operator ConstMoveVolatile() const { return ConstMoveVolatile{nv(), data()}; };
 
   /* resets values of PPcurrent and PPmax */
   void initialize();

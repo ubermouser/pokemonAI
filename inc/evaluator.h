@@ -7,6 +7,7 @@
 
 #include "name.h"
 #include "environment_volatile.h"
+#include "environment_possible.h"
 
 struct EvalResult_t
 {
@@ -30,7 +31,7 @@ public:
   /* returns a NEW copy of the current evaluator */
   virtual Evaluator* clone() const = 0;
 
-  virtual void setEnvironment(std::shared_ptr<const EnvironmentNonvolatile>& nv) { nv_ = nv; }
+  virtual void setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& nv) { nv_ = nv; }
 
   /* does the evaluator have all acceptable data required to perform evaluation? */
   virtual bool isInitialized() const { return true; };
@@ -40,8 +41,8 @@ public:
 
   /* evaluate the fitness of a given environment for team iTeam */
   virtual EvalResult_t calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) = 0;
-  virtual EvalResult_t calculateFitness(const EnvironmentVolatileData& env, size_t iTeam) {
-    return calculateFitness(ConstEnvironmentVolatile{*nv_, env}, iTeam);
+  virtual EvalResult_t calculateFitness(const ConstEnvironmentPossible& env, size_t iTeam) {
+    return calculateFitness(env.getEnv(), iTeam);
   }
 };
 

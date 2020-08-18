@@ -50,6 +50,7 @@ PkCU::PkCU(const EnvironmentNonvolatile& nv, size_t engineAccuracy, bool allowIn
   : nv_(std::make_shared<EnvironmentNonvolatile>(nv)),
   pluginSets(),
   cPluginSet(NULL),
+  initialState_(EnvironmentVolatileData::create(nv)),
   _stack(NULL),
   stackStage(),
   damageComponents(),
@@ -67,26 +68,10 @@ PkCU::PkCU(const EnvironmentNonvolatile& nv, size_t engineAccuracy, bool allowIn
   }
 };
 
-PkCU::PkCU(const PkCU& other)
-  : nv_(other.nv_),
-  pluginSets(other.pluginSets),
-  cPluginSet(NULL),
-  _stack(NULL),
-  stackStage(),
-  damageComponents(),
-  iTeams(),
-  iActions(),
-  iBase(SIZE_MAX),
-  numRandomEnvironments(other.numRandomEnvironments),
-  allowInvalidMoves_(other.allowInvalidMoves_)
-{
-  iTeams.fill(SIZE_MAX);
-  iActions.fill(SIZE_MAX);
-};
-
-void PkCU::setEnvironment(std::shared_ptr<const EnvironmentNonvolatile>& nv)
+void PkCU::setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& nv)
 {
   nv_ = nv;
+  initialState_ = EnvironmentVolatileData::create(*nv_);
   if (!initialize()) {
     assert(false && "PKCU could not generate valid script database!");
   }
@@ -606,7 +591,7 @@ void PkCU::evaluateMove_postMove()
       }
 
       // modify bitmask as secondary effect occuring:
-      getStack().atEnv(iREnv[0]).setSecondary(iCTeam);
+      getStack().at(iREnv[0]).setSecondary(iCTeam);
 
     } else { // end of primary attack hits, and secondary attack is not assured
       // pass-through: no chance to secondary
@@ -892,7 +877,7 @@ void PkCU::evaluateMove_damage() {
       }
 
       // modify bitmask as the hit effect occuring:
-      getStack().atEnv(iHEnv[0]).setHit(getICTeam());
+      getStack().at(iHEnv[0]).setHit(getICTeam());
 
     } else { // end of primary attack hits, and secondary attack is not assured
       // pass-through: no chance to hit or crit
@@ -937,7 +922,7 @@ void PkCU::evaluateMove_damage() {
       }
 
       // modify bitmask as the crit effect occuring:
-      getStack().atEnv(iCEnv[1]).setCrit(getICTeam());
+      getStack().at(iCEnv[1]).setCrit(getICTeam());
     }
     // even with no chance to crit there's still the possibility of damage
   }
@@ -1013,7 +998,7 @@ void PkCU::evaluateMove_script()
       }
 
       // modify bitmask as the hit effect occuring:
-      getStack().atEnv(iHEnv[0]).setHit(getICTeam());
+      getStack().at(iHEnv[0]).setHit(getICTeam());
 
     } else { // end of primary attack hits, and secondary attack is not assured
       // pass-through: no chance to hit
@@ -1097,14 +1082,14 @@ size_t PkCU::combineSimilarEnvironments()
   // compare environment hashes:
   for (size_t iOEnv = 0, iSize = stack.size(); iOEnv != iSize; iOEnv++)
   {
-    EnvironmentPossible oEnv = stack.atEnv(iOEnv);
+    EnvironmentPossible oEnv = stack.at(iOEnv);
     fpType& oProbability = damageComponents[iOEnv].cProbability;
 
     // don't attempt to merge pruned environments
     if (oEnv.isPruned()) { continue; }
 
     for (size_t iIEnv = iOEnv + 1; iIEnv != iSize; iIEnv++) {
-      EnvironmentPossible iEnv = stack.atEnv(iIEnv);
+      EnvironmentPossible iEnv = stack.at(iIEnv);
       fpType& iProbability = damageComponents[iIEnv].cProbability;
 
       // don't re-prune already pruned environments
@@ -1196,7 +1181,7 @@ void PkCU::updateState_move()
 
 
 PossibleEnvironments PkCU::updateState(
-    const EnvironmentVolatileData& currentEnvironment, size_t actionA, size_t actionB) {
+    const ConstEnvironmentVolatile& currentEnvironment, size_t actionA, size_t actionB) {
   PossibleEnvironments result;
   updateState(currentEnvironment, result, actionA, actionB);
   
@@ -1205,7 +1190,7 @@ PossibleEnvironments PkCU::updateState(
 
 
 size_t PkCU::updateState(
-    const EnvironmentVolatileData& cEnv,
+    const ConstEnvironmentVolatile& cEnv,
     PossibleEnvironments& rEnv,
     size_t actionA, 
     size_t actionB) {
@@ -1214,16 +1199,8 @@ size_t PkCU::updateState(
       throw std::runtime_error("Invalid Action");
     }
   }
-  // set stack callback value:
-  _stack = &rEnv;
-
-  // seed teams and actions:
-  iTeams[TEAM_A] = TEAM_A;
-  iTeams[TEAM_B] = TEAM_B;
-  iActions[TEAM_A] = actionA;
-  iActions[TEAM_B] = actionB;
   // seed an initial value onto the stack:
-  seedCurrentState(cEnv);
+  seedCurrentState(rEnv, cEnv, actionA, actionB);
   // set the current set of plugins:
   setCPluginSet();
 
@@ -1269,8 +1246,8 @@ size_t PkCU::updateState(
 }; // end of updateState
 
 
-EnvironmentVolatileData PkCU::initialState() const {
-  return EnvironmentVolatileData::create(*nv_);
+ConstEnvironmentVolatile PkCU::initialState() const {
+  return ConstEnvironmentVolatile{*nv_, initialState_};
 }
 
 
@@ -1380,7 +1357,20 @@ bool PkCU::isValidAction(const ConstEnvironmentVolatile& envV, size_t action, si
 } // endOf is valid action
 
 
-void PkCU::seedCurrentState(const EnvironmentVolatileData& cEnv) {
+void PkCU::seedCurrentState(
+    PossibleEnvironments& rEnv, const ConstEnvironmentVolatile& cEnv, size_t actionA, size_t actionB) {
+  // set stack callback value:
+  _stack = &rEnv;
+
+  if (nv_.get() != cEnv.nv_) { setEnvironment(cEnv.nv()); }
+  _stack->setNonvolatileEnvironment(nv_);
+
+  // seed teams and actions:
+  iTeams[TEAM_A] = TEAM_A;
+  iTeams[TEAM_B] = TEAM_B;
+  iActions[TEAM_A] = actionA;
+  iActions[TEAM_B] = actionB;
+
   // clear the stack, just in case
   _stack->clear();
   stackStage.clear();
@@ -1445,27 +1435,33 @@ void PkCU::triplicateState(std::array<size_t, 3>& result, fpType _probability, f
 }
 
 
-PokemonVolatile PkCU::getPKV(size_t iState)
-{
+PokemonVolatile PkCU::getPKV(size_t iState) {
   return getTV(iState).getPKV();
 }
 
 
-PokemonVolatile PkCU::getTPKV(size_t iState)
-{
+PokemonVolatile PkCU::getTPKV(size_t iState) {
   return getTTV(iState).getPKV();
 }
 
 
-TeamVolatile PkCU::getTV(size_t iState)
-{
-  return getStack().atEnv(iState).getEnv().getTeam(getICTeam());
+TeamVolatile PkCU::getTV(size_t iState) {
+  return getStack().at(iState).getEnv().getTeam(getICTeam());
 }
 
 
-TeamVolatile PkCU::getTTV(size_t iState)
-{
-  return getStack().atEnv(iState).getEnv().getTeam(getIOTeam());
+TeamVolatile PkCU::getTTV(size_t iState) {
+  return getStack().at(iState).getEnv().getTeam(getIOTeam());
+}
+
+
+MoveVolatile PkCU::getMV(size_t iState) {
+  return getPKV(iState).getMV(getICAction());
+}
+
+
+MoveVolatile PkCU::getTMV(size_t iState) {
+  return getPKV(iState).getMV(getIOAction());
 }
 
 

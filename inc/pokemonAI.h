@@ -107,15 +107,15 @@ public:
 
   /* methods returns NULL if no planner/evaluator/team was selected */
   void printTeams(bool printTeammates = false) const;
-  const TeamNonVolatile* teamSelect(char playerID);
+  const TeamNonVolatile* teamSelect(size_t iTeam, const std::string& teamName="agent");
 
   void printEvaluators() const;
   /* returns a NEW evaluator */
-  Evaluator* evaluatorSelect(char playerID);
+  Evaluator* evaluatorSelect(size_t iTeam, const std::string& teamName="agent");
 
   void printPlanners() const;
   /* returns a NEW planner */
-  Planner* plannerSelect(char playerID);
+  Planner* plannerSelect(size_t team, const std::string& teamName="agent");
 
   std::vector<TeamNonVolatile>& getTeams() { return teams; }; 
 
