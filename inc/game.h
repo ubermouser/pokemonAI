@@ -81,48 +81,7 @@ public:
 
     Config(){};
   };
-protected:
-  Config cfg_;
 
-  /* planner class for players */
-  std::array<std::shared_ptr<Planner>, 2> agents_;
-
-  /* state transition engine, given an environment_nonvolatile provides state transitions of an environment_volatile */
-  std::shared_ptr<PkCU> cu_;
-
-  std::shared_ptr<EnvironmentNonvolatile> nv_;
-
-  std::shared_ptr<Evaluator> eval_;
-
-  EnvironmentVolatileData initialState_;
-
-  bool isInitialized_;
-
-  /* create a log of the current turn */
-  Turn digestTurn(
-      unsigned int actionTeamA,
-      unsigned int actionTeamB,
-      size_t resultingState,
-      const ConstEnvironmentPossible& envP);
-
-  /* creates a log of the current completed game */
-  GameResult digestGame(const std::vector<Turn>& cLog, int gameResult);
-
-  HeatResult digestMatch(const std::vector<GameResult>& gLog);
-
-  /* prints the current action */
-  void printAction(
-      const ConstTeamVolatile& currentTeam, unsigned int indexAction, unsigned int iTeam);
-
-  /* prints interesting facts about the game */
-  void printGameStart(size_t iMatch=SIZE_MAX);
-  void printGameOutline(const GameResult& gResult, size_t iMatch=SIZE_MAX);
-
-  /* print interesting facts about the heat */
-  void printHeatStart();
-  void printHeatOutline(const HeatResult& hResult);
-
-public:
   Game(const Config& cfg=Config());
   Game(const Game& other) = default;
   ~Game() {};
@@ -174,6 +133,52 @@ public:
 
   Game& setMaxPlies(size_t maxPlies) { cfg_.maxPlies = maxPlies; return *this; }
   Game& setVerbosity(int verbosity) { cfg_.verbosity = verbosity; return *this; }
+
+protected:
+  Config cfg_;
+
+  /* planner class for players */
+  std::array<std::shared_ptr<Planner>, 2> agents_;
+
+  /* state transition engine, given an environment_nonvolatile provides state transitions of an environment_volatile */
+  std::shared_ptr<PkCU> cu_;
+
+  std::shared_ptr<EnvironmentNonvolatile> nv_;
+
+  std::shared_ptr<Evaluator> eval_;
+
+  EnvironmentVolatileData initialState_;
+
+  bool isInitialized_;
+
+  /* create a log of the current turn */
+  Turn digestTurn(
+      unsigned int actionTeamA,
+      unsigned int actionTeamB,
+      size_t resultingState,
+      const ConstEnvironmentPossible& envP);
+
+  /* creates a log of the current completed game */
+  GameResult digestGame(const std::vector<Turn>& cLog, int gameResult);
+
+  HeatResult digestMatch(const std::vector<GameResult>& gLog);
+
+  std::string getGameIdentifier(size_t iMatch);
+  std::string getTeamIdentifier(size_t iTeam);
+
+  void incrementScore(int matchResult, std::array<uint32_t, 2>& score);
+
+  /* prints the current action */
+  void printAction(
+      const ConstTeamVolatile& currentTeam, unsigned int indexAction, unsigned int iTeam);
+
+  /* prints interesting facts about the game */
+  void printGameStart(size_t iMatch=SIZE_MAX);
+  void printGameOutline(const GameResult& gResult, size_t iMatch=SIZE_MAX);
+
+  /* print interesting facts about the heat */
+  void printHeatStart();
+  void printHeatOutline(const HeatResult& hResult);
 };
 
 #endif	/* PKAI_GAME_H */

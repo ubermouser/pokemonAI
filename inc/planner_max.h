@@ -4,11 +4,7 @@
 #include "pkai.h"
 #include "planner.h"
 
-class PlannerMax : public Planner
-{
-protected:
-  std::vector<PlannerResult> results;
-
+class PlannerMax : public Planner {
 public:
   PlannerMax() = delete;
   PlannerMax(size_t agentTeam) : Planner("max_planner-NULLEVAL", agentTeam) {};

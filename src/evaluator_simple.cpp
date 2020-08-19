@@ -9,7 +9,7 @@
 #include "../inc/engine.h"
 
 
-evaluator_simple::evaluator_simple(fpType _bias)
+EvaluatorSimple::EvaluatorSimple(fpType _bias)
     : Evaluator(),
     bias(_bias) {
   assert(mostlyGTE(bias, 0.0) && mostlyLTE(bias, 1.0));
@@ -21,7 +21,7 @@ evaluator_simple::evaluator_simple(fpType _bias)
 };
 
 
-bool evaluator_simple::isInitialized() const
+bool EvaluatorSimple::isInitialized() const
 {
   if (nv_ == NULL) { return false; }
   if (mostlyGT(bias, 1.0) || mostlyLT(bias, 0.0)) { return false; }
@@ -29,7 +29,7 @@ bool evaluator_simple::isInitialized() const
 }
 
 
-fpType evaluator_simple::fitness_team(const ConstTeamVolatile& tV) {
+fpType EvaluatorSimple::fitness_team(const ConstTeamVolatile& tV) {
   fpType accumulator = 0.0;
   
   for (size_t iTeammate = 0, count = tV.nv().getNumTeammates(); iTeammate != count; ++iTeammate) {
@@ -47,7 +47,7 @@ fpType evaluator_simple::fitness_team(const ConstTeamVolatile& tV) {
 };
 
 
-fpType evaluator_simple::calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam, fpType bias) {
+fpType EvaluatorSimple::calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam, fpType bias) {
   // calculate fitness
   fpType agentFitness = (bias)       *fitness_team(env.getTeam(iTeam));
   fpType otherFitness = (1.0 - bias) * fitness_team(env.getOtherTeam(iTeam));
@@ -66,7 +66,7 @@ fpType evaluator_simple::calculateFitness(const ConstEnvironmentVolatile& env, s
 };
 
 
-EvalResult_t evaluator_simple::calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam)
+EvalResult_t EvaluatorSimple::calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam)
 {
   EvalResult_t result = { calculateFitness(env, iTeam, bias), -1, -1 };
   return result;

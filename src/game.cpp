@@ -1,5 +1,6 @@
 #include "../inc/game.h"
 
+#include <algorithm>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
@@ -91,7 +92,7 @@ bool Game::initialize() {
   if (cu_ == NULL) { setEngine(PkCU()); }
 
   // initialize evaluator:
-  if (eval_ == NULL) {setEvaluator(evaluator_simple()); }
+  if (eval_ == NULL) {setEvaluator(EvaluatorSimple()); }
   if (!eval_->isInitialized()) {
     std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
       ": Game-state evaluator " <<
@@ -126,13 +127,17 @@ bool Game::initialize() {
 
 HeatResult Game::rollout(const EnvironmentVolatileData& initialState) {
   std::vector<GameResult> gameLog;
+  std::array<uint32_t, 2> score{0,0};
+
   if (!isInitialized_) { initialize(); }
-  
   if (cfg_.verbosity > 1) { printHeatStart(); }
   
-  for (size_t iMatch = 0; iMatch != cfg_.maxMatches; ++iMatch) {
+  for (size_t iMatch = 0; iMatch < cfg_.maxMatches; ++iMatch) {
     GameResult gResult = rollout_game(initialState, iMatch);
     gameLog.push_back(gResult);
+    incrementScore(gResult.endStatus, score);
+    // end early if one player clearly dominates the other:
+    if (*std::max_element(begin(score), end(score)) > (cfg_.maxMatches / 2)) { break; }
   }
 
   HeatResult result = digestMatch(gameLog);
@@ -182,7 +187,7 @@ GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_
     if (!nextEnvironment.isEmpty()) {
       size_t iNextEnvironment = &nextEnvironment.data() - &possibleEnvironments.front();
       // determine if the current state is a terminal state, and if so end the game:
-      matchState = cu_->isGameOver(envP);
+      matchState = cu_->isGameOver(nextEnvironment);
 
       // create a log of this turn:
       turnLog.push_back(digestTurn(actions[TEAM_A], actions[TEAM_B], iLastEnvironment, envP));
@@ -201,6 +206,8 @@ GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_
       // perform the state transition:
       stateData = nextEnvironment.data();
       iLastEnvironment = iNextEnvironment;
+    } else { // NO state transition was chosen! Redo the current state:
+      iPly--;
     } // endof state transition
   } // endOf foreach turn
 
@@ -286,8 +293,8 @@ GameResult Game::digestGame(const std::vector<Turn>& cLog, int endStatus) {
   std::array<fpType, 2> prevSimpleFitness;
   std::array<fpType, 2> prev0Fitness;
   std::array<fpType, 2> prevMaxFitness;
-  { // first turn:
-    const Turn& fTurn = cLog[0];
+  if (cLog.size() > 0) { // first turn:
+    const Turn& fTurn = cLog.at(0); // TODO(@drendleman) - what if match begins at a terminal state?
     for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
       // set previous values to fitnesses of the first ply:
       prevSimpleFitness[iTeam] = fTurn.simpleFitness[iTeam];
@@ -400,6 +407,7 @@ GameResult Game::digestGame(const std::vector<Turn>& cLog, int endStatus) {
 HeatResult Game::digestMatch(const std::vector<GameResult>& gLog) {
   // initialize heatResult:
   HeatResult hResult;
+  hResult.gameResults = gLog;
   std::array<std::array<fpType, 6>, 2>& participation = hResult.participation;
   std::array<std::array<fpType, 6>, 2>& aggregateContribution = hResult.aggregateContribution;
   std::array<std::array<fpType, 6>, 2> avgRanking;
@@ -414,15 +422,7 @@ HeatResult Game::digestMatch(const std::vector<GameResult>& gLog) {
   // compute final score:
   for(const auto& log: gLog) {
     // add a point for the winning team:
-    switch (log.endStatus) {
-    case MATCH_TEAM_A_WINS:
-    case MATCH_TEAM_B_WINS:
-      hResult.score[log.endStatus]++;
-      break;
-    case MATCH_DRAW:
-    case MATCH_TIE:
-      break;
-    }
+    incrementScore(log.endStatus, hResult.score);
   }
 
   // generate average numPlies:
@@ -437,8 +437,7 @@ HeatResult Game::digestMatch(const std::vector<GameResult>& gLog) {
   // generate average values:
   for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
     for (size_t iPokemon = 0; iPokemon < 6; ++iPokemon) {
-      for (size_t iLog = 0; iLog != gLog.size(); ++iLog) {
-        const GameResult& cLog = gLog[iLog];
+      for(const auto& cLog: gLog) {
 
         participation[iTeam][iPokemon] += (fpType) ((fpType)cLog.participation[iTeam][iPokemon] / (fpType)cLog.numPlies);
         avgRanking[iTeam][iPokemon] += (fpType)cLog.ranking[iTeam][iPokemon];
@@ -503,6 +502,20 @@ HeatResult Game::digestMatch(const std::vector<GameResult>& gLog) {
 } // endOf digestMatch
 
 
+void Game::incrementScore(int matchState, std::array<uint32_t, 2>& score) {
+  switch (matchState) {
+    case MATCH_TEAM_A_WINS:
+    case MATCH_TEAM_B_WINS:
+      score[matchState]++;
+      break;
+    default:
+    case MATCH_DRAW:
+    case MATCH_TIE:
+      break;
+  }
+}
+
+
 void Game::printAction(
     const ConstTeamVolatile& cTeam, unsigned int indexAction, unsigned int iTeam) {
   //const TeamNonVolatile& cTeam = nv_->getTeam(iTeam);
@@ -548,54 +561,62 @@ void Game::printAction(
 }
 
 
-void Game::printGameStart(size_t iMatch) {
+std::string Game::getGameIdentifier(size_t iMatch) {
   std::ostringstream gameIdentifier;
-  
-  std::cout <<
-    "\nBegin " << gameIdentifier.str() << 
-    " between teams TA: " << agents_[TEAM_A]->getName() <<
-    " - " << nv_->getTeam(TEAM_A).getName() <<
-    " and TB: " << agents_[TEAM_B]->getName() <<
-    " - "<< nv_->getTeam(TEAM_B).getName() <<
-    ((cfg_.verbosity>=3)?"!\n\n":"!\n");
-}
-
-
-void Game::printGameOutline(const GameResult& gResult, size_t iMatch) {
-  std::ostringstream gameIdentifier;
-  int matchState = gResult.endStatus;
   if (iMatch != SIZE_MAX) {
     gameIdentifier << "game " << (iMatch+1) << " of " << cfg_.maxMatches;
   } else {
     gameIdentifier << "the game";
   }
 
+  return gameIdentifier.str();
+}
+
+
+std::string Game::getTeamIdentifier(size_t iTeam) {
+  std::ostringstream teamIdentifier;
+  teamIdentifier <<
+      "T" << (iTeam==TEAM_A?"A":"B") <<
+      ": " << agents_[iTeam]->getName() <<
+      " - " << nv_->getTeam(iTeam).getName();
+
+  return teamIdentifier.str();
+}
+
+
+void Game::printGameStart(size_t iMatch) {
+  std::string gameIdentifier = getGameIdentifier(iMatch);
+  
+  std::cout <<
+    "\nBegin " << gameIdentifier << 
+    " between teams " << getTeamIdentifier(TEAM_A) <<
+    " and " << getTeamIdentifier(TEAM_B) <<
+    ((cfg_.verbosity>=3)?"!\n\n":"!\n");
+}
+
+
+void Game::printGameOutline(const GameResult& gResult, size_t iMatch) {
+  std::string gameIdentifier = getGameIdentifier(iMatch);
+  int matchState = gResult.endStatus;
+
   if (matchState == MATCH_TIE) {
     std::cout <<
-      "Teams TA: " << agents_[TEAM_A]->getName() <<
-      " - " << nv_->getTeam(TEAM_A).getName() <<
-      " and TB: " << agents_[TEAM_B]->getName() <<
-      " - "<< nv_->getTeam(TEAM_B).getName() <<
-      " have tied " << gameIdentifier.str() <<
+      "Teams " << getTeamIdentifier(TEAM_A) <<
+      " and " << getTeamIdentifier(TEAM_B) <<
+      " have tied " << gameIdentifier <<
       "!\n";
   } else if (matchState == MATCH_DRAW) {
     std::cout <<
-      "Teams TA: " << agents_[TEAM_A]->getName() <<
-      " - " << nv_->getTeam(TEAM_A).getName() <<
-      " and TB: " << agents_[TEAM_B]->getName() <<
-      " - "<< nv_->getTeam(TEAM_B).getName() <<
-      " have drawn game " << gameIdentifier.str() <<
+      "Teams " << getTeamIdentifier(TEAM_A) <<
+      " and " << getTeamIdentifier(TEAM_B) <<
+      " have drawn game " << gameIdentifier <<
       "!\n";
   } else {
     size_t losingTeam = (gResult.endStatus + 1) % 2;
     std::cout <<
-      "Team " << "T" << (matchState==TEAM_A?"A":"B") <<
-      ": " << agents_[matchState]->getName() <<
-      " - " << nv_->getTeam(matchState).getName() <<
-      " has beaten team " << "T" << (matchState==TEAM_A?"B":"A") <<
-      ": " << agents_[losingTeam]->getName() <<
-      " - " << nv_->getTeam(losingTeam).getName() <<
-      " in game " << gameIdentifier.str() <<
+      "Team " << getTeamIdentifier(matchState) <<
+      " has beaten team " << getTeamIdentifier(losingTeam) <<
+      " in game " << gameIdentifier <<
       "!\n";
   }
 
@@ -607,8 +628,7 @@ void Game::printGameOutline(const GameResult& gResult, size_t iMatch) {
   for (size_t iTeam = 0; iTeam < 2; iTeam++) {
     const TeamNonVolatile& cTeam = nv_->getTeam(iTeam);
     std::clog 
-      << "  T" << (iTeam==TEAM_A?"A":"B") <<": " 
-      << cTeam.getName() << ":"
+      << "  " << getTeamIdentifier(iTeam)
       << (((int)iTeam==gResult.endStatus)?" (winner)":"")
       << "\n";
     for (size_t iPokemon = 0; iPokemon < cTeam.getNumTeammates(); ++iPokemon) {
@@ -635,40 +655,32 @@ void Game::printHeatOutline(const HeatResult& result) {
   if (result.endStatus == MATCH_TIE) {
     std::cout <<
       ((cfg_.verbosity>=3)?"\n":"") <<
-      "Teams TA: " << agents_[TEAM_A]->getName() <<
-      " - " << nv_->getTeam(TEAM_A).getName() <<
-      " and TB: " << agents_[TEAM_B]->getName() <<
-      " - "<< nv_->getTeam(TEAM_B).getName() <<
+      "Teams " << getTeamIdentifier(TEAM_A) <<
+      " and " << getTeamIdentifier(TEAM_B) <<
       " have tied the bo" << cfg_.maxMatches <<
       " series " << result.score[TEAM_A] <<
       " to " << result.score[TEAM_B] <<
-      ((verbose>=3)?"!\n\n":"!\n");
+      ((cfg_.verbosity>=3)?"!\n\n":"!\n");
   } else if (result.endStatus == MATCH_DRAW) {
     std::cout <<
-      ((verbose>=3)?"\n":"") <<
-      "Teams TA: " << agents_[TEAM_A]->getName() <<
-      " - " << nv_->getTeam(TEAM_A).getName() <<
-      " and TB: " << agents_[TEAM_B]->getName() <<
-      " - "<< nv_->getTeam(TEAM_B).getName() <<
+      ((cfg_.verbosity>=3)?"\n":"") <<
+      "Teams " << getTeamIdentifier(TEAM_A) <<
+      " and " << getTeamIdentifier(TEAM_B) <<
       " have drawn the bo" << cfg_.maxMatches <<
       " series " << result.score[TEAM_A] <<
       " to " << result.score[TEAM_B] <<
-      ((verbose>=3)?"!\n\n":"!\n");
+      ((cfg_.verbosity>=3)?"!\n\n":"!\n");
   } else {
     int matchState = result.endStatus;
     size_t losingTeam = (matchState + 1) % 2;
     std::cout <<
-      ((verbose>=3)?"\n":"") <<
-      "Team " << "T" << (matchState==TEAM_A?"A":"B") <<
-      ": " << agents_[matchState]->getName() <<
-      " - " << nv_->getTeam(matchState).getName() <<
-      " has beaten team " << "T" << (matchState==TEAM_A?"B":"A") <<
-      ": " << agents_[losingTeam]->getName() <<
-      " - " << nv_->getTeam(losingTeam).getName() <<
+      ((cfg_.verbosity>=3)?"\n":"") <<
+      "Team " << getTeamIdentifier(matchState) <<
+      " has beaten team " << getTeamIdentifier(losingTeam) <<
       " , winning the bo" << cfg_.maxMatches <<
       " series " << result.score[matchState] <<
-      " to " << result.score[matchState==TEAM_A?TEAM_B:TEAM_A] <<
-      ((verbose>=3)?"!\n\n":"!\n");
+      " to " << result.score[losingTeam] <<
+      ((cfg_.verbosity>=3)?"!\n\n":"!\n");
   }
 
   std::clog 
@@ -681,8 +693,7 @@ void Game::printHeatOutline(const HeatResult& result) {
   for (size_t iTeam = 0; iTeam < 2; iTeam++) {
     const TeamNonVolatile& cTeam = nv_->getTeam(iTeam);
     std::clog 
-      << "  T" << (iTeam==TEAM_A?"A":"B") <<": " 
-      << cTeam.getName() << ":"
+      << "  " << getTeamIdentifier(iTeam)
       << (((int)iTeam==result.endStatus)?" (winner)":"")
       << "\n";
     for (size_t iPokemon = 0; iPokemon < cTeam.getNumTeammates(); ++iPokemon) {

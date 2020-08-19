@@ -31,7 +31,7 @@ uint32_t PlannerMax::generateSolution(const ConstEnvironmentPossible& origin) {
   {
     if (iBestAction != UINT32_MAX)
     {
-      const PlannerResult& result = results.back();
+      const PlannerResult& result = results_.back();
       std::clog << "----T" << (agentTeam_==TEAM_A?"A":"B") <<
         ": ply=" << std::setw(2) << 1 << 
         " act=" << std::setw(2) << result.bestAgentAction <<

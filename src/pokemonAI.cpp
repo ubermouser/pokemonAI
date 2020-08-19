@@ -385,11 +385,11 @@ Evaluator* PokemonAI::evaluatorSelect(char playerID)
     // determine if network is valid:
     else if (iEvaluator == (networks.size())) // simpleEval:
     {
-      return new evaluator_simple();
+      return new EvaluatorSimple();
     }
     else if (iEvaluator == (networks.size()+1))
     {
-      return new evaluator_random();
+      return new EvaluatorRandom();
     }
     else if((size_t)iEvaluator < networks.size())
     {
@@ -521,8 +521,8 @@ bool PokemonAI::run()
       teamDirectory,
       networkDirectory);
 
-    if (seedDumbEvaluator) { trainer->seedEvaluator(evaluator_simple()); }
-    if (seedRandomEvaluator) { trainer->seedEvaluator(evaluator_random()); }
+    if (seedDumbEvaluator) { trainer->seedEvaluator(EvaluatorSimple()); }
+    if (seedRandomEvaluator) { trainer->seedEvaluator(EvaluatorRandom()); }
 
     // TODO: gauntlet mode
 

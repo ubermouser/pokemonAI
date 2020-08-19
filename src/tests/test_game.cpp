@@ -32,7 +32,7 @@ TEST_F(GameTest, RolloutPokemon) {
         .setBase(pokedex_->getPokemon().at("bulbasaur"))
         .addMove(pokedex_->getMoves().at("tackle"))
         .setLevel(100));
-  auto environment = EnvironmentNonvolatile(team_a, team_b);
+  auto environment = EnvironmentNonvolatile(team_a, team_b, true);
   auto game = Game()
       .setMaxMatches(11)
       .setVerbosity(3)
