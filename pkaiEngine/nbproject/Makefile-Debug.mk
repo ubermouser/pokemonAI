@@ -39,7 +39,11 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/511e4115/environment_nonvolatile.o \
 	${OBJECTDIR}/_ext/511e4115/environment_possible.o \
 	${OBJECTDIR}/_ext/511e4115/environment_volatile.o \
+	${OBJECTDIR}/_ext/511e4115/evaluator.o \
+	${OBJECTDIR}/_ext/511e4115/evaluator_random.o \
+	${OBJECTDIR}/_ext/511e4115/evaluator_simple.o \
 	${OBJECTDIR}/_ext/e96877d6/fixed_func.o \
+	${OBJECTDIR}/_ext/511e4115/game.o \
 	${OBJECTDIR}/_ext/511e4115/gen4_scripts.o \
 	${OBJECTDIR}/_ext/511e4115/init_toolbox.o \
 	${OBJECTDIR}/_ext/511e4115/item.o \
@@ -50,6 +54,10 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/511e4115/nature.o \
 	${OBJECTDIR}/_ext/511e4115/orphan.o \
 	${OBJECTDIR}/_ext/511e4115/pkCU.o \
+	${OBJECTDIR}/_ext/511e4115/planner.o \
+	${OBJECTDIR}/_ext/511e4115/planner_human.o \
+	${OBJECTDIR}/_ext/511e4115/planner_max.o \
+	${OBJECTDIR}/_ext/511e4115/planner_random.o \
 	${OBJECTDIR}/_ext/511e4115/pluggable.o \
 	${OBJECTDIR}/_ext/511e4115/pokedex.o \
 	${OBJECTDIR}/_ext/511e4115/pokedex_dynamic.o \
@@ -67,11 +75,13 @@ TESTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}/tests
 # Test Files
 TESTFILES= \
 	${TESTDIR}/TestFiles/f1 \
+	${TESTDIR}/TestFiles/f3 \
 	${TESTDIR}/TestFiles/f2
 
 # Test Object Files
 TESTOBJECTFILES= \
 	${TESTDIR}/_ext/a55270a7/test_engine.o \
+	${TESTDIR}/_ext/a55270a7/test_game.o \
 	${TESTDIR}/_ext/a55270a7/test_pokedex.o
 
 # C Compiler Flags
@@ -120,10 +130,30 @@ ${OBJECTDIR}/_ext/511e4115/environment_volatile.o: ../src/environment_volatile.c
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/environment_volatile.o ../src/environment_volatile.cpp
 
+${OBJECTDIR}/_ext/511e4115/evaluator.o: ../src/evaluator.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluator.o ../src/evaluator.cpp
+
+${OBJECTDIR}/_ext/511e4115/evaluator_random.o: ../src/evaluator_random.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluator_random.o ../src/evaluator_random.cpp
+
+${OBJECTDIR}/_ext/511e4115/evaluator_simple.o: ../src/evaluator_simple.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluator_simple.o ../src/evaluator_simple.cpp
+
 ${OBJECTDIR}/_ext/e96877d6/fixed_func.o: ../src/fixedpoint/fixed_func.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/e96877d6
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/e96877d6/fixed_func.o ../src/fixedpoint/fixed_func.cpp
+
+${OBJECTDIR}/_ext/511e4115/game.o: ../src/game.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/game.o ../src/game.cpp
 
 ${OBJECTDIR}/_ext/511e4115/gen4_scripts.o: ../src/gen4_scripts.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
@@ -174,6 +204,26 @@ ${OBJECTDIR}/_ext/511e4115/pkCU.o: ../src/pkCU.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pkCU.o ../src/pkCU.cpp
+
+${OBJECTDIR}/_ext/511e4115/planner.o: ../src/planner.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planner.o ../src/planner.cpp
+
+${OBJECTDIR}/_ext/511e4115/planner_human.o: ../src/planner_human.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planner_human.o ../src/planner_human.cpp
+
+${OBJECTDIR}/_ext/511e4115/planner_max.o: ../src/planner_max.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planner_max.o ../src/planner_max.cpp
+
+${OBJECTDIR}/_ext/511e4115/planner_random.o: ../src/planner_random.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planner_random.o ../src/planner_random.cpp
 
 ${OBJECTDIR}/_ext/511e4115/pluggable.o: ../src/pluggable.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
@@ -236,6 +286,10 @@ ${TESTDIR}/TestFiles/f1: ${TESTDIR}/_ext/a55270a7/test_engine.o ${OBJECTFILES:%.
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc} -o ${TESTDIR}/TestFiles/f1 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -ldl -lpthread -lgtest_main -lgtest 
 
+${TESTDIR}/TestFiles/f3: ${TESTDIR}/_ext/a55270a7/test_game.o ${OBJECTFILES:%.o=%_nomain.o}
+	${MKDIR} -p ${TESTDIR}/TestFiles
+	${LINK.cc} -o ${TESTDIR}/TestFiles/f3 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -ldl -lpthread -lgtest_main -lgtest 
+
 ${TESTDIR}/TestFiles/f2: ${TESTDIR}/_ext/a55270a7/test_pokedex.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc} -o ${TESTDIR}/TestFiles/f2 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -ldl -lpthread -lgtest_main -lgtest 
@@ -245,6 +299,12 @@ ${TESTDIR}/_ext/a55270a7/test_engine.o: ../src/tests/test_engine.cpp
 	${MKDIR} -p ${TESTDIR}/_ext/a55270a7
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${TESTDIR}/_ext/a55270a7/test_engine.o ../src/tests/test_engine.cpp
+
+
+${TESTDIR}/_ext/a55270a7/test_game.o: ../src/tests/test_game.cpp 
+	${MKDIR} -p ${TESTDIR}/_ext/a55270a7
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${TESTDIR}/_ext/a55270a7/test_game.o ../src/tests/test_game.cpp
 
 
 ${TESTDIR}/_ext/a55270a7/test_pokedex.o: ../src/tests/test_pokedex.cpp 
@@ -305,6 +365,45 @@ ${OBJECTDIR}/_ext/511e4115/environment_volatile_nomain.o: ${OBJECTDIR}/_ext/511e
 	    ${CP} ${OBJECTDIR}/_ext/511e4115/environment_volatile.o ${OBJECTDIR}/_ext/511e4115/environment_volatile_nomain.o;\
 	fi
 
+${OBJECTDIR}/_ext/511e4115/evaluator_nomain.o: ${OBJECTDIR}/_ext/511e4115/evaluator.o ../src/evaluator.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/evaluator.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluator_nomain.o ../src/evaluator.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/511e4115/evaluator.o ${OBJECTDIR}/_ext/511e4115/evaluator_nomain.o;\
+	fi
+
+${OBJECTDIR}/_ext/511e4115/evaluator_random_nomain.o: ${OBJECTDIR}/_ext/511e4115/evaluator_random.o ../src/evaluator_random.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/evaluator_random.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluator_random_nomain.o ../src/evaluator_random.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/511e4115/evaluator_random.o ${OBJECTDIR}/_ext/511e4115/evaluator_random_nomain.o;\
+	fi
+
+${OBJECTDIR}/_ext/511e4115/evaluator_simple_nomain.o: ${OBJECTDIR}/_ext/511e4115/evaluator_simple.o ../src/evaluator_simple.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/evaluator_simple.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluator_simple_nomain.o ../src/evaluator_simple.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/511e4115/evaluator_simple.o ${OBJECTDIR}/_ext/511e4115/evaluator_simple_nomain.o;\
+	fi
+
 ${OBJECTDIR}/_ext/e96877d6/fixed_func_nomain.o: ${OBJECTDIR}/_ext/e96877d6/fixed_func.o ../src/fixedpoint/fixed_func.cpp 
 	${MKDIR} -p ${OBJECTDIR}/_ext/e96877d6
 	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/e96877d6/fixed_func.o`; \
@@ -316,6 +415,19 @@ ${OBJECTDIR}/_ext/e96877d6/fixed_func_nomain.o: ${OBJECTDIR}/_ext/e96877d6/fixed
 	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/e96877d6/fixed_func_nomain.o ../src/fixedpoint/fixed_func.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/_ext/e96877d6/fixed_func.o ${OBJECTDIR}/_ext/e96877d6/fixed_func_nomain.o;\
+	fi
+
+${OBJECTDIR}/_ext/511e4115/game_nomain.o: ${OBJECTDIR}/_ext/511e4115/game.o ../src/game.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/game.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/game_nomain.o ../src/game.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/511e4115/game.o ${OBJECTDIR}/_ext/511e4115/game_nomain.o;\
 	fi
 
 ${OBJECTDIR}/_ext/511e4115/gen4_scripts_nomain.o: ${OBJECTDIR}/_ext/511e4115/gen4_scripts.o ../src/gen4_scripts.cpp 
@@ -446,6 +558,58 @@ ${OBJECTDIR}/_ext/511e4115/pkCU_nomain.o: ${OBJECTDIR}/_ext/511e4115/pkCU.o ../s
 	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pkCU_nomain.o ../src/pkCU.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/_ext/511e4115/pkCU.o ${OBJECTDIR}/_ext/511e4115/pkCU_nomain.o;\
+	fi
+
+${OBJECTDIR}/_ext/511e4115/planner_nomain.o: ${OBJECTDIR}/_ext/511e4115/planner.o ../src/planner.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/planner.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planner_nomain.o ../src/planner.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/511e4115/planner.o ${OBJECTDIR}/_ext/511e4115/planner_nomain.o;\
+	fi
+
+${OBJECTDIR}/_ext/511e4115/planner_human_nomain.o: ${OBJECTDIR}/_ext/511e4115/planner_human.o ../src/planner_human.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/planner_human.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planner_human_nomain.o ../src/planner_human.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/511e4115/planner_human.o ${OBJECTDIR}/_ext/511e4115/planner_human_nomain.o;\
+	fi
+
+${OBJECTDIR}/_ext/511e4115/planner_max_nomain.o: ${OBJECTDIR}/_ext/511e4115/planner_max.o ../src/planner_max.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/planner_max.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planner_max_nomain.o ../src/planner_max.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/511e4115/planner_max.o ${OBJECTDIR}/_ext/511e4115/planner_max_nomain.o;\
+	fi
+
+${OBJECTDIR}/_ext/511e4115/planner_random_nomain.o: ${OBJECTDIR}/_ext/511e4115/planner_random.o ../src/planner_random.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/planner_random.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planner_random_nomain.o ../src/planner_random.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/511e4115/planner_random.o ${OBJECTDIR}/_ext/511e4115/planner_random_nomain.o;\
 	fi
 
 ${OBJECTDIR}/_ext/511e4115/pluggable_nomain.o: ${OBJECTDIR}/_ext/511e4115/pluggable.o ../src/pluggable.cpp 
@@ -583,6 +747,7 @@ ${OBJECTDIR}/_ext/511e4115/type_nomain.o: ${OBJECTDIR}/_ext/511e4115/type.o ../s
 	@if [ "${TEST}" = "" ]; \
 	then  \
 	    ${TESTDIR}/TestFiles/f1 || true; \
+	    ${TESTDIR}/TestFiles/f3 || true; \
 	    ${TESTDIR}/TestFiles/f2 || true; \
 	else  \
 	    ./${TEST} || true; \

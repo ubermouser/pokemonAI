@@ -31,13 +31,13 @@ public:
   /* returns a NEW copy of the current evaluator */
   virtual Evaluator* clone() const = 0;
 
-  virtual void setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& nv) { nv_ = nv; }
+  virtual Evaluator& setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& nv) {
+    nv_ = nv;
+    return *this;
+  }
 
   /* does the evaluator have all acceptable data required to perform evaluation? */
   virtual bool isInitialized() const { return true; };
-
-  /* reset the nonvolatile team held by the evaluator. envNV is guaranteed to remain until next reset */
-  virtual void resetEvaluator(std::shared_ptr<const EnvironmentNonvolatile>& envNV) { nv_ = envNV; };
 
   /* evaluate the fitness of a given environment for team iTeam */
   virtual EvalResult_t calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) = 0;

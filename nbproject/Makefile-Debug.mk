@@ -36,22 +36,14 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/src/backpropNet.o \
-	${OBJECTDIR}/src/evaluator.o \
-	${OBJECTDIR}/src/evaluator_random.o \
-	${OBJECTDIR}/src/evaluator_simple.o \
 	${OBJECTDIR}/src/experienceNet.o \
 	${OBJECTDIR}/src/fixedpoint/fixed_func.o \
-	${OBJECTDIR}/src/game.o \
 	${OBJECTDIR}/src/init_toolbox.o \
 	${OBJECTDIR}/src/main.o \
 	${OBJECTDIR}/src/name.o \
 	${OBJECTDIR}/src/neuralNet.o \
 	${OBJECTDIR}/src/orphan.o \
 	${OBJECTDIR}/src/pkIO.o \
-	${OBJECTDIR}/src/planner.o \
-	${OBJECTDIR}/src/planner_human.o \
-	${OBJECTDIR}/src/planner_max.o \
-	${OBJECTDIR}/src/planner_random.o \
 	${OBJECTDIR}/src/pokemonAI.o \
 	${OBJECTDIR}/src/ranked.o \
 	${OBJECTDIR}/src/ranked_evaluator.o \
@@ -107,21 +99,6 @@ ${OBJECTDIR}/src/backpropNet.o: src/backpropNet.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/backpropNet.o src/backpropNet.cpp
 
-${OBJECTDIR}/src/evaluator.o: src/evaluator.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator.o src/evaluator.cpp
-
-${OBJECTDIR}/src/evaluator_random.o: src/evaluator_random.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_random.o src/evaluator_random.cpp
-
-${OBJECTDIR}/src/evaluator_simple.o: src/evaluator_simple.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_simple.o src/evaluator_simple.cpp
-
 ${OBJECTDIR}/src/experienceNet.o: src/experienceNet.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
@@ -131,11 +108,6 @@ ${OBJECTDIR}/src/fixedpoint/fixed_func.o: src/fixedpoint/fixed_func.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/fixedpoint
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fixedpoint/fixed_func.o src/fixedpoint/fixed_func.cpp
-
-${OBJECTDIR}/src/game.o: src/game.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/game.o src/game.cpp
 
 ${OBJECTDIR}/src/init_toolbox.o: src/init_toolbox.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -166,26 +138,6 @@ ${OBJECTDIR}/src/pkIO.o: src/pkIO.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/pkIO.o src/pkIO.cpp
-
-${OBJECTDIR}/src/planner.o: src/planner.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/planner.o src/planner.cpp
-
-${OBJECTDIR}/src/planner_human.o: src/planner_human.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/planner_human.o src/planner_human.cpp
-
-${OBJECTDIR}/src/planner_max.o: src/planner_max.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/planner_max.o src/planner_max.cpp
-
-${OBJECTDIR}/src/planner_random.o: src/planner_random.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/planner_random.o src/planner_random.cpp
 
 ${OBJECTDIR}/src/pokemonAI.o: src/pokemonAI.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -281,45 +233,6 @@ ${OBJECTDIR}/src/backpropNet_nomain.o: ${OBJECTDIR}/src/backpropNet.o src/backpr
 	    ${CP} ${OBJECTDIR}/src/backpropNet.o ${OBJECTDIR}/src/backpropNet_nomain.o;\
 	fi
 
-${OBJECTDIR}/src/evaluator_nomain.o: ${OBJECTDIR}/src/evaluator.o src/evaluator.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/evaluator.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_nomain.o src/evaluator.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/evaluator.o ${OBJECTDIR}/src/evaluator_nomain.o;\
-	fi
-
-${OBJECTDIR}/src/evaluator_random_nomain.o: ${OBJECTDIR}/src/evaluator_random.o src/evaluator_random.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/evaluator_random.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_random_nomain.o src/evaluator_random.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/evaluator_random.o ${OBJECTDIR}/src/evaluator_random_nomain.o;\
-	fi
-
-${OBJECTDIR}/src/evaluator_simple_nomain.o: ${OBJECTDIR}/src/evaluator_simple.o src/evaluator_simple.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/evaluator_simple.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_simple_nomain.o src/evaluator_simple.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/evaluator_simple.o ${OBJECTDIR}/src/evaluator_simple_nomain.o;\
-	fi
-
 ${OBJECTDIR}/src/experienceNet_nomain.o: ${OBJECTDIR}/src/experienceNet.o src/experienceNet.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/experienceNet.o`; \
@@ -344,19 +257,6 @@ ${OBJECTDIR}/src/fixedpoint/fixed_func_nomain.o: ${OBJECTDIR}/src/fixedpoint/fix
 	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/fixedpoint/fixed_func_nomain.o src/fixedpoint/fixed_func.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/fixedpoint/fixed_func.o ${OBJECTDIR}/src/fixedpoint/fixed_func_nomain.o;\
-	fi
-
-${OBJECTDIR}/src/game_nomain.o: ${OBJECTDIR}/src/game.o src/game.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/game.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/game_nomain.o src/game.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/game.o ${OBJECTDIR}/src/game_nomain.o;\
 	fi
 
 ${OBJECTDIR}/src/init_toolbox_nomain.o: ${OBJECTDIR}/src/init_toolbox.o src/init_toolbox.cpp 
@@ -435,58 +335,6 @@ ${OBJECTDIR}/src/pkIO_nomain.o: ${OBJECTDIR}/src/pkIO.o src/pkIO.cpp
 	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/pkIO_nomain.o src/pkIO.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/pkIO.o ${OBJECTDIR}/src/pkIO_nomain.o;\
-	fi
-
-${OBJECTDIR}/src/planner_nomain.o: ${OBJECTDIR}/src/planner.o src/planner.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/planner.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/planner_nomain.o src/planner.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/planner.o ${OBJECTDIR}/src/planner_nomain.o;\
-	fi
-
-${OBJECTDIR}/src/planner_human_nomain.o: ${OBJECTDIR}/src/planner_human.o src/planner_human.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/planner_human.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/planner_human_nomain.o src/planner_human.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/planner_human.o ${OBJECTDIR}/src/planner_human_nomain.o;\
-	fi
-
-${OBJECTDIR}/src/planner_max_nomain.o: ${OBJECTDIR}/src/planner_max.o src/planner_max.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/planner_max.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/planner_max_nomain.o src/planner_max.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/planner_max.o ${OBJECTDIR}/src/planner_max_nomain.o;\
-	fi
-
-${OBJECTDIR}/src/planner_random_nomain.o: ${OBJECTDIR}/src/planner_random.o src/planner_random.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/planner_random.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/planner_random_nomain.o src/planner_random.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/planner_random.o ${OBJECTDIR}/src/planner_random_nomain.o;\
 	fi
 
 ${OBJECTDIR}/src/pokemonAI_nomain.o: ${OBJECTDIR}/src/pokemonAI.o src/pokemonAI.cpp 

@@ -15,10 +15,11 @@
 #include "../inc/environment_nonvolatile.h"
 
 
-void PlannerMax::setEngine(const std::shared_ptr<PkCU>& cu) {
+PlannerMax& PlannerMax::setEngine(const std::shared_ptr<PkCU>& cu) {
   // copy, rather than share
   Planner::setEngine(std::make_shared<PkCU>(*cu));
   cu_->setAllowInvalidMoves();
+  return *this;
 }
 
 

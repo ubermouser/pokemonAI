@@ -9,6 +9,7 @@
         <itemPath>../inc/environment_nonvolatile.h</itemPath>
         <itemPath>../inc/environment_possible.h</itemPath>
         <itemPath>../inc/environment_volatile.h</itemPath>
+        <itemPath>../inc/game.h</itemPath>
         <itemPath>../inc/item.h</itemPath>
         <itemPath>../inc/move.h</itemPath>
         <itemPath>../inc/move_nonvolatile.h</itemPath>
@@ -28,6 +29,17 @@
         <itemPath>../inc/team_nonvolatile.h</itemPath>
         <itemPath>../inc/team_volatile.h</itemPath>
         <itemPath>../inc/type.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f3" displayName="evaluators" projectFiles="true">
+        <itemPath>../inc/evaluator.h</itemPath>
+        <itemPath>../inc/evaluator_random.h</itemPath>
+        <itemPath>../inc/evaluator_simple.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f4" displayName="planners" projectFiles="true">
+        <itemPath>../inc/planner.h</itemPath>
+        <itemPath>../inc/planner_human.h</itemPath>
+        <itemPath>../inc/planner_max.h</itemPath>
+        <itemPath>../inc/planner_random.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="toolbox" projectFiles="true">
         <logicalFolder name="f1" displayName="fixedpoint" projectFiles="true">
@@ -55,6 +67,7 @@
         <itemPath>../src/environment_nonvolatile.cpp</itemPath>
         <itemPath>../src/environment_possible.cpp</itemPath>
         <itemPath>../src/environment_volatile.cpp</itemPath>
+        <itemPath>../src/game.cpp</itemPath>
         <itemPath>../src/item.cpp</itemPath>
         <itemPath>../src/move.cpp</itemPath>
         <itemPath>../src/move_nonvolatile.cpp</itemPath>
@@ -70,6 +83,17 @@
         <itemPath>../src/team_nonvolatile.cpp</itemPath>
         <itemPath>../src/team_volatile.cpp</itemPath>
         <itemPath>../src/type.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f3" displayName="evaluators" projectFiles="true">
+        <itemPath>../src/evaluator.cpp</itemPath>
+        <itemPath>../src/evaluator_random.cpp</itemPath>
+        <itemPath>../src/evaluator_simple.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f4" displayName="planners" projectFiles="true">
+        <itemPath>../src/planner.cpp</itemPath>
+        <itemPath>../src/planner_human.cpp</itemPath>
+        <itemPath>../src/planner_max.cpp</itemPath>
+        <itemPath>../src/planner_random.cpp</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="toolbox" projectFiles="true">
         <logicalFolder name="f1" displayName="fixedpoint" projectFiles="true">
@@ -91,6 +115,12 @@
                      projectFiles="true"
                      kind="TEST">
         <itemPath>../src/tests/test_engine.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f3"
+                     displayName="test_game"
+                     projectFiles="true"
+                     kind="TEST">
+        <itemPath>../src/tests/test_game.cpp</itemPath>
       </logicalFolder>
       <logicalFolder name="f2"
                      displayName="test_pokedex"
@@ -144,7 +174,15 @@
       </item>
       <item path="../inc/environment_volatile.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../inc/evaluator.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/evaluator_random.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/evaluator_simple.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../inc/fp_compare.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/game.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/init_toolbox.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -167,6 +205,14 @@
       <item path="../inc/pkCU.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/pkai.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/planner.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/planner_human.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/planner_max.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/planner_random.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/pluggable.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -202,6 +248,12 @@
       </item>
       <item path="../src/environment_volatile.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/evaluator.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/evaluator_random.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/evaluator_simple.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/fixedpoint/fixed_class.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/fixedpoint/fixed_func.cpp" ex="false" tool="1" flavor2="0">
@@ -209,6 +261,8 @@
       <item path="../src/fixedpoint/fixed_func.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/fixedpoint/fixsintab.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/game.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/gen4_scripts.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -230,6 +284,14 @@
       </item>
       <item path="../src/pkCU.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/planner.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/planner_human.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/planner_max.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/planner_random.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/pluggable.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/pokedex.cpp" ex="false" tool="1" flavor2="0">
@@ -249,6 +311,8 @@
       <item path="../src/team_volatile.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/tests/test_engine.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/tests/test_game.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/tests/test_pokedex.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -290,6 +354,29 @@
         </ccTool>
         <linkerTool>
           <output>${TESTDIR}/TestFiles/f2</output>
+          <linkerLibItems>
+            <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
+            <linkerOptionItem>-lboost_system</linkerOptionItem>
+            <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
+            <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
+            <linkerOptionItem>-lgtest_main</linkerOptionItem>
+            <linkerOptionItem>-lgtest</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
+      <folder path="TestFiles/f3">
+        <cTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </cTool>
+        <ccTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f3</output>
           <linkerLibItems>
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
             <linkerOptionItem>-lboost_system</linkerOptionItem>
@@ -342,7 +429,15 @@
       </item>
       <item path="../inc/environment_volatile.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../inc/evaluator.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/evaluator_random.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/evaluator_simple.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../inc/fp_compare.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/game.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/init_toolbox.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -365,6 +460,14 @@
       <item path="../inc/pkCU.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/pkai.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/planner.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/planner_human.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/planner_max.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/planner_random.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/pluggable.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -400,6 +503,12 @@
       </item>
       <item path="../src/environment_volatile.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/evaluator.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/evaluator_random.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/evaluator_simple.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/fixedpoint/fixed_class.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/fixedpoint/fixed_func.cpp" ex="false" tool="1" flavor2="0">
@@ -407,6 +516,8 @@
       <item path="../src/fixedpoint/fixed_func.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/fixedpoint/fixsintab.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/game.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/gen4_scripts.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -428,6 +539,14 @@
       </item>
       <item path="../src/pkCU.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/planner.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/planner_human.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/planner_max.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/planner_random.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/pluggable.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/pokedex.cpp" ex="false" tool="1" flavor2="0">
@@ -447,6 +566,8 @@
       <item path="../src/team_volatile.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/tests/test_engine.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/tests/test_game.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/tests/test_pokedex.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -480,6 +601,21 @@
         </ccTool>
         <linkerTool>
           <output>${TESTDIR}/TestFiles/f2</output>
+        </linkerTool>
+      </folder>
+      <folder path="TestFiles/f3">
+        <cTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </cTool>
+        <ccTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f3</output>
         </linkerTool>
       </folder>
     </conf>

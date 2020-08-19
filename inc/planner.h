@@ -46,8 +46,9 @@ protected:
   virtual void resetName();
 
 public:
+  Planner() = delete;
   Planner(const std::string& name, size_t agentTeam): Name(name), agentTeam_(agentTeam) {};
-
+  Planner(const Planner& other) = default;
   virtual ~Planner() { };
 
   /* create a copy of the current planner (and its evaluator) */
@@ -57,13 +58,21 @@ public:
   virtual bool isInitialized() const;
 
   /* if the planner uses an evaluator, set the evaluator to evalType */
-  virtual void setEvaluator(const std::shared_ptr<Evaluator>& evaluator);
-  virtual std::shared_ptr<const Evaluator> getEvaluator() const { return eval_; };
+  virtual Planner& setEvaluator(const std::shared_ptr<Evaluator>& evaluator);
+  virtual Planner& setEvaluator(const Evaluator& evaluator) {
+    return setEvaluator(std::shared_ptr<Evaluator>(evaluator.clone()));
+  }
 
   /* sets the nonvolatile environment to _cEnvironment, the team being referenced */
-  virtual void setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& env);
+  virtual Planner& setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& env);
+  virtual Planner& setEnvironment(const EnvironmentNonvolatile& nv) {
+    return setEnvironment(std::make_shared<EnvironmentNonvolatile>(nv));
+  }
 
-  virtual void setEngine(const std::shared_ptr<PkCU>& cu);
+  virtual Planner& setEngine(const std::shared_ptr<PkCU>& cu);
+  virtual Planner& setEngine(const PkCU& cu) {
+    return setEngine(std::make_shared<PkCU>(cu));
+  }
 
   /* generate an action */
   virtual uint32_t generateSolution(const ConstEnvironmentPossible& origin) = 0;

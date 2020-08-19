@@ -1,11 +1,8 @@
 #ifndef PLANNER_MAX_H
 #define PLANNER_MAX_H
 
-#include "../inc/pkai.h"
-#include "../inc/planner.h"
-
-class Evaluator;
-class PkCU;
+#include "pkai.h"
+#include "planner.h"
 
 class PlannerMax : public Planner
 {
@@ -13,18 +10,19 @@ protected:
   std::vector<PlannerResult> results;
 
 public:
+  PlannerMax() = delete;
   PlannerMax(size_t agentTeam) : Planner("max_planner-NULLEVAL", agentTeam) {};
   PlannerMax(const PlannerMax& other) = default;
   
-  ~PlannerMax() {};
+  virtual ~PlannerMax() {};
 
   virtual std::string baseName() const override { return "max_planner"; }
 
-  PlannerMax* clone() const override { return new PlannerMax(*this); }
+  virtual PlannerMax* clone() const override { return new PlannerMax(*this); }
 
-  void setEngine(const std::shared_ptr<PkCU>& cu) override;
+  virtual PlannerMax& setEngine(const std::shared_ptr<PkCU>& cu) override;
 
-  uint32_t generateSolution(const ConstEnvironmentPossible& origin) override;
+  virtual uint32_t generateSolution(const ConstEnvironmentPossible& origin) override;
 
   static uint32_t generateSolution(
       PkCU& cu,
