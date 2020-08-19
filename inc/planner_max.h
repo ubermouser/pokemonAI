@@ -6,8 +6,7 @@
 
 class PlannerMax : public Planner {
 public:
-  PlannerMax() = delete;
-  PlannerMax(size_t agentTeam) : Planner("max_planner-NULLEVAL", agentTeam) {};
+  PlannerMax(size_t agentTeam=SIZE_MAX) : Planner("max_planner-NULLEVAL", agentTeam) {};
   PlannerMax(const PlannerMax& other) = default;
   
   virtual ~PlannerMax() {};

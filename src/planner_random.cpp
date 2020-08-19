@@ -4,10 +4,10 @@
 #include "../inc/pkCU.h"
 #include "../inc/environment_possible.h"
 
-const std::string planner_random::ident = "Random_Planner-NULLEVAL";
+const std::string PlannerRandom::ident = "Random_Planner-NULLEVAL";
 
 
-bool planner_random::isInitialized() const 
+bool PlannerRandom::isInitialized() const 
 { 
   if (agentTeam_ >= 2) { return false; }
   if (cu_ == NULL) { return false; }
@@ -16,7 +16,7 @@ bool planner_random::isInitialized() const
 }
 
 
-uint32_t planner_random::generateSolution(const ConstEnvironmentPossible& origin)
+uint32_t PlannerRandom::generateSolution(const ConstEnvironmentPossible& origin)
 {
   // choose a completely random action to return:
   size_t iNAction = rand() % AT_ITEM_USE;

@@ -63,6 +63,7 @@ Game& Game::setEngine(const std::shared_ptr<PkCU>& cu) {
 Game& Game::setPlanner(size_t iAgent, const std::shared_ptr<Planner>& cPlanner) {
   assert(iAgent < 2);
   agents_[iAgent] = cPlanner;
+  agents_[iAgent]->setTeam(iAgent);
 
   if (nv_ != NULL) { agents_[iAgent]->setEnvironment(nv_); }
   isInitialized_ = false;
@@ -104,7 +105,7 @@ bool Game::initialize() {
     if (agents_[iAgent] != NULL) { continue; }
     if (!cfg_.allowUndefinedAgents) { throw std::runtime_error("agent(s) undefined"); }
 
-    setPlanner(iAgent, PlannerMax(iAgent).setEngine(cu_).setEvaluator(eval_));
+    setPlanner(iAgent, PlannerMax().setEngine(cu_).setEvaluator(eval_));
     std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
       ": agent " << iAgent << 
       " is undefined! Replaced with " << agents_[iAgent]->getName() << "\n";
@@ -130,7 +131,7 @@ HeatResult Game::rollout(const EnvironmentVolatileData& initialState) {
   std::array<uint32_t, 2> score{0,0};
 
   if (!isInitialized_) { initialize(); }
-  if (cfg_.verbosity > 1) { printHeatStart(); }
+  if (cfg_.verbosity >= 1) { printHeatStart(); }
   
   for (size_t iMatch = 0; iMatch < cfg_.maxMatches; ++iMatch) {
     GameResult gResult = rollout_game(initialState, iMatch);
@@ -141,7 +142,7 @@ HeatResult Game::rollout(const EnvironmentVolatileData& initialState) {
   }
 
   HeatResult result = digestMatch(gameLog);
-  if (cfg_.verbosity > 1) { printHeatOutline(result); }
+  if (cfg_.verbosity >= 1) { printHeatOutline(result); }
   return result;
 }
 
@@ -224,7 +225,7 @@ Turn Game::digestTurn(
     unsigned int actionTeamB,
     size_t resultingState,
     const ConstEnvironmentPossible& envP) {
-  Turn cTurn;
+  Turn cTurn{};
 
   for (size_t iTeam = 0; iTeam < 2; iTeam++) {
     // set simple fitness to fitness as it would be evaluated depth 0 by the simple non perceptron evaluation function
@@ -265,7 +266,7 @@ Turn Game::digestTurn(
 
 
 GameResult Game::digestGame(const std::vector<Turn>& cLog, int endStatus) {
-  GameResult cResult;
+  GameResult cResult{};
   cResult.log = cLog;
 
   // initialize collected data:
@@ -290,9 +291,9 @@ GameResult Game::digestGame(const std::vector<Turn>& cLog, int endStatus) {
   }
 
   // initialize prevFitnesses
-  std::array<fpType, 2> prevSimpleFitness;
-  std::array<fpType, 2> prev0Fitness;
-  std::array<fpType, 2> prevMaxFitness;
+  std::array<fpType, 2> prevSimpleFitness{};
+  std::array<fpType, 2> prev0Fitness{};
+  std::array<fpType, 2> prevMaxFitness{};
   if (cLog.size() > 0) { // first turn:
     const Turn& fTurn = cLog.at(0); // TODO(@drendleman) - what if match begins at a terminal state?
     for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
@@ -361,10 +362,8 @@ GameResult Game::digestGame(const std::vector<Turn>& cLog, int endStatus) {
   }
 
   // create ranking:
-  for (size_t iTeam = 0; iTeam < 2; ++iTeam)
-  {
-    std::array<bool, 6> rankedPokemon;
-    rankedPokemon.fill(false);
+  for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
+    std::array<bool, 6> rankedPokemon{};
     for (size_t iRank = 0; iRank < nv_->getTeam(iTeam).getNumTeammates(); ++iRank)
     {
       fpType currentBestA = -std::numeric_limits<fpType>::infinity();
@@ -406,7 +405,7 @@ GameResult Game::digestGame(const std::vector<Turn>& cLog, int endStatus) {
 
 HeatResult Game::digestMatch(const std::vector<GameResult>& gLog) {
   // initialize heatResult:
-  HeatResult hResult;
+  HeatResult hResult{};
   hResult.gameResults = gLog;
   std::array<std::array<fpType, 6>, 2>& participation = hResult.participation;
   std::array<std::array<fpType, 6>, 2>& aggregateContribution = hResult.aggregateContribution;
@@ -455,21 +454,18 @@ HeatResult Game::digestMatch(const std::vector<GameResult>& gLog) {
   for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
     std::array<bool, 6> rankedPokemon;
     rankedPokemon.fill(false);
-    for (size_t iRank = 0; iRank < nv_->getTeam(iTeam).getNumTeammates(); ++iRank)
-    {
+    for (size_t iRank = 0; iRank < nv_->getTeam(iTeam).getNumTeammates(); ++iRank) {
       fpType currentBestR = std::numeric_limits<fpType>::infinity();
       fpType currentBestA = -std::numeric_limits<fpType>::infinity();
       size_t iCurrentBest = SIZE_MAX;
 
-      for (size_t iPokemon = 0; iPokemon < nv_->getTeam(iTeam).getNumTeammates(); ++iPokemon)
-      {
+      for (size_t iPokemon = 0; iPokemon < nv_->getTeam(iTeam).getNumTeammates(); ++iPokemon) {
         // don't compare if already ranked:
         if (rankedPokemon[iPokemon] == true) { continue; }
 
         if (mostlyLT(avgRanking[iTeam][iPokemon], currentBestR) || 
           (mostlyLTE(avgRanking[iTeam][iPokemon], currentBestR) &&
-          mostlyGTE(aggregateContribution[iTeam][iPokemon], currentBestA)))
-        {
+          mostlyGTE(aggregateContribution[iTeam][iPokemon], currentBestA))) {
           currentBestR = avgRanking[iTeam][iPokemon];
           currentBestA = aggregateContribution[iTeam][iPokemon];
           iCurrentBest = iPokemon;

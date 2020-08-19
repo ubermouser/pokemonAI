@@ -47,7 +47,7 @@ protected:
 
 public:
   Planner() = delete;
-  Planner(const std::string& name, size_t agentTeam): Name(name), agentTeam_(agentTeam) {};
+  Planner(const std::string& name, size_t agentTeam=SIZE_MAX): Name(name), agentTeam_(agentTeam) {};
   Planner(const Planner& other) = default;
   virtual ~Planner() { };
 
@@ -73,6 +73,8 @@ public:
   virtual Planner& setEngine(const PkCU& cu) {
     return setEngine(std::make_shared<PkCU>(cu));
   }
+
+  virtual Planner& setTeam(size_t iTeam) { agentTeam_ = iTeam; return *this; };
 
   /* generate an action */
   virtual uint32_t generateSolution(const ConstEnvironmentPossible& origin) = 0;

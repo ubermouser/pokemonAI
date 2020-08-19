@@ -3,16 +3,16 @@
 
 #include "planner.h"
 
-class planner_random : public Planner {
+class PlannerRandom : public Planner {
 private:
   static const std::string ident;
 public:
-  planner_random(size_t agentTeam) : Planner(ident, agentTeam) {};
+  PlannerRandom(size_t agentTeam=SIZE_MAX) : Planner(ident, agentTeam) {};
 
-  planner_random(const planner_random& other) = default;
-  virtual ~planner_random() { };
+  PlannerRandom(const PlannerRandom& other) = default;
+  virtual ~PlannerRandom() { };
 
-  virtual planner_random* clone() const override { return new planner_random(*this); }
+  virtual PlannerRandom* clone() const override { return new PlannerRandom(*this); }
 
   virtual bool isInitialized() const override;
 

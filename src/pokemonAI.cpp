@@ -455,7 +455,7 @@ Planner* PokemonAI::plannerSelect(size_t iTeam, const std::string& teamName)
       //return new planner_stochastic(engineAccuracy, plannerTemperature, plannerExploration);
       return NULL;
     case 2:
-      return new planner_random(iTeam);
+      return new PlannerRandom(iTeam);
     case 3:
       //return new planner_directed(experienceNet(1, expSettings), engineAccuracy, plannerExploration);
       return NULL;

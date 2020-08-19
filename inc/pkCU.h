@@ -71,8 +71,7 @@ struct _moveBracket
   unsigned int speed;
 };
 
-class PKAISHARED PkCU
-{
+class PKAISHARED PkCU {
 protected:
   /* the current nonvolatile environment; pkCU loads plugins only for these two teams to fight */
   std::shared_ptr<const EnvironmentNonvolatile> nv_;

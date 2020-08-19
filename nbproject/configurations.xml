@@ -4,28 +4,6 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <logicalFolder name="f1" displayName="engine" projectFiles="true">
-        <itemPath>inc/ability.h</itemPath>
-        <itemPath>inc/environment_nonvolatile.h</itemPath>
-        <itemPath>inc/environment_possible.h</itemPath>
-        <itemPath>inc/environment_volatile.h</itemPath>
-        <itemPath>inc/item.h</itemPath>
-        <itemPath>inc/move.h</itemPath>
-        <itemPath>inc/move_nonvolatile.h</itemPath>
-        <itemPath>inc/move_volatile.h</itemPath>
-        <itemPath>inc/nature.h</itemPath>
-        <itemPath>inc/pkCU.h</itemPath>
-        <itemPath>inc/pluggable.h</itemPath>
-        <itemPath>inc/pluggable_types.h</itemPath>
-        <itemPath>inc/plugin.h</itemPath>
-        <itemPath>inc/pokedex.h</itemPath>
-        <itemPath>inc/pokemon_base.h</itemPath>
-        <itemPath>inc/pokemon_nonvolatile.h</itemPath>
-        <itemPath>inc/pokemon_volatile.h</itemPath>
-        <itemPath>inc/team_nonvolatile.h</itemPath>
-        <itemPath>inc/team_volatile.h</itemPath>
-        <itemPath>inc/type.h</itemPath>
-      </logicalFolder>
       <logicalFolder name="f2" displayName="evaluators" projectFiles="true">
         <itemPath>inc/evaluator_featureVector.h</itemPath>
         <itemPath>inc/evaluator_network128.h</itemPath>
@@ -125,6 +103,11 @@
                    displayName="Source Files"
                    projectFiles="true">
       <logicalFolder name="f1" displayName="evaluators" projectFiles="true">
+        <itemPath>src/evaluator_featureVector.cpp</itemPath>
+        <itemPath>src/evaluator_network128.cpp</itemPath>
+        <itemPath>src/evaluator_network16.cpp</itemPath>
+        <itemPath>src/evaluator_network32.cpp</itemPath>
+        <itemPath>src/evaluator_network64.cpp</itemPath>
       </logicalFolder>
       <logicalFolder name="f4" displayName="neural" projectFiles="true">
         <itemPath>src/backpropNet.cpp</itemPath>
@@ -133,15 +116,18 @@
         <itemPath>src/temporalpropNet.cpp</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="planners" projectFiles="true">
-      </logicalFolder>
-      <logicalFolder name="f5" displayName="toolbox" projectFiles="true">
-        <logicalFolder name="f1" displayName="fixedpoint" projectFiles="true">
-          <itemPath>src/fixedpoint/fixed_func.cpp</itemPath>
+        <logicalFolder name="f1" displayName="planner_minimax" projectFiles="true">
+          <itemPath>src/agentMove.cpp</itemPath>
+          <itemPath>src/orderHeuristic.cpp</itemPath>
+          <itemPath>src/otherMove.cpp</itemPath>
+          <itemPath>src/planner_minimax.cpp</itemPath>
+          <itemPath>src/planner_minimax_thread.cpp</itemPath>
+          <itemPath>src/ply.cpp</itemPath>
+          <itemPath>src/transposition_table.cpp</itemPath>
+          <itemPath>src/vertex.cpp</itemPath>
         </logicalFolder>
-        <itemPath>src/init_toolbox.cpp</itemPath>
-        <itemPath>src/name.cpp</itemPath>
-        <itemPath>src/orphan.cpp</itemPath>
-        <itemPath>src/signature.cpp</itemPath>
+        <itemPath>src/planner_directed.cpp</itemPath>
+        <itemPath>src/planner_stochastic.cpp</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="trainer" projectFiles="true">
         <logicalFolder name="f1" displayName="ranked" projectFiles="true">
@@ -162,18 +148,6 @@
                    displayName="Test Files"
                    projectFiles="false"
                    kind="TEST_LOGICAL_FOLDER">
-      <logicalFolder name="f2"
-                     displayName="test_engine"
-                     projectFiles="true"
-                     kind="TEST">
-        <itemPath>src/tests/test_engine.cpp</itemPath>
-      </logicalFolder>
-      <logicalFolder name="f1"
-                     displayName="test_pokedex"
-                     projectFiles="true"
-                     kind="TEST">
-        <itemPath>src/tests/test_pokedex.cpp</itemPath>
-      </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -272,55 +246,9 @@
       </item>
       <item path="data/pokemon.txt" ex="false" tool="3" flavor2="0">
       </item>
-      <folder path="TestFiles/f1">
-        <cTool>
-          <incDir>
-            <pElem>.</pElem>
-          </incDir>
-        </cTool>
-        <ccTool>
-          <incDir>
-            <pElem>.</pElem>
-          </incDir>
-        </ccTool>
-        <linkerTool>
-          <output>${TESTDIR}/TestFiles/f1</output>
-          <linkerLibItems>
-            <linkerOptionItem>-lgtest_main</linkerOptionItem>
-            <linkerOptionItem>-lgtest</linkerOptionItem>
-          </linkerLibItems>
-        </linkerTool>
-      </folder>
-      <folder path="TestFiles/f2">
-        <cTool>
-          <incDir>
-            <pElem>.</pElem>
-          </incDir>
-        </cTool>
-        <ccTool>
-          <incDir>
-            <pElem>.</pElem>
-          </incDir>
-        </ccTool>
-        <linkerTool>
-          <output>${TESTDIR}/TestFiles/f2</output>
-          <linkerLibItems>
-            <linkerOptionItem>-lgtest</linkerOptionItem>
-            <linkerOptionItem>-lgtest_main</linkerOptionItem>
-          </linkerLibItems>
-        </linkerTool>
-      </folder>
-      <item path="inc/ability.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/agentMove.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/backpropNet.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/environment_nonvolatile.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/environment_possible.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/environment_volatile.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/evaluator_featureVector.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -340,17 +268,7 @@
       </item>
       <item path="inc/init_toolbox.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/item.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/move.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/move_nonvolatile.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/move_volatile.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/name.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/nature.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/neuralNet.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -359,8 +277,6 @@
       <item path="inc/orphan.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/otherMove.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/pkCU.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/pkIO.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -374,23 +290,9 @@
       </item>
       <item path="inc/planner_stochastic.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/pluggable.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/pluggable_types.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/plugin.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/ply.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/pokedex.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/pokemonAI.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/pokemon_base.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/pokemon_nonvolatile.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/pokemon_volatile.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/ranked.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -404,10 +306,6 @@
       </item>
       <item path="inc/signature.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/team_nonvolatile.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/team_volatile.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/temporalpropNet.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/trainer.h" ex="false" tool="3" flavor2="0">
@@ -416,35 +314,51 @@
       </item>
       <item path="inc/trueSkill.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/type.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/vertex.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="pkai.ini" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="src/agentMove.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="src/backpropNet.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/evaluator_featureVector.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/evaluator_network128.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/evaluator_network16.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/evaluator_network32.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/evaluator_network64.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/experienceNet.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/fixedpoint/fixed_class.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/fixedpoint/fixed_func.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/fixedpoint/fixed_func.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/fixedpoint/fixsintab.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/init_toolbox.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/name.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/neuralNet.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/orphan.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/orderHeuristic.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/otherMove.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/pkIO.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/planner_directed.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/planner_minimax.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/planner_minimax_thread.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/planner_stochastic.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/ply.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/pokemonAI.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -456,19 +370,17 @@
       </item>
       <item path="src/ranked_team.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/signature.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/temporalpropNet.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/tests/test_engine.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/tests/test_pokedex.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/trainer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/trainer_io.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="src/transposition_table.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="src/trueSkill.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/vertex.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="teams/dualTeamA.txt" ex="false" tool="3" flavor2="0">
       </item>
@@ -607,47 +519,9 @@
       </item>
       <item path="data/pokemon.txt" ex="false" tool="3" flavor2="0">
       </item>
-      <folder path="TestFiles/f1">
-        <cTool>
-          <incDir>
-            <pElem>.</pElem>
-          </incDir>
-        </cTool>
-        <ccTool>
-          <incDir>
-            <pElem>.</pElem>
-          </incDir>
-        </ccTool>
-        <linkerTool>
-          <output>${TESTDIR}/TestFiles/f1</output>
-        </linkerTool>
-      </folder>
-      <folder path="TestFiles/f2">
-        <cTool>
-          <incDir>
-            <pElem>.</pElem>
-          </incDir>
-        </cTool>
-        <ccTool>
-          <incDir>
-            <pElem>.</pElem>
-          </incDir>
-        </ccTool>
-        <linkerTool>
-          <output>${TESTDIR}/TestFiles/f2</output>
-        </linkerTool>
-      </folder>
-      <item path="inc/ability.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/agentMove.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/backpropNet.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/environment_nonvolatile.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/environment_possible.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/environment_volatile.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/evaluator_featureVector.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -667,17 +541,7 @@
       </item>
       <item path="inc/init_toolbox.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/item.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/move.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/move_nonvolatile.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/move_volatile.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/name.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/nature.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/neuralNet.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -686,8 +550,6 @@
       <item path="inc/orphan.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/otherMove.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/pkCU.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/pkIO.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -701,23 +563,9 @@
       </item>
       <item path="inc/planner_stochastic.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/pluggable.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/pluggable_types.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/plugin.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/ply.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/pokedex.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/pokemonAI.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/pokemon_base.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/pokemon_nonvolatile.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/pokemon_volatile.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/ranked.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -731,10 +579,6 @@
       </item>
       <item path="inc/signature.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/team_nonvolatile.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/team_volatile.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/temporalpropNet.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/trainer.h" ex="false" tool="3" flavor2="0">
@@ -743,35 +587,51 @@
       </item>
       <item path="inc/trueSkill.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/type.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/vertex.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="pkai.ini" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="src/agentMove.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="src/backpropNet.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/evaluator_featureVector.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/evaluator_network128.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/evaluator_network16.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/evaluator_network32.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/evaluator_network64.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/experienceNet.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/fixedpoint/fixed_class.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/fixedpoint/fixed_func.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/fixedpoint/fixed_func.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/fixedpoint/fixsintab.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/init_toolbox.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/name.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/neuralNet.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/orphan.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/orderHeuristic.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/otherMove.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/pkIO.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/planner_directed.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/planner_minimax.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/planner_minimax_thread.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/planner_stochastic.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/ply.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/pokemonAI.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -783,19 +643,17 @@
       </item>
       <item path="src/ranked_team.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/signature.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/temporalpropNet.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/tests/test_engine.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/tests/test_pokedex.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/trainer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/trainer_io.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="src/transposition_table.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="src/trueSkill.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/vertex.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="teams/dualTeamA.txt" ex="false" tool="3" flavor2="0">
       </item>

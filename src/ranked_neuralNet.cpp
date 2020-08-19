@@ -210,8 +210,8 @@ void ranked_neuralNet::propagate(
   // if we haven't cached fitnesses from the last game we played, generate new ones:
   if (rolloutFitnesses.empty())
   {
-    rolloutGame->setPlanner(TEAM_A, planner_random());
-    rolloutGame->setPlanner(TEAM_B, planner_random());
+    rolloutGame->setPlanner(TEAM_A, PlannerRandom());
+    rolloutGame->setPlanner(TEAM_B, PlannerRandom());
 
     rolloutGame->setEnvironment(envNV);
 
