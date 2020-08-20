@@ -27,41 +27,11 @@ public:
 
   static MoveNonVolatile* mNV_struggle;
 
-  MoveNonVolatile()
-    : Signature<MoveNonVolatile, MOVE_NONVOLATILE_DIGESTSIZE>(),
-    base(NULL),
-    scriptVal_a(0),
-    scriptVal_b(0),
-    PPmax(0)
-  {
-  };
-
-  MoveNonVolatile(const MoveNonVolatile& orig)
-    : Signature<MoveNonVolatile, MOVE_NONVOLATILE_DIGESTSIZE>(orig),
-    base(orig.base),
-    scriptVal_a(orig.scriptVal_a),
-    scriptVal_b(orig.scriptVal_b),
-    PPmax(orig.PPmax)
-  {
-  };
-
-  MoveNonVolatile& operator=(const MoveNonVolatile& source)
-  {
-    // identity theorem - simply return what we have now if equal address
-    if (this == &source) { return *this; } 
-
-    Signature<MoveNonVolatile, MOVE_NONVOLATILE_DIGESTSIZE>::operator=(source);
-    base = source.base;
-    scriptVal_a = source.scriptVal_a;
-    scriptVal_b = source.scriptVal_b;
-    PPmax = source.PPmax;
-
-    return *this;
-  };
-
   MoveNonVolatile(const Move& _base, unsigned int PPmultiplier = 16);
-
-  ~MoveNonVolatile() { };
+  MoveNonVolatile() = default;
+  MoveNonVolatile(const MoveNonVolatile& orig) = default;
+  MoveNonVolatile& operator=(const MoveNonVolatile& source) = default;
+  virtual ~MoveNonVolatile() = default;
   
   bool moveExists() const
   {

@@ -122,8 +122,8 @@ typedef int (*onEndOfTurn_rawType)
   );
 
 typedef int (*onInitMove_rawType)
-  (PokemonNonVolatile,
-  MoveNonVolatile);
+  (PokemonNonVolatile&,
+  MoveNonVolatile&);
 
 typedef void (*voidFunction_rawType)(void*);
 

@@ -169,3 +169,20 @@ TEST_F(EngineTest, GroundConditions) {
     EXPECT_EQ(flying_vs_sr.at(0).getEnv().getTeam(1).getPKV().getHP(), 143); // 75%
   }
 }
+
+
+TEST_F(EngineTest, HiddenPower) {
+  auto team = TeamNonVolatile()
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("heatran"))
+        .addMove(pokedex_->getMoves().at("hidden power"))
+        .setLevel(100))
+        .initialize();
+  auto environment = EnvironmentNonvolatile(team, team, true);
+  engine_->setEnvironment(environment);
+
+  auto hidden_power = engine_->updateState(engine_->initialState(), AT_MOVE_0, AT_MOVE_NOTHING);
+
+  // rock_t with 30 power
+  EXPECT_EQ(hidden_power.at(0).getEnv().getTeam(1).getPKV().getHP(), 233);
+}

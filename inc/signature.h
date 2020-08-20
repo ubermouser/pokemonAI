@@ -20,6 +20,8 @@ template<class derived, size_t digestSize = 0>
 class Signature
 {
 public:
+  Signature() = default;
+  virtual ~Signature() = default;
 
   void createDigest(std::array<uint8_t, digestSize>& digest) const
   {

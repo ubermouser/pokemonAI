@@ -10,10 +10,11 @@
 
 #include "../inc/pkai.h"
 
-#include <stdint.h>
-#include <ostream>
-#include <vector>
 #include <array>
+#include <ostream>
+#include <stdint.h>
+#include <string>
+#include <vector>
 
 #include "name.h"
 #include "pokemon_nonvolatile.h"
@@ -84,6 +85,8 @@ public:
   bool input(const std::vector<std::string>& lines, size_t& iLine);
   
   void createDigest_impl(std::array<uint8_t, TEAM_NONVOLATILE_DIGESTSIZE>& digest) const;
+
+  static TeamNonVolatile loadFromFile(const std::string& path);
 
 };
 

@@ -1,11 +1,9 @@
-
-//#define PKAI_EXPORT
 #include "../inc/team_nonvolatile.h"
 
-//#define PKAI_STATIC
+#include <stdexcept>
+
 #include "../inc/pokemon_base.h"
 #include "../inc/team_volatile.h"
-//#undef PKAI_STATIC
 #include "../inc/init_toolbox.h"
 #include "../inc/orphan.h"
 
@@ -408,3 +406,34 @@ bool TeamNonVolatile::input(const std::vector<std::string>& lines, size_t& iLine
   printOrphans(mismatchedMoves, getName(), "team-moves", "move", 4);
   return result; // import success or failure, depending on if we have orphans
 } // endof import team
+
+
+TeamNonVolatile TeamNonVolatile::loadFromFile(const std::string& path) {
+  TeamNonVolatile result;
+  size_t iLine = 0;
+  std::vector<std::string> lines;
+  {
+    std::string inputBuffer;
+
+    if (INI::loadFileToString(path, "PKAIE", inputBuffer) != true) {
+      throw std::invalid_argument("TeamNonVolatile read failure");
+    }
+
+    //tokenize by line endings
+    lines = INI::tokenize(inputBuffer, "\n\r");
+  }
+
+  // this team object does not have any built-in ranking data, and should be easier to load:
+  if (lines.at(iLine).compare(0, 5, "PKAIE") == 0)
+  {
+    // input actual team:
+    if (!result.input(lines, iLine)) { throw std::invalid_argument("TeamNonVolatile deserialization failure"); }
+  } else {
+    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
+      ": File \"" << path << "\" has header of type \"" << lines.at(0).substr(0, 5) <<
+      "\" (needs to be \"PKAIE\" or \"PKAIR\") and is incompatible with this program!\n";
+    throw std::invalid_argument("File header does not match PKAIE");
+  }
+
+  return result;
+} // endOf loadFromFile
