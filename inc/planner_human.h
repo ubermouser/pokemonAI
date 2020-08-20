@@ -30,7 +30,7 @@ protected:
   void resetName() override { setName(ident); }
 
 public:
-  PlannerHuman(size_t agentTeam) : Planner(ident, agentTeam) {};
+  PlannerHuman(size_t agentTeam=SIZE_MAX) : Planner(ident, agentTeam) {};
   PlannerHuman(const PlannerHuman& other) = default;
   ~PlannerHuman() { };
 

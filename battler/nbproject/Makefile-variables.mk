@@ -15,13 +15,13 @@ CND_PACKAGE_DIR_Debug=dist/Debug/CLANG-Linux/package
 CND_PACKAGE_NAME_Debug=battler.tar
 CND_PACKAGE_PATH_Debug=dist/Debug/CLANG-Linux/package/battler.tar
 # Release configuration
-CND_PLATFORM_Release=CLANG-Linux
-CND_ARTIFACT_DIR_Release=dist/Release/CLANG-Linux
+CND_PLATFORM_Release=GNU-Linux
+CND_ARTIFACT_DIR_Release=dist/Release/GNU-Linux
 CND_ARTIFACT_NAME_Release=battler
-CND_ARTIFACT_PATH_Release=dist/Release/CLANG-Linux/battler
-CND_PACKAGE_DIR_Release=dist/Release/CLANG-Linux/package
+CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux/battler
+CND_PACKAGE_DIR_Release=dist/Release/GNU-Linux/package
 CND_PACKAGE_NAME_Release=battler.tar
-CND_PACKAGE_PATH_Release=dist/Release/CLANG-Linux/package/battler.tar
+CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux/package/battler.tar
 #
 # include compiler specific variables
 #

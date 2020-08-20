@@ -11,17 +11,18 @@
 #include "../inc/pkai.h"
 
 #include <string>
+#include <boost/program_options.hpp>
 
-#include "../inc/pokedex.h"
-#include "../inc/type.h"
-#include "../inc/ability.h"
-#include "../inc/nature.h"
-#include "../inc/item.h"
-#include "../inc/move.h"
-#include "../inc/pokemon_base.h"
-#include "../inc/pluggable_types.h"
-#include "../inc/plugin.h"
-#include "../inc/orphan.h"
+#include "pokedex.h"
+#include "type.h"
+#include "ability.h"
+#include "nature.h"
+#include "item.h"
+#include "move.h"
+#include "pokemon_base.h"
+#include "pluggable_types.h"
+#include "plugin.h"
+#include "orphan.h"
 
 class PKAISHARED PokedexStatic: public Pokedex {
 public:
@@ -42,10 +43,13 @@ public:
     std::string typesPath_ = "data/gen4_types.txt";
     // location of pokemon movelists
     std::string movelistsPath_ = "data/gen4_movelist.txt";
-    // location of the plugin library root directory
-    std::string pluginsPath_ = "plugins";
-    
+
     Config(){};
+
+    static boost::program_options::options_description options(
+        Config& cfg,
+        const std::string& category="pokedex configuration",
+        std::string prefix = "");
   };
   
   PokedexStatic(const Config& config=Config(), bool doInitialize=true);

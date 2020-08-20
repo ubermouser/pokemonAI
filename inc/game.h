@@ -7,6 +7,7 @@
 #include <memory>
 #include <vector>
 #include <stdint.h>
+#include <boost/program_options.hpp>
 
 #include "environment_nonvolatile.h"
 #include "environment_possible.h"
@@ -80,6 +81,11 @@ public:
     bool allowUndefinedAgents = true;
 
     Config(){};
+
+    static boost::program_options::options_description options(
+        Config& cfg,
+        const std::string& category="game configuration",
+        std::string prefix = "");
   };
 
   Game(const Config& cfg=Config());
@@ -87,7 +93,7 @@ public:
   ~Game() {};
 
   /* create all variables, prepare game for running */
-  bool initialize();
+  Game& initialize();
 
   HeatResult rollout(const EnvironmentVolatileData& initialState);
   HeatResult rollout() {

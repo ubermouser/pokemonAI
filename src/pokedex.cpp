@@ -8,6 +8,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <boost/program_options.hpp>
 
 #include "../inc/init_toolbox.h"
 #include "../inc/orphan.h"
@@ -19,6 +20,7 @@
 
 using namespace INI;
 using namespace orphan;
+namespace po = boost::program_options;
 
 int verbose = 0;
 int warning = 0;
@@ -73,7 +75,7 @@ bool PokedexStatic::initialize() {
     return false;
   }
 
-  //POKEMON library (requires sorted input of abilities, moves, and types!)
+  //POKEMON library (requires abilities, moves, and types!)
   if (!pokemon_.initialize(
       config_.pokemonPath_,
       config_.movelistsPath_,
@@ -83,22 +85,13 @@ bool PokedexStatic::initialize() {
     return false;
   }
 
-#ifndef _DISABLEPLUGINS
   // initialize scripts:
-  if (config_.pluginsPath_.empty()) {
-    if (verbose >= 6) {
-      std::cerr << "INF " << __FILE__ << "." << __LINE__ <<
-        ": A plugins root directory has not been defined. No plugins will be loaded.\n";
-    }
-  } else {
-    if (verbose >= 1) std::cout << " Loading Plugins...\n";
-    if (!this->inputPlugins()) {
-      std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-          ": inputPlugins failed to initialize an acceptable set of plugins!\n";
-      return false;
-    }
+  if (verbose >= 1) std::cout << " Loading Plugins...\n";
+  if (!this->inputPlugins()) {
+    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
+        ": inputPlugins failed to initialize an acceptable set of plugins!\n";
+    return false;
   }
-#endif /* _DISABLESCRIPTS */
 
   pkdex = this;
   return true;
@@ -128,7 +121,7 @@ bool PokedexStatic::inputPlugins() {
 #endif
 
   registerPlugin_orphanCount(
-      config_.pluginsPath_,
+      "STATIC",
       numExtensions,
       numOverwritten,
       numPluginsLoaded,
@@ -267,4 +260,39 @@ void PokedexStatic::registerPlugin_orphanCount(
       " plugins, loaded " << numExtensions << 
       " ( " << numOverwritten << " overwritten ) extensions!\n";
   }
+}
+
+
+po::options_description PokedexStatic::Config::options(
+    Config& cfg,
+    const std::string& category,
+    std::string prefix) {
+  Config defaults{};
+  po::options_description desc{category};
+
+  if (prefix.size() > 0) { prefix.append("-"); }
+  desc.add_options()
+      ((prefix + "moves").c_str(),
+      po::value<std::string>(&cfg.movesPath_)->default_value(defaults.movesPath_),
+      "location of the move library")
+      ((prefix + "pokemon").c_str(),
+      po::value<std::string>(&cfg.pokemonPath_)->default_value(defaults.pokemonPath_),
+      "location of the pokemon library")
+      ((prefix + "natures").c_str(),
+      po::value<std::string>(&cfg.naturesPath_)->default_value(defaults.naturesPath_),
+      "location of the natures library")
+      ((prefix + "items").c_str(),
+      po::value<std::string>(&cfg.itemsPath_)->default_value(defaults.itemsPath_),
+      "location of the items library")
+      ((prefix + "abilities").c_str(),
+      po::value<std::string>(&cfg.abilitiesPath_)->default_value(defaults.abilitiesPath_),
+      "location of the abilities library")
+      ((prefix + "types").c_str(),
+      po::value<std::string>(&cfg.typesPath_)->default_value(defaults.typesPath_),
+      "location of the types library")
+      ((prefix + "movelist").c_str(),
+      po::value<std::string>(&cfg.movelistsPath_)->default_value(defaults.movelistsPath_),
+      "location of pokemon movelists");
+
+  return desc;
 }

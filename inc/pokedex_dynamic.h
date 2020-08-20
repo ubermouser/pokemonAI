@@ -13,6 +13,7 @@
 #include <memory>
 
 #include <boost/dll/shared_library.hpp>
+#include <boost/program_options.hpp>
 
 #include "../inc/pokedex_static.h"
 
@@ -22,7 +23,12 @@ public:
     // location of the plugin library root directory
     std::string pluginsPath_ = "plugins";
     
-    Config() {};
+    Config() : PokedexStatic::Config() {};
+
+    static boost::program_options::options_description options(
+        Config& cfg,
+        const std::string& category="pokedex configuration",
+        std::string prefix = "");
   };
   
   PokedexDynamic(const Config& config=Config(), bool doInitialize=true);

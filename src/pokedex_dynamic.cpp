@@ -5,11 +5,13 @@
 #include <boost/dll/shared_library.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/program_options.hpp>
 
 #include "../inc/orphan.h"
 
 using namespace boost::dll;
 using namespace orphan;
+namespace po = boost::program_options;
 
 
 PokedexDynamic::PokedexDynamic(const Config& config, bool doInitialize)
@@ -129,3 +131,20 @@ bool PokedexDynamic::inputPlugins()
 
   return true;
 } // endOf inputScript
+
+
+po::options_description PokedexDynamic::Config::options(
+    Config& cfg,
+    const std::string& category,
+    std::string prefix) {
+  Config defaults{};
+  po::options_description desc = PokedexStatic::Config::options(cfg, category, prefix);
+
+  if (prefix.size() > 0) { prefix.append("-"); }
+  desc.add_options()
+      ((prefix + "plugins").c_str(),
+      po::value<std::string>(&cfg.pluginsPath_)->default_value(defaults.pluginsPath_),
+      "location of the plugin library root directory");
+
+  return desc;
+}

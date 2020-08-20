@@ -5,6 +5,7 @@
 #include <memory>
 #include <stdexcept>
 #include <sstream>
+#include <boost/program_options.hpp>
 
 #include "../inc/planner.h"
 #include "../inc/planner_max.h"
@@ -14,6 +15,33 @@
 
 #include "../inc/pkCU.h"
 #include "../inc/engine.h"
+
+namespace po = boost::program_options;
+
+
+po::options_description Game::Config::options(
+    Config& cfg, const std::string& category, std::string prefix) {
+  Config defaults{};
+  po::options_description desc{category};
+
+  if (prefix.size() > 0) { prefix.append("-"); }
+  desc.add_options()
+      ((prefix + "game-verbosity").c_str(),
+      po::value<int>(&cfg.verbosity)->default_value(defaults.verbosity),
+      "verbosity level, controls status printing.")
+      ((prefix + "max-plies").c_str(),
+      po::value<size_t>(&cfg.maxPlies)->default_value(defaults.maxPlies),
+      "maximum number of turns allowed before a draw occurs")
+      ((prefix + "max-matches").c_str(),
+      po::value<size_t>(&cfg.maxMatches)->default_value(defaults.maxMatches),
+      "maximum number of matches, in best of N format")
+      ((prefix + "allow-state-selection").c_str(),
+      po::value<bool>(&cfg.allowStateSelection)->default_value(defaults.allowStateSelection),
+      "when true, manual state selection is used.");
+
+  return desc;
+
+}
 
 
 Game::Game(const Config& cfg):
@@ -79,7 +107,7 @@ Game& Game::setEvaluator(const std::shared_ptr<Evaluator>& eval) {
 }
 
 
-bool Game::initialize() {
+Game& Game::initialize() {
   // teams must be set before initialize is called
   if (nv_ == NULL ||
       nv_->getTeam(TEAM_A).getNumTeammates() == 0 ||
@@ -122,7 +150,7 @@ bool Game::initialize() {
   if ((cfg_.maxMatches & 1) == 0) { cfg_.maxMatches += 1; }
 
   isInitialized_ = true;
-  return true;
+  return *this;
 }
 
 
@@ -142,7 +170,7 @@ HeatResult Game::rollout(const EnvironmentVolatileData& initialState) {
   }
 
   HeatResult result = digestMatch(gameLog);
-  if (cfg_.verbosity >= 1) { printHeatOutline(result); }
+  if (cfg_.verbosity >= 1 && cfg_.maxMatches > 1) { printHeatOutline(result); }
   return result;
 }
 
@@ -178,10 +206,12 @@ GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_
 
     // select the next environment, either by user choice or by random chance:
     ConstEnvironmentPossible nextEnvironment{*nv_};
+    size_t iNextEnvironment;
     if (cfg_.allowStateSelection) {
-      nextEnvironment = possibleEnvironments.stateSelect_index();
+      possibleEnvironments.printStates(iPly);
+      nextEnvironment = possibleEnvironments.stateSelect_index(iNextEnvironment);
     } else {
-      nextEnvironment = possibleEnvironments.stateSelect_roulette();
+      nextEnvironment = possibleEnvironments.stateSelect_roulette(iNextEnvironment);
     }
 
     // perform state transition:

@@ -69,6 +69,7 @@
               </makeArtifact>
             </linkerLibProjectItem>
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
+            <linkerOptionItem>-lboost_program_options</linkerOptionItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>
@@ -77,7 +78,7 @@
     </conf>
     <conf name="Release" type="1">
       <toolsSet>
-        <compilerSet>CLANG|CLang</compilerSet>
+        <compilerSet>default</compilerSet>
         <dependencyChecking>true</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
@@ -86,10 +87,19 @@
           <developmentMode>5</developmentMode>
         </cTool>
         <ccTool>
-          <developmentMode>5</developmentMode>
+          <developmentMode>6</developmentMode>
           <incDir>
             <pElem>..</pElem>
           </incDir>
+          <commandLine>-mtune=native -march=native</commandLine>
+          <preprocessorList>
+            <Elem>DOUBLEPRECISION</Elem>
+            <Elem>NDEBUG</Elem>
+            <Elem>_DISABLEFINEGRAINEDLOCKING</Elem>
+            <Elem>_DISABLETEMPORALTRACE</Elem>
+            <Elem>_HTCOLLECTSTATISTICS</Elem>
+            <Elem>_LINUX</Elem>
+          </preprocessorList>
         </ccTool>
         <fortranCompilerTool>
           <developmentMode>5</developmentMode>
@@ -102,16 +112,17 @@
             <linkerLibProjectItem>
               <makeArtifact PL="../pkaiEngine"
                             CT="3"
-                            CN="Debug"
-                            AC="true"
+                            CN="Release"
+                            AC="false"
                             BL="true"
                             WD="../pkaiEngine"
-                            BC="${MAKE}  -f Makefile CONF=Debug"
-                            CC="${MAKE}  -f Makefile CONF=Debug clean"
+                            BC="${MAKE}  -f Makefile CONF=Release"
+                            CC="${MAKE}  -f Makefile CONF=Release clean"
                             OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libpkaiengine.a">
               </makeArtifact>
             </linkerLibProjectItem>
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
+            <linkerOptionItem>-lboost_program_options</linkerOptionItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>

@@ -52,7 +52,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=../pkaiEngine/dist/Debug/CLANG-Linux/libpkaiengine.a -lboost_filesystem
+LDLIBSOPTIONS=../pkaiEngine/dist/Debug/CLANG-Linux/libpkaiengine.a -lboost_filesystem -lboost_program_options
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}

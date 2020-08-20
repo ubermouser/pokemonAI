@@ -14,14 +14,14 @@ GREP=grep
 NM=nm
 CCADMIN=CCadmin
 RANLIB=ranlib
-CC=clang-9
-CCC=clang++-9
-CXX=clang++-9
+CC=gcc
+CCC=g++
+CXX=g++
 FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=CLANG-Linux
+CND_PLATFORM=GNU-Linux
 CND_DLIB_EXT=so
 CND_CONF=Release
 CND_DISTDIR=dist
@@ -42,8 +42,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=
-CXXFLAGS=
+CCFLAGS=-mtune=native -march=native
+CXXFLAGS=-mtune=native -march=native
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -52,13 +52,13 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=../pkaiEngine/dist/Debug/CLANG-Linux/libpkaiengine.a -lboost_filesystem
+LDLIBSOPTIONS=../pkaiEngine/dist/Release/GNU-Linux/libpkaiengine.a -lboost_filesystem -lboost_program_options
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/battler
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/battler: ../pkaiEngine/dist/Debug/CLANG-Linux/libpkaiengine.a
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/battler: ../pkaiEngine/dist/Release/GNU-Linux/libpkaiengine.a
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/battler: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
@@ -67,11 +67,11 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/battler: ${OBJECTFILES}
 ${OBJECTDIR}/_ext/511e4115/battler_main.o: ../src/battler_main.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/battler_main.o ../src/battler_main.cpp
+	$(COMPILE.cc) -O3 -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/battler_main.o ../src/battler_main.cpp
 
 # Subprojects
 .build-subprojects:
-	cd ../pkaiEngine && ${MAKE}  -f Makefile CONF=Debug
+	cd ../pkaiEngine && ${MAKE}  -f Makefile CONF=Release
 
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
@@ -79,7 +79,7 @@ ${OBJECTDIR}/_ext/511e4115/battler_main.o: ../src/battler_main.cpp
 
 # Subprojects
 .clean-subprojects:
-	cd ../pkaiEngine && ${MAKE}  -f Makefile CONF=Debug clean
+	cd ../pkaiEngine && ${MAKE}  -f Makefile CONF=Release clean
 
 # Enable dependency checking
 .dep.inc: .depcheck-impl
