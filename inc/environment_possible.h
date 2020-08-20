@@ -272,7 +272,7 @@ public:
   void setNonvolatileEnvironment(const EnvironmentNonvolatile& nv) {
     nv_ = std::make_shared<const EnvironmentNonvolatile>(nv);
   }
-  void setNonvolatileEnvironment(std::shared_ptr<const EnvironmentNonvolatile>& nv) {
+  void setNonvolatileEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& nv) {
     nv_ = nv;
   }
   

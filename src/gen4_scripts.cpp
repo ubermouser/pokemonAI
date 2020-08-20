@@ -173,7 +173,7 @@ int move_hiddenPower_calculate(
 };
 
 int move_hiddenPower_setType(
-  PkCU& cu,
+  PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV,
@@ -186,7 +186,7 @@ int move_hiddenPower_setType(
 };
 
 int move_hiddenPower_setPower(
-  PkCU& cu,
+  PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV,
@@ -199,7 +199,7 @@ int move_hiddenPower_setPower(
 }
 
 int move_painSplit(
-  PkCU& cu,
+  PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV)
@@ -216,7 +216,7 @@ int move_painSplit(
 };
 
 int move_stealthRock_set(
-  PkCU& cu,
+  PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV)
@@ -229,7 +229,7 @@ int move_stealthRock_set(
 };
 
 int move_spikes_set(
-  PkCU& cu,
+  PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV)
@@ -243,7 +243,7 @@ int move_spikes_set(
 };
 
 int move_toxicSpikes_set(
-  PkCU& cu,
+  PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV)
@@ -257,7 +257,7 @@ int move_toxicSpikes_set(
 };
 
 int move_stealthRock_switch(
-  PkCU& cu,
+  PkCUEngine& cu,
   PokemonVolatile cPKV)
 {
   if (cPKV.status().nonvolatile.stealthRock > 0) {
@@ -276,7 +276,7 @@ int move_stealthRock_switch(
 };
 
 int move_spikes_switch(
-  PkCU& cu,
+  PkCUEngine& cu,
   PokemonVolatile cPKV)
 {
   switch (cPKV.status().nonvolatile.spikes) {
@@ -293,7 +293,7 @@ int move_spikes_switch(
 };
 
 int move_toxicSpikes_switch(
-  PkCU& cu,
+  PkCUEngine& cu,
   PokemonVolatile cPKV)
 {
   if (cPKV.getStatusAilment() != AIL_NV_NONE) { return 0; }
@@ -309,7 +309,7 @@ int move_toxicSpikes_switch(
 };
 
 int move_rapidSpin(
-  PkCU& cu,
+  PkCUEngine& cu,
   MoveVolatile mV, 
   PokemonVolatile cPKV,
   PokemonVolatile tPKV)
@@ -327,7 +327,7 @@ int move_rapidSpin(
 };
 
 int move_cureNonVolatile_team(
-  PkCU& cu,
+  PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV)
@@ -362,7 +362,7 @@ int move_cureNonVolatile_team(
 };
 
 int move_heal50(
-  PkCU& cu,
+  PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV)
@@ -382,7 +382,7 @@ int move_heal50(
 };
 
 int move_lifeLeech50(
-  PkCU& cu,
+  PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV)
@@ -405,7 +405,7 @@ int move_lifeLeech50(
 };
 
 int move_recoil33(
-  PkCU& cu,
+  PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV)
@@ -428,7 +428,7 @@ int move_recoil33(
 };
 
 int move_leveledDamage(
-  PkCU& cu,
+  PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV)
@@ -449,7 +449,7 @@ int move_leveledDamage(
 };
 
 int move_highCrit
-  (PkCU& cu,
+  (PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV,
@@ -478,7 +478,7 @@ int move_highCrit
 }
 
 int move_suicide_modLife(
-  PkCU& cu,
+  PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV)
@@ -496,7 +496,7 @@ int move_suicide_modLife(
 };
 
 int move_suicide_modPower
-  (PkCU& cu,
+  (PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV,
@@ -510,7 +510,7 @@ int move_suicide_modPower
 };
 
 int move_alwaysHits
-  (PkCU& cu,
+  (PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV,
@@ -535,7 +535,7 @@ int move_alwaysHits
 }
 
 int ability_noGuard
-  (PkCU& cu,
+  (PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV,
@@ -558,7 +558,7 @@ int ability_noGuard
 };
 
 int ability_levitate
-  (PkCU& cu,
+  (PkCUEngine& cu,
   const Type& cType,
   MoveVolatile mV,
   PokemonVolatile cPKV,
@@ -577,7 +577,7 @@ int ability_levitate
 };
 
 int ability_levitate_switch(
-  PkCU& cu,
+  PkCUEngine& cu,
   PokemonVolatile cPKV)
 {
 
@@ -588,7 +588,7 @@ int ability_levitate_switch(
 };
 
 int ability_naturalCure(
-  PkCU& cu,
+  PkCUEngine& cu,
   PokemonVolatile cPKV)
 {
   if (!cPKV.nv().abilityExists() || (&(cPKV.nv().getAbility()) != naturalCure_t)) { return 0; }
@@ -600,7 +600,7 @@ int ability_naturalCure(
 };
 
 int ability_technician
-  (PkCU& cu,
+  (PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV,
@@ -618,7 +618,7 @@ int ability_technician
 };
 
 int ability_sereneGrace
-  (PkCU& cu,
+  (PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV,
@@ -637,7 +637,7 @@ int ability_sereneGrace
 };
 
 int item_leftovers(
-  PkCU& cu,
+  PkCUEngine& cu,
   PokemonVolatile cPKV)
 {
   if (cPKV.hasItem() && (&cPKV.getItem() == leftovers_t))
@@ -650,7 +650,7 @@ int item_leftovers(
 };
 
 int item_lumBerry
-  (PkCU& cu,
+  (PkCUEngine& cu,
   PokemonVolatile cPKV)
 {
   // TODO(@drendleman) - why does this affect target pokemon and not current pokemon?
@@ -682,7 +682,7 @@ int item_lumBerry
 }
 
 int item_lifeOrb_modPower
-  (PkCU& cu,
+  (PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV,
@@ -696,7 +696,7 @@ int item_lifeOrb_modPower
 };
 
 int item_lifeOrb_modLife(
-  PkCU& cu,
+  PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV)
@@ -715,7 +715,7 @@ int item_lifeOrb_modLife(
 };
 
 int engine_typeResistingBerry
-  (PkCU& cu,
+  (PkCUEngine& cu,
   const Type& cType,
   MoveVolatile mV,
   PokemonVolatile cPKV,
@@ -737,7 +737,7 @@ int engine_typeResistingBerry
 };
 
 int engine_typeBoostingItem
-  (PkCU& cu,
+  (PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV,
@@ -758,7 +758,7 @@ int engine_typeBoostingItem
 };
 
 int engine_move_struggle(
-  PkCU& cu,
+  PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV)
@@ -777,7 +777,7 @@ int engine_move_struggle(
 };
 
 int engine_modifyAttackPower_burn
-  (PkCU& cu,
+  (PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV,
@@ -789,7 +789,7 @@ int engine_modifyAttackPower_burn
 };
 
 int engine_onModifySpeed_paralyze
-  (PkCU&,
+  (PkCUEngine&,
   PokemonVolatile cPKV,
   uint32_t& speed)
 {
@@ -800,7 +800,7 @@ int engine_onModifySpeed_paralyze
 };
 
 int engine_endRoundDamageEffect(
-  PkCU& cu,
+  PkCUEngine& cu,
   PokemonVolatile cPKV)
 {
   // nonvolatile:
@@ -831,7 +831,7 @@ int engine_endRoundDamageEffect(
 };
 
 int engine_beginTurnNonvolatileEffect(
-  PkCU& cu,
+  PkCUEngine& cu,
   PokemonVolatile cPKV)
 {
   // Does this pokemon have a non-volatile condition?
@@ -900,7 +900,7 @@ int engine_beginTurnNonvolatileEffect(
 } // endOf begin turn nonvolatile effect
 
 int engine_beginTurnVolatileEffect(
-  PkCU& cu,
+  PkCUEngine& cu,
   PokemonVolatile cPKV)
 {
   // Does this pokemon have a volatile condition?
@@ -953,7 +953,7 @@ int engine_beginTurnVolatileEffect(
 } // endOf begin turn volatile effect
 
 int engine_secondaryBoostEffect(
-  PkCU& cu,
+  PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV)
@@ -978,7 +978,7 @@ int engine_secondaryBoostEffect(
 } //endOf apply buffs / debuffs
 
 int engine_secondaryNonvolatileEffect(
-  PkCU& cu,
+  PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV)
@@ -1010,7 +1010,7 @@ int engine_secondaryNonvolatileEffect(
 } //endOf apply buffs / debuffs
 
 int engine_secondaryVolatileEffect(
-  PkCU& cu,
+  PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV)
@@ -1034,7 +1034,7 @@ int engine_secondaryVolatileEffect(
 } //endOf apply buffs / debuffs
 
 int engine_decrementPP(
-  PkCU& cu,
+  PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV)

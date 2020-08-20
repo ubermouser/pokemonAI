@@ -11,17 +11,15 @@
 #include "../inc/fp_compare.h"
 #include "../src/fixedpoint/fixed_func.h"
 
-//#define PKAI_STATIC
 #include "../inc/plugin.h"
 #include "../inc/engine.h"
-//#undef PKAI_STATIC
 
 typedef std::vector<plugin_t>::const_iterator pluginIt;
 
 #define CALLPLUGIN(retValue, pluginType, pluginFunction, ...) \
 {\
-  std::vector<plugin_t>& cPlugins = getCPluginSet()[(size_t)pluginType];\
-  for (pluginIt iPlugin = cPlugins.begin(), iPSize = cPlugins.end(); iPlugin != iPSize; ++iPlugin)\
+  const std::vector<plugin_t>& cPlugins = getCPluginSet()[(size_t)pluginType];\
+  for (pluginIt iPlugin = cPlugins.cbegin(), iPSize = cPlugins.cend(); iPlugin != iPSize; ++iPlugin)\
   {\
     pluginFunction cPlugin = (pluginFunction)iPlugin->pFunction; \
     retValue = retValue | cPlugin( __VA_ARGS__ ); \
@@ -29,73 +27,32 @@ typedef std::vector<plugin_t>::const_iterator pluginIt;
   }\
 }
 
-PkCU::PkCU(size_t engineAccuracy, bool allowInvalidMoves)
-  : nv_(NULL),
-  pluginSets(),
-  cPluginSet(NULL),
-  _stack(NULL),
-  stackStage(),
-  damageComponents(),
-  iTeams(),
-  iActions(),
-  iBase(SIZE_MAX),
-  numRandomEnvironments((engineAccuracy>16)?1:engineAccuracy),
-  allowInvalidMoves_(allowInvalidMoves)
-{
-  iTeams.fill(SIZE_MAX);
-  iActions.fill(SIZE_MAX);
-};
 
-PkCU::PkCU(const EnvironmentNonvolatile& nv, size_t engineAccuracy, bool allowInvalidMoves)
-  : nv_(std::make_shared<EnvironmentNonvolatile>(nv)),
-  pluginSets(),
-  cPluginSet(NULL),
-  initialState_(EnvironmentVolatileData::create(nv)),
-  _stack(NULL),
-  stackStage(),
-  damageComponents(),
-  iTeams(),
-  iActions(),
-  iBase(SIZE_MAX),
-  numRandomEnvironments((engineAccuracy>16)?1:engineAccuracy),
-  allowInvalidMoves_(allowInvalidMoves)
-{
-  iTeams.fill(SIZE_MAX);
-  iActions.fill(SIZE_MAX);
-  if (!initialize())
-  {
-    assert(false && "PKCU could not generate valid script database!");
-  }
-};
-
-void PkCU::setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& nv)
-{
+PkCU& PkCU::setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& nv) {
   nv_ = nv;
   initialState_ = EnvironmentVolatileData::create(*nv_);
   if (!initialize()) {
-    assert(false && "PKCU could not generate valid script database!");
+    throw std::runtime_error("Could not generate a script database!");
   }
+
+  return *this;
 };
 
-void PkCU::setAccuracy(size_t accuracy)
+PkCU& PkCU::setAccuracy(size_t accuracy)
 {
-  numRandomEnvironments = std::max((size_t)1, std::min((size_t)16, accuracy));
-};
-
-
-PkCU::~PkCU()
-{
+  cfg_.numRandomEnvironments = std::max((size_t)1, std::min((size_t)16, accuracy));
+  return *this;
 };
 
 
 bool PkCU::initialize() {
   size_t numPlugins = 0;
   // clear plugin arrays:
-  for (size_t iNCTeammate = 0; iNCTeammate != pluginSets.size(); ++iNCTeammate)
+  for (size_t iNCTeammate = 0; iNCTeammate != pluginSets_.size(); ++iNCTeammate)
   {
-    for (size_t iOTeammate = 0; iOTeammate != pluginSets[iNCTeammate].size(); ++iOTeammate)
+    for (size_t iOTeammate = 0; iOTeammate != pluginSets_[iNCTeammate].size(); ++iOTeammate)
     {
-      std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>& _cPluginSet = pluginSets[iNCTeammate][iOTeammate];
+      std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>& _cPluginSet = pluginSets_[iNCTeammate][iOTeammate];
       for (size_t iPlugin = 0; iPlugin != _cPluginSet.size(); ++iPlugin)
       {
         _cPluginSet[iPlugin].clear();
@@ -104,21 +61,18 @@ bool PkCU::initialize() {
   }
 
   // add individual plugins: (for each possible current pokemon, 12 total)
-  for (size_t iNCTeammate = 0; iNCTeammate != pluginSets.size(); ++iNCTeammate)
-  {
+  for (size_t iNCTeammate = 0; iNCTeammate != pluginSets_.size(); ++iNCTeammate) {
     size_t iCTeam = iNCTeammate >= 6;
     size_t iCTeammate = iNCTeammate - 6*iCTeam;
     // don't add to a teammate that doesn't exist:
-    if ((iCTeammate) >= getNV().getTeam(iCTeam).getNumTeammates()) { continue; }
+    if ((iCTeammate) >= nv_->getTeam(iCTeam).getNumTeammates()) { continue; }
     // current nonvolatile teammate:
-    const PokemonNonVolatile& cPKNV = getNV().getTeam(iCTeam).teammate(iCTeammate);
+    const PokemonNonVolatile& cPKNV = nv_->getTeam(iCTeam).teammate(iCTeammate);
 
     // plugins for moves:
-    for (size_t iCMove = 0; iCMove != cPKNV.getNumMoves(); ++iCMove)
-    {
+    for (size_t iCMove = 0; iCMove != cPKNV.getNumMoves(); ++iCMove) {
       const Pluggable& cPluggable = cPKNV.getMove_base(iCMove);
-      for (size_t iPlugin = 0; iPlugin != PLUGIN_MAXSIZE; ++iPlugin)
-      {
+      for (size_t iPlugin = 0; iPlugin != PLUGIN_MAXSIZE; ++iPlugin) {
         plugin_t cPlugin = cPluggable.getPlugin(iPlugin);
         if (cPlugin.pFunction == NULL) { continue; }
         insertPluginHandler(cPlugin, iPlugin, iNCTeammate);
@@ -127,11 +81,9 @@ bool PkCU::initialize() {
     }
 
     // plugins for abilities:
-    if (cPKNV.abilityExists()) 
-    { 
+    if (cPKNV.abilityExists())  {
       const Pluggable& cPluggable = cPKNV.getAbility();
-      for (size_t iPlugin = 0; iPlugin != PLUGIN_MAXSIZE; ++iPlugin)
-      {
+      for (size_t iPlugin = 0; iPlugin != PLUGIN_MAXSIZE; ++iPlugin) {
         plugin_t cPlugin = cPluggable.getPlugin(iPlugin);
         if (cPlugin.pFunction == NULL) { continue; }
         insertPluginHandler(cPlugin, iPlugin, iNCTeammate);
@@ -140,11 +92,9 @@ bool PkCU::initialize() {
     }
 
     // plugins for items: TODO: what if the items switch teammates?
-    if (cPKNV.hasInitialItem())
-    { 
+    if (cPKNV.hasInitialItem()) {
       const Pluggable& cPluggable = cPKNV.getInitialItem();
-      for (size_t iPlugin = 0; iPlugin != PLUGIN_MAXSIZE; ++iPlugin)
-      {
+      for (size_t iPlugin = 0; iPlugin != PLUGIN_MAXSIZE; ++iPlugin) {
         plugin_t cPlugin = cPluggable.getPlugin(iPlugin);
         if (cPlugin.pFunction == NULL) { continue; }
         insertPluginHandler(cPlugin, iPlugin, iNCTeammate);
@@ -156,10 +106,8 @@ bool PkCU::initialize() {
   // TODO: add plugins that affect the other pokemon:
 
   // add global (and engine) plugins second:
-  for (size_t iPluginType = 0; iPluginType != PLUGIN_MAXSIZE; ++iPluginType)
-  {
-    for (size_t iPlugin = 0; iPlugin != pkdex->getExtensions().getNumPlugins(iPluginType); ++iPlugin)
-    {
+  for (size_t iPluginType = 0; iPluginType != PLUGIN_MAXSIZE; ++iPluginType) {
+    for (size_t iPlugin = 0; iPlugin != pkdex->getExtensions().getNumPlugins(iPluginType); ++iPlugin) {
       plugin_t cPlugin = pkdex->getExtensions().getPlugin(iPluginType, iPlugin);
       numPlugins++;
 
@@ -168,40 +116,31 @@ bool PkCU::initialize() {
   }
 
   // SORT plugins by priority:
-  for (size_t iNCTeammate = 0; iNCTeammate != pluginSets.size(); ++iNCTeammate)
-  {
-    for (size_t iOTeammate = 0; iOTeammate != pluginSets[iNCTeammate].size(); ++iOTeammate)
-    {
-      std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>& _cPluginSet = pluginSets[iNCTeammate][iOTeammate];
-      for (size_t iPlugin = 0; iPlugin != _cPluginSet.size(); ++iPlugin)
-      {
+  for (size_t iNCTeammate = 0; iNCTeammate != pluginSets_.size(); ++iNCTeammate) {
+    for (size_t iOTeammate = 0; iOTeammate != pluginSets_[iNCTeammate].size(); ++iOTeammate) {
+      std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>& _cPluginSet = pluginSets_[iNCTeammate][iOTeammate];
+      for (size_t iPlugin = 0; iPlugin != _cPluginSet.size(); ++iPlugin) {
         std::sort(_cPluginSet[iPlugin].begin(), _cPluginSet[iPlugin].end());
       }
     }
   }
 
-  assert(numPlugins <= MAXPLUGINS);
   return true;
 }
 
 
-
-
-
-size_t PkCU::insertPluginHandler(plugin_t& cPlugin, size_t pluginType, size_t iNTeammate)
-{
+size_t PkCU::insertPluginHandler(plugin_t& cPlugin, size_t pluginType, size_t iNTeammate) {
   size_t numAdded = 0;
 
   uint32_t target = cPlugin.target;
   size_t iNTeam = (iNTeammate>=6)?1:0;
   size_t iTeammate = iNTeammate - 6*iNTeam;
 
-  for (size_t iNCTeammate = 0; iNCTeammate != pluginSets.size(); ++iNCTeammate)
-  {
+  for (size_t iNCTeammate = 0; iNCTeammate != pluginSets_.size(); ++iNCTeammate) {
     size_t iCTeam = iNCTeammate >= 6;
     size_t iCTeammate = iNCTeammate - 6*iCTeam;
     // don't add to a teammate that doesn't exist:
-    if ((iCTeammate) >= getNV().getTeam(iCTeam).getNumTeammates()) { continue; }
+    if ((iCTeammate) >= nv_->getTeam(iCTeam).getNumTeammates()) { continue; }
 
     if ((target==TEAM_A) && (iCTeam != iNTeam)) { continue; }
     else if ((target==TEAM_B) && (iCTeam == iNTeam)) { continue; }
@@ -209,12 +148,11 @@ size_t PkCU::insertPluginHandler(plugin_t& cPlugin, size_t pluginType, size_t iN
     //if on team of adding team, only match to this teammate. Otherwise match to all teammates
     if ((iNTeammate != SIZE_MAX) && (iNTeam == iCTeam) && (iTeammate != iCTeammate)) { continue; }
 
-    for (size_t iOTeammate = 0; iOTeammate != getNV().getOtherTeam(iCTeam).getNumTeammates(); ++iOTeammate)
-    {
+    for (size_t iOTeammate = 0; iOTeammate != nv_->getOtherTeam(iCTeam).getNumTeammates(); ++iOTeammate) {
       // if on opposite team of adding team, and not add
       if ((iNTeammate != SIZE_MAX) && (iCTeam != iNTeam) && (iTeammate != iOTeammate)) { continue; }
 
-      std::vector<plugin_t>& _cPluginSet = pluginSets[iNCTeammate][iOTeammate][pluginType];
+      std::vector<plugin_t>& _cPluginSet = pluginSets_[iNCTeammate][iOTeammate][pluginType];
       // check for duplicate:
       if (std::find(_cPluginSet.begin(), _cPluginSet.end(), cPlugin) != _cPluginSet.end()) { continue; }
       // add:
@@ -226,22 +164,79 @@ size_t PkCU::insertPluginHandler(plugin_t& cPlugin, size_t pluginType, size_t iN
   return numAdded;
 }
 
+PkCUEngine::PkCUEngine(
+    const PkCU& cu,
+    PossibleEnvironments& stack,
+    const EnvironmentVolatileData& initial,
+    size_t actionA,
+    size_t actionB) :
+    cfg_(cu.cfg_),
+    stack_(stack),
+    pluginSets_(cu.pluginSets_),
+    iTeams_({TEAM_A, TEAM_B}),
+    iActions_({actionA, actionB}),
+    iBase_(0) {
+  stack_.clear();
+  stack_.setNonvolatileEnvironment(cu.nv_);
 
-void PkCU::swapTeamIndexes() {
-  size_t iCTeam = iTeams[0];
-  size_t iCAction = iActions[0];
-
-  iTeams[0] = iTeams[1];
-  iTeams[1] = iCTeam;
-  iActions[0] = iActions[1];
-  iActions[1] = iCAction;
+  // push-back first stack stage:
+  stack_.push_back(EnvironmentPossibleData::create(initial));
+  stackStage_.push_back(STAGE_SEEDED);
+  damageComponents_.push_back(DamageComponents_t());
+  damageComponents_.back().cProbability = 1.0;
 
   setCPluginSet();
 }
 
 
-uint32_t PkCU::movePriority_Speed()
-{
+void PkCUEngine::swapTeamIndexes() {
+  std::swap(iTeams_[0], iTeams_[1]);
+  std::swap(iActions_[0], iActions_[1]);
+
+  setCPluginSet();
+}
+
+
+void PkCUEngine::updateState() {
+  // determine who moves first
+  uint32_t priority = movePriority();
+
+  switch(priority) {
+  case TEAM_B:
+    // swap the indexes, as TEAM_B is moving first:
+    swapTeamIndexes();
+  default:
+  case TEAM_A:
+    updateState_move();
+    break;
+  case 2: {
+      // both teams are moving:
+      std::array<size_t, 2> iStages;
+      duplicateState(iStages, 0.5);
+
+      // first team moves first:
+      iBase_ = iStages[0];
+      updateState_move();
+
+      // swap indexes:
+      iBase_ = iStages[1];
+      //swapTeamIndexes(); (updateState_move swaps team indexes but does not swap them back)
+
+      // second team moves first:
+      updateState_move();
+      break;
+    }
+  }
+
+  // compute end of round component:
+  evaluateRound_end();
+
+  // combine environments that equal eachother:
+  combineSimilarEnvironments();
+}
+
+
+uint32_t PkCUEngine::movePriority_Speed() {
   PokemonVolatile cPKV = getPKV();
 
   // grab FV_boosted speed
@@ -255,11 +250,7 @@ uint32_t PkCU::movePriority_Speed()
 }
 
 
-
-
-
-int32_t PkCU::movePriority_Bracket()
-{
+int32_t PkCUEngine::movePriority_Bracket() {
   // SOURCE: http://www.smogon.com/dp/articles/move_priority
   
    /* action:
@@ -277,7 +268,7 @@ int32_t PkCU::movePriority_Bracket()
   int32_t actionResult = 0;
   
   // if the pokemon is switching out, its move priority is +6
-  switch(iActions[0])
+  switch(iActions_[0])
   {
     case AT_SWITCH_0:
     case AT_SWITCH_1:
@@ -316,9 +307,8 @@ int32_t PkCU::movePriority_Bracket()
 }
 
 
-uint32_t PkCU::movePriority()
-{
-  std::array<_moveBracket, 2> moveBracket;
+uint32_t PkCUEngine::movePriority() {
+  std::array<MoveBracket, 2> moveBracket;
 
   size_t iCTeam = getICTeam();
   size_t iOTeam = getIOTeam();
@@ -355,11 +345,10 @@ uint32_t PkCU::movePriority()
 }
 
 
-void PkCU::evaluateRound_end()
-{
-  iBase = 0;
+void PkCUEngine::evaluateRound_end() {
+  iBase_ = 0;
 
-  for (size_t iSize = getStack().size(); iBase != iSize; ++iBase)
+  for (size_t iSize = getStack().size(); iBase_ != iSize; ++iBase_)
   {
     // do not allow for partially completed stages in this step of computation:
     assert(getStackStage() == STAGE_POSTROUND);
@@ -385,67 +374,66 @@ void PkCU::evaluateRound_end()
 } // endOf evaluateRound_end
 
 
-void PkCU::evaluateMove()
-{
+void PkCUEngine::evaluateMove() {
   // NOTE: ONLY ONE stage is set to preturn at a time
   assert(getStackStage() == STAGE_PRETURN);
   size_t iCAction = getICAction();
   size_t iCTeam = getICTeam();
   // the floor of the stack: everything below this stack value has been evaluated
-  size_t baseFloor = iBase, baseCeil = getStack().size(), iNBase;
+  size_t baseFloor = iBase_, baseCeil = getStack().size(), iNBase;
 
   // TODO: does this model the actual game?
   // if either pokemon is dead at this point, the only valid moves are switching and waiting
-  if ( (!getPKV().isAlive() || !getTPKV().isAlive()) && isMoveAction(iCAction) ) {
+  if ( (!getPKV().isAlive() || !getTPKV().isAlive()) && PkCU::isMoveAction(iCAction) ) {
     iCAction = AT_MOVE_NOTHING;
   }
 
 
   // does this move require a switch-out?
-  if (isSwitchAction(iCAction)) {
-    stackStage[iBase] = STAGE_PRESWITCH;
+  if (PkCU::isSwitchAction(iCAction)) {
+    stackStage_[iBase_] = STAGE_PRESWITCH;
     evaluateMove_switch();
     // end of is Switch type action
   } else if (iCAction == AT_MOVE_NOTHING) { // is this pokemon doing nothing?
-    stackStage[iBase] = STAGE_POSTSECONDARY;
+    stackStage_[iBase_] = STAGE_POSTSECONDARY;
 
     // set that the current team did nothing this turn:
     getBase().setWaited(iCTeam);
     // pokemon performs no action, no update to the state is needed
     // end of is Wait type action
-  } else if (isMoveAction(iCAction)) { // is the pokemon moving normally?
+  } else if (PkCU::isMoveAction(iCAction)) { // is the pokemon moving normally?
     assert(getPKV().isAlive() && getTPKV().isAlive());
 
     // this is the first function which may generate more than one state of STAGE_STATUS type
     {
-      stackStage[iBase] = STAGE_STATUS;
+      stackStage_[iBase_] = STAGE_STATUS;
       evaluateMove_preMove();
     }
 
     // POSSIBLE THAT POKEMON MIGHT HAVE DIED IN PREVIOUS STEP
 
     const Move& cMove = getMV().getBase();
-    void (PkCU::*evaluate_t)();
+    void (PkCUEngine::*evaluate_t)();
     if ( cMove.damageType_ == ATK_PHYSICAL || cMove.damageType_ == ATK_SPECIAL)
-    { evaluate_t = &PkCU::evaluateMove_damage;}
+    { evaluate_t = &PkCUEngine::evaluateMove_damage;}
     else
-    { evaluate_t = &PkCU::evaluateMove_script;}
+    { evaluate_t = &PkCUEngine::evaluateMove_script;}
 
     // evaluate either move or plugin move: (increment with iNBase, as evaluateMove_damage will manipulate stack)
-    for (iNBase = baseFloor, iBase = iNBase, baseCeil = getStack().size(); iNBase != baseCeil; ++iNBase, iBase = iNBase) {
+    for (iNBase = baseFloor, iBase_ = iNBase, baseCeil = getStack().size(); iNBase != baseCeil; ++iNBase, iBase_ = iNBase) {
       if (getStackStage() != STAGE_STATUS) { continue; }
       advanceStackStage();
 
       // was this move blocked by a status?
       // did this pokemon die from the last pokemon's action?
-      if (getBase().wasBlocked(iCTeam) || !getPKV().isAlive()) { stackStage[iBase] = STAGE_POSTTURN; continue; }
+      if (getBase().wasBlocked(iCTeam) || !getPKV().isAlive()) { stackStage_[iBase_] = STAGE_POSTTURN; continue; }
 
       // evaluate either evaluateMove_damage from stackstage movebase, or evaluateMove_script from stackstage postmove
       (this->*evaluate_t)();
     }
 
     // for all worlds: (increment with iNBase, as evaluateMove_postMove will manipulate stack)
-    for (iNBase = baseFloor, iBase = iNBase, baseCeil = getStack().size(); iNBase != baseCeil; ++iNBase, iBase = iNBase) {
+    for (iNBase = baseFloor, iBase_ = iNBase, baseCeil = getStack().size(); iNBase != baseCeil; ++iNBase, iBase_ = iNBase) {
       if (getStackStage() != STAGE_POSTDAMAGE) { continue; }
       advanceStackStage();
 
@@ -456,9 +444,9 @@ void PkCU::evaluateMove()
   // POSSIBLE THAT POKEMON MIGHT HAVE DIED IN PREVIOUS STEP
 
   // end of turn occurences:
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase) {
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_POSTSECONDARY) { continue; }
-    stackStage[iBase] = STAGE_POSTTURN;
+    stackStage_[iBase_] = STAGE_POSTTURN;
 
     evaluateMove_postTurn();
   }
@@ -467,14 +455,14 @@ void PkCU::evaluateMove()
 } // end of evaluateMove
 
 
-void PkCU::evaluateMove_switch()
+void PkCUEngine::evaluateMove_switch()
 {
   assert(getStackStage() == STAGE_PRESWITCH);
 
   size_t iCTeam = getICTeam();
   size_t iCAction = getICAction();
   // the floor of the stack: everything below this stack value has been evaluated
-  size_t baseFloor = iBase, baseCeil = getStack().size();
+  size_t baseFloor = iBase_, baseCeil = getStack().size();
 
   //for (/*iBase = baseFloor, baseCeil = getStack().size()*/; iBase != baseCeil; ++iBase)
   {
@@ -495,9 +483,9 @@ void PkCU::evaluateMove_switch()
     }
   } // endOf switchout script
 
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase) {
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_POSTSWITCH) { continue; }
-    stackStage[iBase] = STAGE_POSTSECONDARY;
+    stackStage_[iBase_] = STAGE_POSTSECONDARY;
 
     // switch out
     getTV().swapPokemon(iCAction);
@@ -513,8 +501,7 @@ void PkCU::evaluateMove_switch()
 } // endOf evaluateMove_switch
 
 
-void PkCU::evaluateMove_preMove()
-{
+void PkCUEngine::evaluateMove_preMove() {
   assert(getStackStage() == STAGE_STATUS);
 
   // parse beginning of turn plugins:
@@ -524,12 +511,11 @@ void PkCU::evaluateMove_preMove()
 }
 
 
-void PkCU::evaluateMove_postMove()
-{
+void PkCUEngine::evaluateMove_postMove() {
   assert(getStackStage() == STAGE_POSTMOVE);
 
   // the floor of the stack: everything below this stack value has been evaluated
-  size_t baseFloor = iBase, baseCeil = getStack().size();
+  size_t baseFloor = iBase_, baseCeil = getStack().size();
 
   // the current environment we are evaluating upon. Will be copied, modified and pushed back eventually
   const Move& cMove = getMV().getBase();
@@ -549,15 +535,15 @@ void PkCU::evaluateMove_postMove()
   // POSSIBLE THAT POKEMON MIGHT HAVE DIED IN PREVIOUS STEP
 
   // calculate probability to perform secondary:
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase) {
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_PRESECONDARY) { continue; }
     advanceStackStage();
 
     // special behavior if the teammate is dead: (cannot compute secondary effects)
-    if (!getPKV().isAlive()) { stackStage[iBase] = STAGE_POSTTURN; continue; }
+    if (!getPKV().isAlive()) { stackStage_[iBase_] = STAGE_POSTTURN; continue; }
 
     // does this move even have a secondary effect? (this check is in-loop because multiple environments could arise from previous call)
-    if (!mostlyGT(cMove.getSecondaryAccuracy(), 0.0)) { stackStage[iBase] = STAGE_POSTSECONDARY; continue; }
+    if (!mostlyGT(cMove.getSecondaryAccuracy(), 0.0)) { stackStage_[iBase_] = STAGE_POSTSECONDARY; continue; }
 
     fpType& secondaryHitProbability = getDamageComponent().tProbability;
 
@@ -571,7 +557,7 @@ void PkCU::evaluateMove_postMove()
   } // endOf calculate secondary probability
 
   // split environments based on their secondary chance:
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase) {
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_MODIFYSECONDARYHITCHANCE) { continue; }
     advanceStackStage();
 
@@ -595,13 +581,13 @@ void PkCU::evaluateMove_postMove()
 
     } else { // end of primary attack hits, and secondary attack is not assured
       // pass-through: no chance to secondary
-      stackStage[iBase] = STAGE_POSTSECONDARY;
+      stackStage_[iBase_] = STAGE_POSTSECONDARY;
       continue;
     }
   }
 
   // calculate effect of secondary, if it occured:
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase)
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_)
   {
     if (getStackStage() != STAGE_SECONDARY) { continue; }
     advanceStackStage();
@@ -617,7 +603,7 @@ void PkCU::evaluateMove_postMove()
 } // endOf evaluateMove_postMove
 
 
-void PkCU::evaluateMove_postTurn() {
+void PkCUEngine::evaluateMove_postTurn() {
   // parse end of turn plugins:
   int result = 0;
   CALLPLUGIN(result, PLUGIN_ON_ENDOFTURN, onEndOfTurn_rawType, 
@@ -625,12 +611,12 @@ void PkCU::evaluateMove_postTurn() {
 };
 
 
-void PkCU::evaluateMove_damage() {
+void PkCUEngine::evaluateMove_damage() {
   assert(getStackStage() == STAGE_MOVEBASE);
   assert(getTPKV().isAlive() && getPKV().isAlive());
 
   // the floor of the stack: everything below this stack value has been evaluated
-  size_t baseFloor = iBase, baseCeil = getStack().size();
+  size_t baseFloor = iBase_, baseCeil = getStack().size();
 
   const Move& cMove = getMV().getBase();
   
@@ -654,7 +640,7 @@ void PkCU::evaluateMove_damage() {
   }
 
   // calculate this move's type:
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase) {
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_SETBASEPOWER) { continue; }
     advanceStackStage();
 
@@ -667,7 +653,7 @@ void PkCU::evaluateMove_damage() {
   }
 
   // modify basePower:
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase) {
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_SETMOVETYPE) { continue; }
     advanceStackStage();
 
@@ -682,7 +668,7 @@ void PkCU::evaluateMove_damage() {
   }
 
   // calculate attack and damage modifiers:
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase) {
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_MODIFYBASEPOWER) { continue; }
     advanceStackStage();
 
@@ -726,7 +712,7 @@ void PkCU::evaluateMove_damage() {
   }
 
   // calculate critical hit modifiers:
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase) {
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_MODIFYATTACKPOWER) { continue; }
     advanceStackStage();
 
@@ -747,7 +733,7 @@ void PkCU::evaluateMove_damage() {
   }
 
   // calculate raw damage modifiers:
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase) {
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_MODIFYCRITICALPOWER) { continue; }
     advanceStackStage();
 
@@ -770,7 +756,7 @@ void PkCU::evaluateMove_damage() {
   }
 
   // calculate this move's STAB:
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase) {
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_MODIFYRAWDAMAGE) { continue; }
     advanceStackStage();
 
@@ -791,7 +777,7 @@ void PkCU::evaluateMove_damage() {
   }
 
   // calculate the enemy pokemon's type resistance:
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase) {
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_MODIFYSTAB) { continue; }
     advanceStackStage();
 
@@ -815,7 +801,7 @@ void PkCU::evaluateMove_damage() {
   }
 
   // calculate item resistance modifiers:
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase) {
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_MODIFYTYPERESISTANCE) { continue; }
     advanceStackStage();
 
@@ -835,7 +821,7 @@ void PkCU::evaluateMove_damage() {
   /* Damage Formula = (((((((Level × 2 ÷ 5) + 2) × BasePower × [Sp]Atk ÷ 50) ÷ [Sp]Def) × Mod1) + 2) × CH × Mod2 × R ÷ 100) × STAB × Type1 × Type2 × Mod3 */
 
   // calculate probability to hit, miss:
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase) {
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_MODIFYITEMPOWER) { continue; }
     advanceStackStage();
 
@@ -858,7 +844,7 @@ void PkCU::evaluateMove_damage() {
   }
 
   // evaluate miss(1), hit(0):
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase) {
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_MODIFYHITCHANCE) { continue; }
     advanceStackStage();
 
@@ -881,17 +867,17 @@ void PkCU::evaluateMove_damage() {
 
     } else { // end of primary attack hits, and secondary attack is not assured
       // pass-through: no chance to hit or crit
-      stackStage[iBase] = STAGE_POSTDAMAGE;
+      stackStage_[iBase_] = STAGE_POSTDAMAGE;
     }
   }
 
   // calculate probability to crit:
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase) {
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_EVALUATEHITCHANCE) { continue; }
     advanceStackStage();
 
     // don't continue to evaluate a stage that has not hit the enemy team:
-    if (!getBase().hasHit(getICTeam())) { stackStage[iBase] = STAGE_POSTDAMAGE; continue; }
+    if (!getBase().hasHit(getICTeam())) { stackStage_[iBase_] = STAGE_POSTDAMAGE; continue; }
 
     PokemonVolatile cPKV = getPKV();
     fpType& probabilityToCrit = getDamageComponent().tProbability;
@@ -906,7 +892,7 @@ void PkCU::evaluateMove_damage() {
   }
 
   // evaluate crit(2):
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase) {
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_MODIFYCRITCHANCE) { continue; }
     advanceStackStage();
 
@@ -928,7 +914,7 @@ void PkCU::evaluateMove_damage() {
   }
 
   // perform actual damage calculation
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase) {
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_PREDAMAGE) { continue; }
     advanceStackStage();
 
@@ -939,21 +925,20 @@ void PkCU::evaluateMove_damage() {
 } // end of evaluateMove_damage
 
 
-void PkCU::evaluateMove_script()
-{
+void PkCUEngine::evaluateMove_script() {
   assert(getStackStage() == STAGE_MOVEBASE);
   assert(getTPKV().isAlive() && getPKV().isAlive());
 
   const Move& cMove = getMV().getBase();
 
   // the floor of the stack: everything below this stack value has been evaluated
-  size_t baseFloor = iBase, baseCeil = getStack().size();
+  size_t baseFloor = iBase_, baseCeil = getStack().size();
 
   // calculate probability to hit, miss:
   //for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase)
   {
     //if (getStackStage() != STAGE_MOVEBASE) { continue; }
-    stackStage[iBase] = STAGE_MODIFYHITCHANCE;
+    stackStage_[iBase_] = STAGE_MODIFYHITCHANCE;
 
     fpType& probabilityToHit = getDamageComponent().tProbability;
 
@@ -979,9 +964,9 @@ void PkCU::evaluateMove_script()
   }
 
   // evaluate miss(1), hit(0),
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase) {
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_MODIFYHITCHANCE) { continue; }
-    stackStage[iBase] = STAGE_PREDAMAGE;
+    stackStage_[iBase_] = STAGE_PREDAMAGE;
 
     fpType& probabilityToHit = getDamageComponent().tProbability;
 
@@ -1002,12 +987,12 @@ void PkCU::evaluateMove_script()
 
     } else { // end of primary attack hits, and secondary attack is not assured
       // pass-through: no chance to hit
-      stackStage[iBase] = STAGE_POSTDAMAGE;
+      stackStage_[iBase_] = STAGE_POSTDAMAGE;
     }
   }
 
   // perform script:
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase) {
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_PREDAMAGE) { continue; }
     advanceStackStage();
 
@@ -1025,21 +1010,22 @@ void PkCU::evaluateMove_script()
 }
 
 
-void PkCU::calculateDamage(bool hasCrit) {
-  fpType partitionEnvironmentProbability = (1.0 / (fpType) numRandomEnvironments);
+void PkCUEngine::calculateDamage(bool hasCrit) {
+  fpType partitionEnvironmentProbability = (1.0 / (fpType) cfg_.numRandomEnvironments);
   DamageComponents_t& cDMG = getDamageComponent();
 
   uint32_t power = (hasCrit)?cDMG.damageCrit:cDMG.damage;
 
   std::array<size_t, 2> iREnv = {{ SIZE_MAX, getIBase() }};
-  for (size_t iEnv = 0; iEnv != numRandomEnvironments; ++iEnv ) {
-    if (numRandomEnvironments > 1) {
-      if ((iEnv + 1) == numRandomEnvironments) { iREnv[1] = getIBase(); }
+  for (size_t iEnv = 0; iEnv != cfg_.numRandomEnvironments; ++iEnv ) {
+    if (cfg_.numRandomEnvironments > 1) {
+      if ((iEnv + 1) == cfg_.numRandomEnvironments) { iREnv[1] = getIBase(); }
       else { duplicateState(iREnv, partitionEnvironmentProbability); }
     };
 
     // find the mean random value for this partition of the random environment
-    fpType randomValue = (iEnv / (fpType)numRandomEnvironments) + ( 1.0 / (fpType)numRandomEnvironments / 2.0);
+    fpType randomValue =
+        (iEnv / (fpType)cfg_.numRandomEnvironments) + ( 1.0 / (fpType)cfg_.numRandomEnvironments / 2.0);
 
     // scale our random value modifier to 0.85..1.0
     randomValue = deScale(randomValue, 1.0, 0.85);
@@ -1057,8 +1043,7 @@ void PkCU::calculateDamage(bool hasCrit) {
 }
 
 
-size_t PkCU::combineSimilarEnvironments()
-{
+size_t PkCUEngine::combineSimilarEnvironments() {
   PossibleEnvironments& stack = getStack();
 
 #ifndef NDEBUG
@@ -1068,7 +1053,7 @@ size_t PkCU::combineSimilarEnvironments()
 #endif
 
   // hash environments (and summate probabilities for check):
-  for (iBase = 0; iBase != stack.size(); ++iBase) {
+  for (iBase_ = 0; iBase_ != stack.size(); ++iBase_) {
     EnvironmentPossible cEnvironment = getBase();
 
     // assert that each of these environments is getting hashed:
@@ -1083,14 +1068,14 @@ size_t PkCU::combineSimilarEnvironments()
   for (size_t iOEnv = 0, iSize = stack.size(); iOEnv != iSize; iOEnv++)
   {
     EnvironmentPossible oEnv = stack.at(iOEnv);
-    fpType& oProbability = damageComponents[iOEnv].cProbability;
+    fpType& oProbability = damageComponents_[iOEnv].cProbability;
 
     // don't attempt to merge pruned environments
     if (oEnv.isPruned()) { continue; }
 
     for (size_t iIEnv = iOEnv + 1; iIEnv != iSize; iIEnv++) {
       EnvironmentPossible iEnv = stack.at(iIEnv);
-      fpType& iProbability = damageComponents[iIEnv].cProbability;
+      fpType& iProbability = damageComponents_[iIEnv].cProbability;
 
       // don't re-prune already pruned environments
       if (iEnv.isPruned()) { continue; }
@@ -1137,28 +1122,24 @@ size_t PkCU::combineSimilarEnvironments()
 } //endOf combineSimilarEnvironments
 
 
-
-
-
-void PkCU::updateState_move()
-{
+void PkCUEngine::updateState_move() {
   assert(getStackStage() == STAGE_SEEDED);
   advanceStackStage();
 
   // the floor of the stack: everything below this stack value has been evaluated
-  size_t baseFloor = iBase, baseCeil = getStack().size(), iNBase;
+  size_t baseFloor = iBase_, baseCeil = getStack().size(), iNBase;
 
   // evaluate first pokemon's moves, and their probabilities (iBase provided by updateState)
   evaluateMove();
 
   // POSSIBLE THAT POKEMON MIGHT HAVE DIED IN PREVIOUS STEP
 
-  iBase = baseFloor;
+  iBase_ = baseFloor;
   swapTeamIndexes();
 
   // TODO: STAGE_POSTROUND should automatically be set after the second go-around as stage keeps incrementing
   // increment with iNBase, as evaluateMove will manipulate stack
-  for (iNBase = baseFloor, baseCeil = getStack().size(); iNBase != baseCeil; ++iNBase, iBase = iNBase)
+  for (iNBase = baseFloor, baseCeil = getStack().size(); iNBase != baseCeil; ++iNBase, iBase_ = iNBase)
   {
     // do not evaluate a move that has not been evaluated by first pokemon yet:
     if (getStackStage() != STAGE_POSTTURN) { continue; }
@@ -1167,12 +1148,12 @@ void PkCU::updateState_move()
     //if (!getPKV().isAlive()) { continue; }
 
     // evaluate second pokemon's moves and their probabilities
-    stackStage[iBase] = STAGE_PRETURN;
+    stackStage_[iBase_] = STAGE_PRETURN;
     evaluateMove();
   }
 
   // assert ALL moves have completed both turns:
-  for (iBase = baseFloor, baseCeil = getStack().size(); iBase != baseCeil; ++iBase)
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_)
   {
     if (getStackStage() != STAGE_POSTTURN) { continue; }
     advanceStackStage();
@@ -1181,68 +1162,26 @@ void PkCU::updateState_move()
 
 
 PossibleEnvironments PkCU::updateState(
-    const ConstEnvironmentVolatile& currentEnvironment, size_t actionA, size_t actionB) {
-  PossibleEnvironments result;
-  updateState(currentEnvironment, result, actionA, actionB);
-  
-  return result;
-}
-
-
-size_t PkCU::updateState(
     const ConstEnvironmentVolatile& cEnv,
-    PossibleEnvironments& rEnv,
-    size_t actionA, 
-    size_t actionB) {
-  if (!allowInvalidMoves_) {
+    size_t actionA,
+    size_t actionB) const {
+  PossibleEnvironments result;
+
+  if (cEnv.nv_ != nv_.get()) {
+    throw std::runtime_error("mismatched nonvolatile state - call setEnvironment first");
+  }
+  if (!cfg_.allowInvalidMoves) {
     if (!isValidAction(cEnv, actionA, TEAM_A) || !isValidAction(cEnv, actionB, TEAM_B)) {
       throw std::runtime_error("Invalid Action");
     }
   }
-  // seed an initial value onto the stack:
-  seedCurrentState(rEnv, cEnv, actionA, actionB);
-  // set the current set of plugins:
-  setCPluginSet();
 
-  // determine who moves first
-  uint32_t priority = movePriority();
-
-  switch(priority)
-  {
-  case TEAM_B:
-    // swap the indexes, as TEAM_B is moving first:
-    swapTeamIndexes();
-  default:
-  case TEAM_A:
-    updateState_move();
-    break;
-  case 2:
-    {
-      // both teams are moving:
-      std::array<size_t, 2> iStages;
-      duplicateState(iStages, 0.5);
-
-      // first team moves first:
-      iBase = iStages[0];
-      updateState_move();
-
-      // swap indexes:
-      iBase = iStages[1];
-      //swapTeamIndexes(); (updateState_move swaps team indexes but does not swap them back)
-
-      // second team moves first:
-      updateState_move();
-      break;
-    }
-  }
+  // construct an engine from the action + state combination:
+  PkCUEngine engine{*this, result, cEnv.data(), actionA, actionB};
+  // and evaluate the state
+  engine.updateState();
   
-  // compute end of round component:
-  evaluateRound_end();
-  
-  // combine environments that equal eachother:
-  size_t numUnique = combineSimilarEnvironments();
-  
-  return numUnique;
+  return result;
 }; // end of updateState
 
 
@@ -1276,8 +1215,7 @@ MatchState PkCU::isGameOver(const ConstEnvironmentVolatile& envV) const {
 }
 
 
-bool PkCU::isValidAction(const ConstEnvironmentVolatile& envV, size_t action, size_t iTeam)
-{
+bool PkCU::isValidAction(const ConstEnvironmentVolatile& envV, size_t action, size_t iTeam) const {
   ConstTeamVolatile cTV = envV.getTeam(iTeam);
   ConstTeamVolatile oTV = envV.getOtherTeam(iTeam);
   ConstPokemonVolatile cPKV = cTV.getPKV();
@@ -1357,41 +1295,7 @@ bool PkCU::isValidAction(const ConstEnvironmentVolatile& envV, size_t action, si
 } // endOf is valid action
 
 
-void PkCU::seedCurrentState(
-    PossibleEnvironments& rEnv, const ConstEnvironmentVolatile& cEnv, size_t actionA, size_t actionB) {
-  // set stack callback value:
-  _stack = &rEnv;
-
-  if (nv_.get() != cEnv.nv_) { setEnvironment(cEnv.nv()); }
-  _stack->setNonvolatileEnvironment(nv_);
-
-  // seed teams and actions:
-  iTeams[TEAM_A] = TEAM_A;
-  iTeams[TEAM_B] = TEAM_B;
-  iActions[TEAM_A] = actionA;
-  iActions[TEAM_B] = actionB;
-
-  // clear the stack, just in case
-  _stack->clear();
-  stackStage.clear();
-  damageComponents.clear();
-
-  // set counter vars:
-  iBase = _stack->size();
-
-  // actually push back stack var:
-  _stack->push_back(EnvironmentPossibleData::create(cEnv));
-
-  // push back memoization vars:
-  stackStage.push_back(STAGE_SEEDED);
-  
-  damageComponents.push_back(DamageComponents_t());
-  damageComponents.back().cProbability = 1.0;
-}
-
-
-bool saneStackProbability(std::deque<DamageComponents_t>& dComponents)
-{
+bool saneStackProbability(std::deque<DamageComponents_t>& dComponents) {
   fpType sum = 0.0;
   for (auto begin = dComponents.begin(), end = dComponents.end(); begin != end; ++begin)
   {
@@ -1402,78 +1306,81 @@ bool saneStackProbability(std::deque<DamageComponents_t>& dComponents)
   return mostlyEQ(sum, 1.0);
 }
 
-void PkCU::duplicateState(std::array<size_t, 2>& result, fpType _probability, size_t iState)
-{
+void PkCUEngine::duplicateState(
+    std::array<size_t, 2>& result,
+    fpType _probability,
+    size_t iState) {
   assert(mostlyLTE(_probability, 1.0));
 
   // duplicate state 2 times
   nPlicateState(result, iState);
 
   // modify probabilities of resulting states:
-  fpType totalProbability = damageComponents[result[0]].cProbability;
-  damageComponents[result[1]].cProbability *= _probability;
-  damageComponents[result[0]].cProbability = totalProbability - damageComponents[result[1]].cProbability;
+  fpType totalProbability = damageComponents_[result[0]].cProbability;
+  damageComponents_[result[1]].cProbability *= _probability;
+  damageComponents_[result[0]].cProbability = totalProbability - damageComponents_[result[1]].cProbability;
 
-  assert(saneStackProbability(damageComponents));
+  assert(saneStackProbability(damageComponents_));
 }
 
 
-void PkCU::triplicateState(std::array<size_t, 3>& result, fpType _probability, fpType _oProbability, size_t iState)
-{
+void PkCUEngine::triplicateState(
+    std::array<size_t, 3>& result,
+    fpType _probability,
+    fpType _oProbability,
+    size_t iState) {
   assert(mostlyLTE(_probability + _oProbability, 1.0));
 
   // duplicate state 3 times
   nPlicateState(result, iState);
 
   // modify probabilities of resulting states:
-  fpType totalProbability = damageComponents[result[0]].cProbability;
-  damageComponents[result[1]].cProbability *= _probability;
-  damageComponents[result[2]].cProbability *= _oProbability;
-  damageComponents[result[0]].cProbability = totalProbability - (damageComponents[result[1]].cProbability + damageComponents[result[2]].cProbability);
+  fpType totalProbability = damageComponents_[result[0]].cProbability;
+  damageComponents_[result[1]].cProbability *= _probability;
+  damageComponents_[result[2]].cProbability *= _oProbability;
+  damageComponents_[result[0]].cProbability = totalProbability - (damageComponents_[result[1]].cProbability + damageComponents_[result[2]].cProbability);
 
-  assert(saneStackProbability(damageComponents));
+  assert(saneStackProbability(damageComponents_));
 }
 
 
-PokemonVolatile PkCU::getPKV(size_t iState) {
+PokemonVolatile PkCUEngine::getPKV(size_t iState) {
   return getTV(iState).getPKV();
 }
 
 
-PokemonVolatile PkCU::getTPKV(size_t iState) {
+PokemonVolatile PkCUEngine::getTPKV(size_t iState) {
   return getTTV(iState).getPKV();
 }
 
 
-TeamVolatile PkCU::getTV(size_t iState) {
+TeamVolatile PkCUEngine::getTV(size_t iState) {
   return getStack().at(iState).getEnv().getTeam(getICTeam());
 }
 
 
-TeamVolatile PkCU::getTTV(size_t iState) {
+TeamVolatile PkCUEngine::getTTV(size_t iState) {
   return getStack().at(iState).getEnv().getTeam(getIOTeam());
 }
 
 
-MoveVolatile PkCU::getMV(size_t iState) {
+MoveVolatile PkCUEngine::getMV(size_t iState) {
   return getPKV(iState).getMV(getICAction());
 }
 
 
-MoveVolatile PkCU::getTMV(size_t iState) {
+MoveVolatile PkCUEngine::getTMV(size_t iState) {
   return getPKV(iState).getMV(getIOAction());
 }
 
 
-std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>& PkCU::getCPluginSet()
-{
-  return *cPluginSet;
+const PluginSet& PkCUEngine::getCPluginSet() {
+  return *cPluginSet_;
 };
 
 
-void PkCU::setCPluginSet()
-{
+void PkCUEngine::setCPluginSet() {
   size_t iCPokemon = getBase().getEnv().getTeam(getICTeam()).getICPKV();
   size_t iOPokemon = getBase().getEnv().getTeam(getIOTeam()).getICPKV();
-  cPluginSet = &pluginSets[getICTeam() * 6 + iCPokemon][iOPokemon];
+  cPluginSet_ = &pluginSets_[getICTeam() * 6 + iCPokemon][iOPokemon];
 }

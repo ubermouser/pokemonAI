@@ -9,7 +9,7 @@ class plugin;
 class MoveNonVolatile;
 class PokemonNonVolatile;
 class Type;
-class PkCU;
+class PkCUEngine;
 
 class MoveVolatile;
 class PokemonVolatile;
@@ -49,60 +49,60 @@ enum pluginType
 
 typedef int (*onSwitch_rawType)
   (
-  PkCU&,
+  PkCUEngine&,
   PokemonVolatile);
 
 typedef int (*onEvaluateMove_rawType)
   (
-  PkCU&,
+  PkCUEngine&,
   MoveVolatile,
   PokemonVolatile,
   PokemonVolatile);
 
 typedef int (*onModifyBracket_rawType)
-  (PkCU&,
+  (PkCUEngine&,
   MoveVolatile,
   PokemonVolatile,
   int32_t&);
 
 typedef int (*onModifySpeed_rawType)
-  (PkCU&,
+  (PkCUEngine&,
   PokemonVolatile,
   uint32_t&);
 
 typedef int (*onEndOfRound_rawType)
-  (PkCU&,
+  (PkCUEngine&,
   PokemonVolatile
   );
 
 typedef int (*onBeginningOfTurn_rawType)
-  (PkCU&,
+  (PkCUEngine&,
   PokemonVolatile
   );
 
 typedef int (*onSetPower_rawType)
-  (PkCU&,
+  (PkCUEngine&,
   MoveVolatile,
   PokemonVolatile,
   PokemonVolatile,
   uint32_t&);
 
 typedef int (*onModifyBasePower_rawType)
-  (PkCU&,
+  (PkCUEngine&,
   MoveVolatile,
   PokemonVolatile,
   PokemonVolatile,
   uint32_t&);
 
 typedef int (*onModifyPower_rawType)
-  (PkCU&,
+  (PkCUEngine&,
   MoveVolatile,
   PokemonVolatile,
   PokemonVolatile,
   fpType&);
 
 typedef int (*onModifyTypePower_rawType)
-  (PkCU&,
+  (PkCUEngine&,
   const Type&,
   MoveVolatile,
   PokemonVolatile,
@@ -110,14 +110,14 @@ typedef int (*onModifyTypePower_rawType)
   fpType&);
 
 typedef int (*onModifyMoveType_rawType)
-  (PkCU&,
+  (PkCUEngine&,
   MoveVolatile,
   PokemonVolatile,
   PokemonVolatile,
   const Type*&);
 
 typedef int (*onEndOfTurn_rawType)
-  (PkCU&,
+  (PkCUEngine&,
   PokemonVolatile
   );
 

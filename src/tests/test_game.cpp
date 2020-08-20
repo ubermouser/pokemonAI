@@ -15,7 +15,7 @@ protected:
   void SetUp() override {
     verbose = 4;
     pokedex_ = std::make_shared<PokedexStatic>();
-    engine_ = std::make_shared<PkCU>(SIZE_MAX, true);
+    engine_ = std::make_shared<PkCU>();
 
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
