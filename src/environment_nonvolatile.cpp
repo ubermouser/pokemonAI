@@ -9,20 +9,16 @@
 #include "../inc/team_nonvolatile.h"
 //#undef PKAI_STATIC
 
-void EnvironmentNonvolatile::initialize()
-{
+EnvironmentNonvolatile& EnvironmentNonvolatile::initialize() {
   for (size_t iTeam = 0; iTeam < teams.size(); ++iTeam)
   {
     getTeam(iTeam).initialize();
   }
+  return *this;
 };
 
 
-
-
-
-void EnvironmentNonvolatile::uninitialize()
-{
+void EnvironmentNonvolatile::uninitialize() {
     for (size_t iTeam = 0; iTeam < teams.size(); ++iTeam)
   {
     getTeam(iTeam).uninitialize();
@@ -30,12 +26,10 @@ void EnvironmentNonvolatile::uninitialize()
 };
 
 
-
-
-
-void EnvironmentNonvolatile::setTeam(size_t iTeam, const TeamNonVolatile& cTeam, bool init)
-{
+EnvironmentNonvolatile& EnvironmentNonvolatile::setTeam(size_t iTeam, const TeamNonVolatile& cTeam, bool init) {
   assert(iTeam < 2);
   teams[iTeam] = cTeam;
   if (init) { getTeam(iTeam).initialize(); };
+
+  return *this;
 };

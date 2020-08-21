@@ -3,12 +3,13 @@
 
 #include "../inc/pkai.h"
 
+#include <array>
+#include <assert.h>
+#include <deque>
 #include <memory>
 #include <stdint.h>
 #include <vector>
-#include <deque>
-#include <array>
-#include <assert.h>
+#include <utility>
 
 #include "environment_nonvolatile.h"
 #include "environment_possible.h"
@@ -124,6 +125,10 @@ public:
 
   /* Seed an initial state from an EnvironmentNonvolatile, then return its volatile state. */
   ConstEnvironmentVolatile initialState() const;
+
+  /* Return a collection of all valid actions for the given state. */
+  std::vector<size_t> getValidActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const;
+  std::vector<std::array<size_t, 2> > getAllValidActions(const ConstEnvironmentVolatile& envV) const;
 
   /* determines whether a given action is a selectable one, given the current state */
   bool isValidAction(const ConstEnvironmentVolatile& envV, size_t action, size_t iTeam) const;

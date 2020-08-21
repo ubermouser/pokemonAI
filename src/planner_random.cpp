@@ -7,8 +7,7 @@
 const std::string PlannerRandom::ident = "Random_Planner-NULLEVAL";
 
 
-bool PlannerRandom::isInitialized() const 
-{ 
+bool PlannerRandom::isInitialized() const {
   if (agentTeam_ >= 2) { return false; }
   if (cu_ == NULL) { return false; }
   
@@ -16,15 +15,14 @@ bool PlannerRandom::isInitialized() const
 }
 
 
-uint32_t PlannerRandom::generateSolution(const ConstEnvironmentPossible& origin)
-{
-  // choose a completely random action to return:
-  size_t iNAction = rand() % AT_ITEM_USE;
-  for (size_t _iAction = 0; _iAction != AT_ITEM_USE; ++_iAction) {
-    size_t iAction = (iNAction + _iAction) % AT_ITEM_USE;
-
-    if (cu_->isValidAction(origin, iAction, agentTeam_)) { return iAction; }
+uint32_t PlannerRandom::generateSolution(const ConstEnvironmentPossible& origin) {
+  // determine the set of all valid actions:
+  auto validMoves = cu_->getValidActions(origin, agentTeam_);
+  if (validMoves.empty()) {
+    return UINT32_MAX;
+  } else {
+    // choose a completely random action to return:
+    size_t iAction = rand() % validMoves.size();
+    return validMoves[iAction];
   }
-  // no actions are valid:
-  return UINT32_MAX;
 };

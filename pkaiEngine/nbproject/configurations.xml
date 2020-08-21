@@ -32,6 +32,7 @@
       </logicalFolder>
       <logicalFolder name="f3" displayName="evaluators" projectFiles="true">
         <itemPath>../inc/evaluator.h</itemPath>
+        <itemPath>../inc/evaluator_montecarlo.h</itemPath>
         <itemPath>../inc/evaluator_random.h</itemPath>
         <itemPath>../inc/evaluator_simple.h</itemPath>
       </logicalFolder>
@@ -86,6 +87,7 @@
       </logicalFolder>
       <logicalFolder name="f3" displayName="evaluators" projectFiles="true">
         <itemPath>../src/evaluator.cpp</itemPath>
+        <itemPath>../src/evaluator_montecarlo.cpp</itemPath>
         <itemPath>../src/evaluator_random.cpp</itemPath>
         <itemPath>../src/evaluator_simple.cpp</itemPath>
       </logicalFolder>
@@ -176,6 +178,8 @@
       </item>
       <item path="../inc/evaluator.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../inc/evaluator_montecarlo.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../inc/evaluator_random.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/evaluator_simple.h" ex="false" tool="3" flavor2="0">
@@ -249,6 +253,8 @@
       <item path="../src/environment_volatile.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/evaluator.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/evaluator_montecarlo.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/evaluator_random.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -334,6 +340,7 @@
           <linkerLibItems>
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
             <linkerOptionItem>-lboost_system</linkerOptionItem>
+            <linkerOptionItem>-lboost_program_options</linkerOptionItem>
             <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
             <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
             <linkerOptionItem>-lgtest_main</linkerOptionItem>
@@ -357,6 +364,7 @@
           <linkerLibItems>
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
             <linkerOptionItem>-lboost_system</linkerOptionItem>
+            <linkerOptionItem>-lboost_program_options</linkerOptionItem>
             <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
             <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
             <linkerOptionItem>-lgtest_main</linkerOptionItem>
@@ -380,6 +388,7 @@
           <linkerLibItems>
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
             <linkerOptionItem>-lboost_system</linkerOptionItem>
+            <linkerOptionItem>-lboost_program_options</linkerOptionItem>
             <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
             <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
             <linkerOptionItem>-lgtest_main</linkerOptionItem>
@@ -430,6 +439,8 @@
       <item path="../inc/environment_volatile.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/evaluator.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/evaluator_montecarlo.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/evaluator_random.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -504,6 +515,8 @@
       <item path="../src/environment_volatile.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/evaluator.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/evaluator_montecarlo.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/evaluator_random.cpp" ex="false" tool="1" flavor2="0">
       </item>

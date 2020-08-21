@@ -40,6 +40,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/511e4115/environment_possible.o \
 	${OBJECTDIR}/_ext/511e4115/environment_volatile.o \
 	${OBJECTDIR}/_ext/511e4115/evaluator.o \
+	${OBJECTDIR}/_ext/511e4115/evaluator_montecarlo.o \
 	${OBJECTDIR}/_ext/511e4115/evaluator_random.o \
 	${OBJECTDIR}/_ext/511e4115/evaluator_simple.o \
 	${OBJECTDIR}/_ext/e96877d6/fixed_func.o \
@@ -134,6 +135,11 @@ ${OBJECTDIR}/_ext/511e4115/evaluator.o: ../src/evaluator.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluator.o ../src/evaluator.cpp
+
+${OBJECTDIR}/_ext/511e4115/evaluator_montecarlo.o: ../src/evaluator_montecarlo.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluator_montecarlo.o ../src/evaluator_montecarlo.cpp
 
 ${OBJECTDIR}/_ext/511e4115/evaluator_random.o: ../src/evaluator_random.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
@@ -284,15 +290,15 @@ ${OBJECTDIR}/_ext/511e4115/type.o: ../src/type.cpp
 
 ${TESTDIR}/TestFiles/f1: ${TESTDIR}/_ext/a55270a7/test_engine.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
-	${LINK.cc} -o ${TESTDIR}/TestFiles/f1 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -ldl -lpthread -lgtest_main -lgtest 
+	${LINK.cc} -o ${TESTDIR}/TestFiles/f1 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -lboost_program_options -ldl -lpthread -lgtest_main -lgtest 
 
 ${TESTDIR}/TestFiles/f3: ${TESTDIR}/_ext/a55270a7/test_game.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
-	${LINK.cc} -o ${TESTDIR}/TestFiles/f3 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -ldl -lpthread -lgtest_main -lgtest 
+	${LINK.cc} -o ${TESTDIR}/TestFiles/f3 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -lboost_program_options -ldl -lpthread -lgtest_main -lgtest 
 
 ${TESTDIR}/TestFiles/f2: ${TESTDIR}/_ext/a55270a7/test_pokedex.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
-	${LINK.cc} -o ${TESTDIR}/TestFiles/f2 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -ldl -lpthread -lgtest_main -lgtest 
+	${LINK.cc} -o ${TESTDIR}/TestFiles/f2 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -lboost_program_options -ldl -lpthread -lgtest_main -lgtest 
 
 
 ${TESTDIR}/_ext/a55270a7/test_engine.o: ../src/tests/test_engine.cpp 
@@ -376,6 +382,19 @@ ${OBJECTDIR}/_ext/511e4115/evaluator_nomain.o: ${OBJECTDIR}/_ext/511e4115/evalua
 	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluator_nomain.o ../src/evaluator.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/_ext/511e4115/evaluator.o ${OBJECTDIR}/_ext/511e4115/evaluator_nomain.o;\
+	fi
+
+${OBJECTDIR}/_ext/511e4115/evaluator_montecarlo_nomain.o: ${OBJECTDIR}/_ext/511e4115/evaluator_montecarlo.o ../src/evaluator_montecarlo.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/evaluator_montecarlo.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluator_montecarlo_nomain.o ../src/evaluator_montecarlo.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/511e4115/evaluator_montecarlo.o ${OBJECTDIR}/_ext/511e4115/evaluator_montecarlo_nomain.o;\
 	fi
 
 ${OBJECTDIR}/_ext/511e4115/evaluator_random_nomain.o: ${OBJECTDIR}/_ext/511e4115/evaluator_random.o ../src/evaluator_random.cpp 

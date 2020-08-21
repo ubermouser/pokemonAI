@@ -40,6 +40,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/511e4115/environment_possible.o \
 	${OBJECTDIR}/_ext/511e4115/environment_volatile.o \
 	${OBJECTDIR}/_ext/511e4115/evaluator.o \
+	${OBJECTDIR}/_ext/511e4115/evaluator_montecarlo.o \
 	${OBJECTDIR}/_ext/511e4115/evaluator_random.o \
 	${OBJECTDIR}/_ext/511e4115/evaluator_simple.o \
 	${OBJECTDIR}/_ext/e96877d6/fixed_func.o \
@@ -134,6 +135,11 @@ ${OBJECTDIR}/_ext/511e4115/evaluator.o: ../src/evaluator.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluator.o ../src/evaluator.cpp
+
+${OBJECTDIR}/_ext/511e4115/evaluator_montecarlo.o: ../src/evaluator_montecarlo.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluator_montecarlo.o ../src/evaluator_montecarlo.cpp
 
 ${OBJECTDIR}/_ext/511e4115/evaluator_random.o: ../src/evaluator_random.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
@@ -376,6 +382,19 @@ ${OBJECTDIR}/_ext/511e4115/evaluator_nomain.o: ${OBJECTDIR}/_ext/511e4115/evalua
 	    $(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluator_nomain.o ../src/evaluator.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/_ext/511e4115/evaluator.o ${OBJECTDIR}/_ext/511e4115/evaluator_nomain.o;\
+	fi
+
+${OBJECTDIR}/_ext/511e4115/evaluator_montecarlo_nomain.o: ${OBJECTDIR}/_ext/511e4115/evaluator_montecarlo.o ../src/evaluator_montecarlo.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/evaluator_montecarlo.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluator_montecarlo_nomain.o ../src/evaluator_montecarlo.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/511e4115/evaluator_montecarlo.o ${OBJECTDIR}/_ext/511e4115/evaluator_montecarlo_nomain.o;\
 	fi
 
 ${OBJECTDIR}/_ext/511e4115/evaluator_random_nomain.o: ${OBJECTDIR}/_ext/511e4115/evaluator_random.o ../src/evaluator_random.cpp 

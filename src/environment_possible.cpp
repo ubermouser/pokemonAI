@@ -199,5 +199,19 @@ void PossibleEnvironments::printStates(size_t iPly) const {
 }
 
 
+std::vector<ConstEnvironmentPossible> PossibleEnvironments::getValidEnvironments() const {
+  std::vector<ConstEnvironmentPossible> result; result.reserve(getNumUnique());
+
+  for (size_t iState = 0; iState < size(); ++iState) {
+    ConstEnvironmentPossible state = at(iState);
+    if (state.isPruned()) { continue; }
+
+    result.push_back(state);
+  }
+
+  return result;
+}
+
+
 template class EnvironmentPossibleImpl<ConstEnvironmentVolatile, const EnvironmentPossibleData>;
 template class EnvironmentPossibleImpl<EnvironmentVolatile, EnvironmentPossibleData>;

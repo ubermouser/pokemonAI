@@ -121,7 +121,7 @@ public:
     return *this;
   }
   Game& setTeam(size_t iAgent, const TeamNonVolatile& nv);
-  Game& setEnvironment(const std::shared_ptr<EnvironmentNonvolatile>& nv);
+  Game& setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& nv);
   Game& setEnvironment(const EnvironmentNonvolatile& nv) {
     return setEnvironment(std::make_shared<EnvironmentNonvolatile>(nv));
   }
@@ -149,7 +149,7 @@ protected:
   /* state transition engine, given an environment_nonvolatile provides state transitions of an environment_volatile */
   std::shared_ptr<PkCU> cu_;
 
-  std::shared_ptr<EnvironmentNonvolatile> nv_;
+  std::shared_ptr<const EnvironmentNonvolatile> nv_;
 
   std::shared_ptr<Evaluator> eval_;
 

@@ -8,6 +8,8 @@
 #include <inc/game.h>
 #include <inc/pkCU.h>
 #include <inc/pokedex_static.h>
+#include <inc/evaluator_simple.h>
+#include <inc/evaluator_montecarlo.h>
 #include <inc/planner_random.h>
 #include <inc/planner_human.h>
 #include <inc/planner_max.h>
@@ -84,8 +86,8 @@ int main(int argc, char** argv) {
       .setEngine(engine)
       .setTeam(0, team_a)
       .setTeam(1, team_b)
-      .setPlanner(0, PlannerHuman())
-      .setPlanner(1, PlannerRandom());
+      .setPlanner(0, PlannerMax().setEngine(engine).setEvaluator(EvaluatorMonteCarlo()))
+      .setPlanner(1, PlannerMax().setEngine(engine).setEvaluator(EvaluatorMonteCarlo()));
 
   game.rollout();
   std::exit(EXIT_SUCCESS);

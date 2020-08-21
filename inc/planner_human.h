@@ -3,12 +3,6 @@
 
 #include "planner.h"
 
-class PokemonAI;
-class PkCU;
-
-class EnvironmentNonvolatile;
-class EnvironmentVolatile;
-
 class PlannerHuman : public Planner {
 protected:
   static const std::string ident;

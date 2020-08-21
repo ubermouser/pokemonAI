@@ -51,7 +51,7 @@ Game::Game(const Config& cfg):
 }
 
 
-Game& Game::setEnvironment(const std::shared_ptr<EnvironmentNonvolatile>& nv) {
+Game& Game::setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& nv) {
   nv_ = nv;
   
   for(auto& planner: agents_) {
@@ -70,8 +70,7 @@ Game& Game::setEnvironment(const std::shared_ptr<EnvironmentNonvolatile>& nv) {
 
 
 Game& Game::setTeam(size_t iAgent, const TeamNonVolatile& tNV) {
-  nv_->setTeam(iAgent, tNV, true);
-  return setEnvironment(nv_);
+  return setEnvironment(EnvironmentNonvolatile(*nv_).setTeam(iAgent, tNV, true));
 }
 
 
@@ -216,7 +215,6 @@ GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_
 
     // perform state transition:
     if (!nextEnvironment.isEmpty()) {
-      size_t iNextEnvironment = &nextEnvironment.data() - &possibleEnvironments.front();
       // determine if the current state is a terminal state, and if so end the game:
       matchState = cu_->isGameOver(nextEnvironment);
 

@@ -16,6 +16,9 @@ public:
   virtual PlannerMax* clone() const override { return new PlannerMax(*this); }
 
   virtual PlannerMax& setEngine(const std::shared_ptr<PkCU>& cu) override;
+  virtual PlannerMax& setEngine(const PkCU& cu) {
+    return setEngine(std::make_shared<PkCU>(cu));
+  }
 
   virtual uint32_t generateSolution(const ConstEnvironmentPossible& origin) override;
 

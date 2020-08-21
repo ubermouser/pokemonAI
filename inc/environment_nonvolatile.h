@@ -40,7 +40,7 @@ public:
     return teams[(movesFirst+1)&1];
   };
 
-  void initialize();
+  EnvironmentNonvolatile& initialize();
 
   void uninitialize();
 
@@ -54,7 +54,7 @@ public:
     return teams[(movesFirst+1)&1];
   };
 
-  void setTeam(size_t iTeam, const TeamNonVolatile& cTeam, bool init = false);
+  EnvironmentNonvolatile& setTeam(size_t iTeam, const TeamNonVolatile& cTeam, bool init = false);
 
 };
 

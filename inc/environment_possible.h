@@ -259,6 +259,8 @@ public:
   }
   ConstEnvironmentPossible stateSelect_roulette(size_t& indexState) const;
 
+  std::vector<ConstEnvironmentPossible> getValidEnvironments() const;
+
   EnvironmentPossible at(size_t index) {
     return EnvironmentPossible{*nv_, base_t::at(index)};
   };

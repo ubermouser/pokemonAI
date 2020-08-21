@@ -1215,6 +1215,32 @@ MatchState PkCU::isGameOver(const ConstEnvironmentVolatile& envV) const {
 }
 
 
+std::vector<std::array<size_t, 2> > PkCU::getAllValidActions(const ConstEnvironmentVolatile& envV) const {
+  std::vector<std::array<size_t, 2> > result; result.reserve(AT_MOVE_CONFUSED * AT_MOVE_CONFUSED);
+  auto agentMoves = getValidActions(envV, TEAM_A);
+  auto otherMoves = getValidActions(envV, TEAM_B);
+  for (auto agentMove: agentMoves) {
+    for (auto otherMove: otherMoves) {
+      result.push_back({agentMove, otherMove});
+    }
+  }
+
+  return result;
+}
+
+
+std::vector<size_t> PkCU::getValidActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
+  std::vector<size_t> result; result.reserve(AT_MOVE_CONFUSED);
+  for (size_t iAction = 0; iAction < AT_MOVE_CONFUSED; ++iAction) {
+    if (isValidAction(envV, iAction, iTeam)) {
+      result.push_back(iAction);
+    }
+  }
+
+  return result;
+}
+
+
 bool PkCU::isValidAction(const ConstEnvironmentVolatile& envV, size_t action, size_t iTeam) const {
   ConstTeamVolatile cTV = envV.getTeam(iTeam);
   ConstTeamVolatile oTV = envV.getOtherTeam(iTeam);
