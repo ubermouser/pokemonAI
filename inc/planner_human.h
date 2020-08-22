@@ -34,7 +34,7 @@ public:
   virtual bool isEvaluatorRequired() const override { return false; }
 
   virtual PlyResult generateSolutionAtDepth(
-      const ConstEnvironmentPossible& origin, size_t maxPly) const override;
+      const ConstEnvironmentVolatile& origin, size_t maxPly) const override;
 };
 
 #endif /* PLANNER_HUMAN_H */

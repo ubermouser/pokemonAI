@@ -8,14 +8,20 @@ const std::string PlannerRandom::ident = "Random_Planner-NULLEVAL";
 
 
 PlyResult PlannerRandom::generateSolutionAtDepth(
-    const ConstEnvironmentPossible& origin, size_t maxPly) const {
+    const ConstEnvironmentVolatile& origin, size_t maxPly) const {
   PlyResult result;
+  // determine if we want to perform moves only:
+  bool doMove = (cfg_.moveChance*RAND_MAX) <= (rand() % RAND_MAX);
   // determine the set of all valid actions:
-  auto validMoves = cu_->getValidActions(origin, agentTeam_);
-  if (!validMoves.empty()) {
+  auto validMoves = cu_->getValidMoveActions(origin, agentTeam_);
+  auto validActions = cu_->getValidActions(origin, agentTeam_);
+  auto& valid = (doMove && !validMoves.empty())?validMoves:validActions;
+
+  // are there ANY valid actions?
+  if (!valid.empty()) {
     // choose a completely random action to return:
-    size_t iAction = rand() % validMoves.size();
-    result.agentAction = validMoves[iAction];
+    size_t iAction = rand() % valid.size();
+    result.agentAction = valid[iAction];
   }
 
   return result;

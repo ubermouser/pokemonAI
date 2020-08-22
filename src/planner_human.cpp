@@ -13,12 +13,12 @@ const std::string PlannerHuman::ident = "HumanPlanner-NULLEVAL";
 
 
 PlyResult PlannerHuman::generateSolutionAtDepth(
-    const ConstEnvironmentPossible& origin, size_t maxPly) const {
+    const ConstEnvironmentVolatile& origin, size_t maxPly) const {
   std::cout << origin;
-  printActions(origin.getEnv());
+  printActions(origin);
 
   PlyResult result;
-  result.agentAction = actionSelect(origin.getEnv());
+  result.agentAction = actionSelect(origin);
   return result;
 };
 

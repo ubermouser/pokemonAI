@@ -114,7 +114,7 @@ void ENV_POSSIBLE_IMPL::printEnvironment(std::ostream& os) const {
 
 std::ostream& operator <<(std::ostream& os, const ConstEnvironmentPossible& envP) {
   envP.printEnvironment(os);
-  envP.getEnv().printActivePokemon(os);
+  os << envP.getEnv();
   return os;
 };
 

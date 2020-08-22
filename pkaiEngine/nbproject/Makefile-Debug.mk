@@ -78,12 +78,14 @@ TESTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}/tests
 TESTFILES= \
 	${TESTDIR}/TestFiles/f1 \
 	${TESTDIR}/TestFiles/f3 \
+	${TESTDIR}/TestFiles/f4 \
 	${TESTDIR}/TestFiles/f2
 
 # Test Object Files
 TESTOBJECTFILES= \
 	${TESTDIR}/_ext/a55270a7/test_engine.o \
 	${TESTDIR}/_ext/a55270a7/test_game.o \
+	${TESTDIR}/_ext/a55270a7/test_planner.o \
 	${TESTDIR}/_ext/a55270a7/test_pokedex.o
 
 # C Compiler Flags
@@ -302,6 +304,10 @@ ${TESTDIR}/TestFiles/f3: ${TESTDIR}/_ext/a55270a7/test_game.o ${OBJECTFILES:%.o=
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc} -o ${TESTDIR}/TestFiles/f3 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -lboost_program_options -ldl -lpthread -lgtest_main -lgtest 
 
+${TESTDIR}/TestFiles/f4: ${TESTDIR}/_ext/a55270a7/test_planner.o ${OBJECTFILES:%.o=%_nomain.o}
+	${MKDIR} -p ${TESTDIR}/TestFiles
+	${LINK.cc} -o ${TESTDIR}/TestFiles/f4 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -lboost_program_options -lgtest_main -lgtest -ldl -lpthread 
+
 ${TESTDIR}/TestFiles/f2: ${TESTDIR}/_ext/a55270a7/test_pokedex.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc} -o ${TESTDIR}/TestFiles/f2 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -lboost_program_options -ldl -lpthread -lgtest_main -lgtest 
@@ -317,6 +323,12 @@ ${TESTDIR}/_ext/a55270a7/test_game.o: ../src/tests/test_game.cpp
 	${MKDIR} -p ${TESTDIR}/_ext/a55270a7
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${TESTDIR}/_ext/a55270a7/test_game.o ../src/tests/test_game.cpp
+
+
+${TESTDIR}/_ext/a55270a7/test_planner.o: ../src/tests/test_planner.cpp 
+	${MKDIR} -p ${TESTDIR}/_ext/a55270a7
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${TESTDIR}/_ext/a55270a7/test_planner.o ../src/tests/test_planner.cpp
 
 
 ${TESTDIR}/_ext/a55270a7/test_pokedex.o: ../src/tests/test_pokedex.cpp 
@@ -786,6 +798,7 @@ ${OBJECTDIR}/_ext/511e4115/type_nomain.o: ${OBJECTDIR}/_ext/511e4115/type.o ../s
 	then  \
 	    ${TESTDIR}/TestFiles/f1 || true; \
 	    ${TESTDIR}/TestFiles/f3 || true; \
+	    ${TESTDIR}/TestFiles/f4 || true; \
 	    ${TESTDIR}/TestFiles/f2 || true; \
 	else  \
 	    ./${TEST} || true; \

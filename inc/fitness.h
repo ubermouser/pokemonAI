@@ -11,6 +11,7 @@
 #include "pkai.h"
 
 #include <assert.h>
+#include <limits>
 
 #include "fp_compare.h"
 
@@ -27,8 +28,8 @@ public:
   static constexpr PrecisionType max_fitness() { return PrecisionType(max_fitness_t) / PrecisionType(fitness_d); }
   static constexpr PrecisionType min_fitness() { return PrecisionType(min_fitness_t) / PrecisionType(fitness_d); }
 
-  static constexpr fitness_t worst() { return fitness_t{min_fitness(), one()}; }
-  static constexpr fitness_t best() { return fitness_t{max_fitness(), one()}; }
+  static constexpr fitness_t worst() { return fitness_t{std::numeric_limits<PrecisionType>::min(), false}; }
+  static constexpr fitness_t best() { return fitness_t{std::numeric_limits<PrecisionType>::max(), false}; }
 
   FitnessType(
       const PrecisionType& value = min_fitness(),
@@ -45,8 +46,13 @@ public:
     return lhs;
   }
   fitness_t& operator +=(const fitness_t& rhs) {
+    // average the two values together in accordance to their certainty:
     value_ = (certainty() * value_) + (rhs.certainty() * rhs.value_);
+    // combine certainty:
     certainty_ += rhs.certainty();
+    // normalize value by certainty:
+    // TODO(@drendleman) - unstable when certainty_ is small!
+    value_ /= certainty_;
 
     assertValidity();
     return *this;
@@ -67,6 +73,10 @@ public:
   const PrecisionType& certainty() const { return certainty_; }
   PrecisionType uncertainty() const { return one() - certainty_; }
 protected:
+  FitnessType(const PrecisionType& value, bool doAssertValidity) : value_(value), certainty_(one()) {
+    if (doAssertValidity) { assertValidity(); }
+  }
+
   void assertValidity() const {
     assert(value_ >= min_fitness() && value_ <= max_fitness());
     assert(certainty_ >= zero() && certainty_ <= one());

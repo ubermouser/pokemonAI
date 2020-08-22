@@ -125,17 +125,19 @@ Game& Game::initialize() {
     std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
       ": Game-state evaluator " <<
       ": \"" << eval_->getName() << "\" failed to initialize!\n";
+    throw std::runtime_error("game-state evaluator failed to initialize");
   }
 
   // assign default agents if none exist:
   for (size_t iAgent = 0; iAgent < 2; ++iAgent) {
-    if (agents_[iAgent] != NULL) { continue; }
-    if (!cfg_.allowUndefinedAgents) { throw std::runtime_error("agent(s) undefined"); }
+    if (agents_[iAgent] == NULL) {
+      if (!cfg_.allowUndefinedAgents) { throw std::runtime_error("agent(s) undefined"); }
 
-    setPlanner(iAgent, PlannerMax().setEngine(cu_).setEvaluator(eval_));
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-      ": agent " << iAgent << 
-      " is undefined! Replaced with " << agents_[iAgent]->getName() << "\n";
+      setPlanner(iAgent, PlannerMax().setEngine(cu_).setEvaluator(eval_));
+      std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
+        ": agent " << iAgent << 
+        " is undefined! Replaced with " << agents_[iAgent]->getName() << "\n";
+    }
 
     if (agents_[iAgent]->isInitialized()) { continue; }
 
@@ -623,14 +625,14 @@ void Game::printGameOutline(const GameResult& gResult, size_t iMatch) {
     std::cout <<
       "Teams " << getTeamIdentifier(TEAM_A) <<
       " and " << getTeamIdentifier(TEAM_B) <<
-      " have drawn game " << gameIdentifier <<
+      " have drawn " << gameIdentifier <<
       "!\n";
   } else {
     size_t losingTeam = (gResult.endStatus + 1) % 2;
     std::cout <<
       "Team " << getTeamIdentifier(matchState) <<
       " has beaten team " << getTeamIdentifier(losingTeam) <<
-      " in game " << gameIdentifier <<
+      " in " << gameIdentifier <<
       "!\n";
   }
 

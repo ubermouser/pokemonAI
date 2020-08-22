@@ -1,4 +1,6 @@
 #include "../inc/evaluator_montecarlo.h"
+
+#include "../inc/pkCU.h"
 #include "../inc/planner_random.h"
 
 EvaluatorMonteCarlo::EvaluatorMonteCarlo(const Config& cfg)
@@ -10,7 +12,8 @@ EvaluatorMonteCarlo::EvaluatorMonteCarlo(const Config& cfg)
   gamecfg.allowStateSelection = false;
   gamecfg.verbosity = 0;
   game_ = std::make_shared<Game>(gamecfg);
-  game_->setPlanner(0, PlannerRandom()).setPlanner(1, PlannerRandom());
+  game_->setPlanner(0, PlannerRandom().setEngine(PkCU()))
+      .setPlanner(1, PlannerRandom().setEngine(PkCU()));
 }
 
 

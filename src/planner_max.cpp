@@ -25,17 +25,18 @@ PlannerMax& PlannerMax::setEngine(const std::shared_ptr<PkCU>& cu) {
 
 
 PlyResult PlannerMax::generateSolutionAtDepth(
-    const ConstEnvironmentPossible& origin, size_t maxPly) const {
+    const ConstEnvironmentVolatile& origin, size_t maxPly) const {
   // a count of the number of nodes evaluated:
   PlyResult result;
 
+  // TODO(@drendleman) in the case of a tie, the agent should always bias towards a damaging action
   // determine the best action based upon the evaluator's prediction:
   for (const auto& action: cu_->getValidActions(origin, agentTeam_)) {
     Fitness currentFitness = evaluateLeaf(
         origin, action, AT_MOVE_NOTHING, result.fitness, &result.numNodes);
 
     // is the returned fitness better than the current best fitness:
-    if (currentFitness >= result.fitness) {
+    if (currentFitness > result.fitness) {
       result.fitness = currentFitness;
       result.agentAction = action;
     }

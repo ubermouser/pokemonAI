@@ -127,6 +127,12 @@
                      kind="TEST">
         <itemPath>../src/tests/test_game.cpp</itemPath>
       </logicalFolder>
+      <logicalFolder name="f4"
+                     displayName="test_planner"
+                     projectFiles="true"
+                     kind="TEST">
+        <itemPath>../src/tests/test_planner.cpp</itemPath>
+      </logicalFolder>
       <logicalFolder name="f2"
                      displayName="test_pokedex"
                      projectFiles="true"
@@ -329,6 +335,8 @@
       </item>
       <item path="../src/tests/test_game.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/tests/test_planner.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/tests/test_pokedex.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/type.cpp" ex="false" tool="1" flavor2="0">
@@ -402,6 +410,30 @@
             <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
             <linkerOptionItem>-lgtest_main</linkerOptionItem>
             <linkerOptionItem>-lgtest</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
+      <folder path="TestFiles/f4">
+        <cTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </cTool>
+        <ccTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f4</output>
+          <linkerLibItems>
+            <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
+            <linkerOptionItem>-lboost_system</linkerOptionItem>
+            <linkerOptionItem>-lboost_program_options</linkerOptionItem>
+            <linkerOptionItem>-lgtest_main</linkerOptionItem>
+            <linkerOptionItem>-lgtest</linkerOptionItem>
+            <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
+            <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
           </linkerLibItems>
         </linkerTool>
       </folder>
@@ -598,6 +630,8 @@
       </item>
       <item path="../src/tests/test_game.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/tests/test_planner.cpp" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="../src/tests/test_pokedex.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/type.cpp" ex="false" tool="1" flavor2="0">
@@ -645,6 +679,21 @@
         </ccTool>
         <linkerTool>
           <output>${TESTDIR}/TestFiles/f3</output>
+        </linkerTool>
+      </folder>
+      <folder path="TestFiles/f4">
+        <cTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </cTool>
+        <ccTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f4</output>
         </linkerTool>
       </folder>
     </conf>

@@ -4,9 +4,13 @@
 #include "planner.h"
 
 class PlannerRandom : public Planner {
-private:
-  static const std::string ident;
 public:
+  struct Config: public Planner::Config {
+    double moveChance = 0.7;
+
+    Config() : Planner::Config() {};
+  };
+
   PlannerRandom(const Config& cfg = Config()) : Planner(cfg, ident) {};
 
   PlannerRandom(const PlannerRandom& other) = default;
@@ -20,7 +24,12 @@ public:
   virtual const std::string& getName() const override { return ident; };
 
   PlyResult generateSolutionAtDepth(
-    const ConstEnvironmentPossible& origin, size_t maxPly) const override;
+    const ConstEnvironmentVolatile& origin, size_t maxPly) const override;
+
+protected:
+  Config cfg_;
+
+  static const std::string ident;
 };
 
 #endif /* PLANNER_RANDOM_H */

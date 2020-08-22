@@ -43,5 +43,11 @@ void ENV_VOLATILE_IMPL::printActivePokemon(std::ostream& os, size_t first) const
 }
 
 
+std::ostream& operator <<(std::ostream& os, const ConstEnvironmentVolatile& env) {
+  env.printActivePokemon(os);
+  return os;
+};
+
+
 template class EnvironmentVolatileImpl<ConstTeamVolatile, const EnvironmentVolatileData>;
 template class EnvironmentVolatileImpl<TeamVolatile, EnvironmentVolatileData>;

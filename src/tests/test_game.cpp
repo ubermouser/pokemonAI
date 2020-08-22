@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <memory>
+#include <stdexcept>
 
 #include <inc/engine.h>
 #include <inc/game.h>
@@ -62,4 +63,17 @@ TEST_F(GameTest, CustomPlanners) {
   auto result = game.rollout();
 
   EXPECT_GE(result.matchesPlayed, 51);
+}
+
+
+TEST_F(GameTest, UninitializedCustomPlanners) {
+  auto game = Game()
+      .setEnvironment(environment_)
+      .setPlanner(0, PlannerMax())
+      .setPlanner(1, PlannerMax());
+
+  EXPECT_THROW({
+    // uninitialized
+    game.rollout();
+  }, std::runtime_error);
 }

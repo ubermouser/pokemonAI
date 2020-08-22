@@ -177,6 +177,9 @@ protected:
   /* The default state for a given nonvolatile state */
   EnvironmentVolatileData initialState_;
 
+  /* throws an exception if the nonvolatile state of the environment doesn't match the engine's */
+  void guardNonvolatileState(const ConstEnvironmentVolatile& cEnv) const;
+
   
   std::vector<Action> getValidActionsInRange(
       const ConstEnvironmentVolatile& envV, size_t iTeam, const Action& iStart, const Action& iEnd) const;

@@ -84,7 +84,7 @@ void Planner::resetName() {
 }
 
 
-PlannerResult Planner::generateSolution(const ConstEnvironmentPossible& origin) const {
+PlannerResult Planner::generateSolution(const ConstEnvironmentVolatile& origin) const {
   PlannerResult result; result.atDepth.reserve(cfg_.maxDepth);
   // keep an elapsed time counter
   auto start = std::chrono::steady_clock::now();
@@ -107,7 +107,7 @@ PlannerResult Planner::generateSolution(const ConstEnvironmentPossible& origin) 
 
 
 Fitness Planner::evaluateLeaf(
-      const ConstEnvironmentPossible& origin,
+      const ConstEnvironmentVolatile& origin,
       const Action& agentAction,
       const Action& otherAction,
       const Fitness& lowCutoff,

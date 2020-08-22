@@ -3,10 +3,7 @@
 
 #include "evaluator.h"
 
-class EvaluatorRandom: public Evaluator
-{
-private:
-  static const std::string ident;
+class EvaluatorRandom: public Evaluator {
 public:
 
   ~EvaluatorRandom() { };
@@ -15,6 +12,8 @@ public:
   EvaluatorRandom* clone() const override { return new EvaluatorRandom(*this); }
 
   EvalResult_t calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const override;
+protected:
+  static const std::string ident;
 };
 
 #endif /* RANDOM_EVALUATOR_H */

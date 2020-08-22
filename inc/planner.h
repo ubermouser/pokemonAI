@@ -103,9 +103,14 @@ public:
   virtual Planner& setTeam(size_t iTeam) { agentTeam_ = iTeam; return *this; };
 
   /* generate an action */
-  virtual PlannerResult generateSolution(const ConstEnvironmentPossible& origin) const;
+  virtual PlannerResult generateSolution(const ConstEnvironmentVolatile& origin) const;
+  virtual PlannerResult generateSolution(const ConstEnvironmentPossible& origin) const {
+    return generateSolution(origin.getEnv());
+  }
+
+  /* generate a prediction at a specific depth */
   virtual PlyResult generateSolutionAtDepth(
-      const ConstEnvironmentPossible& origin, size_t maxPly) const = 0;
+      const ConstEnvironmentVolatile& origin, size_t maxPly) const = 0;
 protected:
   Config cfg_;
 
@@ -128,7 +133,7 @@ protected:
   virtual void resetName();
 
   virtual Fitness evaluateLeaf(
-      const ConstEnvironmentPossible& origin,
+      const ConstEnvironmentVolatile& origin,
       const Action& agentAction,
       const Action& otherAction,
       const Fitness& lowCutoff = Fitness::worst(),
@@ -137,7 +142,7 @@ protected:
         origin, agentAction, otherAction, lowCutoff, Fitness::best(), nodesEvaluated);
   }
   virtual Fitness evaluateLeaf(
-      const ConstEnvironmentPossible& origin,
+      const ConstEnvironmentVolatile& origin,
       const Action& agentAction,
       const Action& otherAction,
       const Fitness& lowCutoff = Fitness::worst(),

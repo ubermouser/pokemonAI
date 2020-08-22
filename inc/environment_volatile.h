@@ -72,5 +72,8 @@ public:
   void initialize();
 };
 
+
+PKAISHARED std::ostream& operator <<(std::ostream& os, const ConstEnvironmentVolatile& environment);
+
 #endif	/* ENVIRONMENT_VOLATILE_H */
 

@@ -1185,9 +1185,7 @@ PossibleEnvironments PkCU::updateState(
     const Action& actionB) const {
   PossibleEnvironments result;
 
-  if (cEnv.nv_ != nv_.get()) {
-    throw std::runtime_error("mismatched nonvolatile state - call setEnvironment first");
-  }
+  guardNonvolatileState(cEnv);
   if (!cfg_.allowInvalidMoves) {
     if (!isValidAction(cEnv, actionA, TEAM_A) || !isValidAction(cEnv, actionB, TEAM_B)) {
       throw std::runtime_error("Invalid Action");
@@ -1209,6 +1207,7 @@ ConstEnvironmentVolatile PkCU::initialState() const {
 
 
 MatchState PkCU::isGameOver(const ConstEnvironmentVolatile& envV) const {
+  guardNonvolatileState(envV);
   bool teamAisDead = envV.getTeam(TEAM_A).numTeammatesAlive() == 0;
   bool teamBisDead = envV.getTeam(TEAM_B).numTeammatesAlive() == 0;
   int status = 
@@ -1262,6 +1261,7 @@ std::vector<Action> PkCU::getValidActionsInRange(
 
 
 bool PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Action& action, size_t iTeam) const {
+  guardNonvolatileState(envV);
   ConstTeamVolatile cTV = envV.getTeam(iTeam);
   ConstTeamVolatile oTV = envV.getOtherTeam(iTeam);
   ConstPokemonVolatile cPKV = cTV.getPKV();
@@ -1339,6 +1339,13 @@ bool PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Action& act
       return false;
   }
 } // endOf is valid action
+
+
+void PkCU::guardNonvolatileState(const ConstEnvironmentVolatile& cEnv) const {
+  if (cEnv.nv_ != nv_.get()) {
+    throw std::runtime_error("mismatched nonvolatile state - call setEnvironment first");
+  }
+}
 
 
 bool saneStackProbability(std::deque<DamageComponents_t>& dComponents) {
