@@ -20,7 +20,7 @@
 struct Turn {
   EnvironmentVolatileData env;
   std::array<uint32_t, 2> activePokemon;
-  std::array<uint32_t, 2> action;
+  std::array<Action, 2> action;
   std::array<uint32_t, 2> prediction;
   std::array<fpType, 2> simpleFitness;
   std::array<fpType, 2> depth0Fitness;
@@ -96,9 +96,7 @@ public:
   Game& initialize();
 
   HeatResult rollout(const EnvironmentVolatileData& initialState);
-  HeatResult rollout() {
-    return rollout(initialState_);
-  }
+  HeatResult rollout() { return rollout(initialState_); }
 
   GameResult rollout_game(const EnvironmentVolatileData& initialState, size_t iMatch=SIZE_MAX);
   GameResult rollout_game(size_t iMatch=SIZE_MAX) {
@@ -159,8 +157,7 @@ protected:
 
   /* create a log of the current turn */
   Turn digestTurn(
-      unsigned int actionTeamA,
-      unsigned int actionTeamB,
+      const std::array<PlannerResult, 2>& actions,
       size_t resultingState,
       const ConstEnvironmentPossible& envP);
 
@@ -176,7 +173,7 @@ protected:
 
   /* prints the current action */
   void printAction(
-      const ConstTeamVolatile& currentTeam, unsigned int indexAction, unsigned int iTeam);
+      const ConstTeamVolatile& currentTeam, const Action& indexAction, unsigned int iTeam);
 
   /* prints interesting facts about the game */
   void printGameStart(size_t iMatch=SIZE_MAX);

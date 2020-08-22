@@ -1,12 +1,13 @@
 #include "../inc/pkCU.h"
 
+#include <algorithm>
 #include <iostream>
 #include <limits>
-#include <algorithm>
-
-#include <stdint.h>
 #include <math.h>
+#include <stdint.h>
 #include <stdexcept>
+#include <string>
+#include <boost/program_options.hpp>
 
 #include "../inc/fp_compare.h"
 #include "../src/fixedpoint/fixed_func.h"
@@ -14,6 +15,7 @@
 #include "../inc/plugin.h"
 #include "../inc/engine.h"
 
+namespace po = boost::program_options;
 typedef std::vector<plugin_t>::const_iterator pluginIt;
 
 #define CALLPLUGIN(retValue, pluginType, pluginFunction, ...) \
@@ -25,6 +27,22 @@ typedef std::vector<plugin_t>::const_iterator pluginIt;
     retValue = retValue | cPlugin( __VA_ARGS__ ); \
     if (retValue > 1) { break; } \
   }\
+}
+
+
+po::options_description PkCU::Config::options(
+    Config& cfg, const std::string& category, std::string prefix) {
+  Config defaults{};
+  po::options_description desc{category};
+
+  if (prefix.size() > 0) { prefix.append("-"); }
+  desc.add_options()
+      ((prefix + "engine-accuracy").c_str(),
+      po::value<size_t>(&cfg.numRandomEnvironments)->default_value(defaults.numRandomEnvironments),
+      "number of random environments to create per hit/crit 1-16.");
+
+  return desc;
+
 }
 
 
@@ -168,8 +186,8 @@ PkCUEngine::PkCUEngine(
     const PkCU& cu,
     PossibleEnvironments& stack,
     const EnvironmentVolatileData& initial,
-    size_t actionA,
-    size_t actionB) :
+    const Action& actionA,
+    const Action& actionB) :
     cfg_(cu.cfg_),
     stack_(stack),
     pluginSets_(cu.pluginSets_),
@@ -1163,8 +1181,8 @@ void PkCUEngine::updateState_move() {
 
 PossibleEnvironments PkCU::updateState(
     const ConstEnvironmentVolatile& cEnv,
-    size_t actionA,
-    size_t actionB) const {
+    const Action& actionA,
+    const Action& actionB) const {
   PossibleEnvironments result;
 
   if (cEnv.nv_ != nv_.get()) {
@@ -1215,10 +1233,11 @@ MatchState PkCU::isGameOver(const ConstEnvironmentVolatile& envV) const {
 }
 
 
-std::vector<std::array<size_t, 2> > PkCU::getAllValidActions(const ConstEnvironmentVolatile& envV) const {
-  std::vector<std::array<size_t, 2> > result; result.reserve(AT_MOVE_CONFUSED * AT_MOVE_CONFUSED);
-  auto agentMoves = getValidActions(envV, TEAM_A);
-  auto otherMoves = getValidActions(envV, TEAM_B);
+std::vector<std::array<Action, 2> > PkCU::getAllValidActions(
+    const ConstEnvironmentVolatile& envV, size_t agentTeam) const {
+  std::vector<std::array<Action, 2> > result; result.reserve(AT_MOVE_LAST * AT_MOVE_LAST);
+  auto agentMoves = getValidActions(envV, agentTeam);
+  auto otherMoves = getValidActions(envV, (agentTeam+1) % 2);
   for (auto agentMove: agentMoves) {
     for (auto otherMove: otherMoves) {
       result.push_back({agentMove, otherMove});
@@ -1229,9 +1248,10 @@ std::vector<std::array<size_t, 2> > PkCU::getAllValidActions(const ConstEnvironm
 }
 
 
-std::vector<size_t> PkCU::getValidActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
-  std::vector<size_t> result; result.reserve(AT_MOVE_CONFUSED);
-  for (size_t iAction = 0; iAction < AT_MOVE_CONFUSED; ++iAction) {
+std::vector<Action> PkCU::getValidActionsInRange(
+    const ConstEnvironmentVolatile& envV, size_t iTeam, const Action& iFirst, const Action& iLast) const {
+  std::vector<Action> result; result.reserve(iLast - iFirst);
+  for (Action iAction = iFirst; iAction < iLast; ++iAction) {
     if (isValidAction(envV, iAction, iTeam)) {
       result.push_back(iAction);
     }
@@ -1241,7 +1261,7 @@ std::vector<size_t> PkCU::getValidActions(const ConstEnvironmentVolatile& envV, 
 }
 
 
-bool PkCU::isValidAction(const ConstEnvironmentVolatile& envV, size_t action, size_t iTeam) const {
+bool PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Action& action, size_t iTeam) const {
   ConstTeamVolatile cTV = envV.getTeam(iTeam);
   ConstTeamVolatile oTV = envV.getOtherTeam(iTeam);
   ConstPokemonVolatile cPKV = cTV.getPKV();

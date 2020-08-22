@@ -171,7 +171,9 @@ enum MatchState
 #define MATCH_DRAW MATCH_MIDGAME
 
 // action types:
-#define AT_MOVE_0 0 // beginning of move range
+typedef int32_t Action;
+#define AT_MOVE_FIRST 0 // beginning of move range
+#define AT_MOVE_0 0 
 #define AT_MOVE_1 1
 #define AT_MOVE_2 2
 #define AT_MOVE_3 3 // end of default move range
@@ -184,6 +186,7 @@ enum MatchState
 #define AT_SWITCH_4 10
 #define AT_SWITCH_5 11 // end of switch range
 #define AT_ITEM_USE 12 // last user chosen item
+#define AT_MOVE_LAST 13 // one past the last action
 #define AT_MOVE_CONFUSED 13 
 
 // multithreading vars:

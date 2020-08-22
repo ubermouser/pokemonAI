@@ -252,8 +252,7 @@ void PokedexStatic::registerPlugin_orphanCount(
   // print mismatched categories
   printOrphans(mismatchedCategories, source, "plugin-categories", "category");
 
-  if (verbose >= 6)
-  {
+  if (verbose >= 6) {
     std::cerr << "INF " << __FILE__ << "." << __LINE__ << 
       " Successfully loaded  " << numPluginsLoaded << 
       " of " << numPluginsTotal <<

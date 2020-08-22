@@ -9,11 +9,10 @@
 #include "environment_volatile.h"
 #include "environment_possible.h"
 
-struct EvalResult_t
-{
+struct EvalResult_t {
   fpType fitness;
-  int8_t agentMove;
-  int8_t otherMove;
+  Action agentMove;
+  Action otherMove;
 };
 
 class Evaluator: public Name
@@ -40,8 +39,8 @@ public:
   virtual bool isInitialized() const;
 
   /* evaluate the fitness of a given environment for team iTeam */
-  virtual EvalResult_t calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) = 0;
-  virtual EvalResult_t calculateFitness(const ConstEnvironmentPossible& env, size_t iTeam) {
+  virtual EvalResult_t calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const = 0;
+  virtual EvalResult_t calculateFitness(const ConstEnvironmentPossible& env, size_t iTeam) const {
     return calculateFitness(env.getEnv(), iTeam);
   }
 };

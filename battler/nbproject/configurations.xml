@@ -94,6 +94,7 @@
           <commandLine>-mtune=native -march=native</commandLine>
           <preprocessorList>
             <Elem>DOUBLEPRECISION</Elem>
+            <Elem>GEN4_STATIC</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>_DISABLEFINEGRAINEDLOCKING</Elem>
             <Elem>_DISABLETEMPORALTRACE</Elem>

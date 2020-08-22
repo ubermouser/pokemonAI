@@ -6,48 +6,74 @@
 #include <memory>
 #include <vector>
 
+#include <boost/program_options.hpp>
+
 #include "environment_nonvolatile.h"
 #include "environment_possible.h"
 #include "evaluator.h"
+#include "fitness.h"
 #include "pkCU.h"
 #include "name.h"
 
 
-class PlannerResult
-{
-public:
-  size_t depth;
-  int bestAgentAction;
-  int bestOtherAction;
-  fpType lbFitness;
-  fpType ubFitness;
+struct PlyResult {
+  size_t depth = 0;
+  Action agentAction = -1;
+  Action otherAction = -1;
+  Fitness fitness = Fitness::worst();
+  size_t numNodes = 0;
+  double timeSpent = 0;
+};
 
-  PlannerResult(size_t _depth, int _bestAgentAction, int _bestOtherAction, fpType _lbFitness, fpType _ubFitness)
-    : depth(_depth),
-    bestAgentAction(_bestAgentAction),
-    bestOtherAction(_bestOtherAction),
-    lbFitness(_lbFitness),
-    ubFitness(_ubFitness)
-  {
-  };
+struct PlannerResult {
+  std::vector<PlyResult> atDepth;
+
+  bool hasSolution() const {
+    return !atDepth.empty();
+  }
+
+  const PlyResult& best() const {
+    return atDepth.back();
+  }
+
+  const Action& bestAgentAction() const {
+    return best().agentAction;
+  }
+
+  const Action& bestOtherAction() const {
+    return best().otherAction;
+  }
+
+
 };
 
 class Planner : public Name {
-protected:
-  std::shared_ptr<PkCU> cu_;
-  std::shared_ptr<Evaluator> eval_;
-  std::shared_ptr<const EnvironmentNonvolatile> nv_;
-
-  std::vector<PlannerResult> results_;
-
-  size_t agentTeam_;
-
-  virtual std::string baseName() const { return "planner"; }
-  virtual void resetName();
-
 public:
+  struct Config {
+    /* Maximum ply depth of computation. */
+    size_t maxDepth = 1;
+
+    /* Maximum amount of time to take per move. */
+    double maxTime = 10.;
+
+    /*
+     * verbosity level, controls status printing.
+     * 0: nothing is printed.
+     * 1: terminal planner decision is printed.
+     * 2: each completed ply decision is printed.
+     */
+    int verbosity = 0;
+
+    Config() {};
+
+    boost::program_options::options_description options(
+        Config& cfg, const std::string& category="agent options", std::string prefix="");
+  };
+
   Planner() = delete;
-  Planner(const std::string& name, size_t agentTeam=SIZE_MAX): Name(name), agentTeam_(agentTeam) {};
+  Planner(
+      const Config& cfg = Config(), const std::string& name = "Planner"):
+      Name(name), cfg_(cfg), agentTeam_(SIZE_MAX) {};
   Planner(const Planner& other) = default;
   virtual ~Planner() { };
 
@@ -77,10 +103,48 @@ public:
   virtual Planner& setTeam(size_t iTeam) { agentTeam_ = iTeam; return *this; };
 
   /* generate an action */
-  virtual uint32_t generateSolution(const ConstEnvironmentPossible& origin) = 0;
+  virtual PlannerResult generateSolution(const ConstEnvironmentPossible& origin) const;
+  virtual PlyResult generateSolutionAtDepth(
+      const ConstEnvironmentPossible& origin, size_t maxPly) const = 0;
+protected:
+  Config cfg_;
 
-  virtual const std::vector<PlannerResult>& getDetailedResults() const { return results_; };
-  virtual void clearResults() { results_.clear(); };
+  /* state transition engine */
+  std::shared_ptr<PkCU> cu_;
+
+  /* state evaluator */
+  std::shared_ptr<Evaluator> eval_;
+
+  /* nonvolatile environment description */
+  std::shared_ptr<const EnvironmentNonvolatile> nv_;
+
+  /* team that this agent represents */
+  size_t agentTeam_;
+
+  virtual size_t maxImplDepth() const { return SIZE_MAX; }
+  virtual bool isEvaluatorRequired() const { return true; }
+
+  virtual std::string baseName() const { return "Planner"; }
+  virtual void resetName();
+
+  virtual Fitness evaluateLeaf(
+      const ConstEnvironmentPossible& origin,
+      const Action& agentAction,
+      const Action& otherAction,
+      const Fitness& lowCutoff = Fitness::worst(),
+      size_t* nodesEvaluated=NULL) const {
+    return evaluateLeaf(
+        origin, agentAction, otherAction, lowCutoff, Fitness::best(), nodesEvaluated);
+  }
+  virtual Fitness evaluateLeaf(
+      const ConstEnvironmentPossible& origin,
+      const Action& agentAction,
+      const Action& otherAction,
+      const Fitness& lowCutoff = Fitness::worst(),
+      const Fitness& highCutoff = Fitness::best(),
+      size_t* nodesEvaluated=NULL) const;
+
+  virtual void printSolution(const PlannerResult& result, bool isLast) const;
 };
 
 #endif /* PLANNER_H */

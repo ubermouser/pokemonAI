@@ -16,7 +16,7 @@
 class EvaluatorMonteCarlo : public Evaluator {
 public:
   struct Config {
-    size_t maxRollouts = 1000;
+    size_t maxRollouts = 250;
 
     size_t maxPlies = 125;
 
@@ -33,11 +33,11 @@ public:
 
   virtual bool isInitialized() const override;
 
-  virtual EvalResult_t calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) override;
+  virtual EvalResult_t calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const override;
 protected:
   Config cfg_;
 
-  std::shared_ptr<Game> game_;
+  mutable std::shared_ptr<Game> game_;
 };
 
 #endif /* EVALUATOR_MONTECARLO_H */

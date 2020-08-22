@@ -186,7 +186,7 @@ GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_
   
   for (iPly = 0; iPly < cfg_.maxPlies && (matchState == MATCH_MIDGAME); ++iPly) {
     // determine which move the teams will use:
-    std::array<uint32_t, 2> actions;
+    std::array<PlannerResult, 2> actions;
     for (size_t iTeam = 0; iTeam != 2; ++iTeam) {
       actions[iTeam] = agents_[iTeam]->generateSolution(envP);
     }
@@ -194,13 +194,13 @@ GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_
     // print out the agent's moves:
     if (cfg_.verbosity >= 3) {
       for (size_t iTeam = 0; iTeam != 2; ++iTeam) {
-        printAction(envP.getEnv().getTeam(iTeam), actions[iTeam], iTeam);
+        printAction(envP.getEnv().getTeam(iTeam), actions[iTeam].bestAgentAction(), iTeam);
       }
     }
 
     // predict what will occur given these actions and their probabilities
     PossibleEnvironments possibleEnvironments = cu_->updateState(
-        envP, actions[TEAM_A], actions[TEAM_B]);
+        envP, actions[TEAM_A].bestAgentAction(), actions[TEAM_B].bestAgentAction());
     assert(possibleEnvironments.getNumUnique() > 0);
 
     // select the next environment, either by user choice or by random chance:
@@ -219,7 +219,7 @@ GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_
       matchState = cu_->isGameOver(nextEnvironment);
 
       // create a log of this turn:
-      turnLog.push_back(digestTurn(actions[TEAM_A], actions[TEAM_B], iLastEnvironment, envP));
+      turnLog.push_back(digestTurn(actions, iLastEnvironment, envP));
 
       // remove a ply if the transition was a dummy move:
       if (nextEnvironment.hasFreeMove(TEAM_A) || nextEnvironment.hasFreeMove(TEAM_B)) {
@@ -249,30 +249,20 @@ GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_
 
 
 Turn Game::digestTurn(
-    unsigned int actionTeamA,
-    unsigned int actionTeamB,
+    const std::array<PlannerResult, 2>& actions,
     size_t resultingState,
     const ConstEnvironmentPossible& envP) {
   Turn cTurn{};
 
   for (size_t iTeam = 0; iTeam < 2; iTeam++) {
+    const PlannerResult& action = actions[iTeam];
     // set simple fitness to fitness as it would be evaluated depth 0 by the simple non perceptron evaluation function
     fpType simpleFitness = eval_->calculateFitness(envP.getEnv(), iTeam).fitness;
     fpType initialFitness, finalFitness;
-    if (agents_[iTeam] != NULL) {
-      const std::vector<PlannerResult>& results = agents_[iTeam]->getDetailedResults();
-      // if the agent for this team has been initialized, grab its collected fitnesses:
-      if (results.empty()) {
-        initialFitness = simpleFitness; finalFitness = simpleFitness;
-      } else {
-        const PlannerResult& iResult = results.front();
-        const PlannerResult& fResult = results.back();
-
-        initialFitness = (iResult.lbFitness + iResult.ubFitness) / 2.0;
-        finalFitness = (fResult.lbFitness + fResult.ubFitness) / 2.0;
-      }
+    if (action.hasSolution()) {
+        initialFitness = action.atDepth.front().fitness.value();
+        finalFitness = action.atDepth.back().fitness.value();
     } else {
-      // or just use the simple evaluation function if no agent was created
       initialFitness = simpleFitness;
       finalFitness = simpleFitness;
     }
@@ -283,8 +273,8 @@ Turn Game::digestTurn(
     cTurn.depthMaxFitness[iTeam] = finalFitness;
   } // endOf foreach team
 
-  cTurn.action[TEAM_A] = actionTeamA;
-  cTurn.action[TEAM_B] = actionTeamB;
+  cTurn.action[TEAM_A] = actions[TEAM_A].bestAgentAction();
+  cTurn.action[TEAM_B] = actions[TEAM_B].bestAgentAction();
   cTurn.stateSelected = (uint32_t) resultingState;
   cTurn.probability = envP.getProbability().to_double();
   cTurn.env = envP.getEnv().data();
@@ -541,32 +531,32 @@ void Game::incrementScore(int matchState, std::array<uint32_t, 2>& score) {
 
 
 void Game::printAction(
-    const ConstTeamVolatile& cTeam, unsigned int indexAction, unsigned int iTeam) {
+    const ConstTeamVolatile& cTeam, const Action& iAction, unsigned int iTeam) {
   //const TeamNonVolatile& cTeam = nv_->getTeam(iTeam);
-  if (indexAction >= AT_MOVE_0 && indexAction <= AT_MOVE_3) {
+  if (iAction >= AT_MOVE_0 && iAction <= AT_MOVE_3) {
     std::clog 
       << "T" << (iTeam==TEAM_A?"A":"B") <<": " 
       << cTeam.nv().getName() << " - "
       << cTeam.getICPKV() << ": "
       << cTeam.getPKV().nv().getName() << " used "
-      << (indexAction - AT_MOVE_0) << "-" 
-      << cTeam.getPKV().getMV(indexAction)
+      << (iAction - AT_MOVE_0) << "-"
+      << cTeam.getPKV().getMV(iAction)
       << "!\n";
-  } else if (indexAction >= AT_SWITCH_0 && indexAction <= AT_SWITCH_5) {
+  } else if (iAction >= AT_SWITCH_0 && iAction <= AT_SWITCH_5) {
     std::clog 
       << "T" << (iTeam==TEAM_A?"A":"B") <<": " 
       << cTeam.nv().getName() << " - "
       << cTeam.getICPKV() << ": "
       << cTeam.getPKV().nv().getName() << " is switching out with "
-      << (indexAction - AT_SWITCH_0) << ": "
-      << cTeam.teammate(indexAction - AT_SWITCH_0).nv().getName() << "!\n";
-  } else if (indexAction == AT_MOVE_NOTHING) {
+      << (iAction - AT_SWITCH_0) << ": "
+      << cTeam.teammate(iAction - AT_SWITCH_0).nv().getName() << "!\n";
+  } else if (iAction == AT_MOVE_NOTHING) {
     std::clog 
       << "T" << (iTeam==TEAM_A?"A":"B") <<": " 
       << cTeam.nv().getName() << " - "
       << cTeam.getICPKV() << ": "
       << cTeam.getPKV().nv().getName() << " waited for a turn!\n";
-  } else if (indexAction == AT_MOVE_STRUGGLE) {
+  } else if (iAction == AT_MOVE_STRUGGLE) {
     std::clog 
       << "T" << (iTeam==TEAM_A?"A":"B") <<": " 
       << cTeam.nv().getName() << " - "
@@ -580,7 +570,7 @@ void Game::printAction(
       << cTeam.nv().getName() << " - "
       << cTeam.getICPKV() << ": "
       << cTeam.getPKV().nv().getName() << " chose unknown action "
-      << indexAction << "!\n";
+      << iAction << "!\n";
   }
 }
 

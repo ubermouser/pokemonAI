@@ -6,29 +6,25 @@
 
 class PlannerMax : public Planner {
 public:
-  PlannerMax(size_t agentTeam=SIZE_MAX) : Planner("max_planner-NULLEVAL", agentTeam) {};
+  PlannerMax(const Planner::Config& cfg = Planner::Config()) : Planner(cfg) {};
   PlannerMax(const PlannerMax& other) = default;
   
   virtual ~PlannerMax() {};
 
-  virtual std::string baseName() const override { return "max_planner"; }
+  virtual std::string baseName() const override { return "MaxPlanner"; }
 
   virtual PlannerMax* clone() const override { return new PlannerMax(*this); }
 
   virtual PlannerMax& setEngine(const std::shared_ptr<PkCU>& cu) override;
-  virtual PlannerMax& setEngine(const PkCU& cu) {
+  virtual PlannerMax& setEngine(const PkCU& cu) override {
+    // TODO(@drendleman) why do we need to override this?
     return setEngine(std::make_shared<PkCU>(cu));
   }
 
-  virtual uint32_t generateSolution(const ConstEnvironmentPossible& origin) override;
+  virtual size_t maxImplDepth() const override { return 1; }
 
-  static uint32_t generateSolution(
-      PkCU& cu,
-      Evaluator& eval,
-      const ConstEnvironmentPossible& env,
-      size_t _agentTeam,
-      size_t* nodesEvaluated = NULL,
-      std::vector<PlannerResult>* results = NULL);
+  virtual PlyResult generateSolutionAtDepth(
+      const ConstEnvironmentPossible& origin, size_t maxPly) const override;
 };
 
 #endif /* PLANNER_MAX_H */

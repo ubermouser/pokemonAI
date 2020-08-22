@@ -14,27 +14,27 @@ protected:
    * AT_SWITCH_0-5: pokemon switches out for pokemon n-6
    * AT_ITEM_USE: pokemon uses an item (not implemented)
    */
-  unsigned int actionSelect(const ConstEnvironmentVolatile& env);
+  int32_t actionSelect(const ConstEnvironmentVolatile& env) const;
 
   /*
    * Prints all possible actions a given pokemon may take to stdout
    */
-  void printActions(const ConstEnvironmentVolatile& env);
+  void printActions(const ConstEnvironmentVolatile& env) const;
 
-  void resetName() override { setName(ident); }
+  virtual std::string baseName() const override { return "HumanPlanner"; }
 
 public:
-  PlannerHuman(size_t agentTeam=SIZE_MAX) : Planner(ident, agentTeam) {};
+  PlannerHuman(const Config& cfg = Config()) : Planner(cfg, ident) {};
   PlannerHuman(const PlannerHuman& other) = default;
   ~PlannerHuman() { };
 
-  PlannerHuman* clone() const override { return new PlannerHuman(*this); }
+  virtual PlannerHuman* clone() const override { return new PlannerHuman(*this); }
 
-  virtual bool isInitialized() const override;
+  virtual size_t maxImplDepth() const override { return 1; }
+  virtual bool isEvaluatorRequired() const override { return false; }
 
-  const std::string& getName() const override { return ident; };
-
-  uint32_t generateSolution(const ConstEnvironmentPossible& origin) override;
+  virtual PlyResult generateSolutionAtDepth(
+      const ConstEnvironmentPossible& origin, size_t maxPly) const override;
 };
 
 #endif /* PLANNER_HUMAN_H */

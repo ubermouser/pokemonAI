@@ -1,15 +1,17 @@
 #ifndef PKAI_CU_H
 #define	PKAI_CU_H
 
-#include "../inc/pkai.h"
+#include "pkai.h"
 
 #include <array>
 #include <assert.h>
 #include <deque>
 #include <memory>
 #include <stdint.h>
+#include <string>
 #include <vector>
 #include <utility>
+#include <boost/program_options.hpp>
 
 #include "environment_nonvolatile.h"
 #include "environment_possible.h"
@@ -82,6 +84,11 @@ public:
     bool allowInvalidMoves = false;
 
     Config(){};
+
+    static boost::program_options::options_description options(
+        Config& cfg,
+        const std::string& category="engine configuration",
+        std::string prefix = "");
   };
 
   PkCU(const Config& cfg = Config()): cfg_(cfg) {}
@@ -114,12 +121,12 @@ public:
    * AT_SWITCH_0-5: pokemon switches out for pokemon n-6
    * AT_ITEM_USE: pokemon uses an item (not implemented)
    * 
-   * returns: number of unique environments in vector
+   * returns: unique environments in a collection
    */
   PossibleEnvironments updateState(
-      const ConstEnvironmentVolatile& cEnv, size_t actionA, size_t actionB) const;
+      const ConstEnvironmentVolatile& cEnv, const Action& actionA, const Action& actionB) const;
   PossibleEnvironments updateState(
-      const ConstEnvironmentPossible& cEnvP, size_t actionA, size_t actionB) const {
+      const ConstEnvironmentPossible& cEnvP, const Action& actionA, const Action& actionB) const {
     return updateState(cEnvP.getEnv(), actionA, actionB);
   };
 
@@ -127,12 +134,20 @@ public:
   ConstEnvironmentVolatile initialState() const;
 
   /* Return a collection of all valid actions for the given state. */
-  std::vector<size_t> getValidActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const;
-  std::vector<std::array<size_t, 2> > getAllValidActions(const ConstEnvironmentVolatile& envV) const;
+  std::vector<Action> getValidActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
+    return getValidActionsInRange(envV, iTeam, AT_MOVE_FIRST, AT_MOVE_LAST);
+  }
+  std::vector<Action> getValidMoveActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
+    return getValidActionsInRange(envV, iTeam, AT_MOVE_0, AT_MOVE_NOTHING + 1);
+  }
+  std::vector<Action> getValidSwapActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
+    return getValidActionsInRange(envV, iTeam, AT_SWITCH_0, AT_SWITCH_5 + 1);
+  }
+  std::vector<std::array<Action, 2> > getAllValidActions(const ConstEnvironmentVolatile& envV, size_t agentTeam=TEAM_A) const;
 
   /* determines whether a given action is a selectable one, given the current state */
-  bool isValidAction(const ConstEnvironmentVolatile& envV, size_t action, size_t iTeam) const;
-  bool isValidAction(const ConstEnvironmentPossible& envV, size_t action, size_t iTeam) const {
+  bool isValidAction(const ConstEnvironmentVolatile& envV, const Action& action, size_t iTeam) const;
+  bool isValidAction(const ConstEnvironmentPossible& envV, const Action& action, size_t iTeam) const {
     return isValidAction(envV.getEnv(), action, iTeam);
   }
 
@@ -142,11 +157,11 @@ public:
     return isGameOver(envV.getEnv());
   }
 
-  static bool isMoveAction(size_t iAction) {
+  static bool isMoveAction(const Action& iAction) {
     return (iAction >= AT_MOVE_0 && iAction <= AT_MOVE_3) || (iAction == AT_MOVE_STRUGGLE);
   };
 
-  static bool isSwitchAction(size_t iAction) {
+  static bool isSwitchAction(const Action& iAction) {
     return (iAction >= AT_SWITCH_0 && iAction <= AT_SWITCH_5);
   };
 
@@ -161,6 +176,10 @@ protected:
 
   /* The default state for a given nonvolatile state */
   EnvironmentVolatileData initialState_;
+
+  
+  std::vector<Action> getValidActionsInRange(
+      const ConstEnvironmentVolatile& envV, size_t iTeam, const Action& iStart, const Action& iEnd) const;
 
   /* if iTeam = SIZE_MAX, insert for both teams. if iCTeammate =  SIZE_MAX, insert for all teammates. True if non-duplicate */
   size_t insertPluginHandler(plugin_t& cPlugin, size_t pluginType, size_t iNTeammate = SIZE_MAX);
@@ -195,7 +214,7 @@ protected:
   std::array<size_t, 2> iTeams_;
 
   /* an array of each team's action. 0 is current team, 1 is other team */
-  std::array<size_t, 2> iActions_;
+  std::array<Action, 2> iActions_;
 
   /* iterator - the environment that the current operation is creating values from */
   size_t iBase_;
@@ -205,8 +224,8 @@ public:
       const PkCU& cu,
       PossibleEnvironments& stack,
       const EnvironmentVolatileData& initial,
-      size_t actionA,
-      size_t actionB);
+      const Action& actionA,
+      const Action& actionB);
 
   void updateState();
 

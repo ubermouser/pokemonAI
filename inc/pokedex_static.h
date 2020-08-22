@@ -8,7 +8,7 @@
 #ifndef POKEDEX_STATIC_H
 #define POKEDEX_STATIC_H
 
-#include "../inc/pkai.h"
+#include "pkai.h"
 
 #include <string>
 #include <boost/program_options.hpp>

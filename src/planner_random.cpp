@@ -7,22 +7,16 @@
 const std::string PlannerRandom::ident = "Random_Planner-NULLEVAL";
 
 
-bool PlannerRandom::isInitialized() const {
-  if (agentTeam_ >= 2) { return false; }
-  if (cu_ == NULL) { return false; }
-  
-  return true; 
-}
-
-
-uint32_t PlannerRandom::generateSolution(const ConstEnvironmentPossible& origin) {
+PlyResult PlannerRandom::generateSolutionAtDepth(
+    const ConstEnvironmentPossible& origin, size_t maxPly) const {
+  PlyResult result;
   // determine the set of all valid actions:
   auto validMoves = cu_->getValidActions(origin, agentTeam_);
-  if (validMoves.empty()) {
-    return UINT32_MAX;
-  } else {
+  if (!validMoves.empty()) {
     // choose a completely random action to return:
     size_t iAction = rand() % validMoves.size();
-    return validMoves[iAction];
+    result.agentAction = validMoves[iAction];
   }
+
+  return result;
 };

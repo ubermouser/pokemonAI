@@ -9,6 +9,7 @@
         <itemPath>../inc/environment_nonvolatile.h</itemPath>
         <itemPath>../inc/environment_possible.h</itemPath>
         <itemPath>../inc/environment_volatile.h</itemPath>
+        <itemPath>../inc/fitness.h</itemPath>
         <itemPath>../inc/game.h</itemPath>
         <itemPath>../inc/item.h</itemPath>
         <itemPath>../inc/move.h</itemPath>
@@ -40,6 +41,7 @@
         <itemPath>../inc/planner.h</itemPath>
         <itemPath>../inc/planner_human.h</itemPath>
         <itemPath>../inc/planner_max.h</itemPath>
+        <itemPath>../inc/planner_maximin.h</itemPath>
         <itemPath>../inc/planner_random.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="toolbox" projectFiles="true">
@@ -95,6 +97,7 @@
         <itemPath>../src/planner.cpp</itemPath>
         <itemPath>../src/planner_human.cpp</itemPath>
         <itemPath>../src/planner_max.cpp</itemPath>
+        <itemPath>../src/planner_maximin.cpp</itemPath>
         <itemPath>../src/planner_random.cpp</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="toolbox" projectFiles="true">
@@ -184,6 +187,8 @@
       </item>
       <item path="../inc/evaluator_simple.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../inc/fitness.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../inc/fp_compare.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/game.h" ex="false" tool="3" flavor2="0">
@@ -215,6 +220,8 @@
       <item path="../inc/planner_human.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/planner_max.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/planner_maximin.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/planner_random.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -295,6 +302,8 @@
       <item path="../src/planner_human.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/planner_max.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/planner_maximin.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/planner_random.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -412,6 +421,7 @@
           <commandLine>-mtune=native -march=native</commandLine>
           <preprocessorList>
             <Elem>DOUBLEPRECISION</Elem>
+            <Elem>GEN4_STATIC</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>PKAI_EXPORT</Elem>
             <Elem>_DISABLEFINEGRAINEDLOCKING</Elem>
@@ -446,6 +456,8 @@
       </item>
       <item path="../inc/evaluator_simple.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../inc/fitness.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../inc/fp_compare.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/game.h" ex="false" tool="3" flavor2="0">
@@ -477,6 +489,8 @@
       <item path="../inc/planner_human.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/planner_max.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/planner_maximin.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/planner_random.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -557,6 +571,8 @@
       <item path="../src/planner_human.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/planner_max.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/planner_maximin.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/planner_random.cpp" ex="false" tool="1" flavor2="0">
       </item>

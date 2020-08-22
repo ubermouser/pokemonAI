@@ -66,8 +66,8 @@ fpType EvaluatorSimple::calculateFitness(const ConstEnvironmentVolatile& env, si
 };
 
 
-EvalResult_t EvaluatorSimple::calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam)
-{
+EvalResult_t EvaluatorSimple::calculateFitness(
+    const ConstEnvironmentVolatile& env, size_t iTeam) const {
   EvalResult_t result = { calculateFitness(env, iTeam, bias), -1, -1 };
   return result;
 };

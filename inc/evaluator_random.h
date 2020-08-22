@@ -12,9 +12,9 @@ public:
   ~EvaluatorRandom() { };
   EvaluatorRandom(): Evaluator("Random_Evaluator") { };
 
-  EvaluatorRandom* clone() const { return new EvaluatorRandom(*this); }
+  EvaluatorRandom* clone() const override { return new EvaluatorRandom(*this); }
 
-  EvalResult_t calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam);
+  EvalResult_t calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const override;
 };
 
 #endif /* RANDOM_EVALUATOR_H */

@@ -32,9 +32,10 @@ bool EvaluatorMonteCarlo::isInitialized() const {
 }
 
 
-EvalResult_t EvaluatorMonteCarlo::calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) {
+EvalResult_t EvaluatorMonteCarlo::calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const {
   // perform a rollout on each state:
   HeatResult result = game_->rollout(env);
 
-  return EvalResult_t{fpType(result.score[iTeam]) / fpType(result.score[0] + result.score[1]), -1, -1};
+  return EvalResult_t{
+    fpType(result.score[iTeam]) / fpType(result.score[0] + result.score[1]), -1, -1};
 }

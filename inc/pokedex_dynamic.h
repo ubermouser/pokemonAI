@@ -8,14 +8,14 @@
 #ifndef POKEDEX_DYNAMIC_H
 #define POKEDEX_DYNAMIC_H
 
-#include "../inc/pkai.h"
+#include "pkai.h"
 
 #include <memory>
 
 #include <boost/dll/shared_library.hpp>
 #include <boost/program_options.hpp>
 
-#include "../inc/pokedex_static.h"
+#include "pokedex_static.h"
 
 class PKAISHARED PokedexDynamic : public PokedexStatic {
 public:

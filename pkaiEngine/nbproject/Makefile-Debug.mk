@@ -58,6 +58,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/511e4115/planner.o \
 	${OBJECTDIR}/_ext/511e4115/planner_human.o \
 	${OBJECTDIR}/_ext/511e4115/planner_max.o \
+	${OBJECTDIR}/_ext/511e4115/planner_maximin.o \
 	${OBJECTDIR}/_ext/511e4115/planner_random.o \
 	${OBJECTDIR}/_ext/511e4115/pluggable.o \
 	${OBJECTDIR}/_ext/511e4115/pokedex.o \
@@ -225,6 +226,11 @@ ${OBJECTDIR}/_ext/511e4115/planner_max.o: ../src/planner_max.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planner_max.o ../src/planner_max.cpp
+
+${OBJECTDIR}/_ext/511e4115/planner_maximin.o: ../src/planner_maximin.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planner_maximin.o ../src/planner_maximin.cpp
 
 ${OBJECTDIR}/_ext/511e4115/planner_random.o: ../src/planner_random.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
@@ -616,6 +622,19 @@ ${OBJECTDIR}/_ext/511e4115/planner_max_nomain.o: ${OBJECTDIR}/_ext/511e4115/plan
 	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planner_max_nomain.o ../src/planner_max.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/_ext/511e4115/planner_max.o ${OBJECTDIR}/_ext/511e4115/planner_max_nomain.o;\
+	fi
+
+${OBJECTDIR}/_ext/511e4115/planner_maximin_nomain.o: ${OBJECTDIR}/_ext/511e4115/planner_maximin.o ../src/planner_maximin.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/planner_maximin.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planner_maximin_nomain.o ../src/planner_maximin.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/511e4115/planner_maximin.o ${OBJECTDIR}/_ext/511e4115/planner_maximin_nomain.o;\
 	fi
 
 ${OBJECTDIR}/_ext/511e4115/planner_random_nomain.o: ${OBJECTDIR}/_ext/511e4115/planner_random.o ../src/planner_random.cpp 

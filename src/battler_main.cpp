@@ -13,6 +13,7 @@
 #include <inc/planner_random.h>
 #include <inc/planner_human.h>
 #include <inc/planner_max.h>
+#include <inc/planner_maximin.h>
 
 namespace po = boost::program_options;
 
@@ -21,6 +22,10 @@ struct Config {
   PokedexStatic::Config pokedex;
   Game::Config game;
   PkCU::Config engine;
+  PkCU::Config agentEngine;
+
+  Planner::Config agent_a;
+  Planner::Config agent_b;
 
   std::string team_a = "teams/hexTeamA.txt";
   std::string team_b = "teams/hexTeamD.txt";
@@ -48,6 +53,10 @@ struct Config {
         "static verbosity level.");
     desc.add(cfg.pokedex.options(cfg.pokedex));
     desc.add(cfg.game.options(cfg.game));
+    desc.add(cfg.engine.options(cfg.engine, "engine configuration"));
+    desc.add(cfg.engine.options(cfg.engine, "agent-engine configuration", "agent"));
+    desc.add(cfg.agent_a.options(cfg.agent_a, "agent-a planner configuration", "a"));
+    desc.add(cfg.agent_b.options(cfg.agent_b, "agent-b planner configuration", "b"));
 
     return desc;
   }
@@ -78,6 +87,7 @@ int main(int argc, char** argv) {
 
   auto pokedex = PokedexStatic(cfg.pokedex);
   auto engine = PkCU(cfg.engine);
+  auto agentEngine = PkCU(cfg.agentEngine);
 
   auto team_a = TeamNonVolatile::loadFromFile(cfg.team_a);
   auto team_b = TeamNonVolatile::loadFromFile(cfg.team_b);
@@ -86,8 +96,10 @@ int main(int argc, char** argv) {
       .setEngine(engine)
       .setTeam(0, team_a)
       .setTeam(1, team_b)
-      .setPlanner(0, PlannerMax().setEngine(engine).setEvaluator(EvaluatorMonteCarlo()))
-      .setPlanner(1, PlannerMax().setEngine(engine).setEvaluator(EvaluatorMonteCarlo()));
+      //.setPlanner(0, PlannerHuman().setEngine(engine))
+      //.setPlanner(1, PlannerHuman().setEngine(engine));
+      .setPlanner(0, PlannerMaxiMin(cfg.agent_a).setEngine(agentEngine).setEvaluator(EvaluatorMonteCarlo()))
+      .setPlanner(1, PlannerMax(cfg.agent_b).setEngine(agentEngine).setEvaluator(EvaluatorMonteCarlo()));
 
   game.rollout();
   std::exit(EXIT_SUCCESS);

@@ -20,7 +20,7 @@ public:
 
   bool isInitialized() const override;
 
-  EvalResult_t calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) override;
+  EvalResult_t calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const override;
 };
 
 #endif /* SIMPLE_EVALUATOR_H */

@@ -9,65 +9,48 @@
 #include "../inc/environment_possible.h"
 #include "../inc/environment_nonvolatile.h"
 
-const std::string PlannerHuman::ident = "Human_Planner-NULLEVAL";
+const std::string PlannerHuman::ident = "HumanPlanner-NULLEVAL";
 
 
-bool PlannerHuman::isInitialized() const {
-  if (agentTeam_ >= 2) { return false; }
-  if (nv_ == NULL) { return false; }
-  if (cu_ == NULL) { return false; }
-  
-  return true; 
-}
-
-
-uint32_t PlannerHuman::generateSolution(const ConstEnvironmentPossible& origin)
-{
+PlyResult PlannerHuman::generateSolutionAtDepth(
+    const ConstEnvironmentPossible& origin, size_t maxPly) const {
   std::cout << origin;
   printActions(origin.getEnv());
-  
-  return actionSelect(origin.getEnv());
+
+  PlyResult result;
+  result.agentAction = actionSelect(origin.getEnv());
+  return result;
 };
 
 
-void PlannerHuman::printActions(const ConstEnvironmentVolatile& env)
-{
+void PlannerHuman::printActions(const ConstEnvironmentVolatile& env) const {
   const ConstTeamVolatile cTeam = env.getTeam(agentTeam_);
   const ConstPokemonVolatile cPokemon = cTeam.getPKV();
   std::cout << "Active pokemon: \n";
   
   // if this is false, then the only move this pokemon may use is "thrash"
-  for (unsigned int iAction = 0; iAction < cPokemon.nv().getNumMoves(); iAction++) {
-    const ConstMoveVolatile cMove = cPokemon.getMV(AT_MOVE_0 + iAction);
-
-    if (cu_->isValidAction(env, AT_MOVE_0 + iAction, agentTeam_) == false) { continue; }
-    
-    std::cout << "\t" << (AT_MOVE_0 + iAction) << "-" << cMove << "\n";
+  for (const auto& action : cu_->getValidMoveActions(env, agentTeam_)) {
+    if (action == AT_MOVE_STRUGGLE) {
+      std::cout << "\t" << (AT_MOVE_STRUGGLE) << "-\"Struggle\" -/-\n";
+    } else if (action == AT_MOVE_NOTHING) {
+      std::cout << "\t" << (AT_MOVE_NOTHING) << "-\"Nothing\" -/-\n";
+    } else {
+      const ConstMoveVolatile cMove = cPokemon.getMV(action);
+      std::cout << "\t" << (action) << "-" << cMove << "\n";
+    }
   }
-  
-  if (cu_->isValidAction(env, AT_MOVE_STRUGGLE, agentTeam_)) { // print information about struggle move
-    std::cout << "\t" << (AT_MOVE_STRUGGLE) << "-\"Struggle\" -/-\n"; 
-  }
-  
-  if (cu_->isValidAction(env, AT_MOVE_NOTHING, agentTeam_)) {
-    std::cout << "\t" << (AT_MOVE_NOTHING) << "-\"Nothing\" -/-\n"; 
-  }
-  
-  if (cTeam.nv().getNumTeammates() > 1)
-  {
+  if (cTeam.nv().getNumTeammates() > 1) {
     std::cout << "Or switch to a sidelined pokemon: \n";
-    for (unsigned int iTeammate = 0; iTeammate < cTeam.nv().getNumTeammates(); iTeammate++) {
-      if (cu_->isValidAction(env, AT_SWITCH_0 + iTeammate, agentTeam_) == false) { continue; }
-      
-      std::cout << "\t" << (AT_SWITCH_0 + iTeammate) << "-" << cTeam.teammate(iTeammate);
+    for (const auto& action: cu_->getValidSwapActions(env, agentTeam_)) {
+      std::cout << "\t" << (action) << "-" << cTeam.teammate(action - AT_SWITCH_0);
     }
   }
 };
 
 
-uint32_t PlannerHuman::actionSelect(const ConstEnvironmentVolatile& env) {
+int32_t PlannerHuman::actionSelect(const ConstEnvironmentVolatile& env) const {
   std::string input;
-  uint32_t action;
+  int32_t action;
   
   do {
     std::cout << "Please select the index of your desired action for Team " << (agentTeam_==TEAM_A?"A":"B") << ":\n";
