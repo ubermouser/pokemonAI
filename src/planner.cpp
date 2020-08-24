@@ -88,8 +88,15 @@ PlannerResult Planner::generateSolution(const ConstEnvironmentVolatile& origin) 
   PlannerResult result; result.atDepth.reserve(cfg_.maxDepth);
   // keep an elapsed time counter
   auto start = std::chrono::steady_clock::now();
-  for (size_t iDepth = 1; iDepth <= cfg_.maxDepth; ++iDepth) {
-    auto plyResult = generateSolutionAtDepth(origin, iDepth);
+
+  // evaluate 0..nth state:
+  for (size_t iDepth = (eval_==NULL)?1:0; iDepth <= cfg_.maxDepth; ++iDepth) {
+    PlyResult plyResult;
+    if (iDepth == 0) {
+      plyResult = generateSolutionAtLeaf(origin);
+    } else {
+      plyResult = generateSolutionAtDepth(origin, iDepth);
+    }
     plyResult.depth = iDepth;
 
     // determine time between last checkpoint and current checkpoint:
@@ -102,6 +109,20 @@ PlannerResult Planner::generateSolution(const ConstEnvironmentVolatile& origin) 
     // break loop early if we are over maximum time
     if (plyResult.timeSpent > cfg_.maxTime) { break; }
   }
+
+  return result;
+}
+
+
+PlyResult Planner::generateSolutionAtLeaf(const ConstEnvironmentVolatile& origin) const {
+  assert(eval_ != NULL);
+
+  EvalResult_t baseEval = eval_->calculateFitness(origin, agentTeam_);
+  PlyResult result;
+  result.agentAction = baseEval.agentMove;
+  result.otherAction = baseEval.otherMove;
+  result.fitness = Fitness(baseEval.fitness, 1.);
+  result.numNodes = 1;
 
   return result;
 }

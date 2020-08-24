@@ -132,15 +132,7 @@ protected:
   virtual PlyResult generateSolutionAtDepth(
       const ConstEnvironmentVolatile& origin, size_t maxPly) const = 0;
 
-  virtual Fitness evaluateLeaf(
-      const ConstEnvironmentVolatile& origin,
-      const Action& agentAction,
-      const Action& otherAction,
-      const Fitness& lowCutoff = Fitness::worst(),
-      size_t* nodesEvaluated=NULL) const {
-    return recurse_gamma(
-        origin, agentAction, otherAction, 0, lowCutoff, Fitness::best(), nodesEvaluated);
-  }
+  virtual PlyResult generateSolutionAtLeaf(const ConstEnvironmentVolatile& origin) const;
 
   /* Recurse through agent and other actions, pruning nodes above high and below low */
   virtual Fitness recurse_alphabeta(
@@ -161,7 +153,7 @@ protected:
       size_t* nodesEvaluated=NULL) const;
 
   /* generate all possible environments from a given origin, agent and other action pair. */
-  PossibleEnvironments generateStates(
+  virtual PossibleEnvironments generateStates(
       const ConstEnvironmentVolatile& origin,
       const Action& agentAction,
       const Action& otherAction) const;

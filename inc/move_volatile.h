@@ -33,6 +33,9 @@ public:
   using base_t::data;
   using base_t::nv;
 
+  /* returns percentage of move's PP remaining. */
+  fpType getPercentPP() const { return fpType(data().PPcurrent) / fpType(nv().getPPMax()); };
+
   /* returns count of this move's PP */
   uint32_t getPP() const { return data().PPcurrent; };
 

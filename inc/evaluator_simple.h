@@ -3,24 +3,44 @@
 
 #include "evaluator.h"
 
-class EvaluatorSimple: public Evaluator
-{
-protected:
-  fpType bias;
-  
+class EvaluatorSimple: public Evaluator {
 public:
-  EvaluatorSimple(fpType _bias = 0.5);
+  struct Config {
+    /* how much more heavily we weight our own fitness compared to the enemy's fitness. */
+    fpType teamBias = 0.5;
+
+    /* proportion of a move's fitness awarded for having moves left. */
+    fpType canMoveBias = 0.05;
+
+    /* proportion of a pokemon's fitness dedicated for moves. */
+    fpType movesBias = 0.1;
+
+    /* proportion of a pokemon's fitness awarded for free for being alive. */
+    fpType aliveBias = 0.05;
+
+    /* proportion of a team's fitness awarded for free for having any single pokemon alive. */
+    fpType teamAliveBias = 0.05;
+
+    Config() {};
+  };
+
+  EvaluatorSimple(const Config& cfg = Config());
   ~EvaluatorSimple() = default;
   EvaluatorSimple(const EvaluatorSimple& other) = default;
-
-  static fpType fitness_team(const ConstTeamVolatile& tV);
-  static fpType calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam, fpType bias = 0.5);
 
   EvaluatorSimple* clone() const override { return new EvaluatorSimple(*this); }
 
   bool isInitialized() const override;
 
   EvalResult_t calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const override;
+protected:
+
+  fpType fitness_move(const ConstMoveVolatile& mV) const;
+  fpType fitness_pokemon(const ConstPokemonVolatile& pV) const;
+  fpType fitness_team(const ConstTeamVolatile& tV) const;
+
+  Config cfg_;
+  
 };
 
 #endif /* SIMPLE_EVALUATOR_H */

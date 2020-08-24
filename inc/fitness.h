@@ -39,7 +39,7 @@ public:
     return fitness_t{std::numeric_limits<PrecisionType>::max(), one(), false};
   }
 
-  FitnessType(
+  explicit FitnessType(
       const PrecisionType& value = min_fitness(),
       const PrecisionType& certainty = zero()) :
       FitnessType(value, certainty, true) {}
@@ -82,7 +82,7 @@ public:
   const PrecisionType& certainty() const { return certainty_; }
   PrecisionType uncertainty() const { return one() - certainty_; }
 protected:
-  FitnessType(
+  explicit FitnessType(
       const PrecisionType& value,
       const PrecisionType& certainty,
       bool doAssertValidity) : value_(value), certainty_(certainty) {
