@@ -186,3 +186,6 @@ TEST_F(EngineTest, HiddenPower) {
   // rock_t with 30 power
   EXPECT_EQ(hidden_power.at(0).getEnv().getTeam(1).getPKV().getHP(), 233);
 }
+
+
+//TODO(@drendleman) test life-orb does not affect moves like pain-split

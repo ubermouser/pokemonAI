@@ -151,10 +151,16 @@ public:
     return isValidAction(envV.getEnv(), action, iTeam);
   }
 
-  /* determines whether a game has ended, given the current state. Returns an enum of the game's current status */
-  MatchState isGameOver(const ConstEnvironmentVolatile& envV) const;
-  MatchState isGameOver(const ConstEnvironmentPossible& envV) const {
-    return isGameOver(envV.getEnv());
+  /* returns true if the current game has ended. */
+  bool isGameOver(const ConstEnvironmentVolatile& envV) const;
+  bool isGameOver(const ConstEnvironmentPossible& envV) const {
+    return getGameState(envV) != MATCH_MIDGAME;
+  }
+
+    /* determines whether a game has ended, given the current state. Returns an enum of the game's current status */
+  MatchState getGameState(const ConstEnvironmentVolatile& envV) const;
+  MatchState getGameState(const ConstEnvironmentPossible& envV) const {
+    return getGameState(envV.getEnv());
   }
 
   static bool isMoveAction(const Action& iAction) {

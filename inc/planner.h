@@ -107,10 +107,6 @@ public:
   virtual PlannerResult generateSolution(const ConstEnvironmentPossible& origin) const {
     return generateSolution(origin.getEnv());
   }
-
-  /* generate a prediction at a specific depth */
-  virtual PlyResult generateSolutionAtDepth(
-      const ConstEnvironmentVolatile& origin, size_t maxPly) const = 0;
 protected:
   Config cfg_;
 
@@ -131,6 +127,10 @@ protected:
 
   virtual std::string baseName() const { return "Planner"; }
   virtual void resetName();
+  
+  /* generate a prediction at a specific depth */
+  virtual PlyResult generateSolutionAtDepth(
+      const ConstEnvironmentVolatile& origin, size_t maxPly) const = 0;
 
   virtual Fitness evaluateLeaf(
       const ConstEnvironmentVolatile& origin,
@@ -138,16 +138,33 @@ protected:
       const Action& otherAction,
       const Fitness& lowCutoff = Fitness::worst(),
       size_t* nodesEvaluated=NULL) const {
-    return evaluateLeaf(
-        origin, agentAction, otherAction, lowCutoff, Fitness::best(), nodesEvaluated);
+    return recurse_gamma(
+        origin, agentAction, otherAction, 0, lowCutoff, Fitness::best(), nodesEvaluated);
   }
-  virtual Fitness evaluateLeaf(
+
+  /* Recurse through agent and other actions, pruning nodes above high and below low */
+  virtual Fitness recurse_alphabeta(
       const ConstEnvironmentVolatile& origin,
-      const Action& agentAction,
-      const Action& otherAction,
+      size_t iDepth,
       const Fitness& lowCutoff = Fitness::worst(),
       const Fitness& highCutoff = Fitness::best(),
       size_t* nodesEvaluated=NULL) const;
+
+  /* Recurse through chance nodes, pruning nodes above high and below low*/
+  virtual Fitness recurse_gamma(
+      const ConstEnvironmentVolatile& origin,
+      const Action& agentAction,
+      const Action& otherAction,
+      size_t iDepth,
+      const Fitness& lowCutoff = Fitness::worst(),
+      const Fitness& highCutoff = Fitness::best(),
+      size_t* nodesEvaluated=NULL) const;
+
+  /* generate all possible environments from a given origin, agent and other action pair. */
+  PossibleEnvironments generateStates(
+      const ConstEnvironmentVolatile& origin,
+      const Action& agentAction,
+      const Action& otherAction) const;
 
   virtual void printSolution(const PlannerResult& result, bool isLast) const;
 };

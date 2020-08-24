@@ -57,7 +57,25 @@ TEST_F(PlannerTest, MaxPlannerChoosesGreedyOption) {
 
 
 TEST_F(PlannerTest, MaximinPlannerChooses1PlyOption) {
-  PlannerMax::Config cfg;
+  PlannerMaxiMin::Config cfg;
+  cfg.maxDepth = 1;
+  cfg.verbosity = 4;
+  std::unique_ptr<Planner> planner = std::make_unique<PlannerMaxiMin>(cfg);
+  planner->setTeam(TEAM_A)
+      .setEvaluator(EvaluatorSimple())
+      .setEngine(engine_)
+      .setEnvironment(environment_);
+  ASSERT_TRUE(planner->isInitialized());
+
+  auto result = planner->generateSolution(engine_->initialState());
+
+  EXPECT_EQ(result.bestAgentAction(), AT_MOVE_0);
+}
+
+
+TEST_F(PlannerTest, MaximinPlannerChooses2PlyOption) {
+  PlannerMaxiMin::Config cfg;
+  cfg.maxDepth = 2;
   cfg.verbosity = 4;
   std::unique_ptr<Planner> planner = std::make_unique<PlannerMaxiMin>(cfg);
   planner->setTeam(TEAM_A)

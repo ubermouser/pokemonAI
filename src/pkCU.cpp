@@ -1206,7 +1206,7 @@ ConstEnvironmentVolatile PkCU::initialState() const {
 }
 
 
-MatchState PkCU::isGameOver(const ConstEnvironmentVolatile& envV) const {
+MatchState PkCU::getGameState(const ConstEnvironmentVolatile& envV) const {
   guardNonvolatileState(envV);
   bool teamAisDead = envV.getTeam(TEAM_A).numTeammatesAlive() == 0;
   bool teamBisDead = envV.getTeam(TEAM_B).numTeammatesAlive() == 0;

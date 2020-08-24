@@ -29,7 +29,6 @@ PlyResult PlannerMax::generateSolutionAtDepth(
   // a count of the number of nodes evaluated:
   PlyResult result;
 
-  // TODO(@drendleman) in the case of a tie, the agent should always bias towards a damaging action
   // determine the best action based upon the evaluator's prediction:
   for (const auto& action: cu_->getValidActions(origin, agentTeam_)) {
     Fitness currentFitness = evaluateLeaf(

@@ -181,7 +181,7 @@ GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_
   if (!isInitialized_) { initialize(); }
   EnvironmentPossibleData stateData = EnvironmentPossibleData::create(initialState);
   ConstEnvironmentPossible envP{*nv_, stateData};
-  int32_t matchState = cu_->isGameOver(envP);
+  int32_t matchState = cu_->getGameState(envP);
   size_t iPly, iLastEnvironment = 0;
 
   if (cfg_.verbosity >= 2) { printGameStart(iMatch); }
@@ -218,7 +218,7 @@ GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_
     // perform state transition:
     if (!nextEnvironment.isEmpty()) {
       // determine if the current state is a terminal state, and if so end the game:
-      matchState = cu_->isGameOver(nextEnvironment);
+      matchState = cu_->getGameState(nextEnvironment);
 
       // create a log of this turn:
       turnLog.push_back(digestTurn(actions, iLastEnvironment, envP));

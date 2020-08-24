@@ -98,8 +98,8 @@ int main(int argc, char** argv) {
       .setTeam(1, team_b)
       //.setPlanner(0, PlannerHuman().setEngine(engine))
       //.setPlanner(1, PlannerHuman().setEngine(engine));
-      .setPlanner(0, PlannerMaxiMin(cfg.agent_a).setEngine(agentEngine).setEvaluator(EvaluatorMonteCarlo()))
-      .setPlanner(1, PlannerMax(cfg.agent_b).setEngine(agentEngine).setEvaluator(EvaluatorSimple()));
+      .setPlanner(0, PlannerMaxiMin(cfg.agent_a).setEngine(agentEngine).setEvaluator(EvaluatorSimple()))
+      .setPlanner(1, PlannerMaxiMin(cfg.agent_b).setEngine(agentEngine).setEvaluator(EvaluatorSimple()));
 
   game.rollout();
   std::exit(EXIT_SUCCESS);

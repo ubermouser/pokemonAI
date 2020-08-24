@@ -25,19 +25,24 @@ public:
   using fitness_t = FitnessType<PrecisionType, min_fitness_t, max_fitness_t, fitness_d>;
   static constexpr PrecisionType one() { return PrecisionType(1.0); }
   static constexpr PrecisionType zero() { return PrecisionType(0.0); }
-  static constexpr PrecisionType max_fitness() { return PrecisionType(max_fitness_t) / PrecisionType(fitness_d); }
-  static constexpr PrecisionType min_fitness() { return PrecisionType(min_fitness_t) / PrecisionType(fitness_d); }
+  static constexpr PrecisionType max_fitness() { 
+    return PrecisionType(max_fitness_t) / PrecisionType(fitness_d);
+  }
+  static constexpr PrecisionType min_fitness() { 
+    return PrecisionType(min_fitness_t) / PrecisionType(fitness_d);
+  }
 
-  static constexpr fitness_t worst() { return fitness_t{std::numeric_limits<PrecisionType>::min(), false}; }
-  static constexpr fitness_t best() { return fitness_t{std::numeric_limits<PrecisionType>::max(), false}; }
+  static constexpr fitness_t worst() { 
+    return fitness_t{std::numeric_limits<PrecisionType>::lowest(), one(), false};
+  }
+  static constexpr fitness_t best() { 
+    return fitness_t{std::numeric_limits<PrecisionType>::max(), one(), false};
+  }
 
   FitnessType(
       const PrecisionType& value = min_fitness(),
       const PrecisionType& certainty = zero()) :
-      value_(value),
-      certainty_(certainty) {
-    assertValidity();
-  };
+      FitnessType(value, certainty, true) {}
   ~FitnessType() {};
   FitnessType(const fitness_t& other) = default;
 
@@ -58,6 +63,10 @@ public:
     return *this;
   }
 
+  fitness_t expand(const PrecisionType& probability)const {
+    return fitness_t{value_, certainty_ * probability, false};
+  }
+
   bool operator <(const fitness_t& rhs) const { return upperBound() < rhs.lowerBound(); }
   bool operator <=(const fitness_t& rhs) const { return upperBound() <= rhs.lowerBound(); }
   bool operator >(const fitness_t& rhs) const { return lowerBound() > rhs.upperBound(); }
@@ -73,7 +82,10 @@ public:
   const PrecisionType& certainty() const { return certainty_; }
   PrecisionType uncertainty() const { return one() - certainty_; }
 protected:
-  FitnessType(const PrecisionType& value, bool doAssertValidity) : value_(value), certainty_(one()) {
+  FitnessType(
+      const PrecisionType& value,
+      const PrecisionType& certainty,
+      bool doAssertValidity) : value_(value), certainty_(certainty) {
     if (doAssertValidity) { assertValidity(); }
   }
 
