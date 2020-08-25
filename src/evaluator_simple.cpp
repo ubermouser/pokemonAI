@@ -2,6 +2,7 @@
 #include "../inc/evaluator_simple.h"
 
 #include <sstream>
+#include <stdexcept>
 
 #include "../inc/engine.h"
 #include "../inc/fp_compare.h"
@@ -18,15 +19,14 @@ EvaluatorSimple::EvaluatorSimple(const Config& cfg)
 };
 
 
-bool EvaluatorSimple::isInitialized() const
-{
-  if (nv_ == NULL) { return false; }
-  if (cfg_.aliveBias >= 1.0 || cfg_.aliveBias <= 0.0) { return false; }
-  if (cfg_.movesBias >= 1.0 || cfg_.movesBias <= 0.0) { return false; }
-  if (cfg_.canMoveBias >= 1.0 || cfg_.canMoveBias <= 0.0) { return false; }
-  if (cfg_.teamBias >= 1.0 || cfg_.teamBias <= 0.0) { return false; }
-  if (cfg_.teamAliveBias >= 1.0 || cfg_.teamAliveBias <= 0.0) { return false; }
-  return true;
+EvaluatorSimple& EvaluatorSimple::initialize() {
+  if (nv_ == NULL) { throw std::invalid_argument("evaluator nonvolatile environment undefined"); }
+  if (cfg_.aliveBias >= 1.0 || cfg_.aliveBias <= 0.0) { throw std::invalid_argument("aliveBias"); }
+  if (cfg_.movesBias >= 1.0 || cfg_.movesBias <= 0.0) { throw std::invalid_argument("movesBias"); }
+  if (cfg_.canMoveBias >= 1.0 || cfg_.canMoveBias <= 0.0) { throw std::invalid_argument("canMoveBias"); }
+  if (cfg_.teamBias >= 1.0 || cfg_.teamBias <= 0.0) { throw std::invalid_argument("teamBias"); }
+  if (cfg_.teamAliveBias >= 1.0 || cfg_.teamAliveBias <= 0.0) { throw std::invalid_argument("teamAliveBias"); }
+  return *this;
 }
 
 

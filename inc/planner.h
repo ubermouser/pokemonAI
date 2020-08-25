@@ -51,9 +51,9 @@ class Planner : public Name {
 public:
   struct Config {
     /* Maximum ply depth of computation. */
-    size_t maxDepth = 1;
+    size_t maxDepth = 0;
 
-    /* Maximum amount of time to take per move. */
+    /* Maximum amount of time to take per move in seconds. */
     double maxTime = 10.;
 
     /*
@@ -81,7 +81,7 @@ public:
   virtual Planner* clone() const = 0;
 
   /* does the planner have all acceptable data required to perform planning? */
-  virtual bool isInitialized() const;
+  virtual Planner& initialize();
 
   /* if the planner uses an evaluator, set the evaluator to evalType */
   virtual Planner& setEvaluator(const std::shared_ptr<Evaluator>& evaluator);
@@ -122,7 +122,7 @@ protected:
   /* team that this agent represents */
   size_t agentTeam_;
 
-  virtual size_t maxImplDepth() const { return SIZE_MAX; }
+  virtual size_t maxImplDepth() const { return 0; }
   virtual bool isEvaluatorRequired() const { return true; }
 
   virtual std::string baseName() const { return "Planner"; }
@@ -130,7 +130,7 @@ protected:
   
   /* generate a prediction at a specific depth */
   virtual PlyResult generateSolutionAtDepth(
-      const ConstEnvironmentVolatile& origin, size_t maxPly) const = 0;
+      const ConstEnvironmentVolatile& origin, size_t maxPly) const;
 
   virtual PlyResult generateSolutionAtLeaf(const ConstEnvironmentVolatile& origin) const;
 

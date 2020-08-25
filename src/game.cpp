@@ -121,30 +121,36 @@ Game& Game::initialize() {
 
   // initialize evaluator:
   if (eval_ == NULL) {setEvaluator(EvaluatorSimple()); }
-  if (!eval_->isInitialized()) {
+  try {
+    eval_->initialize();
+  } catch (const std::exception& e) {
     std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
       ": Game-state evaluator " <<
       ": \"" << eval_->getName() << "\" failed to initialize!\n";
+    std::cerr << e.what() << "\n";
     throw std::runtime_error("game-state evaluator failed to initialize");
   }
-
   // assign default agents if none exist:
   for (size_t iAgent = 0; iAgent < 2; ++iAgent) {
-    if (agents_[iAgent] == NULL) {
+    auto& agent = agents_[iAgent];
+    if (agent == NULL) {
       if (!cfg_.allowUndefinedAgents) { throw std::runtime_error("agent(s) undefined"); }
 
       setPlanner(iAgent, PlannerMax().setEngine(cu_).setEvaluator(eval_));
       std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
         ": agent " << iAgent << 
-        " is undefined! Replaced with " << agents_[iAgent]->getName() << "\n";
+        " is undefined! Replaced with " << agent->getName() << "\n";
     }
 
-    if (agents_[iAgent]->isInitialized()) { continue; }
-
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-      ": Agent " << iAgent <<
-      ": \"" << agents_[iAgent]->getName() << "\" failed to initialize!\n";
-    throw std::runtime_error("agent(s) failed to initialize");
+    try {
+      agent->initialize();
+    } catch (const std::exception& e) {
+      std::cerr << e.what() << "\n";
+      std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
+        ": Agent " << iAgent <<
+        ": \"" << agent->getName() << "\" failed to initialize!\n";
+      throw std::runtime_error("agent(s) failed to initialize");
+    }
   }
   
   // number of matches to be played must be sane:

@@ -1,10 +1,11 @@
 //#define PKAI_IMPORT
 #include "../inc/planner.h"
 
+#include <chrono>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <chrono>
+#include <stdexcept>
 
 #include <boost/program_options.hpp>
 
@@ -33,22 +34,22 @@ po::options_description Planner::Config::options(
 }
 
 
-bool Planner::isInitialized() const {
-    if (agentTeam_ >= 2) { return false; }
-    if (nv_ == NULL) { return false; }
-    if (cu_ == NULL) { return false; }
-    if (eval_ == NULL && isEvaluatorRequired()) { return false; }
-    if (eval_ != NULL && !eval_->isInitialized()) { return false; }
+Planner& Planner::initialize() {
+  if (agentTeam_ >= 2) { throw std::invalid_argument("planner agentTeam undefined"); }
+  if (nv_ == NULL) { throw std::invalid_argument("planner nonvolatile environment undefined"); }
+  if (cu_ == NULL) { throw std::invalid_argument("planner engine undefined"); }
+  if (eval_ == NULL && isEvaluatorRequired()) { throw std::invalid_argument("planner evaluator undefined"); }
+  if (eval_ != NULL) { eval_->initialize(); }
 
-    if (cfg_.maxDepth > maxImplDepth()) {
-      std::cerr <<
-          getName() << " evaluator has maximum implementation depth of " <<
-          maxImplDepth() << ", ignoring depth " <<
-          cfg_.maxDepth << "!\n";
-      return false;
-    }
+  if (cfg_.maxDepth > maxImplDepth()) {
+    std::cerr <<
+        getName() << " evaluator has maximum implementation depth of " <<
+        maxImplDepth() << ", ignoring depth " <<
+        cfg_.maxDepth << "!\n";
+    cfg_.maxDepth = maxImplDepth();
+  }
 
-    return true;
+  return *this;
 }
 
 
@@ -90,7 +91,7 @@ PlannerResult Planner::generateSolution(const ConstEnvironmentVolatile& origin) 
   auto start = std::chrono::steady_clock::now();
 
   // evaluate 0..nth state:
-  for (size_t iDepth = (eval_==NULL)?1:0; iDepth <= cfg_.maxDepth; ++iDepth) {
+  for (size_t iDepth = 0; iDepth <= cfg_.maxDepth; ++iDepth) {
     PlyResult plyResult;
     if (iDepth == 0) {
       plyResult = generateSolutionAtLeaf(origin);
@@ -111,6 +112,12 @@ PlannerResult Planner::generateSolution(const ConstEnvironmentVolatile& origin) 
   }
 
   return result;
+}
+
+
+PlyResult Planner::generateSolutionAtDepth(
+    const ConstEnvironmentVolatile& origin, size_t maxDepth) const {
+  throw std::logic_error("not implemented");
 }
 
 
@@ -147,17 +154,20 @@ Fitness Planner::recurse_alphabeta(
       const Fitness& lowCutoff,
       const Fitness& highCutoff,
       size_t* nodesEvaluated) const {
+  // the best agent move fitness:
   Fitness low = lowCutoff;
+  // the best other move fitness, for every agent move:
   std::unordered_map<Action, Fitness> fitnesses;
 
   // TODO(@drendleman) - evaluate these in accordance to butterfly heuristic:
+  // for every possible move by both agent team and other team:
   for (const auto& actions: cu_->getAllValidActions(origin, agentTeam_)) {
+    // the worst possible other team choice is the one which causes the agent to decide to use it:
     if (fitnesses.count(actions[0]) == 0) { fitnesses[actions[0]] = highCutoff; }
     auto& high = fitnesses[actions[0]];
 
-    // go deeper to evaluate a gamma node:
-    Fitness fitness;
-    fitness = recurse_gamma(
+    // evaluate what probabilistically will occur if agent and other teams perform action at state:
+    Fitness fitness = recurse_gamma(
           origin, actions[0], actions[1], iDepth - 1, low, high, nodesEvaluated);
 
     // TODO(@drendleman) in the case of a tie, the agent should always bias towards a damaging action
@@ -184,30 +194,36 @@ Fitness Planner::recurse_gamma(
       const Fitness& highCutoff,
       size_t* nodesEvaluated) const {
   size_t numNodes = 0;
+  // average fitness of all states combined:
   Fitness fitness;
   auto rEnvP = generateStates(origin, agentAction, otherAction);
 
   // TODO(@drendleman) - evaluate these in order of greatest probability to least
   for (const auto& cEnvP : rEnvP.getValidEnvironments()) {
+    // the likelihood that this state occurs:
     fpType stateProbability = cEnvP.getProbability().to_double();
+    // this individual state's fitness:
+    Fitness deeperFitness;
 
     // if this is either a terminal node or if we are at terminal depth:
     if (cu_->isGameOver(cEnvP) || iDepth == 0) {
       // evaluate as a leaf node:
       EvalResult_t evalResult = eval_->calculateFitness(cEnvP, agentTeam_);
-      fitness += Fitness{evalResult.fitness, stateProbability};
+      deeperFitness = Fitness{evalResult.fitness, 1.};
       ++numNodes;
     } else { // else, recurse to a deeper level:
       // recurse into another depth, widening the cutoffs by the probability of the move:
-      Fitness deeperFitness = recurse_alphabeta(
+      deeperFitness = recurse_alphabeta(
           cEnvP,
           iDepth,
           lowCutoff.expand(stateProbability),
           highCutoff.expand(stateProbability),
           nodesEvaluated);
-      // reduce the certainty of the deeper fitness result by the probability of the move:
-      fitness += deeperFitness.expand(stateProbability);
     }
+
+    // reduce the certainty of the deeper fitness result by state's occurrence probability, and
+    //  accumulate:
+    fitness += deeperFitness.expand(stateProbability);
 
     // if there's no possibility this action is the best for the agent, do not continue:
     if (fitness < lowCutoff) { break; }

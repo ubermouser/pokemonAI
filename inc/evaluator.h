@@ -36,7 +36,7 @@ public:
   }
 
   /* does the evaluator have all acceptable data required to perform evaluation? */
-  virtual bool isInitialized() const;
+  virtual Evaluator& initialize();
 
   /* evaluate the fitness of a given environment for team iTeam */
   virtual EvalResult_t calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const = 0;

@@ -4,10 +4,22 @@
 #include "planner.h"
 
 class PlannerHuman : public Planner {
+public:
+  PlannerHuman(const Config& cfg = Config()) : Planner(cfg, ident) {};
+  PlannerHuman(const PlannerHuman& other) = default;
+  ~PlannerHuman() { };
+
+  virtual PlannerHuman* clone() const override { return new PlannerHuman(*this); }
+
+  virtual size_t maxImplDepth() const override { return 0; }
+  virtual bool isEvaluatorRequired() const override { return false; }
+
+  virtual PlyResult generateSolutionAtLeaf(
+      const ConstEnvironmentVolatile& origin) const override;
 protected:
   static const std::string ident;
 
-  /* Returns a valid action as per the user's choice 
+  /* Returns a valid action as per the user's choice
    * AT_MOVE_0-3: pokemon's move
    * AT_MOVE_STRUGGLE  : struggle
    * AT_MOVE_NOTHING  : do nothing
@@ -22,19 +34,6 @@ protected:
   void printActions(const ConstEnvironmentVolatile& env) const;
 
   virtual std::string baseName() const override { return "HumanPlanner"; }
-
-public:
-  PlannerHuman(const Config& cfg = Config()) : Planner(cfg, ident) {};
-  PlannerHuman(const PlannerHuman& other) = default;
-  ~PlannerHuman() { };
-
-  virtual PlannerHuman* clone() const override { return new PlannerHuman(*this); }
-
-  virtual size_t maxImplDepth() const override { return 1; }
-  virtual bool isEvaluatorRequired() const override { return false; }
-
-  virtual PlyResult generateSolutionAtDepth(
-      const ConstEnvironmentVolatile& origin, size_t maxPly) const override;
 };
 
 #endif /* PLANNER_HUMAN_H */

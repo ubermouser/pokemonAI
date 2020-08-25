@@ -26,12 +26,11 @@ EvaluatorMonteCarlo& EvaluatorMonteCarlo::setEnvironment(
 }
 
 
-bool EvaluatorMonteCarlo::isInitialized() const {
-  if (!Evaluator::isInitialized()) { return false; }
+EvaluatorMonteCarlo& EvaluatorMonteCarlo::initialize() {
+  Evaluator::initialize();
 
-  // TODO(@drendleman) - this throws an exception if not initialized
   game_->initialize();
-  return true;
+  return *this;
 }
 
 

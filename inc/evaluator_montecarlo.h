@@ -31,7 +31,7 @@ public:
   virtual EvaluatorMonteCarlo& setEnvironment(
       const std::shared_ptr<const EnvironmentNonvolatile>& env) override;
 
-  virtual bool isInitialized() const override;
+  virtual EvaluatorMonteCarlo& initialize() override;
 
   virtual EvalResult_t calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const override;
 protected:

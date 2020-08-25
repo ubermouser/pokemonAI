@@ -30,7 +30,7 @@ public:
 
   EvaluatorSimple* clone() const override { return new EvaluatorSimple(*this); }
 
-  bool isInitialized() const override;
+  EvaluatorSimple& initialize() override;
 
   EvalResult_t calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const override;
 protected:

@@ -19,12 +19,12 @@ public:
   virtual PlannerRandom* clone() const override { return new PlannerRandom(*this); }
 
   virtual bool isEvaluatorRequired() const override { return false; }
-  virtual size_t maxImplDepth() const override { return 1; }
+  virtual size_t maxImplDepth() const override { return 0; }
 
   virtual const std::string& getName() const override { return ident; };
 
-  PlyResult generateSolutionAtDepth(
-    const ConstEnvironmentVolatile& origin, size_t maxPly) const override;
+  PlyResult generateSolutionAtLeaf(
+    const ConstEnvironmentVolatile& origin) const override;
 
 protected:
   Config cfg_;

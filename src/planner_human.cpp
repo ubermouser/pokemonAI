@@ -12,8 +12,8 @@
 const std::string PlannerHuman::ident = "HumanPlanner-NULLEVAL";
 
 
-PlyResult PlannerHuman::generateSolutionAtDepth(
-    const ConstEnvironmentVolatile& origin, size_t maxPly) const {
+PlyResult PlannerHuman::generateSolutionAtLeaf(
+    const ConstEnvironmentVolatile& origin) const {
   std::cout << origin;
   printActions(origin);
 
