@@ -31,7 +31,7 @@ EvaluatorSimple& EvaluatorSimple::initialize() {
 
 
 fpType EvaluatorSimple::fitness_move(const ConstMoveVolatile& mV) const {
-  fpType fitness = mV.getPercentPP() * (1. - cfg_.canMoveBias) + mV.hasPP() * (cfg_.canMoveBias);
+  fpType fitness = (mV.getPercentPP() * (1. - cfg_.canMoveBias)) + (mV.hasPP() * (cfg_.canMoveBias));
   return fitness;
 }
 

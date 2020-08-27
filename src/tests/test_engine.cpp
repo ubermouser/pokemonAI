@@ -188,4 +188,41 @@ TEST_F(EngineTest, HiddenPower) {
 }
 
 
-//TODO(@drendleman) test life-orb does not affect moves like pain-split
+TEST_F(EngineTest, LifeOrb) {
+  auto team_1 = TeamNonVolatile()
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("dusknoir"))
+        .addMove(pokedex_->getMoves().at("pain split"))
+        .addMove(pokedex_->getMoves().at("shadow punch"))
+        .addMove(pokedex_->getMoves().at("will-o-wisp"))
+        .addMove(pokedex_->getMoves().at("calm mind"))
+        .setInitialItem(pokedex_->getItems().at("life orb"))
+        .setLevel(100));
+  auto team_2 = team_1;
+  team_2.teammate(0).setNoInitialItem();
+  auto environment = EnvironmentNonvolatile(team_1, team_2, true);
+  engine_->setEnvironment(environment);
+
+  auto sp_lifeorb = engine_->updateState(engine_->initialState(), AT_MOVE_1, AT_MOVE_NOTHING);
+  auto sp_noitem = engine_->updateState(engine_->initialState(), AT_MOVE_NOTHING, AT_MOVE_1);
+  auto will_o_wisp = engine_->updateState(engine_->initialState(), AT_MOVE_2, AT_MOVE_NOTHING);
+  auto split_pain = engine_->updateState(sp_lifeorb.at(0), AT_MOVE_0, AT_MOVE_NOTHING);
+  auto calm_mind = engine_->updateState(engine_->initialState(), AT_MOVE_3, AT_MOVE_NOTHING);
+
+  { // attacking move: life orb subtracts 10%, damage is increased by 30%
+    EXPECT_EQ(sp_lifeorb.at(0).getEnv().getTeam(0).teammate(0).getHP(), 180); // 90%
+    EXPECT_EQ(sp_lifeorb.at(0).getEnv().getTeam(1).teammate(0).getHP(), 62); // 31%
+    EXPECT_LT(sp_lifeorb.at(0).getEnv().getTeam(1).teammate(0).getHP(),
+              sp_noitem.at(0).getEnv().getTeam(0).teammate(0).getHP());
+  }
+  { // special move targeting other team: no effect
+    EXPECT_EQ(split_pain.at(0).getEnv().getTeam(0).teammate(0).getHP(),
+              split_pain.at(0).getEnv().getTeam(1).teammate(0).getHP());
+  }
+  { // status move targeting other team: no effect
+    EXPECT_EQ(will_o_wisp.at(0).getEnv().getTeam(0).teammate(0).getPercentHP(), 1.);
+  }
+  { // move targeting friendly team: no effect
+    EXPECT_EQ(calm_mind.at(0).getEnv().getTeam(0).teammate(0).getPercentHP(), 1.);
+  }
+}

@@ -92,8 +92,8 @@ TESTOBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=-mtune=native -march=native
-CXXFLAGS=-mtune=native -march=native
+CCFLAGS=-g -mtune=native -march=native
+CXXFLAGS=-g -mtune=native -march=native
 
 # Fortran Compiler Flags
 FFLAGS=

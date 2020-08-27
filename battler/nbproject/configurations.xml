@@ -68,8 +68,10 @@
                             OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libpkaiengine.a">
               </makeArtifact>
             </linkerLibProjectItem>
+            <linkerOptionItem>-lboost_system</linkerOptionItem>
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
             <linkerOptionItem>-lboost_program_options</linkerOptionItem>
+            <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>
@@ -91,7 +93,7 @@
           <incDir>
             <pElem>..</pElem>
           </incDir>
-          <commandLine>-mtune=native -march=native</commandLine>
+          <commandLine>-g -mtune=native -march=native</commandLine>
           <preprocessorList>
             <Elem>DOUBLEPRECISION</Elem>
             <Elem>GEN4_STATIC</Elem>
@@ -122,8 +124,10 @@
                             OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libpkaiengine.a">
               </makeArtifact>
             </linkerLibProjectItem>
+            <linkerOptionItem>-lboost_system</linkerOptionItem>
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
             <linkerOptionItem>-lboost_program_options</linkerOptionItem>
+            <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>

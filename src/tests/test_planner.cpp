@@ -47,8 +47,8 @@ TEST_F(PlannerTest, MaxPlannerChoosesGreedyOption) {
   planner->setTeam(TEAM_A)
       .setEvaluator(EvaluatorSimple())
       .setEngine(engine_)
-      .setEnvironment(environment_);
-  ASSERT_TRUE(planner->isInitialized());
+      .setEnvironment(environment_)
+      .initialize();
 
   auto result = planner->generateSolution(engine_->initialState());
 
@@ -64,8 +64,8 @@ TEST_F(PlannerTest, MaximinPlannerChooses1PlyOption) {
   planner->setTeam(TEAM_A)
       .setEvaluator(EvaluatorSimple())
       .setEngine(engine_)
-      .setEnvironment(environment_);
-  ASSERT_TRUE(planner->isInitialized());
+      .setEnvironment(environment_)
+      .initialize();
 
   auto result = planner->generateSolution(engine_->initialState());
 
@@ -81,8 +81,8 @@ TEST_F(PlannerTest, MaximinPlannerChooses2PlyOption) {
   planner->setTeam(TEAM_A)
       .setEvaluator(EvaluatorSimple())
       .setEngine(engine_)
-      .setEnvironment(environment_);
-  ASSERT_TRUE(planner->isInitialized());
+      .setEnvironment(environment_)
+      .initialize();
 
   auto result = planner->generateSolution(engine_->initialState());
 

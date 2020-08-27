@@ -42,8 +42,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=-mtune=native -march=native
-CXXFLAGS=-mtune=native -march=native
+CCFLAGS=-g -mtune=native -march=native
+CXXFLAGS=-g -mtune=native -march=native
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -52,7 +52,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=../pkaiEngine/dist/Release/GNU-Linux/libpkaiengine.a -lboost_filesystem -lboost_program_options
+LDLIBSOPTIONS=../pkaiEngine/dist/Release/GNU-Linux/libpkaiengine.a -lboost_system -lboost_filesystem -lboost_program_options -ldl
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}

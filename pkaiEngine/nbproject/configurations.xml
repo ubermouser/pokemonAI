@@ -42,6 +42,7 @@
         <itemPath>../inc/planner_human.h</itemPath>
         <itemPath>../inc/planner_max.h</itemPath>
         <itemPath>../inc/planner_maximin.h</itemPath>
+        <itemPath>../inc/planner_multithreaded.h</itemPath>
         <itemPath>../inc/planner_random.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="toolbox" projectFiles="true">
@@ -228,6 +229,8 @@
       <item path="../inc/planner_max.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/planner_maximin.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/planner_multithreaded.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/planner_random.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -450,7 +453,7 @@
         </cTool>
         <ccTool>
           <developmentMode>6</developmentMode>
-          <commandLine>-mtune=native -march=native</commandLine>
+          <commandLine>-g -mtune=native -march=native</commandLine>
           <preprocessorList>
             <Elem>DOUBLEPRECISION</Elem>
             <Elem>GEN4_STATIC</Elem>
@@ -523,6 +526,8 @@
       <item path="../inc/planner_max.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/planner_maximin.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/planner_multithreaded.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/planner_random.h" ex="false" tool="3" flavor2="0">
       </item>
