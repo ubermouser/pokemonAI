@@ -196,6 +196,8 @@ protected:
   /* fully seeds the pluginset vector */
   bool initialize();
 
+  const PluginSet& getCPluginSet(const ConstEnvironmentVolatile& cEnv, size_t iTeam) const;
+
   friend class PkCUEngine;
 };
 

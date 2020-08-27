@@ -68,6 +68,9 @@ public:
   /* modifies this move's PP by value */
   bool modPP(int32_t value);
 
+  /* sets the move's PP to this value */
+  bool setPP(uint32_t value);
+
 };
 
 

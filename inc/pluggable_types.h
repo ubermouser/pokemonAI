@@ -11,12 +11,14 @@ class PokemonNonVolatile;
 class Type;
 class PkCUEngine;
 
+class ConstMoveVolatile;
 class MoveVolatile;
+
+class ConstPokemonVolatile;
 class PokemonVolatile;
-class TeamVolatile;
 
 // script types:
-#define PLUGIN_MAXSIZE 26
+#define PLUGIN_MAXSIZE 28
 enum pluginType
 {
   PLUGIN_ON_INIT = 0,
@@ -44,7 +46,9 @@ enum pluginType
   PLUGIN_ON_ENDOFROUND = 22,
   PLUGIN_ON_SWITCHOUT = 23,
   PLUGIN_ON_SWITCHIN = 24,
-  PLUGIN_ON_UNINIT = 25
+  PLUGIN_ON_TESTMOVE = 25,
+  PLUGIN_ON_TESTSWITCH = 26,
+  PLUGIN_ON_UNINIT = 27
 };
 
 typedef int (*onSwitch_rawType)
@@ -124,6 +128,18 @@ typedef int (*onEndOfTurn_rawType)
 typedef int (*onInitMove_rawType)
   (PokemonNonVolatile&,
   MoveNonVolatile&);
+
+typedef int (*onTestMove_rawType)
+  (ConstPokemonVolatile,
+  ConstMoveVolatile,
+  const Action&,
+  bool&);
+
+typedef int (*onTestSwitch_rawType)
+  (ConstPokemonVolatile,
+  ConstPokemonVolatile,
+  const Action&,
+  bool&);
 
 typedef void (*voidFunction_rawType)(void*);
 

@@ -1265,7 +1265,7 @@ bool PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Action& act
   ConstTeamVolatile cTV = envV.getTeam(iTeam);
   ConstTeamVolatile oTV = envV.getOtherTeam(iTeam);
   ConstPokemonVolatile cPKV = cTV.getPKV();
-  ConstPokemonVolatile oPKV = oTV.getPKV();
+  ConstPokemonVolatile tPKV = oTV.getPKV();
   
   switch(action)
   {
@@ -1278,17 +1278,23 @@ bool PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Action& act
       if ((action - AT_MOVE_0) >= cPKV.nv().getNumMoves()) { return false; }
 
       // is the other pokemon alive?
-      if (!(oPKV.isAlive())) { return false; }
+      if (!(tPKV.isAlive())) { return false; }
 
       // is the pokemon we're currently using alive?
       if (!cPKV.isAlive()) { return false; }
 
       // does the move we're using have any PP left?
-      if (cPKV.getMV(action - AT_MOVE_0).hasPP() != true ) { return false; }
+      ConstMoveVolatile cMV = cPKV.getMV(action - AT_MOVE_0);
+      if (cMV.hasPP() != true ) { return false; }
     
-      //TODO: are we locked out of the current move?
+      // Are we locked out of the current move? By default, allow moves
+      bool doAllowMove = true;
+      for (const auto& cPlugin : getCPluginSet(envV, iTeam)[PLUGIN_ON_TESTMOVE]) {
+        onTestMove_rawType pFunction = (onTestMove_rawType)cPlugin.pFunction;
+        if (pFunction(cPKV, cMV, action, doAllowMove) > 1) { break; }
+      }
 
-      return true; // by default, allow moves
+      return doAllowMove;
     }
     case AT_SWITCH_0:
     case AT_SWITCH_1:
@@ -1304,33 +1310,41 @@ bool PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Action& act
       if ((action - AT_SWITCH_0) == cTV.getICPKV()) { return false; }
 
       // is the pokemon we're switching to even alive?
-      if ( cTV.teammate(action - AT_SWITCH_0).isAlive() != true) { return false; }
+      ConstPokemonVolatile cOPKV = cTV.teammate(action - AT_SWITCH_0);
+      if ( cOPKV.isAlive() != true) { return false; }
 
       // are we trying to move during the other team's free move?
-      if (!(oPKV.isAlive()) && cPKV.isAlive()) { return false; }
+      if (!(tPKV.isAlive()) && cPKV.isAlive()) { return false; }
     
-      // TODO: are we locked out of switching?
+      // Are we locked out of switching? By default, allow switches
+      bool doAllowSwitch = true;
+      for (const auto& cPlugin : getCPluginSet(envV, iTeam)[PLUGIN_ON_TESTSWITCH]) {
+        onTestSwitch_rawType pFunction = (onTestSwitch_rawType)cPlugin.pFunction;
+        if (pFunction(cPKV, cOPKV, action, doAllowSwitch) > 1) { break; }
+      }
 
-      return true; // by default, allow switches
+      return doAllowSwitch; // by default, allow switches
     }
     case AT_MOVE_NOTHING:
       // are we waiting for the other team to take its free move?
-      if (!(oPKV.isAlive()) && cPKV.isAlive()) { return true; }
+      if (!(tPKV.isAlive()) && cPKV.isAlive()) { return true; }
 
       // in most cases, do not allow not moving
       return false;
     case AT_MOVE_STRUGGLE:
       // is the other pokemon alive?
-      if (!(oPKV.isAlive())) { return false; }
+      if (!(tPKV.isAlive())) { return false; }
 
       // is the pokemon we're currently using alive?
       if (!cPKV.isAlive()) { return false; }
 
-      // can the pokemon struggle?
-      if (!cPKV.hasPP()) { return true; }
+      // are all other moves unusable?
+      for (size_t iMove = 0, iSize = cPKV.nv().getNumMoves(); iMove != iSize; ++iMove) {
+        if (isValidAction(envV, iMove + AT_MOVE_0, iTeam)) { return false; }
+      }
 
-      // cannot struggle by default
-      return false;
+      // may struggle when all other moves are unusable:
+      return true;
     // disabled action types:
     case AT_ITEM_USE:
     case AT_MOVE_CONFUSED:
@@ -1430,6 +1444,13 @@ MoveVolatile PkCUEngine::getTMV(size_t iState) {
 const PluginSet& PkCUEngine::getCPluginSet() {
   return *cPluginSet_;
 };
+
+
+const PluginSet& PkCU::getCPluginSet(const ConstEnvironmentVolatile& cEnv, size_t iTeam) const {
+  size_t iCPokemon = cEnv.getTeam(iTeam).getICPKV();
+  size_t iOPokemon = cEnv.getOtherTeam(iTeam).getICPKV();
+  return pluginSets_[iTeam * 6 + iCPokemon][iOPokemon];
+}
 
 
 void PkCUEngine::setCPluginSet() {

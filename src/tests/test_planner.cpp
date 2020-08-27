@@ -42,6 +42,7 @@ protected:
 
 TEST_F(PlannerTest, MaxPlannerChoosesGreedyOption) {
   PlannerMax::Config cfg;
+  cfg.maxDepth = 1;
   cfg.verbosity = 4;
   std::unique_ptr<Planner> planner = std::make_unique<PlannerMax>(cfg);
   planner->setTeam(TEAM_A)

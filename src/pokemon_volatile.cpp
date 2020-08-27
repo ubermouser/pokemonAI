@@ -156,9 +156,11 @@ const Item& POKEMON_VOLATILE_IMPL::getItem() const {
 }
 
 
-void PokemonVolatile::setNoItem() {
+void PokemonVolatile::setNoItem(bool resetVolatile) {
   // TODO(@drendleman) index_ of no_item can be greater than the largest possible iHeldItem!
   data().iHeldItem = Item::no_item->index_;
+  // item state is reset when the item is swapped out:
+  if (resetVolatile) { status().cTeammate.itemScratch = 0; }
   assert(!hasItem()); // may not be true because of narrowing
 }
 

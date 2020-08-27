@@ -31,13 +31,18 @@ void MoveVolatile::initialize()
 }
 
 
-bool MoveVolatile::modPP(int32_t value)
-{
-  int32_t _PPcurrent = data().PPcurrent + value;
-  
-  data().PPcurrent = (uint8_t) std::min((uint32_t)std::max(_PPcurrent, 0), nv().getPPMax());
+bool MoveVolatile::modPP(int32_t _value) {
+  int32_t value = data().PPcurrent + _value;
+  value = std::max(value, 0);
 
-  return _PPcurrent == (int32_t)data().PPcurrent; // will be inequal if _PPcurrent is -1 and PPcurrent is still 0
+  return setPP(value);
+}
+
+
+bool MoveVolatile::setPP(uint32_t value) {
+  data().PPcurrent = (uint8_t)std::min(value, nv().getPPMax());
+
+  return value == (int32_t)data().PPcurrent; // will be inequal if _PPcurrent is -1 and PPcurrent is still 0
 }
 
 

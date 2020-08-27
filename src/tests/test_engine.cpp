@@ -226,3 +226,76 @@ TEST_F(EngineTest, LifeOrb) {
     EXPECT_EQ(calm_mind.at(0).getEnv().getTeam(0).teammate(0).getPercentHP(), 1.);
   }
 }
+
+
+TEST_F(EngineTest, ChoiceItems) {
+  auto team_1 = TeamNonVolatile()
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("scizor"))
+        .addMove(pokedex_->getMoves().at("bullet punch")) // increased by choice band
+        .addMove(pokedex_->getMoves().at("swift")) // not increased
+        .setInitialItem(pokedex_->getItems().at("choice band"))
+        .setLevel(100))
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("azelf"))
+        .addMove(pokedex_->getMoves().at("swift")) // increased by choice scarf
+        .addMove(pokedex_->getMoves().at("fire punch")) // not increased
+        .setInitialItem(pokedex_->getItems().at("choice specs"))
+        .setLevel(100))
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("flygon"))
+        .addMove(pokedex_->getMoves().at("draco meteor"))
+        .setInitialItem(pokedex_->getItems().at("choice scarf"))
+        .setLevel(100));
+  auto team_2 = team_1;
+  team_2.teammate(0).setNoInitialItem();
+  team_2.teammate(1).setNoInitialItem();
+  team_2.teammate(2).setNoInitialItem();
+  auto environment = EnvironmentNonvolatile(team_1, team_2, true);
+  engine_->setEnvironment(environment);
+
+  auto bulletpunch_cb = engine_->updateState(engine_->initialState(), AT_MOVE_0, AT_MOVE_0);
+  auto swift_cb = engine_->updateState(engine_->initialState(), AT_MOVE_1, AT_MOVE_1);
+
+  auto azelf_pair = engine_->updateState(engine_->initialState(), AT_SWITCH_1, AT_SWITCH_1);
+  auto swift_cs = engine_->updateState(azelf_pair.at(0), AT_MOVE_0, AT_MOVE_0);
+  auto firepunch_cs = engine_->updateState(azelf_pair.at(0), AT_MOVE_1, AT_MOVE_1);
+
+  auto flygon_pair = engine_->updateState(engine_->initialState(), AT_SWITCH_2, AT_SWITCH_2);
+  auto dracometeor_cs = engine_->updateState(flygon_pair.at(0), AT_MOVE_0, AT_MOVE_0);
+  auto dracometeor_none = engine_->updateState(flygon_pair.at(0), AT_MOVE_NOTHING, AT_MOVE_0);
+
+  { // other moves are locked out after using a choice move:
+    EXPECT_EQ(engine_->isValidAction(bulletpunch_cb.at(0), AT_MOVE_0, TEAM_A), true);
+    EXPECT_EQ(engine_->isValidAction(bulletpunch_cb.at(0), AT_MOVE_1, TEAM_A), false);
+  }
+  { // when all PP have been used, only struggle is available:
+    auto noPPState = bulletpunch_cb.at(1);
+    noPPState.getEnv().getTeam(0).getPKV().getMV(0).setPP(0);
+    EXPECT_EQ(engine_->isValidAction(noPPState, AT_MOVE_0, TEAM_A), false); // locked due to PP
+    EXPECT_EQ(engine_->isValidAction(noPPState, AT_MOVE_1, TEAM_A), false); // locked due to Choice
+    EXPECT_EQ(engine_->isValidAction(noPPState, AT_MOVE_STRUGGLE, TEAM_A), true);
+  }
+  { // physical attack with choice band deals additional damage:
+    EXPECT_GT(bulletpunch_cb.at(0).getEnv().getTeam(0).teammate(0).getHP(),
+              bulletpunch_cb.at(0).getEnv().getTeam(1).teammate(0).getHP());
+  }
+  { // special attack with choice band does no additional damage:
+    EXPECT_EQ(swift_cb.at(0).getEnv().getTeam(0).teammate(0).getHP(),
+              swift_cb.at(0).getEnv().getTeam(1).teammate(0).getHP());
+  }
+  { // special attack with choice specs deals additional damage:
+    EXPECT_GT(swift_cs.at(0).getEnv().getTeam(0).teammate(1).getHP(),
+              swift_cs.at(0).getEnv().getTeam(1).teammate(1).getHP());
+  }
+  { // physical attack with choice specs does no additional damage:
+    EXPECT_EQ(firepunch_cs.at(0).getEnv().getTeam(0).teammate(1).getHP(),
+              firepunch_cs.at(0).getEnv().getTeam(1).teammate(1).getHP());
+  }
+  { // speed boost with 1-hit KO moves before enemy can deal damage with choice scarf:
+    EXPECT_EQ(dracometeor_cs.at(0).getEnv().getTeam(0).teammate(2).getPercentHP(), 1.);
+    EXPECT_GE(dracometeor_cs.at(0).getProbability().to_double(), 0.89); // enemy never moves
+    EXPECT_EQ(dracometeor_cs.at(0).getEnv().getTeam(1).teammate(2).getHP(), 0);
+    EXPECT_EQ(dracometeor_none.at(0).getEnv().getTeam(0).teammate(2).getHP(), 0);
+  }
+}

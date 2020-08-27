@@ -161,7 +161,7 @@ public:
   /* clears the nonvolatile status condition of a pokemon */
   void clearStatusAilment();
 
-  void setNoItem();
+  void setNoItem(bool resetVolatile=true);
 
   /*
    * initialize an empty pokemon_volatile for combat, zeroing
