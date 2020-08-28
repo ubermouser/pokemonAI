@@ -132,7 +132,6 @@ TEST_F(EngineTest, GroundConditions) {
   auto stealth_rock = engine_->updateState(engine_->initialState(), AT_MOVE_0, AT_MOVE_NOTHING);
   auto spikes = engine_->updateState(engine_->initialState(), AT_MOVE_1, AT_MOVE_NOTHING);
   auto toxic_spikes = engine_->updateState(engine_->initialState(), AT_MOVE_2, AT_MOVE_NOTHING);
-
   
   { // test rapid-spin removal:
     auto spikes_removed = engine_->updateState(spikes.at(0), AT_MOVE_NOTHING, AT_MOVE_3);

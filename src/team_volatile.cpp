@@ -93,5 +93,11 @@ void TeamVolatile::resetVolatile()
 }
 
 
+std::ostream& operator <<(std::ostream& os, const ConstTeamVolatile& team) {
+  team.printTeam(os);
+  return os;
+}
+
+
 template class TeamVolatileImpl<ConstPokemonVolatile, const TeamVolatileData, const TeamStatus>;
 template class TeamVolatileImpl<PokemonVolatile, TeamVolatileData, TeamStatus>;

@@ -11,7 +11,7 @@ public:
     Config() : Planner::Config() {};
   };
 
-  PlannerRandom(const Config& cfg = Config()) : Planner(cfg, ident) {};
+  PlannerRandom(const Config& cfg = Config()) : Planner(cfg, ident), cfg_(cfg) {};
 
   PlannerRandom(const PlannerRandom& other) = default;
   virtual ~PlannerRandom() { };

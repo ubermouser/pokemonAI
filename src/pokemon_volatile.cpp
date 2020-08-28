@@ -10,6 +10,7 @@
 #include "../inc/pokemon_nonvolatile.h"
 #include "../inc/move_volatile.h"
 
+#include <boost/format.hpp>
 #include <boost/static_assert.hpp>
 
 BOOST_STATIC_ASSERT(sizeof(PokemonVolatileData) == sizeof(uint64_t));
@@ -309,18 +310,18 @@ std::ostream& operator <<(std::ostream& os, const ConstPokemonVolatile& pkmn)
     if (pkmn.status().cTeammate.infatuate > 0) {
       os << " (INFAT)";
     }
-    /*// target flinched:
-    sA_V = AIL_V_FLINCH;
-    if (cP.currentPokemon.getVolatileStatusCondition(cP.cPokemon, sA_V))
-    {
-      os << " (FLNCH)";
+    // spikes in the ground:
+    if (pkmn.status().nonvolatile.spikes > 0) {
+      os << boost::format(" (SPIKES-%d)") % pkmn.status().nonvolatile.spikes;
     }
-    // target flinched last turn:
-    sA_V = AIL_V_FLINCHED;
-    if (cP.currentPokemon.getVolatileStatusCondition(cP.cPokemon, sA_V))
-    {
-      os << " (FLNCH)";
-    }*/
+    // stealth-rock on the ground:
+    if (pkmn.status().nonvolatile.stealthRock > 0) {
+      os << " (STLTH_ROCK)";
+    }
+    // toxic spikes in the ground:
+    if (pkmn.status().nonvolatile.spikes > 0) {
+      os << boost::format(" (T-SPIKES-%d)") % pkmn.status().nonvolatile.toxicSpikes;
+    }
 
     os << std::showpos; // show the + or -
     if (pkmn.getBoost(FV_ATTACK) != 0) {

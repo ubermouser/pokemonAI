@@ -669,7 +669,10 @@ void Game::printGameOutline(const GameResult& gResult, size_t iMatch) {
 
 
 void Game::printHeatStart() {
-  
+  std::cout << "Team " << getTeamIdentifier(TEAM_A) << ":\n" <<
+      ConstEnvironmentVolatile{*nv_, initialState_}.getTeam(TEAM_A);
+  std::cout << "Team " << getTeamIdentifier(TEAM_B) << ":\n" <<
+      ConstEnvironmentVolatile{*nv_, initialState_}.getTeam(TEAM_B);
 }
 
 

@@ -28,6 +28,7 @@
         <itemPath>../inc/pokemon_nonvolatile.h</itemPath>
         <itemPath>../inc/pokemon_volatile.h</itemPath>
         <itemPath>../inc/team_nonvolatile.h</itemPath>
+        <itemPath>../inc/team_status.h</itemPath>
         <itemPath>../inc/team_volatile.h</itemPath>
         <itemPath>../inc/type.h</itemPath>
       </logicalFolder>
@@ -255,6 +256,8 @@
       <item path="../inc/signature.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/team_nonvolatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/team_status.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/team_volatile.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -552,6 +555,8 @@
       <item path="../inc/signature.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/team_nonvolatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/team_status.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/team_volatile.h" ex="false" tool="3" flavor2="0">
       </item>

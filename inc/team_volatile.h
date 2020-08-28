@@ -127,5 +127,7 @@ public:
   void cModPercentHP(fpType percent) { getPKV().modPercentHP(percent); };
 };
 
+PKAISHARED std::ostream& operator <<(std::ostream& os, const ConstTeamVolatile& team);
+
 #endif	/* TEAM_VOLATILE_H */
 
