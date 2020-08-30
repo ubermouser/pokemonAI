@@ -319,7 +319,7 @@ std::ostream& operator <<(std::ostream& os, const ConstPokemonVolatile& pkmn)
       os << " (STLTH_ROCK)";
     }
     // toxic spikes in the ground:
-    if (pkmn.status().nonvolatile.spikes > 0) {
+    if (pkmn.status().nonvolatile.toxicSpikes > 0) {
       os << boost::format(" (T-SPIKES-%d)") % pkmn.status().nonvolatile.toxicSpikes;
     }
 

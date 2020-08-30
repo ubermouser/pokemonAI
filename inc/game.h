@@ -69,7 +69,7 @@ public:
     int verbosity = 0;
 
     /* maximum number of turns allowed before a draw occurs */
-    size_t maxPlies = 100;
+    size_t maxPlies = 120;
 
     /* number of matches, in best of N format, that game is to play before returning. Should ideally be an odd number */
     size_t maxMatches = 3;
@@ -79,6 +79,9 @@ public:
 
     /* when true, undefined agents are replaced with a default agent */
     bool allowUndefinedAgents = true;
+
+    /* when true, a HeatResult will return its component GameResults, and so on for Turns. Increases memory usage. */
+    bool storeSubcomponents = true;
 
     Config(){};
 
@@ -166,22 +169,23 @@ protected:
 
   HeatResult digestMatch(const std::vector<GameResult>& gLog);
 
-  std::string getGameIdentifier(size_t iMatch);
-  std::string getTeamIdentifier(size_t iTeam);
+  std::string getPokemonIdentifier(const ConstTeamVolatile& cTeam, size_t iTeam) const;
+  std::string getGameIdentifier(size_t iMatch) const;
+  std::string getTeamIdentifier(size_t iTeam) const;
 
   void incrementScore(int matchResult, std::array<uint32_t, 2>& score);
 
   /* prints the current action */
   void printAction(
-      const ConstTeamVolatile& currentTeam, const Action& indexAction, unsigned int iTeam);
+      const ConstTeamVolatile& currentTeam, const Action& indexAction, unsigned int iTeam) const;
 
   /* prints interesting facts about the game */
-  void printGameStart(size_t iMatch=SIZE_MAX);
-  void printGameOutline(const GameResult& gResult, size_t iMatch=SIZE_MAX);
+  void printGameStart(size_t iMatch=SIZE_MAX) const;
+  void printGameOutline(const GameResult& gResult, size_t iMatch=SIZE_MAX) const;
 
   /* print interesting facts about the heat */
-  void printHeatStart();
-  void printHeatOutline(const HeatResult& hResult);
+  void printHeatStart() const;
+  void printHeatOutline(const HeatResult& hResult) const;
 };
 
 #endif	/* PKAI_GAME_H */

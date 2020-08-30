@@ -89,3 +89,6 @@ TEST_F(PlannerTest, MaximinPlannerChooses2PlyOption) {
 
   EXPECT_EQ(result.bestAgentAction(), AT_MOVE_0);
 }
+
+
+// TODO(@drendleman) - test that planner chooses a guaranteed winning move in the shortest depth

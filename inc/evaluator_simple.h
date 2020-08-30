@@ -5,10 +5,7 @@
 
 class EvaluatorSimple: public Evaluator {
 public:
-  struct Config {
-    /* how much more heavily we weight our own fitness compared to the enemy's fitness. */
-    fpType teamBias = 0.5;
-
+  struct Config : public Evaluator::Config {
     /* proportion of a move's fitness awarded for having moves left. */
     fpType canMoveBias = 0.05;
 
@@ -21,7 +18,7 @@ public:
     /* proportion of a team's fitness awarded for free for having any single pokemon alive. */
     fpType teamAliveBias = 0.05;
 
-    Config() {};
+    Config() : Evaluator::Config() {};
   };
 
   EvaluatorSimple(const Config& cfg = Config());

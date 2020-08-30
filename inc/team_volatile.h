@@ -82,7 +82,7 @@ public:
   /* returns TRUE if the pokemon has more than 0 hitpoints */
   bool cIsAlive() const { return getPKV().isAlive(); }
 
-  void printTeam(std::ostream& os) const;
+  void printTeam(std::ostream& os, const std::string& linePrefix="") const;
 };
 
 

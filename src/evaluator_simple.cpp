@@ -5,17 +5,13 @@
 #include <stdexcept>
 
 #include "../inc/engine.h"
-#include "../inc/fp_compare.h"
 
 
 EvaluatorSimple::EvaluatorSimple(const Config& cfg)
-    : Evaluator(),
-    cfg_(cfg) {
-  {
-    std::ostringstream name;
-    name << "Simple_Evaluator-" << cfg_.aliveBias;
-    setName(name.str());
-  }
+    : Evaluator(cfg), cfg_(cfg) {
+  std::ostringstream name;
+  name << "Simple_Evaluator-" << cfg_.aliveBias;
+  setName(name.str());
 };
 
 
@@ -73,16 +69,8 @@ fpType EvaluatorSimple::fitness_team(const ConstTeamVolatile& tV) const {
 EvalResult_t EvaluatorSimple::calculateFitness(
     const ConstEnvironmentVolatile& env, size_t iTeam) const {
   // calculate fitness
-  fpType agentFitness = (cfg_.teamBias)       * fitness_team(env.getTeam(iTeam));
-  fpType otherFitness = (1.0 - cfg_.teamBias) * fitness_team(env.getOtherTeam(iTeam));
+  fpType agentFitness = fitness_team(env.getTeam(iTeam));
+  fpType otherFitness = fitness_team(env.getOtherTeam(iTeam));
 
-  fpType maxFitness = std::max(agentFitness, otherFitness);
-  // if maxFitness is about 0, we've tied the game. Ties do not favor either team
-  if (mostlyEQ(maxFitness, 0.0)) { return EvalResult_t{0.5, -1, -1}; }
-
-  fpType fitness = (agentFitness - otherFitness) / maxFitness;
-
-  // normalize fitness from 0..1 instead of -1..1
-  fitness = (fitness + 1.0) / 2.0;
-  return EvalResult_t{fitness, -1, -1};
+  return EvalResult_t{combineTeamFitness(agentFitness, otherFitness), -1, -1};
 };

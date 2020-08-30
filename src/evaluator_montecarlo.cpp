@@ -1,5 +1,6 @@
 #include "../inc/evaluator_montecarlo.h"
 
+#include "../inc/evaluator_random.h"
 #include "../inc/pkCU.h"
 #include "../inc/planner_random.h"
 
@@ -10,9 +11,11 @@ EvaluatorMonteCarlo::EvaluatorMonteCarlo(const Config& cfg)
   gamecfg.maxPlies = cfg_.maxPlies;
   gamecfg.allowUndefinedAgents = false;
   gamecfg.allowStateSelection = false;
+  gamecfg.storeSubcomponents = false;
   gamecfg.verbosity = 0;
   game_ = std::make_shared<Game>(gamecfg);
-  game_->setPlanner(0, PlannerRandom().setEngine(PkCU()))
+  game_->setEvaluator(EvaluatorRandom())
+      .setPlanner(0, PlannerRandom().setEngine(PkCU()))
       .setPlanner(1, PlannerRandom().setEngine(PkCU()));
 }
 
@@ -37,7 +40,8 @@ EvaluatorMonteCarlo& EvaluatorMonteCarlo::initialize() {
 EvalResult_t EvaluatorMonteCarlo::calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const {
   // perform a rollout on each state:
   HeatResult result = game_->rollout(env);
+  fpType agentFitness = result.score[iTeam];
+  fpType otherFitness = result.score[(iTeam + 1) % 2];
 
-  return EvalResult_t{
-    fpType(result.score[iTeam]) / fpType(result.score[0] + result.score[1]), -1, -1};
+  return EvalResult_t{combineTeamFitness(agentFitness, otherFitness), -1, -1};
 }

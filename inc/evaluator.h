@@ -15,14 +15,17 @@ struct EvalResult_t {
   Action otherMove;
 };
 
-class Evaluator: public Name
-{
-protected:
-  std::shared_ptr<const EnvironmentNonvolatile> nv_;
-
+class Evaluator: public Name {
 public:
-  Evaluator() = default;
-  Evaluator(const std::string& name): Name(name) {}
+  struct Config {
+    /* how much more heavily we weight our own fitness compared to the enemy's fitness. */
+    fpType teamBias = 0.5;
+
+    Config() {};
+  };
+
+  Evaluator(const Config& cfg = Config()) : Name(), cfg_(cfg) {}
+  Evaluator(const std::string& name, const Config& cfg = Config()): Name(name), cfg_(cfg) {}
 
   /* delete evaluator */
   virtual ~Evaluator() { };
@@ -43,6 +46,12 @@ public:
   virtual EvalResult_t calculateFitness(const ConstEnvironmentPossible& env, size_t iTeam) const {
     return calculateFitness(env.getEnv(), iTeam);
   }
+protected:
+  std::shared_ptr<const EnvironmentNonvolatile> nv_;
+
+  Config cfg_;
+
+  virtual fpType combineTeamFitness(fpType agentFitness, fpType otherFitness) const;
 };
 
 #endif /* EVALUATOR_H */

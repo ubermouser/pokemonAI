@@ -89,7 +89,7 @@ dream eater	Psychic	15	100	100	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0
 drill peck	Flying	20	100	80	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	A corkscrewing attack with the sharp beak acting as a drill.
 dynamicpunch	Fighting	5	50	100	1	1	0	0	0	0	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	---	"The foe is punched with the user's full, concentrated power. It confuses the foe if it hits."
 earth power	Ground	10	100	90	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user makes the ground under the foe erupt with power. It may also lower the target's Sp. Def.
-earthquake	Ground	10	100	100	1	6	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	"SetDMG(target.delay(dig),200%*dmg)"	The user sets off an earthquake that hits all the Pokémon in the battle.
+earthquake	Ground	10	100	100	1	6	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user sets off an earthquake that hits all the Pokémon in the battle.
 encore	Normal	5	100	---	0	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	"lockIn(target,always,4-8)"	The user compels the foe to keep using only the move it last used for two to six turns.
 endeavor	Normal	5	100	Var	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	"SetDMG(Always, Max(target.HP - user.HP,0))"	An attack move that cuts down the foe's HP to equal the user's HP.
 endure	Normal	10	100	---	0	0	3	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	"SetHP(self, Max(target.dmg - self.hp, 1));dr"	"The user endures any attack, leaving 1 HP. Its chance of failing rises if it is used in succession."
@@ -140,7 +140,7 @@ growl	Normal	40	100	---	0	3	0	0	0	0	0	0	0	0	0	0	100	1	0	0	0	0	0	0	0	0	0	0	0	0	0	
 growth	Normal	40	---	---	0	0	0	0	1	0	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user's body is forced to grow all at once. It raises the Sp. Atk stat.
 grudge	Ghost	5	100	---	0	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	"FailIf(!self.InjuredthisTurn);SetPP(target,target.attackingMove,0)"	"If the user faints, the user's grudge fully depletes the PP of the foe's move that knocked it out."
 gunk shot	Poison	5	70	120	1	1	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	---	The user shoots filthy garbage at the foe to attack. It may also poison the target.
-gust	Flying	35	100	40	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	"SetDMG(target.delay(fly),200%*dmg)"	A gust of wind is whipped up by wings and launched at the foe to inflict damage.
+gust	Flying	35	100	40	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	A gust of wind is whipped up by wings and launched at the foe to inflict damage.
 gyro ball	Steel	5	100	Var	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	"SetDMG(always,min(150,1+25*target.speed/user.speed))"	"The user tackles the foe with a high-speed spin. The slower the user, the greater the damage."
 hail	Ice	10	---	---	0	7	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SetEnvironment(Hail)	The user summons a hailstorm lasting five turns. It damages all Pokémon except the Ice type.
 hammer arm	Fighting	10	90	100	1	1	0	0	0	0	0	-1	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	"The user swings and hits with its strong and heavy fist. It lowers the user's Speed, however."
@@ -327,7 +327,7 @@ sunny day	Fire	5	---	---	0	7	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0
 super fang	Normal	10	90	Var	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	"SetDMG(self,always,Max(1,target.HP*0.5))"	The user chomps hard on the foe with its sharp front fangs. It cuts the target's HP to half.
 superpower	Fighting	5	100	120	1	1	0	-1	0	-1	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	"The user attacks the foe with great power. However, it also lowers the user's Attack and Defense."
 supersonic	Normal	20	100	---	0	1	0	0	0	0	0	0	0	0	0	0	55	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	---	The user generates odd sound waves from its body. It may confuse the target.
-surf	Water	15	100	95	2	6	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	"SetDMG(self,target.delay(dive),2*dmg)"	It swamps the entire battlefield with a giant wave. It can also be used for crossing water.
+surf	Water	15	100	95	2	6	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	It swamps the entire battlefield with a giant wave. It can also be used for crossing water.
 swagger	Normal	15	100	---	0	1	0	0	0	0	0	0	0	0	0	0	90	-2	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	---	"The user enrages the foe into confusion. However, it also sharply raises the foe's Attack stat."
 swallow	Normal	10	---	---	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!SWALLOW	The power stored using the move Stockpile is absorbed by the user to heal its HP.
 sweet kiss	Normal	10	100	---	0	1	0	0	0	0	0	0	0	0	0	0	75	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	---	"The user kisses the foe with a sweet, angelic cuteness that causes confusion."

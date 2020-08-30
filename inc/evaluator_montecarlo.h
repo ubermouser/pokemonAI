@@ -15,12 +15,12 @@
 
 class EvaluatorMonteCarlo : public Evaluator {
 public:
-  struct Config {
+  struct Config : public Evaluator::Config {
     size_t maxRollouts = 250;
 
     size_t maxPlies = 125;
 
-    Config(){}
+    Config() : Evaluator::Config() {};
   };
 
   EvaluatorMonteCarlo(const Config& cfg = Config());

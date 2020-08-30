@@ -293,7 +293,7 @@ Turn Game::digestTurn(
 
 GameResult Game::digestGame(const std::vector<Turn>& cLog, int endStatus) {
   GameResult cResult{};
-  cResult.log = cLog;
+  if (cfg_.storeSubcomponents) { cResult.log = cLog; }
 
   // initialize collected data:
   std::array<std::array<std::array<uint32_t, 5>, 6>, 2>& moveUse = cResult.moveUse;
@@ -432,7 +432,7 @@ GameResult Game::digestGame(const std::vector<Turn>& cLog, int endStatus) {
 HeatResult Game::digestMatch(const std::vector<GameResult>& gLog) {
   // initialize heatResult:
   HeatResult hResult{};
-  hResult.gameResults = gLog;
+  if (cfg_.storeSubcomponents) { hResult.gameResults = gLog; }
   std::array<std::array<fpType, 6>, 2>& participation = hResult.participation;
   std::array<std::array<fpType, 6>, 2>& aggregateContribution = hResult.aggregateContribution;
   std::array<std::array<fpType, 6>, 2> avgRanking;
@@ -539,51 +539,39 @@ void Game::incrementScore(int matchState, std::array<uint32_t, 2>& score) {
 
 
 void Game::printAction(
-    const ConstTeamVolatile& cTeam, const Action& iAction, unsigned int iTeam) {
-  //const TeamNonVolatile& cTeam = nv_->getTeam(iTeam);
+    const ConstTeamVolatile& cTeam, const Action& iAction, unsigned int iTeam) const {
   if (iAction >= AT_MOVE_0 && iAction <= AT_MOVE_3) {
     std::clog 
-      << "T" << (iTeam==TEAM_A?"A":"B") <<": " 
-      << cTeam.nv().getName() << " - "
-      << cTeam.getICPKV() << ": "
-      << cTeam.getPKV().nv().getName() << " used "
+      << getPokemonIdentifier(cTeam, iTeam) << " used "
       << (iAction - AT_MOVE_0) << "-"
       << cTeam.getPKV().getMV(iAction)
       << "!\n";
   } else if (iAction >= AT_SWITCH_0 && iAction <= AT_SWITCH_5) {
     std::clog 
-      << "T" << (iTeam==TEAM_A?"A":"B") <<": " 
-      << cTeam.nv().getName() << " - "
-      << cTeam.getICPKV() << ": "
-      << cTeam.getPKV().nv().getName() << " is switching out with "
+      << getPokemonIdentifier(cTeam, iTeam) << " is switching out with "
       << (iAction - AT_SWITCH_0) << ": "
       << cTeam.teammate(iAction - AT_SWITCH_0).nv().getName() << "!\n";
   } else if (iAction == AT_MOVE_NOTHING) {
     std::clog 
-      << "T" << (iTeam==TEAM_A?"A":"B") <<": " 
-      << cTeam.nv().getName() << " - "
-      << cTeam.getICPKV() << ": "
-      << cTeam.getPKV().nv().getName() << " waited for a turn!\n";
+      << getPokemonIdentifier(cTeam, iTeam) << " waited for a turn!\n";
   } else if (iAction == AT_MOVE_STRUGGLE) {
     std::clog 
-      << "T" << (iTeam==TEAM_A?"A":"B") <<": " 
-      << cTeam.nv().getName() << " - "
-      << cTeam.getICPKV() << ": "
-      << cTeam.getPKV().nv().getName() << " used X-"
+      << getPokemonIdentifier(cTeam, iTeam) << " used X-"
       << cTeam.getPKV().getMV(AT_MOVE_STRUGGLE)
       << "!\n";
   } else {
     std::clog 
-      << "T" << (iTeam==TEAM_A?"A":"B") <<": " 
-      << cTeam.nv().getName() << " - "
-      << cTeam.getICPKV() << ": "
-      << cTeam.getPKV().nv().getName() << " chose unknown action "
+      << getPokemonIdentifier(cTeam, iTeam) << " chose unknown action "
       << iAction << "!\n";
+  }
+  // if the current pokemon is dead and switching out, print their team:
+  if (!cTeam.getPKV().isAlive()) {
+    cTeam.printTeam(std::clog, "    ");
   }
 }
 
 
-std::string Game::getGameIdentifier(size_t iMatch) {
+std::string Game::getGameIdentifier(size_t iMatch) const {
   std::ostringstream gameIdentifier;
   if (iMatch != SIZE_MAX) {
     gameIdentifier << "game " << (iMatch+1) << " of " << cfg_.maxMatches;
@@ -595,7 +583,7 @@ std::string Game::getGameIdentifier(size_t iMatch) {
 }
 
 
-std::string Game::getTeamIdentifier(size_t iTeam) {
+std::string Game::getTeamIdentifier(size_t iTeam) const {
   std::ostringstream teamIdentifier;
   teamIdentifier <<
       "T" << (iTeam==TEAM_A?"A":"B") <<
@@ -606,7 +594,19 @@ std::string Game::getTeamIdentifier(size_t iTeam) {
 }
 
 
-void Game::printGameStart(size_t iMatch) {
+std::string Game::getPokemonIdentifier(const ConstTeamVolatile& cTeam, size_t iTeam) const {
+  std::ostringstream pkIdentifier;
+  pkIdentifier
+      << "T" << (iTeam==TEAM_A?"A":"B") <<": "
+      << cTeam.nv().getName() << " - "
+      << cTeam.getICPKV() << ": "
+      << cTeam.getPKV().nv().getName();
+
+  return pkIdentifier.str();
+}
+
+
+void Game::printGameStart(size_t iMatch) const {
   std::string gameIdentifier = getGameIdentifier(iMatch);
   
   std::cout <<
@@ -617,7 +617,7 @@ void Game::printGameStart(size_t iMatch) {
 }
 
 
-void Game::printGameOutline(const GameResult& gResult, size_t iMatch) {
+void Game::printGameOutline(const GameResult& gResult, size_t iMatch) const {
   std::string gameIdentifier = getGameIdentifier(iMatch);
   int matchState = gResult.endStatus;
 
@@ -668,15 +668,16 @@ void Game::printGameOutline(const GameResult& gResult, size_t iMatch) {
 }
 
 
-void Game::printHeatStart() {
-  std::cout << "Team " << getTeamIdentifier(TEAM_A) << ":\n" <<
-      ConstEnvironmentVolatile{*nv_, initialState_}.getTeam(TEAM_A);
-  std::cout << "Team " << getTeamIdentifier(TEAM_B) << ":\n" <<
-      ConstEnvironmentVolatile{*nv_, initialState_}.getTeam(TEAM_B);
+void Game::printHeatStart() const {
+  std::cout << "Team " << getTeamIdentifier(TEAM_A) << ":\n";
+  ConstEnvironmentVolatile{*nv_, initialState_}.getTeam(TEAM_A).printTeam(std::cout, "    ");
+  
+  std::cout << "Team " << getTeamIdentifier(TEAM_B) << ":\n";
+  ConstEnvironmentVolatile{*nv_, initialState_}.getTeam(TEAM_B).printTeam(std::cout, "    ");
 }
 
 
-void Game::printHeatOutline(const HeatResult& result) {
+void Game::printHeatOutline(const HeatResult& result) const {
   if (result.endStatus == MATCH_TIE) {
     std::cout <<
       ((cfg_.verbosity>=3)?"\n":"") <<
