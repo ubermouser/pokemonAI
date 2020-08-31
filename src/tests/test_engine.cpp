@@ -298,3 +298,60 @@ TEST_F(EngineTest, ChoiceItems) {
     EXPECT_EQ(dracometeor_none.at(0).getEnv().getTeam(0).teammate(2).getHP(), 0);
   }
 }
+
+
+TEST_F(EngineTest, Pursuit) {
+  auto team = TeamNonVolatile()
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("scizor"))
+        .addMove(pokedex_->getMoves().at("pursuit"))
+        .setLevel(100))
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("azelf")));
+  auto environment = EnvironmentNonvolatile(team, team, true);
+  engine_->setEnvironment(environment);
+
+  auto pursuit_switch = engine_->updateState(engine_->initialState(), AT_MOVE_0, AT_SWITCH_1);
+  auto pursuit_noswitch = engine_->updateState(engine_->initialState(), AT_MOVE_0, AT_MOVE_NOTHING);
+
+  // the pokemon switching out receives 2x the damage as a pokemon that doesn't:
+  EXPECT_LT(pursuit_switch.at(0).getEnv().getTeam(1).teammate(0).getHP(),
+            pursuit_noswitch.at(0).getEnv().getTeam(1).teammate(0).getHP());
+  // no damage to the pokemon who switched in:
+  EXPECT_EQ(pursuit_switch.at(0).getEnv().getTeam(1).teammate(1).getPercentHP(), 1.);
+}
+
+
+TEST_F(EngineTest, Outrage) {
+  auto team_1 = TeamNonVolatile()
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("flygon"))
+        .addMove(pokedex_->getMoves().at("outrage"))
+        .addMove(pokedex_->getMoves().at("roost"))
+        .setLevel(100))
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("pikachu")));
+  auto team_2 = TeamNonVolatile()
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("metagross"))
+        .setLevel(100));
+  auto environment = EnvironmentNonvolatile(team_1, team_2, true);
+  engine_->setEnvironment(environment);
+
+  auto outrage_0 = engine_->updateState(engine_->initialState(), AT_MOVE_0, AT_MOVE_NOTHING);
+  auto outrage_1 = engine_->updateState(outrage_0.at(0), AT_MOVE_0, AT_MOVE_NOTHING);
+  auto outrage_2 = engine_->updateState(outrage_1.at(0), AT_MOVE_0, AT_MOVE_NOTHING);
+
+  // the pokemon cannot switch out or perform other moves when outraging:
+  EXPECT_TRUE(engine_->isValidAction(outrage_0.at(0), AT_MOVE_0, TEAM_A));
+  EXPECT_FALSE(engine_->isValidAction(outrage_0.at(0), AT_MOVE_1, TEAM_A));
+  EXPECT_FALSE(engine_->isValidAction(outrage_0.at(0), AT_SWITCH_1, TEAM_A));
+
+  // the pokemon is confused after outraging:
+  EXPECT_EQ(
+      outrage_2.at(0).getEnv().getTeam(0).teammate(0).status().cTeammate.confused, AIL_V_CONFUSED_5T);
+  // the pokemon may switch out or perform other moves:
+  EXPECT_TRUE(engine_->isValidAction(outrage_2.at(0), AT_MOVE_0, TEAM_A));
+  EXPECT_TRUE(engine_->isValidAction(outrage_2.at(0), AT_MOVE_1, TEAM_A));
+  EXPECT_TRUE(engine_->isValidAction(outrage_2.at(0), AT_SWITCH_1, TEAM_A));
+}

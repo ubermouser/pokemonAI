@@ -51,9 +51,9 @@ struct VolatileStatus
   uint32_t itemScratch : 4; // free bits for the current item to use
   uint32_t numRoundsInPlay : 4; // updated only when conditions like slow start are in play
   uint32_t toxicPoison_tier : 4; // updated only when conditions like toxic poison are in play
-  uint32_t chargeMove : 3; // includes uproar, outrage, charge, and recharge
+  uint32_t lockIn_action : 3; // includes uproar, outrage, charge, and recharge
+  uint32_t lockIn_duration : 3;
   uint32_t defensiveCurl : 1;
-  uint32_t momentum : 3;
   uint32_t imprison : 1;
   uint32_t infatuate : 1;
   // END OF THIRD WORD

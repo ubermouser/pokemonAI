@@ -49,7 +49,9 @@ const Move* memento_t;
 const Move* milkDrink_t;
 const Move* nightShade_t;
 const Move* nightSlash_t;
+const Move* outrage_t;
 const Move* painSplit_t;
+const Move* pursuit_t;
 const Move* psychoCut_t;
 const Move* rapidSpin_t;
 const Move* razorLeaf_t;
@@ -535,6 +537,133 @@ int move_alwaysHits
 
   // do not allow anything to affect hit chance other than this if the move always hits:
   return 2;
+}
+
+int move_pursuit_modBracket
+  (PkCUEngine& cu,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  int32_t& bracket) {
+  if (&mV.getBase() != pursuit_t) { return 0; }
+
+  // if the enemy's move is a swap move:
+  if (!PkCU::isSwitchAction(cu.getIOAction())) { return 1; }
+
+  // increase the speed bracket such that it outspeeds a switch-in:
+  bracket = 7;
+  return 1;
+}
+
+int move_pursuit_modPower
+  (PkCUEngine& cu,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV,
+  fpType& modifier) {
+  if (&mV.getBase() != pursuit_t) { return 0; }
+
+  // if the enemy's move is a swap move:
+  if (!PkCU::isSwitchAction(cu.getIOAction())) { return 1; }
+
+  // greatly increase the power of the move if the enemy's move is a switch-in
+  modifier *= 2.0;
+  return 1;
+}
+
+int move_pursuit_modAccuracy
+  (PkCUEngine& cu,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV,
+  fpType& probabilityToHit) {
+  if (&mV.getBase() != pursuit_t) { return 0; }
+
+  // if the enemy's move is a swap move:
+  if (!PkCU::isSwitchAction(cu.getIOAction())) { return 1; }
+
+  // the move never misses if the enemy move is a switch-in:
+  probabilityToHit = 1.0;
+  return 2;
+}
+
+int move_outrage_lockMove(
+    PkCUEngine& cu,
+    PokemonVolatile cPKV) {
+  // action is guaranteed to be a move action:
+  MoveVolatile mV = cPKV.getMV(cu.getICAction());
+  auto& status = cPKV.status();
+  // if not outrage, ignore:
+  if (&mV.getBase() != outrage_t) { return 0; }
+  // outrage cannot be re-locked if it is currently locked in:
+  if (status.cTeammate.lockIn_duration > 0) { return 0; }
+
+  size_t action_idx = (cu.getICAction() - AT_MOVE_0) + 1;
+  status.cTeammate.lockIn_duration = 3;
+  status.cTeammate.lockIn_action = action_idx;
+
+  return 1;
+}
+
+
+int move_outrage_endLockOn(
+    PkCUEngine& cu,
+    PokemonVolatile cPKV) {
+  // are we locked in to outrage?
+  auto& status = cPKV.status();
+  if (status.cTeammate.lockIn_duration == 0) { return 0; }
+  MoveVolatile mV = cPKV.getMV(status.cTeammate.lockIn_action - 1);
+  if (&mV.getBase() != outrage_t) { return 0; }
+
+  // 50% chance to end at stage 1:
+  if (status.cTeammate.lockIn_duration == 2) {
+    
+      std::array<size_t, 2> iREnv;
+      cu.duplicateState(iREnv, 0.5);
+
+      PokemonVolatile rPKV = cu.getPKV(iREnv[1]);
+      // state #1: pokemon snaps out of dragon dance immediatelay and becomes confused:
+      rPKV.status().cTeammate.lockIn_duration = 0;
+      rPKV.status().cTeammate.lockIn_action = 0;
+      rPKV.status().cTeammate.confused = AIL_V_CONFUSED_5T;
+      
+  }
+  // state #2 / else: dragon dance counts down for another turn:
+  status.cTeammate.lockIn_duration--;
+
+  // if this was the last dragon dance stage, confuse the pokemon:
+  if (status.cTeammate.lockIn_duration == 0) { 
+    status.cTeammate.confused = AIL_V_CONFUSED_5T;
+    status.cTeammate.lockIn_action = 0;
+  }
+  return 1;
+}
+
+int move_testLockedIn(
+    ConstPokemonVolatile cPKV,
+    ConstMoveVolatile mV,
+    const Action& action,
+    bool& moveAllowed) {
+  if (cPKV.status().cTeammate.lockIn_duration == 0) { return 0; }
+
+  // if locked in, only the locked-in move may be used. Other move actions are not permitted.
+
+  size_t action_idx = (action - AT_MOVE_0) + 1;
+  moveAllowed = cPKV.status().cTeammate.lockIn_action == action_idx;
+
+  return 1;
+}
+
+int move_testLockedSwitch(
+    ConstPokemonVolatile cPKV,
+    ConstPokemonVolatile cOPKV,
+    const Action& action,
+    bool& switchAllowed) {
+  if (cPKV.status().cTeammate.lockIn_duration == 0) { return 0; }
+
+  // if locked in, only the locked-in move may be used. Switch actions are not permitted.
+  switchAllowed = false;
+
+  return 1;
 }
 
 int ability_noGuard
@@ -1228,7 +1357,9 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   milkDrink_t = orphan::orphanCheck(moves, "milk drink");
   nightShade_t = orphan::orphanCheck(moves, "night shade");
   nightSlash_t = orphan::orphanCheck(moves, "night slash");
+  outrage_t = orphan::orphanCheck(moves, "outrage");
   painSplit_t = orphan::orphanCheck(moves, "pain split");
+  pursuit_t = orphan::orphanCheck(moves, "pursuit");
   psychoCut_t = orphan::orphanCheck(moves, "psycho cut");
   rapidSpin_t = orphan::orphanCheck(moves, "rapid spin");
   razorLeaf_t = orphan::orphanCheck(moves, "razor leaf");
@@ -1317,8 +1448,15 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(MOVE_PLUGIN, "milk drink", PLUGIN_ON_EVALUATEMOVE, move_heal50, 0, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "night shade", PLUGIN_ON_EVALUATEMOVE, move_leveledDamage, 0, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "night slash", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, 0));
+  extensions.push_back(plugin(MOVE_PLUGIN, "outrage", PLUGIN_ON_ENDOFTURN, move_outrage_endLockOn, 0, 0));
+  extensions.push_back(plugin(MOVE_PLUGIN, "outrage", PLUGIN_ON_TESTMOVE, move_testLockedIn, 0, 0));
+  extensions.push_back(plugin(MOVE_PLUGIN, "outrage", PLUGIN_ON_TESTSWITCH, move_testLockedSwitch, 0, 0));
+  extensions.push_back(plugin(MOVE_PLUGIN, "outrage", PLUGIN_ON_BEGINNINGOFTURN, move_outrage_lockMove, 0, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "pain split", PLUGIN_ON_EVALUATEMOVE, move_painSplit, 0, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "psycho cut", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, 0));
+  extensions.push_back(plugin(MOVE_PLUGIN, "pursuit", PLUGIN_ON_SETSPEEDBRACKET, move_pursuit_modBracket, 0, 0));
+  extensions.push_back(plugin(MOVE_PLUGIN, "pursuit", PLUGIN_ON_MODIFYHITPROBABILITY, move_pursuit_modAccuracy, 0, 0));
+  extensions.push_back(plugin(MOVE_PLUGIN, "pursuit", PLUGIN_ON_MODIFYRAWDAMAGE, move_pursuit_modPower, 0, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "rapid spin", PLUGIN_ON_ENDOFMOVE, move_rapidSpin, 0, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "razor leaf", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "recover", PLUGIN_ON_EVALUATEMOVE, move_heal50, 0, 0));

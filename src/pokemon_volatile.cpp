@@ -304,11 +304,15 @@ std::ostream& operator <<(std::ostream& os, const ConstPokemonVolatile& pkmn)
     // volatile ailments:
     // target confused:
     if (pkmn.status().cTeammate.confused > 0) {
-      os << " (CNFSD)";
+      os << boost::format(" (CNFSD-%d)") % pkmn.status().cTeammate.confused;
     }
     // target infatuated:
     if (pkmn.status().cTeammate.infatuate > 0) {
       os << " (INFAT)";
+    }
+    // target is locked-n to a certain move
+    if (pkmn.status().cTeammate.lockIn_duration > 0) {
+      os << boost::format(" (LOCKIN-%d)") % pkmn.status().cTeammate.lockIn_duration;
     }
     // spikes in the ground:
     if (pkmn.status().nonvolatile.spikes > 0) {
