@@ -13,6 +13,7 @@
 #include <utility>
 #include <boost/program_options.hpp>
 
+#include "action.h"
 #include "environment_nonvolatile.h"
 #include "environment_possible.h"
 #include "environment_volatile.h"
@@ -73,6 +74,8 @@ struct MoveBracket {
 
 using PluginSet = std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>;
 using PluginSets = std::array< std::array<PluginSet, 6>, 12>;
+using ActionPairVector = std::vector<std::array<Action, 2> >;
+using ActionVector = std::vector<Action>;
 
 class PKAISHARED PkCU {
 public:
@@ -134,16 +137,16 @@ public:
   ConstEnvironmentVolatile initialState() const;
 
   /* Return a collection of all valid actions for the given state. */
-  std::vector<Action> getValidActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
-    return getValidActionsInRange(envV, iTeam, AT_MOVE_FIRST, AT_MOVE_LAST);
+  ActionVector getValidActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
+    return getValidActionsInRange(envV, iTeam, 0, Action::MOVE_LAST);
   }
-  std::vector<Action> getValidMoveActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
-    return getValidActionsInRange(envV, iTeam, AT_MOVE_0, AT_MOVE_NOTHING + 1);
+  ActionVector getValidMoveActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
+    return getValidActionsInRange(envV, iTeam, Action::MOVE_0, Action::MOVE_STRUGGLE + 1);
   }
-  std::vector<Action> getValidSwapActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
-    return getValidActionsInRange(envV, iTeam, AT_SWITCH_0, AT_SWITCH_5 + 1);
+  ActionVector getValidSwapActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
+    return getValidActionsInRange(envV, iTeam, Action::MOVE_SWITCH, Action::MOVE_SWITCH + 1);
   }
-  std::vector<std::array<Action, 2> > getAllValidActions(const ConstEnvironmentVolatile& envV, size_t agentTeam=TEAM_A) const;
+  ActionPairVector getAllValidActions(const ConstEnvironmentVolatile& envV, size_t agentTeam=TEAM_A) const;
 
   /* determines whether a given action is a selectable one, given the current state */
   bool isValidAction(const ConstEnvironmentVolatile& envV, const Action& action, size_t iTeam) const;
@@ -163,13 +166,9 @@ public:
     return getGameState(envV.getEnv());
   }
 
-  static bool isMoveAction(const Action& iAction) {
-    return (iAction >= AT_MOVE_0 && iAction <= AT_MOVE_3) || (iAction == AT_MOVE_STRUGGLE);
-  };
+  static bool isMoveAction(const Action& action) { return action.isMove(); };
 
-  static bool isSwitchAction(const Action& iAction) {
-    return (iAction >= AT_SWITCH_0 && iAction <= AT_SWITCH_5);
-  };
+  static bool isSwitchAction(const Action& action) { return action.isSwitch(); };
 
 protected:
   Config cfg_;
@@ -187,8 +186,8 @@ protected:
   void guardNonvolatileState(const ConstEnvironmentVolatile& cEnv) const;
 
   
-  std::vector<Action> getValidActionsInRange(
-      const ConstEnvironmentVolatile& envV, size_t iTeam, const Action& iStart, const Action& iEnd) const;
+  ActionVector getValidActionsInRange(
+      const ConstEnvironmentVolatile& envV, size_t iTeam, size_t iStart, size_t iEnd) const;
 
   /* if iTeam = SIZE_MAX, insert for both teams. if iCTeammate =  SIZE_MAX, insert for all teammates. True if non-duplicate */
   size_t insertPluginHandler(plugin_t& cPlugin, size_t pluginType, size_t iNTeammate = SIZE_MAX);
@@ -225,7 +224,7 @@ protected:
   std::array<size_t, 2> iTeams_;
 
   /* an array of each team's action. 0 is current team, 1 is other team */
-  std::array<Action, 2> iActions_;
+  std::array<Action, 2> actions_;
 
   /* iterator - the environment that the current operation is creating values from */
   size_t iBase_;
@@ -396,8 +395,8 @@ public:
   ConstEnvironmentPossible getBase() const { return getStack().at(iBase_); };
   size_t getICTeam() const { return iTeams_[0]; };
   size_t getIOTeam() const { return iTeams_[1]; };
-  size_t getICAction() const { return iActions_[0]; };
-  size_t getIOAction() const { return iActions_[1]; };
+  const Action& getCAction() const { return actions_[0]; };
+  const Action& getOAction() const { return actions_[1]; };
   size_t getIBase() const { return iBase_; };
   PossibleEnvironments& getStack() { return stack_; };
   const PossibleEnvironments& getStack() const { return stack_; };

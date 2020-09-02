@@ -55,6 +55,7 @@ public:
   const VolatileStatus& getVolatile() const { return data().status.cTeammate; };
   const NonVolatileStatus& getNonVolatile() const { return data().status.nonvolatile; };
 
+  pokemonvolatile_t teammate(const Action& action) const { return teammate(action.iFriendly()); }
   pokemonvolatile_t teammate(size_t iTeammate) const;
 
   /* returns number of teammates on this team that are still alive */

@@ -11,6 +11,7 @@
 #include "pkai.h"
 #include "pokedex.h"
 
+#include "action.h"
 #include "ability.h"
 #include "item.h"
 #include "type.h"

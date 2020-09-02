@@ -8,6 +8,7 @@
 
 #include <boost/program_options.hpp>
 
+#include "action.h"
 #include "environment_nonvolatile.h"
 #include "environment_possible.h"
 #include "evaluator.h"
@@ -18,8 +19,8 @@
 
 struct PlyResult {
   size_t depth = 0;
-  Action agentAction = -1;
-  Action otherAction = -1;
+  Action agentAction = Action{};
+  Action otherAction = Action{};
   Fitness fitness = Fitness::worst();
   size_t numNodes = 0;
   double timeSpent = 0;

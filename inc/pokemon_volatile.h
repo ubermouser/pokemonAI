@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <array>
 
+#include "action.h"
 #include "move_volatile.h"
 #include "nonvolatile_volatile.h"
 #include "team_status.h"
@@ -93,6 +94,7 @@ public:
   /* returns TRUE if the pokemon has more than 0 hitpoints */
   bool isAlive() const;
 
+  movevolatile_t getMV(const Action& action) const { return getMV(action.iMove()); }
   movevolatile_t getMV(size_t index) const;
 
   /* True if the pokemon has at least one move they can perform */

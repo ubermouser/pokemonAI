@@ -71,6 +71,7 @@ const Move* stoneEdge_t;
 const Move* struggle_t;
 const Move* swift_t;
 const Move* toxicSpikes_t;
+const Move* uTurn_t;
 const Move* voltTackle_t;
 const Move* woodHammer_t;
 
@@ -547,7 +548,7 @@ int move_pursuit_modBracket
   if (&mV.getBase() != pursuit_t) { return 0; }
 
   // if the enemy's move is a swap move:
-  if (!PkCU::isSwitchAction(cu.getIOAction())) { return 1; }
+  if (!cu.getOAction().isSwitch()) { return 1; }
 
   // increase the speed bracket such that it outspeeds a switch-in:
   bracket = 7;
@@ -563,7 +564,7 @@ int move_pursuit_modPower
   if (&mV.getBase() != pursuit_t) { return 0; }
 
   // if the enemy's move is a swap move:
-  if (!PkCU::isSwitchAction(cu.getIOAction())) { return 1; }
+  if (!cu.getOAction().isSwitch()) { return 1; }
 
   // greatly increase the power of the move if the enemy's move is a switch-in
   modifier *= 2.0;
@@ -579,7 +580,7 @@ int move_pursuit_modAccuracy
   if (&mV.getBase() != pursuit_t) { return 0; }
 
   // if the enemy's move is a swap move:
-  if (!PkCU::isSwitchAction(cu.getIOAction())) { return 1; }
+  if (!cu.getOAction().isSwitch()) { return 1; }
 
   // the move never misses if the enemy move is a switch-in:
   probabilityToHit = 1.0;
@@ -590,14 +591,14 @@ int move_outrage_lockMove(
     PkCUEngine& cu,
     PokemonVolatile cPKV) {
   // action is guaranteed to be a move action:
-  MoveVolatile mV = cPKV.getMV(cu.getICAction());
+  MoveVolatile mV = cPKV.getMV(cu.getCAction());
   auto& status = cPKV.status();
   // if not outrage, ignore:
   if (&mV.getBase() != outrage_t) { return 0; }
   // outrage cannot be re-locked if it is currently locked in:
   if (status.cTeammate.lockIn_duration > 0) { return 0; }
 
-  size_t action_idx = (cu.getICAction() - AT_MOVE_0) + 1;
+  size_t action_idx = cu.getCAction().iMove() + 1;
   status.cTeammate.lockIn_duration = 3;
   status.cTeammate.lockIn_action = action_idx;
 
@@ -647,7 +648,7 @@ int move_testLockedIn(
 
   // if locked in, only the locked-in move may be used. Other move actions are not permitted.
 
-  size_t action_idx = (action - AT_MOVE_0) + 1;
+  size_t action_idx = action.iMove() + 1;
   moveAllowed = cPKV.status().cTeammate.lockIn_action == action_idx;
 
   return 1;
@@ -664,6 +665,26 @@ int move_testLockedSwitch(
   switchAllowed = false;
 
   return 1;
+}
+
+int move_uTurn_swapOnTurnEnd(
+  PkCUEngine& cu,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV) {
+  if (&mV.getBase() != uTurn_t) { return 0; }
+  auto action = cu.getCAction();
+  TeamVolatile tV = cu.getTV();
+
+  // u-turn is used when the current pokemon is the swap target (usable when no other allies alive)
+  if (action.iFriendly() == tV.getICPKV()) { return 1; }
+
+  cu.getBase().setSwitched(cu.getICTeam());
+  tV.swapPokemon(action.iFriendly());
+  cu.setCPluginSet();
+  // TODO(@drendleman) - swap-in should cause entry-hazards to trigger
+
+  return 2;
 }
 
 int ability_noGuard
@@ -891,7 +912,7 @@ int item_choiceItem_lockMove(
     (cItem != choiceSpecs_t)) { return 0; }
 
   // action is guaranteed to be a move action:
-  size_t action_idx = (cu.getICAction() - AT_MOVE_0) + 1;
+  size_t action_idx = cu.getCAction().iMove() + 1;
   // the pokemon may not use another move until it switches out:
   cPKV.status().cTeammate.itemScratch = action_idx;
 
@@ -917,7 +938,7 @@ int item_choiceItem_testLockedMove(
   if (choice_item_idx == 0) { return 1; }
 
   // else, if the choice item has chosen a move, the only acceptable move is the choice move:
-  size_t action_idx = (action - AT_MOVE_0) + 1;
+  size_t action_idx = action.iMove() + 1;
   moveAllowed = choice_item_idx == action_idx;
   
   return 1;
@@ -1061,7 +1082,7 @@ int engine_beginTurnNonvolatileEffect(
       }
       // 20% chance for pokemon to not be completely frozen:
       {
-        if (&cPKV.getMV(cu.getICAction()).getBase().getType() == fire_t) {
+        if (&cPKV.getMV(cu.getCAction()).getBase().getType() == fire_t) {
           cu.getPKV(iREnv[0]).clearStatusAilment();
         }
       }
@@ -1378,6 +1399,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   struggle_t = orphan::orphanCheck(moves, "struggle");
   swift_t = orphan::orphanCheck(moves, "swift");
   toxicSpikes_t = orphan::orphanCheck(moves, "toxic spikes");
+  uTurn_t = orphan::orphanCheck(moves, "u-turn");
   voltTackle_t = orphan::orphanCheck(moves, "volt tackle");
   woodHammer_t = orphan::orphanCheck(moves, "wood hammer");
   //items:
@@ -1478,6 +1500,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(MOVE_PLUGIN, "swift", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "toxic spikes", PLUGIN_ON_SWITCHIN, move_toxicSpikes_switch, 2, 2));
   extensions.push_back(plugin(MOVE_PLUGIN, "toxic spikes", PLUGIN_ON_EVALUATEMOVE, move_toxicSpikes_set, 0, 0));
+  extensions.push_back(plugin(MOVE_PLUGIN, "u-turn", PLUGIN_ON_ENDOFMOVE, move_uTurn_swapOnTurnEnd, 1, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "wood hammer", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "volt tackle", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, 0));
   // item effects:

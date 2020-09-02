@@ -192,7 +192,7 @@ PkCUEngine::PkCUEngine(
     stack_(stack),
     pluginSets_(cu.pluginSets_),
     iTeams_({TEAM_A, TEAM_B}),
-    iActions_({actionA, actionB}),
+    actions_({actionA, actionB}),
     iBase_(0) {
   stack_.clear();
   stack_.setNonvolatileEnvironment(cu.nv_);
@@ -209,7 +209,7 @@ PkCUEngine::PkCUEngine(
 
 void PkCUEngine::swapTeamIndexes() {
   std::swap(iTeams_[0], iTeams_[1]);
-  std::swap(iActions_[0], iActions_[1]);
+  std::swap(actions_[0], actions_[1]);
 
   setCPluginSet();
 }
@@ -286,20 +286,14 @@ int32_t PkCUEngine::movePriority_Bracket() {
   int32_t actionResult = 0;
   
   // if the pokemon is switching out, its move priority is +6
-  switch(iActions_[0])
-  {
-    case AT_SWITCH_0:
-    case AT_SWITCH_1:
-    case AT_SWITCH_2:
-    case AT_SWITCH_3:
-    case AT_SWITCH_4:
-    case AT_SWITCH_5:
+  switch(actions_[0].type()) {
+    case Action::MOVE_SWITCH:
       actionResult = 6;
       break;
-    case AT_MOVE_0:
-    case AT_MOVE_1:
-    case AT_MOVE_2:
-    case AT_MOVE_3:
+    case Action::MOVE_0:
+    case Action::MOVE_1:
+    case Action::MOVE_2:
+    case Action::MOVE_3:
     {
       // if the pokemon is performing a move, find the move's priority
       MoveVolatile mv = getMV();
@@ -311,11 +305,10 @@ int32_t PkCUEngine::movePriority_Bracket() {
           *this, mv, getPKV(), actionResult);
       break;
     }
-    case AT_MOVE_NOTHING:
+    case Action::MOVE_WAIT:
       actionResult = -7;
       break;
-    case AT_MOVE_STRUGGLE:
-    case AT_ITEM_USE:
+    case Action::MOVE_STRUGGLE:
     default:
       actionResult = 0;
       break;
@@ -395,31 +388,31 @@ void PkCUEngine::evaluateRound_end() {
 void PkCUEngine::evaluateMove() {
   // NOTE: ONLY ONE stage is set to preturn at a time
   assert(getStackStage() == STAGE_PRETURN);
-  size_t iCAction = getICAction();
+  Action cAction = getCAction();
   size_t iCTeam = getICTeam();
   // the floor of the stack: everything below this stack value has been evaluated
   size_t baseFloor = iBase_, baseCeil = getStack().size(), iNBase;
 
   // TODO: does this model the actual game?
   // if either pokemon is dead at this point, the only valid moves are switching and waiting
-  if ( (!getPKV().isAlive() || !getTPKV().isAlive()) && PkCU::isMoveAction(iCAction) ) {
-    iCAction = AT_MOVE_NOTHING;
+  if ( (!getPKV().isAlive() || !getTPKV().isAlive()) && cAction.isMove() ) {
+    cAction = Action::nothing();
   }
 
 
   // does this move require a switch-out?
-  if (PkCU::isSwitchAction(iCAction)) {
+  if (cAction.isSwitch()) {
     stackStage_[iBase_] = STAGE_PRESWITCH;
     evaluateMove_switch();
     // end of is Switch type action
-  } else if (iCAction == AT_MOVE_NOTHING) { // is this pokemon doing nothing?
+  } else if (cAction.isWait()) { // is this pokemon doing nothing?
     stackStage_[iBase_] = STAGE_POSTSECONDARY;
 
     // set that the current team did nothing this turn:
     getBase().setWaited(iCTeam);
     // pokemon performs no action, no update to the state is needed
     // end of is Wait type action
-  } else if (PkCU::isMoveAction(iCAction)) { // is the pokemon moving normally?
+  } else if (cAction.isMove()) { // is the pokemon moving normally?
     assert(getPKV().isAlive() && getTPKV().isAlive());
 
     // this is the first function which may generate more than one state of STAGE_STATUS type
@@ -478,7 +471,7 @@ void PkCUEngine::evaluateMove_switch()
   assert(getStackStage() == STAGE_PRESWITCH);
 
   size_t iCTeam = getICTeam();
-  size_t iCAction = getICAction();
+  const Action& cAction = getCAction();
   // the floor of the stack: everything below this stack value has been evaluated
   size_t baseFloor = iBase_, baseCeil = getStack().size();
 
@@ -506,7 +499,7 @@ void PkCUEngine::evaluateMove_switch()
     stackStage_[iBase_] = STAGE_POSTSECONDARY;
 
     // switch out
-    getTV().swapPokemon(iCAction);
+    getTV().swapPokemon(cAction.iFriendly());
 
     // set the current array of plugins:
     setCPluginSet();
@@ -1232,13 +1225,13 @@ MatchState PkCU::getGameState(const ConstEnvironmentVolatile& envV) const {
 }
 
 
-std::vector<std::array<Action, 2> > PkCU::getAllValidActions(
+ActionPairVector PkCU::getAllValidActions(
     const ConstEnvironmentVolatile& envV, size_t agentTeam) const {
-  std::vector<std::array<Action, 2> > result; result.reserve(AT_MOVE_LAST * AT_MOVE_LAST);
-  auto agentMoves = getValidActions(envV, agentTeam);
-  auto otherMoves = getValidActions(envV, (agentTeam+1) % 2);
-  for (auto agentMove: agentMoves) {
-    for (auto otherMove: otherMoves) {
+  ActionPairVector result; result.reserve(std::sqrt(Action::MOVE_LAST));
+  auto agentActions = getValidActions(envV, agentTeam);
+  auto otherActions = getValidActions(envV, (agentTeam+1) % 2);
+  for (auto agentMove: agentActions) {
+    for (auto otherMove: otherActions) {
       result.push_back({agentMove, otherMove});
     }
   }
@@ -1247,12 +1240,19 @@ std::vector<std::array<Action, 2> > PkCU::getAllValidActions(
 }
 
 
-std::vector<Action> PkCU::getValidActionsInRange(
-    const ConstEnvironmentVolatile& envV, size_t iTeam, const Action& iFirst, const Action& iLast) const {
-  std::vector<Action> result; result.reserve(iLast - iFirst);
-  for (Action iAction = iFirst; iAction < iLast; ++iAction) {
-    if (isValidAction(envV, iAction, iTeam)) {
-      result.push_back(iAction);
+ActionVector PkCU::getValidActionsInRange(
+    const ConstEnvironmentVolatile& envV, size_t iTeam, size_t iFirst, size_t iLast) const {
+  ActionVector result; result.reserve(iLast - iFirst);
+  for (size_t iType = iFirst; iType < iLast; ++iType) {
+    if (iType == Action::MOVE_SWITCH) {
+      for (size_t iFriendly = 0; iFriendly < 6; ++iFriendly) {
+        Action action{iType, iFriendly};
+        if (isValidAction(envV, action, iTeam)) { result.push_back(action); }
+      }
+    } else {
+      // TODO - moves that require a friendly target
+      Action action{iType};
+      if (isValidAction(envV, action, iTeam)) { result.push_back(action); }
     }
   }
 
@@ -1267,16 +1267,16 @@ bool PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Action& act
   ConstPokemonVolatile cPKV = cTV.getPKV();
   ConstPokemonVolatile tPKV = oTV.getPKV();
   
-  switch(action)
-  {
-    case AT_MOVE_0:
-    case AT_MOVE_1:
-    case AT_MOVE_2:
-    case AT_MOVE_3:
+  switch(action.type()) {
+    case Action::MOVE_0:
+    case Action::MOVE_1:
+    case Action::MOVE_2:
+    case Action::MOVE_3:
     {
       /* is this a valid move? */
-      if ((action - AT_MOVE_0) >= cPKV.nv().getNumMoves()) { return false; }
+      if (action.iMove() >= cPKV.nv().getNumMoves()) { return false; }
 
+      // TODO(@drendleman) - are both the target and friendly pokemon alive?
       // is the other pokemon alive?
       if (!(tPKV.isAlive())) { return false; }
 
@@ -1284,7 +1284,7 @@ bool PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Action& act
       if (!cPKV.isAlive()) { return false; }
 
       // does the move we're using have any PP left?
-      ConstMoveVolatile cMV = cPKV.getMV(action - AT_MOVE_0);
+      ConstMoveVolatile cMV = cPKV.getMV(action);
       if (cMV.hasPP() != true ) { return false; }
     
       // Are we locked out of the current move? By default, allow moves
@@ -1296,21 +1296,16 @@ bool PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Action& act
 
       return doAllowMove;
     }
-    case AT_SWITCH_0:
-    case AT_SWITCH_1:
-    case AT_SWITCH_2:
-    case AT_SWITCH_3:
-    case AT_SWITCH_4:
-    case AT_SWITCH_5:
+    case Action::MOVE_SWITCH:
     {
       // is the pokemon we're switching to a valid teammate?
-      if ( ((action - AT_SWITCH_0) < cTV.nv().getNumTeammates()) != true) { return false; }
+      if ( (action.iFriendly() < cTV.nv().getNumTeammates()) != true) { return false; }
     
       // are we trying to switch to ourself?
-      if ((action - AT_SWITCH_0) == cTV.getICPKV()) { return false; }
+      if (action.iFriendly() == cTV.getICPKV()) { return false; }
 
       // is the pokemon we're switching to even alive?
-      ConstPokemonVolatile cOPKV = cTV.teammate(action - AT_SWITCH_0);
+      ConstPokemonVolatile cOPKV = cTV.teammate(action.iFriendly());
       if ( cOPKV.isAlive() != true) { return false; }
 
       // are we trying to move during the other team's free move?
@@ -1325,13 +1320,13 @@ bool PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Action& act
 
       return doAllowSwitch; // by default, allow switches
     }
-    case AT_MOVE_NOTHING:
+    case Action::MOVE_WAIT:
       // are we waiting for the other team to take its free move?
       if (!(tPKV.isAlive()) && cPKV.isAlive()) { return true; }
 
       // in most cases, do not allow not moving
       return false;
-    case AT_MOVE_STRUGGLE:
+    case Action::MOVE_STRUGGLE:
       // is the other pokemon alive?
       if (!(tPKV.isAlive())) { return false; }
 
@@ -1340,16 +1335,12 @@ bool PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Action& act
 
       // are all other moves unusable?
       for (size_t iMove = 0, iSize = cPKV.nv().getNumMoves(); iMove != iSize; ++iMove) {
-        if (isValidAction(envV, iMove + AT_MOVE_0, iTeam)) { return false; }
+        if (isValidAction(envV, Action::move(iMove), iTeam)) { return false; }
       }
 
       // may struggle when all other moves are unusable:
       return true;
-    // disabled action types:
-    case AT_ITEM_USE:
-    case AT_MOVE_CONFUSED:
-      return false;
-    default: // what the hell happened here? No, this isn't a valid move. Shut up.
+    default: // disabled action types (item use):
       return false;
   }
 } // endOf is valid action
@@ -1432,12 +1423,12 @@ TeamVolatile PkCUEngine::getTTV(size_t iState) {
 
 
 MoveVolatile PkCUEngine::getMV(size_t iState) {
-  return getPKV(iState).getMV(getICAction());
+  return getPKV(iState).getMV(getCAction());
 }
 
 
 MoveVolatile PkCUEngine::getTMV(size_t iState) {
-  return getPKV(iState).getMV(getIOAction());
+  return getPKV(iState).getMV(getOAction());
 }
 
 

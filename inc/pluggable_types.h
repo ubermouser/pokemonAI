@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 class plugin;
+class Action;
 class MoveNonVolatile;
 class PokemonNonVolatile;
 class Type;

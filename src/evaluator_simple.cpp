@@ -72,5 +72,5 @@ EvalResult_t EvaluatorSimple::calculateFitness(
   fpType agentFitness = fitness_team(env.getTeam(iTeam));
   fpType otherFitness = fitness_team(env.getOtherTeam(iTeam));
 
-  return EvalResult_t{combineTeamFitness(agentFitness, otherFitness), -1, -1};
+  return EvalResult_t{combineTeamFitness(agentFitness, otherFitness), Action{}, Action{}};
 };

@@ -30,7 +30,7 @@ TEST_F(EngineTest, PrimaryHitAndCrit) {
   engine_->setEnvironment(environment);
 
   PossibleEnvironments result = engine_->updateState(
-      engine_->initialState(), AT_MOVE_0, AT_MOVE_NOTHING);
+      engine_->initialState(), Action::move(0), Action::nothing());
 
   EXPECT_EQ(result.size(), 3);
   EXPECT_EQ(result.at(0).hasHit(0), true);
@@ -49,7 +49,7 @@ TEST_F(EngineTest, PainSplit) {
   auto environment = EnvironmentNonvolatile(team, team, true);
   engine_->setEnvironment(environment);
 
-  auto split_pain = engine_->updateState(engine_->initialState(), AT_MOVE_0, AT_MOVE_1);
+  auto split_pain = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(1));
 
   auto result = split_pain.at(0).getEnv();
   EXPECT_EQ(result.getTeam(0).teammate(0).getHP(), result.getTeam(1).teammate(0).getHP());
@@ -73,9 +73,9 @@ TEST_F(EngineTest, Aromatherapy) {
   auto environment = EnvironmentNonvolatile(agentTeam, otherTeam, true);
   engine_->setEnvironment(environment);
 
-  auto pikachu_poisoned = engine_->updateState(engine_->initialState(), AT_MOVE_NOTHING, AT_MOVE_0);
-  auto blissey_poisoned = engine_->updateState(pikachu_poisoned.at(0), AT_SWITCH_1, AT_MOVE_0);
-  auto all_cured = engine_->updateState(blissey_poisoned.at(0), AT_MOVE_0, AT_MOVE_NOTHING);
+  auto pikachu_poisoned = engine_->updateState(engine_->initialState(), Action::nothing(), Action::move(0));
+  auto blissey_poisoned = engine_->updateState(pikachu_poisoned.at(0), Action::swap(1), Action::move(0));
+  auto all_cured = engine_->updateState(blissey_poisoned.at(0), Action::move(0), Action::nothing());
 
   EXPECT_EQ(pikachu_poisoned.at(0).getEnv().getTeam(0).teammate(0).getStatusAilment(), AIL_NV_POISON_TOXIC);
   EXPECT_EQ(blissey_poisoned.at(0).getEnv().getTeam(0).teammate(1).getStatusAilment(), AIL_NV_POISON_TOXIC);
@@ -97,8 +97,8 @@ TEST_F(EngineTest, Heal50) {
   auto environment = EnvironmentNonvolatile(team, team, true);
   engine_->setEnvironment(environment);
 
-  auto pidgey_tackled = engine_->updateState(engine_->initialState(), AT_MOVE_NOTHING, AT_MOVE_0);
-  auto pidgey_roosted = engine_->updateState(pidgey_tackled.at(1), AT_MOVE_1, AT_MOVE_NOTHING);
+  auto pidgey_tackled = engine_->updateState(engine_->initialState(), Action::nothing(), Action::move(0));
+  auto pidgey_roosted = engine_->updateState(pidgey_tackled.at(1), Action::move(1), Action::nothing());
 
   EXPECT_EQ(pidgey_tackled.at(1).getEnv().getTeam(0).teammate(0).getHP(), 30);
   EXPECT_EQ(pidgey_roosted.at(0).getEnv().getTeam(0).teammate(0).getHP(), 125);
@@ -129,42 +129,42 @@ TEST_F(EngineTest, GroundConditions) {
   auto environment = EnvironmentNonvolatile(team, team, true);
   engine_->setEnvironment(environment);
 
-  auto stealth_rock = engine_->updateState(engine_->initialState(), AT_MOVE_0, AT_MOVE_NOTHING);
-  auto spikes = engine_->updateState(engine_->initialState(), AT_MOVE_1, AT_MOVE_NOTHING);
-  auto toxic_spikes = engine_->updateState(engine_->initialState(), AT_MOVE_2, AT_MOVE_NOTHING);
+  auto stealth_rock = engine_->updateState(engine_->initialState(), Action::move(0), Action::nothing());
+  auto spikes = engine_->updateState(engine_->initialState(), Action::move(1), Action::nothing());
+  auto toxic_spikes = engine_->updateState(engine_->initialState(), Action::move(2), Action::nothing());
   
   { // test rapid-spin removal:
-    auto spikes_removed = engine_->updateState(spikes.at(0), AT_MOVE_NOTHING, AT_MOVE_3);
-    auto removed_vs_spikes = engine_->updateState(spikes_removed.at(0), AT_MOVE_NOTHING, AT_SWITCH_1);
+    auto spikes_removed = engine_->updateState(spikes.at(0), Action::nothing(), Action::move(3));
+    auto removed_vs_spikes = engine_->updateState(spikes_removed.at(0), Action::nothing(), Action::swap(1));
     EXPECT_EQ(removed_vs_spikes.at(0).getEnv().getTeam(1).getPKV().getHP(), 170); // 100%
   }
   { // test normal harmed vs spikes:
-    auto normal_vs_spikes = engine_->updateState(spikes.at(0), AT_MOVE_NOTHING, AT_SWITCH_1);
+    auto normal_vs_spikes = engine_->updateState(spikes.at(0), Action::nothing(), Action::swap(1));
     EXPECT_EQ(normal_vs_spikes.at(0).getEnv().getTeam(1).getPKV().getHP(), 149); // 87.5%
   }
   { // test normal harmed vs toxic spikes:
-    auto normal_vs_toxic = engine_->updateState(toxic_spikes.at(0), AT_MOVE_NOTHING, AT_SWITCH_1);
+    auto normal_vs_toxic = engine_->updateState(toxic_spikes.at(0), Action::nothing(), Action::swap(1));
     EXPECT_EQ(normal_vs_toxic.at(0).getEnv().getTeam(1).getPKV().getHP(), 149); // 87.5%
     EXPECT_EQ(normal_vs_toxic.at(0).getEnv().getTeam(1).getPKV().getStatusAilment(), AIL_NV_POISON); // 87.5%
   }
   { // test levitate unharmed vs spikes:
-    auto lev_vs_spikes = engine_->updateState(spikes.at(0), AT_MOVE_NOTHING, AT_SWITCH_2);
+    auto lev_vs_spikes = engine_->updateState(spikes.at(0), Action::nothing(), Action::swap(2));
     EXPECT_EQ(lev_vs_spikes.at(0).getEnv().getTeam(1).getPKV().getHP(), 260); // 100%
   }
   { // test levitate unharmed vs toxic spikes:
-    auto lev_vs_toxic = engine_->updateState(toxic_spikes.at(0), AT_MOVE_NOTHING, AT_SWITCH_2);
+    auto lev_vs_toxic = engine_->updateState(toxic_spikes.at(0), Action::nothing(), Action::swap(2));
     EXPECT_EQ(lev_vs_toxic.at(0).getEnv().getTeam(1).getPKV().getHP(), 260); // 100%
   }
   { // test levitate harmed vs stealth rock:
-    auto lev_vs_sr = engine_->updateState(stealth_rock.at(0), AT_MOVE_NOTHING, AT_SWITCH_2);
+    auto lev_vs_sr = engine_->updateState(stealth_rock.at(0), Action::nothing(), Action::swap(2));
     EXPECT_EQ(lev_vs_sr.at(0).getEnv().getTeam(1).getPKV().getHP(), 260); // 87.5%
   }
   { // test flying unharmed vs spikes:
-    auto flying_vs_spikes = engine_->updateState(spikes.at(0), AT_MOVE_NOTHING, AT_SWITCH_3);
+    auto flying_vs_spikes = engine_->updateState(spikes.at(0), Action::nothing(), Action::swap(3));
     EXPECT_EQ(flying_vs_spikes.at(0).getEnv().getTeam(1).getPKV().getHP(), 190); // 100%
   }
   { // test flying harmed vs stealth rock:
-    auto flying_vs_sr = engine_->updateState(stealth_rock.at(0), AT_MOVE_NOTHING, AT_SWITCH_3);
+    auto flying_vs_sr = engine_->updateState(stealth_rock.at(0), Action::nothing(), Action::swap(3));
     EXPECT_EQ(flying_vs_sr.at(0).getEnv().getTeam(1).getPKV().getHP(), 143); // 75%
   }
 }
@@ -180,7 +180,7 @@ TEST_F(EngineTest, HiddenPower) {
   auto environment = EnvironmentNonvolatile(team, team, true);
   engine_->setEnvironment(environment);
 
-  auto hidden_power = engine_->updateState(engine_->initialState(), AT_MOVE_0, AT_MOVE_NOTHING);
+  auto hidden_power = engine_->updateState(engine_->initialState(), Action::move(0), Action::nothing());
 
   // rock_t with 30 power
   EXPECT_EQ(hidden_power.at(0).getEnv().getTeam(1).getPKV().getHP(), 233);
@@ -202,11 +202,11 @@ TEST_F(EngineTest, LifeOrb) {
   auto environment = EnvironmentNonvolatile(team_1, team_2, true);
   engine_->setEnvironment(environment);
 
-  auto sp_lifeorb = engine_->updateState(engine_->initialState(), AT_MOVE_1, AT_MOVE_NOTHING);
-  auto sp_noitem = engine_->updateState(engine_->initialState(), AT_MOVE_NOTHING, AT_MOVE_1);
-  auto will_o_wisp = engine_->updateState(engine_->initialState(), AT_MOVE_2, AT_MOVE_NOTHING);
-  auto split_pain = engine_->updateState(sp_lifeorb.at(0), AT_MOVE_0, AT_MOVE_NOTHING);
-  auto calm_mind = engine_->updateState(engine_->initialState(), AT_MOVE_3, AT_MOVE_NOTHING);
+  auto sp_lifeorb = engine_->updateState(engine_->initialState(), Action::move(1), Action::nothing());
+  auto sp_noitem = engine_->updateState(engine_->initialState(), Action::nothing(), Action::move(1));
+  auto will_o_wisp = engine_->updateState(engine_->initialState(), Action::move(2), Action::nothing());
+  auto split_pain = engine_->updateState(sp_lifeorb.at(0), Action::move(0), Action::nothing());
+  auto calm_mind = engine_->updateState(engine_->initialState(), Action::move(3), Action::nothing());
 
   { // attacking move: life orb subtracts 10%, damage is increased by 30%
     EXPECT_EQ(sp_lifeorb.at(0).getEnv().getTeam(0).teammate(0).getHP(), 180); // 90%
@@ -253,27 +253,27 @@ TEST_F(EngineTest, ChoiceItems) {
   auto environment = EnvironmentNonvolatile(team_1, team_2, true);
   engine_->setEnvironment(environment);
 
-  auto bulletpunch_cb = engine_->updateState(engine_->initialState(), AT_MOVE_0, AT_MOVE_0);
-  auto swift_cb = engine_->updateState(engine_->initialState(), AT_MOVE_1, AT_MOVE_1);
+  auto bulletpunch_cb = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(0));
+  auto swift_cb = engine_->updateState(engine_->initialState(), Action::move(1), Action::move(1));
 
-  auto azelf_pair = engine_->updateState(engine_->initialState(), AT_SWITCH_1, AT_SWITCH_1);
-  auto swift_cs = engine_->updateState(azelf_pair.at(0), AT_MOVE_0, AT_MOVE_0);
-  auto firepunch_cs = engine_->updateState(azelf_pair.at(0), AT_MOVE_1, AT_MOVE_1);
+  auto azelf_pair = engine_->updateState(engine_->initialState(), Action::swap(1), Action::swap(1));
+  auto swift_cs = engine_->updateState(azelf_pair.at(0), Action::move(0), Action::move(0));
+  auto firepunch_cs = engine_->updateState(azelf_pair.at(0), Action::move(1), Action::move(1));
 
-  auto flygon_pair = engine_->updateState(engine_->initialState(), AT_SWITCH_2, AT_SWITCH_2);
-  auto dracometeor_cs = engine_->updateState(flygon_pair.at(0), AT_MOVE_0, AT_MOVE_0);
-  auto dracometeor_none = engine_->updateState(flygon_pair.at(0), AT_MOVE_NOTHING, AT_MOVE_0);
+  auto flygon_pair = engine_->updateState(engine_->initialState(), Action::swap(2), Action::swap(2));
+  auto dracometeor_cs = engine_->updateState(flygon_pair.at(0), Action::move(0), Action::move(0));
+  auto dracometeor_none = engine_->updateState(flygon_pair.at(0), Action::nothing(), Action::move(0));
 
   { // other moves are locked out after using a choice move:
-    EXPECT_EQ(engine_->isValidAction(bulletpunch_cb.at(0), AT_MOVE_0, TEAM_A), true);
-    EXPECT_EQ(engine_->isValidAction(bulletpunch_cb.at(0), AT_MOVE_1, TEAM_A), false);
+    EXPECT_EQ(engine_->isValidAction(bulletpunch_cb.at(0), Action::move(0), TEAM_A), true);
+    EXPECT_EQ(engine_->isValidAction(bulletpunch_cb.at(0), Action::move(1), TEAM_A), false);
   }
   { // when all PP have been used, only struggle is available:
     auto noPPState = bulletpunch_cb.at(1);
     noPPState.getEnv().getTeam(0).getPKV().getMV(0).setPP(0);
-    EXPECT_EQ(engine_->isValidAction(noPPState, AT_MOVE_0, TEAM_A), false); // locked due to PP
-    EXPECT_EQ(engine_->isValidAction(noPPState, AT_MOVE_1, TEAM_A), false); // locked due to Choice
-    EXPECT_EQ(engine_->isValidAction(noPPState, AT_MOVE_STRUGGLE, TEAM_A), true);
+    EXPECT_EQ(engine_->isValidAction(noPPState, Action::move(0), TEAM_A), false); // locked due to PP
+    EXPECT_EQ(engine_->isValidAction(noPPState, Action::move(1), TEAM_A), false); // locked due to Choice
+    EXPECT_EQ(engine_->isValidAction(noPPState, Action::struggle(), TEAM_A), true);
   }
   { // physical attack with choice band deals additional damage:
     EXPECT_GT(bulletpunch_cb.at(0).getEnv().getTeam(0).teammate(0).getHP(),
@@ -311,8 +311,8 @@ TEST_F(EngineTest, Pursuit) {
   auto environment = EnvironmentNonvolatile(team, team, true);
   engine_->setEnvironment(environment);
 
-  auto pursuit_switch = engine_->updateState(engine_->initialState(), AT_MOVE_0, AT_SWITCH_1);
-  auto pursuit_noswitch = engine_->updateState(engine_->initialState(), AT_MOVE_0, AT_MOVE_NOTHING);
+  auto pursuit_switch = engine_->updateState(engine_->initialState(), Action::move(0), Action::swap(1));
+  auto pursuit_noswitch = engine_->updateState(engine_->initialState(), Action::move(0), Action::nothing());
 
   // the pokemon switching out receives 2x the damage as a pokemon that doesn't:
   EXPECT_LT(pursuit_switch.at(0).getEnv().getTeam(1).teammate(0).getHP(),
@@ -338,20 +338,64 @@ TEST_F(EngineTest, Outrage) {
   auto environment = EnvironmentNonvolatile(team_1, team_2, true);
   engine_->setEnvironment(environment);
 
-  auto outrage_0 = engine_->updateState(engine_->initialState(), AT_MOVE_0, AT_MOVE_NOTHING);
-  auto outrage_1 = engine_->updateState(outrage_0.at(0), AT_MOVE_0, AT_MOVE_NOTHING);
-  auto outrage_2 = engine_->updateState(outrage_1.at(0), AT_MOVE_0, AT_MOVE_NOTHING);
+  auto outrage_0 = engine_->updateState(engine_->initialState(), Action::move(0), Action::nothing());
+  auto outrage_1 = engine_->updateState(outrage_0.at(0), Action::move(0), Action::nothing());
+  auto outrage_2 = engine_->updateState(outrage_1.at(0), Action::move(0), Action::nothing());
 
   // the pokemon cannot switch out or perform other moves when outraging:
-  EXPECT_TRUE(engine_->isValidAction(outrage_0.at(0), AT_MOVE_0, TEAM_A));
-  EXPECT_FALSE(engine_->isValidAction(outrage_0.at(0), AT_MOVE_1, TEAM_A));
-  EXPECT_FALSE(engine_->isValidAction(outrage_0.at(0), AT_SWITCH_1, TEAM_A));
+  EXPECT_TRUE(engine_->isValidAction(outrage_0.at(0), Action::move(0), TEAM_A));
+  EXPECT_FALSE(engine_->isValidAction(outrage_0.at(0), Action::move(1), TEAM_A));
+  EXPECT_FALSE(engine_->isValidAction(outrage_0.at(0), Action::swap(1), TEAM_A));
 
   // the pokemon is confused after outraging:
   EXPECT_EQ(
       outrage_2.at(0).getEnv().getTeam(0).teammate(0).status().cTeammate.confused, AIL_V_CONFUSED_5T);
   // the pokemon may switch out or perform other moves:
-  EXPECT_TRUE(engine_->isValidAction(outrage_2.at(0), AT_MOVE_0, TEAM_A));
-  EXPECT_TRUE(engine_->isValidAction(outrage_2.at(0), AT_MOVE_1, TEAM_A));
-  EXPECT_TRUE(engine_->isValidAction(outrage_2.at(0), AT_SWITCH_1, TEAM_A));
+  EXPECT_TRUE(engine_->isValidAction(outrage_2.at(0), Action::move(0), TEAM_A));
+  EXPECT_TRUE(engine_->isValidAction(outrage_2.at(0), Action::move(1), TEAM_A));
+  EXPECT_TRUE(engine_->isValidAction(outrage_2.at(0), Action::swap(1), TEAM_A));
+}
+
+
+TEST_F(EngineTest, UTurn) {
+  auto team = TeamNonVolatile()
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("scizor"))
+        .addMove(pokedex_->getMoves().at("u-turn"))
+        .setInitialItem(pokedex_->getItems().at("life orb"))
+        .setLevel(100))
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("torterra"))
+        .addMove(pokedex_->getMoves().at("stealth rock"))
+        .setLevel(50));
+  auto environment = EnvironmentNonvolatile(team, team, true);
+  engine_->setEnvironment(environment);
+
+  auto setup_swap = engine_->updateState(engine_->initialState(), Action::nothing(), Action::swap(1));
+  auto setup_sr = engine_->updateState(setup_swap.at(0), Action::nothing(), Action::move(0));
+  auto uturn_to_ally = engine_->updateState(setup_sr.at(0), Action::moveAlly(0, 1), Action::nothing());
+  auto swap_to_scyzor = engine_->updateState(uturn_to_ally.at(0), Action::nothing(), Action::swap(0));
+  auto uturn_no_ally = engine_->updateState(swap_to_scyzor.at(0), Action::nothing(), Action::move(0));
+
+  { // swap condition with an ally:
+    EXPECT_TRUE(engine_->isValidAction(setup_sr.at(0), Action::move(0), TEAM_A));
+    EXPECT_TRUE(engine_->isValidAction(setup_sr.at(0), Action::moveAlly(0, 1), TEAM_A));
+    EXPECT_FALSE(engine_->isValidAction(setup_sr.at(0), Action::moveAlly(0, 0), TEAM_A));
+  }
+  { // swap condition with no ally:
+    EXPECT_TRUE(engine_->isValidAction(swap_to_scyzor.at(0), Action::move(0), TEAM_B));
+    EXPECT_TRUE(engine_->isValidAction(swap_to_scyzor.at(0), Action::moveAlly(0, 0), TEAM_B));
+    EXPECT_FALSE(engine_->isValidAction(swap_to_scyzor.at(0), Action::moveAlly(0, 1), TEAM_B));
+  }
+  { // u-turn with an ally:
+    EXPECT_EQ(uturn_to_ally.at(0).getEnv().getTeam(0).teammate(0).getMV(0).getPP(), 31); // pp decremented
+    EXPECT_FLOAT_EQ(uturn_to_ally.at(0).getEnv().getTeam(0).teammate(0).getPercentHP(), 0.7875); // item effect AND stealth-rock apply
+    EXPECT_EQ(uturn_to_ally.at(0).getEnv().getTeam(0).getICPKV(), 1); // ally has swapped out
+    EXPECT_EQ(uturn_to_ally.at(0).getEnv().getTeam(1).teammate(1).getPercentHP(), 0.); // enemy weakling deleted
+  }
+  { // u-turn with no ally:
+    EXPECT_EQ(uturn_no_ally.at(0).getEnv().getTeam(1).teammate(0).getMV(0).getPP(), 31);
+    EXPECT_FLOAT_EQ(uturn_no_ally.at(0).getEnv().getTeam(1).teammate(0).getPercentHP(), 0.9); // item effect (life orb) applies
+    EXPECT_EQ(uturn_no_ally.at(0).getEnv().getTeam(1).getICPKV(), 0); // ally NOT swapped out:
+  }
 }

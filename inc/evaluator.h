@@ -5,6 +5,7 @@
 
 #include <memory>
 
+#include "action.h"
 #include "name.h"
 #include "environment_volatile.h"
 #include "environment_possible.h"

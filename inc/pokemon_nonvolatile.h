@@ -17,6 +17,7 @@
 
 #include "signature.h"
 
+#include "action.h"
 #include "orphan.h"
 #include "name.h"
 #include "move_nonvolatile.h"
@@ -237,7 +238,7 @@ public:
    * NULL if AT_MOVE_NOTHING */
   MoveNonVolatile& getMove(size_t index);
 
-  const Move& getMove_base(size_t index) const;
+  const Move& getMove_base(size_t index) const { return getMove(index).getBase(); }
 
   const MoveNonVolatile& getMove(size_t index) const;
 

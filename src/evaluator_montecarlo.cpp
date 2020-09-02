@@ -43,5 +43,5 @@ EvalResult_t EvaluatorMonteCarlo::calculateFitness(const ConstEnvironmentVolatil
   fpType agentFitness = result.score[iTeam];
   fpType otherFitness = result.score[(iTeam + 1) % 2];
 
-  return EvalResult_t{combineTeamFitness(agentFitness, otherFitness), -1, -1};
+  return EvalResult_t{combineTeamFitness(agentFitness, otherFitness), Action{}, Action{}};
 }

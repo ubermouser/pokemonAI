@@ -139,7 +139,7 @@ void PokemonNonVolatile::createDigest_impl(std::array<uint8_t, POKEMON_NONVOLATI
     const MoveNonVolatile* bestMove = NULL;
     for (size_t iAction = 0; iAction != iSize; ++iAction)
     {
-      const MoveNonVolatile& cMove = getMove(iAction + AT_MOVE_0);
+      const MoveNonVolatile& cMove = getMove(iAction);
 
       // don't hash a move that has already been hashed:
       if (hashedMoves[iAction] == true) { continue; }
@@ -358,7 +358,7 @@ bool PokemonNonVolatile::isLegalAdd(const Move& candidate) const
 
 bool PokemonNonVolatile::isLegalSet(size_t iAction, const Move& candidate) const
 {
-  size_t iPosition = iAction - AT_MOVE_0;
+  size_t iPosition = iAction;
   if (!pokemonExists()) { return false; }
   if ((iPosition != SIZE_MAX) && (iPosition >= getNumMoves()) ) { return false; }
   if ((candidate.lostChild == true) || (candidate.isImplemented() == false)) { return false; }
@@ -371,7 +371,7 @@ bool PokemonNonVolatile::isLegalSet(size_t iAction, const Move& candidate) const
   for (size_t iMove = 0; iMove != getNumMoves(); ++iMove)
   {
     if (iPosition == iMove) { continue; }
-    if (&getMove_base(AT_MOVE_0 + iMove) == &candidate) { return false; }
+    if (&getMove_base(iMove) == &candidate) { return false; }
   }
 
   return true;
@@ -399,14 +399,14 @@ MoveNonVolatile& PokemonNonVolatile::getMove(size_t index)
   {
     default:
       assert(false && "attempted to get volatile move of non-move action");
-    case AT_MOVE_STRUGGLE:
+    case 4:
       return *MoveNonVolatile::mNV_struggle;
-    case AT_MOVE_0:
-    case AT_MOVE_1:
-    case AT_MOVE_2:
-    case AT_MOVE_3:
-      assert((index - AT_MOVE_0) < getNumMoves());
-      return actions[index - AT_MOVE_0];
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+      assert(index < getNumMoves());
+      return actions[index];
   }
 };
 
@@ -420,14 +420,14 @@ const MoveNonVolatile& PokemonNonVolatile::getMove(size_t index) const
   {
     default:
       assert(false && "attempted to get volatile move of non-move action");
-    case AT_MOVE_STRUGGLE:
+    case 4:
       return *MoveNonVolatile::mNV_struggle;
-    case AT_MOVE_0:
-    case AT_MOVE_1:
-    case AT_MOVE_2:
-    case AT_MOVE_3:
-      assert((index - AT_MOVE_0) < getNumMoves());
-      return actions[index - AT_MOVE_0];
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+      assert(index < getNumMoves());
+      return actions[index];
   }
 };
 
@@ -437,7 +437,7 @@ const MoveNonVolatile& PokemonNonVolatile::getMove(size_t index) const
 
 PokemonNonVolatile& PokemonNonVolatile::setMove(size_t iAction, const MoveNonVolatile& _cMove)
 {
-  assert(isLegalSet(iAction - AT_MOVE_0, _cMove));
+  assert(isLegalSet(iAction, _cMove));
   getMove(iAction) = _cMove;
   return *this;
 };
@@ -449,7 +449,7 @@ PokemonNonVolatile& PokemonNonVolatile::setMove(size_t iAction, const MoveNonVol
 PokemonNonVolatile& PokemonNonVolatile::removeMove(size_t iRemovedAction)
 {
   // don't bother removing a move that doesn't exist
-  if ((iRemovedAction - AT_MOVE_0) >= getNumMoves()) { return *this; }
+  if (iRemovedAction >= getNumMoves()) { return *this; }
 
   {
     MoveNonVolatile& removedMove = getMove(iRemovedAction);
@@ -460,9 +460,8 @@ PokemonNonVolatile& PokemonNonVolatile::removeMove(size_t iRemovedAction)
 
   // there's a "hole" in the contiguous move array now, so 
   // refactor moves above the removed move:
-  for (size_t iSource = (iRemovedAction - AT_MOVE_0) + 1; iSource < getNumMoves(); iSource++)
-  {
-    MoveNonVolatile& source = getMove(AT_MOVE_0 + iSource);
+  for (size_t iSource = iRemovedAction + 1; iSource < getNumMoves(); iSource++) {
+    MoveNonVolatile& source = getMove(iSource);
 
     for (size_t iNDestination = 0; iNDestination < iSource; iNDestination++)
     {
@@ -625,29 +624,6 @@ void PokemonNonVolatile::initFV()
 
 
 
-
-const Move& PokemonNonVolatile::getMove_base(size_t index) const
-{
-  switch(index)
-  {
-    case AT_MOVE_NOTHING:
-    case AT_MOVE_CONFUSED:
-    default:
-      assert(false && "attempted to get base of non-move action");
-      return *Move::move_none;
-    case AT_MOVE_STRUGGLE:
-      return *Move::move_struggle;
-    case AT_MOVE_0:
-    case AT_MOVE_1:
-    case AT_MOVE_2:
-    case AT_MOVE_3:
-      return getMove(index).getBase();
-  }
-};
-
-
-
-
 std::ostream& operator <<(std::ostream& os, const PokemonNonVolatile& cPKNV)
 {
   os << "\"" << cPKNV.getName() << "\"-\"" << cPKNV.getBase().getName();
@@ -655,7 +631,7 @@ std::ostream& operator <<(std::ostream& os, const PokemonNonVolatile& cPKNV)
   os << " " << (cPKNV.hasInitialItem()?cPKNV.getInitialItem().getName():"NO_ITEM");
   for (size_t iAction = 0; iAction != cPKNV.getNumMoves(); ++iAction)
   {
-    os << " " << cPKNV.getMove_base(iAction + AT_MOVE_0).getName();
+    os << " " << cPKNV.getMove_base(iAction).getName();
   }
   os << "\n";
 

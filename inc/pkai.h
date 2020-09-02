@@ -85,22 +85,6 @@ typedef fixedpoint::fixed_point<30> fixType;
 #define WEATHER_FOG 5
 #define WEATHER_SHADOWSKY 6
 
-// targets:
-#define TARGET_TEAM_A0 0
-#define TARGET_TEAM_A1 1
-#define TARGET_TEAM_A2 2
-#define TARGET_TEAM_A3 3
-#define TARGET_TEAM_A4 4
-#define TARGET_TEAM_A5 5
-#define TARGET_TEAM_B0 6
-#define TARGET_TEAM_B1 7
-#define TARGET_TEAM_B2 8
-#define TARGET_TEAM_B3 9
-#define TARGET_TEAM_B4 10
-#define TARGET_TEAM_B5 11
-#define TARGET_SELF 12
-#define TARGET_OPPONENT 13
-
 // Genders:
 #define SEX_MALE 0
 #define SEX_FEMALE 1
@@ -169,25 +153,6 @@ enum MatchState
   MATCH_TIE = 2
 };
 #define MATCH_DRAW MATCH_MIDGAME
-
-// action types:
-typedef int32_t Action;
-#define AT_MOVE_FIRST 0 // beginning of move range
-#define AT_MOVE_0 0 
-#define AT_MOVE_1 1
-#define AT_MOVE_2 2
-#define AT_MOVE_3 3 // end of default move range
-#define AT_MOVE_STRUGGLE 4
-#define AT_MOVE_NOTHING 5 // end of extended move range
-#define AT_SWITCH_0 6 // beginning of switch range
-#define AT_SWITCH_1 7
-#define AT_SWITCH_2 8
-#define AT_SWITCH_3 9
-#define AT_SWITCH_4 10
-#define AT_SWITCH_5 11 // end of switch range
-#define AT_ITEM_USE 12 // last user chosen item
-#define AT_MOVE_LAST 13 // one past the last action
-#define AT_MOVE_CONFUSED 13 
 
 // multithreading vars:
 #define THREADS_MINDEPTH 2

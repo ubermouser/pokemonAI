@@ -12,7 +12,7 @@ PlyResult PlannerMaxiMin::generateSolutionAtDepth(
   // determine the best action based upon the evaluator's prediction:
   for (const auto& actions: cu_->getAllValidActions(origin, agentTeam_)) {
     if (fitnesses.count(actions[0]) == 0) { 
-      fitnesses[actions[0]] = {-1, Fitness::best()};
+      fitnesses[actions[0]] = {Action{}, Fitness::best()};
     }
     auto& high = fitnesses[actions[0]];
 

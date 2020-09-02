@@ -6,6 +6,8 @@
                    projectFiles="true">
       <logicalFolder name="f1" displayName="engine" projectFiles="true">
         <itemPath>../inc/ability.h</itemPath>
+        <itemPath>../inc/action.h</itemPath>
+        <itemPath>../inc/engine.h</itemPath>
         <itemPath>../inc/environment_nonvolatile.h</itemPath>
         <itemPath>../inc/environment_possible.h</itemPath>
         <itemPath>../inc/environment_volatile.h</itemPath>
@@ -69,6 +71,7 @@
                    projectFiles="true">
       <logicalFolder name="f1" displayName="engine" projectFiles="true">
         <itemPath>../src/ability.cpp</itemPath>
+        <itemPath>../src/action.cpp</itemPath>
         <itemPath>../src/environment_nonvolatile.cpp</itemPath>
         <itemPath>../src/environment_possible.cpp</itemPath>
         <itemPath>../src/environment_volatile.cpp</itemPath>
@@ -181,6 +184,10 @@
       </compileType>
       <item path="../inc/ability.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../inc/action.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/engine.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../inc/environment_nonvolatile.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/environment_possible.h" ex="false" tool="3" flavor2="0">
@@ -264,6 +271,8 @@
       <item path="../inc/type.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/ability.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/action.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/environment_nonvolatile.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -480,6 +489,10 @@
       </compileType>
       <item path="../inc/ability.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../inc/action.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/engine.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../inc/environment_nonvolatile.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/environment_possible.h" ex="false" tool="3" flavor2="0">
@@ -563,6 +576,8 @@
       <item path="../inc/type.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/ability.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/action.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/environment_nonvolatile.cpp" ex="false" tool="1" flavor2="0">
       </item>

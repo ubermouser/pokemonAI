@@ -61,7 +61,7 @@ uint32_t TEAM_VOLATILE_IMPL::numTeammatesAlive() const {
 bool TeamVolatile::swapPokemon(size_t iAction, bool preserveVolatile)
 {
   size_t iOldPokemon = getICPKV();
-  size_t iNewPokemon = iAction - AT_SWITCH_0;
+  size_t iNewPokemon = iAction;
 
   // make sure we're not switching to ourself
   if (iNewPokemon == iOldPokemon) { return false; }

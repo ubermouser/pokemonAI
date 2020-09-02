@@ -26,7 +26,7 @@ protected:
    * AT_SWITCH_0-5: pokemon switches out for pokemon n-6
    * AT_ITEM_USE: pokemon uses an item (not implemented)
    */
-  int32_t actionSelect(const ConstEnvironmentVolatile& env) const;
+  Action actionSelect(const ConstEnvironmentVolatile& env) const;
 
   /*
    * Prints all possible actions a given pokemon may take to stdout

@@ -8,8 +8,8 @@ EvalResult_t EvaluatorRandom::calculateFitness(
   // TODO(@drendleman) choose valid actions?
   EvalResult_t result = { 
     (fpType)rand() / (fpType) RAND_MAX,
-    (Action)((rand() % AT_ITEM_USE+2) - 1),
-    (Action)((rand() % AT_ITEM_USE+2) - 1)
+    Action{rand() % (Action::MOVE_LAST + 1)},
+    Action{rand() % (Action::MOVE_LAST + 1)}
   };
   return result;
 };

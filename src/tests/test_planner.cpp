@@ -53,7 +53,7 @@ TEST_F(PlannerTest, MaxPlannerChoosesGreedyOption) {
 
   auto result = planner->generateSolution(engine_->initialState());
 
-  EXPECT_EQ(result.bestAgentAction(), AT_MOVE_0);
+  EXPECT_EQ(result.bestAgentAction(), Action::move(0));
 }
 
 
@@ -70,7 +70,7 @@ TEST_F(PlannerTest, MaximinPlannerChooses1PlyOption) {
 
   auto result = planner->generateSolution(engine_->initialState());
 
-  EXPECT_EQ(result.bestAgentAction(), AT_MOVE_0);
+  EXPECT_EQ(result.bestAgentAction(), Action::move(0));
 }
 
 
@@ -87,7 +87,7 @@ TEST_F(PlannerTest, MaximinPlannerChooses2PlyOption) {
 
   auto result = planner->generateSolution(engine_->initialState());
 
-  EXPECT_EQ(result.bestAgentAction(), AT_MOVE_0);
+  EXPECT_EQ(result.bestAgentAction(), Action::move(0));
 }
 
 

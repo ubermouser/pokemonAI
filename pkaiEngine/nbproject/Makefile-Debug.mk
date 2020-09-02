@@ -36,6 +36,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/_ext/511e4115/ability.o \
+	${OBJECTDIR}/_ext/511e4115/action.o \
 	${OBJECTDIR}/_ext/511e4115/environment_nonvolatile.o \
 	${OBJECTDIR}/_ext/511e4115/environment_possible.o \
 	${OBJECTDIR}/_ext/511e4115/environment_volatile.o \
@@ -118,6 +119,11 @@ ${OBJECTDIR}/_ext/511e4115/ability.o: ../src/ability.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ability.o ../src/ability.cpp
+
+${OBJECTDIR}/_ext/511e4115/action.o: ../src/action.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/action.o ../src/action.cpp
 
 ${OBJECTDIR}/_ext/511e4115/environment_nonvolatile.o: ../src/environment_nonvolatile.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
@@ -348,6 +354,19 @@ ${OBJECTDIR}/_ext/511e4115/ability_nomain.o: ${OBJECTDIR}/_ext/511e4115/ability.
 	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ability_nomain.o ../src/ability.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/_ext/511e4115/ability.o ${OBJECTDIR}/_ext/511e4115/ability_nomain.o;\
+	fi
+
+${OBJECTDIR}/_ext/511e4115/action_nomain.o: ${OBJECTDIR}/_ext/511e4115/action.o ../src/action.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/action.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/action_nomain.o ../src/action.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/511e4115/action.o ${OBJECTDIR}/_ext/511e4115/action_nomain.o;\
 	fi
 
 ${OBJECTDIR}/_ext/511e4115/environment_nonvolatile_nomain.o: ${OBJECTDIR}/_ext/511e4115/environment_nonvolatile.o ../src/environment_nonvolatile.cpp 

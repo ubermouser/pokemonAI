@@ -41,7 +41,7 @@ void PokemonVolatile::initialize(bool isActive)
   for (size_t iMove = 0, iSize = nv().getNumMoves(); iMove != iSize; ++iMove)
   {
     // reset action
-    getMV(AT_MOVE_0 + iMove).initialize();
+    getMV(iMove).initialize();
   }
 }
 
@@ -51,10 +51,10 @@ bool POKEMON_VOLATILE_IMPL::hasPP() const {
   bool result = true;
 
   result =
-    (getMV(AT_MOVE_0).hasPP()) ||
-    (getMV(AT_MOVE_1).hasPP()) ||
-    (getMV(AT_MOVE_2).hasPP()) ||
-    (getMV(AT_MOVE_3).hasPP());
+    (getMV(0).hasPP()) ||
+    (getMV(1).hasPP()) ||
+    (getMV(2).hasPP()) ||
+    (getMV(3).hasPP());
 
   return result;
 }
@@ -120,18 +120,17 @@ static MoveVolatileData standardMove;
 POKEMON_VOLATILE_IMPL_TEMPLATE
 typename POKEMON_VOLATILE_IMPL::movevolatile_t
 POKEMON_VOLATILE_IMPL::getMV(size_t index) const {
-  switch(index)
-  {
-  case AT_MOVE_0:
-  case AT_MOVE_1:
-  case AT_MOVE_2:
-  case AT_MOVE_3:
+  switch(index) {
+  case 0:
+  case 1:
+  case 2:
+  case 3:
     return movevolatile_t{
-        nv().actions[index - AT_MOVE_0],
-        data().actions[index - AT_MOVE_0]};
+        nv().actions[index],
+        data().actions[index]};
   default:
     assert(false && "attempted to access an unknown non volatile move!\n");
-  case AT_MOVE_STRUGGLE:
+  case 4:
     // TODO(@drendleman) - assert struggle cannot be retrieved from non-const context
     return movevolatile_t{*MoveNonVolatile::mNV_struggle, standardMove};
   };

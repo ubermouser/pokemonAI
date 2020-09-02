@@ -331,8 +331,8 @@ GameResult Game::digestGame(const std::vector<Turn>& cLog, int endStatus) {
       // add participation for first moving pokemon: (or lead twice)
       participation[iTeam][fTurn.activePokemon[iTeam]] += 1;
       // add a move increment for the first moving pokemon:
-      if (PkCU::isMoveAction(fTurn.action[iTeam])) {
-        moveUse[iTeam][fTurn.activePokemon[iTeam]][ fTurn.action[iTeam] - AT_MOVE_0 ] += 1;
+      if (fTurn.action[iTeam].isMove()) {
+        moveUse[iTeam][fTurn.activePokemon[iTeam]][ fTurn.action[iTeam].iMove() ] += 1;
       }
     }
   }
@@ -354,9 +354,8 @@ GameResult Game::digestGame(const std::vector<Turn>& cLog, int endStatus) {
       participation[iTeam][cTurn.activePokemon[iTeam]]+= 1;
       
       // add a move increment for the current pokemon's move
-      if (PkCU::isMoveAction(cTurn.action[iTeam]))
-      {
-        moveUse[iTeam][cTurn.activePokemon[iTeam]][cTurn.action[iTeam] - AT_MOVE_0] += 1;
+      if (cTurn.action[iTeam].isMove()) {
+        moveUse[iTeam][cTurn.activePokemon[iTeam]][cTurn.action[iTeam].iMove()] += 1;
       }
 
       // increase contribution fractionals:
@@ -539,30 +538,25 @@ void Game::incrementScore(int matchState, std::array<uint32_t, 2>& score) {
 
 
 void Game::printAction(
-    const ConstTeamVolatile& cTeam, const Action& iAction, unsigned int iTeam) const {
-  if (iAction >= AT_MOVE_0 && iAction <= AT_MOVE_3) {
+    const ConstTeamVolatile& cTeam, const Action& action, unsigned int iTeam) const {
+  if (action.isMove()) {
     std::clog 
       << getPokemonIdentifier(cTeam, iTeam) << " used "
-      << (iAction - AT_MOVE_0) << "-"
-      << cTeam.getPKV().getMV(iAction)
+      << action.iMove() << "-"
+      << cTeam.getPKV().getMV(action)
       << "!\n";
-  } else if (iAction >= AT_SWITCH_0 && iAction <= AT_SWITCH_5) {
+  } else if (action.isSwitch()) {
     std::clog 
       << getPokemonIdentifier(cTeam, iTeam) << " is switching out with "
-      << (iAction - AT_SWITCH_0) << ": "
-      << cTeam.teammate(iAction - AT_SWITCH_0).nv().getName() << "!\n";
-  } else if (iAction == AT_MOVE_NOTHING) {
+      << action.friendlyTarget() << ": "
+      << cTeam.teammate(action.friendlyTarget() - Action::FRIENDLY_0).nv().getName() << "!\n";
+  } else if (action.isWait()) {
     std::clog 
       << getPokemonIdentifier(cTeam, iTeam) << " waited for a turn!\n";
-  } else if (iAction == AT_MOVE_STRUGGLE) {
-    std::clog 
-      << getPokemonIdentifier(cTeam, iTeam) << " used X-"
-      << cTeam.getPKV().getMV(AT_MOVE_STRUGGLE)
-      << "!\n";
   } else {
     std::clog 
       << getPokemonIdentifier(cTeam, iTeam) << " chose unknown action "
-      << iAction << "!\n";
+      << action << "!\n";
   }
   // if the current pokemon is dead and switching out, print their team:
   if (!cTeam.getPKV().isAlive()) {
