@@ -19,10 +19,13 @@ void Action::print(std::ostream& os) const {
     os << "MS";
   } else if (isMove()) {
     os << boost::format("M%d") % (iMove()+1);
+    if (friendlyTarget() != FRIENDLY_DEFAULT) {
+      os << boost::format("-%d") % (friendlyTarget());
+    }
   } else if (isSwitch()) {
-    os << boost::format("S%D") % (iFriendly()+1);
+    os << boost::format("S%d") % (iFriendly()+1);
   } else if (isWait()) {
-    os << 'W';
+    os << "W";
   } else if (isUndefined()) {
     os << "??";
   } else { // unknown move!

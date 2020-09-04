@@ -10,6 +10,7 @@
 
 #include "pkai.h"
 #include "pokedex.h"
+#include "pluggable.h"
 
 #include "action.h"
 #include "ability.h"

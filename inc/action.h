@@ -22,7 +22,7 @@ public:
   static constexpr uint32_t MOVE_STRUGGLE = 5;
   static constexpr uint32_t MOVE_WAIT = 6;
   static constexpr uint32_t MOVE_SWITCH = 7;
-  static constexpr uint32_t MOVE_LAST = 7;
+  static constexpr uint32_t MOVE_LAST = 8;
 
   static constexpr uint32_t FRIENDLY_DEFAULT = 0;
   static constexpr uint32_t FRIENDLY_ANY = 0;
@@ -41,7 +41,7 @@ public:
   static constexpr uint32_t HOSTILE_ADJACENT_L = 2;
   static constexpr uint32_t HOSTILE_ADJACENT_R = 3;
   static constexpr uint32_t HOSTILE_ALL = 4;
-  static constexpr uint32_t HOSTILE_LAST = 4;
+  static constexpr uint32_t HOSTILE_LAST = 5;
 
   static Action move(size_t iMove) {
     assert(iMove < 4);
@@ -57,7 +57,7 @@ public:
     return Action{MOVE_SWITCH, FRIENDLY_0 + iPokemon};
   }
   static Action struggle() { return Action{MOVE_STRUGGLE}; }
-  static Action nothing() { return Action{MOVE_WAIT}; }
+  static Action wait() { return Action{MOVE_WAIT}; }
 
   Action() : type_(MOVE_UNDEFINED), friendlyTarget_(FRIENDLY_DEFAULT), enemyTarget_(HOSTILE_DEFAULT) {};
   explicit Action(
@@ -65,9 +65,9 @@ public:
       uint32_t friendly=FRIENDLY_DEFAULT,
       uint32_t hostile=HOSTILE_DEFAULT
   ): type_(type), friendlyTarget_(friendly), enemyTarget_(hostile) {
-    assert(type <= MOVE_LAST);
-    assert(friendly <= FRIENDLY_LAST);
-    assert(hostile <= HOSTILE_LAST);
+    assert(type < MOVE_LAST);
+    assert(friendly < FRIENDLY_LAST);
+    assert(hostile < HOSTILE_LAST);
   };
 
   uint32_t type() const { return type_; }

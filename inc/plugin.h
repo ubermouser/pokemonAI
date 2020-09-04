@@ -1,13 +1,14 @@
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
-#include "../inc/pkai.h"
+#include "pkai.h"
+
 #include <stdint.h>
 #include <string>
 #include <vector>
 #include <boost/function.hpp>
 
-#include "../inc/pluggable_types.h"
+#include "pluggable.h"
 
 class Pokedex;
 class plugin;
@@ -32,6 +33,7 @@ extern "C"
 };
 #endif
 
+// TODO(@drendleman) - why do both plugin and plugin_t exist? One is redundant with the other?
 class PKAISHARED plugin
 {
 private:

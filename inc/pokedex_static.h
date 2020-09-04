@@ -20,7 +20,6 @@
 #include "item.h"
 #include "move.h"
 #include "pokemon_base.h"
-#include "pluggable_types.h"
 #include "plugin.h"
 #include "orphan.h"
 

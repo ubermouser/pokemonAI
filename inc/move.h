@@ -160,6 +160,7 @@ public:
   const Type& getType() const;
 
   bool targetsEnemy() const { return primaryAccuracy_ > 0; };
+  bool targetsAlly() const { return target_ == 8; } // TODO(@drendleman) make targeting sane
 
   int32_t getSpeedPriority() const { return priority_; }
 

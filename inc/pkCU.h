@@ -5,6 +5,7 @@
 
 #include <array>
 #include <assert.h>
+#include <bitset>
 #include <deque>
 #include <memory>
 #include <stdint.h>
@@ -13,11 +14,7 @@
 #include <utility>
 #include <boost/program_options.hpp>
 
-#include "action.h"
-#include "environment_nonvolatile.h"
-#include "environment_possible.h"
-#include "environment_volatile.h"
-#include "pluggable.h"
+#include "engine.h"
 
 class PkCUEngine;
 
@@ -59,6 +56,21 @@ class PkCUEngine;
 #define STAGE_FINAL 28
 #define STAGE_HASH 29
 
+#define VALID_MOVE_SELF_ALIVE 0
+#define VALID_MOVE_TARGET_ALIVE 1
+#define VALID_MOVE_HAS_PP 2
+#define VALID_MOVE_FRIENDLY_ALIVE 3
+#define VALID_MOVE_FRIENDLY_IS_OTHER 4
+#define VALID_MOVE_SCRIPT 5
+#define VALID_MOVE_SIZE 6
+
+#define VALID_SWAP_FRIENDLY_ALIVE 0
+#define VALID_SWAP_FRIENDLY_IS_OTHER 1
+#define VALID_SWAP_MUST_WAIT 2
+#define VALID_SWAP_SCRIPT 3
+#define VALID_SWAP_SIZE 4
+
+
 struct DamageComponents_t {
   uint32_t damage;
   uint32_t damageCrit;
@@ -76,6 +88,8 @@ using PluginSet = std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>;
 using PluginSets = std::array< std::array<PluginSet, 6>, 12>;
 using ActionPairVector = std::vector<std::array<Action, 2> >;
 using ActionVector = std::vector<Action>;
+using ValidMoveSet = std::bitset<VALID_MOVE_SIZE>;
+using ValidSwapSet = std::bitset<VALID_SWAP_SIZE>;
 
 class PKAISHARED PkCU {
 public:
@@ -155,8 +169,8 @@ public:
   }
 
   /* returns true if the current game has ended. */
-  bool isGameOver(const ConstEnvironmentVolatile& envV) const;
-  bool isGameOver(const ConstEnvironmentPossible& envV) const {
+  bool isGameOver(const ConstEnvironmentPossible& envV) const { return isGameOver(envV.getEnv()); }
+  bool isGameOver(const ConstEnvironmentVolatile& envV) const {
     return getGameState(envV) != MATCH_MIDGAME;
   }
 

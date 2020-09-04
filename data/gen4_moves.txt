@@ -359,7 +359,7 @@ trick	Psychic	10	100	---	0	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0
 trick room	Psychic	5	---	---	0	7	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	"SetEnvironment(trickroom,5)"	The user creates a bizarre area in which slower Pokémon get to move first for five turns.
 trump card	Normal	5	---	Var	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!TRUMPCARD	"The fewer PP this move has, the more power it has for attack."
 uproar	Normal	10	100	50	2	3	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	"lock-in(self,always,5);UPROAR"	"The user attacks in an uproar for two to five turns. Over that time, no one can fall asleep."
-u-turn	Bug	20	100	70	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!UTURN	"After making its attack, the user rushes back to switch places with a party Pokémon in waiting."
+u-turn	Bug	20	100	70	1	8	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!UTURN	"After making its attack, the user rushes back to switch places with a party Pokémon in waiting."
 vacuum wave	Fighting	30	100	40	2	1	1	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user whirls its fists to send a wave of pure vacuum at the foe. This move always goes first.
 vital throw	Fighting	10	100	70	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	Always-Hits	"The user allows the foe to attack first. In return, this throw move is guaranteed not to miss."
 volt tackle	Electric	15	100	120	1	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	"ModHP(self,onHit,-0.33*dmg)"	"The user electrifies itself, then charges at the foe. It causes considerable damage to the user as well."

@@ -33,10 +33,10 @@ public:
   }
 
   static constexpr fitness_t worst() { 
-    return fitness_t{std::numeric_limits<PrecisionType>::lowest(), one(), false};
+    return fitness_t{-std::numeric_limits<PrecisionType>::infinity(), one(), false};
   }
   static constexpr fitness_t best() { 
-    return fitness_t{std::numeric_limits<PrecisionType>::max(), one(), false};
+    return fitness_t{std::numeric_limits<PrecisionType>::infinity(), one(), false};
   }
 
   explicit FitnessType(

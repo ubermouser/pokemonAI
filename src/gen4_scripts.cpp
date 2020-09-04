@@ -640,16 +640,18 @@ int move_outrage_endLockOn(
 }
 
 int move_testLockedIn(
+    ConstTeamVolatile cTV,
     ConstPokemonVolatile cPKV,
     ConstMoveVolatile mV,
     const Action& action,
-    bool& moveAllowed) {
+    ValidMoveSet& moveAllowed) {
   if (cPKV.status().cTeammate.lockIn_duration == 0) { return 0; }
 
   // if locked in, only the locked-in move may be used. Other move actions are not permitted.
 
   size_t action_idx = action.iMove() + 1;
-  moveAllowed = cPKV.status().cTeammate.lockIn_action == action_idx;
+  moveAllowed[VALID_MOVE_SCRIPT] = 
+      moveAllowed[VALID_MOVE_SCRIPT] & (cPKV.status().cTeammate.lockIn_action == action_idx);
 
   return 1;
 }
@@ -658,11 +660,11 @@ int move_testLockedSwitch(
     ConstPokemonVolatile cPKV,
     ConstPokemonVolatile cOPKV,
     const Action& action,
-    bool& switchAllowed) {
+    ValidSwapSet& switchAllowed) {
   if (cPKV.status().cTeammate.lockIn_duration == 0) { return 0; }
 
   // if locked in, only the locked-in move may be used. Switch actions are not permitted.
-  switchAllowed = false;
+  switchAllowed[VALID_SWAP_SCRIPT] = false;
 
   return 1;
 }
@@ -685,6 +687,23 @@ int move_uTurn_swapOnTurnEnd(
   // TODO(@drendleman) - swap-in should cause entry-hazards to trigger
 
   return 2;
+}
+
+int move_uTurn_testMoveSwap(
+    ConstTeamVolatile cTV,
+    ConstPokemonVolatile cPKV,
+    ConstMoveVolatile mV,
+    const Action& action,
+    ValidMoveSet& moveAllowed) {
+  if (&mV.getBase() != uTurn_t) { return 0; }
+
+  // normally, a friendly targeting move is disallowed when target friendly pokemon is dead. But
+  //  u-turn is allowed when there are no friendly pokemon.
+  if (cTV.numTeammatesAlive() == 1) {
+    moveAllowed[VALID_MOVE_FRIENDLY_IS_OTHER] = true;
+  }
+
+  return 1;
 }
 
 int ability_noGuard
@@ -920,10 +939,11 @@ int item_choiceItem_lockMove(
 }
 
 int item_choiceItem_testLockedMove(
+    ConstTeamVolatile cTV,
     ConstPokemonVolatile cPKV,
     ConstMoveVolatile mV,
     const Action& action,
-    bool& moveAllowed) {
+    ValidMoveSet& moveAllowed) {
   if (!cPKV.hasItem()) { return 0; }
 
   const Item* cItem = &cPKV.getItem();
@@ -939,7 +959,8 @@ int item_choiceItem_testLockedMove(
 
   // else, if the choice item has chosen a move, the only acceptable move is the choice move:
   size_t action_idx = action.iMove() + 1;
-  moveAllowed = choice_item_idx == action_idx;
+  moveAllowed[VALID_MOVE_SCRIPT] = 
+      moveAllowed[VALID_MOVE_SCRIPT] & (choice_item_idx == action_idx);
   
   return 1;
 }
@@ -1501,6 +1522,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(MOVE_PLUGIN, "toxic spikes", PLUGIN_ON_SWITCHIN, move_toxicSpikes_switch, 2, 2));
   extensions.push_back(plugin(MOVE_PLUGIN, "toxic spikes", PLUGIN_ON_EVALUATEMOVE, move_toxicSpikes_set, 0, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "u-turn", PLUGIN_ON_ENDOFMOVE, move_uTurn_swapOnTurnEnd, 1, 0));
+  extensions.push_back(plugin(MOVE_PLUGIN, "u-turn", PLUGIN_ON_TESTMOVE, move_uTurn_testMoveSwap, 1, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "wood hammer", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "volt tackle", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, 0));
   // item effects:

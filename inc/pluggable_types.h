@@ -1,56 +1,14 @@
 #ifndef PLUGGABLE_TYPES_H
 #define PLUGGABLE_TYPES_H
 
-#include "../inc/pkai.h"
+#include "pkai.h"
 
 #include <stdint.h>
 
-class plugin;
-class Action;
-class MoveNonVolatile;
-class PokemonNonVolatile;
-class Type;
-class PkCUEngine;
-
-class ConstMoveVolatile;
-class MoveVolatile;
-
-class ConstPokemonVolatile;
-class PokemonVolatile;
+#include "engine.h"
+#include "pkCU.h"
 
 // script types:
-#define PLUGIN_MAXSIZE 28
-enum pluginType
-{
-  PLUGIN_ON_INIT = 0,
-  PLUGIN_ON_RESET = 1,
-  PLUGIN_ON_SETSPEEDBRACKET = 2,
-  PLUGIN_ON_MODIFYSPEED = 3,
-  PLUGIN_ON_BEGINNINGOFTURN = 4,
-  PLUGIN_ON_EVALUATEMOVE = 5,
-  PLUGIN_ON_SETBASEPOWER = 6,
-  PLUGIN_ON_MODIFYBASEPOWER = 7,
-  PLUGIN_ON_MODIFYATTACKPOWER = 8,
-  PLUGIN_ON_MODIFYCRITICALPOWER = 9,
-  PLUGIN_ON_MODIFYRAWDAMAGE = 10,
-  PLUGIN_ON_SETMOVETYPE = 11,
-  PLUGIN_ON_MODIFYSTAB = 12,
-  PLUGIN_ON_SETDEFENSETYPE = 13,
-  PLUGIN_ON_MODIFYITEMPOWER = 14,
-  PLUGIN_ON_MODIFYHITPROBABILITY = 15,
-  PLUGIN_ON_MODIFYCRITPROBABILITY = 16,
-  PLUGIN_ON_CALCULATEDAMAGE = 17,
-  PLUGIN_ON_ENDOFMOVE = 18,
-  PLUGIN_ON_MODIFYSECONDARYPROBABILITY = 19,
-  PLUGIN_ON_SECONDARYEFFECT = 20,
-  PLUGIN_ON_ENDOFTURN = 21,
-  PLUGIN_ON_ENDOFROUND = 22,
-  PLUGIN_ON_SWITCHOUT = 23,
-  PLUGIN_ON_SWITCHIN = 24,
-  PLUGIN_ON_TESTMOVE = 25,
-  PLUGIN_ON_TESTSWITCH = 26,
-  PLUGIN_ON_UNINIT = 27
-};
 
 typedef int (*onSwitch_rawType)
   (
@@ -131,18 +89,17 @@ typedef int (*onInitMove_rawType)
   MoveNonVolatile&);
 
 typedef int (*onTestMove_rawType)
-  (ConstPokemonVolatile,
+  (ConstTeamVolatile,
+  ConstPokemonVolatile,
   ConstMoveVolatile,
   const Action&,
-  bool&);
+  ValidMoveSet&);
 
 typedef int (*onTestSwitch_rawType)
   (ConstPokemonVolatile,
   ConstPokemonVolatile,
   const Action&,
-  bool&);
-
-typedef void (*voidFunction_rawType)(void*);
+  ValidSwapSet&);
 
 //typedef bool (*regExtension_rawType)(const pokedex&, std::vector<plugin>&);
 

@@ -6,6 +6,7 @@
 #include "../inc/move.h"
 #include "../inc/pokemon_nonvolatile.h"
 #include "../inc/move_volatile.h"
+#include "../inc/pluggable_types.h"
 //#undef PKAI_STATIC
 
 MoveNonVolatile* MoveNonVolatile::mNV_struggle = NULL;
