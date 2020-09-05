@@ -31,18 +31,18 @@ void PlannerHuman::printActions(const ConstEnvironmentVolatile& env) const {
   // if this is false, then the only move this pokemon may use is "thrash"
   for (const auto& action : cu_->getValidMoveActions(env, agentTeam_)) {
     if (action.isStruggle()) {
-      std::cout << "\t" << action << "-\"Struggle\" -/-\n";
+      std::cout << "\t" << action << " \"Struggle\" -/-\n";
     } else if (action.isWait()) {
-      std::cout << "\t" << action << "-\"Nothing\" -/-\n";
+      std::cout << "\t" << action << " \"Nothing\" -/-\n";
     } else {
       const ConstMoveVolatile cMove = cPokemon.getMV(action);
-      std::cout << "\t" << action << "-" << cMove << "\n";
+      std::cout << "\t" << action << " " << cMove << "\n";
     }
   }
   if (cTeam.nv().getNumTeammates() > 1) {
     std::cout << "Or switch to a sidelined pokemon: \n";
     for (const auto& action: cu_->getValidSwapActions(env, agentTeam_)) {
-      std::cout << "\t" << action << "-" << cTeam.teammate(action);
+      std::cout << "\t" << action << " " << cTeam.teammate(action);
     }
   }
 };
@@ -54,7 +54,7 @@ Action PlannerHuman::actionSelect(const ConstEnvironmentVolatile& env) const {
   
   do {
     std::cout << "Please select the index of your desired action for Team " << (agentTeam_==TEAM_A?"A":"B") << ":\n";
-    getline(std::cin, input);
+    getline(*istream_, input);
     std::stringstream inputResult(input);
     
     // determine if action is valid:

@@ -155,7 +155,7 @@ public:
     return getValidActionsInRange(envV, iTeam, 0, Action::MOVE_LAST);
   }
   ActionVector getValidMoveActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
-    return getValidActionsInRange(envV, iTeam, Action::MOVE_0, Action::MOVE_STRUGGLE + 1);
+    return getValidActionsInRange(envV, iTeam, Action::MOVE_0, Action::MOVE_WAIT + 1);
   }
   ActionVector getValidSwapActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
     return getValidActionsInRange(envV, iTeam, Action::MOVE_SWITCH, Action::MOVE_SWITCH + 1);

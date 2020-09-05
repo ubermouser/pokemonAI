@@ -52,7 +52,7 @@ class Planner : public Name {
 public:
   struct Config {
     /* Maximum ply depth of computation. */
-    size_t maxDepth = 0;
+    size_t maxDepth = 1;
 
     /* Maximum amount of time to take per move in seconds. */
     double maxTime = 10.;

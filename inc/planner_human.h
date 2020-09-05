@@ -3,9 +3,11 @@
 
 #include "planner.h"
 
+#include <iostream>
+
 class PlannerHuman : public Planner {
 public:
-  PlannerHuman(const Config& cfg = Config()) : Planner(cfg, ident) {};
+  PlannerHuman(const Config& cfg = Config(), std::istream& input = std::cin) : Planner(cfg, ident), istream_(&input) {};
   PlannerHuman(const PlannerHuman& other) = default;
   ~PlannerHuman() { };
 
@@ -18,6 +20,8 @@ public:
       const ConstEnvironmentVolatile& origin) const override;
 protected:
   static const std::string ident;
+
+  std::istream* istream_;
 
   /* Returns a valid action as per the user's choice
    * AT_MOVE_0-3: pokemon's move

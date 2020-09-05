@@ -2,7 +2,11 @@
 
 #include <cstring>
 #include <functional>
+#include <regex>
+#include <string>
+#include <stdexcept>
 
+#include <boost/algorithm/string/case_conv.hpp>
 #include <boost/format.hpp>
 #include <boost/static_assert.hpp>
 
@@ -41,7 +45,39 @@ std::ostream& operator <<(std::ostream& os, const Action& action) {
 
 
 std::istream& operator >>(std::istream& is, Action& action) {
-  // TODO(@drendleman) - use regexes
+  // read input into string:
+  bool success = false;
+  std::string input;
+  is >> input;
+  boost::to_lower(input);
+  std::smatch match;
+
+  if (input.substr(0, 2) == "ms") {
+    action = Action::struggle();
+    success = true;
+  } else if (input[0] == 'm') {
+    if (std::regex_match(input, match, std::regex{"m(\\d)(?:-(\\d))?"})) {
+      if (match.size() == 3) {
+        action = Action::moveAlly(std::stoi(match[1].str()) - 1, std::stoi(match[2].str()) - 1);
+        success = true;
+      } else if (match.size() == 2) {
+        action = Action::move(std::stoi(match[1].str()) - 1);
+        success = true;
+      }
+    }
+  } else if (input[0] == 's') {
+    if (std::regex_match(input, match, std::regex{"s(\\d)"})) {
+      if (match.size() == 2) {
+        action = Action::swap(std::stoi(match[1].str()) - 1);
+        success = true;
+      }
+    }
+  } else if (input[0] == 'w') {
+    action = Action::wait();
+    success = true;
+  }
+  
+  if (!success) { is.setstate(std::ios::failbit); }
   return is;
 }
 

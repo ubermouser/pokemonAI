@@ -1319,6 +1319,8 @@ bool PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Action& act
 
         // is the friendly target us?
         doAllowMove[VALID_MOVE_FRIENDLY_IS_OTHER] = action.iFriendly() != cTV.getICPKV();
+      } else if (action.friendlyTarget() != Action::FRIENDLY_DEFAULT) {
+        return false;
       }
     
       // Are we locked out of the current move? 
