@@ -147,6 +147,7 @@ typedef fixedpoint::fixed_point<30> fixType;
 // win conditions:
 enum MatchState
 {
+  MATCH_UNPLAYED = -2,
   MATCH_MIDGAME = -1,
   MATCH_TEAM_A_WINS = TEAM_A,
   MATCH_TEAM_B_WINS = TEAM_B,

@@ -93,8 +93,8 @@ TESTOBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=-O0
-CXXFLAGS=-O0
+CCFLAGS=-O0 -fopenmp
+CXXFLAGS=-O0 -fopenmp
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -304,19 +304,19 @@ ${OBJECTDIR}/_ext/511e4115/type.o: ../src/type.cpp
 
 ${TESTDIR}/TestFiles/f1: ${TESTDIR}/_ext/a55270a7/test_engine.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
-	${LINK.cc} -o ${TESTDIR}/TestFiles/f1 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -lboost_program_options -ldl -lpthread -lgtest_main -lgtest 
+	${LINK.cc} -o ${TESTDIR}/TestFiles/f1 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -lboost_program_options -ldl -lpthread -fopenmp -lgtest_main -lgtest 
 
 ${TESTDIR}/TestFiles/f3: ${TESTDIR}/_ext/a55270a7/test_game.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
-	${LINK.cc} -o ${TESTDIR}/TestFiles/f3 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -lboost_program_options -ldl -lpthread -lgtest_main -lgtest 
+	${LINK.cc} -o ${TESTDIR}/TestFiles/f3 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -lboost_program_options -ldl -lpthread -fopenmp -lgtest_main -lgtest 
 
 ${TESTDIR}/TestFiles/f4: ${TESTDIR}/_ext/a55270a7/test_planner.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
-	${LINK.cc} -o ${TESTDIR}/TestFiles/f4 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -lboost_program_options -lgtest_main -lgtest -ldl -lpthread 
+	${LINK.cc} -o ${TESTDIR}/TestFiles/f4 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -lboost_program_options -fopenmp -lgtest_main -lgtest -ldl -lpthread 
 
 ${TESTDIR}/TestFiles/f2: ${TESTDIR}/_ext/a55270a7/test_pokedex.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
-	${LINK.cc} -o ${TESTDIR}/TestFiles/f2 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -lboost_program_options -ldl -lpthread -lgtest_main -lgtest 
+	${LINK.cc} -o ${TESTDIR}/TestFiles/f2 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -lboost_program_options -fopenmp -ldl -lpthread -lgtest_main -lgtest 
 
 
 ${TESTDIR}/_ext/a55270a7/test_engine.o: ../src/tests/test_engine.cpp 

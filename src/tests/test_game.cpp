@@ -51,6 +51,19 @@ TEST_F(GameTest, RolloutPokemon) {
 }
 
 
+TEST_F(GameTest, Multithreaded) {
+  Game::Config cfg;
+  cfg.numThreads = 2;
+  cfg.maxMatches = 200;
+  cfg.verbosity = 1;
+  auto game = Game(cfg)
+      .setEnvironment(environment_);
+  auto result = game.rollout();
+
+  EXPECT_GE(result.matchesPlayed, 101);
+}
+
+
 TEST_F(GameTest, CustomPlanners) {
   auto cu = PkCU();
   auto game = Game()

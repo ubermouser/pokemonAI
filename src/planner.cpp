@@ -238,11 +238,12 @@ Fitness Planner::recurse_gamma(
 
 void Planner::printSolution(const PlannerResult& results, bool isLast) const {
   if (cfg_.verbosity < (isLast?1:2)) { return; }
-  
+
+  std::stringstream out;
   if (!results.atDepth.empty()) {
     const auto& result = results.best();
 
-    std::clog << (isLast?"~~~~T":"    T") << (agentTeam_==TEAM_A?"A":"B") <<
+    out << (isLast?"~~~~T":"    T") << (agentTeam_==TEAM_A?"A":"B") <<
       ": ply=" << std::setw(2) << result.depth <<
       " act=" << std::setw(2) << result.agentAction <<
       " oact=" << std::setw(2) << result.otherAction <<
@@ -252,7 +253,8 @@ void Planner::printSolution(const PlannerResult& results, bool isLast) const {
       "\n";
 
   } else {
-    std::clog << "~~~~T" << (agentTeam_==TEAM_A?"A":"B") <<
+    out << "~~~~T" << (agentTeam_==TEAM_A?"A":"B") <<
       ": NO SOLUTIONS FOUND FOR ANY DEPTH!\n";
   }
+  std::cout << out.str();
 }

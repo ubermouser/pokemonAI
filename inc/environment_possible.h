@@ -114,7 +114,7 @@ public:
   using base_t::nv;
 
   /* print details of a single state */
-  void printState(size_t iState=SIZE_MAX, size_t iPly=SIZE_MAX) const;
+  void printState(std::ostream& os) const;
   void printEnvironment(std::ostream& os) const;
 
   operator environmentvolatile_t() const { return environmentvolatile_t{nv(), data().env}; };
@@ -242,11 +242,10 @@ public:
   using base_t = std::deque<EnvironmentPossibleData>;
   
   /* Print details of all possible states */
-  void printStates(size_t iPly=SIZE_MAX) const;
+  void printStates(std::ostream& os, const std::string& linePrefix="") const;
   
   /* Selects a state as per the user's choice to evaluate upon */
-  ConstEnvironmentPossible stateSelect_index(bool doPrint=false) const {
-    if (doPrint) { printStates(); }
+  ConstEnvironmentPossible stateSelect_index() const {
     size_t indexState;
     return stateSelect_index(indexState);
   }

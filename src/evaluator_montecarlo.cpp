@@ -9,6 +9,7 @@ EvaluatorMonteCarlo::EvaluatorMonteCarlo(const Config& cfg)
   Game::Config gamecfg;
   gamecfg.maxMatches = cfg_.maxRollouts;
   gamecfg.maxPlies = cfg_.maxPlies;
+  gamecfg.numThreads = cfg_.numThreads;
   gamecfg.allowUndefinedAgents = false;
   gamecfg.allowStateSelection = false;
   gamecfg.storeSubcomponents = false;

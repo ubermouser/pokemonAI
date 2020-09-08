@@ -18,14 +18,12 @@
 
 
 struct Turn {
-  EnvironmentVolatileData env;
+  EnvironmentPossibleData env;
   std::array<uint32_t, 2> activePokemon;
   std::array<Action, 2> action;
-  std::array<uint32_t, 2> prediction;
   std::array<fpType, 2> simpleFitness;
   std::array<fpType, 2> depth0Fitness;
   std::array<fpType, 2> depthMaxFitness;
-  fpType probability;
   uint32_t stateSelected;
 };
 
@@ -39,8 +37,10 @@ struct GameResult {
   std::array<std::array<fpType, 6>, 2> dMaxContribution;
   std::array<std::array<uint32_t, 6>, 2> ranking;
   std::array<fpType, 2> predictionAccuracy;
-  uint32_t numPlies;
-  int endStatus;
+  uint32_t numPlies = 0;
+  int endStatus = MATCH_UNPLAYED;
+
+  bool isPlayed() const { return endStatus != MATCH_UNPLAYED; }
 };
 
 struct HeatResult {
@@ -73,6 +73,9 @@ public:
 
     /* number of matches, in best of N format, that game is to play before returning. Should ideally be an odd number */
     size_t maxMatches = 3;
+
+    /* When above 0, n threads are instantiated for each match when performing heat rollouts. */
+    size_t numThreads = 0;
 
     /* when true, manual state selection is used. */
     bool allowStateSelection = false;
@@ -178,6 +181,8 @@ protected:
   /* prints the current action */
   void printAction(
       const ConstTeamVolatile& currentTeam, const Action& indexAction, unsigned int iTeam) const;
+
+  void printStateTransition(const Turn& cTurn, size_t iPly=SIZE_MAX) const;
 
   /* prints interesting facts about the game */
   void printGameStart(size_t iMatch=SIZE_MAX) const;

@@ -1,6 +1,7 @@
 #include "../inc/environment_possible.h"
 
 #include <iostream>
+#include <boost/format.hpp>
 #include <boost/static_assert.hpp>
 
 #include "../inc/environment_nonvolatile.h"
@@ -47,13 +48,9 @@ bool ConstEnvironmentPossible::isEmpty() const {
 
 
 ENV_POSSIBLE_IMPL_TEMPLATE
-void ENV_POSSIBLE_IMPL::printState(size_t iState, size_t iPly) const {
-  // print ply index if we have a valid one:
-  if (iPly != SIZE_MAX) { std::cout << "ply " << iPly << ", "; }
-  // print state and probability:
-  if (iState != SIZE_MAX) { std::cout << "s=" << iState << ", "; }
+void ENV_POSSIBLE_IMPL::printState(std::ostream& os) const {
   // print environment status:
-  std::cout << ConstEnvironmentPossible{nv(), data()};
+  os << ConstEnvironmentPossible{nv(), data()};
 }
 
 
@@ -185,17 +182,18 @@ ConstEnvironmentPossible PossibleEnvironments::stateSelect_index(size_t& indexRe
 } // endOf stateSelect_index
 
 
-void PossibleEnvironments::printStates(size_t iPly) const {
-  std::cout << getNumUnique() << "(" << size() << ") possible states!\n";
+void PossibleEnvironments::printStates(std::ostream& os, const std::string& linePrefix) const {
+  os << getNumUnique() << "(" << size() << ") possible states!\n";
   for (size_t iState = 0; iState < size(); iState++)
   {
     ConstEnvironmentPossible state = at(iState);
     if (state.isPruned()) { continue; } // don't display pruned states
 
-    state.printState(iState, iPly);
+    os << boost::format("%sstate=%d ") % linePrefix % iState;
+    state.printState(os);
   }
 
-  std::cout << "\n";
+  os << "\n";
 }
 
 

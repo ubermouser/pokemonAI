@@ -167,7 +167,7 @@
       </toolsSet>
       <compileType>
         <ccTool>
-          <commandLine>-O0</commandLine>
+          <commandLine>-O0 -fopenmp</commandLine>
           <preprocessorList>
             <Elem>DOUBLEPRECISION</Elem>
             <Elem>GEN4_STATIC</Elem>
@@ -375,6 +375,7 @@
             <linkerOptionItem>-lboost_program_options</linkerOptionItem>
             <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
             <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
+            <linkerOptionItem>-fopenmp</linkerOptionItem>
             <linkerOptionItem>-lgtest_main</linkerOptionItem>
             <linkerOptionItem>-lgtest</linkerOptionItem>
           </linkerLibItems>
@@ -397,6 +398,7 @@
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
             <linkerOptionItem>-lboost_system</linkerOptionItem>
             <linkerOptionItem>-lboost_program_options</linkerOptionItem>
+            <linkerOptionItem>-fopenmp</linkerOptionItem>
             <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
             <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
             <linkerOptionItem>-lgtest_main</linkerOptionItem>
@@ -423,6 +425,7 @@
             <linkerOptionItem>-lboost_program_options</linkerOptionItem>
             <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
             <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
+            <linkerOptionItem>-fopenmp</linkerOptionItem>
             <linkerOptionItem>-lgtest_main</linkerOptionItem>
             <linkerOptionItem>-lgtest</linkerOptionItem>
           </linkerLibItems>
@@ -445,6 +448,7 @@
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
             <linkerOptionItem>-lboost_system</linkerOptionItem>
             <linkerOptionItem>-lboost_program_options</linkerOptionItem>
+            <linkerOptionItem>-fopenmp</linkerOptionItem>
             <linkerOptionItem>-lgtest_main</linkerOptionItem>
             <linkerOptionItem>-lgtest</linkerOptionItem>
             <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
@@ -465,7 +469,7 @@
         </cTool>
         <ccTool>
           <developmentMode>6</developmentMode>
-          <commandLine>-g -mtune=native -march=native</commandLine>
+          <commandLine>-g -mtune=native -march=native -fopenmp</commandLine>
           <preprocessorList>
             <Elem>DOUBLEPRECISION</Elem>
             <Elem>GEN4_STATIC</Elem>

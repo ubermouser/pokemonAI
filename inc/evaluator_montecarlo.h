@@ -20,6 +20,8 @@ public:
 
     size_t maxPlies = 125;
 
+    size_t numThreads = 0;
+
     Config() : Evaluator::Config() {};
   };
 
