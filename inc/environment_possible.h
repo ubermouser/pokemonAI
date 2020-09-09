@@ -10,6 +10,7 @@
 
 #include "pkai.h"
 
+#include <bitset>
 #include <deque>
 #include <ostream>
 #include <memory>
@@ -19,6 +20,19 @@
 #include "environment_volatile.h"
 #include "environment_nonvolatile.h"
 #include "../src/fixedpoint/fixed_class.h"
+
+
+#define ENV_TEAM_HIT 0
+#define ENV_TEAM_CRIT 1
+#define ENV_TEAM_SECONDARY 2
+#define ENV_TEAM_BLOCKED 3
+#define ENV_TEAM_SWITCHED 4
+#define ENV_TEAM_FREE 5
+#define ENV_TEAM_WAIT 6
+#define ENV_TEAM_MOVESFIRST 7
+#define ENV_PRUNED 15
+#define ENV_MERGED 31
+#define ENV_TEAM_LAST 16
 
 typedef fixedpoint::fixed_point<30> fixType;
 
@@ -62,7 +76,7 @@ struct PKAISHARED EnvironmentPossibleData {
    * 15 - this environmentPossible has been merged with a duplicate environment
    * 
    */
-  uint32_t envBitset;
+  std::bitset<32> envBitset;
 
 
   static EnvironmentPossibleData create(const EnvironmentVolatileData& source, bool doHash = false);
@@ -78,24 +92,25 @@ struct PKAISHARED EnvironmentPossibleData {
   const fixType& getProbability() const { return probability; };
   fixType& getProbability() { return probability; };
 
-  const uint32_t& getBitmask() const { return envBitset; };
-  uint32_t& getBitmask() { return envBitset; };
+  const std::bitset<32>& getBitmask() const { return envBitset; };
+  std::bitset<32>& getBitmask() { return envBitset; };
 
-  void setMerged()
-  {
-    envBitset = envBitset | (0x1<<(15));
+  void setMerged() {
+    envBitset.set(ENV_MERGED);
   };
 
-  void setPruned()
-  {
-    envBitset = envBitset | (0x1<<(7));
+  void setPruned() {
+    envBitset.set(ENV_PRUNED);
   };
   
 
-  bool isPruned() const
-  {
-    return (0x1<<(7) & envBitset) > 0;
+  bool isPruned() const {
+    return envBitset[ENV_PRUNED];
   };
+
+  bool isMerged() const {
+    return envBitset[ENV_MERGED];
+  }
 };
 
 
@@ -124,55 +139,49 @@ public:
 
   const uint64_t& getHash() const { return data().getHash(); };
 
-  const uint32_t& getBitmask() const { return data().getBitmask(); };
+  const std::bitset<32>& getBitmask() const { return data().getBitmask(); };
 
   /* has iTeam hit this round? */
-  bool hasHit(size_t iTeam) const
-  {
-    return (0x1<<(0 + iTeam*8) & data().envBitset) > 0;
+  bool hasHit(size_t iTeam) const {
+    return data().envBitset[iTeam * ENV_TEAM_LAST + ENV_TEAM_HIT];
   };
 
   /* has iTeam critical hit this round? */
-  bool hasCrit(size_t iTeam) const
-  {
-    return (0x1<<(1 + iTeam*8) & data().envBitset) > 0;
+  bool hasCrit(size_t iTeam) const {
+    return data().envBitset[iTeam * ENV_TEAM_LAST + ENV_TEAM_CRIT];
   };
 
   /* has iTeam used a secondary effect this round? */
-  bool hasSecondary(size_t iTeam) const
-  {
-    return (0x1<<(2 + iTeam*8) & data().envBitset) > 0;
+  bool hasSecondary(size_t iTeam) const {
+    return data().envBitset[iTeam * ENV_TEAM_LAST + ENV_TEAM_SECONDARY];
   };
 
   /* was iteam's action blocked this round? */
-  bool wasBlocked(size_t iTeam) const
-  {
-    return (0x1<<(3 + iTeam*8) & data().envBitset) > 0;
+  bool wasBlocked(size_t iTeam) const {
+    return data().envBitset[iTeam * ENV_TEAM_LAST + ENV_TEAM_BLOCKED];
   };
 
   /* has iTeam switched this round? */
-  bool hasSwitched(size_t iTeam) const
-  {
-    return (0x1<<(4 + iTeam*8) & data().envBitset) > 0;
+  bool hasSwitched(size_t iTeam) const {
+    return data().envBitset[iTeam * ENV_TEAM_LAST + ENV_TEAM_SWITCHED];
   };
 
   /* has iTeam used a free move this round? */
-  bool hasFreeMove(size_t iTeam) const
-  {
-    return (0x1<<(5 + iTeam*8) & data().envBitset) > 0;
+  bool hasFreeMove(size_t iTeam) const {
+    return data().envBitset[iTeam * ENV_TEAM_LAST + ENV_TEAM_FREE];
   };
 
   /* has iTeam used waited this round? */
-  bool hasWaited(size_t iTeam) const
-  {
-    return (0x1<<(6 + iTeam*8) & data().envBitset) > 0;
+  bool hasWaited(size_t iTeam) const {
+    return data().envBitset[iTeam * ENV_TEAM_LAST + ENV_TEAM_WAIT];
   };
 
-  bool isMerged() const
-  {
-    return (0x1<<(15) & data().envBitset) > 0;
+  /* has iTeam moved first this round? */
+  bool hasMovedFirst(size_t iTeam) const {
+    return data().envBitset[iTeam * ENV_TEAM_LAST + ENV_TEAM_MOVESFIRST];
   };
 
+  bool isMerged() const { return data().isMerged(); }
   bool isPruned() const { return data().isPruned(); }
 };
 
@@ -193,43 +202,40 @@ public:
 
   operator ConstEnvironmentPossible() const { return ConstEnvironmentPossible{nv(), data()}; };
 
-  uint32_t& getBitmask() { return data().getBitmask(); };
+  std::bitset<32>& getBitmask() { return data().getBitmask(); };
 
   fixType& getProbability() { return data().getProbability(); };
   
-  void setHit(size_t iTeam)
-  {
-    data().envBitset = data().envBitset | (0x1<<(0 + iTeam*8));
+  void setHit(size_t iTeam) {
+    data().envBitset.set(iTeam * ENV_TEAM_LAST + ENV_TEAM_HIT);
   };
 
-  void setCrit(size_t iTeam)
-  {
-    data().envBitset = data().envBitset | (0x1<<(1 + iTeam*8));
+  void setCrit(size_t iTeam) {
+    data().envBitset.set(iTeam * ENV_TEAM_LAST + ENV_TEAM_CRIT);
   };
 
-  void setSecondary(size_t iTeam)
-  {
-    data().envBitset = data().envBitset | (0x1<<(2 + iTeam*8));
+  void setSecondary(size_t iTeam) {
+    data().envBitset.set(iTeam * ENV_TEAM_LAST + ENV_TEAM_SECONDARY);
   };
 
-  void setBlocked(size_t iTeam)
-  {
-    data().envBitset = data().envBitset | (0x1<<(3 + iTeam*8));
+  void setBlocked(size_t iTeam) {
+    data().envBitset.set(iTeam * ENV_TEAM_LAST + ENV_TEAM_BLOCKED);
   };
 
-  void setSwitched(size_t iTeam)
-  {
-    data().envBitset = data().envBitset | (0x1<<(4 + iTeam*8));
+  void setSwitched(size_t iTeam) {
+    data().envBitset.set(iTeam * ENV_TEAM_LAST + ENV_TEAM_SWITCHED);
   };
 
-  void setFreeMove(size_t iTeam)
-  {
-    data().envBitset = data().envBitset | (0x1<<(5 + iTeam*8));
+  void setFreeMove(size_t iTeam) {
+    data().envBitset.set(iTeam * ENV_TEAM_LAST + ENV_TEAM_FREE);
   };
 
-  void setWaited(size_t iTeam)
-  {
-    data().envBitset = data().envBitset | (0x1<<(6 + iTeam*8));
+  void setWaited(size_t iTeam) {
+    data().envBitset.set(iTeam * ENV_TEAM_LAST + ENV_TEAM_WAIT);
+  }
+
+  void setMovedFirst(size_t iTeam) {
+    data().envBitset.set(iTeam * ENV_TEAM_LAST + ENV_TEAM_MOVESFIRST);
   }
 
   void setPruned() { data().setPruned(); };
@@ -242,6 +248,7 @@ public:
   using base_t = std::deque<EnvironmentPossibleData>;
   
   /* Print details of all possible states */
+  void printStates() const;
   void printStates(std::ostream& os, const std::string& linePrefix="") const;
   
   /* Selects a state as per the user's choice to evaluate upon */

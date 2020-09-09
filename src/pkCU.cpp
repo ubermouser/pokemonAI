@@ -226,6 +226,7 @@ void PkCUEngine::updateState() {
     swapTeamIndexes();
   default:
   case TEAM_A:
+    getBase().setMovedFirst(priority);
     updateState_move();
     break;
   case 2: {
@@ -235,11 +236,13 @@ void PkCUEngine::updateState() {
 
       // first team moves first:
       iBase_ = iStages[0];
+      getBase().setMovedFirst(TEAM_A);
       updateState_move();
 
       // swap indexes:
       iBase_ = iStages[1];
       //swapTeamIndexes(); (updateState_move swaps team indexes but does not swap them back)
+      getBase().setMovedFirst(TEAM_B);
 
       // second team moves first:
       updateState_move();

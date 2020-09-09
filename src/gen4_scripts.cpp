@@ -69,6 +69,7 @@ const Move* spikes_t;
 const Move* stealthRock_t;
 const Move* stoneEdge_t;
 const Move* struggle_t;
+const Move* suckerPunch_t;
 const Move* swift_t;
 const Move* toxicSpikes_t;
 const Move* uTurn_t;
@@ -703,6 +704,29 @@ int move_uTurn_testMoveSwap(
     moveAllowed[VALID_MOVE_FRIENDLY_IS_OTHER] = true;
   }
 
+  return 1;
+}
+
+int move_suckerPunch_alwaysMissesOnCondition
+  (PkCUEngine& cu,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV,
+  fpType& probabilityToHit) {
+  if (&mV.getBase() != suckerPunch_t) { return 0; }
+
+  // if the enemy's move is NOT a damaging move:
+  const Action& oAction = cu.getOAction();
+  bool enemyMoveAction = (cu.getOAction().isMove());
+  auto damageType = enemyMoveAction?tPKV.getMV(oAction).getBase().getDamageType():ATK_NODMG;
+  bool enemyDamagingAction = damageType == ATK_PHYSICAL || damageType == ATK_SPECIAL;
+  // if the enemy moves first:
+  bool enemyMovedFirst = cu.getBase().hasMovedFirst(cu.getIOTeam());
+  if (!enemyDamagingAction || enemyMovedFirst) {
+    // the move never hits if these conditions are met:
+    probabilityToHit = 0.0;
+  }
+  
   return 1;
 }
 
@@ -1418,6 +1442,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   stealthRock_t = orphan::orphanCheck(moves, "stealth rock");
   stoneEdge_t = orphan::orphanCheck(moves, "stone edge");
   struggle_t = orphan::orphanCheck(moves, "struggle");
+  suckerPunch_t = orphan::orphanCheck(moves, "sucker punch");
   swift_t = orphan::orphanCheck(moves, "swift");
   toxicSpikes_t = orphan::orphanCheck(moves, "toxic spikes");
   uTurn_t = orphan::orphanCheck(moves, "u-turn");
@@ -1518,6 +1543,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(MOVE_PLUGIN, "stealth rock", PLUGIN_ON_SWITCHIN, move_stealthRock_switch, 0, 2));
   extensions.push_back(plugin(MOVE_PLUGIN, "stealth rock", PLUGIN_ON_EVALUATEMOVE, move_stealthRock_set, 0, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "stone edge", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, 0));
+  extensions.push_back(plugin(MOVE_PLUGIN, "sucker punch", PLUGIN_ON_MODIFYHITPROBABILITY, move_suckerPunch_alwaysMissesOnCondition, 0, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "swift", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "toxic spikes", PLUGIN_ON_SWITCHIN, move_toxicSpikes_switch, 2, 2));
   extensions.push_back(plugin(MOVE_PLUGIN, "toxic spikes", PLUGIN_ON_EVALUATEMOVE, move_toxicSpikes_set, 0, 0));

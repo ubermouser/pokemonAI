@@ -182,6 +182,10 @@ ConstEnvironmentPossible PossibleEnvironments::stateSelect_index(size_t& indexRe
 } // endOf stateSelect_index
 
 
+void PossibleEnvironments::printStates() const {
+  return printStates(std::cout, "");
+}
+
 void PossibleEnvironments::printStates(std::ostream& os, const std::string& linePrefix) const {
   os << getNumUnique() << "(" << size() << ") possible states!\n";
   for (size_t iState = 0; iState < size(); iState++)

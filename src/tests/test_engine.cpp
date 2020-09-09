@@ -442,3 +442,37 @@ TEST_F(EngineTest, UTurn) {
     EXPECT_EQ(uturn_no_ally.at(0).getEnv().getTeam(1).getICPKV(), 0); // ally NOT swapped out
   }
 }
+
+
+TEST_F(EngineTest, SuckerPunch) {
+  auto team = TeamNonVolatile()
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("spiritomb"))
+        .addMove(pokedex_->getMoves().at("sucker punch"))
+        .addMove(pokedex_->getMoves().at("will-o-wisp"))
+        .addMove(pokedex_->getMoves().at("shock wave"))
+        .setLevel(100))
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("azelf"))
+        .setLevel(100));
+  auto environment = EnvironmentNonvolatile(team, team, true);
+  engine_->setEnvironment(environment);
+
+  auto suckerpunch_dmg = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(2));
+  auto suckerpunch_status = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(1));
+  auto suckerpunch_move = engine_->updateState(engine_->initialState(), Action::move(0), Action::swap(1));
+
+  { // no damage to pokemon who used status:
+    EXPECT_EQ(suckerpunch_status.at(0).getEnv().getTeam(1).teammate(0).getPercentHP(), 1.);
+    EXPECT_EQ(suckerpunch_status.at(0).getEnv().getTeam(0).teammate(0).getMV(0).getPP(), 7);
+  }
+  { // no damage to the pokemon who swapped:
+    EXPECT_EQ(suckerpunch_move.at(0).getEnv().getTeam(1).teammate(0).getPercentHP(), 1.);
+    EXPECT_EQ(suckerpunch_move.at(0).getEnv().getTeam(1).teammate(1).getPercentHP(), 1.);
+    EXPECT_EQ(suckerpunch_move.at(0).getEnv().getTeam(0).teammate(0).getMV(0).getPP(), 7);
+  }
+  {  // full damage to pokemon who attacked:
+    EXPECT_EQ(suckerpunch_dmg.at(0).getEnv().getTeam(1).teammate(0).getHP(), 129);
+    EXPECT_EQ(suckerpunch_dmg.at(0).getEnv().getTeam(0).teammate(0).getMV(0).getPP(), 7);
+  }
+}
