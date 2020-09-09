@@ -280,6 +280,22 @@ void TeamNonVolatile::createDigest_impl(std::array<uint8_t, TEAM_NONVOLATILE_DIG
 }
 
 
+std::ostream& operator <<(std::ostream& os, const TeamNonVolatile& tNV) {
+  for (size_t iTeammate = 0; iTeammate != tNV.getNumTeammates(); ++iTeammate) {
+    os << iTeammate << "-" << tNV.teammate(iTeammate) << "\n";
+  }
+  return os;
+}
+
+
+void TeamNonVolatile::printSummary(std::ostream& os, const std::string& prefix) const {
+  for (size_t iTeammate = 0; iTeammate != getNumTeammates(); ++iTeammate) {
+    os << prefix << iTeammate << "-";
+    teammate(iTeammate).printSummary(os);
+    os << "\n";
+  }
+}
+
 
 static const std::string header = "PKAIE0";
 

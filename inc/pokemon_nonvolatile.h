@@ -260,6 +260,7 @@ public:
   void initFV();
 
   /* output a single pokemon */
+  void printSummary(std::ostream& out) const;
   void output(std::ostream& oFile, bool printHeader = true) const;
 
   /* input a single pokemon */

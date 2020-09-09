@@ -624,18 +624,22 @@ void PokemonNonVolatile::initFV()
 
 
 
-std::ostream& operator <<(std::ostream& os, const PokemonNonVolatile& cPKNV)
-{
-  os << "\"" << cPKNV.getName() << "\"-\"" << cPKNV.getBase().getName();
-  os << " " << (cPKNV.abilityExists()?cPKNV.getAbility().getName():"NO_ABILITY");
-  os << " " << (cPKNV.hasInitialItem()?cPKNV.getInitialItem().getName():"NO_ITEM");
-  for (size_t iAction = 0; iAction != cPKNV.getNumMoves(); ++iAction)
-  {
-    os << " " << cPKNV.getMove_base(iAction).getName();
-  }
-  os << "\n";
-
+std::ostream& operator <<(std::ostream& os, const PokemonNonVolatile& cPKNV) {
+  os << "\"" << cPKNV.getName() << "\"-\"" << cPKNV.getBase().getName() << "\"";
   return os;
+}
+
+
+void PokemonNonVolatile::printSummary(std::ostream& os) const {
+  os << *this
+     << "  " << getFV_base(FV_HITPOINTS)
+     << "HP  A[" << (abilityExists()?getAbility().getName():"")
+     << "]  I[" << (hasInitialItem()?getInitialItem().getName():"")
+     << "]  M[";
+  for (size_t iMove = 0; iMove != getNumMoves(); ++iMove) {
+    os << getMove_base(iMove).getName() << ((iMove+1)==getNumMoves()?"":", ");
+  }
+  os << "]";
 }
 
 

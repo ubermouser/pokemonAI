@@ -30,7 +30,7 @@ struct Turn {
 struct GameResult {
   std::vector<Turn> log;
   std::array<std::array<std::array<uint32_t, 5>, 6>, 2> moveUse; 
-  std::array<std::array<uint32_t, 6>, 2> participation;
+  std::array<std::array<fpType, 6>, 2> participation;
   std::array<std::array<fpType, 6>, 2> aggregateContribution;
   std::array<std::array<fpType, 6>, 2> simpleContribution;
   std::array<std::array<fpType, 6>, 2> d0Contribution;

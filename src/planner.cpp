@@ -7,6 +7,7 @@
 #include <sstream>
 #include <stdexcept>
 
+#include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
 namespace po = boost::program_options;
@@ -243,15 +244,15 @@ void Planner::printSolution(const PlannerResult& results, bool isLast) const {
   if (!results.atDepth.empty()) {
     const auto& result = results.best();
 
-    out << (isLast?"~~~~T":"    T") << (agentTeam_==TEAM_A?"A":"B") <<
-      ": ply=" << std::setw(2) << result.depth <<
-      " act=" << std::setw(2) << result.agentAction <<
-      " oact=" << std::setw(2) << result.otherAction <<
-      " fit=" << std::setw(9) << result.fitness.lowerBound() <<
-      " elaps=" << std::setw(7) << result.timeSpent << "s" <<
-      " nnod=" << std::dec << result.numNodes <<
-      "\n";
-
+    out << boost::format("%sT%s: ply=%2d act=%4s oact=%4s fit=% 6.4f elaps=%6.2f nnod=%d\n")
+        % (isLast?"~~~~":"    ")
+        % (agentTeam_==TEAM_A?"A":"B")
+        % result.depth
+        % result.agentAction
+        % result.otherAction
+        % result.fitness.lowerBound()
+        % result.timeSpent
+        % result.numNodes;
   } else {
     out << "~~~~T" << (agentTeam_==TEAM_A?"A":"B") <<
       ": NO SOLUTIONS FOUND FOR ANY DEPTH!\n";

@@ -172,11 +172,11 @@ Game& Game::initialize() {
 
 
 HeatResult Game::rollout(const EnvironmentVolatileData& initialState) {
-  std::vector<GameResult> gameLog(cfg_.maxMatches);
-  std::array<uint32_t, 2> score{0,0};
-
   if (!isInitialized_) { initialize(); }
   if (cfg_.verbosity >= 1) { printHeatStart(); }
+
+  std::vector<GameResult> gameLog(cfg_.maxMatches, GameResult());
+  std::array<uint32_t, 2> score{0,0};
 
   #pragma omp parallel for if (cfg_.numThreads > 0) num_threads(cfg_.numThreads)
   for (size_t iMatch = 0; iMatch < cfg_.maxMatches; ++iMatch) {
@@ -311,7 +311,7 @@ GameResult Game::digestGame(const std::vector<Turn>& cLog, int endStatus) {
 
   // initialize collected data:
   std::array<std::array<std::array<uint32_t, 5>, 6>, 2>& moveUse = cResult.moveUse;
-  std::array<std::array<uint32_t, 6>, 2>& participation = cResult.participation;
+  std::array<std::array<fpType, 6>, 2>& participation = cResult.participation;
   std::array<std::array<fpType, 6>, 2>& aggregateContribution = cResult.aggregateContribution;
   std::array<std::array<fpType, 6>, 2>& simpleContribution = cResult.simpleContribution;
   std::array<std::array<fpType, 6>, 2>& d0Contribution = cResult.d0Contribution;
@@ -387,6 +387,8 @@ GameResult Game::digestGame(const std::vector<Turn>& cLog, int endStatus) {
   // create scores:
   for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
     for (size_t iPokemon = 0; iPokemon < nv_->getTeam(iTeam).getNumTeammates(); ++iPokemon) {
+      participation[iTeam][iPokemon] /= (fpType)cLog.size();
+
       aggregateContribution[iTeam][iPokemon] =
         (
           simpleContribution[iTeam][iPokemon] * 0.35 
@@ -396,7 +398,7 @@ GameResult Game::digestGame(const std::vector<Turn>& cLog, int endStatus) {
           dMaxContribution[iTeam][iPokemon] * 0.6
         ) 
         *
-        (fpType)((fpType)participation[iTeam][iPokemon] / (fpType)(cLog.size()));
+        participation[iTeam][iPokemon];
     }
   }
 
@@ -476,7 +478,7 @@ HeatResult Game::digestMatch(const std::vector<GameResult>& gLog) {
     for (size_t iPokemon = 0; iPokemon < 6; ++iPokemon) {
       for(const auto& cLog: gLog) {
         if (!cLog.isPlayed()) { continue; }
-        participation[iTeam][iPokemon] += (fpType) ((fpType)cLog.participation[iTeam][iPokemon] / (fpType)cLog.numPlies);
+        participation[iTeam][iPokemon] += cLog.participation[iTeam][iPokemon];
         avgRanking[iTeam][iPokemon] += (fpType)cLog.ranking[iTeam][iPokemon];
         aggregateContribution[iTeam][iPokemon] += cLog.aggregateContribution[iTeam][iPokemon];
 
@@ -668,7 +670,7 @@ void Game::printGameOutline(const GameResult& gResult, size_t iMatch) const {
   out
     << "--- GAME STATISTICS ---\n "
     << gResult.numPlies << " plies total\n"
-    " Leaderboard: (index: name - (rank) aScore sScore participation)\n";
+    " Leaderboard: (index: name  r=rank  c=aggregate-score  s=simple-score  p=participation)\n";
 
   for (size_t iTeam = 0; iTeam < 2; iTeam++) {
     const TeamNonVolatile& cTeam = nv_->getTeam(iTeam);
@@ -677,15 +679,13 @@ void Game::printGameOutline(const GameResult& gResult, size_t iMatch) const {
       << (((int)iTeam==gResult.endStatus)?" (winner)":"")
       << "\n";
     for (size_t iPokemon = 0; iPokemon < cTeam.getNumTeammates(); ++iPokemon) {
-      out
-        << "    "
-        << iPokemon << ": "
-        << cTeam.teammate(iPokemon).getName() << " - ("
-        << (gResult.ranking[iTeam][iPokemon] + 1) << ") "
-        << gResult.aggregateContribution[iTeam][iPokemon] << " "
-        << gResult.simpleContribution[iTeam][iPokemon] << " "
-        << ((fpType)gResult.participation[iTeam][iPokemon] / (fpType)gResult.numPlies )
-        << "\n";
+      out << boost::format("    %d: %24s  r=%d  c=% 5.3f  s=% 5.3f  p=% 5.3f\n")
+          % iPokemon
+          % cTeam.teammate(iPokemon)
+          % (gResult.ranking[iTeam][iPokemon] + 1)
+          % gResult.aggregateContribution[iTeam][iPokemon]
+          % gResult.simpleContribution[iTeam][iPokemon]
+          % gResult.participation[iTeam][iPokemon];
     }
   }
   std::cout << out.str();
@@ -696,7 +696,7 @@ void Game::printHeatStart() const {
   std::stringstream out;
   for (size_t iTeam = 0; iTeam < 2; iTeam++) {
     out << "Team " << getTeamIdentifier(iTeam) << ":\n";
-    ConstEnvironmentVolatile{*nv_, initialState_}.getTeam(iTeam).printTeam(out, "    ");
+    nv_->getTeam(iTeam).printSummary(out, "    ");
   }
 
   std::cout << out.str();
@@ -730,7 +730,7 @@ void Game::printHeatOutline(const HeatResult& result) const {
       ((cfg_.verbosity>=3)?"\n":"") <<
       "Team " << getTeamIdentifier(matchState) <<
       " has beaten team " << getTeamIdentifier(losingTeam) <<
-      " , winning the bo" << cfg_.maxMatches <<
+      ", winning the bo" << cfg_.maxMatches <<
       " series " << result.score[matchState] <<
       " to " << result.score[losingTeam] <<
       ((cfg_.verbosity>=3)?"!\n\n":"!\n");
@@ -741,7 +741,7 @@ void Game::printHeatOutline(const HeatResult& result) const {
     << result.matchesPlayed << " out of " << result.matchesTotal << " games played\n "
     << "final score: " << result.score[0] << " to " << result.score[1] << "\n "
     << result.numPlies << " average plies per game\n"
-    " Leaderboard: (index: name - (rank) avG-score avG-participation)\n";
+    " Leaderboard: (index: name  r=rank  aC=avG-score  aP=avG-participation)\n";
 
   for (size_t iTeam = 0; iTeam < 2; iTeam++) {
     const TeamNonVolatile& cTeam = nv_->getTeam(iTeam);
@@ -750,14 +750,12 @@ void Game::printHeatOutline(const HeatResult& result) const {
       << (((int)iTeam==result.endStatus)?" (winner)":"")
       << "\n";
     for (size_t iPokemon = 0; iPokemon < cTeam.getNumTeammates(); ++iPokemon) {
-      out
-        << "    "
-        << iPokemon << ": "
-        << cTeam.teammate(iPokemon).getName() << " - ("
-        << (result.ranking[iTeam][iPokemon] + 1) << ") "
-        << result.aggregateContribution[iTeam][iPokemon] << " "
-        << result.participation[iTeam][iPokemon]
-        << "\n";
+      out << boost::format("    %d: %24s  r=%d  aC=% 5.3f  aP=% 5.3f\n")
+          % iPokemon
+          % cTeam.teammate(iPokemon)
+          % (result.ranking[iTeam][iPokemon] + 1)
+          % result.aggregateContribution[iTeam][iPokemon]
+          % result.participation[iTeam][iPokemon];
     }
   }
   std::cout << out.str();

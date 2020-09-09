@@ -14,34 +14,34 @@
 
 class Action {
 public:
-  static constexpr uint32_t MOVE_UNDEFINED = 0;
-  static constexpr uint32_t MOVE_0 = 1;
-  static constexpr uint32_t MOVE_1 = 2;
-  static constexpr uint32_t MOVE_2 = 3;
-  static constexpr uint32_t MOVE_3 = 4;
-  static constexpr uint32_t MOVE_STRUGGLE = 5;
-  static constexpr uint32_t MOVE_WAIT = 6;
-  static constexpr uint32_t MOVE_SWITCH = 7;
-  static constexpr uint32_t MOVE_LAST = 8;
+  static constexpr size_t MOVE_UNDEFINED = 0;
+  static constexpr size_t MOVE_0 = 1;
+  static constexpr size_t MOVE_1 = 2;
+  static constexpr size_t MOVE_2 = 3;
+  static constexpr size_t MOVE_3 = 4;
+  static constexpr size_t MOVE_STRUGGLE = 5;
+  static constexpr size_t MOVE_WAIT = 6;
+  static constexpr size_t MOVE_SWITCH = 7;
+  static constexpr size_t MOVE_LAST = 8;
 
-  static constexpr uint32_t FRIENDLY_DEFAULT = 0;
-  static constexpr uint32_t FRIENDLY_ANY = 0;
-  static constexpr uint32_t FRIENDLY_0 = 1;
-  static constexpr uint32_t FRIENDLY_1 = 2;
-  static constexpr uint32_t FRIENDLY_2 = 3;
-  static constexpr uint32_t FRIENDLY_3 = 4;
-  static constexpr uint32_t FRIENDLY_4 = 5;
-  static constexpr uint32_t FRIENDLY_5 = 6;
-  static constexpr uint32_t FRIENDLY_ALL = 7;
-  static constexpr uint32_t FRIENDLY_LAST = 8;
+  static constexpr size_t FRIENDLY_DEFAULT = 0;
+  static constexpr size_t FRIENDLY_ANY = 0;
+  static constexpr size_t FRIENDLY_0 = 1;
+  static constexpr size_t FRIENDLY_1 = 2;
+  static constexpr size_t FRIENDLY_2 = 3;
+  static constexpr size_t FRIENDLY_3 = 4;
+  static constexpr size_t FRIENDLY_4 = 5;
+  static constexpr size_t FRIENDLY_5 = 6;
+  static constexpr size_t FRIENDLY_ALL = 7;
+  static constexpr size_t FRIENDLY_LAST = 8;
 
-  static constexpr uint32_t HOSTILE_DEFAULT = 0;
-  static constexpr uint32_t HOSTILE_ANY = 0;
-  static constexpr uint32_t HOSTILE_ADJACENT_C = 1;
-  static constexpr uint32_t HOSTILE_ADJACENT_L = 2;
-  static constexpr uint32_t HOSTILE_ADJACENT_R = 3;
-  static constexpr uint32_t HOSTILE_ALL = 4;
-  static constexpr uint32_t HOSTILE_LAST = 5;
+  static constexpr size_t HOSTILE_DEFAULT = 0;
+  static constexpr size_t HOSTILE_ANY = 0;
+  static constexpr size_t HOSTILE_ADJACENT_C = 1;
+  static constexpr size_t HOSTILE_ADJACENT_L = 2;
+  static constexpr size_t HOSTILE_ADJACENT_R = 3;
+  static constexpr size_t HOSTILE_ALL = 4;
+  static constexpr size_t HOSTILE_LAST = 5;
 
   static Action move(size_t iMove) {
     assert(iMove < 4);
@@ -61,22 +61,22 @@ public:
 
   Action() : type_(MOVE_UNDEFINED), friendlyTarget_(FRIENDLY_DEFAULT), enemyTarget_(HOSTILE_DEFAULT) {};
   explicit Action(
-      uint32_t type,
-      uint32_t friendly=FRIENDLY_DEFAULT,
-      uint32_t hostile=HOSTILE_DEFAULT
+      size_t type,
+      size_t friendly=FRIENDLY_DEFAULT,
+      size_t hostile=HOSTILE_DEFAULT
   ): type_(type), friendlyTarget_(friendly), enemyTarget_(hostile) {
     assert(type < MOVE_LAST);
     assert(friendly < FRIENDLY_LAST);
     assert(hostile < HOSTILE_LAST);
   };
 
-  uint32_t type() const { return type_; }
-  uint32_t iMove() const { return type() - MOVE_0;}
+  size_t type() const { return type_; }
+  size_t iMove() const { return type() - MOVE_0;}
 
-  uint32_t friendlyTarget() const { return friendlyTarget_; }
-  uint32_t iFriendly() const { return friendlyTarget() - FRIENDLY_0; }
+  size_t friendlyTarget() const { return friendlyTarget_; }
+  size_t iFriendly() const { return friendlyTarget() - FRIENDLY_0; }
 
-  uint32_t enemyTarget() const { return enemyTarget_; }
+  size_t enemyTarget() const { return enemyTarget_; }
 
   bool isSwitch() const { return type() == MOVE_SWITCH; }
   bool isMove() const { return type() >= MOVE_0 && type_ <= MOVE_STRUGGLE; }

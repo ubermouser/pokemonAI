@@ -79,7 +79,8 @@ public:
   void uninitialize();
   
   const PokemonNonVolatile& teammate(size_t iTeammate) const;
-  
+
+  void printSummary(std::ostream& os, const std::string& prefix) const;
   void output(std::ostream& oFile, bool printHeader = true) const;
 
   bool input(const std::vector<std::string>& lines, size_t& iLine);
@@ -89,6 +90,9 @@ public:
   static TeamNonVolatile loadFromFile(const std::string& path);
 
 };
+
+
+std::ostream& operator <<(std::ostream& os, const TeamNonVolatile& team);
 
 #endif	/* TEAM_NONVOLATILE_H */
 
