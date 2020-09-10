@@ -347,7 +347,7 @@ thief	Dark	10	100	40	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
 thrash	Normal	20	100	90	1	3	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	"lock-in(self,always,2-3);SetStatus(self,endOfEffect,confusion)"	"The user rampages and attacks for two to three turns. It then becomes confused, however."
 thunder	Electric	10	70	120	2	1	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	A wicked thunderbolt is dropped on the foe to inflict damage. It may also leave the target paralyzed.
 thunder fang	Electric	15	95	65	1	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	1	0	0	0	0	0	---	The user bites with electrified fangs. It may also make the foe flinch or become paralyzed.
-thunder wave	Electric	20	100	---	0	1	0	0	0	0	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	FailIf(target.Ability(Motor Drive));FailIf(target.Ability(Volt Absorb))	A weak electric charge is launched at the foe. It causes paralysis if it hits.
+thunder wave	Electric	20	100	---	0	1	0	0	0	0	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	A weak electric charge is launched at the foe. It causes paralysis if it hits.
 thunderbolt	Electric	15	100	95	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	A strong electric blast is loosed at the foe. It may also leave the foe paralyzed.
 thunderpunch	Electric	15	100	75	1	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	The foe is punched with an electrified fist. It may leave the target with paralysis.
 tickle	Normal	20	100	---	0	1	0	0	0	0	0	0	0	0	0	0	100	1	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	"The user tickles the foe into laughing, reducing its Attack and Defense stats."

@@ -20,16 +20,16 @@ bool Action::operator ==(const Action& other) const {
 
 void Action::print(std::ostream& os) const {
   if (isStruggle()) {
-    os << "MS";
+    os << "mS";
   } else if (isMove()) {
-    os << boost::format("M%d") % (iMove()+1);
+    os << boost::format("m%d") % (iMove()+1);
     if (friendlyTarget() != FRIENDLY_DEFAULT) {
       os << boost::format("-%d") % (friendlyTarget());
     }
   } else if (isSwitch()) {
-    os << boost::format("S%d") % (iFriendly()+1);
+    os << boost::format("s%d") % (iFriendly()+1);
   } else if (isWait()) {
-    os << "W";
+    os << "w";
   } else if (isUndefined()) {
     os << "??";
   } else { // unknown move!

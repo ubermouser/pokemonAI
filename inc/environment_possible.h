@@ -10,7 +10,6 @@
 
 #include "pkai.h"
 
-#include <bitset>
 #include <deque>
 #include <ostream>
 #include <memory>
@@ -76,7 +75,7 @@ struct PKAISHARED EnvironmentPossibleData {
    * 15 - this environmentPossible has been merged with a duplicate environment
    * 
    */
-  std::bitset<32> envBitset;
+  uint32_t envBitset;
 
 
   static EnvironmentPossibleData create(const EnvironmentVolatileData& source, bool doHash = false);
@@ -92,24 +91,27 @@ struct PKAISHARED EnvironmentPossibleData {
   const fixType& getProbability() const { return probability; };
   fixType& getProbability() { return probability; };
 
-  const std::bitset<32>& getBitmask() const { return envBitset; };
-  std::bitset<32>& getBitmask() { return envBitset; };
+  const uint32_t& getBitmask() const { return envBitset; };
+  uint32_t& getBitmask() { return envBitset; };
+
+  void setBit(size_t iBit) { envBitset |= (0x1 << iBit); };
+  bool getBit(size_t iBit) const { return ((0x1 << iBit) & envBitset) > 0; }
 
   void setMerged() {
-    envBitset.set(ENV_MERGED);
+    setBit(ENV_MERGED);
   };
 
   void setPruned() {
-    envBitset.set(ENV_PRUNED);
+    setBit(ENV_PRUNED);
   };
   
 
   bool isPruned() const {
-    return envBitset[ENV_PRUNED];
+    return getBit(ENV_PRUNED);
   };
 
   bool isMerged() const {
-    return envBitset[ENV_MERGED];
+    return getBit(ENV_MERGED);
   }
 };
 
@@ -139,46 +141,46 @@ public:
 
   const uint64_t& getHash() const { return data().getHash(); };
 
-  const std::bitset<32>& getBitmask() const { return data().getBitmask(); };
+  const uint32_t& getBitmask() const { return data().getBitmask(); };
 
   /* has iTeam hit this round? */
   bool hasHit(size_t iTeam) const {
-    return data().envBitset[iTeam * ENV_TEAM_LAST + ENV_TEAM_HIT];
+    return data().getBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_HIT);
   };
 
   /* has iTeam critical hit this round? */
   bool hasCrit(size_t iTeam) const {
-    return data().envBitset[iTeam * ENV_TEAM_LAST + ENV_TEAM_CRIT];
+    return data().getBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_CRIT);
   };
 
   /* has iTeam used a secondary effect this round? */
   bool hasSecondary(size_t iTeam) const {
-    return data().envBitset[iTeam * ENV_TEAM_LAST + ENV_TEAM_SECONDARY];
+    return data().getBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_SECONDARY);
   };
 
   /* was iteam's action blocked this round? */
   bool wasBlocked(size_t iTeam) const {
-    return data().envBitset[iTeam * ENV_TEAM_LAST + ENV_TEAM_BLOCKED];
+    return data().getBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_BLOCKED);
   };
 
   /* has iTeam switched this round? */
   bool hasSwitched(size_t iTeam) const {
-    return data().envBitset[iTeam * ENV_TEAM_LAST + ENV_TEAM_SWITCHED];
+    return data().getBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_SWITCHED);
   };
 
   /* has iTeam used a free move this round? */
   bool hasFreeMove(size_t iTeam) const {
-    return data().envBitset[iTeam * ENV_TEAM_LAST + ENV_TEAM_FREE];
+    return data().getBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_FREE);
   };
 
   /* has iTeam used waited this round? */
   bool hasWaited(size_t iTeam) const {
-    return data().envBitset[iTeam * ENV_TEAM_LAST + ENV_TEAM_WAIT];
+    return data().getBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_WAIT);
   };
 
   /* has iTeam moved first this round? */
   bool hasMovedFirst(size_t iTeam) const {
-    return data().envBitset[iTeam * ENV_TEAM_LAST + ENV_TEAM_MOVESFIRST];
+    return data().getBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_MOVESFIRST);
   };
 
   bool isMerged() const { return data().isMerged(); }
@@ -202,40 +204,40 @@ public:
 
   operator ConstEnvironmentPossible() const { return ConstEnvironmentPossible{nv(), data()}; };
 
-  std::bitset<32>& getBitmask() { return data().getBitmask(); };
+  uint32_t& getBitmask() { return data().getBitmask(); };
 
   fixType& getProbability() { return data().getProbability(); };
   
   void setHit(size_t iTeam) {
-    data().envBitset.set(iTeam * ENV_TEAM_LAST + ENV_TEAM_HIT);
+    data().setBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_HIT);
   };
 
   void setCrit(size_t iTeam) {
-    data().envBitset.set(iTeam * ENV_TEAM_LAST + ENV_TEAM_CRIT);
+    data().setBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_CRIT);
   };
 
   void setSecondary(size_t iTeam) {
-    data().envBitset.set(iTeam * ENV_TEAM_LAST + ENV_TEAM_SECONDARY);
+    data().setBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_SECONDARY);
   };
 
   void setBlocked(size_t iTeam) {
-    data().envBitset.set(iTeam * ENV_TEAM_LAST + ENV_TEAM_BLOCKED);
+    data().setBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_BLOCKED);
   };
 
   void setSwitched(size_t iTeam) {
-    data().envBitset.set(iTeam * ENV_TEAM_LAST + ENV_TEAM_SWITCHED);
+    data().setBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_SWITCHED);
   };
 
   void setFreeMove(size_t iTeam) {
-    data().envBitset.set(iTeam * ENV_TEAM_LAST + ENV_TEAM_FREE);
+    data().setBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_FREE);
   };
 
   void setWaited(size_t iTeam) {
-    data().envBitset.set(iTeam * ENV_TEAM_LAST + ENV_TEAM_WAIT);
+    data().setBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_WAIT);
   }
 
   void setMovedFirst(size_t iTeam) {
-    data().envBitset.set(iTeam * ENV_TEAM_LAST + ENV_TEAM_MOVESFIRST);
+    data().setBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_MOVESFIRST);
   }
 
   void setPruned() { data().setPruned(); };

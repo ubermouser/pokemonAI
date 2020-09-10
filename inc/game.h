@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <boost/program_options.hpp>
 
+#include "action.h"
 #include "environment_nonvolatile.h"
 #include "environment_possible.h"
 #include "environment_volatile.h"
@@ -18,42 +19,65 @@
 
 
 struct Turn {
+  struct PerTeam {
+    double simpleFitness = 0;
+    double depth0Fitness = 0;
+    double depthMaxFitness = 0;
+    size_t activePokemon = 0;
+    Action action;
+  };
+
   EnvironmentPossibleData env;
-  std::array<uint32_t, 2> activePokemon;
-  std::array<Action, 2> action;
-  std::array<fpType, 2> simpleFitness;
-  std::array<fpType, 2> depth0Fitness;
-  std::array<fpType, 2> depthMaxFitness;
-  uint32_t stateSelected;
+  std::array<PerTeam, 2> teams;
+  size_t stateSelected = SIZE_MAX;
 };
 
 struct GameResult {
+  struct PerTeam {
+    struct PerPokemon {
+      std::array<double, 5> moveUse = {0., 0., 0., 0., 0.};
+      double participation = 0;
+      double aggregateContribution = 0;
+      double simpleContribution = 0;
+      double d0Contribution = 0;
+      double dMaxContribution = 0;
+      size_t ranking = 7;
+    };
+
+    std::array<PerPokemon, 6> pokemon;
+    double predictionAccuracy = 0;
+  };
+
   std::vector<Turn> log;
-  std::array<std::array<std::array<uint32_t, 5>, 6>, 2> moveUse; 
-  std::array<std::array<fpType, 6>, 2> participation;
-  std::array<std::array<fpType, 6>, 2> aggregateContribution;
-  std::array<std::array<fpType, 6>, 2> simpleContribution;
-  std::array<std::array<fpType, 6>, 2> d0Contribution;
-  std::array<std::array<fpType, 6>, 2> dMaxContribution;
-  std::array<std::array<uint32_t, 6>, 2> ranking;
-  std::array<fpType, 2> predictionAccuracy;
-  uint32_t numPlies = 0;
+  std::array<PerTeam, 2> teams;
+
+  size_t numPlies = 0;
   int endStatus = MATCH_UNPLAYED;
 
   bool isPlayed() const { return endStatus != MATCH_UNPLAYED; }
 };
 
 struct HeatResult {
+  struct PerTeam {
+    struct PerPokemon {
+      std::array<double, 5> moveUse = {0., 0., 0., 0., 0.};
+      double participation = 0;
+      double aggregateContribution = 0;
+      double simpleContribution = 0;
+      size_t ranking = 7;
+    };
+
+    std::array<PerPokemon, 6> pokemon;
+    double predictionAccuracy = 0;
+  };
+
   std::vector<GameResult> gameResults;
-  std::array<std::array<fpType, 6>, 2> participation;
-  std::array<std::array<fpType, 6>, 2> aggregateContribution;
-  std::array<std::array<uint32_t, 6>, 2> ranking;
+  std::array<PerTeam, 2> teams;
   std::array<uint32_t, 2> score;
-  std::array<fpType, 2> predictionAccuracy;
-  fpType numPlies;
-  int endStatus;
-  size_t matchesPlayed;
-  size_t matchesTotal;
+  double numPlies = 0.;
+  int endStatus = MATCH_UNPLAYED;
+  size_t matchesPlayed = 0;
+  size_t matchesTotal = 0;
 };
 
 class Game {

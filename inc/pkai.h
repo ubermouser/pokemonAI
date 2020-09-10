@@ -201,7 +201,6 @@ extern const Pokedex* pkdex;
 #pragma warning( disable: 4251 )
 #endif
 
-#endif	/* PKAI_H */
 
 // used to define symbols
 #undef PKAISHARED
@@ -214,3 +213,5 @@ extern const Pokedex* pkdex;
 #else
 #define PKAISHARED
 #endif
+
+#endif	/* PKAI_H */

@@ -177,11 +177,14 @@ HeatResult Game::rollout(const EnvironmentVolatileData& initialState) {
 
   std::vector<GameResult> gameLog(cfg_.maxMatches, GameResult());
   std::array<uint32_t, 2> score{0,0};
+  bool shouldContinue = true;
 
-  #pragma omp parallel for if (cfg_.numThreads > 0) num_threads(cfg_.numThreads)
-  for (size_t iMatch = 0; iMatch < cfg_.maxMatches; ++iMatch) {
+  auto rollout_fn = [&](size_t iMatch){
     // end early if one player clearly dominates the other (we cannot break out of a parallel loop)
-    if (*std::max_element(begin(score), end(score)) > (cfg_.maxMatches / 2)) { continue; }
+    if (*std::max_element(begin(score), end(score)) > (cfg_.maxMatches / 2)) { 
+      shouldContinue = false;
+      return;
+    }
 
     // perform the rollout:
     GameResult& gResult = gameLog[iMatch];
@@ -189,6 +192,13 @@ HeatResult Game::rollout(const EnvironmentVolatileData& initialState) {
 
     // increment score:
     incrementScore(gResult.endStatus, score);
+  };
+
+  if (cfg_.numThreads > 0) {
+    #pragma omp parallel for num_threads(cfg_.numThreads)
+    for (size_t iMatch = 0; iMatch < cfg_.maxMatches; ++iMatch) { rollout_fn(iMatch); }
+  } else {
+    for (size_t iMatch = 0; shouldContinue && iMatch < cfg_.maxMatches; ++iMatch) { rollout_fn(iMatch); }
   }
 
   HeatResult result = digestMatch(gameLog);
@@ -278,10 +288,11 @@ Turn Game::digestTurn(
   Turn cTurn{};
 
   for (size_t iTeam = 0; iTeam < 2; iTeam++) {
+    auto& turn = cTurn.teams[iTeam];
     const PlannerResult& action = actions[iTeam];
     // set simple fitness to fitness as it would be evaluated depth 0 by the simple non perceptron evaluation function
-    fpType simpleFitness = eval_->calculateFitness(envP.getEnv(), iTeam).fitness;
-    fpType initialFitness, finalFitness;
+    double simpleFitness = eval_->calculateFitness(envP.getEnv(), iTeam).fitness;
+    double initialFitness, finalFitness;
     if (action.hasSolution()) {
         initialFitness = action.atDepth.front().fitness.value();
         finalFitness = action.atDepth.back().fitness.value();
@@ -290,16 +301,15 @@ Turn Game::digestTurn(
       finalFitness = simpleFitness;
     }
 
-    cTurn.activePokemon[iTeam] = (uint32_t) envP.getEnv().getTeam(iTeam).getICPKV();
-    cTurn.simpleFitness[iTeam] = simpleFitness;
-    cTurn.depth0Fitness[iTeam] = initialFitness;
-    cTurn.depthMaxFitness[iTeam] = finalFitness;
+    turn.activePokemon = envP.getEnv().getTeam(iTeam).getICPKV();
+    turn.simpleFitness = simpleFitness;
+    turn.depth0Fitness = initialFitness;
+    turn.depthMaxFitness = finalFitness;
+    turn.action = actions[iTeam].bestAgentAction();
   } // endOf foreach team
 
-  cTurn.action[TEAM_A] = actions[TEAM_A].bestAgentAction();
-  cTurn.action[TEAM_B] = actions[TEAM_B].bestAgentAction();
-  cTurn.stateSelected = (uint32_t) resultingState;
   cTurn.env = envP.data();
+  cTurn.stateSelected = resultingState;
 
   return cTurn;
 } // endOf digestTurn
@@ -309,44 +319,18 @@ GameResult Game::digestGame(const std::vector<Turn>& cLog, int endStatus) {
   GameResult cResult{};
   if (cfg_.storeSubcomponents) { cResult.log = cLog; }
 
-  // initialize collected data:
-  std::array<std::array<std::array<uint32_t, 5>, 6>, 2>& moveUse = cResult.moveUse;
-  std::array<std::array<fpType, 6>, 2>& participation = cResult.participation;
-  std::array<std::array<fpType, 6>, 2>& aggregateContribution = cResult.aggregateContribution;
-  std::array<std::array<fpType, 6>, 2>& simpleContribution = cResult.simpleContribution;
-  std::array<std::array<fpType, 6>, 2>& d0Contribution = cResult.d0Contribution;
-  std::array<std::array<fpType, 6>, 2>& dMaxContribution = cResult.dMaxContribution;
-  std::array<std::array<uint32_t, 6>, 2>& ranking = cResult.ranking;
-  for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
-    for (size_t iTeammate = 0; iTeammate < 6; ++iTeammate) {
-      moveUse[iTeam][iTeammate].fill(0);
-    }
-    
-    participation[iTeam].fill(0);
-    aggregateContribution[iTeam].fill(std::numeric_limits<fpType>::quiet_NaN());
-    simpleContribution[iTeam].fill(0);
-    d0Contribution[iTeam].fill(0);
-    dMaxContribution[iTeam].fill(0);
-    ranking[iTeam].fill(7);
-  }
-
-  // initialize prevFitnesses
-  std::array<fpType, 2> prevSimpleFitness{};
-  std::array<fpType, 2> prev0Fitness{};
-  std::array<fpType, 2> prevMaxFitness{};
-  if (cLog.size() > 0) { // first turn:
-    const Turn& fTurn = cLog.at(0); // TODO(@drendleman) - what if match begins at a terminal state?
+  if (cLog.size() > 0) { // last turn:
+    const Turn& lastTurn = cLog.back(); // TODO(@drendleman) - what if match begins at a terminal state?
     for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
-      // set previous values to fitnesses of the first ply:
-      prevSimpleFitness[iTeam] = fTurn.simpleFitness[iTeam];
-      prev0Fitness[iTeam] = fTurn.depth0Fitness[iTeam];
-      prevMaxFitness[iTeam] = fTurn.depthMaxFitness[iTeam];
-  
+      const auto& tTurn = lastTurn.teams[iTeam];
+      auto& team = cResult.teams[iTeam];
+      auto& pokemon = team.pokemon[tTurn.activePokemon];
+      
       // add participation for first moving pokemon: (or lead twice)
-      participation[iTeam][fTurn.activePokemon[iTeam]] += 1;
+      pokemon.participation += 1;
       // add a move increment for the first moving pokemon:
-      if (fTurn.action[iTeam].isMove()) {
-        moveUse[iTeam][fTurn.activePokemon[iTeam]][ fTurn.action[iTeam].iMove() ] += 1;
+      if (tTurn.action.isMove()) {
+        pokemon.moveUse[tTurn.action.iMove()] += 1;
       }
     }
   }
@@ -354,91 +338,69 @@ GameResult Game::digestGame(const std::vector<Turn>& cLog, int endStatus) {
   // all turns after the first:
   for (size_t iPly = 1; iPly < cLog.size(); ++iPly) {
     // the previous turn. The previous turn was responsible for the delta between turn n-1 and n
-    const Turn& bTurn = cLog[iPly -1];
+    const Turn& pTurn = cLog[iPly - 1];
     // the current turn. Used for updating delta
     const Turn& cTurn = cLog[iPly];
 
     for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
-      // create deltas
-      fpType dSimpleFitness = cTurn.simpleFitness[iTeam] - prevSimpleFitness[iTeam];
-      fpType d0Fitness = cTurn.depth0Fitness[iTeam] - prev0Fitness[iTeam];
-      fpType dMaxFitness = cTurn.depthMaxFitness[iTeam] - prevMaxFitness[iTeam];
+      const auto& pTTurn = pTurn.teams[iTeam];
+      const auto& cTTurn = cTurn.teams[iTeam];
+      auto& team = cResult.teams[iTeam];
+      auto& pokemon = team.pokemon[pTTurn.activePokemon];
 
       // for every turn a pokemon is in play, this increases a counter for that pokemon by 1
-      participation[iTeam][cTurn.activePokemon[iTeam]]+= 1;
+      pokemon.participation += 1;
       
       // add a move increment for the current pokemon's move
-      if (cTurn.action[iTeam].isMove()) {
-        moveUse[iTeam][cTurn.activePokemon[iTeam]][cTurn.action[iTeam].iMove()] += 1;
+      if (pTTurn.action.isMove()) {
+        pokemon.moveUse[pTTurn.action.iMove()] += 1;
       }
 
       // increase contribution fractionals:
-      simpleContribution[iTeam][ bTurn.activePokemon[iTeam] ] += dSimpleFitness;
-      d0Contribution[iTeam][ bTurn.activePokemon[iTeam] ] += d0Fitness;
-      dMaxContribution[iTeam][ bTurn.activePokemon[iTeam] ] += dMaxFitness;
-
-      // increment previous values
-      prevSimpleFitness[iTeam] = cTurn.simpleFitness[iTeam];
-      prev0Fitness[iTeam] = cTurn.depth0Fitness[iTeam];
-      prev0Fitness[iTeam] = cTurn.depthMaxFitness[iTeam];
+      pokemon.simpleContribution += cTTurn.simpleFitness - pTTurn.simpleFitness;
+      pokemon.d0Contribution += cTTurn.depth0Fitness - pTTurn.depth0Fitness;
+      pokemon.dMaxContribution += cTTurn.depthMaxFitness - pTTurn.depthMaxFitness;
     }
   }
 
   // create scores:
   for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
+    auto& team = cResult.teams[iTeam];
     for (size_t iPokemon = 0; iPokemon < nv_->getTeam(iTeam).getNumTeammates(); ++iPokemon) {
-      participation[iTeam][iPokemon] /= (fpType)cLog.size();
+      auto& pokemon = team.pokemon[iPokemon];
 
-      aggregateContribution[iTeam][iPokemon] =
-        (
-          simpleContribution[iTeam][iPokemon] * 0.35 
-          +
-          d0Contribution[iTeam][iPokemon] * 0.05 
-          +
-          dMaxContribution[iTeam][iPokemon] * 0.6
-        ) 
-        *
-        participation[iTeam][iPokemon];
+      // normalize move usage by pokemon participation
+      for (size_t iMove = 0; iMove < 5 && pokemon.participation > 0; ++iMove) {
+        pokemon.moveUse[iMove] /= pokemon.participation;
+      }
+      // normalize pokemon participation by game size
+      if (cLog.size() > 0) { pokemon.participation /= (double)cLog.size(); }
+
+      pokemon.aggregateContribution = (
+          pokemon.simpleContribution * 0.35 +
+          pokemon.d0Contribution * 0.05 +
+          pokemon.dMaxContribution * 0.6
+        ) * pokemon.participation;
     }
   }
 
   // create ranking:
   for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
-    std::array<bool, 6> rankedPokemon{};
-    for (size_t iRank = 0; iRank < nv_->getTeam(iTeam).getNumTeammates(); ++iRank)
-    {
-      fpType currentBestA = -std::numeric_limits<fpType>::infinity();
-      fpType currentBestS = -std::numeric_limits<fpType>::infinity();
-      size_t iCurrentBest = SIZE_MAX;
+    auto& team = cResult.teams[iTeam];
 
-      for (size_t iPokemon = 0; iPokemon < nv_->getTeam(iTeam).getNumTeammates(); ++iPokemon)
-      {
-        // don't compare if already ranked:
-        if (rankedPokemon[iPokemon] == true) { continue; }
+    std::array<size_t, 6> ranking = {0, 1, 2, 3, 4, 5};
+    std::sort(begin(ranking), end(ranking), [&](size_t a, size_t b){
+      return team.pokemon[a].aggregateContribution > team.pokemon[b].aggregateContribution;
+    });
 
-        // if score is greater than; or if score is equal, if simple score is greater than:
-        if (mostlyGT(aggregateContribution[iTeam][iPokemon], currentBestA) || 
-          (mostlyGTE(aggregateContribution[iTeam][iPokemon], currentBestA) &&
-          mostlyGTE(simpleContribution[iTeam][iPokemon], currentBestS)))
-        {
-          currentBestA = aggregateContribution[iTeam][iPokemon];
-          currentBestS = simpleContribution[iTeam][iPokemon];
-          iCurrentBest = iPokemon;
-        }
-      } // endOf inner pokemon
-
-      // no more ranked pokemon available
-      if (iCurrentBest == SIZE_MAX) { break; }
-
-      ranking[iTeam][iCurrentBest] = (uint32_t) iRank;
-      rankedPokemon[iCurrentBest] = true;
-
-    } // endOf foreach rank
+    for (size_t iPokemon = 0; iPokemon < nv_->getTeam(iTeam).getNumTeammates(); ++iPokemon) {
+      team.pokemon[iPokemon].ranking = ranking[iPokemon];
+    }
   } // endOf foreach team
 
   // set game status:
   cResult.endStatus = endStatus;
-  cResult.numPlies = (uint32_t) cLog.size();
+  cResult.numPlies = cLog.size();
 
   return cResult;
 } // endOf digestGame
@@ -448,16 +410,6 @@ HeatResult Game::digestMatch(const std::vector<GameResult>& gLog) {
   // initialize heatResult:
   HeatResult hResult{};
   if (cfg_.storeSubcomponents) { hResult.gameResults = gLog; }
-  std::array<std::array<fpType, 6>, 2>& participation = hResult.participation;
-  std::array<std::array<fpType, 6>, 2>& aggregateContribution = hResult.aggregateContribution;
-  std::array<std::array<fpType, 6>, 2> avgRanking;
-  std::array<std::array<uint32_t, 6>, 2>& ranking = hResult.ranking;
-  for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
-    avgRanking[iTeam].fill(0);
-    participation[iTeam].fill(0);
-    aggregateContribution[iTeam].fill(0);
-    ranking[iTeam].fill(7);
-  }
 
   hResult.numPlies = 0;
   hResult.matchesTotal = cfg_.maxMatches;
@@ -475,50 +427,44 @@ HeatResult Game::digestMatch(const std::vector<GameResult>& gLog) {
 
   // generate average values:
   for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
+    auto& team = hResult.teams[iTeam];
     for (size_t iPokemon = 0; iPokemon < 6; ++iPokemon) {
-      for(const auto& cLog: gLog) {
+      auto& pokemon = team.pokemon[iPokemon];
+      for (const auto& cLog: gLog) {
         if (!cLog.isPlayed()) { continue; }
-        participation[iTeam][iPokemon] += cLog.participation[iTeam][iPokemon];
-        avgRanking[iTeam][iPokemon] += (fpType)cLog.ranking[iTeam][iPokemon];
-        aggregateContribution[iTeam][iPokemon] += cLog.aggregateContribution[iTeam][iPokemon];
+        const auto& source = cLog.teams[iTeam].pokemon[iPokemon];
+        pokemon.participation += source.participation;
+        pokemon.aggregateContribution += source.aggregateContribution;
+        pokemon.simpleContribution += source.simpleContribution;
 
+        for (size_t iMove = 0; iMove < 5; ++iMove) {
+          pokemon.moveUse[iMove] += source.moveUse[iMove];
+        }
       } // endOf forEach log
 
-      participation[iTeam][iPokemon] /= hResult.matchesPlayed;
-      avgRanking[iTeam][iPokemon] /= hResult.matchesPlayed;
-      aggregateContribution[iTeam][iPokemon] /= hResult.matchesPlayed;
+      if (hResult.matchesPlayed > 0) {
+        for (size_t iMove = 0; iMove < 5; ++iMove) {
+          pokemon.moveUse[iMove] /= hResult.matchesPlayed;
+        }
+        pokemon.participation /= hResult.matchesPlayed;
+        pokemon.aggregateContribution /= hResult.matchesPlayed;
+        pokemon.simpleContribution /= hResult.matchesPlayed;
+      }
     } // endOf forEach pokemon
   } // endOf forEach team 
 
   // create aggregate ranking:
   for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
-    std::array<bool, 6> rankedPokemon;
-    rankedPokemon.fill(false);
-    for (size_t iRank = 0; iRank < nv_->getTeam(iTeam).getNumTeammates(); ++iRank) {
-      fpType currentBestR = std::numeric_limits<fpType>::infinity();
-      fpType currentBestA = -std::numeric_limits<fpType>::infinity();
-      size_t iCurrentBest = SIZE_MAX;
+    auto& team = hResult.teams[iTeam];
 
-      for (size_t iPokemon = 0; iPokemon < nv_->getTeam(iTeam).getNumTeammates(); ++iPokemon) {
-        // don't compare if already ranked:
-        if (rankedPokemon[iPokemon] == true) { continue; }
+    std::array<size_t, 6> ranking = {0, 1, 2, 3, 4, 5};
+    std::sort(begin(ranking), end(ranking), [&](size_t a, size_t b){
+      return team.pokemon[a].aggregateContribution > team.pokemon[b].aggregateContribution;
+    });
 
-        if (mostlyLT(avgRanking[iTeam][iPokemon], currentBestR) || 
-          (mostlyLTE(avgRanking[iTeam][iPokemon], currentBestR) &&
-          mostlyGTE(aggregateContribution[iTeam][iPokemon], currentBestA))) {
-          currentBestR = avgRanking[iTeam][iPokemon];
-          currentBestA = aggregateContribution[iTeam][iPokemon];
-          iCurrentBest = iPokemon;
-        }
-      } // endOf inner pokemon
-
-      // no more ranked pokemon available
-      if (iCurrentBest == SIZE_MAX) { break; }
-
-      ranking[iTeam][iCurrentBest] = (uint32_t) iRank;
-      rankedPokemon[iCurrentBest] = true;
-
-    } // endOf foreach rank
+    for (size_t iPokemon = 0; iPokemon < nv_->getTeam(iTeam).getNumTeammates(); ++iPokemon) {
+      team.pokemon[iPokemon].ranking = ranking[iPokemon];
+    }
   } // endOf foreach team
 
   // variables that do not require loops:
@@ -641,6 +587,24 @@ void Game::printGameStart(size_t iMatch) const {
 }
 
 
+template<typename ResultType> void printLeaderboard(
+    std::ostream& out, size_t iPokemon, const ResultType& pResult, const PokemonNonVolatile& cPKNV) {
+  out << boost::format("    %d: %24.24s r=%d  c=% 5.3f  s=% 5.3f  p=%5.3f  ")
+      % iPokemon
+      % cPKNV
+      % (pResult.ranking + 1)
+      % pResult.aggregateContribution
+      % pResult.simpleContribution
+      % pResult.participation;
+  for (size_t iMove = 0; iMove < cPKNV.getNumMoves(); ++iMove) {
+    out << boost::format("%s=%5.3f  ") % Action::move(iMove) % pResult.moveUse[iMove];
+  }
+  // struggle move:
+  out << boost::format("%s=%5.3f\n") % Action::struggle() % pResult.moveUse[4];
+
+}
+
+
 void Game::printGameOutline(const GameResult& gResult, size_t iMatch) const {
   std::stringstream out;
   std::string gameIdentifier = getGameIdentifier(iMatch);
@@ -673,19 +637,16 @@ void Game::printGameOutline(const GameResult& gResult, size_t iMatch) const {
     " Leaderboard: (index: name  r=rank  c=aggregate-score  s=simple-score  p=participation)\n";
 
   for (size_t iTeam = 0; iTeam < 2; iTeam++) {
+    const auto& teamResult = gResult.teams[iTeam];
     const TeamNonVolatile& cTeam = nv_->getTeam(iTeam);
     out
       << "  " << getTeamIdentifier(iTeam)
       << (((int)iTeam==gResult.endStatus)?" (winner)":"")
       << "\n";
     for (size_t iPokemon = 0; iPokemon < cTeam.getNumTeammates(); ++iPokemon) {
-      out << boost::format("    %d: %24s  r=%d  c=% 5.3f  s=% 5.3f  p=% 5.3f\n")
-          % iPokemon
-          % cTeam.teammate(iPokemon)
-          % (gResult.ranking[iTeam][iPokemon] + 1)
-          % gResult.aggregateContribution[iTeam][iPokemon]
-          % gResult.simpleContribution[iTeam][iPokemon]
-          % gResult.participation[iTeam][iPokemon];
+      const auto& pResult = teamResult.pokemon[iPokemon];
+      const PokemonNonVolatile& cPKNV = cTeam.teammate(iPokemon);
+      printLeaderboard(out, iPokemon, pResult, cPKNV);
     }
   }
   std::cout << out.str();
@@ -744,18 +705,16 @@ void Game::printHeatOutline(const HeatResult& result) const {
     " Leaderboard: (index: name  r=rank  aC=avG-score  aP=avG-participation)\n";
 
   for (size_t iTeam = 0; iTeam < 2; iTeam++) {
+    const auto& teamResult = result.teams[iTeam];
     const TeamNonVolatile& cTeam = nv_->getTeam(iTeam);
     out
       << "  " << getTeamIdentifier(iTeam)
       << (((int)iTeam==result.endStatus)?" (winner)":"")
       << "\n";
     for (size_t iPokemon = 0; iPokemon < cTeam.getNumTeammates(); ++iPokemon) {
-      out << boost::format("    %d: %24s  r=%d  aC=% 5.3f  aP=% 5.3f\n")
-          % iPokemon
-          % cTeam.teammate(iPokemon)
-          % (result.ranking[iTeam][iPokemon] + 1)
-          % result.aggregateContribution[iTeam][iPokemon]
-          % result.participation[iTeam][iPokemon];
+      const auto& pResult = teamResult.pokemon[iPokemon];
+      const PokemonNonVolatile& cPKNV = cTeam.teammate(iPokemon);
+      printLeaderboard(out, iPokemon, pResult, cPKNV);
     }
   }
   std::cout << out.str();
