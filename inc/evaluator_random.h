@@ -7,7 +7,7 @@ class EvaluatorRandom: public Evaluator {
 public:
 
   ~EvaluatorRandom() { };
-  EvaluatorRandom(): Evaluator("Random_Evaluator") { };
+  EvaluatorRandom(const Config& cfg = Config{}): Evaluator("Random_Evaluator", cfg) { };
 
   EvaluatorRandom* clone() const override { return new EvaluatorRandom(*this); }
 

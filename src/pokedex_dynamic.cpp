@@ -134,16 +134,15 @@ bool PokedexDynamic::inputPlugins()
 
 
 po::options_description PokedexDynamic::Config::options(
-    Config& cfg,
     const std::string& category,
     std::string prefix) {
   Config defaults{};
-  po::options_description desc = PokedexStatic::Config::options(cfg, category, prefix);
+  po::options_description desc = PokedexStatic::Config::options(category, prefix);
 
   if (prefix.size() > 0) { prefix.append("-"); }
   desc.add_options()
       ((prefix + "plugins").c_str(),
-      po::value<std::string>(&cfg.pluginsPath_)->default_value(defaults.pluginsPath_),
+      po::value<std::string>(&pluginsPath_)->default_value(defaults.pluginsPath_),
       "location of the plugin library root directory");
 
   return desc;

@@ -58,6 +58,18 @@ uint32_t TEAM_VOLATILE_IMPL::numTeammatesAlive() const {
 }
 
 
+TEAM_VOLATILE_IMPL_TEMPLATE
+bool TEAM_VOLATILE_IMPL::isAlive() const {
+  size_t numTeammates = nv().getNumTeammates();
+  size_t iCurrent = getICPKV();
+  for (size_t iPokemon=iCurrent, iMax=iCurrent+numTeammates; iPokemon < iMax; ++iPokemon) {
+    if (teammate(iPokemon % numTeammates).isAlive()) { return true; }
+  }
+
+  return false;
+}
+
+
 bool TeamVolatile::swapPokemon(size_t iAction, bool preserveVolatile)
 {
   size_t iOldPokemon = getICPKV();

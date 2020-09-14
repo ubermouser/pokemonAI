@@ -30,6 +30,7 @@ struct Turn {
   EnvironmentPossibleData env;
   std::array<PerTeam, 2> teams;
   size_t stateSelected = SIZE_MAX;
+  bool freeTurn = false;
 };
 
 struct GameResult {
@@ -45,7 +46,7 @@ struct GameResult {
     };
 
     std::array<PerPokemon, 6> pokemon;
-    double predictionAccuracy = 0;
+    double lastSimpleFitness = 0;
   };
 
   std::vector<Turn> log;
@@ -68,7 +69,7 @@ struct HeatResult {
     };
 
     std::array<PerPokemon, 6> pokemon;
-    double predictionAccuracy = 0;
+    double lastSimpleFitness = 0;
   };
 
   std::vector<GameResult> gameResults;
@@ -112,8 +113,7 @@ public:
 
     Config(){};
 
-    static boost::program_options::options_description options(
-        Config& cfg,
+    boost::program_options::options_description options(
         const std::string& category="game configuration",
         std::string prefix = "");
   };
@@ -189,18 +189,19 @@ protected:
   Turn digestTurn(
       const std::array<PlannerResult, 2>& actions,
       size_t resultingState,
-      const ConstEnvironmentPossible& envP);
+      const ConstEnvironmentPossible& envP) const;
 
   /* creates a log of the current completed game */
-  GameResult digestGame(const std::vector<Turn>& cLog, int gameResult);
+  GameResult digestGame(
+      std::vector<Turn>& cLog, const ConstEnvironmentVolatile& initialState, int gameResult) const;
 
-  HeatResult digestMatch(const std::vector<GameResult>& gLog);
+  HeatResult digestMatch(std::vector<GameResult>& gLog) const;
 
   std::string getPokemonIdentifier(const ConstTeamVolatile& cTeam, size_t iTeam) const;
   std::string getGameIdentifier(size_t iMatch) const;
   std::string getTeamIdentifier(size_t iTeam) const;
 
-  void incrementScore(int matchResult, std::array<uint32_t, 2>& score);
+  void incrementScore(int matchResult, std::array<uint32_t, 2>& score) const;
 
   /* prints the current action */
   void printAction(

@@ -39,6 +39,7 @@
         <itemPath>../inc/evaluator_montecarlo.h</itemPath>
         <itemPath>../inc/evaluator_random.h</itemPath>
         <itemPath>../inc/evaluator_simple.h</itemPath>
+        <itemPath>../inc/evaluators.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f4" displayName="planners" projectFiles="true">
         <itemPath>../inc/planner.h</itemPath>
@@ -47,6 +48,7 @@
         <itemPath>../inc/planner_maximin.h</itemPath>
         <itemPath>../inc/planner_multithreaded.h</itemPath>
         <itemPath>../inc/planner_random.h</itemPath>
+        <itemPath>../inc/planners.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="toolbox" projectFiles="true">
         <logicalFolder name="f1" displayName="fixedpoint" projectFiles="true">
@@ -97,6 +99,7 @@
         <itemPath>../src/evaluator_montecarlo.cpp</itemPath>
         <itemPath>../src/evaluator_random.cpp</itemPath>
         <itemPath>../src/evaluator_simple.cpp</itemPath>
+        <itemPath>../src/evaluators.cpp</itemPath>
       </logicalFolder>
       <logicalFolder name="f4" displayName="planners" projectFiles="true">
         <itemPath>../src/planner.cpp</itemPath>
@@ -104,6 +107,7 @@
         <itemPath>../src/planner_max.cpp</itemPath>
         <itemPath>../src/planner_maximin.cpp</itemPath>
         <itemPath>../src/planner_random.cpp</itemPath>
+        <itemPath>../src/planners.cpp</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="toolbox" projectFiles="true">
         <logicalFolder name="f1" displayName="fixedpoint" projectFiles="true">
@@ -202,6 +206,8 @@
       </item>
       <item path="../inc/evaluator_simple.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../inc/evaluators.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../inc/fitness.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/fp_compare.h" ex="false" tool="3" flavor2="0">
@@ -241,6 +247,8 @@
       <item path="../inc/planner_multithreaded.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/planner_random.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/planners.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/pluggable.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -288,6 +296,8 @@
       </item>
       <item path="../src/evaluator_simple.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/evaluators.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/fixedpoint/fixed_class.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/fixedpoint/fixed_func.cpp" ex="false" tool="1" flavor2="0">
@@ -327,6 +337,8 @@
       <item path="../src/planner_maximin.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/planner_random.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/planners.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/pluggable.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -511,6 +523,8 @@
       </item>
       <item path="../inc/evaluator_simple.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../inc/evaluators.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../inc/fitness.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/fp_compare.h" ex="false" tool="3" flavor2="0">
@@ -550,6 +564,8 @@
       <item path="../inc/planner_multithreaded.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/planner_random.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/planners.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/pluggable.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -597,6 +613,8 @@
       </item>
       <item path="../src/evaluator_simple.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/evaluators.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/fixedpoint/fixed_class.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/fixedpoint/fixed_func.cpp" ex="false" tool="1" flavor2="0">
@@ -636,6 +654,8 @@
       <item path="../src/planner_maximin.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/planner_random.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/planners.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/pluggable.cpp" ex="false" tool="1" flavor2="0">
       </item>

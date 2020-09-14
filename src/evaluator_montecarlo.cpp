@@ -1,11 +1,38 @@
 #include "../inc/evaluator_montecarlo.h"
 
+#include <boost/program_options.hpp>
+
 #include "../inc/evaluator_random.h"
 #include "../inc/pkCU.h"
 #include "../inc/planner_random.h"
 
-EvaluatorMonteCarlo::EvaluatorMonteCarlo(const Config& cfg)
-    : Evaluator("MonteCarlo_Evaluator"), cfg_(cfg) {
+namespace po = boost::program_options;
+
+
+po::options_description EvaluatorMonteCarlo::Config::options(
+    const std::string& category, std::string prefix) {
+  Config defaults{};
+  po::options_description desc = Evaluator::Config::options(category, prefix);
+
+  if (prefix.size() > 0) { prefix.append("-"); }
+  desc.add_options()
+      ((prefix + "max-rollouts").c_str(),
+      po::value<size_t>(&maxRollouts)->default_value(defaults.maxRollouts),
+      "maximum number of rollouts per calculation.")
+      ((prefix + "max-plies").c_str(),
+      po::value<size_t>(&maxPlies)->default_value(defaults.maxPlies),
+      "Maximum depth per rollout.")
+      ((prefix + "num-threads").c_str(),
+      po::value<size_t>(&numThreads)->default_value(defaults.numThreads),
+      "If greater than 0, thread-parallelism is used.");
+
+  return desc;
+
+}
+
+
+EvaluatorMonteCarlo::EvaluatorMonteCarlo(const Evaluator::Config& cfg)
+    : Evaluator("MonteCarlo_Evaluator"), cfg_(dynamic_cast<const Config&>(cfg)) {
   Game::Config gamecfg;
   gamecfg.maxMatches = cfg_.maxRollouts;
   gamecfg.maxPlies = cfg_.maxPlies;
@@ -41,8 +68,7 @@ EvaluatorMonteCarlo& EvaluatorMonteCarlo::initialize() {
 EvalResult_t EvaluatorMonteCarlo::calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const {
   // perform a rollout on each state:
   HeatResult result = game_->rollout(env);
-  fpType agentFitness = result.score[iTeam];
-  fpType otherFitness = result.score[(iTeam + 1) % 2];
+  fpType fitness = result.teams[iTeam].lastSimpleFitness;
 
-  return EvalResult_t{combineTeamFitness(agentFitness, otherFitness), Action{}, Action{}};
+  return EvalResult_t{fitness, Action{}, Action{}};
 }

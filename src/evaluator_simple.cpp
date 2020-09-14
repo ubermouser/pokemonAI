@@ -7,8 +7,8 @@
 #include "../inc/engine.h"
 
 
-EvaluatorSimple::EvaluatorSimple(const Config& cfg)
-    : Evaluator(cfg), cfg_(cfg) {
+EvaluatorSimple::EvaluatorSimple(const Evaluator::Config& cfg)
+    : Evaluator(cfg), cfg_(dynamic_cast<const Config&>(cfg)) {
   std::ostringstream name;
   name << "Simple_Evaluator-" << cfg_.aliveBias;
   setName(name.str());
@@ -38,7 +38,7 @@ fpType EvaluatorSimple::fitness_pokemon(const ConstPokemonVolatile& pV) const {
 
   // accumulate move fitness:
   fpType moveAccumulator = 0.;
-  for (size_t iMove = 0, count=pV.nv().getNumMoves(); isAlive && iMove < count; ++iMove) {
+  for (size_t iMove = 0, count=isAlive?pV.nv().getNumMoves():0; isAlive && iMove < count; ++iMove) {
     moveAccumulator += fitness_move(pV.getMV(iMove));
   }
   moveAccumulator /= pV.nv().getNumMoves();
@@ -52,15 +52,16 @@ fpType EvaluatorSimple::fitness_pokemon(const ConstPokemonVolatile& pV) const {
 
 
 fpType EvaluatorSimple::fitness_team(const ConstTeamVolatile& tV) const {
+  bool isAlive = tV.isAlive();
   fpType pokemonAccumulator = 0.0;
-  for (size_t iTeammate = 0, count = tV.nv().getNumTeammates(); iTeammate != count; ++iTeammate) {
+  for (size_t iTeammate = 0, count = isAlive?tV.nv().getNumTeammates():0; iTeammate != count; ++iTeammate) {
     pokemonAccumulator += fitness_pokemon(tV.teammate(iTeammate));
   }
   pokemonAccumulator /= tV.nv().getNumTeammates();
 
   fpType fitness =
       (pokemonAccumulator * (1. - cfg_.teamAliveBias)) +
-      ((tV.numTeammatesAlive()>0) * cfg_.teamAliveBias);
+      (isAlive * cfg_.teamAliveBias);
   
   return fitness;
 };

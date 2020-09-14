@@ -9,6 +9,7 @@
 #define EVALUATOR_MONTECARLO_H
 
 #include <memory>
+#include <boost/program_options.hpp>
 
 #include "game.h"
 #include "evaluator.h"
@@ -16,16 +17,19 @@
 class EvaluatorMonteCarlo : public Evaluator {
 public:
   struct Config : public Evaluator::Config {
-    size_t maxRollouts = 250;
+    size_t maxRollouts = 600;
 
-    size_t maxPlies = 125;
+    size_t maxPlies = 20;
 
     size_t numThreads = 0;
 
     Config() : Evaluator::Config() {};
+
+    virtual boost::program_options::options_description options(
+        const std::string& category="evaluator options", std::string prefix="") override;
   };
 
-  EvaluatorMonteCarlo(const Config& cfg = Config());
+  EvaluatorMonteCarlo(const Evaluator::Config& cfg = Config());
   virtual ~EvaluatorMonteCarlo() override {};
 
   virtual EvaluatorMonteCarlo* clone() const override { return new EvaluatorMonteCarlo(*this); }

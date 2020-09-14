@@ -22,26 +22,26 @@ namespace po = boost::program_options;
 
 
 po::options_description Game::Config::options(
-    Config& cfg, const std::string& category, std::string prefix) {
+    const std::string& category, std::string prefix) {
   Config defaults{};
   po::options_description desc{category};
 
   if (prefix.size() > 0) { prefix.append("-"); }
   desc.add_options()
       ((prefix + "game-verbosity").c_str(),
-      po::value<int>(&cfg.verbosity)->default_value(defaults.verbosity),
+      po::value<int>(&verbosity)->default_value(defaults.verbosity),
       "verbosity level, controls status printing.")
       ((prefix + "max-plies").c_str(),
-      po::value<size_t>(&cfg.maxPlies)->default_value(defaults.maxPlies),
+      po::value<size_t>(&maxPlies)->default_value(defaults.maxPlies),
       "maximum number of turns allowed before a draw occurs")
       ((prefix + "max-matches").c_str(),
-      po::value<size_t>(&cfg.maxMatches)->default_value(defaults.maxMatches),
+      po::value<size_t>(&maxMatches)->default_value(defaults.maxMatches),
       "maximum number of matches, in best of N format")
       ((prefix + "num-threads").c_str(),
-      po::value<size_t>(&cfg.numThreads)->default_value(defaults.numThreads),
+      po::value<size_t>(&numThreads)->default_value(defaults.numThreads),
       "number of threads to use when performing multiple matches")
       ((prefix + "allow-state-selection").c_str(),
-      po::value<bool>(&cfg.allowStateSelection)->default_value(defaults.allowStateSelection),
+      po::value<bool>(&allowStateSelection)->default_value(defaults.allowStateSelection),
       "when true, manual state selection is used.");
 
   return desc;
@@ -162,7 +162,7 @@ Game& Game::initialize() {
   if ((cfg_.maxMatches & 1) == 0) { cfg_.maxMatches += 1; }
 
   if (cfg_.numThreads == SIZE_MAX) {
-    cfg_.numThreads = omp_get_num_threads();
+    cfg_.numThreads = omp_get_num_procs();
     std::cerr << "Game thread parallelism set to " << cfg_.numThreads << "!\n";
   }
 
@@ -208,8 +208,8 @@ HeatResult Game::rollout(const EnvironmentVolatileData& initialState) {
 
 
 GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_t iMatch) {
-  std::vector<Turn> turnLog;
   if (!isInitialized_) { initialize(); }
+  std::vector<Turn> turnLog; turnLog.reserve(cfg_.maxPlies + nv_->getNumPokemon());
   EnvironmentPossibleData stateData = EnvironmentPossibleData::create(initialState);
   ConstEnvironmentPossible envP{*nv_, stateData};
   int32_t matchState = cu_->getGameState(envP);
@@ -274,7 +274,7 @@ GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_
   } // endOf foreach turn
 
   // print terminal state:
-  GameResult result = digestGame(turnLog, matchState);
+  GameResult result = digestGame(turnLog, ConstEnvironmentVolatile{*nv_, initialState}, matchState);
   if (cfg_.verbosity >= 2) { printGameOutline(result, iMatch); }
 
   return result;
@@ -284,7 +284,7 @@ GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_
 Turn Game::digestTurn(
     const std::array<PlannerResult, 2>& actions,
     size_t resultingState,
-    const ConstEnvironmentPossible& envP) {
+    const ConstEnvironmentPossible& envP) const {
   Turn cTurn{};
 
   for (size_t iTeam = 0; iTeam < 2; iTeam++) {
@@ -301,60 +301,61 @@ Turn Game::digestTurn(
       finalFitness = simpleFitness;
     }
 
+    // active pokemon at the END of the turn:
     turn.activePokemon = envP.getEnv().getTeam(iTeam).getICPKV();
+    // simple, d-0 and d-M fitness at the BEGINNING of the turn:
     turn.simpleFitness = simpleFitness;
     turn.depth0Fitness = initialFitness;
     turn.depthMaxFitness = finalFitness;
+    // action taken by each team to transition the previous turn to the current turn:
     turn.action = actions[iTeam].bestAgentAction();
   } // endOf foreach team
 
+  // resulting environment:
   cTurn.env = envP.data();
   cTurn.stateSelected = resultingState;
+  // was the transition a free one?
+  cTurn.freeTurn = envP.hasFreeMove(TEAM_A) || envP.hasFreeMove(TEAM_B);
 
   return cTurn;
 } // endOf digestTurn
 
 
-GameResult Game::digestGame(const std::vector<Turn>& cLog, int endStatus) {
+GameResult Game::digestGame(
+    std::vector<Turn>& cLog, const ConstEnvironmentVolatile& initialState, int endStatus) const {
   GameResult cResult{};
-  if (cfg_.storeSubcomponents) { cResult.log = cLog; }
 
-  if (cLog.size() > 0) { // last turn:
-    const Turn& lastTurn = cLog.back(); // TODO(@drendleman) - what if match begins at a terminal state?
-    for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
-      const auto& tTurn = lastTurn.teams[iTeam];
-      auto& team = cResult.teams[iTeam];
+  // foreach team:
+  for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
+    auto& team = cResult.teams[iTeam];
+    // starter pokemon participation:
+    team.pokemon[initialState.getTeam(iTeam).getICPKV()].participation += 1;
+    // for each turn:
+    for (const auto& turn: cLog) {
+      const auto& tTurn = turn.teams[iTeam];
       auto& pokemon = team.pokemon[tTurn.activePokemon];
-      
-      // add participation for first moving pokemon: (or lead twice)
+
+      // for every turn a pokemon is in play, this increases a counter for that pokemon by 1:
       pokemon.participation += 1;
-      // add a move increment for the first moving pokemon:
+      // add a move increment for the current pokemon's move:
       if (tTurn.action.isMove()) {
         pokemon.moveUse[tTurn.action.iMove()] += 1;
       }
     }
   }
 
-  // all turns after the first:
-  for (size_t iPly = 1; iPly < cLog.size(); ++iPly) {
-    // the previous turn. The previous turn was responsible for the delta between turn n-1 and n
-    const Turn& pTurn = cLog[iPly - 1];
-    // the current turn. Used for updating delta
-    const Turn& cTurn = cLog[iPly];
-
-    for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
-      const auto& pTTurn = pTurn.teams[iTeam];
-      const auto& cTTurn = cTurn.teams[iTeam];
-      auto& team = cResult.teams[iTeam];
+  for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
+    auto& team = cResult.teams[iTeam];
+    // terminal state fitness:
+    ConstEnvironmentVolatile terminalState = cLog.size()>0?ConstEnvironmentVolatile{*nv_, cLog.back().env.env}:initialState;
+    team.lastSimpleFitness = eval_->calculateFitness(terminalState, iTeam).fitness;
+    // delta fitness change:
+    for (size_t iPly = 1; iPly < cLog.size(); ++iPly) {
+      // the previous turn. The previous turn was responsible for the delta between turn n-1 and n
+      const auto& pTTurn = cLog[iPly - 1].teams[iTeam];
+      // the current turn. Used for updating delta
+      const auto& cTTurn = cLog[iPly].teams[iTeam];
       auto& pokemon = team.pokemon[pTTurn.activePokemon];
-
-      // for every turn a pokemon is in play, this increases a counter for that pokemon by 1
-      pokemon.participation += 1;
-      
-      // add a move increment for the current pokemon's move
-      if (pTTurn.action.isMove()) {
-        pokemon.moveUse[pTTurn.action.iMove()] += 1;
-      }
 
       // increase contribution fractionals:
       pokemon.simpleContribution += cTTurn.simpleFitness - pTTurn.simpleFitness;
@@ -401,31 +402,43 @@ GameResult Game::digestGame(const std::vector<Turn>& cLog, int endStatus) {
   // set game status:
   cResult.endStatus = endStatus;
   cResult.numPlies = cLog.size();
+  if (cfg_.storeSubcomponents) {
+    cResult.log = std::move(cLog);
+    cResult.log.shrink_to_fit();
+  }
 
   return cResult;
 } // endOf digestGame
 
 
-HeatResult Game::digestMatch(const std::vector<GameResult>& gLog) {
+HeatResult Game::digestMatch(std::vector<GameResult>& gLog) const {
   // initialize heatResult:
   HeatResult hResult{};
-  if (cfg_.storeSubcomponents) { hResult.gameResults = gLog; }
 
   hResult.numPlies = 0;
   hResult.matchesTotal = cfg_.maxMatches;
   hResult.matchesPlayed = std::count_if(
       begin(gLog), end(gLog), [](auto& log){return log.isPlayed();});
 
-  // compute final score:
+  // generate average team and total values:
   for(const auto& log: gLog) {
     // add a point for the winning team:
     incrementScore(log.endStatus, hResult.score);
     // accumulate average numPlies:
     hResult.numPlies += (fpType) log.numPlies;
+
+    for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
+      const auto& source = log.teams[iTeam];
+      auto& team = hResult.teams[iTeam];
+      team.lastSimpleFitness += source.lastSimpleFitness;
+    }
   }
   hResult.numPlies /= hResult.matchesPlayed;
+  for (auto& team: hResult.teams) {
+    team.lastSimpleFitness /= hResult.matchesPlayed;
+  }
 
-  // generate average values:
+  // generate average pokemon values:
   for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
     auto& team = hResult.teams[iTeam];
     for (size_t iPokemon = 0; iPokemon < 6; ++iPokemon) {
@@ -468,6 +481,10 @@ HeatResult Game::digestMatch(const std::vector<GameResult>& gLog) {
   } // endOf foreach team
 
   // variables that do not require loops:
+  if (cfg_.storeSubcomponents) { 
+    hResult.gameResults = std::move(gLog);
+    hResult.gameResults.shrink_to_fit();
+  }
   if (hResult.score[TEAM_A] > hResult.score[TEAM_B]) {
     hResult.endStatus = MATCH_TEAM_A_WINS;
   } else if (hResult.score[TEAM_A] < hResult.score[TEAM_B]) {
@@ -482,7 +499,7 @@ HeatResult Game::digestMatch(const std::vector<GameResult>& gLog) {
 } // endOf digestMatch
 
 
-void Game::incrementScore(int matchState, std::array<uint32_t, 2>& score) {
+void Game::incrementScore(int matchState, std::array<uint32_t, 2>& score) const {
   switch (matchState) {
     case MATCH_TEAM_A_WINS:
     case MATCH_TEAM_B_WINS:

@@ -45,8 +45,7 @@ public:
 
     Config(){};
 
-    static boost::program_options::options_description options(
-        Config& cfg,
+    virtual boost::program_options::options_description options(
         const std::string& category="pokedex configuration",
         std::string prefix = "");
   };

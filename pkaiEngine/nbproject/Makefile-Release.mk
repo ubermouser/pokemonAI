@@ -44,6 +44,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/511e4115/evaluator_montecarlo.o \
 	${OBJECTDIR}/_ext/511e4115/evaluator_random.o \
 	${OBJECTDIR}/_ext/511e4115/evaluator_simple.o \
+	${OBJECTDIR}/_ext/511e4115/evaluators.o \
 	${OBJECTDIR}/_ext/e96877d6/fixed_func.o \
 	${OBJECTDIR}/_ext/511e4115/game.o \
 	${OBJECTDIR}/_ext/511e4115/gen4_scripts.o \
@@ -61,6 +62,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/511e4115/planner_max.o \
 	${OBJECTDIR}/_ext/511e4115/planner_maximin.o \
 	${OBJECTDIR}/_ext/511e4115/planner_random.o \
+	${OBJECTDIR}/_ext/511e4115/planners.o \
 	${OBJECTDIR}/_ext/511e4115/pluggable.o \
 	${OBJECTDIR}/_ext/511e4115/pokedex.o \
 	${OBJECTDIR}/_ext/511e4115/pokedex_dynamic.o \
@@ -160,6 +162,11 @@ ${OBJECTDIR}/_ext/511e4115/evaluator_simple.o: ../src/evaluator_simple.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluator_simple.o ../src/evaluator_simple.cpp
 
+${OBJECTDIR}/_ext/511e4115/evaluators.o: ../src/evaluators.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluators.o ../src/evaluators.cpp
+
 ${OBJECTDIR}/_ext/e96877d6/fixed_func.o: ../src/fixedpoint/fixed_func.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/e96877d6
 	${RM} "$@.d"
@@ -244,6 +251,11 @@ ${OBJECTDIR}/_ext/511e4115/planner_random.o: ../src/planner_random.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planner_random.o ../src/planner_random.cpp
+
+${OBJECTDIR}/_ext/511e4115/planners.o: ../src/planners.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planners.o ../src/planners.cpp
 
 ${OBJECTDIR}/_ext/511e4115/pluggable.o: ../src/pluggable.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
@@ -458,6 +470,19 @@ ${OBJECTDIR}/_ext/511e4115/evaluator_simple_nomain.o: ${OBJECTDIR}/_ext/511e4115
 	    $(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluator_simple_nomain.o ../src/evaluator_simple.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/_ext/511e4115/evaluator_simple.o ${OBJECTDIR}/_ext/511e4115/evaluator_simple_nomain.o;\
+	fi
+
+${OBJECTDIR}/_ext/511e4115/evaluators_nomain.o: ${OBJECTDIR}/_ext/511e4115/evaluators.o ../src/evaluators.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/evaluators.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluators_nomain.o ../src/evaluators.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/511e4115/evaluators.o ${OBJECTDIR}/_ext/511e4115/evaluators_nomain.o;\
 	fi
 
 ${OBJECTDIR}/_ext/e96877d6/fixed_func_nomain.o: ${OBJECTDIR}/_ext/e96877d6/fixed_func.o ../src/fixedpoint/fixed_func.cpp 
@@ -679,6 +704,19 @@ ${OBJECTDIR}/_ext/511e4115/planner_random_nomain.o: ${OBJECTDIR}/_ext/511e4115/p
 	    $(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planner_random_nomain.o ../src/planner_random.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/_ext/511e4115/planner_random.o ${OBJECTDIR}/_ext/511e4115/planner_random_nomain.o;\
+	fi
+
+${OBJECTDIR}/_ext/511e4115/planners_nomain.o: ${OBJECTDIR}/_ext/511e4115/planners.o ../src/planners.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/planners.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planners_nomain.o ../src/planners.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/511e4115/planners.o ${OBJECTDIR}/_ext/511e4115/planners_nomain.o;\
 	fi
 
 ${OBJECTDIR}/_ext/511e4115/pluggable_nomain.o: ${OBJECTDIR}/_ext/511e4115/pluggable.o ../src/pluggable.cpp 

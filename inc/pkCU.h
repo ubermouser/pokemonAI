@@ -102,8 +102,7 @@ public:
 
     Config(){};
 
-    static boost::program_options::options_description options(
-        Config& cfg,
+    boost::program_options::options_description options(
         const std::string& category="engine configuration",
         std::string prefix = "");
   };

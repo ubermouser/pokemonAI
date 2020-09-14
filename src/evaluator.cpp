@@ -2,8 +2,26 @@
 #include "../inc/evaluator.h"
 
 #include <stdexcept>
+#include <boost/program_options.hpp>
 
 #include "../inc/fp_compare.h"
+
+namespace po = boost::program_options;
+
+
+po::options_description Evaluator::Config::options(const std::string& category, std::string prefix) {
+  Config defaults{};
+  po::options_description desc{category};
+
+  if (prefix.size() > 0) { prefix.append("-"); }
+  desc.add_options()
+      ((prefix + "team-bias").c_str(),
+      po::value<fpType>(&teamBias)->default_value(defaults.teamBias),
+      "home team vs away team bias.");
+
+  return desc;
+
+}
 
 
 Evaluator& Evaluator::initialize() {

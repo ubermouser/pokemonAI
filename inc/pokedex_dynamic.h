@@ -25,10 +25,9 @@ public:
     
     Config() : PokedexStatic::Config() {};
 
-    static boost::program_options::options_description options(
-        Config& cfg,
+    virtual boost::program_options::options_description options(
         const std::string& category="pokedex configuration",
-        std::string prefix = "");
+        std::string prefix = "") override;
   };
   
   PokedexDynamic(const Config& config=Config(), bool doInitialize=true);

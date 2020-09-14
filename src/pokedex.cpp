@@ -263,7 +263,6 @@ void PokedexStatic::registerPlugin_orphanCount(
 
 
 po::options_description PokedexStatic::Config::options(
-    Config& cfg,
     const std::string& category,
     std::string prefix) {
   Config defaults{};
@@ -272,25 +271,25 @@ po::options_description PokedexStatic::Config::options(
   if (prefix.size() > 0) { prefix.append("-"); }
   desc.add_options()
       ((prefix + "moves").c_str(),
-      po::value<std::string>(&cfg.movesPath_)->default_value(defaults.movesPath_),
+      po::value<std::string>(&movesPath_)->default_value(defaults.movesPath_),
       "location of the move library")
       ((prefix + "pokemon").c_str(),
-      po::value<std::string>(&cfg.pokemonPath_)->default_value(defaults.pokemonPath_),
+      po::value<std::string>(&pokemonPath_)->default_value(defaults.pokemonPath_),
       "location of the pokemon library")
       ((prefix + "natures").c_str(),
-      po::value<std::string>(&cfg.naturesPath_)->default_value(defaults.naturesPath_),
+      po::value<std::string>(&naturesPath_)->default_value(defaults.naturesPath_),
       "location of the natures library")
       ((prefix + "items").c_str(),
-      po::value<std::string>(&cfg.itemsPath_)->default_value(defaults.itemsPath_),
+      po::value<std::string>(&itemsPath_)->default_value(defaults.itemsPath_),
       "location of the items library")
       ((prefix + "abilities").c_str(),
-      po::value<std::string>(&cfg.abilitiesPath_)->default_value(defaults.abilitiesPath_),
+      po::value<std::string>(&abilitiesPath_)->default_value(defaults.abilitiesPath_),
       "location of the abilities library")
       ((prefix + "types").c_str(),
-      po::value<std::string>(&cfg.typesPath_)->default_value(defaults.typesPath_),
+      po::value<std::string>(&typesPath_)->default_value(defaults.typesPath_),
       "location of the types library")
       ((prefix + "movelist").c_str(),
-      po::value<std::string>(&cfg.movelistsPath_)->default_value(defaults.movelistsPath_),
+      po::value<std::string>(&movelistsPath_)->default_value(defaults.movelistsPath_),
       "location of pokemon movelists");
 
   return desc;

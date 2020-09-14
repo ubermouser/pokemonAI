@@ -60,6 +60,9 @@ public:
 
   /* returns number of teammates on this team that are still alive */
   uint32_t numTeammatesAlive() const;
+  
+  /* returns true if at least one teammate on the team is alive */
+  bool isAlive() const;
 
   /* Retrieves a pointer to the current pokemon active on this team */
   pokemonvolatile_t getPKV() const { return teammate(getICPKV()); }

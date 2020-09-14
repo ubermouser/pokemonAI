@@ -9,17 +9,10 @@
 #include <inc/game.h>
 #include <inc/pkCU.h>
 #include <inc/pokedex_static.h>
-#include <inc/evaluator_montecarlo.h>
-#include <inc/evaluator_random.h>
-#include <inc/evaluator_simple.h>
-#include <inc/planner_random.h>
-#include <inc/planner_human.h>
-#include <inc/planner_max.h>
-#include <inc/planner_maximin.h>
-#include <inc/orphan.h>
+#include <inc/evaluators.h>
+#include <inc/planners.h>
 
 namespace po = boost::program_options;
-using orphan::lowerCase;
 
 struct Config {
   PokedexStatic::Config pokedex;
@@ -27,7 +20,8 @@ struct Config {
   PkCU::Config engine;
   PkCU::Config agentEngine;
 
-  std::array<Planner::Config, 2> agent = {Planner::Config(), Planner::Config()};
+  std::array<std::shared_ptr<Planner::Config>, 2> agent = {NULL, NULL};
+  std::array<std::shared_ptr<Evaluator::Config>, 2> agenteval = {NULL, NULL};
   std::array<std::string, 2> planner = {"Maximin", "Max"};
   std::array<std::string, 2> evaluator = {"Simple", "MonteCarlo"};
   std::array<std::string, 2> team = {"teams/hexTeamA.txt", "teams/hexTeamD.txt"};
@@ -35,42 +29,57 @@ struct Config {
   int verbosity = 1;
   int random_seed = -1;
 
-  static po::options_description options(Config& cfg) {
-    Config defaults{};
+  static Config create(const Config& prototype) {
+    Config result = prototype;
+    for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
+      result.agent[iTeam] = planners::config(result.planner[iTeam]);
+      result.agenteval[iTeam] = evaluators::config(result.evaluator[iTeam]);
+    }
+
+    return result;
+  }
+
+  po::options_description options() {
+    Config defaults = Config::create(*this);
     po::options_description desc;
 
     desc.add_options()
         ("help", "produce this help message")
         ("team-a",
-        po::value<std::string>(&cfg.team[TEAM_A])->default_value(defaults.team[TEAM_A]),
+        po::value<std::string>(&team[TEAM_A])->default_value(defaults.team[TEAM_A]),
         "filepath of the first team")
         ("team-b",
-        po::value<std::string>(&cfg.team[TEAM_B])->default_value(defaults.team[TEAM_B]),
+        po::value<std::string>(&team[TEAM_B])->default_value(defaults.team[TEAM_B]),
         "filepath of the second team")
         ("planner-a",
-        po::value<std::string>(&cfg.planner[TEAM_A])->default_value(defaults.planner[TEAM_A]),
+        po::value<std::string>(&planner[TEAM_A])->default_value(defaults.planner[TEAM_A]),
         "planner-id of the first team")
         ("planner-b",
-        po::value<std::string>(&cfg.planner[TEAM_B])->default_value(defaults.planner[TEAM_B]),
+        po::value<std::string>(&planner[TEAM_B])->default_value(defaults.planner[TEAM_B]),
         "planner-id of the second team")
         ("evaluator-a",
-        po::value<std::string>(&cfg.evaluator[TEAM_A])->default_value(defaults.evaluator[TEAM_A]),
+        po::value<std::string>(&evaluator[TEAM_A])->default_value(defaults.evaluator[TEAM_A]),
         "evaluator-id of the first team")
         ("evaluator-b",
-        po::value<std::string>(&cfg.evaluator[TEAM_B])->default_value(defaults.evaluator[TEAM_B]),
+        po::value<std::string>(&evaluator[TEAM_B])->default_value(defaults.evaluator[TEAM_B]),
         "evaluator-id of the second team")
         ("random-seed",
-        po::value<int>(&cfg.random_seed)->default_value(defaults.random_seed),
+        po::value<int>(&random_seed)->default_value(defaults.random_seed),
         "random number generator seed. -1 for TIME.")
         ("verbosity",
-        po::value<int>(&cfg.verbosity)->default_value(defaults.verbosity),
+        po::value<int>(&verbosity)->default_value(defaults.verbosity),
         "static verbosity level.");
-    desc.add(cfg.pokedex.options(cfg.pokedex));
-    desc.add(cfg.game.options(cfg.game));
-    desc.add(cfg.engine.options(cfg.engine, "engine configuration"));
-    desc.add(cfg.engine.options(cfg.engine, "agent-engine configuration", "agent"));
-    desc.add(cfg.agent[TEAM_A].options(cfg.agent[TEAM_A], "agent-a planner configuration", "a"));
-    desc.add(cfg.agent[TEAM_B].options(cfg.agent[TEAM_B], "agent-b planner configuration", "b"));
+    desc.add(pokedex.options());
+    desc.add(game.options());
+    desc.add(engine.options("engine configuration"));
+    desc.add(engine.options("agent-engine configuration", "agent"));
+
+    // TODO(@drendleman) - Config should default to base-class, then be specified if valid
+    desc.add(agent[TEAM_A]->options("agent-a planner configuration", "a"));
+    desc.add(agent[TEAM_B]->options("agent-b planner configuration", "b"));
+
+    desc.add(agenteval[TEAM_A]->options("agent-a evaluator configuration", "a"));
+    desc.add(agenteval[TEAM_B]->options("agent-b evaluator configuration", "b"));
 
     return desc;
   }
@@ -78,58 +87,38 @@ struct Config {
 
 
 Config parse_command_line(int argc, char**argv) {
-  Config cfg;
-  auto description = Config::options(cfg);
-  po::variables_map vm;
-  po::store(po::parse_command_line(argc, argv, Config::options(cfg)), vm);
-  po::notify(vm);
-
-  if (vm.count("help")) {
-    std::cout << description << std::endl;
-    std::exit(EXIT_FAILURE);
+  // determine prototype values:
+  Config protocfg = Config::create(Config{});
+  {
+    po::variables_map vm;
+    auto description = protocfg.options();
+    po::store(
+        po::command_line_parser(argc, argv).options(description).allow_unregistered().run(), vm);
+    po::notify(vm);
   }
+  
+  Config cfg = Config::create(protocfg);
+  {
+    po::variables_map vm;
+    auto description = cfg.options();
+    po::store(po::parse_command_line(argc, argv, description), vm);
+    po::notify(vm);
 
+    if (vm.count("help")) {
+      std::cout << description << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+  }
+  
   return cfg;
-}
-
-
-std::shared_ptr<Planner> choosePlanner(const std::string& _type, const Planner::Config& cfg) {
-  auto type = lowerCase(_type);
-  if (type == "maximin") {
-    return std::make_shared<PlannerMaxiMin>(cfg);
-  } else if (type == "random") {
-    return std::make_shared<PlannerRandom>(); // TODO(@drendleman) - support for other configs
-  } else if (type == "max") {
-    return std::make_shared<PlannerMax>(cfg);
-  } else if (type == "human") {
-    return std::make_shared<PlannerHuman>(cfg);
-  } else {
-    std::cerr << "unknown planner type \"" << _type << "\"!\n";
-    throw std::invalid_argument("planner type");
-  }
-}
-
-
-std::shared_ptr<Evaluator> chooseEvaluator(const std::string& _type) {
-  auto type = lowerCase(_type);
-  if (type == "simple") {
-    return std::make_shared<EvaluatorSimple>();
-  } else if (type == "random") {
-    return std::make_shared<EvaluatorRandom>();
-  } else if (type == "montecarlo") {
-    return std::make_shared<EvaluatorMonteCarlo>();
-  } else {
-    std::cerr << "unknown evaluator type \"" << _type << "\"!\n";
-    throw std::invalid_argument("evaluator type");
-  }
 }
 
 
 std::shared_ptr<Planner> buildPlanner(const Config& cfg, size_t iTeam) {
   auto agentEngine = PkCU(cfg.agentEngine);
 
-  auto planner = choosePlanner(cfg.planner[iTeam], cfg.agent[iTeam]);
-  auto evaluator = chooseEvaluator(cfg.evaluator[iTeam]);
+  auto planner = planners::choose(cfg.planner[iTeam], *cfg.agent[iTeam]);
+  auto evaluator = evaluators::choose(cfg.evaluator[iTeam], *cfg.agenteval[iTeam]);
 
   planner->setEngine(agentEngine).setEvaluator(evaluator);
   return planner;

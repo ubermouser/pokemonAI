@@ -21,7 +21,7 @@ public:
     Config() : Evaluator::Config() {};
   };
 
-  EvaluatorSimple(const Config& cfg = Config());
+  EvaluatorSimple(const Evaluator::Config& cfg = Config());
   ~EvaluatorSimple() = default;
   EvaluatorSimple(const EvaluatorSimple& other) = default;
 

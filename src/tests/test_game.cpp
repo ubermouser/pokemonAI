@@ -79,7 +79,7 @@ TEST_F(GameTest, CustomPlanners) {
 }
 
 
-TEST_F(GameTest, UninitializedCustomPlanners) {
+TEST_F(GameTest, UninitializedCustom) {
   auto game = Game()
       .setEnvironment(environment_)
       .setPlanner(0, PlannerMax())

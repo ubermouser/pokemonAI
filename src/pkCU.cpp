@@ -32,14 +32,14 @@ typedef std::vector<plugin_t>::const_iterator pluginIt;
 
 
 po::options_description PkCU::Config::options(
-    Config& cfg, const std::string& category, std::string prefix) {
+    const std::string& category, std::string prefix) {
   Config defaults{};
   po::options_description desc{category};
 
   if (prefix.size() > 0) { prefix.append("-"); }
   desc.add_options()
       ((prefix + "engine-accuracy").c_str(),
-      po::value<size_t>(&cfg.numRandomEnvironments)->default_value(defaults.numRandomEnvironments),
+      po::value<size_t>(&numRandomEnvironments)->default_value(defaults.numRandomEnvironments),
       "number of random environments to create per hit/crit 1-16.");
 
   return desc;
@@ -1205,12 +1205,9 @@ ConstEnvironmentVolatile PkCU::initialState() const {
 
 MatchState PkCU::getGameState(const ConstEnvironmentVolatile& envV) const {
   guardNonvolatileState(envV);
-  bool teamAisDead = envV.getTeam(TEAM_A).numTeammatesAlive() == 0;
-  bool teamBisDead = envV.getTeam(TEAM_B).numTeammatesAlive() == 0;
-  int status = 
-    (teamAisDead==true?1:0) * 1 
-    + 
-    (teamBisDead==true?1:0) * 2;
+  bool teamAisDead = !envV.getTeam(TEAM_A).isAlive();
+  bool teamBisDead = !envV.getTeam(TEAM_B).isAlive();
+  int status = (teamAisDead * 1) + (teamBisDead * 2);
 
   switch(status)
   {
@@ -1247,7 +1244,7 @@ ActionPairVector PkCU::getAllValidActions(
 
 ActionVector PkCU::getValidActionsInRange(
     const ConstEnvironmentVolatile& envV, size_t iTeam, size_t iFirst, size_t iLast) const {
-  ActionVector result; result.reserve((iLast - iFirst) + envV.getTeam(iTeam).numTeammatesAlive());
+  ActionVector result; result.reserve((iLast - iFirst) + envV.getTeam(iTeam).nv().getNumTeammates());
   ConstTeamVolatile cTV = envV.getTeam(iTeam);
   ConstPokemonVolatile cPKV = envV.getTeam(iTeam).getPKV();
   // foreach move type:

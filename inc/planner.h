@@ -4,6 +4,7 @@
 #include "pkai.h"
 
 #include <memory>
+#include <string>
 #include <vector>
 
 #include <boost/program_options.hpp>
@@ -66,9 +67,10 @@ public:
     int verbosity = 0;
 
     Config() {};
+    virtual ~Config() {};
 
-    boost::program_options::options_description options(
-        Config& cfg, const std::string& category="agent options", std::string prefix="");
+    virtual boost::program_options::options_description options(
+        const std::string& category="agent options", std::string prefix="");
   };
 
   Planner() = delete;

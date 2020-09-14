@@ -4,6 +4,9 @@
 #include "pkai.h"
 
 #include <memory>
+#include <string>
+
+#include <boost/program_options.hpp>
 
 #include "action.h"
 #include "name.h"
@@ -23,6 +26,10 @@ public:
     fpType teamBias = 0.5;
 
     Config() {};
+    virtual ~Config() {};
+
+    virtual boost::program_options::options_description options(
+        const std::string& category="evaluator options", std::string prefix="");
   };
 
   Evaluator(const Config& cfg = Config()) : Name(), cfg_(cfg) {}

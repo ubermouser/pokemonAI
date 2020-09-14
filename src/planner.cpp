@@ -13,21 +13,20 @@
 namespace po = boost::program_options;
 
 
-po::options_description Planner::Config::options(
-    Config& cfg, const std::string& category, std::string prefix) {
+po::options_description Planner::Config::options(const std::string& category, std::string prefix) {
   Config defaults{};
   po::options_description desc{category};
 
   if (prefix.size() > 0) { prefix.append("-"); }
   desc.add_options()
       ((prefix + "planner-verbosity").c_str(),
-      po::value<int>(&cfg.verbosity)->default_value(defaults.verbosity),
+      po::value<int>(&verbosity)->default_value(defaults.verbosity),
       "verbosity level, controls intermediate ply result printing.")
       ((prefix + "max-search-time").c_str(),
-      po::value<double>(&cfg.maxTime)->default_value(defaults.maxTime),
+      po::value<double>(&maxTime)->default_value(defaults.maxTime),
       "Maximum planner evaluation search time.")
       ((prefix + "max-search-depth").c_str(),
-      po::value<size_t>(&cfg.maxDepth)->default_value(defaults.maxDepth),
+      po::value<size_t>(&maxDepth)->default_value(defaults.maxDepth),
       "Maximum planner evaluation search depth.");
 
   return desc;

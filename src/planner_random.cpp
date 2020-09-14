@@ -1,10 +1,19 @@
 //#define PKAI_IMPORT
 #include "../inc/planner_random.h"
 
+#include <typeinfo>
+
 #include "../inc/pkCU.h"
 #include "../inc/environment_possible.h"
 
 const std::string PlannerRandom::ident = "Random_Planner-NULLEVAL";
+
+
+/*PlannerRandom::PlannerRandom(const Planner::Config& cfg) : Planner(cfg, ident), cfg_(cfg) {
+  try {
+    cfg_ = dynamic_cast<const Config&>(cfg);
+  } catch(std::bad_cast) { }
+}*/
 
 
 PlyResult PlannerRandom::generateSolutionAtLeaf(
