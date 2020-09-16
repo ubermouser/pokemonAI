@@ -39,9 +39,9 @@ public:
 
   void resetNetwork(const neuralNet& cNet);
   void resetEvaluator(const EnvironmentNonvolatile& envNV);
-  EvalResult_t calculateFitness(const EnvironmentVolatile& env, size_t iTeam);
+  EvalResult calculateFitness(const EnvironmentVolatile& env, size_t iTeam);
 
-  EvalResult_t calculateFitness(neuralNet& cNet, const EnvironmentVolatile& env, size_t iTeam);
+  EvalResult calculateFitness(neuralNet& cNet, const EnvironmentVolatile& env, size_t iTeam);
 
   void seed(float* cInput, const EnvironmentVolatile& env, size_t iTeam) const;
   size_t inputSize() const { return numInputNeurons; };

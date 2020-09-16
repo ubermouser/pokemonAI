@@ -6,7 +6,7 @@
 
 class PlannerMax : public Planner {
 public:
-  PlannerMax(const Planner::Config& cfg = Planner::Config()) : Planner(cfg) {};
+  PlannerMax(const Config& cfg = Config()) : Planner(cfg) {};
   PlannerMax(const PlannerMax& other) = default;
   
   virtual ~PlannerMax() {};

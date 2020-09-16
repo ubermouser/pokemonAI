@@ -13,7 +13,7 @@
 
 class PlannerMaxiMin : public Planner {
 public:
-  PlannerMaxiMin(const Planner::Config& cfg = Planner::Config()) : Planner(cfg) {};
+  PlannerMaxiMin(const Config& cfg = Config()) : Planner(cfg) {};
   PlannerMaxiMin(const PlannerMaxiMin& other) = default;
 
   virtual ~PlannerMaxiMin() {};

@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <boost/program_options.hpp>
 
+#include "../inc/fitness.h"
 #include "../inc/fp_compare.h"
 
 namespace po = boost::program_options;
@@ -31,18 +32,18 @@ Evaluator& Evaluator::initialize() {
 }
 
 
-fpType Evaluator::combineTeamFitness(fpType _agentFitness, fpType _otherFitness) const {
+Fitness Evaluator::combineTeamFitness(fpType _agentFitness, fpType _otherFitness) const {
   // calculate fitness
   fpType agentFitness = (cfg_.teamBias)       * _agentFitness;
   fpType otherFitness = (1.0 - cfg_.teamBias) * _otherFitness;
 
   fpType maxFitness = std::max(agentFitness, otherFitness);
   // if maxFitness is about 0, we've tied the game. Ties do not favor either team
-  if (mostlyEQ(maxFitness, 0.0)) { return 0.5; }
+  if (mostlyEQ(maxFitness, 0.0)) { return Fitness{0.5}; }
 
   fpType fitness = (agentFitness - otherFitness) / maxFitness;
 
   // normalize fitness from 0..1 instead of -1..1
   fitness = (fitness + 1.0) / 2.0;
-  return fitness;
+  return Fitness{fitness};
 }

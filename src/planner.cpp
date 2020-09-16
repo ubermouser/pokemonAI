@@ -105,10 +105,12 @@ PlannerResult Planner::generateSolution(const ConstEnvironmentVolatile& origin) 
     plyResult.timeSpent =  std::chrono::duration<double>(checkpoint - start).count();
     result.atDepth.push_back(plyResult);
 
-    printSolution(result, iDepth == cfg_.maxDepth);
+    bool terminalDepth = (iDepth == cfg_.maxDepth);
+    bool terminalTime = plyResult.timeSpent > cfg_.maxTime;
+    printSolution(result, terminalDepth || terminalTime);
 
     // break loop early if we are over maximum time
-    if (plyResult.timeSpent > cfg_.maxTime) { break; }
+    if (terminalTime) { break; }
   }
 
   return result;
@@ -124,11 +126,7 @@ PlyResult Planner::generateSolutionAtDepth(
 PlyResult Planner::generateSolutionAtLeaf(const ConstEnvironmentVolatile& origin) const {
   assert(eval_ != NULL);
 
-  EvalResult_t baseEval = eval_->calculateFitness(origin, agentTeam_);
-  PlyResult result;
-  result.agentAction = baseEval.agentMove;
-  result.otherAction = baseEval.otherMove;
-  result.fitness = Fitness(baseEval.fitness, 1.);
+  PlyResult result = eval_->calculateFitness(origin, agentTeam_);
   result.numNodes = 1;
 
   return result;
@@ -148,40 +146,43 @@ PossibleEnvironments Planner::generateStates(
 }
 
 
-Fitness Planner::recurse_alphabeta(
+EvalResult Planner::recurse_alphabeta(
       const ConstEnvironmentVolatile& origin,
       size_t iDepth,
       const Fitness& lowCutoff,
       const Fitness& highCutoff,
       size_t* nodesEvaluated) const {
   // the best agent move fitness:
-  Fitness low = lowCutoff;
-  // the best other move fitness, for every agent move:
-  std::unordered_map<Action, Fitness> fitnesses;
+  EvalResult bestOfWorst{Action{}, Action{}, lowCutoff};
 
   // TODO(@drendleman) - evaluate these in accordance to butterfly heuristic:
   // for every possible move by both agent team and other team:
-  for (const auto& actions: cu_->getAllValidActions(origin, agentTeam_)) {
+  for (const auto& agentAction: cu_->getValidActions(origin, agentTeam_)) {
+    EvalResult worst{Action{}, Action{}, highCutoff};
     // the worst possible other team choice is the one which causes the agent to decide to use it:
-    if (fitnesses.count(actions[0]) == 0) { fitnesses[actions[0]] = highCutoff; }
-    auto& high = fitnesses[actions[0]];
-
-    // evaluate what probabilistically will occur if agent and other teams perform action at state:
-    Fitness fitness = recurse_gamma(
-          origin, actions[0], actions[1], iDepth - 1, low, high, nodesEvaluated);
-
-    // TODO(@drendleman) in the case of a tie, the agent should always bias towards a damaging action
-    // has the other agent improved upon its best score by reducing our score more?
-    if (fitness < high) {
-      high = fitness;
+    for (const auto& otherAction: cu_->getValidActions(origin, (agentTeam_+1)%2)) {
+      // evaluate what probabilistically will occur if agent and other teams perform action at state:
+      Fitness fitness = recurse_gamma(
+          origin,
+          agentAction,
+          otherAction,
+          iDepth - 1,
+          bestOfWorst.fitness,
+          worst.fitness,
+          nodesEvaluated);
+      // has the other agent improved upon its best score by reducing our score more?
+      if (fitness < worst.fitness) {
+        worst = EvalResult{agentAction, otherAction, fitness};
+      }
     }
+    // TODO(@drendleman) in the case of a tie, the agent should always bias towards a damaging action
     // is the min of all other agent moves better than the best of our current moves?
-    if (high > low) {
-      low = high;
+    if (worst > bestOfWorst) {
+      bestOfWorst = worst;
     }
   }
 
-  return low;
+  return bestOfWorst;
 }
 
 
@@ -195,7 +196,7 @@ Fitness Planner::recurse_gamma(
       size_t* nodesEvaluated) const {
   size_t numNodes = 0;
   // average fitness of all states combined:
-  Fitness fitness;
+  Fitness fitness{0., 0.};
   auto rEnvP = generateStates(origin, agentAction, otherAction);
 
   // TODO(@drendleman) - evaluate these in order of greatest probability to least
@@ -203,17 +204,16 @@ Fitness Planner::recurse_gamma(
     // the likelihood that this state occurs:
     fpType stateProbability = cEnvP.getProbability().to_double();
     // this individual state's fitness:
-    Fitness deeperFitness;
+    EvalResult deeperEval;
 
     // if this is either a terminal node or if we are at terminal depth:
     if (cu_->isGameOver(cEnvP) || iDepth == 0) {
       // evaluate as a leaf node:
-      EvalResult_t evalResult = eval_->calculateFitness(cEnvP, agentTeam_);
-      deeperFitness = Fitness{evalResult.fitness, 1.};
+      deeperEval = eval_->calculateFitness(cEnvP, agentTeam_);
       ++numNodes;
     } else { // else, recurse to a deeper level:
       // recurse into another depth, widening the cutoffs by the probability of the move:
-      deeperFitness = recurse_alphabeta(
+      deeperEval = recurse_alphabeta(
           cEnvP,
           iDepth,
           lowCutoff.expand(stateProbability),
@@ -223,7 +223,7 @@ Fitness Planner::recurse_gamma(
 
     // reduce the certainty of the deeper fitness result by state's occurrence probability, and
     //  accumulate:
-    fitness += deeperFitness.expand(stateProbability);
+    fitness += deeperEval.fitness.expand(stateProbability);
 
     // if there's no possibility this action is the best for the agent, do not continue:
     if (fitness < lowCutoff) { break; }

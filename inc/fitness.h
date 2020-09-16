@@ -41,7 +41,7 @@ public:
 
   explicit FitnessType(
       const PrecisionType& value = min_fitness(),
-      const PrecisionType& certainty = zero()) :
+      const PrecisionType& certainty = one()) :
       FitnessType(value, certainty, true) {}
   ~FitnessType() {};
   FitnessType(const fitness_t& other) = default;

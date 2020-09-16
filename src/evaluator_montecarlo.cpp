@@ -31,8 +31,8 @@ po::options_description EvaluatorMonteCarlo::Config::options(
 }
 
 
-EvaluatorMonteCarlo::EvaluatorMonteCarlo(const Evaluator::Config& cfg)
-    : Evaluator("MonteCarlo_Evaluator"), cfg_(dynamic_cast<const Config&>(cfg)) {
+EvaluatorMonteCarlo::EvaluatorMonteCarlo(const Config& cfg)
+    : Evaluator("MonteCarlo_Evaluator"), cfg_(cfg) {
   Game::Config gamecfg;
   gamecfg.maxMatches = cfg_.maxRollouts;
   gamecfg.maxPlies = cfg_.maxPlies;
@@ -65,10 +65,10 @@ EvaluatorMonteCarlo& EvaluatorMonteCarlo::initialize() {
 }
 
 
-EvalResult_t EvaluatorMonteCarlo::calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const {
+EvalResult EvaluatorMonteCarlo::calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const {
   // perform a rollout on each state:
   HeatResult result = game_->rollout(env);
   fpType fitness = result.teams[iTeam].lastSimpleFitness;
 
-  return EvalResult_t{fitness, Action{}, Action{}};
+  return EvalResult{Action{}, Action{}, Fitness{fitness}};
 }

@@ -171,8 +171,8 @@ Game& Game::initialize() {
 }
 
 
-HeatResult Game::rollout(const EnvironmentVolatileData& initialState) {
-  if (!isInitialized_) { initialize(); }
+HeatResult Game::rollout(const EnvironmentVolatileData& initialState) const {
+  if (!isInitialized_) { throw std::runtime_error("game not initialized"); }
   if (cfg_.verbosity >= 1) { printHeatStart(); }
 
   std::vector<GameResult> gameLog(cfg_.maxMatches, GameResult());
@@ -207,8 +207,8 @@ HeatResult Game::rollout(const EnvironmentVolatileData& initialState) {
 }
 
 
-GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_t iMatch) {
-  if (!isInitialized_) { initialize(); }
+GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_t iMatch) const {
+  if (!isInitialized_) { throw std::runtime_error("game not initialized"); }
   std::vector<Turn> turnLog; turnLog.reserve(cfg_.maxPlies + nv_->getNumPokemon());
   EnvironmentPossibleData stateData = EnvironmentPossibleData::create(initialState);
   ConstEnvironmentPossible envP{*nv_, stateData};
@@ -291,7 +291,7 @@ Turn Game::digestTurn(
     auto& turn = cTurn.teams[iTeam];
     const PlannerResult& action = actions[iTeam];
     // set simple fitness to fitness as it would be evaluated depth 0 by the simple non perceptron evaluation function
-    double simpleFitness = eval_->calculateFitness(envP.getEnv(), iTeam).fitness;
+    double simpleFitness = eval_->calculateFitness(envP.getEnv(), iTeam).fitness.lowerBound();
     double initialFitness, finalFitness;
     if (action.hasSolution()) {
         initialFitness = action.atDepth.front().fitness.value();
@@ -348,7 +348,7 @@ GameResult Game::digestGame(
     auto& team = cResult.teams[iTeam];
     // terminal state fitness:
     ConstEnvironmentVolatile terminalState = cLog.size()>0?ConstEnvironmentVolatile{*nv_, cLog.back().env.env}:initialState;
-    team.lastSimpleFitness = eval_->calculateFitness(terminalState, iTeam).fitness;
+    team.lastSimpleFitness = eval_->calculateFitness(terminalState, iTeam).fitness.lowerBound();
     // delta fitness change:
     for (size_t iPly = 1; iPly < cLog.size(); ++iPly) {
       // the previous turn. The previous turn was responsible for the delta between turn n-1 and n

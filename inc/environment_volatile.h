@@ -22,7 +22,7 @@ class EnvironmentNonvolatile;
 
 struct PKAISHARED EnvironmentVolatileData
 {
-  std::array<TeamVolatileData, 2> teams_;
+  std::array<TeamVolatileData, 2> teams;
   
   /* Compares values of selected environment. Base values are compared by
    * pointer, volatile values are compared by value */
@@ -47,7 +47,7 @@ public:
   using base_t::nv;
 
   teamvolatile_t getTeam(size_t movesFirst) const {
-    return teamvolatile_t{nv().getTeam(movesFirst), data().teams_[movesFirst]};
+    return teamvolatile_t{nv().getTeam(movesFirst), data().teams[movesFirst]};
   };
   
   teamvolatile_t getOtherTeam(size_t movesFirst) const {

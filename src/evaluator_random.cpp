@@ -3,13 +3,13 @@
 
 const std::string EvaluatorRandom::ident = "Random_Evaluator";
 
-EvalResult_t EvaluatorRandom::calculateFitness(
+EvalResult EvaluatorRandom::calculateFitness(
     const ConstEnvironmentVolatile& env, size_t iTeam) const {
   // TODO(@drendleman) choose valid actions?
-  EvalResult_t result = { 
-    (fpType)rand() / (fpType) RAND_MAX,
+  EvalResult result = { 
     Action{rand() % (Action::MOVE_LAST)},
-    Action{rand() % (Action::MOVE_LAST)}
+    Action{rand() % (Action::MOVE_LAST)},
+    Fitness{(fpType)rand() / (fpType) RAND_MAX}
   };
   return result;
 };

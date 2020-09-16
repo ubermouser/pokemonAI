@@ -18,13 +18,13 @@
 #include "name.h"
 
 
-struct PlyResult {
+struct PlyResult : public EvalResult {
   size_t depth = 0;
-  Action agentAction = Action{};
-  Action otherAction = Action{};
-  Fitness fitness = Fitness::worst();
   size_t numNodes = 0;
   double timeSpent = 0;
+
+  PlyResult() = default;
+  PlyResult(const EvalResult& other): EvalResult(other) { }
 };
 
 struct PlannerResult {
@@ -138,7 +138,7 @@ protected:
   virtual PlyResult generateSolutionAtLeaf(const ConstEnvironmentVolatile& origin) const;
 
   /* Recurse through agent and other actions, pruning nodes above high and below low */
-  virtual Fitness recurse_alphabeta(
+  virtual EvalResult recurse_alphabeta(
       const ConstEnvironmentVolatile& origin,
       size_t iDepth,
       const Fitness& lowCutoff = Fitness::worst(),

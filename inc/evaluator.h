@@ -12,11 +12,15 @@
 #include "name.h"
 #include "environment_volatile.h"
 #include "environment_possible.h"
+#include "fitness.h"
 
-struct EvalResult_t {
-  fpType fitness;
-  Action agentMove;
-  Action otherMove;
+struct EvalResult {
+  Action agentAction = Action{};
+  Action otherAction = Action{};
+  Fitness fitness = Fitness::worst();
+
+  bool operator < (const EvalResult& other) const { return fitness < other.fitness; }
+  bool operator > (const EvalResult& other) const { return fitness > other.fitness; }
 };
 
 class Evaluator: public Name {
@@ -50,8 +54,8 @@ public:
   virtual Evaluator& initialize();
 
   /* evaluate the fitness of a given environment for team iTeam */
-  virtual EvalResult_t calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const = 0;
-  virtual EvalResult_t calculateFitness(const ConstEnvironmentPossible& env, size_t iTeam) const {
+  virtual EvalResult calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const = 0;
+  virtual EvalResult calculateFitness(const ConstEnvironmentPossible& env, size_t iTeam) const {
     return calculateFitness(env.getEnv(), iTeam);
   }
 protected:
@@ -59,7 +63,7 @@ protected:
 
   Config cfg_;
 
-  virtual fpType combineTeamFitness(fpType agentFitness, fpType otherFitness) const;
+  virtual Fitness combineTeamFitness(fpType agentFitness, fpType otherFitness) const;
 };
 
 #endif /* EVALUATOR_H */

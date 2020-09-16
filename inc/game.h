@@ -125,16 +125,19 @@ public:
   /* create all variables, prepare game for running */
   Game& initialize();
 
-  HeatResult rollout(const EnvironmentVolatileData& initialState);
-  HeatResult rollout() { return rollout(initialState_); }
+  HeatResult rollout(const EnvironmentVolatileData& initialState) const;
+  HeatResult rollout() const { return rollout(initialState_); }
 
-  GameResult rollout_game(const EnvironmentVolatileData& initialState, size_t iMatch=SIZE_MAX);
-  GameResult rollout_game(size_t iMatch=SIZE_MAX) {
+  GameResult rollout_game(const EnvironmentVolatileData& initialState, size_t iMatch=SIZE_MAX) const;
+  GameResult rollout_game(size_t iMatch=SIZE_MAX) const {
     return rollout_game(initialState_, iMatch);
   }
   
   /* main loop. Calls computation in pkai_cu, search via planner, input from user if necessary */
-  HeatResult run() { return rollout(); }
+  HeatResult run() { 
+    if (!isInitialized_) { initialize(); }
+    return rollout();
+  }
 
   Game& setEvaluator(const std::shared_ptr<Evaluator>& eval);
   Game& setEvaluator(const Evaluator& eval) {

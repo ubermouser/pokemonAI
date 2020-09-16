@@ -116,12 +116,12 @@ void evaluator_network64::resetEvaluator(const EnvironmentNonvolatile& _envNV)
   if (network != NULL) { network->clearInput(); }
 };
 
-EvalResult_t evaluator_network64::calculateFitness(const EnvironmentVolatile& env, size_t iTeam)
+EvalResult evaluator_network64::calculateFitness(const EnvironmentVolatile& env, size_t iTeam)
 {
   return calculateFitness(*network, env, iTeam);
 };
 
-EvalResult_t evaluator_network64::calculateFitness(neuralNet& cNet, const EnvironmentVolatile& env, size_t iTeam)
+EvalResult evaluator_network64::calculateFitness(neuralNet& cNet, const EnvironmentVolatile& env, size_t iTeam)
 {
   // seed network with values:
   seed(&*cNet.inputBegin(), env, iTeam);
@@ -133,7 +133,7 @@ EvalResult_t evaluator_network64::calculateFitness(neuralNet& cNet, const Enviro
   fpType fitness = *output;
   fitness = std::max(0.0, std::min(1.0, scale(fitness, 0.85, 0.15)));
 
-  EvalResult_t result= { fitness , -1/*agentMove*/ , -1/*otherMove*/ };
+  EvalResult result= { fitness , -1/*agentMove*/ , -1/*otherMove*/ };
   return result;
 };
 

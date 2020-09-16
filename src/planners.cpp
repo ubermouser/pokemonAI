@@ -31,13 +31,13 @@ std::shared_ptr<Planner::Config> planners::config(const std::string& _type) {
 std::shared_ptr<Planner> planners::choose(const std::string& _type, const Planner::Config& cfg) {
   auto type = boost::to_lower_copy(_type);
   if (type == "maximin") {
-    return std::make_shared<PlannerMaxiMin>(cfg);
+    return std::make_shared<PlannerMaxiMin>(dynamic_cast<const PlannerMaxiMin::Config&>(cfg));
   } else if (type == "random") {
-    return std::make_shared<PlannerRandom>(cfg);
+    return std::make_shared<PlannerRandom>(dynamic_cast<const PlannerRandom::Config&>(cfg));
   } else if (type == "max") {
-    return std::make_shared<PlannerMax>(cfg);
+    return std::make_shared<PlannerMax>(dynamic_cast<const PlannerMax::Config&>(cfg));
   } else if (type == "human") {
-    return std::make_shared<PlannerHuman>(cfg);
+    return std::make_shared<PlannerHuman>(dynamic_cast<const PlannerHuman::Config&>(cfg));
   } else {
     std::cerr << "unknown planner type \"" << _type << "\"!\n";
     throw std::invalid_argument("planner type");

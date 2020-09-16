@@ -21,7 +21,7 @@ public:
     Config() : Evaluator::Config() {};
   };
 
-  EvaluatorSimple(const Evaluator::Config& cfg = Config());
+  EvaluatorSimple(const Config& cfg = Config());
   ~EvaluatorSimple() = default;
   EvaluatorSimple(const EvaluatorSimple& other) = default;
 
@@ -29,7 +29,7 @@ public:
 
   EvaluatorSimple& initialize() override;
 
-  EvalResult_t calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const override;
+  EvalResult calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const override;
 protected:
 
   fpType fitness_move(const ConstMoveVolatile& mV) const;

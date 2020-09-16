@@ -11,7 +11,7 @@ public:
 
   EvaluatorRandom* clone() const override { return new EvaluatorRandom(*this); }
 
-  EvalResult_t calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const override;
+  EvalResult calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const override;
 protected:
   static const std::string ident;
 };

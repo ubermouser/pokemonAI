@@ -45,7 +45,7 @@ TEST_F(GameTest, RolloutPokemon) {
       .setVerbosity(3)
       .setEnvironment(environment_);
 
-  auto result = game.rollout();
+  auto result = game.run();
 
   EXPECT_GE(result.matchesPlayed, 2);
 }
@@ -58,7 +58,7 @@ TEST_F(GameTest, Multithreaded) {
   cfg.verbosity = 1;
   auto game = Game(cfg)
       .setEnvironment(environment_);
-  auto result = game.rollout();
+  auto result = game.run();
 
   EXPECT_GE(result.matchesPlayed, 101);
 }
@@ -73,7 +73,7 @@ TEST_F(GameTest, CustomPlanners) {
       .setPlanner(0, PlannerRandom().setEngine(cu))
       .setPlanner(1, PlannerRandom().setEngine(cu));
 
-  auto result = game.rollout();
+  auto result = game.run();
 
   EXPECT_GE(result.matchesPlayed, 51);
 }
@@ -87,6 +87,6 @@ TEST_F(GameTest, UninitializedCustom) {
 
   EXPECT_THROW({
     // uninitialized
-    game.rollout();
+    game.run();
   }, std::runtime_error);
 }

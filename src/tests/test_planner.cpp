@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <sstream>
+#include <limits>
 
 #include <inc/engine.h>
 #include <inc/evaluator_simple.h>
@@ -19,19 +20,27 @@ protected:
     verbose = 4;
     pokedex_ = std::make_shared<PokedexStatic>();
     engine_ = std::make_shared<PkCU>();
+    EvaluatorSimple::Config eval_config;
+    eval_config.canMoveBias = 0.0;
+    eval_config.movesBias = 0.0;
+    evaluator_ = std::make_shared<EvaluatorSimple>(eval_config);
 
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->getPokemon().at("charmander"))
-          .addMove(pokedex_->getMoves().at("cut"))
-          .addMove(pokedex_->getMoves().at("swords dance"))
-          .setLevel(100));
+          .setBase(pokedex_->getPokemon().at("gengar"))
+          .addMove(pokedex_->getMoves().at("explosion"))
+          .addMove(pokedex_->getMoves().at("focus blast")))
+        .addPokemon(PokemonNonVolatile()
+          .setBase(pokedex_->getPokemon().at("weavile"))
+          .addMove(pokedex_->getMoves().at("leer"))
+          .addMove(pokedex_->getMoves().at("night slash")));
     auto team_b = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->getPokemon().at("bulbasaur"))
-          .addMove(pokedex_->getMoves().at("cut"))
-          .addMove(pokedex_->getMoves().at("charm"))
-          .setLevel(100));
+          .setBase(pokedex_->getPokemon().at("alakazam"))
+          .addMove(pokedex_->getMoves().at("recover"))
+          .addMove(pokedex_->getMoves().at("psychic")))
+        .addPokemon(PokemonNonVolatile()
+          .setBase(pokedex_->getPokemon().at("pikachu")));
     environment_ = std::make_shared<EnvironmentNonvolatile>(team_a, team_b, true);
     engine_->setEnvironment(environment_);
   }
@@ -39,6 +48,7 @@ protected:
   std::shared_ptr<EnvironmentNonvolatile> environment_;
   std::shared_ptr<Pokedex> pokedex_;
   std::shared_ptr<PkCU> engine_;
+  std::shared_ptr<Evaluator> evaluator_;
 };
 
 
@@ -46,16 +56,22 @@ TEST_F(PlannerTest, MaxPlannerChoosesGreedyOption) {
   PlannerMax::Config cfg;
   cfg.maxDepth = 1;
   cfg.verbosity = 4;
-  std::unique_ptr<Planner> planner = std::make_unique<PlannerMax>(cfg);
-  planner->setTeam(TEAM_A)
-      .setEvaluator(EvaluatorSimple())
-      .setEngine(engine_)
-      .setEnvironment(environment_)
-      .initialize();
+  cfg.maxTime = std::numeric_limits<double>::infinity();
+  std::array<PlannerMax, 2> planners {PlannerMax(cfg), PlannerMax(cfg)};
+  for (auto& planner: planners) {
+    planner
+        .setEvaluator(evaluator_)
+        .setTeam(&planner - planners.begin())
+        .setEngine(engine_)
+        .setEnvironment(environment_)
+        .initialize();
+  }
 
-  auto result = planner->generateSolution(engine_->initialState());
+  auto agent_result = planners[TEAM_A].generateSolution(engine_->initialState());
+  auto other_result = planners[TEAM_B].generateSolution(engine_->initialState());
 
-  EXPECT_EQ(result.bestAgentAction(), Action::move(0));
+  EXPECT_EQ(agent_result.bestAgentAction(), Action::move(1));
+  EXPECT_EQ(other_result.bestAgentAction(), Action::move(1));
 }
 
 
@@ -63,16 +79,23 @@ TEST_F(PlannerTest, MaximinPlannerChooses1PlyOption) {
   PlannerMaxiMin::Config cfg;
   cfg.maxDepth = 1;
   cfg.verbosity = 4;
-  std::unique_ptr<Planner> planner = std::make_unique<PlannerMaxiMin>(cfg);
-  planner->setTeam(TEAM_A)
-      .setEvaluator(EvaluatorSimple())
-      .setEngine(engine_)
-      .setEnvironment(environment_)
-      .initialize();
+  cfg.maxTime = std::numeric_limits<double>::infinity();
+  std::array<PlannerMaxiMin, 2> planners {PlannerMaxiMin(cfg), PlannerMaxiMin(cfg)};
+  for (auto& planner: planners) {
+    planner
+        .setEvaluator(evaluator_)
+        .setTeam(&planner - planners.begin())
+        .setEngine(engine_)
+        .setEnvironment(environment_)
+        .initialize();
+  }
 
-  auto result = planner->generateSolution(engine_->initialState());
+  auto agent_result = planners[TEAM_A].generateSolution(engine_->initialState());
+  auto other_result = planners[TEAM_B].generateSolution(engine_->initialState());
 
-  EXPECT_EQ(result.bestAgentAction(), Action::move(0));
+  EXPECT_EQ(agent_result.bestAgentAction(), Action::move(0));
+  EXPECT_EQ(agent_result.bestOtherAction(), other_result.bestAgentAction());
+  EXPECT_EQ(other_result.bestOtherAction(), agent_result.bestAgentAction());
 }
 
 
@@ -80,16 +103,23 @@ TEST_F(PlannerTest, MaximinPlannerChooses2PlyOption) {
   PlannerMaxiMin::Config cfg;
   cfg.maxDepth = 2;
   cfg.verbosity = 4;
-  std::unique_ptr<Planner> planner = std::make_unique<PlannerMaxiMin>(cfg);
-  planner->setTeam(TEAM_A)
-      .setEvaluator(EvaluatorSimple())
-      .setEngine(engine_)
-      .setEnvironment(environment_)
-      .initialize();
+  cfg.maxTime = std::numeric_limits<double>::infinity();
+  std::array<PlannerMaxiMin, 2> planners {PlannerMaxiMin(cfg), PlannerMaxiMin(cfg)};
+  for (auto& planner: planners) {
+    planner
+        .setEvaluator(evaluator_)
+        .setTeam(&planner - planners.begin())
+        .setEngine(engine_)
+        .setEnvironment(environment_)
+        .initialize();
+  }
 
-  auto result = planner->generateSolution(engine_->initialState());
+  auto agent_result = planners[TEAM_A].generateSolution(engine_->initialState());
+  auto other_result = planners[TEAM_B].generateSolution(engine_->initialState());
 
-  EXPECT_EQ(result.bestAgentAction(), Action::move(0));
+  EXPECT_EQ(agent_result.bestAgentAction(), Action::swap(1));
+  EXPECT_EQ(agent_result.bestOtherAction(), other_result.bestAgentAction());
+  EXPECT_EQ(other_result.bestOtherAction(), agent_result.bestAgentAction());
 }
 
 

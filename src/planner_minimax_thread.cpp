@@ -238,7 +238,7 @@ bool minimax_threadArg::evaluateVertex_IDDFS_Fitness(ply& current, std::vector<p
     else
     {
       // calculate fitness
-      EvalResult_t evalResult;
+      EvalResult evalResult;
       if (current.getStatus() != NODET_FULLEVAL)
       {
         // use the heuristic evaluator for cutoff nodes

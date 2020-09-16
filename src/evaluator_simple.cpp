@@ -1,14 +1,15 @@
 //#define PKAI_IMPORT
 #include "../inc/evaluator_simple.h"
 
+#include <algorithm>
 #include <sstream>
 #include <stdexcept>
 
 #include "../inc/engine.h"
 
 
-EvaluatorSimple::EvaluatorSimple(const Evaluator::Config& cfg)
-    : Evaluator(cfg), cfg_(dynamic_cast<const Config&>(cfg)) {
+EvaluatorSimple::EvaluatorSimple(const Config& cfg)
+    : Evaluator(cfg), cfg_(cfg) {
   std::ostringstream name;
   name << "Simple_Evaluator-" << cfg_.aliveBias;
   setName(name.str());
@@ -16,12 +17,12 @@ EvaluatorSimple::EvaluatorSimple(const Evaluator::Config& cfg)
 
 
 EvaluatorSimple& EvaluatorSimple::initialize() {
-  if (nv_ == NULL) { throw std::invalid_argument("evaluator nonvolatile environment undefined"); }
-  if (cfg_.aliveBias >= 1.0 || cfg_.aliveBias <= 0.0) { throw std::invalid_argument("aliveBias"); }
-  if (cfg_.movesBias >= 1.0 || cfg_.movesBias <= 0.0) { throw std::invalid_argument("movesBias"); }
-  if (cfg_.canMoveBias >= 1.0 || cfg_.canMoveBias <= 0.0) { throw std::invalid_argument("canMoveBias"); }
-  if (cfg_.teamBias >= 1.0 || cfg_.teamBias <= 0.0) { throw std::invalid_argument("teamBias"); }
-  if (cfg_.teamAliveBias >= 1.0 || cfg_.teamAliveBias <= 0.0) { throw std::invalid_argument("teamAliveBias"); }
+  Evaluator::initialize();
+  if (cfg_.aliveBias > 1.0 || cfg_.aliveBias < 0.0) { throw std::invalid_argument("aliveBias"); }
+  if (cfg_.movesBias > 1.0 || cfg_.movesBias < 0.0) { throw std::invalid_argument("movesBias"); }
+  if (cfg_.canMoveBias > 1.0 || cfg_.canMoveBias < 0.0) { throw std::invalid_argument("canMoveBias"); }
+  if (cfg_.teamBias > 1.0 || cfg_.teamBias < 0.0) { throw std::invalid_argument("teamBias"); }
+  if (cfg_.teamAliveBias > 1.0 || cfg_.teamAliveBias < 0.0) { throw std::invalid_argument("teamAliveBias"); }
   return *this;
 }
 
@@ -41,7 +42,8 @@ fpType EvaluatorSimple::fitness_pokemon(const ConstPokemonVolatile& pV) const {
   for (size_t iMove = 0, count=isAlive?pV.nv().getNumMoves():0; isAlive && iMove < count; ++iMove) {
     moveAccumulator += fitness_move(pV.getMV(iMove));
   }
-  moveAccumulator /= pV.nv().getNumMoves();
+  // TODO(@drendleman) does a valid pokemon have at least one move?
+  moveAccumulator /= std::max(pV.nv().getNumMoves(), 1U);
 
   fpType fitness =
       (moveAccumulator * cfg_.movesBias) +
@@ -67,11 +69,11 @@ fpType EvaluatorSimple::fitness_team(const ConstTeamVolatile& tV) const {
 };
 
 
-EvalResult_t EvaluatorSimple::calculateFitness(
+EvalResult EvaluatorSimple::calculateFitness(
     const ConstEnvironmentVolatile& env, size_t iTeam) const {
   // calculate fitness
   fpType agentFitness = fitness_team(env.getTeam(iTeam));
   fpType otherFitness = fitness_team(env.getOtherTeam(iTeam));
 
-  return EvalResult_t{combineTeamFitness(agentFitness, otherFitness), Action{}, Action{}};
+  return EvalResult{Action{}, Action{}, combineTeamFitness(agentFitness, otherFitness)};
 };

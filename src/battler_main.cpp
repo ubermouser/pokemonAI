@@ -140,6 +140,6 @@ int main(int argc, char** argv) {
       .setPlanner(0, buildPlanner(cfg, 0))
       .setPlanner(1, buildPlanner(cfg, 1));
 
-  game.rollout();
+  game.run();
   std::exit(EXIT_SUCCESS);
 }

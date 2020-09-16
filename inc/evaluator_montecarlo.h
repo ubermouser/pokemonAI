@@ -29,7 +29,7 @@ public:
         const std::string& category="evaluator options", std::string prefix="") override;
   };
 
-  EvaluatorMonteCarlo(const Evaluator::Config& cfg = Config());
+  EvaluatorMonteCarlo(const Config& cfg = Config());
   virtual ~EvaluatorMonteCarlo() override {};
 
   virtual EvaluatorMonteCarlo* clone() const override { return new EvaluatorMonteCarlo(*this); }
@@ -39,11 +39,11 @@ public:
 
   virtual EvaluatorMonteCarlo& initialize() override;
 
-  virtual EvalResult_t calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const override;
+  virtual EvalResult calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const override;
 protected:
   Config cfg_;
 
-  mutable std::shared_ptr<Game> game_;
+  std::shared_ptr<Game> game_;
 };
 
 #endif /* EVALUATOR_MONTECARLO_H */
