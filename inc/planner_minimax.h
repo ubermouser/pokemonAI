@@ -20,7 +20,7 @@ public:
   using base_t = PlannerMaxiMin;
 
   struct Config: public base_t::Config {
-    size_t transposition_table_size = 10000000;
+    size_t transposition_table_size = 1024 * 1024 * 10;
 
     Config() : base_t::Config() {};
 

@@ -106,14 +106,14 @@ PlannerResult Planner::generateSolution(const ConstEnvironmentPossible& origin) 
     } else {
       plyResult = generateSolutionAtDepth(origin, iDepth);
     }
-    plyResult.depth = iDepth;
+    iDepth = std::max(iDepth, plyResult.depth);
 
     // determine time between last checkpoint and current checkpoint:
     auto checkpoint = std::chrono::steady_clock::now();
     plyResult.timeSpent =  std::chrono::duration<double>(checkpoint - start).count();
     result.atDepth.push_back(plyResult);
 
-    bool terminalDepth = (iDepth == cfg_.maxDepth);
+    bool terminalDepth = (iDepth >= cfg_.maxDepth);
     bool terminalTime = plyResult.timeSpent > cfg_.maxTime;
     printSolution(result, terminalDepth || terminalTime);
 
@@ -237,7 +237,7 @@ Fitness Planner::recurse_gamma(
   auto rEnvP = generateStates(origin, agentAction, otherAction);
 
   // TODO(@drendleman) - evaluate these in order of greatest probability to least
-  for (const auto& cEnvP : rEnvP.getValidEnvironments()) {
+  for (const auto& cEnvP : rEnvP.getValidEnvironments(true)) {
     // the likelihood that this state occurs:
     fpType stateProbability = cEnvP.getProbability().to_double();
     // this individual state's fitness:
@@ -281,7 +281,7 @@ void Planner::printSolution(const PlannerResult& results, bool isLast) const {
   if (!results.atDepth.empty()) {
     const auto& result = results.best();
 
-    out << boost::format("%sT%s: ply=%2d act=%4s oact=%4s fit=% 6.4f elaps=%6.2f nnod=%d\n")
+    out << boost::format("%sT%s: ply=%2d act=%4s oact=%4s fit=% 6.4f time=%6.2f nnod=%d\n")
         % (isLast?"~~~~":"    ")
         % (agentTeam_==TEAM_A?"A":"B")
         % result.depth

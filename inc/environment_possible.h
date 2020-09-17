@@ -78,7 +78,7 @@ struct PKAISHARED EnvironmentPossibleData {
   uint32_t envBitset;
 
 
-  static EnvironmentPossibleData create(const EnvironmentVolatileData& source, bool doHash = false);
+  static EnvironmentPossibleData create(const EnvironmentVolatileData& source, bool doHash = true);
 
   /* Is the probability of this entity occuring less than the probability of
    the other entity occuring?*/
@@ -267,7 +267,7 @@ public:
   }
   ConstEnvironmentPossible stateSelect_roulette(size_t& indexState) const;
 
-  std::vector<ConstEnvironmentPossible> getValidEnvironments() const;
+  std::vector<ConstEnvironmentPossible> getValidEnvironments(bool sort=false) const;
 
   EnvironmentPossible at(size_t index) {
     return EnvironmentPossible{*nv_, base_t::at(index)};

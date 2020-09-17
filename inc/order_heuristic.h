@@ -20,11 +20,13 @@ public:
 
   void increment(const ConstEnvironmentVolatile& env, size_t iTeam, const Action& action);
 
-  ActionVector& order(const ConstEnvironmentVolatile& env, size_t iTeam, ActionVector& actions) const;
+  ActionVector& order(const ConstEnvironmentVolatile& env, size_t iTeam, ActionVector& actions, const Action& killer=Action{}) const;
 
   void initialize();
 protected:
-  std::array<ActionMap, 2> major_counts_;
+  size_t getBin(const ConstEnvironmentVolatile& env, size_t iTeam) const;
+
+  std::array<ActionMap, (6 * 6 * 2)> major_counts_;
 };
 
 #endif

@@ -39,10 +39,17 @@ PlannerMiniMax& PlannerMiniMax::initialize() {
 ActionVector PlannerMiniMax::getValidActions(
     const ConstEnvironmentPossible& origin,
     size_t iTeam) const {
-  // TODO(@drendleman) - killer heuristic
+  // if this state has been evaluated at a shallower depth, immediately consider the shallower
+  //  depth's best move first. Odds are, it will still be quite good.
+  Action killerMove;
+  if (transpositionTable_.exists(origin.getHash())) {
+    auto probe = transpositionTable_.get(origin.getHash());
+    killerMove = (iTeam==agentTeam_)?probe.agentAction:probe.otherAction;
+  }
 
+  // order the remaining moves as per the butterfly heuristic:
   auto actions = cu_->getValidActions(origin, iTeam);
-  orderHeuristic_.order(origin, iTeam, actions);
+  orderHeuristic_.order(origin, iTeam, actions, killerMove);
 
   return actions;
 }
@@ -84,9 +91,16 @@ EvalResult PlannerMiniMax::recurse_alphabeta(
   bool doRecurse = true;
   if (transpositionTable_.exists(origin.getHash())) {
     result = transpositionTable_.get(origin.getHash());
-    if (result.depth >= iDepth) { 
-      doRecurse = false;
-      // TODO(@drendleman) - recurse if this was a cutoff node previously but is now a full node
+    // if this result has sufficient minimum depth:
+    if (result.depth >= iDepth) {
+      // if this result is either 100% evaluated:
+      if (result.fitness.fullyEvaluated()) {
+        doRecurse = false;
+      // else, if this result is evaluated enough to produce a cutoff:
+      } else if (result.fitness < lowCutoff ||
+                 result.fitness > highCutoff) {
+        doRecurse = false;
+      }
     }
   }
 

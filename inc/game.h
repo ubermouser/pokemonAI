@@ -20,6 +20,8 @@
 
 struct Turn {
   struct PerTeam {
+    uint64_t numNodesEvaluated = 0;
+    double timeSpent = 0;
     double simpleFitness = 0;
     double depth0Fitness = 0;
     double depthMaxFitness = 0;
@@ -47,6 +49,8 @@ struct GameResult {
 
     std::array<PerPokemon, 6> pokemon;
     double lastSimpleFitness = 0;
+    double timeSpent = 0;
+    uint64_t numNodesEvaluated = 0;
   };
 
   std::vector<Turn> log;
@@ -70,6 +74,8 @@ struct HeatResult {
 
     std::array<PerPokemon, 6> pokemon;
     double lastSimpleFitness = 0;
+    double averageTimeSpent = 0;
+    uint64_t averageNodesEvaluated = 0;
   };
 
   std::vector<GameResult> gameResults;

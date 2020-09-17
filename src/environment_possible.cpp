@@ -1,5 +1,6 @@
 #include "../inc/environment_possible.h"
 
+#include <algorithm>
 #include <iostream>
 #include <boost/format.hpp>
 #include <boost/static_assert.hpp>
@@ -194,7 +195,7 @@ void PossibleEnvironments::printStates(std::ostream& os, const std::string& line
 }
 
 
-std::vector<ConstEnvironmentPossible> PossibleEnvironments::getValidEnvironments() const {
+std::vector<ConstEnvironmentPossible> PossibleEnvironments::getValidEnvironments(bool sort) const {
   std::vector<ConstEnvironmentPossible> result; result.reserve(getNumUnique());
 
   for (size_t iState = 0; iState < size(); ++iState) {
@@ -202,6 +203,12 @@ std::vector<ConstEnvironmentPossible> PossibleEnvironments::getValidEnvironments
     if (state.isPruned()) { continue; }
 
     result.push_back(state);
+  }
+
+  if (sort) {
+    std::sort(std::begin(result), std::end(result), [&](auto& a, auto& b){
+      return a.getProbability() > b.getProbability();
+    });
   }
 
   return result;

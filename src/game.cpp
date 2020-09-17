@@ -8,6 +8,7 @@
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <omp.h>
+#include <numeric>
 
 #include "../inc/planner.h"
 #include "../inc/planner_max.h"
@@ -291,22 +292,23 @@ Turn Game::digestTurn(
     auto& turn = cTurn.teams[iTeam];
     const PlannerResult& action = actions[iTeam];
     // set simple fitness to fitness as it would be evaluated depth 0 by the simple non perceptron evaluation function
-    double simpleFitness = eval_->calculateFitness(envP.getEnv(), iTeam).fitness.lowerBound();
-    double initialFitness, finalFitness;
+    turn.simpleFitness = eval_->calculateFitness(envP.getEnv(), iTeam).fitness.lowerBound();
     if (action.hasSolution()) {
-        initialFitness = action.atDepth.front().fitness.value();
-        finalFitness = action.atDepth.back().fitness.value();
+      // simple, d-0 and d-M fitness at the BEGINNING of the turn:
+        turn.depth0Fitness = action.atDepth.front().fitness.value();
+        turn.depthMaxFitness = action.atDepth.back().fitness.value();
+        turn.timeSpent = action.atDepth.back().timeSpent;
     } else {
-      initialFitness = simpleFitness;
-      finalFitness = simpleFitness;
+      turn.depth0Fitness = turn.simpleFitness;
+      turn.depthMaxFitness = turn.simpleFitness;
     }
-
+    // sum of all nodes evaluated:
+    turn.numNodesEvaluated = std::accumulate(
+        std::begin(action.atDepth), std::end(action.atDepth), 0U, [](auto& a, auto& b) {
+      return a + b.numNodes;
+    });
     // active pokemon at the END of the turn:
     turn.activePokemon = envP.getEnv().getTeam(iTeam).getICPKV();
-    // simple, d-0 and d-M fitness at the BEGINNING of the turn:
-    turn.simpleFitness = simpleFitness;
-    turn.depth0Fitness = initialFitness;
-    turn.depthMaxFitness = finalFitness;
     // action taken by each team to transition the previous turn to the current turn:
     turn.action = actions[iTeam].bestAgentAction();
   } // endOf foreach team
@@ -334,7 +336,9 @@ GameResult Game::digestGame(
     for (const auto& turn: cLog) {
       const auto& tTurn = turn.teams[iTeam];
       auto& pokemon = team.pokemon[tTurn.activePokemon];
-
+      // increment turns evaluated and time spent:
+      team.numNodesEvaluated += tTurn.numNodesEvaluated;
+      team.timeSpent += tTurn.timeSpent;
       // for every turn a pokemon is in play, this increases a counter for that pokemon by 1:
       pokemon.participation += 1;
       // add a move increment for the current pokemon's move:
@@ -431,11 +435,15 @@ HeatResult Game::digestMatch(std::vector<GameResult>& gLog) const {
       const auto& source = log.teams[iTeam];
       auto& team = hResult.teams[iTeam];
       team.lastSimpleFitness += source.lastSimpleFitness;
+      team.averageNodesEvaluated += source.numNodesEvaluated;
+      team.averageTimeSpent += source.timeSpent;
     }
   }
   hResult.numPlies /= hResult.matchesPlayed;
   for (auto& team: hResult.teams) {
     team.lastSimpleFitness /= hResult.matchesPlayed;
+    team.averageNodesEvaluated /= hResult.matchesPlayed;
+    team.averageTimeSpent /= hResult.matchesPlayed;
   }
 
   // generate average pokemon values:
@@ -660,6 +668,9 @@ void Game::printGameOutline(const GameResult& gResult, size_t iMatch) const {
       << "  " << getTeamIdentifier(iTeam)
       << (((int)iTeam==gResult.endStatus)?" (winner)":"")
       << "\n";
+    out << boost::format("  time=%7.2f  nnod=%d\n")
+        % teamResult.timeSpent
+        % teamResult.numNodesEvaluated;
     for (size_t iPokemon = 0; iPokemon < cTeam.getNumTeammates(); ++iPokemon) {
       const auto& pResult = teamResult.pokemon[iPokemon];
       const PokemonNonVolatile& cPKNV = cTeam.teammate(iPokemon);
@@ -728,6 +739,9 @@ void Game::printHeatOutline(const HeatResult& result) const {
       << "  " << getTeamIdentifier(iTeam)
       << (((int)iTeam==result.endStatus)?" (winner)":"")
       << "\n";
+    out << boost::format("  aTime=%7.2f  aNod=%d\n")
+        % teamResult.averageTimeSpent
+        % teamResult.averageNodesEvaluated;
     for (size_t iPokemon = 0; iPokemon < cTeam.getNumTeammates(); ++iPokemon) {
       const auto& pResult = teamResult.pokemon[iPokemon];
       const PokemonNonVolatile& cPKNV = cTeam.teammate(iPokemon);

@@ -40,6 +40,7 @@ PlyResult PlannerMax::generateSolutionAtDepth(
       result.agentAction = action;
     }
   }
-  
+
+  result.depth = maxPly;
   return result;
 };
