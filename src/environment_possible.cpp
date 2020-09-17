@@ -6,7 +6,6 @@
 
 #include "../inc/environment_nonvolatile.h"
 #include "../inc/roulette.h"
-#include "../inc/signature.h"
 
 
 BOOST_STATIC_ASSERT(sizeof(EnvironmentPossibleData) == (sizeof(uint64_t)*18));
@@ -26,13 +25,7 @@ bool EnvironmentPossibleData::operator <(const EnvironmentPossibleData& other) c
 
 
 void EnvironmentPossibleData::generateHash() {
-#if defined(_USEFNVHASH)
-    hash = hashes::hash_fnv(&env, sizeof(EnvironmentVolatileData));
-#elif defined(_USEMURMUR2)
-    hash = hashes::hash_murmur2(&env, sizeof(EnvironmentVolatileData));
-#else
-    hash = hashes::hash_murmur3(&env, sizeof(EnvironmentVolatileData));
-#endif
+  hash = env.generateHash();
 }
 
 

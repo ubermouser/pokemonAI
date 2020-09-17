@@ -8,9 +8,11 @@
 #ifndef ACTION_H
 #define ACTION_H
 
+#include <array>
 #include <assert.h>
-#include <ostream>
+#include <iostream>
 #include <stdint.h>
+#include <vector>
 
 class Action {
 public:
@@ -100,6 +102,9 @@ protected:
   uint16_t enemyTarget_: 5;
 
 };
+
+using ActionVector = std::vector<Action>;
+using ActionPairVector = std::vector<std::array<Action, 2> >;
 
 std::ostream& operator <<(std::ostream& os, const Action& action);
 std::istream& operator >>(std::istream& is, Action& action);

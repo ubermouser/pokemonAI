@@ -19,14 +19,6 @@
       </logicalFolder>
       <logicalFolder name="f3" displayName="planners" projectFiles="true">
         <logicalFolder name="f1" displayName="planner_minimax" projectFiles="true">
-          <itemPath>inc/agentMove.h</itemPath>
-          <itemPath>inc/orderHeuristic.h</itemPath>
-          <itemPath>inc/otherMove.h</itemPath>
-          <itemPath>inc/planner_minimax.h</itemPath>
-          <itemPath>inc/planner_minimax_thread.h</itemPath>
-          <itemPath>inc/ply.h</itemPath>
-          <itemPath>inc/transposition_table.h</itemPath>
-          <itemPath>inc/vertex.h</itemPath>
         </logicalFolder>
         <itemPath>inc/planner_directed.h</itemPath>
         <itemPath>inc/planner_stochastic.h</itemPath>
@@ -117,14 +109,6 @@
       </logicalFolder>
       <logicalFolder name="f2" displayName="planners" projectFiles="true">
         <logicalFolder name="f1" displayName="planner_minimax" projectFiles="true">
-          <itemPath>src/agentMove.cpp</itemPath>
-          <itemPath>src/orderHeuristic.cpp</itemPath>
-          <itemPath>src/otherMove.cpp</itemPath>
-          <itemPath>src/planner_minimax.cpp</itemPath>
-          <itemPath>src/planner_minimax_thread.cpp</itemPath>
-          <itemPath>src/ply.cpp</itemPath>
-          <itemPath>src/transposition_table.cpp</itemPath>
-          <itemPath>src/vertex.cpp</itemPath>
         </logicalFolder>
         <itemPath>src/planner_directed.cpp</itemPath>
         <itemPath>src/planner_stochastic.cpp</itemPath>
@@ -246,8 +230,6 @@
       </item>
       <item path="data/pokemon.txt" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/agentMove.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/backpropNet.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/evaluator_featureVector.h" ex="false" tool="3" flavor2="0">
@@ -272,11 +254,7 @@
       </item>
       <item path="inc/neuralNet.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/orderHeuristic.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/orphan.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/otherMove.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/pkIO.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -284,13 +262,7 @@
       </item>
       <item path="inc/planner_directed.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/planner_minimax.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/planner_minimax_thread.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/planner_stochastic.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/ply.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/pokemonAI.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -310,15 +282,9 @@
       </item>
       <item path="inc/trainer.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/transposition_table.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/trueSkill.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/vertex.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="pkai.ini" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="src/agentMove.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/backpropNet.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -344,21 +310,11 @@
       </item>
       <item path="src/neuralNet.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/orderHeuristic.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/otherMove.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/pkIO.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/planner_directed.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/planner_minimax.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/planner_minimax_thread.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/planner_stochastic.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/ply.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/pokemonAI.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -376,11 +332,7 @@
       </item>
       <item path="src/trainer_io.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/transposition_table.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/trueSkill.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/vertex.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="teams/dualTeamA.txt" ex="false" tool="3" flavor2="0">
       </item>
@@ -519,8 +471,6 @@
       </item>
       <item path="data/pokemon.txt" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/agentMove.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/backpropNet.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/evaluator_featureVector.h" ex="false" tool="3" flavor2="0">
@@ -545,11 +495,7 @@
       </item>
       <item path="inc/neuralNet.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/orderHeuristic.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/orphan.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/otherMove.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/pkIO.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -557,13 +503,7 @@
       </item>
       <item path="inc/planner_directed.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/planner_minimax.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/planner_minimax_thread.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/planner_stochastic.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/ply.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/pokemonAI.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -583,15 +523,9 @@
       </item>
       <item path="inc/trainer.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/transposition_table.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/trueSkill.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/vertex.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="pkai.ini" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="src/agentMove.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/backpropNet.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -617,21 +551,11 @@
       </item>
       <item path="src/neuralNet.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/orderHeuristic.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/otherMove.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/pkIO.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/planner_directed.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/planner_minimax.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/planner_minimax_thread.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/planner_stochastic.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/ply.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/pokemonAI.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -649,11 +573,7 @@
       </item>
       <item path="src/trainer_io.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/transposition_table.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/trueSkill.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/vertex.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="teams/dualTeamA.txt" ex="false" tool="3" flavor2="0">
       </item>

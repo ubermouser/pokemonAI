@@ -30,6 +30,8 @@ struct PKAISHARED EnvironmentVolatileData
   bool operator!=(const EnvironmentVolatileData& other) const;
 
   static EnvironmentVolatileData create(const EnvironmentNonvolatile& envNV);
+
+  uint64_t generateHash() const;
 };
 
 

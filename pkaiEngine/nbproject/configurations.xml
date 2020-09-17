@@ -42,6 +42,10 @@
         <itemPath>../inc/evaluators.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f4" displayName="planners" projectFiles="true">
+        <logicalFolder name="f1" displayName="planner_minimax" projectFiles="true">
+          <itemPath>../inc/order_heuristic.h</itemPath>
+          <itemPath>../inc/transposition_table.h</itemPath>
+        </logicalFolder>
         <itemPath>../inc/planner.h</itemPath>
         <itemPath>../inc/planner_human.h</itemPath>
         <itemPath>../inc/planner_max.h</itemPath>
@@ -102,6 +106,11 @@
         <itemPath>../src/evaluators.cpp</itemPath>
       </logicalFolder>
       <logicalFolder name="f4" displayName="planners" projectFiles="true">
+        <logicalFolder name="f1" displayName="planner_minimax" projectFiles="true">
+          <itemPath>../src/order_heuristic.cpp</itemPath>
+          <itemPath>../src/planner_minimax.cpp</itemPath>
+          <itemPath>../src/transposition_table.cpp</itemPath>
+        </logicalFolder>
         <itemPath>../src/planner.cpp</itemPath>
         <itemPath>../src/planner_human.cpp</itemPath>
         <itemPath>../src/planner_max.cpp</itemPath>
@@ -230,6 +239,8 @@
       </item>
       <item path="../inc/nonvolatile_volatile.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../inc/order_heuristic.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../inc/orphan.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/pkCU.h" ex="false" tool="3" flavor2="0">
@@ -275,6 +286,8 @@
       <item path="../inc/team_status.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/team_volatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/transposition_table.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/type.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -324,6 +337,8 @@
       </item>
       <item path="../src/nature.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/order_heuristic.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/orphan.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/pkCU.cpp" ex="false" tool="1" flavor2="0">
@@ -335,6 +350,8 @@
       <item path="../src/planner_max.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/planner_maximin.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/planner_minimax.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/planner_random.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -365,6 +382,8 @@
       <item path="../src/tests/test_planner.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/tests/test_pokedex.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/transposition_table.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/type.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -547,6 +566,8 @@
       </item>
       <item path="../inc/nonvolatile_volatile.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../inc/order_heuristic.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../inc/orphan.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/pkCU.h" ex="false" tool="3" flavor2="0">
@@ -592,6 +613,8 @@
       <item path="../inc/team_status.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/team_volatile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/transposition_table.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/type.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -641,6 +664,8 @@
       </item>
       <item path="../src/nature.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/order_heuristic.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/orphan.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/pkCU.cpp" ex="false" tool="1" flavor2="0">
@@ -652,6 +677,8 @@
       <item path="../src/planner_max.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/planner_maximin.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/planner_minimax.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/planner_random.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -682,6 +709,8 @@
       <item path="../src/tests/test_planner.cpp" ex="false" tool="0" flavor2="0">
       </item>
       <item path="../src/tests/test_pokedex.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/transposition_table.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/type.cpp" ex="false" tool="1" flavor2="0">
       </item>

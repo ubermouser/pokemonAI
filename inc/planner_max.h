@@ -24,7 +24,7 @@ public:
   virtual size_t maxImplDepth() const override { return MAXTRIES; }
 
   virtual PlyResult generateSolutionAtDepth(
-      const ConstEnvironmentVolatile& origin, size_t maxPly) const override;
+      const ConstEnvironmentPossible& origin, size_t maxPly) const override;
 };
 
 #endif /* PLANNER_MAX_H */

@@ -55,12 +55,14 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/511e4115/move_volatile.o \
 	${OBJECTDIR}/_ext/511e4115/name.o \
 	${OBJECTDIR}/_ext/511e4115/nature.o \
+	${OBJECTDIR}/_ext/511e4115/order_heuristic.o \
 	${OBJECTDIR}/_ext/511e4115/orphan.o \
 	${OBJECTDIR}/_ext/511e4115/pkCU.o \
 	${OBJECTDIR}/_ext/511e4115/planner.o \
 	${OBJECTDIR}/_ext/511e4115/planner_human.o \
 	${OBJECTDIR}/_ext/511e4115/planner_max.o \
 	${OBJECTDIR}/_ext/511e4115/planner_maximin.o \
+	${OBJECTDIR}/_ext/511e4115/planner_minimax.o \
 	${OBJECTDIR}/_ext/511e4115/planner_random.o \
 	${OBJECTDIR}/_ext/511e4115/planners.o \
 	${OBJECTDIR}/_ext/511e4115/pluggable.o \
@@ -72,6 +74,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/511e4115/signature.o \
 	${OBJECTDIR}/_ext/511e4115/team_nonvolatile.o \
 	${OBJECTDIR}/_ext/511e4115/team_volatile.o \
+	${OBJECTDIR}/_ext/511e4115/transposition_table.o \
 	${OBJECTDIR}/_ext/511e4115/type.o
 
 # Test Directory
@@ -217,6 +220,11 @@ ${OBJECTDIR}/_ext/511e4115/nature.o: ../src/nature.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/nature.o ../src/nature.cpp
 
+${OBJECTDIR}/_ext/511e4115/order_heuristic.o: ../src/order_heuristic.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/order_heuristic.o ../src/order_heuristic.cpp
+
 ${OBJECTDIR}/_ext/511e4115/orphan.o: ../src/orphan.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
@@ -246,6 +254,11 @@ ${OBJECTDIR}/_ext/511e4115/planner_maximin.o: ../src/planner_maximin.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planner_maximin.o ../src/planner_maximin.cpp
+
+${OBJECTDIR}/_ext/511e4115/planner_minimax.o: ../src/planner_minimax.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planner_minimax.o ../src/planner_minimax.cpp
 
 ${OBJECTDIR}/_ext/511e4115/planner_random.o: ../src/planner_random.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
@@ -301,6 +314,11 @@ ${OBJECTDIR}/_ext/511e4115/team_volatile.o: ../src/team_volatile.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/team_volatile.o ../src/team_volatile.cpp
+
+${OBJECTDIR}/_ext/511e4115/transposition_table.o: ../src/transposition_table.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/transposition_table.o ../src/transposition_table.cpp
 
 ${OBJECTDIR}/_ext/511e4115/type.o: ../src/type.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
@@ -615,6 +633,19 @@ ${OBJECTDIR}/_ext/511e4115/nature_nomain.o: ${OBJECTDIR}/_ext/511e4115/nature.o 
 	    ${CP} ${OBJECTDIR}/_ext/511e4115/nature.o ${OBJECTDIR}/_ext/511e4115/nature_nomain.o;\
 	fi
 
+${OBJECTDIR}/_ext/511e4115/order_heuristic_nomain.o: ${OBJECTDIR}/_ext/511e4115/order_heuristic.o ../src/order_heuristic.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/order_heuristic.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/order_heuristic_nomain.o ../src/order_heuristic.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/511e4115/order_heuristic.o ${OBJECTDIR}/_ext/511e4115/order_heuristic_nomain.o;\
+	fi
+
 ${OBJECTDIR}/_ext/511e4115/orphan_nomain.o: ${OBJECTDIR}/_ext/511e4115/orphan.o ../src/orphan.cpp 
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/orphan.o`; \
@@ -691,6 +722,19 @@ ${OBJECTDIR}/_ext/511e4115/planner_maximin_nomain.o: ${OBJECTDIR}/_ext/511e4115/
 	    $(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planner_maximin_nomain.o ../src/planner_maximin.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/_ext/511e4115/planner_maximin.o ${OBJECTDIR}/_ext/511e4115/planner_maximin_nomain.o;\
+	fi
+
+${OBJECTDIR}/_ext/511e4115/planner_minimax_nomain.o: ${OBJECTDIR}/_ext/511e4115/planner_minimax.o ../src/planner_minimax.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/planner_minimax.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/planner_minimax_nomain.o ../src/planner_minimax.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/511e4115/planner_minimax.o ${OBJECTDIR}/_ext/511e4115/planner_minimax_nomain.o;\
 	fi
 
 ${OBJECTDIR}/_ext/511e4115/planner_random_nomain.o: ${OBJECTDIR}/_ext/511e4115/planner_random.o ../src/planner_random.cpp 
@@ -834,6 +878,19 @@ ${OBJECTDIR}/_ext/511e4115/team_volatile_nomain.o: ${OBJECTDIR}/_ext/511e4115/te
 	    $(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/team_volatile_nomain.o ../src/team_volatile.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/_ext/511e4115/team_volatile.o ${OBJECTDIR}/_ext/511e4115/team_volatile_nomain.o;\
+	fi
+
+${OBJECTDIR}/_ext/511e4115/transposition_table_nomain.o: ${OBJECTDIR}/_ext/511e4115/transposition_table.o ../src/transposition_table.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/transposition_table.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DNDEBUG -DPKAI_EXPORT -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/transposition_table_nomain.o ../src/transposition_table.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/511e4115/transposition_table.o ${OBJECTDIR}/_ext/511e4115/transposition_table_nomain.o;\
 	fi
 
 ${OBJECTDIR}/_ext/511e4115/type_nomain.o: ${OBJECTDIR}/_ext/511e4115/type.o ../src/type.cpp 

@@ -199,7 +199,7 @@ PkCUEngine::PkCUEngine(
   stack_.setNonvolatileEnvironment(cu.nv_);
 
   // push-back first stack stage:
-  stack_.push_back(EnvironmentPossibleData::create(initial));
+  stack_.push_back(EnvironmentPossibleData::create(initial, false));
   stackStage_.push_back(STAGE_SEEDED);
   damageComponents_.push_back(DamageComponents_t());
   damageComponents_.back().cProbability = 1.0;

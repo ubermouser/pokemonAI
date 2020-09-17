@@ -86,8 +86,6 @@ struct MoveBracket {
 
 using PluginSet = std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>;
 using PluginSets = std::array< std::array<PluginSet, 6>, 12>;
-using ActionPairVector = std::vector<std::array<Action, 2> >;
-using ActionVector = std::vector<Action>;
 using ValidMoveSet = std::bitset<VALID_MOVE_SIZE>;
 using ValidSwapSet = std::bitset<VALID_SWAP_SIZE>;
 

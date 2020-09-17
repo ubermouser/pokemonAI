@@ -23,8 +23,8 @@ public:
 
   virtual const std::string& getName() const override { return ident; };
 
-  PlyResult generateSolutionAtLeaf(
-    const ConstEnvironmentVolatile& origin) const override;
+  virtual PlyResult generateSolutionAtLeaf(
+    const ConstEnvironmentPossible& origin) const override;
 
 protected:
   Config cfg_;

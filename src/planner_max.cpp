@@ -25,7 +25,7 @@ PlannerMax& PlannerMax::setEngine(const std::shared_ptr<PkCU>& cu) {
 
 
 PlyResult PlannerMax::generateSolutionAtDepth(
-    const ConstEnvironmentVolatile& origin, size_t maxPly) const {
+    const ConstEnvironmentPossible& origin, size_t maxPly) const {
   // a count of the number of nodes evaluated:
   PlyResult result;
 

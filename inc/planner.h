@@ -19,7 +19,6 @@
 
 
 struct PlyResult : public EvalResult {
-  size_t depth = 0;
   size_t numNodes = 0;
   double timeSpent = 0;
 
@@ -107,9 +106,7 @@ public:
 
   /* generate an action */
   virtual PlannerResult generateSolution(const ConstEnvironmentVolatile& origin) const;
-  virtual PlannerResult generateSolution(const ConstEnvironmentPossible& origin) const {
-    return generateSolution(origin.getEnv());
-  }
+  virtual PlannerResult generateSolution(const ConstEnvironmentPossible& origin) const;
 protected:
   Config cfg_;
 
@@ -125,6 +122,9 @@ protected:
   /* team that this agent represents */
   size_t agentTeam_;
 
+  /* team that the other agent represents */
+  size_t otherTeam_;
+
   virtual size_t maxImplDepth() const { return 0; }
   virtual bool isEvaluatorRequired() const { return true; }
 
@@ -133,13 +133,13 @@ protected:
   
   /* generate a prediction at a specific depth */
   virtual PlyResult generateSolutionAtDepth(
-      const ConstEnvironmentVolatile& origin, size_t maxPly) const;
+      const ConstEnvironmentPossible& origin, size_t maxPly) const;
 
-  virtual PlyResult generateSolutionAtLeaf(const ConstEnvironmentVolatile& origin) const;
+  virtual PlyResult generateSolutionAtLeaf(const ConstEnvironmentPossible& origin) const;
 
   /* Recurse through agent and other actions, pruning nodes above high and below low */
   virtual EvalResult recurse_alphabeta(
-      const ConstEnvironmentVolatile& origin,
+      const ConstEnvironmentPossible& origin,
       size_t iDepth,
       const Fitness& lowCutoff = Fitness::worst(),
       const Fitness& highCutoff = Fitness::best(),
@@ -147,7 +147,7 @@ protected:
 
   /* Recurse through chance nodes, pruning nodes above high and below low*/
   virtual Fitness recurse_gamma(
-      const ConstEnvironmentVolatile& origin,
+      const ConstEnvironmentPossible& origin,
       const Action& agentAction,
       const Action& otherAction,
       size_t iDepth,
@@ -157,9 +157,20 @@ protected:
 
   /* generate all possible environments from a given origin, agent and other action pair. */
   virtual PossibleEnvironments generateStates(
-      const ConstEnvironmentVolatile& origin,
+      const ConstEnvironmentPossible& origin,
       const Action& agentAction,
       const Action& otherAction) const;
+
+  virtual ActionVector getValidActions(const ConstEnvironmentPossible& origin, size_t iTeam) const;
+
+  virtual bool testAgentCutoff(
+      EvalResult& bestOfWorst, 
+      const EvalResult& worst,
+      const ConstEnvironmentPossible& origin) const;
+  virtual bool testOtherCutoff(
+      EvalResult& worst, 
+      const EvalResult& current,
+      const ConstEnvironmentPossible& origin) const;
 
   virtual void printSolution(const PlannerResult& result, bool isLast) const;
 };

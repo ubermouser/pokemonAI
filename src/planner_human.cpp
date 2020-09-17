@@ -13,7 +13,7 @@ const std::string PlannerHuman::ident = "HumanPlanner-NULLEVAL";
 
 
 PlyResult PlannerHuman::generateSolutionAtLeaf(
-    const ConstEnvironmentVolatile& origin) const {
+    const ConstEnvironmentPossible& origin) const {
   std::cout << origin;
   printActions(origin);
 

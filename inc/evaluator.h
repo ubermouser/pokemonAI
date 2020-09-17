@@ -15,10 +15,21 @@
 #include "fitness.h"
 
 struct EvalResult {
-  Action agentAction = Action{};
-  Action otherAction = Action{};
-  Fitness fitness = Fitness::worst();
+  Action agentAction;
+  Action otherAction;
+  uint32_t depth;
+  Fitness fitness;
 
+  EvalResult(
+      const Fitness& fitness_ = Fitness::worst(),
+      const Action& agent = Action{},
+      const Action& other = Action{},
+      const size_t depth_ = 0) :
+      agentAction(agent),
+      otherAction(other),
+      depth(depth_),
+      fitness(fitness_) { }
+      
   bool operator < (const EvalResult& other) const { return fitness < other.fitness; }
   bool operator > (const EvalResult& other) const { return fitness > other.fitness; }
 };

@@ -36,6 +36,8 @@ po::options_description Planner::Config::options(const std::string& category, st
 
 Planner& Planner::initialize() {
   if (agentTeam_ >= 2) { throw std::invalid_argument("planner agentTeam undefined"); }
+  otherTeam_ = (agentTeam_ + 1) % 2;
+  
   if (nv_ == NULL) { throw std::invalid_argument("planner nonvolatile environment undefined"); }
   if (cu_ == NULL) { throw std::invalid_argument("planner engine undefined"); }
   if (eval_ == NULL && isEvaluatorRequired()) { throw std::invalid_argument("planner evaluator undefined"); }
@@ -86,6 +88,12 @@ void Planner::resetName() {
 
 
 PlannerResult Planner::generateSolution(const ConstEnvironmentVolatile& origin) const {
+  auto data = EnvironmentPossibleData::create(origin.data());
+  return generateSolution(ConstEnvironmentPossible{origin.nv(), data});
+}
+
+
+PlannerResult Planner::generateSolution(const ConstEnvironmentPossible& origin) const {
   PlannerResult result; result.atDepth.reserve(cfg_.maxDepth);
   // keep an elapsed time counter
   auto start = std::chrono::steady_clock::now();
@@ -118,12 +126,12 @@ PlannerResult Planner::generateSolution(const ConstEnvironmentVolatile& origin) 
 
 
 PlyResult Planner::generateSolutionAtDepth(
-    const ConstEnvironmentVolatile& origin, size_t maxDepth) const {
+    const ConstEnvironmentPossible& origin, size_t maxDepth) const {
   throw std::logic_error("not implemented");
 }
 
 
-PlyResult Planner::generateSolutionAtLeaf(const ConstEnvironmentVolatile& origin) const {
+PlyResult Planner::generateSolutionAtLeaf(const ConstEnvironmentPossible& origin) const {
   assert(eval_ != NULL);
 
   PlyResult result = eval_->calculateFitness(origin, agentTeam_);
@@ -134,7 +142,7 @@ PlyResult Planner::generateSolutionAtLeaf(const ConstEnvironmentVolatile& origin
 
 
 PossibleEnvironments Planner::generateStates(
-    const ConstEnvironmentVolatile& origin,
+    const ConstEnvironmentPossible& origin,
     const Action& agentAction,
     const Action& otherAction) const {
   // produce the resulting state of iAction:
@@ -146,21 +154,53 @@ PossibleEnvironments Planner::generateStates(
 }
 
 
+ActionVector Planner::getValidActions(
+    const ConstEnvironmentPossible& origin,
+    size_t iTeam) const {
+  return cu_->getValidActions(origin, iTeam);
+}
+
+
+bool Planner::testAgentCutoff(
+    EvalResult& bestOfWorst,
+    const EvalResult& worst,
+    const ConstEnvironmentPossible& origin) const {
+  // TODO(@drendleman) in the case of a tie, the agent should always bias towards a damaging action
+  if (worst > bestOfWorst) {
+    bestOfWorst = worst;
+    return true;
+  }
+  return false;
+}
+
+
+bool Planner::testOtherCutoff(
+    EvalResult& worst,
+    const EvalResult& current,
+    const ConstEnvironmentPossible& origin) const {
+  if (current < worst) {
+    worst = current;
+    return true;
+  }
+  return false;
+}
+
+
 EvalResult Planner::recurse_alphabeta(
-      const ConstEnvironmentVolatile& origin,
+      const ConstEnvironmentPossible& origin,
       size_t iDepth,
       const Fitness& lowCutoff,
       const Fitness& highCutoff,
       size_t* nodesEvaluated) const {
   // the best agent move fitness:
-  EvalResult bestOfWorst{Action{}, Action{}, lowCutoff};
+  EvalResult bestOfWorst{lowCutoff};
 
   // TODO(@drendleman) - evaluate these in accordance to butterfly heuristic:
   // for every possible move by both agent team and other team:
-  for (const auto& agentAction: cu_->getValidActions(origin, agentTeam_)) {
-    EvalResult worst{Action{}, Action{}, highCutoff};
+  for (const auto& agentAction: getValidActions(origin, agentTeam_)) {
+    EvalResult worst{highCutoff};
     // the worst possible other team choice is the one which causes the agent to decide to use it:
-    for (const auto& otherAction: cu_->getValidActions(origin, (agentTeam_+1)%2)) {
+    for (const auto& otherAction: getValidActions(origin, otherTeam_)) {
       // evaluate what probabilistically will occur if agent and other teams perform action at state:
       Fitness fitness = recurse_gamma(
           origin,
@@ -170,16 +210,13 @@ EvalResult Planner::recurse_alphabeta(
           bestOfWorst.fitness,
           worst.fitness,
           nodesEvaluated);
+      // TODO(@drendleman) mark that the node is fully evaluated
       // has the other agent improved upon its best score by reducing our score more?
-      if (fitness < worst.fitness) {
-        worst = EvalResult{agentAction, otherAction, fitness};
-      }
+      testOtherCutoff(worst, EvalResult{fitness, agentAction, otherAction, iDepth}, origin);
     }
-    // TODO(@drendleman) in the case of a tie, the agent should always bias towards a damaging action
+    
     // is the min of all other agent moves better than the best of our current moves?
-    if (worst > bestOfWorst) {
-      bestOfWorst = worst;
-    }
+    testAgentCutoff(bestOfWorst, worst, origin);
   }
 
   return bestOfWorst;
@@ -187,7 +224,7 @@ EvalResult Planner::recurse_alphabeta(
 
 
 Fitness Planner::recurse_gamma(
-      const ConstEnvironmentVolatile& origin,
+      const ConstEnvironmentPossible& origin,
       const Action& agentAction,
       const Action& otherAction,
       size_t iDepth,
@@ -231,6 +268,7 @@ Fitness Planner::recurse_gamma(
     if (fitness > highCutoff) { break; }
   }
 
+  // TODO(@drendleman) - propagate that the node is fully evaluated 
   if (nodesEvaluated != NULL) { *nodesEvaluated += numNodes; }
   return fitness;
 }

@@ -17,7 +17,7 @@ public:
   virtual bool isEvaluatorRequired() const override { return false; }
 
   virtual PlyResult generateSolutionAtLeaf(
-      const ConstEnvironmentVolatile& origin) const override;
+      const ConstEnvironmentPossible& origin) const override;
 protected:
   static const std::string ident;
 

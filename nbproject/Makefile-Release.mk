@@ -35,7 +35,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/src/agentMove.o \
 	${OBJECTDIR}/src/backpropNet.o \
 	${OBJECTDIR}/src/evaluator_featureVector.o \
 	${OBJECTDIR}/src/evaluator_network128.o \
@@ -45,14 +44,9 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/experienceNet.o \
 	${OBJECTDIR}/src/main.o \
 	${OBJECTDIR}/src/neuralNet.o \
-	${OBJECTDIR}/src/orderHeuristic.o \
-	${OBJECTDIR}/src/otherMove.o \
 	${OBJECTDIR}/src/pkIO.o \
 	${OBJECTDIR}/src/planner_directed.o \
-	${OBJECTDIR}/src/planner_minimax.o \
-	${OBJECTDIR}/src/planner_minimax_thread.o \
 	${OBJECTDIR}/src/planner_stochastic.o \
-	${OBJECTDIR}/src/ply.o \
 	${OBJECTDIR}/src/pokemonAI.o \
 	${OBJECTDIR}/src/ranked.o \
 	${OBJECTDIR}/src/ranked_evaluator.o \
@@ -61,9 +55,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/temporalpropNet.o \
 	${OBJECTDIR}/src/trainer.o \
 	${OBJECTDIR}/src/trainer_io.o \
-	${OBJECTDIR}/src/transposition_table.o \
-	${OBJECTDIR}/src/trueSkill.o \
-	${OBJECTDIR}/src/vertex.o
+	${OBJECTDIR}/src/trueSkill.o
 
 
 # C Compiler Flags
@@ -91,11 +83,6 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/pokemonai: pkaiEngine/dist/Release/GN
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/pokemonai: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/pokemonai ${OBJECTFILES} ${LDLIBSOPTIONS} -Wl,--export-dynamic
-
-${OBJECTDIR}/src/agentMove.o: src/agentMove.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/agentMove.o src/agentMove.cpp
 
 ${OBJECTDIR}/src/backpropNet.o: src/backpropNet.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -142,16 +129,6 @@ ${OBJECTDIR}/src/neuralNet.o: src/neuralNet.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/neuralNet.o src/neuralNet.cpp
 
-${OBJECTDIR}/src/orderHeuristic.o: src/orderHeuristic.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/orderHeuristic.o src/orderHeuristic.cpp
-
-${OBJECTDIR}/src/otherMove.o: src/otherMove.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/otherMove.o src/otherMove.cpp
-
 ${OBJECTDIR}/src/pkIO.o: src/pkIO.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
@@ -162,25 +139,10 @@ ${OBJECTDIR}/src/planner_directed.o: src/planner_directed.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/planner_directed.o src/planner_directed.cpp
 
-${OBJECTDIR}/src/planner_minimax.o: src/planner_minimax.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/planner_minimax.o src/planner_minimax.cpp
-
-${OBJECTDIR}/src/planner_minimax_thread.o: src/planner_minimax_thread.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/planner_minimax_thread.o src/planner_minimax_thread.cpp
-
 ${OBJECTDIR}/src/planner_stochastic.o: src/planner_stochastic.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/planner_stochastic.o src/planner_stochastic.cpp
-
-${OBJECTDIR}/src/ply.o: src/ply.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/ply.o src/ply.cpp
 
 ${OBJECTDIR}/src/pokemonAI.o: src/pokemonAI.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -222,20 +184,10 @@ ${OBJECTDIR}/src/trainer_io.o: src/trainer_io.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/trainer_io.o src/trainer_io.cpp
 
-${OBJECTDIR}/src/transposition_table.o: src/transposition_table.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/transposition_table.o src/transposition_table.cpp
-
 ${OBJECTDIR}/src/trueSkill.o: src/trueSkill.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/trueSkill.o src/trueSkill.cpp
-
-${OBJECTDIR}/src/vertex.o: src/vertex.cpp
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/vertex.o src/vertex.cpp
 
 # Subprojects
 .build-subprojects:

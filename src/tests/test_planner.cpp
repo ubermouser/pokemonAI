@@ -156,3 +156,4 @@ TEST_F(PlannerTest, HumanPlannerActionReader) {
 
 
 // TODO(@drendleman) - test that planner ;chooses a guaranteed winning move in the shortest depth
+// TODO(@drendleman) - test that minimax planner does the same things that maximin planner does

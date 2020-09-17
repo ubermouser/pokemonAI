@@ -17,7 +17,7 @@ const std::string PlannerRandom::ident = "Random_Planner-NULLEVAL";
 
 
 PlyResult PlannerRandom::generateSolutionAtLeaf(
-    const ConstEnvironmentVolatile& origin) const {
+    const ConstEnvironmentPossible& origin) const {
   PlyResult result;
   // determine if we want to perform moves only:
   bool doMove = (cfg_.moveChance*RAND_MAX) <= (rand() % RAND_MAX);

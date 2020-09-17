@@ -70,5 +70,5 @@ EvalResult EvaluatorMonteCarlo::calculateFitness(const ConstEnvironmentVolatile&
   HeatResult result = game_->rollout(env);
   fpType fitness = result.teams[iTeam].lastSimpleFitness;
 
-  return EvalResult{Action{}, Action{}, Fitness{fitness}};
+  return EvalResult{Fitness{fitness}};
 }
