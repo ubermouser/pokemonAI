@@ -71,6 +71,8 @@ public:
   bool operator <=(const fitness_t& rhs) const { return upperBound() <= rhs.lowerBound(); }
   bool operator >(const fitness_t& rhs) const { return lowerBound() > rhs.upperBound(); }
   bool operator >=(const fitness_t& rhs) const { return lowerBound() >= rhs.upperBound(); }
+  bool operator ==(const fitness_t& rhs) const { return mostlyEQ(lowerBound(), rhs.upperBound()); }
+  bool operator !=(const fitness_t& rhs) const { return !(*this == rhs); }
 
   bool fullyEvaluated() const {
     return mostlyEQ(certainty(), one());

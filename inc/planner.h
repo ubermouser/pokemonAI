@@ -146,7 +146,7 @@ protected:
       size_t* nodesEvaluated=NULL) const;
 
   /* Recurse through chance nodes, pruning nodes above high and below low*/
-  virtual Fitness recurse_gamma(
+  virtual FitnessDepth recurse_gamma(
       const ConstEnvironmentPossible& origin,
       const Action& agentAction,
       const Action& otherAction,

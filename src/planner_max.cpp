@@ -31,16 +31,16 @@ PlyResult PlannerMax::generateSolutionAtDepth(
 
   // determine the best action based upon the evaluator's prediction:
   for (const auto& action: cu_->getValidActions(origin, agentTeam_)) {
-    Fitness currentFitness = recurse_gamma(
+    FitnessDepth child = recurse_gamma(
         origin, action, Action::wait(), maxPly - 1, result.fitness, Fitness::best(), &result.numNodes);
 
     // is the returned fitness better than the current best fitness:
-    if (currentFitness > result.fitness) {
-      result.fitness = currentFitness;
+    if (child > result) {
+      result.fitness = child.fitness;
+      result.depth = child.depth;
       result.agentAction = action;
     }
   }
 
-  result.depth = maxPly;
   return result;
 };

@@ -202,7 +202,7 @@ EvalResult Planner::recurse_alphabeta(
     // the worst possible other team choice is the one which causes the agent to decide to use it:
     for (const auto& otherAction: getValidActions(origin, otherTeam_)) {
       // evaluate what probabilistically will occur if agent and other teams perform action at state:
-      Fitness fitness = recurse_gamma(
+      FitnessDepth child = recurse_gamma(
           origin,
           agentAction,
           otherAction,
@@ -212,7 +212,8 @@ EvalResult Planner::recurse_alphabeta(
           nodesEvaluated);
       // TODO(@drendleman) mark that the node is fully evaluated
       // has the other agent improved upon its best score by reducing our score more?
-      testOtherCutoff(worst, EvalResult{fitness, agentAction, otherAction, iDepth}, origin);
+      testOtherCutoff(
+          worst, EvalResult{child.fitness, agentAction, otherAction, child.depth + 1}, origin);
     }
     
     // is the min of all other agent moves better than the best of our current moves?
@@ -223,7 +224,7 @@ EvalResult Planner::recurse_alphabeta(
 }
 
 
-Fitness Planner::recurse_gamma(
+FitnessDepth Planner::recurse_gamma(
       const ConstEnvironmentPossible& origin,
       const Action& agentAction,
       const Action& otherAction,
@@ -233,7 +234,7 @@ Fitness Planner::recurse_gamma(
       size_t* nodesEvaluated) const {
   size_t numNodes = 0;
   // average fitness of all states combined:
-  Fitness fitness{0., 0.};
+  FitnessDepth result{Fitness{0., 0.}, MAXTRIES};
   auto rEnvP = generateStates(origin, agentAction, otherAction);
 
   // TODO(@drendleman) - evaluate these in order of greatest probability to least
@@ -241,16 +242,18 @@ Fitness Planner::recurse_gamma(
     // the likelihood that this state occurs:
     fpType stateProbability = cEnvP.getProbability().to_double();
     // this individual state's fitness:
-    EvalResult deeperEval;
+    EvalResult child;
 
     // if this is either a terminal node or if we are at terminal depth:
-    if (cu_->isGameOver(cEnvP) || iDepth == 0) {
+    bool isGameOver = cu_->isGameOver(cEnvP);
+    if (isGameOver || iDepth == 0) {
       // evaluate as a leaf node:
-      deeperEval = eval_->calculateFitness(cEnvP, agentTeam_);
+      child = eval_->calculateFitness(cEnvP, agentTeam_);
+      child.depth = (isGameOver)?MAXTRIES:child.depth; // TODO(@drendleman) - move into eval
       ++numNodes;
     } else { // else, recurse to a deeper level:
       // recurse into another depth, widening the cutoffs by the probability of the move:
-      deeperEval = recurse_alphabeta(
+      child = recurse_alphabeta(
           cEnvP,
           iDepth,
           lowCutoff.expand(stateProbability),
@@ -260,17 +263,18 @@ Fitness Planner::recurse_gamma(
 
     // reduce the certainty of the deeper fitness result by state's occurrence probability, and
     //  accumulate:
-    fitness += deeperEval.fitness.expand(stateProbability);
+    result.fitness += child.fitness.expand(stateProbability);
+    result.depth = std::min(result.depth, child.depth);
 
+    // TODO(@drendleman) cutoff when solution has been found at a shallower depth
     // if there's no possibility this action is the best for the agent, do not continue:
-    if (fitness < lowCutoff) { break; }
+    if (result.fitness < lowCutoff) { break; }
     // if the other team would never choose this move against the agent, do not continue:
-    if (fitness > highCutoff) { break; }
+    if (result.fitness > highCutoff) { break; }
   }
 
-  // TODO(@drendleman) - propagate that the node is fully evaluated 
   if (nodesEvaluated != NULL) { *nodesEvaluated += numNodes; }
-  return fitness;
+  return result;
 }
 
 

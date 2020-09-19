@@ -55,7 +55,7 @@ typedef fixedpoint::fixed_point<30> fixType;
 #define MAXSEARCHDEPTH 31
 #define MAXBESTOF 10001
 #define MAXPLIES 1560
-#define MAXTRIES 50
+#define MAXTRIES 50U
 #define MAXLEAGUEPOPULATION 50000
 #define MAXNETWORKPOPULATION 10000
 #define MAXGENERATIONS 9999
