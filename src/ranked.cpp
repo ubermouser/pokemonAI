@@ -3,14 +3,14 @@
 
 #include <boost/foreach.hpp>
 
-#include "../inc/trueSkill.h"
+#include "../inc/true_skill.h"
 #include "../inc/game.h"
 #include "../inc/init_toolbox.h"
 
-const std::string ranked::header = "PKART0";
-const uint64_t ranked::defaultHash = UINT64_MAX;
+const std::string Ranked::header = "PKART0";
+const uint64_t Ranked::defaultHash = UINT64_MAX;
 
-ranked::ranked(size_t _generation, const trueSkillSettings& settings)
+Ranked::Ranked(size_t _generation, const trueSkillSettings& settings)
   : skill(settings),
   generation(_generation),
   numWins(0),
@@ -22,13 +22,13 @@ ranked::ranked(size_t _generation, const trueSkillSettings& settings)
 {
 };
 
-const std::string& ranked::getName() const
+const std::string& Ranked::getName() const
 {
   static const std::string unnamed("-UNNAMED RANKED OBJ-");
   return unnamed;
 };
 
-size_t ranked::update(const Game& cGame, const trueSkillTeam& cTeam, size_t iTeam)
+size_t Ranked::update(const Game& cGame, const TrueSkillTeam& cTeam, size_t iTeam)
 {
   BOOST_FOREACH(const GameResult& cGameResult, cGame.getGameResults())
   {
@@ -60,7 +60,7 @@ size_t ranked::update(const Game& cGame, const trueSkillTeam& cTeam, size_t iTea
   return cGame.getGameResults().size();
 } // endOf update
 
-std::ostream& operator <<(std::ostream& os, const ranked& tR)
+std::ostream& operator <<(std::ostream& os, const Ranked& tR)
 {
   size_t prevPrecision = os.precision();
   os.precision(6);
@@ -75,7 +75,7 @@ std::ostream& operator <<(std::ostream& os, const ranked& tR)
   return os;
 }
 
-void ranked::output(std::ostream& oFile, bool printHeader) const
+void Ranked::output(std::ostream& oFile, bool printHeader) const
 {
   // header:
   if (printHeader)
@@ -100,7 +100,7 @@ void ranked::output(std::ostream& oFile, bool printHeader) const
   skill.output(oFile);
 };
 
-bool ranked::input(const std::vector<std::string>& lines, size_t& iLine)
+bool Ranked::input(const std::vector<std::string>& lines, size_t& iLine)
 {
   // are the enough lines in the input stream:
   if ((lines.size() - iLine) < 1U)

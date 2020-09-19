@@ -3,31 +3,32 @@
 
 #include "../inc/pkai.h"
 
+#include <memory>
+
 #include "../inc/ranked.h"
 
 class Evaluator;
 
-class ranked_evaluator : public ranked
-{
-private:
-  Evaluator* eval;
+class RankedEvaluator : public Ranked {
+protected:
+  std::shared_ptr<Evaluator> eval;
 public:
-  ranked_evaluator(
+  RankedEvaluator(
     const Evaluator& _eval,
     size_t generation = 0, 
     const trueSkillSettings& settings = trueSkillSettings::defaultSettings);
 
-  ranked_evaluator(const ranked_evaluator& other);
+  RankedEvaluator(const RankedEvaluator& other);
 
-  ~ranked_evaluator();
+  ~RankedEvaluator();
 
   const std::string& getName() const;
 
   const Evaluator& getEvaluator() const { return *eval; };
 
-  friend std::ostream& operator <<(std::ostream& os, const ranked_evaluator& tR);
+  friend std::ostream& operator <<(std::ostream& os, const RankedEvaluator& tR);
 };
 
-std::ostream& operator <<(std::ostream& os, const ranked_evaluator& tR);
+std::ostream& operator <<(std::ostream& os, const RankedEvaluator& tR);
 
 #endif /* RANKED_EVALUATOR_H */

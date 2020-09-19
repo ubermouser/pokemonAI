@@ -333,7 +333,7 @@ bool PkIO::inputPlayerNetwork(const boost::filesystem::path& path, neuralNet& cR
 
 
 
-bool PkIO::inputRankedTeam(const boost::filesystem::path& path, ranked_team& cTeam)
+bool PkIO::inputRankedTeam(const boost::filesystem::path& path, RankedTeam& cTeam)
 {
   std::vector<std::string> lines;
   {
@@ -382,7 +382,7 @@ bool PkIO::inputPlayerTeam(const boost::filesystem::path& path, TeamNonVolatile&
   // this is the wrong team object type, but we can still load it:
   if (lines.at(iLine).compare(0, 5, "PKAIR") == 0)
   {
-    ranked_team cTeam;
+    RankedTeam cTeam;
     // input actual team:
     if (!cTeam.input(lines, iLine)) { return false; }
     cResult = cTeam.team;

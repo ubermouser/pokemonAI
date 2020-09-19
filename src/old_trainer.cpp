@@ -1,4 +1,4 @@
-#include "../inc/trainer.h"
+#include "../inc/old_trainer.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -7,19 +7,13 @@
 
 #include <boost/timer.hpp>
 #include <boost/foreach.hpp>
-#include <boost/scoped_ptr.hpp>
 
-#include "../inc/pokedex.h"
 #include "../inc/game.h"
 
 #include "../inc/pokemon_nonvolatile.h"
 #include "../inc/team_nonvolatile.h"
 
-#include "../inc/planner_max.h"
-#include "../inc/planner_stochastic.h"
-#include "../inc/planner_directed.h"
-
-#include "../inc/evaluator_featureVector.h"
+#include "../inc/planner.h"
 
 #include "../inc/genetic.h"
 #include "../inc/fp_compare.h"
@@ -31,54 +25,7 @@ size_t findInData(const std::vector<dataType>& data, uint64_t hash);
 template<class data_t>
 void shrinkDataPopulation(std::vector<data_t>& data, size_t targetSize);
 
-Trainer::Trainer(
-  uint32_t _gameType, 
-  size_t _maxPlies, 
-  size_t _maxMatches, 
-  size_t _gameAccuracy,
-  size_t _engineAccuracy,
-  const trueSkillSettings& _tSettings,
-  const experienceNetSettings& _expSettings,
-  size_t _maxGenerations,
-  fpType _workTime,
-  fpType _mutationProbability,
-  fpType _crossoverProbability,
-  fpType _seedProbability,
-  bool _enforceSameLeague,
-  fpType _exploration,
-  fpType _temperature,
-  size_t _networkPopulations,
-  const networkSettings_t& _netSettings,
-  const std::vector<size_t>& _networkLayerSize,
-  const std::array<size_t, 6>& _teamPopulations,
-  fpType _seedNetworkProbability,
-  size_t _jitterEpoch,
-  size_t _numRollouts,
-  size_t _writeoutInterval,
-  const std::string& _teamPath,
-  const std::string& _networkPath)
-  : gameType(_gameType),
-  tSettings(_tSettings),
-  netSettings(_netSettings),
-  expSettings(_expSettings),
-  maxGenerations(_maxGenerations),
-  teamPath(_teamPath),
-  networkPath(_networkPath),
-  writeOutEvery(_writeoutInterval),
-  minimumWorkTime(_workTime),
-  mutationProbability(_mutationProbability),
-  crossoverProbability(_crossoverProbability),
-  seedProbability(_seedProbability),
-  seedNetworkProbability(_seedNetworkProbability),
-  jitterEpoch(_jitterEpoch),
-  numRollouts(_numRollouts),
-  plannerAccuracy(_engineAccuracy),
-  plannerExploration(_exploration),
-  plannerTemperature(_temperature),
-  teamPopulationSize(_teamPopulations),
-  networkPopulationSize(_networkPopulations),
-  networkLayerSize(_networkLayerSize),
-  enforceSameLeague(_enforceSameLeague),
+Trainer::Trainer(const Config& cfg) :
   generationsCompleted(0),
   heatsCompleted(),
   leagues(),
@@ -91,25 +38,6 @@ Trainer::Trainer(
   ranked_neuralNet::initStatic(numRollouts);
   heatsCompleted.fill(0);
 };
-
-
-
-
-
-Trainer::~Trainer()
-{
-#ifdef _DISABLETEMPORALDIFFERENCE
-  if (ranked_neuralNet::rolloutGame != NULL) { delete ranked_neuralNet::rolloutGame; ranked_neuralNet::rolloutGame = NULL; }
-#endif
-
-  ranked_neuralNet::uninitStatic();
-
-  if (cGame != NULL) { delete cGame; }
-
-  if (trialTeam != NULL) { delete trialTeam; }
-
-  if (trialNet != NULL) { delete trialNet; } 
-}
 
 
 
@@ -135,37 +63,13 @@ void Trainer::setGauntletTeam(const TeamNonVolatile& cTeam)
   }
 
   if (trialTeam != NULL) { delete trialTeam; }
-  trialTeam = new ranked_team(cTeam, 0, tSettings);
+  trialTeam = new RankedTeam(cTeam, 0, tSettings);
   trialTeam->generateHash();
-}
-
-void Trainer::setGauntletNetwork(const neuralNet& cNet)
-{
-  bool gauntletModeSet = false;
-  if (gameType == GT_OTHER_GAUNTLET_TEAM) 
-  {
-    gauntletModeSet = true;
-    gameType = GT_OTHER_GAUNTLET_BOTH;
-  }
-  else if (gameType < GT_OTHER_GAUNTLET_TEAM)
-  {
-    gauntletModeSet = true;
-    gameType = GT_OTHER_GAUNTLET_NET;
-  }
-  if (verbose >= 6 && gauntletModeSet)
-  {
-    std::cerr << "INF " << __FILE__ << "." << __LINE__ << 
-      ": A gauntlet network was defined, but gauntlet mode was not selected. Auto-selecting gauntlet mode...\n";
-  }
-
-  if (trialNet != NULL) { delete trialNet; }
-  trialNet = new ranked_neuralNet(cNet, 0, netSettings, expSettings, tSettings);
-  trialNet->generateHash();
 }
 
 bool Trainer::seedTeam(const TeamNonVolatile& cTeam)
 {
-  ranked_team cRankTeam(cTeam, 0, tSettings);
+  RankedTeam cRankTeam(cTeam, 0, tSettings);
   cRankTeam.generateHash();
   if (isInPopulation(cRankTeam))
   {
@@ -180,34 +84,9 @@ bool Trainer::seedTeam(const TeamNonVolatile& cTeam)
   return true;
 }
 
-bool Trainer::seedNetwork(const neuralNet& cNet)
-{
-  if (ranked_neuralNet::getEvaluator(cNet.numInputs(), cNet.numOutputs()) == NULL)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": No loaded evaluators exist for given network topology!\n";
-    return false;
-  }
-
-  ranked_neuralNet cRankNet(cNet, 0, netSettings, expSettings, tSettings);
-  cRankNet.generateHash();
-
-  if (isInNetworks(cRankNet))
-  {
-    if (verbose >= 5)
-    {
-      std::cerr << "WAR " << __FILE__ << "." << __LINE__ << 
-        ": Duplicate network \"" << cNet.getName() << "\" was seeded, ignoring...\n";
-    }
-    return false; 
-  }
-  networks.push_back(cRankNet);
-  return true;
-}
-
 bool Trainer::seedEvaluator(const Evaluator& eval)
 {
-  evaluators.push_back(ranked_evaluator(eval, 0, tSettings));
+  evaluators.push_back(RankedEvaluator(eval, 0, tSettings));
   return true;
 }
 
@@ -215,16 +94,7 @@ bool Trainer::seedEvaluator(const Evaluator& eval)
 
 
 
-bool Trainer::initialize()
-{
-  // make sure networks are correctly sized:
-  if (networkLayerSize.size() < 2 || evaluator_featureVector::getEvaluator(networkLayerSize.front(), networkLayerSize.back()) == NULL)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": No loaded evaluators exist for given network topology!\n";
-
-    return false;
-  }
+bool Trainer::initialize() {
 
   // no writeouts if there's no path to save a file
   if (teamPath.empty() && networkPath.empty() && writeOutEvery > 0) 
@@ -243,7 +113,7 @@ bool Trainer::initialize()
 
     for (size_t iLeague = 0; iLeague != leagues.size(); ++iLeague)
     {
-      std::vector<ranked_team>& cLeague = leagues[iLeague];
+      std::vector<RankedTeam>& cLeague = leagues[iLeague];
       size_t& leagueTargetSize = teamPopulationSize[iLeague];
 
       // don't bother operating on leagues which don't need it
@@ -258,21 +128,6 @@ bool Trainer::initialize()
       // cull population with stored fitness values
       // TODO: should some assurance be made that the fitness values stored are relateable to eachother? A unique trainer tag?
       shrinkTeamPopulation(iLeague, leagueTargetSize);
-    }
-  }
-
-  if (!networkPath.empty())
-  {
-    if (!loadNetworkPopulation()) { return false; }
-
-    if ((networks.size() > 0) && (networks.size() >= networkPopulationSize) && (networkPopulationSize != 0))
-    {
-      // sort network for pruning:
-      std::sort(networks.begin(), networks.end());
-
-      // shrink its population to target:
-      shrinkNetworkPopulation(networkPopulationSize);
-
     }
   }
 
@@ -356,7 +211,7 @@ void Trainer::evolve()
       return;
     }
 
-    std::vector<ranked_team>& cLeague = leagues[iLeague];
+    std::vector<RankedTeam>& cLeague = leagues[iLeague];
     size_t& leagueTargetSize = teamPopulationSize[iLeague];
 
     // if we are to write our data out to disk this generation:
@@ -414,8 +269,8 @@ void Trainer::evolve()
     boost::timer checkpointTimer;
     while(mostlyLT(workTimer.elapsed(),minimumWorkTime) && (numFailedMatches < MAXTRIES))
     {
-      ranked_team* teamA = NULL;
-      ranked* rankedA = NULL;
+      RankedTeam* teamA = NULL;
+      Ranked* rankedA = NULL;
       // determine team_A based on criteria:
       switch(gameType)
       {
@@ -426,7 +281,7 @@ void Trainer::evolve()
       default:
         // find via roulette a team that needs to be ranked better:
         {
-          size_t iTeamA = roulette<ranked_team, sortByVariability>::select(cLeague, sortByVariability());
+          size_t iTeamA = roulette<RankedTeam, sortByVariability>::select(cLeague, sortByVariability());
           if (iTeamA == SIZE_MAX) { break; } // unable to find team by variability!?
           // the "challenger", highest variability team needing a match:
           teamA = &cLeague[iTeamA];
@@ -460,8 +315,8 @@ void Trainer::evolve()
         }
       }
 
-      std::array<trueSkillTeam, 2> tsTeams;
-      tsTeams[TEAM_A] = trueSkillTeam(*teamA, *rankedA);
+      std::array<TrueSkillTeam, 2> tsTeams;
+      tsTeams[TEAM_A] = TrueSkillTeam(*teamA, *rankedA);
 
       // find via roulette a team and network that would be a good match for this team:
       
@@ -471,12 +326,12 @@ void Trainer::evolve()
       if (tsTeams[TEAM_B].baseEvaluator == NULL || tsTeams[TEAM_B].baseTeam == NULL) { numFailedMatches++; continue; }
 
       // save match quality for later:
-      fpType cMatchQuality = trueSkill::matchQuality(tsTeams[TEAM_A], tsTeams[TEAM_B], tSettings);
+      fpType cMatchQuality = TrueSkill::matchQuality(tsTeams[TEAM_A], tsTeams[TEAM_B], tSettings);
 
       // initialize game with these two teams:
       cGame->setTeam(TEAM_A, tsTeams[TEAM_A].baseTeam->team);
       cGame->setTeam(TEAM_B, tsTeams[TEAM_B].baseTeam->team);
-      std::array<ranked_evaluator*, 2> evals = {{ dynamic_cast<ranked_evaluator*>(tsTeams[TEAM_A].baseEvaluator) , dynamic_cast<ranked_evaluator*>(tsTeams[TEAM_B].baseEvaluator) }};
+      std::array<RankedEvaluator*, 2> evals = {{ dynamic_cast<RankedEvaluator*>(tsTeams[TEAM_A].baseEvaluator) , dynamic_cast<RankedEvaluator*>(tsTeams[TEAM_B].baseEvaluator) }};
       std::array<ranked_neuralNet*, 2> nets = {{ dynamic_cast<ranked_neuralNet*>(tsTeams[TEAM_A].baseEvaluator) , dynamic_cast<ranked_neuralNet*>(tsTeams[TEAM_B].baseEvaluator) }};
       bool successful = true;
       for (size_t iTeam = 0; iTeam != 2; ++iTeam)
@@ -536,7 +391,7 @@ void Trainer::evolve()
       // update weights:
       BOOST_FOREACH(const GameResult& cGameResult, cGame->getGameResults())
       {
-        trueSkill::update( tsTeams[TEAM_A], tsTeams[TEAM_B], cGameResult, tSettings);
+        TrueSkill::update( tsTeams[TEAM_A], tsTeams[TEAM_B], cGameResult, tSettings);
       }
 
       aPlies += cGame->getResult().numPlies;
@@ -654,7 +509,7 @@ void Trainer::evolve()
     {
       if (printingTeams)
       {
-        teamTrainerResult cResult;
+        TrainerResult cResult;
         calculateDescriptiveStatistics(iLeague, cResult);
         printLeagueStatistics(iLeague, 5, cResult);
       }
@@ -672,14 +527,14 @@ void Trainer::evolve()
   if (printingTeams)
   {
     size_t iLeague = 0;
-    BOOST_FOREACH(std::vector<ranked_team>& cLeague, leagues)
+    BOOST_FOREACH(std::vector<RankedTeam>& cLeague, leagues)
     {
       if (cLeague.empty()) { iLeague++; continue; }
       if (teamPopulationSize[iLeague] == 0) { iLeague++; continue; }
 
       // assure the league is sorted
       std::sort(cLeague.begin(), cLeague.end());
-      teamTrainerResult cResult;
+      TrainerResult cResult;
       calculateDescriptiveStatistics(iLeague, cResult);
       printLeagueStatistics(iLeague, 15, cResult);
       iLeague++;
@@ -710,16 +565,16 @@ void Trainer::evolve()
 
 void Trainer::spawnTeamChildren(size_t iLeague, size_t& numMutated, size_t& numCrossed, size_t& numSeeded)
 {
-  std::vector<ranked_team> offspring;
-  std::vector<ranked_team>& cLeague = leagues[iLeague];
-  BOOST_FOREACH(ranked_team& cTeam, cLeague)
+  std::vector<RankedTeam> offspring;
+  std::vector<RankedTeam>& cLeague = leagues[iLeague];
+  BOOST_FOREACH(RankedTeam& cTeam, cLeague)
   {
     fpType cProbability = (double)rand()/(double)RAND_MAX;
 
     // if we should probabilistically cause a mutation to this team:
     if (cProbability < mutationProbability)
     {
-      ranked_team mutatedTeam = ranked_team::mutate(tSettings, leagues, cTeam);
+      RankedTeam mutatedTeam = RankedTeam::mutate(tSettings, leagues, cTeam);
 
       if ((mutatedTeam.team.getNumTeammates() - 1) != iLeague) { continue; } // don't add a freak
       if (isInPopulation(mutatedTeam)) { continue; } // don't add a duplicate
@@ -730,12 +585,12 @@ void Trainer::spawnTeamChildren(size_t iLeague, size_t& numMutated, size_t& numC
     else if ((1.0 - cProbability) < crossoverProbability)
     {
       // find the best crossover partner for cTeam that is not cTeam its self
-      size_t iOTeam = roulette<ranked_team, sortByMean_noDuplicates>::select(cLeague, sortByMean_noDuplicates(cTeam, true));
+      size_t iOTeam = roulette<RankedTeam, sortByMean_noDuplicates>::select(cLeague, sortByMean_noDuplicates(cTeam, true));
 
       if (iOTeam == SIZE_MAX) { continue; }
-      ranked_team& oTeam = cLeague[ iOTeam ];
+      RankedTeam& oTeam = cLeague[ iOTeam ];
         
-      ranked_team crossedTeam = ranked_team::crossover(tSettings, cTeam, oTeam);
+      RankedTeam crossedTeam = RankedTeam::crossover(tSettings, cTeam, oTeam);
 
       if ((crossedTeam.team.getNumTeammates() - 1) != iLeague) { continue; } // don't add a freak
       if (isInPopulation(crossedTeam)) { continue; } // don't add a duplicate
@@ -745,7 +600,7 @@ void Trainer::spawnTeamChildren(size_t iLeague, size_t& numMutated, size_t& numC
     // if we should probabilstically add a seed to the population:
     else if ((cProbability - mutationProbability) < seedProbability)
     {
-      ranked_team seededTeam = ranked_team::selectRandom(tSettings, leagues, iLeague + 1);
+      RankedTeam seededTeam = RankedTeam::selectRandom(tSettings, leagues, iLeague + 1);
 
       if ((seededTeam.team.getNumTeammates() - 1) != iLeague) { continue; } // don't add a freak
       if (isInPopulation(seededTeam)) { continue; } //  don't add a duplicate
@@ -765,57 +620,6 @@ void Trainer::spawnTeamChildren(size_t iLeague, size_t& numMutated, size_t& numC
   assert(cLeague.size() == teamPopulationSize[iLeague]);
 };
 
-void Trainer::spawnNetworkChildren(size_t& numJittered, size_t& numCrossed, size_t& numSeeded)
-{
-  std::vector<ranked_neuralNet> offspring;
-  BOOST_FOREACH(ranked_neuralNet& cNet, networks)
-  {
-    fpType cProbability = (double)rand()/(double)RAND_MAX;
-
-    // if we should probabilistically cause a mutation (jitter) to this network:
-    /*if (cProbability < jitterNetworkProbability)
-    {
-      offspring.push_back(ranked_neuralNet::jitter_create(cNet, tSettings));
-
-      numJittered++;
-    }*/
-    // if we should probabilstically add a seed to the population:
-    if (cProbability < seedNetworkProbability)
-    {
-      offspring.push_back(ranked_neuralNet::generateRandom(networkLayerSize, netSettings, expSettings, tSettings));
-
-      numSeeded++;
-    }
-  } // endOf mutation, crossover and seed loop
-
-  // delete as many elements as necessary to allow the new offspring their place in the population:
-  shrinkNetworkPopulation(networkPopulationSize - offspring.size());
-
-  // force jitter networks which are stuck in local minima or have diverged:
-  if (mostlyGT(netSettings.jitterMax, 0.0f))
-  {
-    BOOST_FOREACH(ranked_neuralNet& cNet, networks)
-    {
-      if  (
-        mostlyGT(cNet.getMeanSquaredError(), 0.45)
-        || 
-        ((jitterEpoch > 0) && (cNet.gamesSinceJitter() >= jitterEpoch))
-        )
-      {
-        cNet.jitter(tSettings); numJittered++;
-      }
-    }
-  }
-
-  // add elements from offspring to population:
-  BOOST_FOREACH(ranked_neuralNet& offspringNet, offspring)
-  {
-    networks.push_back(offspringNet);
-  }
-
-  assert(networks.size() == networkPopulationSize);
-};
-
 
 
 
@@ -823,15 +627,15 @@ void Trainer::spawnNetworkChildren(size_t& numJittered, size_t& numCrossed, size
 size_t Trainer::seedRandomTeamPopulation(size_t iLeague, size_t targetSize)
 {
   size_t numSeeded = 0;
-  std::vector<ranked_team>& cLeague = leagues[iLeague];
+  std::vector<RankedTeam>& cLeague = leagues[iLeague];
   cLeague.reserve(targetSize);
   for (size_t iTeam = 0, iSize = targetSize - cLeague.size(); iTeam != iSize; ++iTeam)
   {
     bool isSuccessful = false;
-    ranked_team cTeam;
+    RankedTeam cTeam;
     for (size_t numTries = 0; (numTries != MAXTRIES) && (!isSuccessful); ++numTries)
     {
-      cTeam = ranked_team::selectRandom(tSettings, leagues, iLeague + 1);
+      cTeam = RankedTeam::selectRandom(tSettings, leagues, iLeague + 1);
 
       if (!isInPopulation(cTeam)){ isSuccessful = true; }
     }
@@ -851,35 +655,7 @@ size_t Trainer::seedRandomTeamPopulation(size_t iLeague, size_t targetSize)
   return numSeeded;
 }; //endOf seedRandomTeamPopulation
 
-size_t Trainer::seedRandomNetworkPopulation(size_t targetSize)
-{
-  size_t numSeeded = 0;
-  networks.reserve(targetSize);
-  for (size_t iNetwork = 0, iSize = targetSize - networks.size(); iNetwork != iSize; ++iNetwork)
-  {
-    bool isSuccessful = false;
-    ranked_neuralNet cNet;
-    for (size_t numTries = 0; (numTries != MAXTRIES) && (!isSuccessful); ++numTries)
-    {
-      cNet = ranked_neuralNet::generateRandom(networkLayerSize, netSettings, expSettings, tSettings);
 
-      if (!isInNetworks(cNet)){ isSuccessful = true; }
-    }
-
-    // don't bother trying anymore, we just can't generate any unique networks for some reason
-    if (isSuccessful == false)
-    {
-      break;
-    }
-
-    networks.push_back(cNet);
-    numSeeded++;
-  }
-
-  // sort the population by skill after our new additions
-  std::sort(networks.begin(), networks.end());
-  return numSeeded;
-}; //endOf seedRandomNetworkPopulation
 
 
 
@@ -925,14 +701,10 @@ void shrinkDataPopulation(std::vector<data_t>& data, size_t targetSize)
 
 void Trainer::shrinkTeamPopulation(size_t iLeague, size_t targetSize)
 {
-  std::vector<ranked_team>& cLeague = leagues[iLeague];
+  std::vector<RankedTeam>& cLeague = leagues[iLeague];
   shrinkDataPopulation(cLeague, targetSize);
 };
 
-void Trainer::shrinkNetworkPopulation(size_t targetSize)
-{
-  shrinkDataPopulation(networks, targetSize);
-};
 
 
 
@@ -963,23 +735,23 @@ size_t Trainer::determineWorkingLeague() const
 
 size_t Trainer::findEvaluator()
 {
-  std::vector<const ranked*> possibleEvaluators;
+  std::vector<const Ranked*> possibleEvaluators;
   possibleEvaluators.reserve(networks.size() + evaluators.size());
-  BOOST_FOREACH(const ranked& cEvaluator, networks)
+  BOOST_FOREACH(const Ranked& cEvaluator, networks)
   {
     possibleEvaluators.push_back(&cEvaluator);
   }
-  BOOST_FOREACH(const ranked& cEvaluator, evaluators)
+  BOOST_FOREACH(const Ranked& cEvaluator, evaluators)
   {
     possibleEvaluators.push_back(&cEvaluator);
   }
 
-  return roulette<const ranked*, sortByVariability>::select(possibleEvaluators, sortByVariability());
+  return roulette<const Ranked*, sortByVariability>::select(possibleEvaluators, sortByVariability());
 }
 
-trueSkillTeam Trainer::findMatch(const trueSkillTeam& oTeam)
+TrueSkillTeam Trainer::findMatch(const TrueSkillTeam& oTeam)
 {
-  std::vector<trueSkillTeam> possibleMatches;
+  std::vector<TrueSkillTeam> possibleMatches;
   std::vector<size_t> rankedSectionBegin;
 
   size_t iCLeague = oTeam.baseTeam->team.getNumTeammates() - 1;
@@ -1003,22 +775,22 @@ trueSkillTeam Trainer::findMatch(const trueSkillTeam& oTeam)
   {
     rankedSectionBegin.push_back(possibleMatches.size());
 
-    BOOST_FOREACH(ranked_team& cTeam, leagues[iLeague])
+    BOOST_FOREACH(RankedTeam& cTeam, leagues[iLeague])
     {
-      BOOST_FOREACH(ranked& cRanked, networks)
+      BOOST_FOREACH(Ranked& cRanked, networks)
       {
-        possibleMatches.push_back(trueSkillTeam(cTeam, cRanked));
+        possibleMatches.push_back(TrueSkillTeam(cTeam, cRanked));
       }
-      BOOST_FOREACH(ranked& cRanked, evaluators)
+      BOOST_FOREACH(Ranked& cRanked, evaluators)
       {
-        possibleMatches.push_back(trueSkillTeam(cTeam, cRanked));
+        possibleMatches.push_back(TrueSkillTeam(cTeam, cRanked));
       }
     }
   }
 
   // find a match:
-  size_t iResult = roulette<trueSkillTeam, sortByMatchQuality>::select(possibleMatches, sortByMatchQuality(oTeam, tSettings));
-  if (iResult == SIZE_MAX) { return trueSkillTeam(); } 
+  size_t iResult = roulette<TrueSkillTeam, sortByMatchQuality>::select(possibleMatches, sortByMatchQuality(oTeam, tSettings));
+  if (iResult == SIZE_MAX) { return TrueSkillTeam(); }
   return possibleMatches[iResult];
 } //endOf findMatch
 
@@ -1041,11 +813,11 @@ size_t findInData(const std::vector<dataType>& data, uint64_t hash)
 
 size_t Trainer::findInPopulation(size_t iLeague, uint64_t teamHash) const
 {
-  const std::vector<ranked_team>& cLeague = leagues[iLeague];
+  const std::vector<RankedTeam>& cLeague = leagues[iLeague];
   return findInData(cLeague, teamHash);
 }
 
-bool Trainer::isInPopulation(const ranked_team& tTeam) const
+bool Trainer::isInPopulation(const RankedTeam& tTeam) const
 {
 #ifndef NDEBUG
   // assert team is valid:
@@ -1057,35 +829,25 @@ bool Trainer::isInPopulation(const ranked_team& tTeam) const
   return (findInPopulation(tTeam.team.getNumTeammates() -1 , tTeam.getHash()) != SIZE_MAX);
 } //endOf isInPopulation
 
-size_t Trainer::findInNetworks(uint64_t hash) const
-{
-  return findInData(networks, hash);
-}
-
-bool Trainer::isInNetworks(const ranked_neuralNet& cRankNet) const
-{
-  return findInNetworks(cRankNet.getHash()) != SIZE_MAX;
-}
-
 
 
 
 
 void Trainer::findSubteams(
-  trueSkillTeam& cSTeam, 
+  TrueSkillTeam& cSTeam,
   size_t iTeam)
 {
-  const ranked_team& cTeam = *cSTeam.baseTeam;
+  const RankedTeam& cTeam = *cSTeam.baseTeam;
 
   // league:
   size_t initialLeague = cTeam.team.getNumTeammates() - 1;
   for (size_t iNLeague = 0; iNLeague != initialLeague; ++iNLeague)
   {
     size_t iLeague = initialLeague - iNLeague - 1;
-    std::vector<ranked_team>& cLeague = leagues[iLeague];
+    std::vector<RankedTeam>& cLeague = leagues[iLeague];
 
     // exhaustively search hashes of teams for pokemon matches:
-    BOOST_FOREACH(ranked_team& oTeam, cLeague)
+    BOOST_FOREACH(RankedTeam& oTeam, cLeague)
     {
       bool isMatch = true;
 

@@ -1,5 +1,18 @@
-#ifndef TRAINER_H
-#define TRAINER_H
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/* 
+ * File:   old_trainer.h
+ * Author: drendleman
+ *
+ * Created on September 17, 2020, 1:00 PM
+ */
+
+#ifndef OLD_TRAINER_H
+#define OLD_TRAINER_H
 
 #include "../inc/pkai.h"
 
@@ -8,20 +21,17 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <unordered_map>
 #include <boost/program_options.hpp>
 
-#include "game.h"
 #include "true_skill.h"
 #include "ranked.h"
 
 #include "ranked_team.h"
 #include "ranked_evaluator.h"
 
-
-using TrueSkillTeamPtr = std::shared_ptr<TrueSkillTeam>;
-using RankedTeamPtr = std::shared_ptr<RankedTeam>;
-using RankedEvalPtr = std::shared_ptr<RankedEvaluator>;
+class Type;
+class Game;
+class Evaluator;
 
 struct TrainerResult {
   // averages: (rank, mean, stdDev, plies, games, wins, draws)
@@ -42,26 +52,6 @@ struct TrainerResult {
   size_t highestPokemonCount, highestAbilityCount, highestItemCount, highestTypeCount, highestNatureCount, highestMoveCount;
 };
 
-struct GameHeat {
-  std::shared_ptr<TrueSkillTeam> team_a;
-  
-  std::shared_ptr<TrueSkillTeam> team_b;
-
-  HeatResult heatResult;
-};
-
-struct LeagueHeat {
-  std::vector<std::shared_ptr<RankedEvaluator> > evaluators;
-
-  std::vector<std::shared_ptr<RankedTeam> > teams;
-
-  std::vector<std::shared_ptr<TrueSkillTeam> > tsTeams;
-
-  std::unordered_map<TrueSkillTeam::Hash, size_t> teamGameCount;
-
-  std::vector<GameHeat> games;
-};
-
 class Trainer {
 public:
   struct Config {
@@ -77,9 +67,6 @@ public:
     /* number of generations to complete, maximum */
     size_t maxGenerations = 12;
 
-    /* the minimum number of games per generation */
-    size_t minGamesPerGeneration = 5;
-
     /* if a team population is to be loaded to memory from a directory, this is where it is */
     std::string teamPath = "teams";
 
@@ -87,7 +74,7 @@ public:
     size_t writeOutEvery = 0;
 
     /* minimum amount of time to work on a given league, in seconds */
-    double minimumWorkTime = 20;
+    double minimumWorkTime = 120;
 
     /* probability that a pokemon will undergo a mutation */
     double mutationProbability = 0.55;
@@ -104,9 +91,6 @@ public:
     /* do we allow teams to rank against teams of different leagues? Useful for small population */
     bool enforceSameLeague = false;
 
-    /* when true, matches against TrueSkillTeams with the same RankedTeam or RankedEvaluator may take place */
-    bool allowSelfPlay = false;
-
     boost::program_options::options_description options(
         const std::string& category="trainer configuration",
         std::string prefix = "");
@@ -120,20 +104,16 @@ public:
 
   TrainerResult run() const;
 
-  /* plays minGamesPerGeneration games for every tsTeam within league */
-  void runLeague(LeagueHeat& league) const;
 
-  /* plays minGamesPerGeneration games with tsTeam within league*/
-  void gauntlet(const std::shared_ptr<TrueSkillTeam>& tsTeam, LeagueHeat& league) const;
-
-  GameHeat singleGame(
-      const std::shared_ptr<TrueSkillTeam>& team_a,
-      const std::shared_ptr<TrueSkillTeam>& team_b) const;
-  
 protected:
   Config cfg_;
 
   std::shared_ptr<TrueSkillFactory> trueSkillFactory_;
+
+  size_t generationsCompleted;
+
+  /* amount of heats performed in each league */
+  std::array<size_t, 6> heatsCompleted;
 
   /* population of teams to be run on. 0 implies no work will be done on the league */
   std::array<std::vector<std::shared_ptr<RankedTeam> >, 6> leagues;
@@ -141,8 +121,14 @@ protected:
   /* population of evaluators to be run on. If networks is 0, this MUST be greater than 0. */
   std::vector<std::shared_ptr<RankedEvaluator>> evaluators;
 
-  /* game instance used for evaluation, per thread */
-  mutable std::vector<std::shared_ptr<Game> > games;
+  /* if performing ranking, trialTeam and/or trialNet are set */
+  std::shared_ptr<RankedTeam> trialTeam;
+
+  /* base engine configuration used for agents */
+  std::shared_ptr<PkCU> agentEngine;
+
+  /* game instance used for evaluation */
+  std::shared_ptr<Game> game;
 
   /* select two parents, weighted by fitness */
   std::array<size_t, 2> selectParent_Roulette(const std::vector<const RankedTeam>& cLeague) const;
@@ -154,6 +140,9 @@ protected:
   size_t seedRandomTeamPopulation(size_t iLeague, size_t targetSize);
 
   void spawnTeamChildren(size_t iLeague, size_t& numMutated, size_t& numCrossed, size_t& numSeeded);
+
+  /* determine the league that should receive the next work cycle, giving precedence to lower leagues */
+  size_t determineWorkingLeague() const;
 
   /* stochastically find a match of ideal skill for a given team. If enforceSameLeague is false, allow matches from nearby leagues */
   TrueSkillTeam findMatch( const TrueSkillTeam& oTeam );
@@ -175,12 +164,12 @@ protected:
 
   /* print information about the top n members of league iLeague */
   void printLeagueStatistics(size_t iLeague, size_t numMembers, const TrainerResult& cResult) const;
-  
+
   /*load a population of pokemon and their rankings from a filepath */
   bool loadTeamPopulation();
 
   bool saveTeamPopulation();
-  
+
 public:
 
   void setGauntletTeam(const TeamNonVolatile& cTeam);
@@ -193,4 +182,6 @@ public:
   void evolve();
 };
 
-#endif /* TRAINER_H */
+
+#endif /* OLD_TRAINER_H */
+

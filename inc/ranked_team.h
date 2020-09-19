@@ -9,7 +9,7 @@
 
 #include "ranked.h"
 
-#include "trueSkill.h"
+#include "true_skill.h"
 
 #include "../inc/team_nonvolatile.h"
 
@@ -17,7 +17,7 @@ class Pokedex;
 class Game;
 
 
-class ranked_team : public ranked
+class RankedTeam : public Ranked
 {
 public:
   /* team that this ranked_team represents */
@@ -38,7 +38,7 @@ private:
 
   void resetRecord()
   {
-    ranked::resetRecord();
+    Ranked::resetRecord();
     
     rankPoints.fill(0);
     numPlies.fill(0);
@@ -52,9 +52,9 @@ private:
 public:
   static const std::string header;
 
-  ~ranked_team() { };
-  ranked_team(const TeamNonVolatile& cTeam = TeamNonVolatile(), size_t generation = 0, const trueSkillSettings& settings = trueSkillSettings::defaultSettings);
-  ranked_team(const ranked_team& other);
+  ~RankedTeam() { };
+  RankedTeam(const TeamNonVolatile& cTeam = TeamNonVolatile(), size_t generation = 0, const trueSkillSettings& settings = trueSkillSettings::defaultSettings);
+  RankedTeam(const RankedTeam& other);
 
   /* define the names of the team and its pokemon given the hash */
   void defineNames();
@@ -136,7 +136,7 @@ private:
   /* randomize a number of the pokemon's moves */
   static void randomMove(PokemonNonVolatile& cPokemon, size_t numMoves = 1);
 
-  static void mutate_single(ranked_team& cRankteam, size_t iTeammate, size_t numMutations);
+  static void mutate_single(RankedTeam& cRankteam, size_t iTeammate, size_t numMutations);
 
   static PokemonNonVolatile crossover_single(
     const PokemonNonVolatile& parentA, 
@@ -144,15 +144,15 @@ private:
 
   /* select a new team based on roulette selection; the team selected will consist of at or less than numPokemon teammates */
   static std::array<size_t, 2> selectRandom_single(
-    const ranked_team& existing,
-    const std::array<std::vector<ranked_team>, 6>& league, 
+    const RankedTeam& existing,
+    const std::array<std::vector<RankedTeam>, 6>& league, 
     size_t numPokemon,
     bool allowLess = true);
 
 public:
 
   /* generate a random child, initialize its descriptive variables, define its hash */
-  static ranked_team createRandom(
+  static RankedTeam createRandom(
     const trueSkillSettings& settings,
     size_t numPokemon, 
     size_t _generation);
@@ -160,32 +160,32 @@ public:
   static TeamNonVolatile createRandom(size_t numPokemon);
 
   /* update two team rankings */
-  size_t update(const Game& cGame, const trueSkillTeam& cTeam, size_t iTeam);
+  size_t update(const Game& cGame, const TrueSkillTeam& cTeam, size_t iTeam);
 
   /* generate a child through sexual reproduction of two ranked_team objects with the same number of teammates */
-  static ranked_team crossover(
+  static RankedTeam crossover(
     const trueSkillSettings& settings,
-    const ranked_team& parentA, 
-    const ranked_team& parentB);
+    const RankedTeam& parentA, 
+    const RankedTeam& parentB);
 
   /* generate a child through asexual reproduction of two ranked objects */
-  static ranked_team mutate(
+  static RankedTeam mutate(
     const trueSkillSettings& settings,
-    const std::array<std::vector<ranked_team>, 6>& league, 
-    const ranked_team& parent, 
+    const std::array<std::vector<RankedTeam>, 6>& league, 
+    const RankedTeam& parent, 
     size_t numMutations = 1);
 
   /* generate a new team based on roulette selection from smaller leagues */
-  static ranked_team selectRandom(
+  static RankedTeam selectRandom(
     const trueSkillSettings& settings,
-    const std::array<std::vector<ranked_team>, 6>& league, 
+    const std::array<std::vector<RankedTeam>, 6>& league, 
     size_t numPokemon);
 
   friend class PokemonAI;
   friend class PkIO;
-  friend std::ostream& operator <<(std::ostream& os, const ranked_team& tR);
+  friend std::ostream& operator <<(std::ostream& os, const RankedTeam& tR);
 };
 
-std::ostream& operator <<(std::ostream& os, const ranked_team& tR);
+std::ostream& operator <<(std::ostream& os, const RankedTeam& tR);
 
 #endif /* TEAM_RANKED_H */

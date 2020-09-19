@@ -1,4 +1,4 @@
-#include "../inc/trainer.h"
+#include "../inc/old_trainer.h"
 
 #include <iomanip>
 #include <iostream>
@@ -116,7 +116,7 @@ void Trainer::printNetworkStatistics(size_t numMembers, const networkTrainerResu
   // print bias evaluators, if we're doing that:
   for (size_t iEval = 0; iEval != evaluators.size(); ++iEval)
   {
-    const ranked_evaluator& cEval = evaluators[iEval];
+    const RankedEvaluator& cEval = evaluators[iEval];
     std::clog
       << "--: " << cEval
       << "\n";
@@ -126,9 +126,9 @@ void Trainer::printNetworkStatistics(size_t numMembers, const networkTrainerResu
   std::clog.flush();
 };
 
-void Trainer::printLeagueStatistics(size_t iLeague, size_t numMembers, const teamTrainerResult& cResult) const
+void Trainer::printLeagueStatistics(size_t iLeague, size_t numMembers, const TrainerResult& cResult) const
 {
-  const std::vector<ranked_team>& cLeague = leagues[iLeague];
+  const std::vector<RankedTeam>& cLeague = leagues[iLeague];
 
   size_t numToPrint = std::min(numMembers, cLeague.size());
   if (numToPrint == 0) { return; }
@@ -199,7 +199,7 @@ void calculateRankedDescriptiveStatistics(const std::vector<dataType>& data, res
     aggData[4].push_back(cData.getNumGamesPlayed());
     if (mostlyEQ(aggData[4].back(), 0.0)) { continue; }
 
-    const trueSkill& cSkill = cData.getSkill();
+    const TrueSkill& cSkill = cData.getSkill();
     // rank:
     aggData[0].push_back(cSkill.getRank());
     // mean:
@@ -309,10 +309,10 @@ void Trainer::calculateDescriptiveStatistics(networkTrainerResult& cR) const
   assert(!boost::math::isnan(cR.meanSquaredError[0]) || !boost::math::isnan(cR.meanSquaredError[1]));
 }
 
-void Trainer::calculateDescriptiveStatistics(size_t iLeague, teamTrainerResult& cR) const
+void Trainer::calculateDescriptiveStatistics(size_t iLeague, TrainerResult& cR) const
 {
   // initialize:
-  const std::vector<ranked_team>& cLeague = leagues[iLeague];
+  const std::vector<RankedTeam>& cLeague = leagues[iLeague];
   // calculate ranked vars:
   calculateRankedDescriptiveStatistics(cLeague, cR);
 
@@ -332,7 +332,7 @@ void Trainer::calculateDescriptiveStatistics(size_t iLeague, teamTrainerResult& 
 
   // foreach team:
   size_t iTeam = 0;
-  BOOST_FOREACH(const ranked_team& cRTeam, cLeague)
+  BOOST_FOREACH(const RankedTeam& cRTeam, cLeague)
   {
     const TeamNonVolatile& cTeam = cRTeam.team;
 
@@ -627,7 +627,7 @@ bool Trainer::saveTeamPopulation()
   // add elements to directory:
   for (size_t iLeague = 0; iLeague != leagues.size(); ++iLeague)
   {
-    std::vector<ranked_team>& cLeague = leagues[iLeague];
+    std::vector<RankedTeam>& cLeague = leagues[iLeague];
     saveElements(pPath, cLeague, numSavedTeams, numUpdatedTeams, numFailed);
   } // endOf foreach league
 
@@ -709,7 +709,7 @@ bool Trainer::loadTeamPopulation()
     numTotalTeams++;
 
     // read file from disk
-    ranked_team cTeam(TeamNonVolatile(), 0, tSettings);
+    RankedTeam cTeam(TeamNonVolatile(), 0, tSettings);
     isSuccessful = PkIO::inputRankedTeam(cTeamFile->path(), cTeam);
 
     if (!isSuccessful)
@@ -756,249 +756,6 @@ bool Trainer::loadTeamPopulation()
       " of " << numTotalTeams <<
       " teams ( " << numIncorrectHashes <<
       " hashes rebuilt ) from \"" << teamPath << "\"!\n";
-    std::clog.flush();
-  }
-  
-  return true;
-} // endOf loadElements
-
-
-
-
-
-bool Trainer::saveNetworkPopulation()
-{
-  // assure path exists:
-  boost::filesystem::path pPath(networkPath);
-
-  // determine if folder exists:
-  if (!boost::filesystem::exists(pPath))
-  {
-    if (verbose >= 6)
-    {
-      std::cerr << "INF " << __FILE__ << "." << __LINE__ << 
-        ": A network folder was not found at location \"" << pPath << "\", creating one...\n";
-    }
-    
-    if (!boost::filesystem::create_directory(pPath))
-    {
-      std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": A network folder could not be created at \"" << pPath << "\"!\n";
-      return false;
-    }
-  }
-
-  // determine if folder is a directory:
-  if (!boost::filesystem::is_directory(pPath))
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": \"" << pPath << "\" is not a directory!\n";
-    return false;
-  }
-
-  if (verbose >= 1)
-  {
-    std::cout << "Backing up networks to disk at location \"" << networkPath << "\"...\n";
-  }
-
-  size_t numDestroyed = 0;
-  size_t numFailed = 0;
-  size_t numTotal = 0;
-  size_t numTotalSaved = 0;
-  size_t numSaved = 0;
-  size_t numUpdated = 0;
-
-  numTotal = networks.size();
-
-  // destroy outdated elements in directory:
-  for ( boost::filesystem::directory_iterator cNetworkFile(pPath), endNetworkFile; cNetworkFile != endNetworkFile; ++cNetworkFile)
-  {
-    // ignore directories
-    if (boost::filesystem::is_directory(*cNetworkFile)) { continue; }
-
-    // make sure extension is txt, ignore all others:
-    if ((cNetworkFile->path().extension().compare(".txt") != 0)) { continue; }
-
-    const std::string cNetworkFileStem = cNetworkFile->path().stem().string();
-
-    // make sure extension is of the form NETx<HASH>.txt
-    if (cNetworkFileStem.size() != 20) { continue; }
-
-    // hash from name of network:
-    uint64_t hash;
-    {
-      std::stringstream hexNameBuf(cNetworkFileStem);
-      // determine hash:
-      hexNameBuf.seekg(4);
-      if (!(hexNameBuf >> std::hex >> hash )) 
-      {
-        std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": Unable to determine hash from filename of \"" << cNetworkFile->path() << "\"!\n";
-        continue; 
-      }
-    }
-
-    numTotalSaved++;
-
-    // if we haven't modified the network vector yet:
-    size_t iNetwork = findInNetworks(hash);
-    if ((iNetwork != SIZE_MAX) || (generationsCompleted == 0))
-    {
-      // DO NOT delete network:
-      continue;
-    }
-
-    if (verbose >= 6)
-    {
-      std::cerr << "INF " << __FILE__ << "." << __LINE__ << 
-        "Deleting network at \"" << cNetworkFile->path() << "\"...\n";
-    }
-
-    if (!boost::filesystem::remove(cNetworkFile->path()))
-    {
-      std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": Could not delete file at \"" << cNetworkFile->path() << "\"!\n";
-      return false;
-    }
-
-    numDestroyed++;
-  } // endOf destroy outdated elements
-
-  // add elements to directory:
-  saveElements(pPath, networks, numSaved, numUpdated, numFailed);
-
-  if (numFailed > 0)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      "Backing up " << numFailed << 
-      " of " << numTotal <<
-      " FAILED!\n";
-    // todo: stop backup on failure mode:
-  }
-
-  if (verbose >= 0)
-  {
-    std::clog 
-      << "Saved " << numSaved
-      << " ( updated " << numUpdated
-      << " ) of " << numTotal
-      << " networks, deleted " << numDestroyed
-      << " of " << numTotalSaved
-      << " from \"" << networkPath << "\" !\n";
-    std::clog.flush();
-  }
-
-  return true;
-} // endOf savePopulation
-
-bool Trainer::loadNetworkPopulation()
-{
-  // assure path exists:
-  boost::filesystem::path pPath(networkPath);
-
-  // determine if folder exists:
-  if (!boost::filesystem::exists(pPath))
-  {
-    if (verbose >= 6)
-    {
-      std::cerr << "INF " << __FILE__ << "." << __LINE__ << 
-        ": A population folder was not found at location \"" << pPath << 
-        "\", it will be created upon next backup...\n";
-    }
-    return true;
-  }
-
-  // determine if folder is a directory:
-  if (!boost::filesystem::is_directory(pPath))
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": \"" << pPath << "\" is not a directory!\n";
-    return false;
-  }
-
-  if (verbose >= 1)
-  {
-    std::cout << "Loading backup population from disk at location \"" << networkPath << "\"...\n";
-  }
-
-  // load all elements in directory:
-  size_t numLoaded = 0;
-  size_t numTotal = 0;
-  size_t numIncorrectHashes = 0;
-  for ( boost::filesystem::directory_iterator cNetworkFile(pPath), endNetworkFile; cNetworkFile != endNetworkFile; ++cNetworkFile)
-  {
-    bool isSuccessful = false;
-    // ignore directories
-    if (boost::filesystem::is_directory(*cNetworkFile)) { continue; }
-
-    // make sure extension is txt, ignore all others:
-    if ((cNetworkFile->path().extension().compare(".txt") != 0)) { continue; }
-
-    // TODO: determine if the file is currently in the league array:
-
-    if (verbose >= 6)
-    {
-      std::cerr << "INF " << __FILE__ << "." << __LINE__ << 
-        ": Loading network at \"" << cNetworkFile->path() << "\"...\n";
-    }
-
-    numTotal++;
-
-    // read file from disk
-    ranked_neuralNet cNetwork(neuralNet(), 0, netSettings, expSettings, tSettings);
-    isSuccessful = PkIO::inputRankedNetwork(cNetworkFile->path(), cNetwork);
-
-    if (!isSuccessful)
-    {
-      std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": Unable to read network from disk at \"" << cNetworkFile->path() << "\"!\n";
-      continue;
-    }
-
-    cNetwork.setStateSaved();
-
-    // make sure the hashes are correct, and if they're not redo them:
-    {
-      uint64_t oldHash = cNetwork.getHash();
-      cNetwork.generateHash();
-      if (cNetwork.getHash() != oldHash)
-      {
-        numIncorrectHashes++;
-        // recreate the network's naming if the hash was incorrect
-        cNetwork.defineName();
-
-        if (verbose >= 5)
-        {
-          std::cerr << "WAR " << __FILE__ << "." << __LINE__ << 
-            " Network at \"" << cNetworkFile->path() << "\" hash does not match its specified network!\n";
-        }
-      } // endOf hash incorrect
-    }
-
-    // determine if an evaluator exists for this type of network:
-    if (!cNetwork.hasEvaluator())
-    {
-      std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": No loaded evaluators exist for given network topology!\n";
-      return false;
-    }
-
-    // don't add a duplicate network:
-    if (isInNetworks(cNetwork)){ isSuccessful = false; }
-
-    if (isSuccessful)
-    {
-      numLoaded++;
-      networks.push_back(cNetwork);
-    }
-  } // endOf foreach file
-
-  if (verbose >= 0)
-  {
-    std::clog << "loaded " << numLoaded << 
-      " of " << numTotal <<
-      " networks ( " << numIncorrectHashes <<
-      " hashes rebuilt ) from \"" << networkPath << "\"!\n";
     std::clog.flush();
   }
   

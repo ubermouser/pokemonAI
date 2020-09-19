@@ -26,12 +26,12 @@ typedef temporalpropNet network_t;
 
 class evaluator_featureVector;
 class EnvironmentNonvolatile;
-class ranked_team;
-class trueSkillTeam;
+class RankedTeam;
+class TrueSkillTeam;
 class Game;
 struct Turn;
 
-class ranked_neuralNet: public ranked
+class ranked_neuralNet: public Ranked
 {
 public:
 #ifdef _DISABLETEMPORALDIFFERENCE
@@ -93,7 +93,7 @@ public:
 
   void resetRecord()
   {
-    ranked::resetRecord();
+    Ranked::resetRecord();
 
     resetMeanSquaredError();
 
@@ -106,7 +106,7 @@ public:
   };
 
   /* update two neural network rankings with TD */
-  size_t update(const Game& cGame, const trueSkillTeam& cTeam, size_t iTeam, bool updateWeights = true);
+  size_t update(const Game& cGame, const TrueSkillTeam& cTeam, size_t iTeam, bool updateWeights = true);
 
   /* performs monte-carlo backpropagation on bNet. Returns the error if an update was performed, or 0.0 if none */
   /* performs temporal difference learning on bNet. Returns the error if an update was performed, or 0.0 if none */

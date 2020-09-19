@@ -24,7 +24,7 @@
 
 class PokemonAI;
 class TeamNonVolatile;
-class ranked_team;
+class RankedTeam;
 class ranked_neuralNet;
 class neuralNet;
 
@@ -44,7 +44,7 @@ public:
 
   static bool parseArg(const std::string& input, PkIO*& target);
   
-  static bool inputRankedTeam(const boost::filesystem::path& path, ranked_team& cTeam);
+  static bool inputRankedTeam(const boost::filesystem::path& path, RankedTeam& cTeam);
 
   static TeamNonVolatile inputPlayerTeam(const std::string& path);
   static bool inputPlayerTeam(const boost::filesystem::path& path, TeamNonVolatile& cTeam);

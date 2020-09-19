@@ -5,32 +5,32 @@
 
 #include "../inc/evaluator.h"
 
-ranked_evaluator::ranked_evaluator(
+RankedEvaluator::RankedEvaluator(
   const Evaluator& _eval,
   size_t generation, 
   const trueSkillSettings& settings)
-  : ranked(generation, settings),
+  : Ranked(generation, settings),
   eval(_eval.clone())
 {
 };
 
-ranked_evaluator::ranked_evaluator(const ranked_evaluator& other)
-  : ranked(other),
+RankedEvaluator::RankedEvaluator(const RankedEvaluator& other)
+  : Ranked(other),
   eval(other.eval->clone())
 {
 };
 
-ranked_evaluator::~ranked_evaluator()
+RankedEvaluator::~RankedEvaluator()
 {
   delete eval;
 };
 
-const std::string& ranked_evaluator::getName() const
+const std::string& RankedEvaluator::getName() const
 {
   return eval->getName();
 };
 
-std::ostream& operator <<(std::ostream& os, const ranked_evaluator& tR)
+std::ostream& operator <<(std::ostream& os, const RankedEvaluator& tR)
 {
   os << std::setw(45) << std::left << tR.getName().substr(0,45);
 

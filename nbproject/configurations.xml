@@ -4,19 +4,6 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <logicalFolder name="f2" displayName="evaluators" projectFiles="true">
-        <itemPath>inc/evaluator_featureVector.h</itemPath>
-        <itemPath>inc/evaluator_network128.h</itemPath>
-        <itemPath>inc/evaluator_network16.h</itemPath>
-        <itemPath>inc/evaluator_network32.h</itemPath>
-        <itemPath>inc/evaluator_network64.h</itemPath>
-      </logicalFolder>
-      <logicalFolder name="f5" displayName="neural" projectFiles="true">
-        <itemPath>inc/backpropNet.h</itemPath>
-        <itemPath>inc/experienceNet.h</itemPath>
-        <itemPath>inc/neuralNet.h</itemPath>
-        <itemPath>inc/temporalpropNet.h</itemPath>
-      </logicalFolder>
       <logicalFolder name="f3" displayName="planners" projectFiles="true">
         <logicalFolder name="f1" displayName="planner_minimax" projectFiles="true">
         </logicalFolder>
@@ -35,17 +22,6 @@
         <itemPath>inc/orphan.h</itemPath>
         <itemPath>inc/roulette.h</itemPath>
         <itemPath>inc/signature.h</itemPath>
-      </logicalFolder>
-      <logicalFolder name="f4" displayName="trainer" projectFiles="true">
-        <logicalFolder name="f1" displayName="ranked" projectFiles="true">
-          <itemPath>inc/ranked.h</itemPath>
-          <itemPath>inc/ranked_evaluator.h</itemPath>
-          <itemPath>inc/ranked_neuralNet.h</itemPath>
-          <itemPath>inc/ranked_team.h</itemPath>
-        </logicalFolder>
-        <itemPath>inc/genetic.h</itemPath>
-        <itemPath>inc/trainer.h</itemPath>
-        <itemPath>inc/trueSkill.h</itemPath>
       </logicalFolder>
       <itemPath>inc/pkIO.h</itemPath>
       <itemPath>inc/pkai.h</itemPath>
@@ -94,35 +70,11 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <logicalFolder name="f1" displayName="evaluators" projectFiles="true">
-        <itemPath>src/evaluator_featureVector.cpp</itemPath>
-        <itemPath>src/evaluator_network128.cpp</itemPath>
-        <itemPath>src/evaluator_network16.cpp</itemPath>
-        <itemPath>src/evaluator_network32.cpp</itemPath>
-        <itemPath>src/evaluator_network64.cpp</itemPath>
-      </logicalFolder>
-      <logicalFolder name="f4" displayName="neural" projectFiles="true">
-        <itemPath>src/backpropNet.cpp</itemPath>
-        <itemPath>src/experienceNet.cpp</itemPath>
-        <itemPath>src/neuralNet.cpp</itemPath>
-        <itemPath>src/temporalpropNet.cpp</itemPath>
-      </logicalFolder>
       <logicalFolder name="f2" displayName="planners" projectFiles="true">
         <logicalFolder name="f1" displayName="planner_minimax" projectFiles="true">
         </logicalFolder>
         <itemPath>src/planner_directed.cpp</itemPath>
         <itemPath>src/planner_stochastic.cpp</itemPath>
-      </logicalFolder>
-      <logicalFolder name="f3" displayName="trainer" projectFiles="true">
-        <logicalFolder name="f1" displayName="ranked" projectFiles="true">
-          <itemPath>src/ranked.cpp</itemPath>
-          <itemPath>src/ranked_evaluator.cpp</itemPath>
-          <itemPath>src/ranked_neuralNet.cpp</itemPath>
-          <itemPath>src/ranked_team.cpp</itemPath>
-        </logicalFolder>
-        <itemPath>src/trainer.cpp</itemPath>
-        <itemPath>src/trainer_io.cpp</itemPath>
-        <itemPath>src/trueSkill.cpp</itemPath>
       </logicalFolder>
       <itemPath>src/main.cpp</itemPath>
       <itemPath>src/pkIO.cpp</itemPath>
@@ -230,29 +182,11 @@
       </item>
       <item path="data/pokemon.txt" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/backpropNet.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/evaluator_featureVector.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/evaluator_network128.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/evaluator_network16.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/evaluator_network32.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/evaluator_network64.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/experienceNet.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/fp_compare.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/genetic.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/init_toolbox.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/name.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/neuralNet.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/orphan.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -266,39 +200,11 @@
       </item>
       <item path="inc/pokemonAI.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/ranked.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/ranked_evaluator.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/ranked_neuralNet.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/ranked_team.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/roulette.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/signature.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/temporalpropNet.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/trainer.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/trueSkill.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="pkai.ini" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="src/backpropNet.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/evaluator_featureVector.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/evaluator_network128.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/evaluator_network16.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/evaluator_network32.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/evaluator_network64.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/experienceNet.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/fixedpoint/fixed_class.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -308,8 +214,6 @@
       </item>
       <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/neuralNet.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/pkIO.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/planner_directed.cpp" ex="false" tool="1" flavor2="0">
@@ -317,22 +221,6 @@
       <item path="src/planner_stochastic.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/pokemonAI.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/ranked.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/ranked_evaluator.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/ranked_neuralNet.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/ranked_team.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/temporalpropNet.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/trainer.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/trainer_io.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/trueSkill.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="teams/dualTeamA.txt" ex="false" tool="3" flavor2="0">
       </item>
@@ -471,29 +359,11 @@
       </item>
       <item path="data/pokemon.txt" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/backpropNet.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/evaluator_featureVector.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/evaluator_network128.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/evaluator_network16.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/evaluator_network32.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/evaluator_network64.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/experienceNet.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/fp_compare.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/genetic.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/init_toolbox.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/name.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/neuralNet.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/orphan.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -507,39 +377,11 @@
       </item>
       <item path="inc/pokemonAI.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/ranked.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/ranked_evaluator.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/ranked_neuralNet.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/ranked_team.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="inc/roulette.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/signature.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="inc/temporalpropNet.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/trainer.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="inc/trueSkill.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="pkai.ini" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="src/backpropNet.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/evaluator_featureVector.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/evaluator_network128.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/evaluator_network16.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/evaluator_network32.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/evaluator_network64.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/experienceNet.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/fixedpoint/fixed_class.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -549,8 +391,6 @@
       </item>
       <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/neuralNet.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/pkIO.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/planner_directed.cpp" ex="false" tool="1" flavor2="0">
@@ -558,22 +398,6 @@
       <item path="src/planner_stochastic.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/pokemonAI.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/ranked.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/ranked_evaluator.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/ranked_neuralNet.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/ranked_team.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/temporalpropNet.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/trainer.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/trainer_io.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/trueSkill.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="teams/dualTeamA.txt" ex="false" tool="3" flavor2="0">
       </item>

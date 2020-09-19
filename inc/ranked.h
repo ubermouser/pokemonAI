@@ -6,16 +6,15 @@
 #include <vector>
 #include <string>
 
-#include "../inc/trueSkill.h"
+#include "../inc/true_skill.h"
 
 class Game;
-class trueSkillTeam;
+class TrueSkillTeam;
 
-class ranked
-{
+class Ranked {
 protected:
   /* measure of the ranked object's skill */
-  trueSkill skill;
+  TrueSkill skill;
 
   /* the generation that this ranked object was created */
   uint32_t generation;
@@ -42,17 +41,17 @@ public:
   static const uint64_t defaultHash;
   static const std::string header;
 
-  virtual ~ranked() { };
-  ranked(size_t generation = 0, const trueSkillSettings& settings = trueSkillSettings::defaultSettings);
+  virtual ~Ranked() { };
+  Ranked(size_t generation = 0, const trueSkillSettings& settings = trueSkillSettings::defaultSettings);
 
   virtual const std::string& getName() const;
 
-  trueSkill& getSkill()
+  TrueSkill& getSkill()
   {
     return skill;
   };
 
-  const trueSkill& getSkill() const
+  const TrueSkill& getSkill() const
   {
     return skill;
   };
@@ -99,7 +98,7 @@ public:
     return  ((fpType)getNumPlies() / (fpType)getNumGamesPlayed());
   };
 
-  bool operator<(const ranked& other) const
+  bool operator<(const Ranked& other) const
   {
     return getSkill() > other.getSkill();
   };
@@ -111,17 +110,17 @@ public:
     return getHash() == oHash;
   };
 
-  bool operator==(const ranked& other) const
+  bool operator==(const Ranked& other) const
   {
     return getHash() == other.getHash();
   };
 
-  bool operator!=(const ranked& other) const
+  bool operator!=(const Ranked& other) const
   {
     return !(*this == other);
   };
 
-  size_t update(const Game& cGame, const trueSkillTeam& cTeam, size_t iTeam);
+  size_t update(const Game& cGame, const TrueSkillTeam& cTeam, size_t iTeam);
 
   virtual void resetRecord()
   {
@@ -148,9 +147,9 @@ public:
   /* input the ranked preamble to this object */
   virtual bool input(const std::vector<std::string>& lines, size_t& firstLine);
 
-  friend std::ostream& operator <<(std::ostream& os, const ranked& r);
+  friend std::ostream& operator <<(std::ostream& os, const Ranked& r);
 };
 
-std::ostream& operator <<(std::ostream& os, const ranked& tR);
+std::ostream& operator <<(std::ostream& os, const Ranked& tR);
 
 #endif /* RANKED_H */

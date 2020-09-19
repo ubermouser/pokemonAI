@@ -1,4 +1,4 @@
-#include "../inc/trueSkill.h"
+#include "../inc/true_skill.h"
 
 #include <vector>
 #include <array>
@@ -29,7 +29,7 @@ trueSkillSettings::trueSkillSettings(fpType _iMean, fpType _iStdDev, fpType _dPe
   drawProbability(_pDraw),
   dynamicsFactor(_dFactor),
   betaSquared(pow(performanceStdDev, 2)),
-  drawMargin(trueSkill::calculateDrawMargin(drawProbability, performanceStdDev)),
+  drawMargin(TrueSkill::calculateDrawMargin(drawProbability, performanceStdDev)),
   tauSquared(pow(dynamicsFactor, 2))
 {
 };
@@ -41,7 +41,7 @@ trueSkillSettings::trueSkillSettings(const trueSkillSettings& other)
   drawProbability(other.drawProbability),
   dynamicsFactor(other.dynamicsFactor),
   betaSquared(pow(performanceStdDev, 2)),
-  drawMargin(trueSkill::calculateDrawMargin(drawProbability, performanceStdDev)),
+  drawMargin(TrueSkill::calculateDrawMargin(drawProbability, performanceStdDev)),
   tauSquared(pow(dynamicsFactor, 2))
 {
 };
@@ -50,7 +50,7 @@ trueSkillSettings::trueSkillSettings(const trueSkillSettings& other)
 
 
 
-trueSkillTeam::trueSkillTeam()
+TrueSkillTeam::TrueSkillTeam()
   : baseTeam(NULL),
   baseEvaluator(NULL),
   aggregateSkill(),
@@ -59,7 +59,7 @@ trueSkillTeam::trueSkillTeam()
 {
 };
 
-trueSkillTeam::trueSkillTeam(ranked_team& cTeam, ranked& cEvaluator, const trueSkillSettings& settings)
+TrueSkillTeam::TrueSkillTeam(RankedTeam& cTeam, Ranked& cEvaluator, const trueSkillSettings& settings)
   : baseTeam(&cTeam),
   baseEvaluator(&cEvaluator),
   aggregateSkill(settings),
@@ -69,22 +69,22 @@ trueSkillTeam::trueSkillTeam(ranked_team& cTeam, ranked& cEvaluator, const trueS
   finalize(settings);
 };
 
-void trueSkillTeam::finalize(const trueSkillSettings& settings)
+void TrueSkillTeam::finalize(const trueSkillSettings& settings)
 {
   static const std::array<fpType, 2> proportion = {{ 1.0, 1.0 }};
 
-  const std::array<const ranked*, 2> components = {{ baseEvaluator, baseTeam }};
+  const std::array<const Ranked*, 2> components = {{ baseEvaluator, baseTeam }};
   // scale evaluation function's trueskill by the team's size: (evaluation function is always half the total trueskill)
   //proportion[0] *= baseTeam->team.getNumTeammates();
 
-  aggregateSkill = trueSkill::teamRank(components.begin(), components.end(), proportion.begin(), 1.0, settings);
+  aggregateSkill = TrueSkill::teamRank(components.begin(), components.end(), proportion.begin(), 1.0, settings);
 };
 
 
 
 
 
-trueSkill::trueSkill(size_t numTeammates, const trueSkillSettings& settings)
+TrueSkill::TrueSkill(size_t numTeammates, const trueSkillSettings& settings)
   : mean(settings.initialMean * numTeammates),
   stdDev(sqrt(pow(settings.initialStdDev, 2) * numTeammates))
 {
@@ -95,7 +95,7 @@ trueSkill::trueSkill(size_t numTeammates, const trueSkillSettings& settings)
 
 static const std::string header = "PKATS0";
 
-void trueSkill::output(std::ostream& oFile, bool printHeader) const
+void TrueSkill::output(std::ostream& oFile, bool printHeader) const
 {
   // header:
   if (printHeader)
@@ -109,7 +109,7 @@ void trueSkill::output(std::ostream& oFile, bool printHeader) const
     << "\n";
 };
 
-bool trueSkill::input(const std::vector<std::string>& lines, size_t& iLine)
+bool TrueSkill::input(const std::vector<std::string>& lines, size_t& iLine)
 {
   // are the enough lines in the input stream:
   if ((lines.size() - iLine) < 1U)
@@ -146,7 +146,7 @@ bool trueSkill::input(const std::vector<std::string>& lines, size_t& iLine)
 
 
 
-fpType trueSkill::calculateDrawMargin(fpType drawProbability, fpType beta)
+fpType TrueSkill::calculateDrawMargin(fpType drawProbability, fpType beta)
 {
   static boost::math::normal_distribution<fpType> cNormal;
 
@@ -161,7 +161,7 @@ fpType trueSkill::calculateDrawMargin(fpType drawProbability, fpType beta)
 
 
 
-fpType trueSkill::VExceedsMargin(fpType dPerformance, fpType drawMargin)
+fpType TrueSkill::VExceedsMargin(fpType dPerformance, fpType drawMargin)
 {
   static boost::math::normal_distribution<fpType> cNormal;
 
@@ -180,7 +180,7 @@ fpType trueSkill::VExceedsMargin(fpType dPerformance, fpType drawMargin)
 
 
 
-fpType trueSkill::WExceedsMargin(fpType dPerformance, fpType drawMargin)
+fpType TrueSkill::WExceedsMargin(fpType dPerformance, fpType drawMargin)
 {
   static boost::math::normal_distribution<fpType> cNormal;
 
@@ -207,7 +207,7 @@ fpType trueSkill::WExceedsMargin(fpType dPerformance, fpType drawMargin)
 
 
 
-fpType trueSkill::VWithinMargin(fpType dPerformance, fpType drawMargin)
+fpType TrueSkill::VWithinMargin(fpType dPerformance, fpType drawMargin)
 {
   static boost::math::normal_distribution<fpType> cNormal;
 
@@ -249,7 +249,7 @@ fpType trueSkill::VWithinMargin(fpType dPerformance, fpType drawMargin)
 
 
 
-fpType trueSkill::WWithinMargin(fpType dPerformance, fpType drawMargin)
+fpType TrueSkill::WWithinMargin(fpType dPerformance, fpType drawMargin)
 {
   static boost::math::normal_distribution<fpType> cNormal;
 
@@ -289,15 +289,15 @@ fpType trueSkill::WWithinMargin(fpType dPerformance, fpType drawMargin)
 
 
 
-fpType trueSkill::matchQuality(
-  const trueSkillTeam& team_A, 
-  const trueSkillTeam& team_B,
+fpType TrueSkill::matchQuality(
+  const TrueSkillTeam& team_A, 
+  const TrueSkillTeam& team_B,
   const trueSkillSettings& settings)
 {
   // total number of teammates on the team
   size_t totalTeammates = team_A.baseTeam->team.getNumTeammates() * 2 + team_B.baseTeam->team.getNumTeammates() * 2;
-  const trueSkill& skillA = team_A.aggregateSkill;
-  const trueSkill& skillB = team_B.aggregateSkill;
+  const TrueSkill& skillA = team_A.aggregateSkill;
+  const TrueSkill& skillB = team_B.aggregateSkill;
 
   fpType skillAStdDevSquared = pow(skillA.getStdDev() , 2);
   fpType skillBStdDevSquared = pow(skillB.getStdDev() , 2);
@@ -329,16 +329,16 @@ fpType trueSkill::matchQuality(
 
 
 
-size_t trueSkill::update(
-  trueSkillTeam& team_A,
-  trueSkillTeam& team_B,
+size_t TrueSkill::update(
+  TrueSkillTeam& team_A,
+  TrueSkillTeam& team_B,
   const GameResult& gResult,
   const trueSkillSettings& s)
 {
   int outcome = gResult.endStatus;
-  std::array< trueSkillTeam*, 2 > teams = 
+  std::array< TrueSkillTeam*, 2 > teams = 
     {{ &team_A, &team_B }};
-  std::array<trueSkill*, 2> ratings = 
+  std::array<TrueSkill*, 2> ratings = 
     {{ &team_A.aggregateSkill , &team_B.aggregateSkill }};
   std::array<fpType, 2> rankMultiplier;
 
@@ -397,7 +397,7 @@ size_t trueSkill::update(
   bool evaluatorsSame = *(teams[0]->baseEvaluator) == *(teams[1]->baseEvaluator);
   for (size_t iTeam = 0; iTeam != 2; ++iTeam)
   {
-    trueSkillTeam& tTeam = *teams[iTeam];
+    TrueSkillTeam& tTeam = *teams[iTeam];
     
     // update team:
     update_ranked(tTeam.baseTeam->getSkill(), v, w, c, cSquared, rankMultiplier[iTeam], evaluatorsSame?1.0:0.5, s);
@@ -454,8 +454,8 @@ size_t trueSkill::update(
   return numUpdates;
 } // endOf update
 
-void trueSkill::update_ranked(
-  trueSkill& cSkill, 
+void TrueSkill::update_ranked(
+  TrueSkill& cSkill, 
   fpType v, 
   fpType w, 
   fpType c, 
@@ -493,7 +493,7 @@ void trueSkill::update_ranked(
 
 
 
-void trueSkill::teamRank_finalize(trueSkill& cResult, fpType currentProportion, fpType totalProportion, const trueSkillSettings& settings)
+void TrueSkill::teamRank_finalize(TrueSkill& cResult, fpType currentProportion, fpType totalProportion, const trueSkillSettings& settings)
 {
   if (mostlyLT(currentProportion, totalProportion))
   {
@@ -510,7 +510,7 @@ void trueSkill::teamRank_finalize(trueSkill& cResult, fpType currentProportion, 
 
 
 
-void trueSkill::feather(const trueSkillSettings& settings)
+void TrueSkill::feather(const trueSkillSettings& settings)
 {
   stdDev = std::max(sqrt(pow(stdDev, 2) * 2), std::min(stdDev, settings.initialStdDev));
 };

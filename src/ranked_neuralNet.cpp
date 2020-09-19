@@ -51,10 +51,10 @@ ranked_neuralNet::ranked_neuralNet(
   const networkSettings_t& cSettings,
   const experienceNetSettings& eSettings,
   const trueSkillSettings& settings)
-  : ranked(generation, settings),
+  : Ranked(generation, settings),
   bNet(nNet, cSettings),
   experience(nNet.isInitialized()?nNet.numInputs():1, eSettings),
-  hash(ranked::defaultHash),
+  hash(Ranked::defaultHash),
   totalMeanSquaredError(0.0),
   numUpdates(0.0),
   lastJitterEpoch(0)
@@ -139,10 +139,10 @@ void ranked_neuralNet::jitter(const trueSkillSettings& settings)
   stateSaved = false;
 }
 
-size_t ranked_neuralNet::update(const Game& cGame, const trueSkillTeam& cTeam, size_t iTeam, bool updateWeights)
+size_t ranked_neuralNet::update(const Game& cGame, const TrueSkillTeam& cTeam, size_t iTeam, bool updateWeights)
 {
   // update ranked vars:
-  ranked::update(cGame, cTeam, iTeam);
+  Ranked::update(cGame, cTeam, iTeam);
 
   if (updateWeights)
   {
@@ -566,7 +566,7 @@ void ranked_neuralNet::output(std::ostream& oFile, bool printHeader) const
   oFile << "\t" << std::hex << getHash() << std::dec << "\n";
 
   // out put ranked data:
-  ranked::output(oFile);
+  Ranked::output(oFile);
 
   // output neural network:
   bNet.getNeuralNet().output(oFile);
@@ -605,7 +605,7 @@ bool ranked_neuralNet::input(const std::vector<std::string>& lines, size_t& iLin
 
   iLine++;
   // input ranked object:
-  if (!ranked::input(lines, iLine)) { return false; }
+  if (!Ranked::input(lines, iLine)) { return false; }
 
   // input neural network:
   {

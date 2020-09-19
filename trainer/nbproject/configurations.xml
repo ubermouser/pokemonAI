@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="100">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <logicalFolder name="f2" displayName="evaluators" projectFiles="true">
+        <itemPath>../inc/evaluator_featureVector.h</itemPath>
+        <itemPath>../inc/evaluator_network128.h</itemPath>
+        <itemPath>../inc/evaluator_network16.h</itemPath>
+        <itemPath>../inc/evaluator_network32.h</itemPath>
+        <itemPath>../inc/evaluator_network64.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f5" displayName="neural" projectFiles="true">
+        <itemPath>../inc/backpropNet.h</itemPath>
+        <itemPath>../inc/experienceNet.h</itemPath>
+        <itemPath>../inc/neuralNet.h</itemPath>
+        <itemPath>../inc/temporalpropNet.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f4" displayName="trainer" projectFiles="true">
+        <logicalFolder name="f1" displayName="ranked" projectFiles="true">
+          <itemPath>../inc/ranked.h</itemPath>
+          <itemPath>../inc/ranked_evaluator.h</itemPath>
+          <itemPath>../inc/ranked_neuralNet.h</itemPath>
+          <itemPath>../inc/ranked_team.h</itemPath>
+        </logicalFolder>
+        <itemPath>../inc/genetic.h</itemPath>
+        <itemPath>../inc/old_trainer.h</itemPath>
+        <itemPath>../inc/trainer.h</itemPath>
+        <itemPath>../inc/trainer_neural.h</itemPath>
+        <itemPath>../inc/true_skill.h</itemPath>
+      </logicalFolder>
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <logicalFolder name="f1" displayName="evaluators" projectFiles="true">
+        <itemPath>../src/evaluator_featureVector.cpp</itemPath>
+        <itemPath>../src/evaluator_network128.cpp</itemPath>
+        <itemPath>../src/evaluator_network16.cpp</itemPath>
+        <itemPath>../src/evaluator_network32.cpp</itemPath>
+        <itemPath>../src/evaluator_network64.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f4" displayName="neural" projectFiles="true">
+        <itemPath>../src/backpropNet.cpp</itemPath>
+        <itemPath>../src/experienceNet.cpp</itemPath>
+        <itemPath>../src/neuralNet.cpp</itemPath>
+        <itemPath>../src/temporalpropNet.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f3" displayName="trainer" projectFiles="true">
+        <logicalFolder name="f1" displayName="ranked" projectFiles="true">
+          <itemPath>../src/ranked.cpp</itemPath>
+          <itemPath>../src/ranked_evaluator.cpp</itemPath>
+          <itemPath>../src/ranked_neuralNet.cpp</itemPath>
+          <itemPath>../src/ranked_team.cpp</itemPath>
+        </logicalFolder>
+        <itemPath>../src/old_trainer.cpp</itemPath>
+        <itemPath>../src/trainer.cpp</itemPath>
+        <itemPath>../src/trainer_io.cpp</itemPath>
+        <itemPath>../src/trainer_neural.cpp</itemPath>
+        <itemPath>../src/trueSkill.cpp</itemPath>
+      </logicalFolder>
+      <itemPath>../src/ranker_main.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceRootList>
+    <Elem>../src</Elem>
+    <Elem>../inc</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <compilerSet>CLANG|CLang</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <ccTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>GEN4_STATIC</Elem>
+            <Elem>_DEBUG</Elem>
+            <Elem>_LINUX</Elem>
+          </preprocessorList>
+        </ccTool>
+        <linkerTool>
+          <linkerLibItems>
+            <linkerLibProjectItem>
+              <makeArtifact PL="../pkaiEngine"
+                            CT="3"
+                            CN="Debug"
+                            AC="true"
+                            BL="true"
+                            WD="../pkaiEngine"
+                            BC="${MAKE}  -f Makefile CONF=Debug"
+                            CC="${MAKE}  -f Makefile CONF=Debug clean"
+                            OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libpkaiengine.a">
+              </makeArtifact>
+            </linkerLibProjectItem>
+            <linkerOptionItem>-lboost_system</linkerOptionItem>
+            <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
+            <linkerOptionItem>-lboost_program_options</linkerOptionItem>
+            <linkerOptionItem>-fopenmp</linkerOptionItem>
+            <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+      <item path="../inc/backpropNet.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/evaluator_featureVector.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/evaluator_network128.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/evaluator_network16.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/evaluator_network32.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/evaluator_network64.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/experienceNet.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/genetic.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/neuralNet.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/old_trainer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/ranked.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/ranked_evaluator.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/ranked_neuralNet.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/ranked_team.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/temporalpropNet.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/trainer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/trainer_neural.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/true_skill.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/backpropNet.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/evaluator_featureVector.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/evaluator_network128.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/evaluator_network16.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/evaluator_network32.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/evaluator_network64.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/experienceNet.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/neuralNet.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/old_trainer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/ranked.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/ranked_evaluator.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/ranked_neuralNet.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/ranked_team.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/ranker_main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/temporalpropNet.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/trainer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/trainer_io.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/trainer_neural.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/trueSkill.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+      </compileType>
+      <item path="../inc/backpropNet.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/evaluator_featureVector.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/evaluator_network128.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/evaluator_network16.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/evaluator_network32.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/evaluator_network64.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/experienceNet.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/genetic.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/neuralNet.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/old_trainer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/ranked.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/ranked_evaluator.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/ranked_neuralNet.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/ranked_team.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/temporalpropNet.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/trainer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/trainer_neural.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/true_skill.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../src/backpropNet.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/evaluator_featureVector.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/evaluator_network128.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/evaluator_network16.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/evaluator_network32.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/evaluator_network64.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/experienceNet.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/neuralNet.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/old_trainer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/ranked.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/ranked_evaluator.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/ranked_neuralNet.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/ranked_team.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/ranker_main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/temporalpropNet.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/trainer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/trainer_io.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/trainer_neural.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/trueSkill.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>

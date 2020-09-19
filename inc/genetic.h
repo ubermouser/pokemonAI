@@ -9,7 +9,7 @@
 #include "../inc/fp_compare.h"
 #include "../inc/ranked.h"
 #include "../inc/ranked_team.h"
-#include "../inc/trueSkill.h"
+#include "../inc/true_skill.h"
 
 
 
@@ -19,15 +19,15 @@ class sortByMatchQuality
 {
 private:
   const trueSkillSettings& tSettings;
-  const trueSkillTeam& cTeam;
+  const TrueSkillTeam& cTeam;
 public:
-  sortByMatchQuality(const trueSkillTeam& _cTeam, const trueSkillSettings& _tSettings = trueSkillSettings::defaultSettings)
+  sortByMatchQuality(const TrueSkillTeam& _cTeam, const trueSkillSettings& _tSettings = trueSkillSettings::defaultSettings)
     : tSettings(_tSettings),
     cTeam(_cTeam)
   {
   };
 
-  fpType getValue(const trueSkillTeam& oTeam) const
+  fpType getValue(const TrueSkillTeam& oTeam) const
   {
     // don't attempt to find match against an identical team:
     if (*(cTeam.baseTeam) == *(oTeam.baseTeam)) { return std::numeric_limits<fpType>::quiet_NaN(); }
@@ -56,7 +56,7 @@ public:
     }
 
     // determine match quality
-    fpType cQuality = trueSkill::matchQuality(cTeam, oTeam, tSettings);
+    fpType cQuality = TrueSkill::matchQuality(cTeam, oTeam, tSettings);
     cQuality = cQuality * cQuality * multiplier;
     return mostlyLT(cQuality, 0.0001)?0.0:cQuality;
   };
@@ -65,12 +65,12 @@ public:
 class sortByVariability
 {
 public:
-  static fpType getValue (const ranked& cTeam)
+  static fpType getValue (const Ranked& cTeam)
   {
     return cTeam.getSkill().getStdDev() * cTeam.getSkill().getStdDev();
   };
 
-  static fpType getValue (const ranked* const cTeam)
+  static fpType getValue (const Ranked* const cTeam)
   {
     return cTeam->getSkill().getStdDev() * cTeam->getSkill().getStdDev();
   };
@@ -80,7 +80,7 @@ class sortByMean
 {
 public:
 
-  static fpType getValue (const ranked& oTeam)
+  static fpType getValue (const Ranked& oTeam)
   {
     fpType oMean = oTeam.getSkill().getMean();
     return 1.0 + (mostlyGT(oMean, 0.0)?sqrt(oMean):0.0);
@@ -96,7 +96,7 @@ public:
   {
   };
 
-  fpType getValue (const ranked& oTeam) const
+  fpType getValue (const Ranked& oTeam) const
   {
     // the element with the highest mean has a 0% chance of being selected
     fpType oMean = oTeam.getSkill().getMean();
@@ -107,16 +107,16 @@ public:
 class sortByMean_noDuplicates
 {
 private:
-  const ranked_team& cTeam;
+  const RankedTeam& cTeam;
   bool partial;
 public:
-  sortByMean_noDuplicates(const ranked_team& _cTeam, bool _partial = false)
+  sortByMean_noDuplicates(const RankedTeam& _cTeam, bool _partial = false)
     : cTeam(_cTeam),
     partial(_partial)
   {
   };
 
-  fpType getValue (const ranked_team& oTeam) const
+  fpType getValue (const RankedTeam& oTeam) const
   {
     // compare team hash - don't allow duplicate
     if (cTeam == oTeam) { return std::numeric_limits<fpType>::quiet_NaN(); }
@@ -141,17 +141,17 @@ public:
 class sortByRank
 {
 private:
-  const ranked_team& cTeam;
+  const RankedTeam& cTeam;
   fpType minRank;
   fpType maxRank;
 public:
-  sortByRank(const ranked_team& _cTeam, fpType _minRank, fpType _maxRank)
+  sortByRank(const RankedTeam& _cTeam, fpType _minRank, fpType _maxRank)
     : cTeam(_cTeam),
     minRank(_minRank),
     maxRank(_maxRank)
   {
   }
-  fpType getValue (const ranked_team& oTeam) const
+  fpType getValue (const RankedTeam& oTeam) const
   {
     if (cTeam == oTeam) { return std::numeric_limits<fpType>::quiet_NaN(); }
     return 0.1 + scale(cTeam.getSkill().getRank(), maxRank, minRank);
