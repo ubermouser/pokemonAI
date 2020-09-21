@@ -394,6 +394,8 @@ TEST_F(EngineTest, Outrage) {
   EXPECT_TRUE(engine_->isValidAction(outrage_2.at(0), Action::move(0), TEAM_A));
   EXPECT_TRUE(engine_->isValidAction(outrage_2.at(0), Action::move(1), TEAM_A));
   EXPECT_TRUE(engine_->isValidAction(outrage_2.at(0), Action::swap(1), TEAM_A));
+
+  // TODO(@drendleman) the pokemon's outrage counter doesn't decrease when the enemy is dead:
 }
 
 

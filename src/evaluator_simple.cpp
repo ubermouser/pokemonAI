@@ -39,7 +39,7 @@ fpType EvaluatorSimple::fitness_pokemon(const ConstPokemonVolatile& pV) const {
 
   // accumulate move fitness:
   fpType moveAccumulator = 0.;
-  for (size_t iMove = 0, count=isAlive?pV.nv().getNumMoves():0; isAlive && iMove < count; ++iMove) {
+  for (size_t iMove = 0, count=isAlive?pV.nv().getNumMoves():0; iMove < count; ++iMove) {
     moveAccumulator += fitness_move(pV.getMV(iMove));
   }
   // TODO(@drendleman) does a valid pokemon have at least one move?
@@ -56,7 +56,7 @@ fpType EvaluatorSimple::fitness_pokemon(const ConstPokemonVolatile& pV) const {
 fpType EvaluatorSimple::fitness_team(const ConstTeamVolatile& tV) const {
   bool isAlive = tV.isAlive();
   fpType pokemonAccumulator = 0.0;
-  for (size_t iTeammate = 0, count = isAlive?tV.nv().getNumTeammates():0; iTeammate != count; ++iTeammate) {
+  for (size_t iTeammate = 0, count = isAlive?tV.nv().getNumTeammates():0; iTeammate < count; ++iTeammate) {
     pokemonAccumulator += fitness_pokemon(tV.teammate(iTeammate));
   }
   pokemonAccumulator /= tV.nv().getNumTeammates();

@@ -615,6 +615,8 @@ int move_outrage_endLockOn(
   if (status.cTeammate.lockIn_duration == 0) { return 0; }
   MoveVolatile mV = cPKV.getMV(status.cTeammate.lockIn_action - 1);
   if (&mV.getBase() != outrage_t) { return 0; }
+  // if the enemy team has a free move, do not decrement lock-on counter
+  if (cu.getBase().hasWaited(cu.getICTeam())) { return 0; }
 
   // 50% chance to end at stage 1:
   if (status.cTeammate.lockIn_duration == 2) {
