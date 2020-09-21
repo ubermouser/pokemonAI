@@ -2,25 +2,35 @@
 #include "../inc/planner_random.h"
 
 #include <typeinfo>
+#include <boost/program_options.hpp>
 
 #include "../inc/pkCU.h"
 #include "../inc/environment_possible.h"
 
+namespace po = boost::program_options;
 const std::string PlannerRandom::ident = "Random_Planner-NULLEVAL";
 
 
-/*PlannerRandom::PlannerRandom(const Planner::Config& cfg) : Planner(cfg, ident), cfg_(cfg) {
-  try {
-    cfg_ = dynamic_cast<const Config&>(cfg);
-  } catch(std::bad_cast) { }
-}*/
+po::options_description PlannerRandom::Config::options(
+    const std::string& category, std::string prefix) {
+  Config defaults{};
+  po::options_description desc = base_t::Config::options(category, prefix);
+
+  if (prefix.size() > 0) { prefix.append("-"); }
+  desc.add_options()
+      ((prefix + "move-chance").c_str(),
+      po::value<double>(&moveChance)->default_value(defaults.moveChance),
+      "likelihood for the random action selected to be a move.");
+
+  return desc;
+}
 
 
 PlyResult PlannerRandom::generateSolutionAtLeaf(
     const ConstEnvironmentPossible& origin) const {
   PlyResult result;
   // determine if we want to perform moves only:
-  bool doMove = (cfg_.moveChance*RAND_MAX) <= (rand() % RAND_MAX);
+  bool doMove = (rand() % RAND_MAX) <= (cfg_.moveChance*RAND_MAX);
   // determine the set of all valid actions:
   auto validMoves = cu_->getValidMoveActions(origin, agentTeam_);
   auto validActions = cu_->getValidActions(origin, agentTeam_);

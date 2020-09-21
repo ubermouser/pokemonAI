@@ -2,7 +2,7 @@
 
 #include <boost/program_options.hpp>
 
-#include "../inc/evaluator_random.h"
+#include "../inc/evaluator_simple.h"
 #include "../inc/pkCU.h"
 #include "../inc/planner_random.h"
 
@@ -16,6 +16,9 @@ po::options_description EvaluatorMonteCarlo::Config::options(
 
   if (prefix.size() > 0) { prefix.append("-"); }
   desc.add_options()
+      ((prefix + "move-chance").c_str(),
+      po::value<double>(&moveChance)->default_value(defaults.moveChance),
+      "likelihood for the random action selected to be a move.")
       ((prefix + "max-rollouts").c_str(),
       po::value<size_t>(&maxRollouts)->default_value(defaults.maxRollouts),
       "maximum number of rollouts per calculation.")
@@ -33,6 +36,8 @@ po::options_description EvaluatorMonteCarlo::Config::options(
 
 EvaluatorMonteCarlo::EvaluatorMonteCarlo(const Config& cfg)
     : Evaluator("MonteCarlo_Evaluator"), cfg_(cfg) {
+  PlannerRandom::Config plannercfg;
+  plannercfg.moveChance = cfg.moveChance;
   Game::Config gamecfg;
   gamecfg.maxMatches = cfg_.maxRollouts;
   gamecfg.maxPlies = cfg_.maxPlies;
@@ -42,9 +47,9 @@ EvaluatorMonteCarlo::EvaluatorMonteCarlo(const Config& cfg)
   gamecfg.storeSubcomponents = false;
   gamecfg.verbosity = 0;
   game_ = std::make_shared<Game>(gamecfg);
-  game_->setEvaluator(EvaluatorRandom())
-      .setPlanner(0, PlannerRandom().setEngine(PkCU()))
-      .setPlanner(1, PlannerRandom().setEngine(PkCU()));
+  game_->setEvaluator(EvaluatorSimple())
+      .setPlanner(0, PlannerRandom(plannercfg).setEngine(PkCU()))
+      .setPlanner(1, PlannerRandom(plannercfg).setEngine(PkCU()));
 }
 
 

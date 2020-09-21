@@ -5,10 +5,14 @@
 
 class PlannerRandom : public Planner {
 public:
+  using base_t = Planner;
   struct Config: public Planner::Config {
-    double moveChance = 0.7;
+    double moveChance = 0.75;
 
     Config() : Planner::Config() {};
+
+    virtual boost::program_options::options_description options(
+        const std::string& category="agent options", std::string prefix="") override;
   };
 
   PlannerRandom(const Config& cfg = Config()) : Planner(cfg, ident), cfg_(dynamic_cast<const Config&>(cfg)) {};

@@ -113,12 +113,13 @@ PlannerResult Planner::generateSolution(const ConstEnvironmentPossible& origin) 
     plyResult.timeSpent =  std::chrono::duration<double>(checkpoint - start).count();
     result.atDepth.push_back(plyResult);
 
+    bool hasSolution = result.hasSolution();
     bool terminalDepth = (iDepth >= cfg_.maxDepth);
     bool terminalTime = plyResult.timeSpent > cfg_.maxTime;
     printSolution(result, terminalDepth || terminalTime);
 
     // break loop early if we are over maximum time
-    if (terminalTime) { break; }
+    if (hasSolution && terminalTime) { break; }
   }
 
   return result;

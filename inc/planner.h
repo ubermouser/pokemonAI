@@ -19,18 +19,23 @@
 
 
 struct PlyResult : public EvalResult {
-  size_t numNodes = 0;
-  double timeSpent = 0;
+  size_t numNodes;
+  double timeSpent;
 
-  PlyResult() = default;
-  PlyResult(const EvalResult& other): EvalResult(other) { }
+  PlyResult(
+      const EvalResult& evalResult = EvalResult{}) :
+      EvalResult(evalResult), 
+      numNodes(0),
+      timeSpent(0) {};
 };
 
 struct PlannerResult {
   std::vector<PlyResult> atDepth;
 
   bool hasSolution() const {
-    return !atDepth.empty();
+    if (atDepth.empty()) { return false; }
+    if (bestAgentAction().isUndefined()) { return false; }
+    return true;
   }
 
   const PlyResult& best() const {

@@ -23,6 +23,8 @@ public:
 
     size_t numThreads = 0;
 
+    double moveChance = 0.75;
+
     Config() : Evaluator::Config() {};
 
     virtual boost::program_options::options_description options(

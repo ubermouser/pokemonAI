@@ -203,7 +203,7 @@ HeatResult Game::rollout(const EnvironmentVolatileData& initialState) const {
   }
 
   HeatResult result = digestMatch(gameLog);
-  if (cfg_.verbosity >= 1 && cfg_.maxMatches > 1) { printHeatOutline(result); }
+  if (cfg_.verbosity >= 1) { printHeatOutline(result); }
   return result;
 }
 
@@ -293,7 +293,7 @@ Turn Game::digestTurn(
     const PlannerResult& action = actions[iTeam];
     // set simple fitness to fitness as it would be evaluated depth 0 by the simple non perceptron evaluation function
     turn.simpleFitness = eval_->calculateFitness(envP.getEnv(), iTeam).fitness.lowerBound();
-    if (action.hasSolution()) {
+    if (!action.atDepth.empty()) {
       // simple, d-0 and d-M fitness at the BEGINNING of the turn:
         turn.depth0Fitness = action.atDepth.front().fitness.value();
         turn.depthMaxFitness = action.atDepth.back().fitness.value();
@@ -528,13 +528,13 @@ void Game::printAction(
   if (action.isMove()) {
     out
       << getPokemonIdentifier(cTeam, iTeam) << " used "
-      << action.iMove() << "-"
+      << (action.iMove()+1) << "-"
       << cTeam.getPKV().getMV(action)
       << "!\n";
   } else if (action.isSwitch()) {
     out
       << getPokemonIdentifier(cTeam, iTeam) << " is switching out with "
-      << action.friendlyTarget() << ": "
+      << (action.friendlyTarget()+1) << ": "
       << cTeam.teammate(action.friendlyTarget() - Action::FRIENDLY_0).nv().getName() << "!\n";
   } else if (action.isWait()) {
     out
@@ -615,7 +615,7 @@ void Game::printGameStart(size_t iMatch) const {
 template<typename ResultType> void printLeaderboard(
     std::ostream& out, size_t iPokemon, const ResultType& pResult, const PokemonNonVolatile& cPKNV) {
   out << boost::format("    %d: %24.24s r=%d  c=% 5.3f  s=% 5.3f  p=%5.3f  ")
-      % iPokemon
+      % (iPokemon+1)
       % cPKNV
       % (pResult.ranking + 1)
       % pResult.aggregateContribution

@@ -37,7 +37,7 @@ PlyResult PlannerMax::generateSolutionAtDepth(
     // is the returned fitness better than the current best fitness:
     if (child > result) {
       result.fitness = child.fitness;
-      result.depth = child.depth;
+      result.depth = child.depth + 1;
       result.agentAction = action;
     }
   }

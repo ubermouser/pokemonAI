@@ -25,7 +25,7 @@ struct FitnessDepth {
     fitness(fitness_),
     depth(std::min(depth_, MAXTRIES)) { }
 
-  bool fullyEvaluated() const { return depth == MAXTRIES; }
+  bool fullyEvaluated() const { return depth >= MAXTRIES; }
 
   bool operator < (const FitnessDepth& other) const {
     // bias towards shallower depth
