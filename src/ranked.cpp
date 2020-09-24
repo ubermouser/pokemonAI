@@ -66,8 +66,8 @@ std::ostream& operator <<(std::ostream& os, const Ranked& tR)
   os.precision(6);
   os <<
     " g= " << std::setw(3) << std::right << tR.getGeneration() <<
-    " m= " << std::setw(7) << tR.getSkill().getMean() <<
-    " s= " << std::setw(7) << tR.getSkill().getStdDev() <<
+    " m= " << std::setw(7) << tR.skill().getMean() <<
+    " s= " << std::setw(7) << tR.skill().getStdDev() <<
     " w= " << std::setw(7) << std::left << tR.getNumWins() << 
     " / " << std::setw(7) << std::right << (tR.getNumGamesPlayed());
   os.precision(prevPrecision);

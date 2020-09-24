@@ -34,17 +34,17 @@ for (size_t iComponentTeam = 0; iComponentTeam != componentTeams.size(); ++iComp
 
 RankedTeam::RankedTeam(const TeamNonVolatile& cTeam, size_t _generation, const trueSkillSettings& cSettings)
   : Ranked(_generation, cSettings),
-  team(cTeam),
+  nv_(cTeam),
   hash(),
   rankPoints(),
   numPlies(),
   numMoves()
 {
-  getSkill() = TrueSkill(1, cSettings);
+  skill() = TrueSkill(1, cSettings);
   hash.fill(Ranked::defaultHash);
   numPlies.fill(0);
   rankPoints.fill(0);
-  for (size_t iTeammate = 0; iTeammate != team.getMaxNumTeammates(); ++iTeammate)
+  for (size_t iTeammate = 0; iTeammate != nv_.getMaxNumTeammates(); ++iTeammate)
   {
     numMoves[iTeammate].fill(0);
   }
@@ -56,7 +56,7 @@ RankedTeam::RankedTeam(const TeamNonVolatile& cTeam, size_t _generation, const t
 
 RankedTeam::RankedTeam(const RankedTeam& other)
   : Ranked(other),
-  team(other.team),
+  nv_(other.nv_),
   hash(other.hash),
   rankPoints(other.rankPoints),
   numPlies(other.numPlies),
@@ -71,16 +71,16 @@ RankedTeam::RankedTeam(const RankedTeam& other)
 std::ostream& operator <<(std::ostream& os, const RankedTeam& tR)
 {
   os << 
-    "" << std::setw(20) << tR.team.getName().substr(0,20) << " ";
+    "" << std::setw(20) << tR.team_.getName().substr(0,20) << " ";
 
   // print a few characters from each teammate:
   size_t teammateStringSize = 0;
   size_t sizeAccumulator = 0;
-  for (size_t iTeammate = 0; iTeammate != tR.team.getNumTeammates(); ++iTeammate)
+  for (size_t iTeammate = 0; iTeammate != tR.team_.getNumTeammates(); ++iTeammate)
   {
-    teammateStringSize = (24 - sizeAccumulator) / (tR.team.getNumTeammates() - iTeammate);
+    teammateStringSize = (24 - sizeAccumulator) / (tR.team_.getNumTeammates() - iTeammate);
 
-    const std::string& baseName = tR.team.teammate(iTeammate).getBase().getName();
+    const std::string& baseName = tR.team_.teammate(iTeammate).getBase().getName();
     os << baseName.substr(0, teammateStringSize);
 
     sizeAccumulator += std::min(baseName.size(), teammateStringSize);
@@ -91,8 +91,8 @@ std::ostream& operator <<(std::ostream& os, const RankedTeam& tR)
   os.precision(6);
   os <<
     " g= " << std::setw(3) << std::right << tR.getGeneration() <<
-    " m= " << std::setw(7) << tR.getSkill().getMean() <<
-    " s= " << std::setw(7) << tR.getSkill().getStdDev() <<
+    " m= " << std::setw(7) << tR.skill().getMean() <<
+    " s= " << std::setw(7) << tR.skill().getStdDev() <<
     " w= " << std::setw(7) << std::left << tR.getNumWins() << 
     " / " << std::setw(7) << std::right << (tR.getNumGamesPlayed());
   os.precision(prevPrecision);
@@ -113,8 +113,8 @@ void RankedTeam::output(std::ostream& oFile, bool printHeader) const
   };
 
   // team hash:
-  oFile << std::hex << getHash() << std::dec << "\n";
-  for (size_t iTeammate = 0; iTeammate != team.getNumTeammates(); ++iTeammate)
+  oFile << std::hex << hash() << std::dec << "\n";
+  for (size_t iTeammate = 0; iTeammate != nv_.getNumTeammates(); ++iTeammate)
   {
     // pokemon hashes:
     oFile << std::hex << getTeammateHash(iTeammate) << std::dec << "\t";
@@ -149,7 +149,7 @@ void RankedTeam::output(std::ostream& oFile, bool printHeader) const
   Ranked::output(oFile);
 
   // the rest of this section is exactly like a normal output team method, except with a different header
-  team.output(oFile);
+  nv_.output(oFile);
 } // endOf outputRankedTeam
 
 
@@ -261,7 +261,7 @@ bool RankedTeam::input(const std::vector<std::string>& lines, size_t& iLine)
   if (!Ranked::input(lines, iLine)) { return false; }
 
   // input actual team:
-  if (!team.input(lines, iLine)) { return false; }
+  if (!nv_.input(lines, iLine)) { return false; }
 
   return true;
 } // endOf inputTeam (ranked)
@@ -275,13 +275,13 @@ void RankedTeam::generateHash(bool generateSubHashes)
   if (generateSubHashes)
   {
     // generate hashes for each of the pokemon:
-    for (size_t iTeammate = 0; iTeammate < team.getNumTeammates(); ++iTeammate)
+    for (size_t iTeammate = 0; iTeammate < nv_.getNumTeammates(); ++iTeammate)
     {
-      hash[iTeammate + 1] = team.teammate(iTeammate).hash();
+      hash[iTeammate + 1] = nv_.teammate(iTeammate).hash();
     }
   }
 
-  hash[0] = team.hash();
+  hash[0] = nv_.hash();
 };
 
 
@@ -290,18 +290,18 @@ void RankedTeam::generateHash(bool generateSubHashes)
 
 void RankedTeam::defineNames()
 {
-  size_t numPokemon = team.getNumTeammates();
+  size_t numPokemon = team_.getNumTeammates();
   // set name of created team based on hash:
   {
     std::ostringstream tName(std::ostringstream::out);
-    tName << "_" << numPokemon << "-x" << std::setfill('0') << std::setw(16) << std::hex << getHash();
-    team.setName(tName.str());
+    tName << "_" << numPokemon << "-x" << std::setfill('0') << std::setw(16) << std::hex << hash();
+    team_.setName(tName.str());
   }
 
   // set names of created pokemon based on hashes:
   for (size_t iTeammate = 0; iTeammate < numPokemon; ++iTeammate)
   {
-    PokemonNonVolatile& cPokemon = team.teammate(iTeammate);
+    PokemonNonVolatile& cPokemon = team_.teammate(iTeammate);
 
     std::ostringstream tName(std::ostringstream::out);
     tName << "" << iTeammate << numPokemon << "-x" << std::setfill('0') << std::setw(16) << std::hex << getTeammateHash(iTeammate);
@@ -331,12 +331,12 @@ size_t RankedTeam::update(const Game& cGame, const TrueSkillTeam& cTeam, size_t 
     const std::array<std::array<uint32_t, 5>, 6>& cTeamMoves = cGameResult.moveUse[iTeam];
     const std::array<uint32_t, 6>& cTeamRanks = cGameResult.ranking[iTeam];
     const std::array<uint32_t, 6>& cTeamPlies = cGameResult.participation[iTeam];
-    for (size_t iTeammate = 0; iTeammate != team.getNumTeammates(); ++iTeammate)
+    for (size_t iTeammate = 0; iTeammate != team_.getNumTeammates(); ++iTeammate)
     {
       const std::array<uint32_t, 5>& cTeammateMoves = cTeamMoves[iTeammate];
 
       // main team:
-      for (size_t iMove = 0, iMoveSize = team.teammate(iTeammate).getNumMoves(); iMove != iMoveSize; ++iMove)
+      for (size_t iMove = 0, iMoveSize = team_.teammate(iTeammate).getNumMoves(); iMove != iMoveSize; ++iMove)
       {
         // add number of a particular action this pokemon used during the match to total
         numMoves[iTeammate][iMove] += cTeammateMoves[iMove];
@@ -346,7 +346,7 @@ size_t RankedTeam::update(const Game& cGame, const TrueSkillTeam& cTeam, size_t 
       numPlies[iTeammate] += cTeamPlies[iTeammate];
       // add rankPoints:
       rankPoints[iTeammate] += 
-        team.getNumTeammates() - cTeamRanks[iTeammate];
+        team_.getNumTeammates() - cTeamRanks[iTeammate];
     }
     numUpdates++;
 
@@ -356,7 +356,7 @@ size_t RankedTeam::update(const Game& cGame, const TrueSkillTeam& cTeam, size_t 
     {
       const std::array<size_t, 6>& correspondence = cTeam.correspondencies[iComponent];
 
-      for (size_t iOTeammate = 0; iOTeammate != componentTeam->team.getNumTeammates(); ++iOTeammate)
+      for (size_t iOTeammate = 0; iOTeammate != componentTeam->team_.getNumTeammates(); ++iOTeammate)
       {
         assert(correspondence[iOTeammate] != SIZE_MAX);
 
@@ -366,10 +366,10 @@ size_t RankedTeam::update(const Game& cGame, const TrueSkillTeam& cTeam, size_t 
         componentTeam->numPlies[iOTeammate] += cTeamPlies[correspondence[iOTeammate]];
         // increment rankPoints: (weighted by total team's numTeammates)
         componentTeam->rankPoints[iOTeammate] += 
-          team.getNumTeammates() - cTeamRanks[correspondence[iOTeammate]];
+          team_.getNumTeammates() - cTeamRanks[correspondence[iOTeammate]];
 
         // increment moves:
-        for (size_t iMove = 0, iMoveSize = componentTeam->team.teammate(iOTeammate).getNumMoves(); iMove != iMoveSize; ++iMove)
+        for (size_t iMove = 0, iMoveSize = componentTeam->team_.teammate(iOTeammate).getNumMoves(); iMove != iMoveSize; ++iMove)
         {
           // add number of a particular action this pokemon used during the match to total
           componentTeam->numMoves[iOTeammate][iMove] += cTeammateMoves[iMove];
@@ -397,7 +397,7 @@ RankedTeam RankedTeam::selectRandom(
   std::vector<bool> createdTeams;
   std::vector<fpType> numCTeam;
   RankedTeam cRankTeam;
-  TeamNonVolatile& cTeam = cRankTeam.team;
+  TeamNonVolatile& cTeam = cRankTeam.team_;
   size_t maxGeneration = 0;
 
   if (numPokemon > 1)
@@ -421,9 +421,9 @@ RankedTeam RankedTeam::selectRandom(
       numCTeam.push_back(0);
 
       // add collected pokemon to cRankTeam
-      for (size_t iTeammate = 0, iSize = targetTeam->team.getNumTeammates(); iTeammate != iSize; ++iTeammate)
+      for (size_t iTeammate = 0, iSize = targetTeam->team_.getNumTeammates(); iTeammate != iSize; ++iTeammate)
       {
-        const PokemonNonVolatile& cTeammate = targetTeam->team.teammate(iTeammate);
+        const PokemonNonVolatile& cTeammate = targetTeam->team_.teammate(iTeammate);
 
         // determine if pokemon is legal add: (selectRandom_single should guarantee this)
         if (!cTeam.isLegalAdd(cTeammate)) { continue; }
@@ -469,7 +469,7 @@ RankedTeam RankedTeam::selectRandom(
   }
 
   // determine team's skill from its component skills
-  cRankTeam.getSkill() = TrueSkill::teamRank(componentTeams.begin(), componentTeams.end(), numCTeam.begin(), 1.0, settings);
+  cRankTeam.skill() = TrueSkill::teamRank(componentTeams.begin(), componentTeams.end(), numCTeam.begin(), 1.0, settings);
   //cRankTeam.getSkill().feather(settings);
 
   // set generation of team:
@@ -578,7 +578,7 @@ RankedTeam RankedTeam::mutate(
 {
   RankedTeam mutatedTeam(parent);
 
-  size_t numTeammates = mutatedTeam.team.getNumTeammates();
+  size_t numTeammates = mutatedTeam.team_.getNumTeammates();
   size_t maxGeneration = mutatedTeam.getGeneration();
 
   // an array of which pokemon have been seeded from which team. Used for averaging trueskill scores
@@ -612,7 +612,7 @@ RankedTeam RankedTeam::mutate(
 
       // add elements from targetTeam to mutatedTeam, but don't add an element over an already swapped teammate:
       std::vector<bool> isSwapped(numTeammates, false);
-      for (size_t iOTeammate = 0; iOTeammate != targetTeam.team.getNumTeammates(); ++iOTeammate)
+      for (size_t iOTeammate = 0; iOTeammate != targetTeam.team_.getNumTeammates(); ++iOTeammate)
       {
         // find an acceptable target swap index:
         size_t iTarget = rand() % numTeammates;
@@ -621,13 +621,13 @@ RankedTeam RankedTeam::mutate(
           iTarget = (iTarget + 1) % numTeammates;
         };
 
-        const PokemonNonVolatile& swappedTeammate = targetTeam.team.teammate(iOTeammate);
+        const PokemonNonVolatile& swappedTeammate = targetTeam.team_.teammate(iOTeammate);
 
         // determine if pokemon is legal add: (selectRandom_single should guarantee this)
-        if (!mutatedTeam.team.isLegalAdd(swappedTeammate)) { continue; }
+        if (!mutatedTeam.team_.isLegalAdd(swappedTeammate)) { continue; }
         
         // add pokemon if legal:
-        mutatedTeam.team.setPokemon(iTarget, swappedTeammate);
+        mutatedTeam.team_.setPokemon(iTarget, swappedTeammate);
 
         // remove 1 pokemon from current team, add one to new team
         numCTeam.front() -= 1.0;
@@ -651,7 +651,7 @@ RankedTeam RankedTeam::mutate(
     {
       size_t iSwap = (rand() % (numTeammates - 1)) + 1; 
       
-      mutatedTeam.team.setLeadPokemon(iSwap);
+      mutatedTeam.team_.setLeadPokemon(iSwap);
       //numCTeam.front() -= 1.0; // feather by 1
       break;
     }
@@ -671,7 +671,7 @@ RankedTeam RankedTeam::mutate(
   }
 
   // feather (not reset) the team's rank:
-  mutatedTeam.getSkill() = TrueSkill::teamRank(componentTeams.begin(), componentTeams.end(), numCTeam.begin(), 1.0, settings);
+  mutatedTeam.skill() = TrueSkill::teamRank(componentTeams.begin(), componentTeams.end(), numCTeam.begin(), 1.0, settings);
   //mutatedTeam.getSkill().feather(settings);
 
   // add one to the team's generation:

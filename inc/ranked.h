@@ -1,129 +1,41 @@
 #ifndef RANKED_H
 #define RANKED_H
 
-#include "../inc/pkai.h"
+#include "pkai.h"
 
 #include <vector>
 #include <string>
+#include <ostream>
 
-#include "../inc/true_skill.h"
+#include "true_skill.h"
 
-class Game;
-class TrueSkillTeam;
 
-class Ranked {
-protected:
+struct RankedRecord {
   /* measure of the ranked object's skill */
-  TrueSkill skill;
+  TrueSkill skill = TrueSkill{};
 
   /* the generation that this ranked object was created */
-  uint32_t generation;
+  size_t generation = 0;
 
   /* total number of wins by this ranked object */
-  uint32_t numWins;
-  
+  uint64_t numWins = 0;
+
   /* total number of losses by this ranked object */
-  uint32_t numLosses;
-  
+  uint64_t numLosses = 0;
+
   /* total number of draws by this ranked object */
-  uint32_t numDraws;
+  uint64_t numDraws = 0;
 
   /* total number of ties by this ranked object */
-  uint32_t numTies;
+  uint64_t numTies = 0;
 
   /* total number of plies played by this ranked object */
-  uint32_t numPlies;
+  uint64_t numPlies = 0;
 
   /* has state been written to disk? */
-  bool stateSaved;
+  bool stateSaved = false;
 
-public:
-  static const uint64_t defaultHash;
-  static const std::string header;
-
-  virtual ~Ranked() { };
-  Ranked(size_t generation = 0, const trueSkillSettings& settings = trueSkillSettings::defaultSettings);
-
-  virtual const std::string& getName() const;
-
-  TrueSkill& getSkill()
-  {
-    return skill;
-  };
-
-  const TrueSkill& getSkill() const
-  {
-    return skill;
-  };
-
-  uint32_t getNumWins() const
-  {
-    return numWins;
-  };
-
-  uint32_t getNumLosses() const
-  {
-    return numLosses;
-  };
-
-  uint32_t getNumDraws() const
-  {
-    return numDraws;
-  };
-
-  uint32_t getNumTies() const
-  {
-    return numTies;
-  };
-
-  virtual uint32_t getNumPlies() const
-  {
-    return numPlies;
-  };
-
-  size_t getGeneration() const
-  {
-    return generation;
-  };
-
-  uint32_t getNumGamesPlayed() const
-  {
-    return numWins + numTies + numDraws + numLosses;
-  };
-
-  fpType getAveragePliesPerGame() const
-  {
-    size_t numPlayed = getNumGamesPlayed();
-    if (numPlayed == 0) { return 0.0; }
-    return  ((fpType)getNumPlies() / (fpType)getNumGamesPlayed());
-  };
-
-  bool operator<(const Ranked& other) const
-  {
-    return getSkill() > other.getSkill();
-  };
-
-  virtual uint64_t getHash() const { return defaultHash; };
-
-  bool compareHash(uint64_t oHash) const
-  {
-    return getHash() == oHash;
-  };
-
-  bool operator==(const Ranked& other) const
-  {
-    return getHash() == other.getHash();
-  };
-
-  bool operator!=(const Ranked& other) const
-  {
-    return !(*this == other);
-  };
-
-  size_t update(const Game& cGame, const TrueSkillTeam& cTeam, size_t iTeam);
-
-  virtual void resetRecord()
-  {
+  void resetRecord() {
     numWins = 0;
     numTies = 0;
     numDraws = 0;
@@ -131,25 +43,64 @@ public:
     numPlies = 0;
   };
 
-  bool isStateSaved() const
-  {
-    return stateSaved;
+  uint64_t numGamesPlayed() const {
+    return numWins + numTies + numDraws + numLosses;
   };
 
-  void setStateSaved()
-  {
-    stateSaved = true;
+  double pliesPerGame() const {
+    auto numPlayed = numGamesPlayed();
+    if (numPlayed == 0) { return 0.0; }
+    return  ((double)numPlies() / (double)numGamesPlayed());
   };
-
-  /* output the ranked preamble to this object */
-  virtual void output(std::ostream& oFile, bool printHeader = true) const;
-
-  /* input the ranked preamble to this object */
-  virtual bool input(const std::vector<std::string>& lines, size_t& firstLine);
-
-  friend std::ostream& operator <<(std::ostream& os, const Ranked& r);
 };
 
-std::ostream& operator <<(std::ostream& os, const Ranked& tR);
+class Ranked {
+public:
+  using Hash = uint64_t;
+
+  static const std::string header;
+
+  virtual ~Ranked() { };
+  Ranked(size_t generation = 0);
+
+  virtual const std::string& getName() const = 0;
+
+  const RankedRecord& record() const { return record_; }
+  RankedRecord& record() { return record_; }
+  
+  const TrueSkill& skill() const { return record().skill; }
+  TrueSkill& skill() { return record().skill; }
+
+  bool operator<(const Ranked& other) const
+  {
+    return skill() > other.skill();
+  };
+
+  virtual uint64_t hash() const { return hash_; }
+
+  bool compareHash(uint64_t oHash) const
+  {
+    return hash() == oHash;
+  };
+
+  bool operator==(const Ranked& other) const
+  {
+    return hash() == other.hash();
+  };
+
+  bool operator!=(const Ranked& other) const
+  {
+    return !(*this == other);
+  };
+
+protected:
+  /* generate the hash, and the pokemon subhashes too if true */
+  void generateHash(bool generateSubHashes = true) = 0;
+  void defineName();
+
+  RankedRecord record_;
+
+  Hash hash_;
+};
 
 #endif /* RANKED_H */

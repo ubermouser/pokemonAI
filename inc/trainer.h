@@ -1,94 +1,18 @@
+/* 
+ * File:   trainer.h
+ * Author: drendleman
+ *
+ * Created on September 22, 2020, 12:54 PM
+ */
+
 #ifndef TRAINER_H
 #define TRAINER_H
 
-#include "../inc/pkai.h"
+#include "ranker.h"
 
-#include <stdint.h>
-#include <array>
-#include <memory>
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <boost/program_options.hpp>
-
-#include "game.h"
-#include "true_skill.h"
-#include "ranked.h"
-
-#include "ranked_team.h"
-#include "ranked_evaluator.h"
-
-
-using TrueSkillTeamPtr = std::shared_ptr<TrueSkillTeam>;
-using RankedTeamPtr = std::shared_ptr<RankedTeam>;
-using RankedEvalPtr = std::shared_ptr<RankedEvaluator>;
-
-struct TrainerResult {
-  // averages: (rank, mean, stdDev, plies, games, wins, draws)
-  std::array<fpType, 7> averages;
-  // stdDevs:
-  std::array<fpType, 7> stdDevs;
-  // minimums:
-  std::array<fpType, 7> mins;
-  // maximums:
-  std::array<fpType, 7> maxes;
-  // highest counts:
-  const PokemonBase* highestPokemon;
-  const Ability* highestAbility;
-  const Item* highestItem;
-  const Type* highestType;
-  const Nature* highestNature;
-  const Move* highestMove;
-  size_t highestPokemonCount, highestAbilityCount, highestItemCount, highestTypeCount, highestNatureCount, highestMoveCount;
-};
-
-struct GameHeat {
-  std::shared_ptr<TrueSkillTeam> team_a;
-  
-  std::shared_ptr<TrueSkillTeam> team_b;
-
-  HeatResult heatResult;
-};
-
-struct LeagueHeat {
-  std::vector<std::shared_ptr<RankedEvaluator> > evaluators;
-
-  std::vector<std::shared_ptr<RankedTeam> > teams;
-
-  std::vector<std::shared_ptr<TrueSkillTeam> > tsTeams;
-
-  std::unordered_map<TrueSkillTeam::Hash, size_t> teamGameCount;
-
-  std::vector<GameHeat> games;
-};
-
-class Trainer {
+class Trainer : public Ranker {
 public:
-  struct Config {
-    /*verbosity of trainer */
-    int verbosity = 0;
-
-    /*when above 0, thread parallelism is used to invoke games*/
-    size_t numThreads = 0;
-
-    /* what do we intend for trainer to do? */
-    uint32_t gameType = GT_OTHER_EVOTEAMS;
-
-    /* number of generations to complete, maximum */
-    size_t maxGenerations = 12;
-
-    /* the minimum number of games per generation */
-    size_t minGamesPerGeneration = 5;
-
-    /* if a team population is to be loaded to memory from a directory, this is where it is */
-    std::string teamPath = "teams";
-
-    /* if value is nonzero, the number of generations between writeOuts to disk. Otherwise, do not write out */
-    size_t writeOutEvery = 0;
-
-    /* minimum amount of time to work on a given league, in seconds */
-    double minimumWorkTime = 20;
-
+  struct Config : public Ranker::Config {
     /* probability that a pokemon will undergo a mutation */
     double mutationProbability = 0.55;
 
@@ -98,99 +22,20 @@ public:
     /* probability that an entirely new pokemon will spontaneously find its self in the population */
     double seedProbability = 0.035;
 
-    /* sizes of the six populations aka "leagues" */
-    std::array<size_t, 6> teamPopulationSize = {490, 240, 194, 150, 121, 106};
-
-    /* do we allow teams to rank against teams of different leagues? Useful for small population */
-    bool enforceSameLeague = false;
-
-    /* when true, matches against TrueSkillTeams with the same RankedTeam or RankedEvaluator may take place */
-    bool allowSelfPlay = false;
-
-    boost::program_options::options_description options(
-        const std::string& category="trainer configuration",
-        std::string prefix = "");
   };
 
-  Trainer(const Config& cfg = Config{});
-  virtual ~Trainer();
-
-  /* create all variables, prepare trainer for running */
-  void initialize();
-
-  TrainerResult run() const;
-
-  /* plays minGamesPerGeneration games for every tsTeam within league */
-  void runLeague(LeagueHeat& league) const;
-
-  /* plays minGamesPerGeneration games with tsTeam within league*/
-  void gauntlet(const std::shared_ptr<TrueSkillTeam>& tsTeam, LeagueHeat& league) const;
-
-  GameHeat singleGame(
-      const std::shared_ptr<TrueSkillTeam>& team_a,
-      const std::shared_ptr<TrueSkillTeam>& team_b) const;
-  
+  /* begin evolution process */
+  void evolve();
 protected:
   Config cfg_;
-
-  std::shared_ptr<TrueSkillFactory> trueSkillFactory_;
-
-  /* population of teams to be run on. 0 implies no work will be done on the league */
-  std::array<std::vector<std::shared_ptr<RankedTeam> >, 6> leagues;
-
-  /* population of evaluators to be run on. If networks is 0, this MUST be greater than 0. */
-  std::vector<std::shared_ptr<RankedEvaluator>> evaluators;
-
-  /* game instance used for evaluation, per thread */
-  mutable std::vector<std::shared_ptr<Game> > games;
-
-  /* select two parents, weighted by fitness */
-  std::array<size_t, 2> selectParent_Roulette(const std::vector<const RankedTeam>& cLeague) const;
-
-  /* generate an array of teams which are contained within the current team. Will always return an empty set if the team contains one pokemon */
-  void findSubteams(TrueSkillTeam& cTeam, size_t iTeam);
 
   /* generates a random population from previous leagues, or from random functions if at single pokemon league */
   size_t seedRandomTeamPopulation(size_t iLeague, size_t targetSize);
 
   void spawnTeamChildren(size_t iLeague, size_t& numMutated, size_t& numCrossed, size_t& numSeeded);
 
-  /* stochastically find a match of ideal skill for a given team. If enforceSameLeague is false, allow matches from nearby leagues */
-  TrueSkillTeam findMatch( const TrueSkillTeam& oTeam );
-
-  /* finds an evaluator, or returns NULL if we are to use the dumb evaluator */
-  size_t findEvaluator();
-
-  /* determine if a given ranked_team is already in the population, and if so, return its index. SIZE_MAX if not */
-  size_t findInPopulation(size_t iLeague, uint64_t teamHash) const;
-
-  /* return true if findInPopulation returns a value */
-  bool isInPopulation(const RankedTeam& cRankTeam) const;
-
   /* destroy the elements with the lowest rank from the league */
   void shrinkTeamPopulation(size_t iLeague, size_t targetSize);
-
-  /* calculates interesting things about the given league */
-  void calculateDescriptiveStatistics(size_t iLeague, TrainerResult& cResult) const;
-
-  /* print information about the top n members of league iLeague */
-  void printLeagueStatistics(size_t iLeague, size_t numMembers, const TrainerResult& cResult) const;
-  
-  /*load a population of pokemon and their rankings from a filepath */
-  bool loadTeamPopulation();
-
-  bool saveTeamPopulation();
-  
-public:
-
-  void setGauntletTeam(const TeamNonVolatile& cTeam);
-
-  bool seedEvaluator(const Evaluator& _eval);
-
-  bool seedTeam(const TeamNonVolatile& cTeam);
-
-  /* begin evolution process */
-  void evolve();
 };
 
 #endif /* TRAINER_H */

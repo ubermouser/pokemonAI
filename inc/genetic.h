@@ -67,12 +67,12 @@ class sortByVariability
 public:
   static fpType getValue (const Ranked& cTeam)
   {
-    return cTeam.getSkill().getStdDev() * cTeam.getSkill().getStdDev();
+    return cTeam.skill().getStdDev() * cTeam.skill().getStdDev();
   };
 
   static fpType getValue (const Ranked* const cTeam)
   {
-    return cTeam->getSkill().getStdDev() * cTeam->getSkill().getStdDev();
+    return cTeam->skill().getStdDev() * cTeam->skill().getStdDev();
   };
 };
 
@@ -82,7 +82,7 @@ public:
 
   static fpType getValue (const Ranked& oTeam)
   {
-    fpType oMean = oTeam.getSkill().getMean();
+    fpType oMean = oTeam.skill().getMean();
     return 1.0 + (mostlyGT(oMean, 0.0)?sqrt(oMean):0.0);
   };
 };
@@ -99,7 +99,7 @@ public:
   fpType getValue (const Ranked& oTeam) const
   {
     // the element with the highest mean has a 0% chance of being selected
-    fpType oMean = oTeam.getSkill().getMean();
+    fpType oMean = oTeam.skill().getMean();
     return maxMean - oMean;
   };
 };
@@ -133,7 +133,7 @@ public:
       }
     }
     // finally, weight fitness by the team's mean score
-    fpType oMean = oTeam.getSkill().getMean();
+    fpType oMean = oTeam.skill().getMean();
     return 1.0 + (mostlyGT(oMean, 0.0)?sqrt(oMean):0.0);
   };
 };
@@ -154,7 +154,7 @@ public:
   fpType getValue (const RankedTeam& oTeam) const
   {
     if (cTeam == oTeam) { return std::numeric_limits<fpType>::quiet_NaN(); }
-    return 0.1 + scale(cTeam.getSkill().getRank(), maxRank, minRank);
+    return 0.1 + scale(cTeam.skill().getRank(), maxRank, minRank);
   };
 };
 

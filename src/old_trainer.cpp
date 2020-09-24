@@ -25,7 +25,7 @@ size_t findInData(const std::vector<dataType>& data, uint64_t hash);
 template<class data_t>
 void shrinkDataPopulation(std::vector<data_t>& data, size_t targetSize);
 
-Trainer::Trainer(const Config& cfg) :
+Trainer::Ranker(const Config& cfg) :
   generationsCompleted(0),
   heatsCompleted(),
   leagues(),
@@ -826,7 +826,7 @@ bool Trainer::isInPopulation(const RankedTeam& tTeam) const
     assert(tTeam.team.isLegalSet(iTeammate, tTeam.team.teammate(iTeammate)));
   }
 #endif
-  return (findInPopulation(tTeam.team.getNumTeammates() -1 , tTeam.getHash()) != SIZE_MAX);
+  return (findInPopulation(tTeam.team.getNumTeammates() -1 , tTeam.hash()) != SIZE_MAX);
 } //endOf isInPopulation
 
 

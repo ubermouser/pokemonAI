@@ -35,11 +35,23 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/src/backpropNet.o \
+	${OBJECTDIR}/src/evaluator_featureVector.o \
+	${OBJECTDIR}/src/evaluator_network128.o \
+	${OBJECTDIR}/src/evaluator_network16.o \
+	${OBJECTDIR}/src/evaluator_network32.o \
+	${OBJECTDIR}/src/evaluator_network64.o \
+	${OBJECTDIR}/src/experienceNet.o \
 	${OBJECTDIR}/src/main.o \
+	${OBJECTDIR}/src/neuralNet.o \
+	${OBJECTDIR}/src/old_trainer.o \
 	${OBJECTDIR}/src/pkIO.o \
 	${OBJECTDIR}/src/planner_directed.o \
 	${OBJECTDIR}/src/planner_stochastic.o \
-	${OBJECTDIR}/src/pokemonAI.o
+	${OBJECTDIR}/src/pokemonAI.o \
+	${OBJECTDIR}/src/ranked_neuralNet.o \
+	${OBJECTDIR}/src/temporalpropNet.o \
+	${OBJECTDIR}/src/trainer_neural.o
 
 
 # C Compiler Flags
@@ -68,10 +80,55 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/pokemonai: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/pokemonai ${OBJECTFILES} ${LDLIBSOPTIONS} -Wl,--export-dynamic
 
+${OBJECTDIR}/src/backpropNet.o: src/backpropNet.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/backpropNet.o src/backpropNet.cpp
+
+${OBJECTDIR}/src/evaluator_featureVector.o: src/evaluator_featureVector.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_featureVector.o src/evaluator_featureVector.cpp
+
+${OBJECTDIR}/src/evaluator_network128.o: src/evaluator_network128.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_network128.o src/evaluator_network128.cpp
+
+${OBJECTDIR}/src/evaluator_network16.o: src/evaluator_network16.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_network16.o src/evaluator_network16.cpp
+
+${OBJECTDIR}/src/evaluator_network32.o: src/evaluator_network32.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_network32.o src/evaluator_network32.cpp
+
+${OBJECTDIR}/src/evaluator_network64.o: src/evaluator_network64.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/evaluator_network64.o src/evaluator_network64.cpp
+
+${OBJECTDIR}/src/experienceNet.o: src/experienceNet.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/experienceNet.o src/experienceNet.cpp
+
 ${OBJECTDIR}/src/main.o: src/main.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.cpp
+
+${OBJECTDIR}/src/neuralNet.o: src/neuralNet.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/neuralNet.o src/neuralNet.cpp
+
+${OBJECTDIR}/src/old_trainer.o: src/old_trainer.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/old_trainer.o src/old_trainer.cpp
 
 ${OBJECTDIR}/src/pkIO.o: src/pkIO.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -92,6 +149,21 @@ ${OBJECTDIR}/src/pokemonAI.o: src/pokemonAI.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/pokemonAI.o src/pokemonAI.cpp
+
+${OBJECTDIR}/src/ranked_neuralNet.o: src/ranked_neuralNet.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/ranked_neuralNet.o src/ranked_neuralNet.cpp
+
+${OBJECTDIR}/src/temporalpropNet.o: src/temporalpropNet.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/temporalpropNet.o src/temporalpropNet.cpp
+
+${OBJECTDIR}/src/trainer_neural.o: src/trainer_neural.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/trainer_neural.o src/trainer_neural.cpp
 
 # Subprojects
 .build-subprojects:

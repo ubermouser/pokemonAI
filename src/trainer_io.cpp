@@ -723,9 +723,9 @@ bool Trainer::loadTeamPopulation()
 
     // make sure the hashes are correct, and if they're not redo them:
     {
-      uint64_t oldTeamHash = cTeam.getHash();
+      uint64_t oldTeamHash = cTeam.hash();
       cTeam.generateHash();
-      if (cTeam.getHash() != oldTeamHash)
+      if (cTeam.hash() != oldTeamHash)
       {
         numIncorrectHashes++;
         // recreate the team's naming if the hash was incorrect

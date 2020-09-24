@@ -1,33 +1,32 @@
 #ifndef RANKED_EVALUATOR_H
 #define RANKED_EVALUATOR_H
 
-#include "../inc/pkai.h"
+#include "pkai.h"
 
 #include <memory>
 
-#include "../inc/ranked.h"
-
-class Evaluator;
+#include "ranked.h"
+#include "evaluator.h"
 
 class RankedEvaluator : public Ranked {
-protected:
-  std::shared_ptr<Evaluator> eval;
 public:
   RankedEvaluator(
-    const Evaluator& _eval,
-    size_t generation = 0, 
-    const trueSkillSettings& settings = trueSkillSettings::defaultSettings);
+    std::shared_ptr<Evaluator>& eval,
+    size_t generation = 0);
 
-  RankedEvaluator(const RankedEvaluator& other);
+  const std::string& getName() const { return eval_->getName(); }
 
-  ~RankedEvaluator();
+  const Evaluator& get() const { return *eval_; };
 
-  const std::string& getName() const;
+  std::ostream& print(std::ostream& os) const;
 
-  const Evaluator& getEvaluator() const { return *eval; };
-
-  friend std::ostream& operator <<(std::ostream& os, const RankedEvaluator& tR);
+protected:
+  std::shared_ptr<Evaluator> eval_;
 };
+
+
+using RankedEvaluatorPtr = std::shared_ptr<RankedEvaluator>;
+using EvaluatorLeague = std::unordered_map<RankedEvaluator::Hash, RankedEvaluatorPtr >;
 
 std::ostream& operator <<(std::ostream& os, const RankedEvaluator& tR);
 

@@ -176,7 +176,7 @@ size_t Trainer::findInNetworks(uint64_t hash) const
 
 bool Trainer::isInNetworks(const ranked_neuralNet& cRankNet) const
 {
-  return findInNetworks(cRankNet.getHash()) != SIZE_MAX;
+  return findInNetworks(cRankNet.hash()) != SIZE_MAX;
 }
 
 bool TrainerNeural::loadNetworkPopulation()
@@ -247,9 +247,9 @@ bool TrainerNeural::loadNetworkPopulation()
 
     // make sure the hashes are correct, and if they're not redo them:
     {
-      uint64_t oldHash = cNetwork.getHash();
+      uint64_t oldHash = cNetwork.hash();
       cNetwork.generateHash();
-      if (cNetwork.getHash() != oldHash)
+      if (cNetwork.hash() != oldHash)
       {
         numIncorrectHashes++;
         // recreate the network's naming if the hash was incorrect

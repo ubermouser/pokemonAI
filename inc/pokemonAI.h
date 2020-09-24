@@ -25,7 +25,7 @@
 
 class PkIO;
 class Game;
-class Trainer;
+class Ranker;
 class PokemonNonVolatile;
 class Evaluator;
 class Planner;
@@ -34,7 +34,7 @@ class PokemonAI
 {
 private:
   friend class PkIO;
-  friend class Trainer;
+  friend class Ranker;
   friend class Game;
   friend class PkCU;
   friend class PokemonNonVolatile;
@@ -43,7 +43,7 @@ private:
 
   class PkIO* pokemonIO;
   class Game* game;
-  class Trainer* trainer;
+  class Ranker* trainer;
 
   // invocation:
   /* see pkai.h for a list of permissable values for gameType enum */

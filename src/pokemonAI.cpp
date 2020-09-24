@@ -495,7 +495,7 @@ bool PokemonAI::run()
   }
   else if (gameType >= GT_OTHER_EVOTEAMS && gameType <= GT_OTHER_GAUNTLET_BOTH)
   {
-    trainer = new Trainer(gameType,
+    trainer = new Ranker(gameType,
       maxPlies,
       maxMatches,
       gameAccuracy,

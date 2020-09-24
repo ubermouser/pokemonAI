@@ -150,7 +150,7 @@ public:
 
   const std::string& getName() const { return bNet.getNeuralNet().getName(); };
 
-  uint64_t getHash() const { return hash; };
+  uint64_t hash() const { return hash; };
 
   void output(std::ostream& oFile, bool printHeader = true) const;
 

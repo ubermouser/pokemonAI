@@ -121,7 +121,7 @@ void ranked_neuralNet::jitter(const trueSkillSettings& settings)
   bNet.jitterNetwork();
 
   // feather trueskill:
-  getSkill().feather(settings);
+  skill().feather(settings);
   
   // increment generation
   generation++;
@@ -480,7 +480,7 @@ void ranked_neuralNet::defineName()
 {
   // set name of created network based on hash:
   std::ostringstream tName(std::ostringstream::out);
-  tName << "NT-x" << std::setfill('0') << std::setw(16) << std::hex << getHash();
+  tName << "NT-x" << std::setfill('0') << std::setw(16) << std::hex << hash();
   bNet.getNeuralNet().setName(tName.str());
 }
 
@@ -544,8 +544,8 @@ std::ostream& operator <<(std::ostream& os, const ranked_neuralNet& tR)
   os.precision(6);
   os <<
     " g= " << std::setw(3) << std::right << tR.getGeneration() <<
-    " m= " << std::setw(7) << tR.getSkill().getMean() <<
-    " s= " << std::setw(7) << tR.getSkill().getStdDev() <<
+    " m= " << std::setw(7) << tR.skill().getMean() <<
+    " s= " << std::setw(7) << tR.skill().getStdDev() <<
     " w= " << std::setw(7) << std::left << tR.getNumWins() << 
     " / " << std::setw(7) << std::right << (tR.getNumGamesPlayed());
   os.precision(prevPrecision);
@@ -563,7 +563,7 @@ void ranked_neuralNet::output(std::ostream& oFile, bool printHeader) const
   {
     oFile << header;
   };
-  oFile << "\t" << std::hex << getHash() << std::dec << "\n";
+  oFile << "\t" << std::hex << hash() << std::dec << "\n";
 
   // out put ranked data:
   Ranked::output(oFile);
