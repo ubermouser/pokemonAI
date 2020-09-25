@@ -17,9 +17,16 @@ public:
     /* speed of rank propagation */
     double dynamicsFactor = TrueSkill::initialMean() / 300.;
 
+    /* probability of a draw given two equal teams */
+    double drawProbability = 0.1;
+
     /* proportion of a win/loss/draw that an evaluator is responsible for */
     double evaluatorContribution = 0.5;
+
+    Config(){};
   };
+
+  GameFactory(const Config& cfg = Config{});
 
   TrueSkill create(size_t numTeammates) const;
 
@@ -28,34 +35,7 @@ public:
   /* determine the quality of a match between two teams */
   double matchQuality(const Battlegroup& team_a, const Battlegroup& team_b) const;
 
-  size_t update(const Battlegroup& team_a, const Battlegroup& team_b, const HeatResult& gResult) const;
-
-  void teamRank_finalize(TrueSkill& cResult, double currentProportion, double totalProportion);
-
-  /* estimate the rank of a team given its component teams */
-  template<class constRankedIterator_t, class constDoubleIterator_t>
-  TrueSkill teamRank(
-    constRankedIterator_t iComponent,
-    constRankedIterator_t componentEnd,
-    constDoubleIterator_t iProportion,
-    fpType totalProportion = 1.0)
-  {
-    fpType currentProportion = 0;
-    TrueSkill cResult(0, 0);
-
-    for ( ;iComponent != componentEnd; ++iComponent, ++iProportion)
-    {
-      const TrueSkill& cSkill = (*iComponent)->getSkill();
-
-      cResult.mean += cSkill.mean * (*iProportion / totalProportion);
-      cResult.stdDev += (cSkill.stdDev*cSkill.stdDev) * (*iProportion / totalProportion);
-
-      currentProportion += *iProportion;
-    }
-
-    teamRank_finalize(cResult, currentProportion, totalProportion);
-    return cResult;
-  }; // endOf teamRank
+  size_t update(Battlegroup& team_a, Battlegroup& team_b, const HeatResult& gResult) const;
 
 protected:
   static double calculateDrawMargin(double drawProbability, double beta);
@@ -76,6 +56,8 @@ protected:
     double cSquared,
     double rankMultiplier,
     double partialPlay) const;
+
+  Config cfg_;
 
   /* equivalent to performanceStdDev squared */
   double betaSquared_;

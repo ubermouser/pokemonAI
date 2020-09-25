@@ -1,26 +1,17 @@
-
 #include "../inc/ranked.h"
 
-#include <boost/foreach.hpp>
+#include <algorithm>
+#include <numeric>
+#include <boost/format.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 #include "../inc/true_skill.h"
 #include "../inc/game.h"
-#include "../inc/init_toolbox.h"
 
-const std::string Ranked::header = "PKART0";
-const uint64_t Ranked::defaultHash = UINT64_MAX;
+namespace pt = boost::property_tree;
+const std::string Ranked::HEADER = "PKART0";
 
-Ranked::Ranked(size_t _generation, const trueSkillSettings& settings)
-  : skill(settings),
-  generation(_generation),
-  numWins(0),
-  numLosses(0),
-  numDraws(0),
-  numTies(0),
-  numPlies(0),
-  stateSaved(false)
-{
-};
 
 const std::string& Ranked::getName() const
 {
@@ -28,115 +19,70 @@ const std::string& Ranked::getName() const
   return unnamed;
 };
 
-size_t Ranked::update(const Game& cGame, const TrueSkillTeam& cTeam, size_t iTeam)
-{
-  BOOST_FOREACH(const GameResult& cGameResult, cGame.getGameResults())
-  {
-    // update plies
-    numPlies += cGameResult.numPlies;
-
-    // update wins, losses, etc
-    switch(cGameResult.endStatus)
-    {
-    case MATCH_DRAW:
-      numDraws++;
-      break;
-    case MATCH_TIE:
-      numTies++;
-      break;
-    case MATCH_TEAM_A_WINS:
-      if (iTeam==TEAM_A) { numWins++; }
-      else { numLosses++; }
-      break;
-    case MATCH_TEAM_B_WINS:
-      if (iTeam==TEAM_A) { numLosses++; }
-      else { numWins++; }
-      break;
-    }
-  } // endOf foreach game in heat
-
-  stateSaved = false;
-  assert(getAveragePliesPerGame() <= (MAXPLIES + 1.0));
-  return cGame.getGameResults().size();
+void Ranked::update(const HeatResult& hResult, size_t iTeam) {
+  auto& rec = record();
+  rec.stateSaved = false;
+  rec.numPlies += uint64_t(hResult.numPlies * hResult.matchesPlayed);
+  rec.numWins += hResult.score[iTeam];
+  rec.numLosses += hResult.score[(iTeam + 1) % 2];
+  rec.numTies +=
+      hResult.matchesPlayed - std::accumulate(hResult.score.begin(), hResult.score.end(), 0);
 } // endOf update
 
-std::ostream& operator <<(std::ostream& os, const Ranked& tR)
-{
-  size_t prevPrecision = os.precision();
-  os.precision(6);
-  os <<
-    " g= " << std::setw(3) << std::right << tR.getGeneration() <<
-    " m= " << std::setw(7) << tR.skill().getMean() <<
-    " s= " << std::setw(7) << tR.skill().getStdDev() <<
-    " w= " << std::setw(7) << std::left << tR.getNumWins() << 
-    " / " << std::setw(7) << std::right << (tR.getNumGamesPlayed());
-  os.precision(prevPrecision);
-  
+
+std::ostream& Ranked::print(std::ostream& os) const {
+  os << boost::format("%24.24s ") % getName();
+  printStats(os);
+
   return os;
 }
 
-void Ranked::output(std::ostream& oFile, bool printHeader) const
-{
+
+std::ostream& Ranked::printStats(std::ostream& os) const {
+  os << boost::format("m=%4.2f s=%4.2f w=%5d / %5d")
+      % skill().mean
+      % skill().stdDev
+      % record().numWins
+      % record().numGamesPlayed();
+  return os;
+}
+
+pt::ptree Ranked::output(bool printHeader) const {
+  pt::ptree result;
   // header:
-  if (printHeader)
-  {
-    oFile << header << "\t";
-  };
+  if (printHeader) {
+    result.put("header", HEADER);
+  }
 
-  // generation:
-  oFile << getGeneration() << "\t";
-
-  oFile << getNumPlies() << "\t";
-
-  // wins, losses, ties, draws:
-  oFile 
-    << getNumWins() <<
-    "\t" << getNumLosses() <<
-    "\t" << getNumTies() <<
-    "\t" << getNumDraws() <<
-    "\n";
-
+  result.put("numWins", record().numWins);
+  result.put("numLosses", record().numLosses);
+  result.put("numDraws", record().numDraws);
+  result.put("numTies", record().numTies);
+  result.put("numPlies", record().numPlies);
   // trueSkill:
-  skill.output(oFile);
+  result.put_child("skill", record().skill.output());
+
+  return result;
 };
 
-bool Ranked::input(const std::vector<std::string>& lines, size_t& iLine)
-{
-  // are the enough lines in the input stream:
-  if ((lines.size() - iLine) < 1U)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": unexpected end of input stream at line " << iLine << "!\n";
-    return false; 
+void Ranked::input(const pt::ptree& tree) {
+  auto header = tree.get<std::string>("header");
+  if (header != HEADER) {
+    std::cerr << boost::format("Ranked header mismatch! Should be \"%s\", was \"%s\"!\n")
+        % HEADER
+        % header;
   }
 
-  // compare trueskill header:
-  if (lines.at(iLine).compare(0, header.size(), header) != 0)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": trueSkill stream has header of type \"" << lines.at(0).substr(0, header.size()) << 
-      "\" (needs to be \"" << header <<
-      "\") and is incompatible with this program!\n";
+  record().numWins = tree.get<uint64_t>("numWins");
+  record().numLosses = tree.get<uint64_t>("numLosses");
+  record().numDraws = tree.get<uint64_t>("numDraws");
+  record().numTies = tree.get<uint64_t>("numTies");
+  record().numPlies = tree.get<uint64_t>("numPlies");
+  // trueskill:
+  skill().input(tree.get_child("skill"));
+};
 
-    return false;
-  }
-  // input ranked:
-  {
-    std::vector<std::string> tokens = INI::tokenize(lines.at(iLine), "\t");
-    if (!INI::checkRangeB(tokens.size(), (size_t)7, (size_t)7)) { return false; }
-
-    if (!INI::setArgAndPrintError("rank generation", tokens.at(1), generation, iLine, 1)) { return false; }
-    if (!INI::setArgAndPrintError("rank numPlies", tokens.at(2), numPlies, iLine, 2)) { return false; }
-    if (!INI::setArgAndPrintError("rank numWins", tokens.at(3), numWins, iLine, 3)) { return false; }
-    if (!INI::setArgAndPrintError("rank numLosses", tokens.at(4), numLosses, iLine, 4)) { return false; }
-    if (!INI::setArgAndPrintError("rank numTies", tokens.at(5), numTies, iLine, 5)) { return false; }
-    if (!INI::setArgAndPrintError("rank numDraws", tokens.at(6), numDraws, iLine, 6)) { return false; }
-  }
-  // since we just loaded this team from memory, state is saved
-  stateSaved = true;
-  iLine++;
-
-  if (!skill.input(lines, iLine)) { return false; } 
-
-  return true;
+std::ostream& operator <<(std::ostream& os, const Ranked& tR) {
+  tR.print(os);
+  return os;
 };

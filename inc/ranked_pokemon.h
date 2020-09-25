@@ -16,6 +16,9 @@
 #include "pokemon_nonvolatile.h"
 
 struct PokemonRankedRecord : public RankedRecord {
+  /* number of times a pokemon is in play */
+  uint64_t numPliesInPlay;
+
   /* number of times a given move has been used */
   std::array<uint64_t, 5> numMoves;
 };
@@ -23,22 +26,24 @@ struct PokemonRankedRecord : public RankedRecord {
 
 class RankedPokemon : public Ranked {
 public:
+  RankedPokemon(const PokemonNonVolatile& pk) : Ranked(pk.hash()), pokemon_(pk) { identify(); }
+
   const PokemonNonVolatile& get() const { return pokemon_; }
 
-  const std::string& getName() const { return pokemon_.getName(); };
+  virtual void update(const HeatResult& hResult, size_t iTeam, size_t iPokemon);
+  virtual const std::string& getName() const override { return pokemon_.getName(); };
 
-  std::ostream& print(std::ostream& os) const;
+  virtual const PokemonRankedRecord& record() const override { return record_; }
+  virtual PokemonRankedRecord& record() override { return record_; }
 protected:
-  void generateHash(bool generateSubHashes = true) = 0;
-  void defineName();
+  virtual void identify() override;
+  virtual Hash generateHash(bool generateSubHashes = true) override;
+  virtual std::string defineName() override;
 
   PokemonRankedRecord record_;
 
   PokemonNonVolatile pokemon_;
 };
-
-
-std::ostream& operator <<(std::ostream& os, const RankedPokemon& tR);
 
 using RankedPokemonPtr = std::shared_ptr<RankedPokemon>;
 using PokemonLeague = std::unordered_map<RankedPokemon::Hash, RankedPokemonPtr >;

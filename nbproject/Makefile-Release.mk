@@ -51,6 +51,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/pokemonAI.o \
 	${OBJECTDIR}/src/ranked_neuralNet.o \
 	${OBJECTDIR}/src/temporalpropNet.o \
+	${OBJECTDIR}/src/trainer_io.o \
 	${OBJECTDIR}/src/trainer_neural.o
 
 
@@ -159,6 +160,11 @@ ${OBJECTDIR}/src/temporalpropNet.o: src/temporalpropNet.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/temporalpropNet.o src/temporalpropNet.cpp
+
+${OBJECTDIR}/src/trainer_io.o: src/trainer_io.cpp
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Wall -DDOUBLEPRECISION -DNDEBUG -D_DISABLEFINEGRAINEDLOCKING -D_DISABLETEMPORALTRACE -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/trainer_io.o src/trainer_io.cpp
 
 ${OBJECTDIR}/src/trainer_neural.o: src/trainer_neural.cpp
 	${MKDIR} -p ${OBJECTDIR}/src

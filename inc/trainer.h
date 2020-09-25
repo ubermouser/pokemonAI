@@ -13,6 +13,9 @@
 class Trainer : public Ranker {
 public:
   struct Config : public Ranker::Config {
+    /* number of generations to complete, maximum */
+    size_t maxGenerations = 12;
+
     /* probability that a pokemon will undergo a mutation */
     double mutationProbability = 0.55;
 
@@ -21,7 +24,9 @@ public:
 
     /* probability that an entirely new pokemon will spontaneously find its self in the population */
     double seedProbability = 0.035;
-
+    
+    /* sizes of the six populations aka "leagues" */
+    std::array<size_t, 6> teamPopulationSize = {490, 240, 194, 150, 121, 106};
   };
 
   /* begin evolution process */

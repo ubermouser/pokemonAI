@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include <array>
 #include <vector>
+#include <unordered_map>
+#include <boost/property_tree/ptree.hpp>
 
 #include "ranked.h"
 #include "ranked_pokemon.h"
@@ -28,24 +30,28 @@ struct TeamRankedRecord : public RankedRecord {
 
 class RankedTeam : public Ranked {
 public:
-  static const std::string header;
+  static const std::string HEADER;
 
-  RankedTeam(const TeamNonVolatile& cTeam = TeamNonVolatile(), const PokemonLeague& league, size_t generation = 0);
-  RankedTeam(const RankedTeam& other) = default;
+  RankedTeam(const TeamNonVolatile& cTeam, PokemonLeague& league);
 
-  const std::string& getName() const { return nv_.getName(); };
+  virtual const std::string& getName() const override { return nv_.getName(); };
 
   const TeamNonVolatile& nv() const { return nv_; }
   TeamNonVolatile& nv() { return nv_; }
 
-  void output(std::ostream& oFile, bool printHeader = true) const;
+  std::vector<RankedPokemonPtr>& teammates() { return ranked_components_; }
 
-  std::ostream& print(std::ostream& os) const;
+  virtual void update(const HeatResult& hResult, size_t iTeam) override;
 
-  bool input(const std::vector<std::string>& lines, size_t& firstLine);
+  virtual void input(const boost::property_tree::ptree& ptree) override;
+  virtual boost::property_tree::ptree output(bool printHeader = true) const override;
 protected:
+  std::vector<RankedPokemonPtr> findSubteams(PokemonLeague& league) const;
+
   /* generate the hash, and the pokemon subhashes too if true */
-  void generateHash(bool generateSubHashes = true);
+  virtual void identify() override;
+  virtual Hash generateHash(bool generateSubHashes = true) override;
+  std::string defineName() override;
 
   /* team that this ranked_team represents */
   TeamNonVolatile nv_;
@@ -55,7 +61,5 @@ protected:
 
 using RankedTeamPtr = std::shared_ptr<RankedTeam>;
 using TeamLeague = std::unordered_map<RankedPokemon::Hash, RankedTeamPtr >;
-
-std::ostream& operator <<(std::ostream& os, const RankedTeam& tR);
 
 #endif /* TEAM_RANKED_H */

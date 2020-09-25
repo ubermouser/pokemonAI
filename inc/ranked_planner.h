@@ -11,30 +11,29 @@
 #include "pkai.h"
 
 #include <memory>
+#include <unordered_map>
 
 #include "ranked.h"
 #include "planner.h"
 
 class RankedPlanner : public Ranked {
 public:
-  RankedPlanner(
-    std::shared_ptr<Planner>& planner);
+  RankedPlanner(const std::shared_ptr<Planner>& planner): Ranked(), planner_(planner) { identify(); }
 
-  const std::string& getName() const { return planner_->getName(); }
+  const std::string& getName() const override { return planner_->getName(); }
 
   const Planner& get() const { return *planner_; };
 
-  std::ostream& print(std::ostream& os) const;
-
 protected:
+  virtual Hash generateHash(bool generateSubHashes = true) override;
+  virtual std::string defineName() override { return planner_->getName(); };
+
   std::shared_ptr<Planner> planner_;
 };
 
 
 using RankedPlannerPtr = std::shared_ptr<RankedPlanner>;
 using PlannerLeague = std::unordered_map<RankedPlanner::Hash, RankedPlannerPtr >;
-
-std::ostream& operator <<(std::ostream& os, const RankedPlanner& tR);
 
 #endif /* RANKED_PLANNER_H */
 

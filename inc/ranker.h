@@ -5,7 +5,9 @@
 
 #include <stdint.h>
 #include <array>
+#include <functional>
 #include <memory>
+#include <random>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -61,8 +63,6 @@ struct LeagueHeat {
 
   BattlegroupLeague battlegroups;
 
-  std::unordered_map<Battlegroup::Hash, uint64_t> teamGameCount;
-
   std::vector<GameHeat> games;
 };
 
@@ -72,17 +72,17 @@ public:
     /*verbosity of trainer */
     int verbosity = 0;
 
+    /* random seed of the trainer */
+    uint32_t randomSeed = 0;
+
     /*when above 0, thread parallelism is used to invoke games*/
     size_t numThreads = 0;
 
-    /* what do we intend for trainer to do? */
-    uint32_t gameType = GT_OTHER_EVOTEAMS;
-
-    /* number of generations to complete, maximum */
-    size_t maxGenerations = 12;
+    /* The maximum number of elements in a leaderboard to print*/
+    size_t leaderboardPrintCount = 20;
 
     /* the minimum number of games per generation */
-    size_t minGamesPerGeneration = 10;
+    size_t minGamesPerBattlegroup = 10;
 
     /* if a team population is to be loaded to memory from a directory, this is where it is */
     std::string teamPath = "teams";
@@ -93,8 +93,9 @@ public:
     /* minimum amount of time to work on a given league, in seconds */
     double minimumWorkTime = 20;
 
-    /* sizes of the six populations aka "leagues" */
-    std::array<size_t, 6> teamPopulationSize = {490, 240, 194, 150, 121, 106};
+    Game::Config game;
+
+    Battlegroup::Contribution contributions;
 
     /* do we allow teams to rank against teams of different leagues? Useful for small population */
     bool enforceSameLeague = false;
@@ -114,12 +115,12 @@ public:
   };
 
   Ranker(const Config& cfg = Config{});
-  virtual ~Ranker();
+  virtual ~Ranker() {};
 
   /* create all variables, prepare trainer for running */
   void initialize();
 
-  TrainerResult run() const;
+  LeagueHeat rank() const;
 
   /* plays minGamesPerGeneration games for every tsTeam within league */
   void runLeague(LeagueHeat& league) const;
@@ -127,55 +128,69 @@ public:
   /* plays minGamesPerGeneration games with tsTeam within league*/
   void gauntlet(BattlegroupPtr& tsTeam, LeagueHeat& league) const;
 
-  GameHeat singleGame(
-      BattlegroupPtr& team_a,
-      BattlegroupPtr& team_b) const;
+  Ranker& setGameFactory(const GameFactory& gameFactory) { gameFactory_ = gameFactory; return *this; }
+
+  Ranker& setGame(const Game& game);
+
+  Ranker& addEvaluator(const std::shared_ptr<Evaluator>& evaluator);
+  Ranker& addEvaluator(const Evaluator& evaluator) {
+    return addEvaluator(std::shared_ptr<Evaluator>(evaluator.clone()));
+  }
+
+  Ranker& addPlanner(const std::shared_ptr<Planner>& planner);
+  Ranker& addPlanner(const Planner& planner) {
+    return addPlanner(std::shared_ptr<Planner>(planner.clone()));
+  }
+
+  Ranker& addTeam(const TeamNonVolatile& cTeam);
   
 protected:
   Config cfg_;
 
-  std::shared_ptr<GameFactory> gameFactory_;
+  GameFactory gameFactory_;
 
   /* population of teams to be run on. 0 implies no work will be done on the league */
-  TeamLeague teams;
+  TeamLeague teams_;
+
+  PokemonLeague pokemon_;
 
   /* population of evaluators to be run on. If networks is 0, this MUST be greater than 0. */
-  EvaluatorLeague evaluators;
+  EvaluatorLeague evaluators_;
+
+  PlannerLeague planners_;
+
+  std::reference_wrapper<std::ostream> out_;
 
   /* game instance used for evaluation, per thread */
-  mutable std::vector<std::shared_ptr<Game> > games;
+  mutable std::vector<Game> games_;
 
-  /* generate an array of teams which are contained within the current team. Will always return an empty set if the team contains one pokemon */
-  void findSubteams(TrueSkillTeam& cTeam, size_t iTeam);
+  mutable std::default_random_engine rand_;
+
+  bool initialized_;
+
+  GameHeat singleGame(
+      BattlegroupPtr& team_a,
+      BattlegroupPtr& team_b) const;
 
   /* stochastically find a match of ideal skill for a given team. If enforceSameLeague is false, allow matches from nearby leagues */
-  BattlegroupPtr findMatch(const BattlegroupPtr& oTeam, const LeagueHeat& league) const;
+  BattlegroupPtr findMatch(const Battlegroup& oTeam, const LeagueHeat& league) const;
 
   /* calculates interesting things about the given league */
   void calculateDescriptiveStatistics(size_t iLeague, TrainerResult& cResult) const;
 
   /* print information about the top n members of league iLeague */
-  void printLeagueStatistics(size_t iLeague, size_t numMembers, const TrainerResult& cResult) const;
+  void printLeagueStatistics(const LeagueHeat& league) const;
   
   /*load a population of pokemon and their rankings from a filepath */
   bool loadTeamPopulation();
 
   bool saveTeamPopulation();
 
-  void digestGame(GameHeat& gameHeat) const;
-  
+  LeagueHeat constructLeague() const;
+  void digestGame(GameHeat& gameHeat, LeagueHeat& league) const;
+
+  void testInitialized() const;
 public:
-
-  void setGameFactory(const std::shared_ptr<GameFactory>& gameFactory);
-  void setGameFactory(const GameFactory& gameFactory) {
-    return setGameFactory(std::make_shared<GameFactory>(gameFactory));
-  }
-
-  void setGame(const Game& game);
-
-  bool addEvaluator(const Evaluator& _eval);
-
-  bool addTeam(const TeamNonVolatile& cTeam);
 
 };
 

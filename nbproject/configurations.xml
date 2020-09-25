@@ -40,7 +40,9 @@
         <logicalFolder name="f1" displayName="ranked" projectFiles="true">
           <itemPath>inc/ranked_neuralNet.h</itemPath>
         </logicalFolder>
+        <itemPath>inc/genetic.h</itemPath>
         <itemPath>inc/old_trainer.h</itemPath>
+        <itemPath>inc/trainer.h</itemPath>
         <itemPath>inc/trainer_neural.h</itemPath>
       </logicalFolder>
       <itemPath>inc/pkIO.h</itemPath>
@@ -114,6 +116,7 @@
           <itemPath>src/ranked_neuralNet.cpp</itemPath>
         </logicalFolder>
         <itemPath>src/old_trainer.cpp</itemPath>
+        <itemPath>src/trainer_io.cpp</itemPath>
         <itemPath>src/trainer_neural.cpp</itemPath>
       </logicalFolder>
       <itemPath>src/main.cpp</itemPath>
@@ -238,6 +241,8 @@
       </item>
       <item path="inc/fp_compare.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="inc/genetic.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="inc/init_toolbox.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/name.h" ex="false" tool="3" flavor2="0">
@@ -265,6 +270,8 @@
       <item path="inc/signature.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/temporalpropNet.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="inc/trainer.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/trainer_neural.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -307,6 +314,8 @@
       <item path="src/ranked_neuralNet.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/temporalpropNet.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/trainer_io.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/trainer_neural.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -463,6 +472,8 @@
       </item>
       <item path="inc/fp_compare.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="inc/genetic.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="inc/init_toolbox.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/name.h" ex="false" tool="3" flavor2="0">
@@ -490,6 +501,8 @@
       <item path="inc/signature.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/temporalpropNet.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="inc/trainer.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="inc/trainer_neural.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -532,6 +545,8 @@
       <item path="src/ranked_neuralNet.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/temporalpropNet.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/trainer_io.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/trainer_neural.cpp" ex="false" tool="1" flavor2="0">
       </item>

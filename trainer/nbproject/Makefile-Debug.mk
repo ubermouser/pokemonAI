@@ -37,11 +37,13 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/_ext/511e4115/game_factory.o \
 	${OBJECTDIR}/_ext/511e4115/ranked.o \
+	${OBJECTDIR}/_ext/511e4115/ranked_battlegroup.o \
 	${OBJECTDIR}/_ext/511e4115/ranked_evaluator.o \
+	${OBJECTDIR}/_ext/511e4115/ranked_planner.o \
+	${OBJECTDIR}/_ext/511e4115/ranked_pokemon.o \
 	${OBJECTDIR}/_ext/511e4115/ranked_team.o \
 	${OBJECTDIR}/_ext/511e4115/ranker.o \
 	${OBJECTDIR}/_ext/511e4115/ranker_main.o \
-	${OBJECTDIR}/_ext/511e4115/trainer_io.o \
 	${OBJECTDIR}/_ext/511e4115/true_skill.o
 
 
@@ -81,10 +83,25 @@ ${OBJECTDIR}/_ext/511e4115/ranked.o: ../src/ranked.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -DGEN4_STATIC -D_DEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranked.o ../src/ranked.cpp
 
+${OBJECTDIR}/_ext/511e4115/ranked_battlegroup.o: ../src/ranked_battlegroup.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -DGEN4_STATIC -D_DEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranked_battlegroup.o ../src/ranked_battlegroup.cpp
+
 ${OBJECTDIR}/_ext/511e4115/ranked_evaluator.o: ../src/ranked_evaluator.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -DGEN4_STATIC -D_DEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranked_evaluator.o ../src/ranked_evaluator.cpp
+
+${OBJECTDIR}/_ext/511e4115/ranked_planner.o: ../src/ranked_planner.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -DGEN4_STATIC -D_DEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranked_planner.o ../src/ranked_planner.cpp
+
+${OBJECTDIR}/_ext/511e4115/ranked_pokemon.o: ../src/ranked_pokemon.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -DGEN4_STATIC -D_DEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranked_pokemon.o ../src/ranked_pokemon.cpp
 
 ${OBJECTDIR}/_ext/511e4115/ranked_team.o: ../src/ranked_team.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
@@ -100,11 +117,6 @@ ${OBJECTDIR}/_ext/511e4115/ranker_main.o: ../src/ranker_main.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -DGEN4_STATIC -D_DEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranker_main.o ../src/ranker_main.cpp
-
-${OBJECTDIR}/_ext/511e4115/trainer_io.o: ../src/trainer_io.cpp
-	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -DGEN4_STATIC -D_DEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/trainer_io.o ../src/trainer_io.cpp
 
 ${OBJECTDIR}/_ext/511e4115/true_skill.o: ../src/true_skill.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115

@@ -4,22 +4,21 @@
  *
  * Created on September 17, 2020, 11:15 AM
  */
-
-#include <cstdlib>
 #include <string>
 #include <boost/program_options.hpp>
 
 #include <inc/ranker.h>
-#include <inc/pkCU.h>
+#include <inc/engine.h>
 #include <inc/pkCU.h>
 #include <inc/pokedex_static.h>
+#include <inc/evaluators.h>
+#include <inc/planners.h>
 
 namespace po = boost::program_options;
 
 
 struct Config {
   PokedexStatic::Config pokedex;
-  Game::Config game;
   PkCU::Config engine;
   Ranker::Config trainer;
 
@@ -28,6 +27,27 @@ struct Config {
 };
 
 int main(int argc, char** argv) {
+  Config cfg;
+  cfg.trainer.verbosity = 1;
+  cfg.trainer.minGamesPerBattlegroup = 5;
+  cfg.trainer.game.verbosity = 0;
+  cfg.trainer.game.maxMatches = 1;
 
-  return 0;
+  verbose = cfg.verbosity;
+  srand((cfg.random_seed < 0)?time(NULL):cfg.random_seed);
+
+  auto pokedex = PokedexStatic(cfg.pokedex);
+
+  Ranker ranker(cfg.trainer);
+  ranker.addTeam(TeamNonVolatile::loadFromFile("teams/hexTeamA.txt"));
+  ranker.addTeam(TeamNonVolatile::loadFromFile("teams/hexTeamB.txt"));
+  ranker.addTeam(TeamNonVolatile::loadFromFile("teams/hexTeamC.txt"));
+  ranker.addTeam(TeamNonVolatile::loadFromFile("teams/hexTeamD.txt"));
+  ranker.addPlanner(planners::choose("maximin", *planners::config("maximin"))->setEngine(PkCU()));
+  ranker.addEvaluator(evaluators::choose("simple", *evaluators::config("simple")));
+
+  ranker.initialize();
+  ranker.rank();
+  
+  std::exit(EXIT_SUCCESS);
 }

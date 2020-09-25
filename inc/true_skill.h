@@ -7,6 +7,7 @@
 #include <vector>
 #include <array>
 #include <ostream>
+#include <boost/property_tree/ptree.hpp>
 
 
 struct TrueSkill {
@@ -28,18 +29,15 @@ struct TrueSkill {
   a team will have an 80% : 20% ratio of winning : losing */
   static constexpr double performanceStdDev() { return initialMean() / 6.0; }
 
-  /* probability of a draw given two equal teams */
-  static constexpr double drawProbability() { return 0.1; }
-
   double rank() const { return mean - (stdDev * 3.0); }
-
-  TrueSkill create(size_t numTeammates) const;
   
   bool operator <(const TrueSkill& other) const { return rank() < other.rank(); };
   bool operator >(const TrueSkill& other) const { return rank() > other.rank(); };
 
-  void output(std::ostream& oFile, bool printHeader = true) const;
-  bool input(const std::vector<std::string>& lines, size_t& firstLine);
+  std::ostream& print(std::ostream& os) const;
+
+  boost::property_tree::ptree output() const;
+  void input(const boost::property_tree::ptree& ptree);
 };
 
 #endif /* TRUESKILL_H */

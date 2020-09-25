@@ -11,6 +11,7 @@
 #include <memory>
 #include <vector>
 
+#include "true_skill.h"
 #include "ranked.h"
 #include "ranked_team.h"
 #include "ranked_evaluator.h"
@@ -23,26 +24,49 @@ struct GroupContribution {
 
 class Battlegroup : public Ranked {
 public:
+  struct Contribution {
+    double synergy = 1.0;
+    double team = 1.0;
+    double pokemon = 1.0;
+    double planner = 1.0;
+    double evaluator = 1.0;
+
+    Contribution(){};
+  };
 
   std::vector<GroupContribution> contributions();
 
-  TrueSkill skill() const;
-  RankedTeamPtr team() const { return team_; }
-  RankedPlannerPtr planner() const { return evaluator_; }
-  RankedEvaluatorPtr evaluator() const { return evaluator_; }
-  Hash hash() const { return hash_; }
-  
+  const RankedTeam& team() const { return *team_; }
+  const RankedPlanner& planner() const { return *planner_; }
+  const RankedEvaluator& evaluator() const { return *evaluator_; }
+  RankedTeam& team() { return *team_; }
+  RankedPlanner& planner() { return *planner_; }
+  RankedEvaluator& evaluator() { return *evaluator_; }
+
+  virtual void update(const HeatResult& hResult, size_t iTeam) override;
+
+  const std::string& getName() const override { return name_; }
+
+  Battlegroup(
+      const RankedTeamPtr& team,
+      const RankedEvaluatorPtr& evaluator,
+      const RankedPlannerPtr& planner,
+      const Contribution& contribution = Contribution{});
 protected:
-  GroupContribution synergyContribution() { return GroupContribution{record().skill, 0.1}; }
+  TrueSkill synergy_;
 
   RankedTeamPtr team_;
-  double teamContribution_;
 
   RankedEvaluatorPtr evaluator_;
-  double evaluatorContribution_;
 
   RankedPlannerPtr planner_;
-  double plannerContribution_;
+
+  Contribution contribution_;
+
+  std::string name_;
+
+  virtual Hash generateHash(bool generateSubHashes = true) override;
+  virtual std::string defineName() override;
 };
 
 using BattlegroupPtr = std::shared_ptr<Battlegroup>;
