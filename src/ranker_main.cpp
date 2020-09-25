@@ -43,7 +43,9 @@ int main(int argc, char** argv) {
   ranker.addTeam(TeamNonVolatile::loadFromFile("teams/hexTeamB.txt"));
   ranker.addTeam(TeamNonVolatile::loadFromFile("teams/hexTeamC.txt"));
   ranker.addTeam(TeamNonVolatile::loadFromFile("teams/hexTeamD.txt"));
+  ranker.addPlanner(planners::choose("random", *planners::config("random"))->setEngine(PkCU()));
   ranker.addPlanner(planners::choose("maximin", *planners::config("maximin"))->setEngine(PkCU()));
+  ranker.addPlanner(planners::choose("max", *planners::config("max"))->setEngine(PkCU()));
   ranker.addEvaluator(evaluators::choose("simple", *evaluators::config("simple")));
 
   ranker.initialize();

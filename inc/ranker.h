@@ -97,6 +97,10 @@ public:
 
     Battlegroup::Contribution contributions;
 
+    bool printPokemonLeaderboard = false;
+
+    bool printBattlegroupLeaderboard = true;
+
     /* do we allow teams to rank against teams of different leagues? Useful for small population */
     bool enforceSameLeague = false;
 
@@ -179,10 +183,10 @@ protected:
   void calculateDescriptiveStatistics(size_t iLeague, TrainerResult& cResult) const;
 
   /* print information about the top n members of league iLeague */
-  void printLeagueStatistics(const LeagueHeat& league) const;
+  void printLeagueStatistics(LeagueHeat& league) const;
   
   /*load a population of pokemon and their rankings from a filepath */
-  bool loadTeamPopulation();
+  size_t loadTeamPopulation();
 
   bool saveTeamPopulation();
 

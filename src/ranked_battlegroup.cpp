@@ -1,5 +1,6 @@
 #include "../inc/ranked_battlegroup.h"
 
+#include <cmath>
 #include <boost/functional/hash.hpp>
 #include <boost/format.hpp>
 
@@ -9,10 +10,12 @@ Battlegroup::Battlegroup(
     const RankedEvaluatorPtr& evaluator,
     const RankedPlannerPtr& planner,
     const Contribution& contribution)
-  : team_(team),
+  : Ranked(),
+    team_(team),
     evaluator_(evaluator),
     planner_(planner),
-    contribution_(contribution) { 
+    contribution_(contribution) {
+  computeSkill();
   identify();
 }
 
@@ -30,6 +33,22 @@ std::vector<GroupContribution> Battlegroup::contributions() {
     result.push_back({pokemon->skill(), contribution_.pokemon});
   }
   return result;
+}
+
+
+TrueSkill& Battlegroup::computeSkill() {
+  double totalContribution = 0;
+  TrueSkill result{0.0, 0.0};
+  for (auto& cnt: contributions()) {
+    result.mean += cnt.skill.mean * cnt.contribution;
+    result.stdDev += std::pow(cnt.skill.stdDev, 2) * cnt.contribution;
+    totalContribution += cnt.contribution;
+  }
+
+  //result.mean /= totalContribution;
+  result.stdDev = std::sqrt(result.stdDev);
+  skill() = result;
+  return skill();
 }
 
 

@@ -193,45 +193,55 @@ Ranker& Ranker::addPlanner(const std::shared_ptr<Planner>& planner) {
 
 
 template<class LeagueType>
-void printLeaderboard(std::ostream& os, const LeagueType& league, size_t numToPrint) {
-  numToPrint = std::min(numToPrint, league.size());
+void printMapLeaderboard(std::ostream& os, const LeagueType& league, size_t numToPrint) {
   std::vector<typename LeagueType::mapped_type> rankedLeague; rankedLeague.reserve(league.size());
   for (auto& pair : league) { rankedLeague.push_back(pair.second); }
+  
+  printLeaderboard(os, rankedLeague, numToPrint);
+};
+
+template<class VectorLeagueType>
+void printLeaderboard(std::ostream& os, VectorLeagueType& league, size_t numToPrint) {
   // sort numToPrint order:
+  numToPrint = std::min(numToPrint, league.size());
   std::partial_sort(
-      rankedLeague.begin(),
-      rankedLeague.begin() + numToPrint,
-      rankedLeague.end(),
-      [](const typename LeagueType::mapped_type& a, const typename LeagueType::mapped_type& b) {
+      league.begin(),
+      league.begin() + numToPrint,
+      league.end(),
+      [](const typename VectorLeagueType::value_type& a, const typename VectorLeagueType::value_type& b) {
         return a.get() > b.get();
   });
 
   for (size_t iRanked = 0; iRanked < numToPrint; ++iRanked) {
-    const auto& ranked = rankedLeague[iRanked];
+    const auto& ranked = league[iRanked];
     const auto& record = ranked->record();
 
-    os << boost::format("%02d: %s\n") % iRanked % *ranked;
+    os << boost::format(" %02d: %s\n") % (iRanked+1) % *ranked;
   }
-};
+}
 
 
-void Ranker::printLeagueStatistics(const LeagueHeat& league) const {
+void Ranker::printLeagueStatistics(LeagueHeat& league) const {
   out_.get() << boost::format("played %d games!\n") % league.games.size();
-  if (league.evaluators.size() > 0) {
+  if (league.evaluators.size() >= 2) {
     out_.get() << "---- EVALUATOR LEADERBOARD ----\n";
-    printLeaderboard(out_, league.evaluators, cfg_.leaderboardPrintCount);
+    printMapLeaderboard(out_, league.evaluators, cfg_.leaderboardPrintCount);
   }
-  if (league.planners.size() > 0) {
+  if (league.planners.size() >= 2) {
     out_.get() << "---- PLANNER LEADERBOARD ----\n";
-    printLeaderboard(out_, league.planners, cfg_.leaderboardPrintCount);
+    printMapLeaderboard(out_, league.planners, cfg_.leaderboardPrintCount);
   }
-  if (league.pokemon.size() > 0) {
+  if (league.pokemon.size() >= 2 && cfg_.printPokemonLeaderboard) {
     out_.get() << "---- POKEMON LEADERBOARD ----\n";
-    printLeaderboard(out_, league.pokemon, cfg_.leaderboardPrintCount);
+    printMapLeaderboard(out_, league.pokemon, cfg_.leaderboardPrintCount);
   }
-  if (league.teams.size() > 0) {
+  if (league.teams.size() >= 2) {
     out_.get() << "---- TEAM LEADERBOARD ----\n";
-    printLeaderboard(out_, league.teams, cfg_.leaderboardPrintCount);
+    printMapLeaderboard(out_, league.teams, cfg_.leaderboardPrintCount);
+  }
+  if (cfg_.printBattlegroupLeaderboard) {
+    out_.get() << "---- BATTLEGROUP LEADERBOARD ----\n";
+    printLeaderboard(out_, league.battlegroups, cfg_.leaderboardPrintCount);
   }
 }
 

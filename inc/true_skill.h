@@ -40,4 +40,6 @@ struct TrueSkill {
   void input(const boost::property_tree::ptree& ptree);
 };
 
+std::ostream& operator <<(std::ostream& os, const TrueSkill& tR);
+
 #endif /* TRUESKILL_H */

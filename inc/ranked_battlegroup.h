@@ -35,6 +35,7 @@ public:
   };
 
   std::vector<GroupContribution> contributions();
+  TrueSkill& computeSkill();
 
   const RankedTeam& team() const { return *team_; }
   const RankedPlanner& planner() const { return *planner_; }

@@ -1,6 +1,8 @@
 #include "../inc/game_factory.h"
 
+#include <algorithm>
 #include <boost/math/distributions/normal.hpp>
+#include <numeric>
 
 GameFactory::GameFactory(const Config& cfg)
   : cfg_(cfg),
@@ -120,8 +122,6 @@ double GameFactory::WWithinMargin(double dPerformance, double drawMargin) {
 double GameFactory::matchQuality(
   const Battlegroup& team_A,
   const Battlegroup& team_B) const {
-  // total number of teammates on the team
-  size_t totalTeammates = team_A.team().nv().getNumTeammates() * 2 + team_B.team().nv().getNumTeammates() * 2;
   const TrueSkill& skillA = team_A.skill();
   const TrueSkill& skillB = team_B.skill();
 
@@ -129,9 +129,9 @@ double GameFactory::matchQuality(
   double skillBStdDevSquared = pow(skillB.stdDev , 2);
 
   double denominator =
-      ((totalTeammates * betaSquared_) + skillAStdDevSquared + skillBStdDevSquared);
+      (betaSquared_ + skillAStdDevSquared + skillBStdDevSquared);
 
-  double sqrtPart = sqrt((totalTeammates * betaSquared_) / denominator);
+  double sqrtPart = sqrt(betaSquared_ / denominator);
 
   double expPart =
     exp
@@ -213,11 +213,20 @@ size_t GameFactory::update(
   //bool evaluatorsSame = *(teams[0]->baseEvaluator) == *(teams[1]->baseEvaluator);
   for (size_t iTeam = 0; iTeam != 2; ++iTeam) {
     Battlegroup& tTeam = *teams[iTeam];
+    auto contributions = tTeam.contributions();
+    /*double totalContribution = std::accumulate(
+        contributions.begin(), contributions.end(), 0., [](auto& a, auto& b){
+          return a + b.contribution;
+    });*/
 
-    // TODO(@drendleman) - team subcomponents
-    // update team:
-    update_ranked(tTeam.record().skill, v, w, c, cSquared, rankMultiplier[iTeam], 1.0);
-    numUpdates++;
+    for (auto& cnt: tTeam.contributions()) {
+      // update contribution:
+      //double partialContribution = cnt.contribution / totalContribution;
+      update_ranked(cnt.skill, v, w, c, cSquared, rankMultiplier[iTeam], cnt.contribution);
+      numUpdates++;
+    }
+    // recompute battlegroup skill:
+    tTeam.computeSkill();
   } // end of for each team
 
   return numUpdates;
