@@ -11,7 +11,7 @@
 #include "../inc/pkai.h"
 
 #include <array>
-#include <ostream>
+#include <iosfwd>
 #include <stdint.h>
 #include <string>
 #include <vector>

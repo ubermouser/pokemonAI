@@ -51,8 +51,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=
-CXXFLAGS=
+CCFLAGS=-g -mtune=native -march=native
+CXXFLAGS=-g -mtune=native -march=native
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -61,11 +61,13 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=
+LDLIBSOPTIONS=../pkaiEngine/dist/Release/GNU-Linux/libpkaiengine.a -lboost_filesystem -lboost_system -lboost_program_options -fopenmp -ldl
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/trainer
+
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/trainer: ../pkaiEngine/dist/Release/GNU-Linux/libpkaiengine.a
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/trainer: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
@@ -74,55 +76,56 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/trainer: ${OBJECTFILES}
 ${OBJECTDIR}/_ext/511e4115/game_factory.o: ../src/game_factory.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/game_factory.o ../src/game_factory.cpp
+	$(COMPILE.cc) -O3 -Wall -DGEN4_STATIC -DNDEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/game_factory.o ../src/game_factory.cpp
 
 ${OBJECTDIR}/_ext/511e4115/ranked.o: ../src/ranked.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranked.o ../src/ranked.cpp
+	$(COMPILE.cc) -O3 -Wall -DGEN4_STATIC -DNDEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranked.o ../src/ranked.cpp
 
 ${OBJECTDIR}/_ext/511e4115/ranked_battlegroup.o: ../src/ranked_battlegroup.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranked_battlegroup.o ../src/ranked_battlegroup.cpp
+	$(COMPILE.cc) -O3 -Wall -DGEN4_STATIC -DNDEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranked_battlegroup.o ../src/ranked_battlegroup.cpp
 
 ${OBJECTDIR}/_ext/511e4115/ranked_evaluator.o: ../src/ranked_evaluator.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranked_evaluator.o ../src/ranked_evaluator.cpp
+	$(COMPILE.cc) -O3 -Wall -DGEN4_STATIC -DNDEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranked_evaluator.o ../src/ranked_evaluator.cpp
 
 ${OBJECTDIR}/_ext/511e4115/ranked_planner.o: ../src/ranked_planner.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranked_planner.o ../src/ranked_planner.cpp
+	$(COMPILE.cc) -O3 -Wall -DGEN4_STATIC -DNDEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranked_planner.o ../src/ranked_planner.cpp
 
 ${OBJECTDIR}/_ext/511e4115/ranked_pokemon.o: ../src/ranked_pokemon.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranked_pokemon.o ../src/ranked_pokemon.cpp
+	$(COMPILE.cc) -O3 -Wall -DGEN4_STATIC -DNDEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranked_pokemon.o ../src/ranked_pokemon.cpp
 
 ${OBJECTDIR}/_ext/511e4115/ranked_team.o: ../src/ranked_team.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranked_team.o ../src/ranked_team.cpp
+	$(COMPILE.cc) -O3 -Wall -DGEN4_STATIC -DNDEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranked_team.o ../src/ranked_team.cpp
 
 ${OBJECTDIR}/_ext/511e4115/ranker.o: ../src/ranker.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranker.o ../src/ranker.cpp
+	$(COMPILE.cc) -O3 -Wall -DGEN4_STATIC -DNDEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranker.o ../src/ranker.cpp
 
 ${OBJECTDIR}/_ext/511e4115/ranker_main.o: ../src/ranker_main.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranker_main.o ../src/ranker_main.cpp
+	$(COMPILE.cc) -O3 -Wall -DGEN4_STATIC -DNDEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranker_main.o ../src/ranker_main.cpp
 
 ${OBJECTDIR}/_ext/511e4115/true_skill.o: ../src/true_skill.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/true_skill.o ../src/true_skill.cpp
+	$(COMPILE.cc) -O3 -Wall -DGEN4_STATIC -DNDEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/true_skill.o ../src/true_skill.cpp
 
 # Subprojects
 .build-subprojects:
+	cd ../pkaiEngine && ${MAKE}  -f Makefile CONF=Release
 
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
@@ -130,6 +133,7 @@ ${OBJECTDIR}/_ext/511e4115/true_skill.o: ../src/true_skill.cpp
 
 # Subprojects
 .clean-subprojects:
+	cd ../pkaiEngine && ${MAKE}  -f Makefile CONF=Release clean
 
 # Enable dependency checking
 .dep.inc: .depcheck-impl

@@ -97,7 +97,7 @@ public:
 
     Battlegroup::Contribution contributions;
 
-    bool printPokemonLeaderboard = false;
+    bool printPokemonLeaderboard = true;
 
     bool printBattlegroupLeaderboard = true;
 
@@ -184,6 +184,9 @@ protected:
 
   /* print information about the top n members of league iLeague */
   void printLeagueStatistics(LeagueHeat& league) const;
+
+  /* print information about a single heat */
+  void printHeatResult(const GameHeat& heat) const;
   
   /*load a population of pokemon and their rankings from a filepath */
   size_t loadTeamPopulation();

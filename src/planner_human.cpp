@@ -9,8 +9,8 @@
 #include "../inc/environment_possible.h"
 #include "../inc/environment_nonvolatile.h"
 
-const std::string PlannerHuman::ident = "HumanPlanner-NULLEVAL";
 
+PlannerHuman::PlannerHuman(const Config& cfg) : PlannerHuman(cfg, std::cin) {};
 
 PlyResult PlannerHuman::generateSolutionAtLeaf(
     const ConstEnvironmentPossible& origin) const {
@@ -54,7 +54,7 @@ Action PlannerHuman::actionSelect(const ConstEnvironmentVolatile& env) const {
   
   do {
     std::cout << "Please select the index of your desired action for Team " << (agentTeam_==TEAM_A?"A":"B") << ":\n";
-    getline(*istream_, input);
+    getline(in_.get(), input);
     std::stringstream inputResult(input);
     
     // determine if action is valid:

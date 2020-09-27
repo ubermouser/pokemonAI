@@ -1,6 +1,7 @@
 #include "../inc/evaluator_montecarlo.h"
 
 #include <boost/program_options.hpp>
+#include <boost/format.hpp>
 
 #include "../inc/evaluator_simple.h"
 #include "../inc/pkCU.h"
@@ -35,7 +36,7 @@ po::options_description EvaluatorMonteCarlo::Config::options(
 
 
 EvaluatorMonteCarlo::EvaluatorMonteCarlo(const Config& cfg)
-    : Evaluator("MonteCarlo_Evaluator"), cfg_(cfg) {
+    : Evaluator(cfg), cfg_(cfg) {
   PlannerRandom::Config plannercfg;
   plannercfg.moveChance = cfg.moveChance;
   Game::Config gamecfg;
@@ -50,6 +51,13 @@ EvaluatorMonteCarlo::EvaluatorMonteCarlo(const Config& cfg)
   game_->setEvaluator(EvaluatorSimple())
       .setPlanner(0, PlannerRandom(plannercfg).setEngine(PkCU()))
       .setPlanner(1, PlannerRandom(plannercfg).setEngine(PkCU()));
+
+  resetName();
+}
+
+
+void EvaluatorMonteCarlo::resetName() {
+  setName((boost::format("%s(r=%d") % baseName() % cfg_.maxRollouts).str());
 }
 
 

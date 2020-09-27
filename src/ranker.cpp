@@ -1,12 +1,41 @@
 #include "../inc/ranker.h"
 
 #include <assert.h>
-#include <stdexcept>
 #include <algorithm>
-#include <unordered_map>
-#include <random>
+#include <iostream>
 #include <omp.h>
+#include <random>
+#include <stdexcept>
+#include <unordered_map>
 #include <boost/format.hpp>
+#include <boost/filesystem.hpp>
+
+
+namespace bf = boost::filesystem;
+namespace po = boost::program_options;
+
+
+po::options_description Ranker::Config::options(const std::string& category, std::string prefix) {
+  Config defaults{};
+  po::options_description desc{category};
+
+  if (prefix.size() > 0) { prefix.append("-"); }
+  desc.add_options()
+      ((prefix + "ranker-verbosity").c_str(),
+      po::value<int>(&verbosity)->default_value(defaults.verbosity),
+      "verbosity level, controls intermediate rank printing.")
+      ((prefix + "ranker-seed").c_str(),
+      po::value<uint32_t>(&randomSeed)->default_value(defaults.randomSeed),
+      "random number generator seed.")
+      ((prefix + "num-threads").c_str(),
+      po::value<size_t>(&numThreads)->default_value(defaults.numThreads),
+      "number of threads to use when ranking teams")
+      ((prefix + "team-path").c_str(),
+      po::value<std::string>(&teamPath)->default_value(defaults.teamPath),
+      "folder for loading / saving pokemon teams");;
+
+  return desc;
+}
 
 
 Ranker::Ranker(const Config& cfg) : cfg_(cfg), out_(std::cout), rand_(cfg.randomSeed) {
@@ -16,9 +45,13 @@ Ranker::Ranker(const Config& cfg) : cfg_(cfg), out_(std::cout), rand_(cfg.random
 
 void Ranker::initialize() {
   if (games_.empty()) {throw std::runtime_error("game undefined"); }
-  if (teams_.empty()) { throw std::runtime_error("no teams defined"); }
   if (evaluators_.empty()) { throw std::runtime_error("no evaluators defined"); }
   if (planners_.empty()) { throw std::runtime_error("no planners defined"); }
+
+  if (!cfg_.teamPath.empty()) {
+    loadTeamPopulation();
+  }
+  if (teams_.empty()) { throw std::runtime_error("no teams defined"); }
 
   initialized_ = true;
 }
@@ -79,6 +112,7 @@ void Ranker::gauntlet(BattlegroupPtr& battlegroup, LeagueHeat& league) const {
 
     GameHeat result = singleGame(battlegroup, adversary);
     digestGame(result, league);
+    if (cfg_.verbosity >= 3) { printHeatResult(result); }
   }
 }
 
@@ -107,8 +141,8 @@ GameHeat Ranker::singleGame(
 
 
 BattlegroupPtr Ranker::findMatch(const Battlegroup& cBG, const LeagueHeat& league) const {
-  std::vector<double> matchQualities(0.0, league.battlegroups.size());
   size_t numMatches = league.battlegroups.size();
+  std::vector<double> matchQualities; matchQualities.reserve(numMatches);
 
   // compute match quality between all pairs in the league:
   for (size_t iBG = 0; iBG < league.battlegroups.size(); ++iBG) {
@@ -208,8 +242,8 @@ void printLeaderboard(std::ostream& os, VectorLeagueType& league, size_t numToPr
       league.begin(),
       league.begin() + numToPrint,
       league.end(),
-      [](const typename VectorLeagueType::value_type& a, const typename VectorLeagueType::value_type& b) {
-        return a.get() > b.get();
+      [](const auto& a, const auto& b) {
+        return a->skill() > b->skill();
   });
 
   for (size_t iRanked = 0; iRanked < numToPrint; ++iRanked) {
@@ -246,11 +280,54 @@ void Ranker::printLeagueStatistics(LeagueHeat& league) const {
 }
 
 
+void Ranker::printHeatResult(const GameHeat& heat) const {
+  auto endStatus = heat.heatResult.endStatus;
+  std::string winDrawLoss =
+      endStatus==MATCH_TEAM_A_WINS?">":
+      endStatus==MATCH_TEAM_B_WINS?"<":
+      endStatus==MATCH_TIE?"=":"~";
+  out_.get() << boost::format("%32.32s %s %-32.32s\n")
+      % heat.team_a->getName()
+      % winDrawLoss
+      % heat.team_b->getName();
+}
+
+
 void Ranker::digestGame(GameHeat& gameHeat, LeagueHeat& league) const {
   // update ranks of both teams
+  // TODO(@drendleman) - this should update all battlegroups which reference the specified component
   gameFactory_.update(*gameHeat.team_a, *gameHeat.team_b, gameHeat.heatResult);
   // update statistics:
   gameHeat.team_a->update(gameHeat.heatResult, TEAM_A);
   gameHeat.team_b->update(gameHeat.heatResult, TEAM_B);
   league.games.push_back(gameHeat);
+}
+
+
+size_t Ranker::loadTeamPopulation() {
+  bf::path teamPath{cfg_.teamPath};
+  if (!bf::exists(teamPath) || !bf::is_directory(teamPath)) {
+    std::cerr << 
+        boost::format("Team population directory at \"%s\" is not a folder or does not exist!\n")
+        % cfg_.teamPath;
+    return 0;
+  }
+
+  size_t numLoaded = 0;
+  for (auto& pathIt : bf::directory_iterator(teamPath)) {
+    if (!bf::is_regular_file(pathIt.path())) { continue; }
+
+    try {
+      addTeam(TeamNonVolatile::loadFromFile(pathIt.path().string()));
+    } catch(std::invalid_argument& e) {
+      if (cfg_.verbosity >= 2) {
+        std::cerr << boost::format("Failed to load team at \"%s\"\n") % pathIt.path();
+      }
+      continue;
+    }
+    
+    numLoaded += 1;
+  }
+
+  return numLoaded;
 }

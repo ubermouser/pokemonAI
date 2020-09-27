@@ -32,7 +32,7 @@ public:
 
   virtual PlannerMiniMax& initialize() override;
 
-  virtual std::string baseName() const override { return "MiniMaxPlanner"; }
+  virtual std::string baseName() const override { return "MiniMax"; }
 
   virtual PlannerMiniMax* clone() const override { return new PlannerMiniMax(*this); }
 protected:

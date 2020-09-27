@@ -10,7 +10,7 @@
 
 #include <array>
 #include <assert.h>
-#include <iostream>
+#include <iosfwd>
 #include <stdint.h>
 #include <vector>
 

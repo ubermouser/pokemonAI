@@ -1,6 +1,7 @@
 #include "../inc/ranked.h"
 
 #include <algorithm>
+#include <iostream>
 #include <numeric>
 #include <boost/format.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -31,7 +32,7 @@ void Ranked::update(const HeatResult& hResult, size_t iTeam) {
 
 
 std::ostream& Ranked::print(std::ostream& os) const {
-  os << boost::format("%24.24s ") % getName();
+  os << boost::format("%-32.32s ") % getName();
   printStats(os);
 
   return os;

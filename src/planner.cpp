@@ -79,11 +79,12 @@ Planner& Planner::setEvaluator(const std::shared_ptr<Evaluator>& eval) {
 
 
 void Planner::resetName() {
-  std::ostringstream name;
-  name << baseName();
-  name << "-";
-  name << ((eval_!= NULL) ? eval_->getName(): "NULLEVAL");
-  setName(name.str());
+  std::string evalName = ((eval_!= NULL)?(boost::format("-%s") % eval_->getName()).str(): "");
+  std::string planName = (boost::format("%s(d=%d)%s")
+      % baseName()
+      % cfg_.maxDepth
+      % evalName).str();
+  setName(planName);
 }
 
 

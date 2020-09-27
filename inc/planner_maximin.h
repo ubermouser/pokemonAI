@@ -13,12 +13,12 @@
 
 class PlannerMaxiMin : public Planner {
 public:
-  PlannerMaxiMin(const Config& cfg = Config()) : Planner(cfg) {};
+  PlannerMaxiMin(const Config& cfg = Config()) : Planner(cfg) { resetName(); };
   PlannerMaxiMin(const PlannerMaxiMin& other) = default;
 
   virtual ~PlannerMaxiMin() {};
 
-  virtual std::string baseName() const override { return "MaxiMinPlanner"; }
+  virtual std::string baseName() const override { return "MaxiMin"; }
 
   virtual PlannerMaxiMin* clone() const override { return new PlannerMaxiMin(*this); }
 

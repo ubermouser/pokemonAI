@@ -147,7 +147,17 @@
           <developmentMode>5</developmentMode>
         </cTool>
         <ccTool>
-          <developmentMode>5</developmentMode>
+          <developmentMode>6</developmentMode>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+          <commandLine>-g -mtune=native -march=native</commandLine>
+          <preprocessorList>
+            <Elem>GEN4_STATIC</Elem>
+            <Elem>NDEBUG</Elem>
+            <Elem>_LINUX</Elem>
+          </preprocessorList>
+          <warningLevel>2</warningLevel>
         </ccTool>
         <fortranCompilerTool>
           <developmentMode>5</developmentMode>
@@ -155,6 +165,27 @@
         <asmTool>
           <developmentMode>5</developmentMode>
         </asmTool>
+        <linkerTool>
+          <linkerLibItems>
+            <linkerLibProjectItem>
+              <makeArtifact PL="../pkaiEngine"
+                            CT="3"
+                            CN="Release"
+                            AC="false"
+                            BL="true"
+                            WD="../pkaiEngine"
+                            BC="${MAKE}  -f Makefile CONF=Release"
+                            CC="${MAKE}  -f Makefile CONF=Release clean"
+                            OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libpkaiengine.a">
+              </makeArtifact>
+            </linkerLibProjectItem>
+            <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
+            <linkerOptionItem>-lboost_system</linkerOptionItem>
+            <linkerOptionItem>-lboost_program_options</linkerOptionItem>
+            <linkerOptionItem>-fopenmp</linkerOptionItem>
+            <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
+          </linkerLibItems>
+        </linkerTool>
       </compileType>
       <item path="../inc/game_factory.h" ex="false" tool="3" flavor2="0">
       </item>

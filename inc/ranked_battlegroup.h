@@ -17,17 +17,11 @@
 #include "ranked_evaluator.h"
 #include "ranked_planner.h"
 
-struct GroupContribution {
-  TrueSkill& skill;
-  double contribution;
-};
-
 class Battlegroup : public Ranked {
 public:
   struct Contribution {
     double synergy = 1.0;
     double team = 1.0;
-    double pokemon = 1.0;
     double planner = 1.0;
     double evaluator = 1.0;
 

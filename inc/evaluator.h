@@ -106,6 +106,9 @@ protected:
   Config cfg_;
 
   virtual Fitness combineTeamFitness(fpType agentFitness, fpType otherFitness) const;
+
+  virtual std::string baseName() const { return "Evaluator"; }
+  virtual void resetName();
 };
 
 #endif /* EVALUATOR_H */

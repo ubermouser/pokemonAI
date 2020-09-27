@@ -125,8 +125,8 @@ double GameFactory::matchQuality(
   const TrueSkill& skillA = team_A.skill();
   const TrueSkill& skillB = team_B.skill();
 
-  double skillAStdDevSquared = pow(skillA.stdDev , 2);
-  double skillBStdDevSquared = pow(skillB.stdDev , 2);
+  double skillAStdDevSquared = skillA.variance;
+  double skillBStdDevSquared = skillB.variance;
 
   double denominator =
       (betaSquared_ + skillAStdDevSquared + skillBStdDevSquared);
@@ -147,9 +147,6 @@ double GameFactory::matchQuality(
 }; //endOf matchQuality
 
 
-
-
-
 size_t GameFactory::update(
   Battlegroup& team_A,
   Battlegroup& team_B,
@@ -162,14 +159,9 @@ size_t GameFactory::update(
   double c, cSquared, v, w, winningMean, losingMean, meanDelta;
 
   {
-    size_t totalPlayers = 
-        team_A.team().nv().getNumTeammates() * 2 + team_B.team().nv().getNumTeammates() * 2;
-    double ratingsSquared =
-      pow(ratings[TEAM_A]->stdDev, 2)
-      +
-      pow(ratings[TEAM_B]->stdDev, 2);
+    double ratingsSquared = ratings[TEAM_A]->variance + ratings[TEAM_B]->variance;
 
-    cSquared = ratingsSquared + totalPlayers * betaSquared_;
+    cSquared = ratingsSquared + betaSquared_;
 
     c = sqrt(cSquared);
   }
@@ -232,35 +224,29 @@ size_t GameFactory::update(
   return numUpdates;
 } // endOf update
 
-void GameFactory::update_ranked(
-  TrueSkill& cSkill,
-  double v,
-  double w,
-  double c,
-  double cSquared,
-  double rankMultiplier,
-  double partialPlay) const {
-  double oMeanMultiplier = partialPlay * ((pow(cSkill.stdDev, 2) + tauSquared_) / c);
 
-  double oStdDevMultiplier = partialPlay * ((pow(cSkill.stdDev, 2) + tauSquared_) / cSquared);
+void GameFactory::update_ranked(
+    TrueSkill& cSkill,
+    double v,
+    double w,
+    double c,
+    double cSquared,
+    double rankMultiplier,
+    double partialPlay) const {
+  double oMeanMultiplier = partialPlay * ((cSkill.variance + tauSquared_) / c);
+
+  double oStdDevMultiplier = partialPlay * ((cSkill.variance + tauSquared_) / cSquared);
 
   double oTeamMeanDelta = (rankMultiplier * oMeanMultiplier * v);
 
   double oNewMean = cSkill.mean + oTeamMeanDelta;
-  double oNewStdDev =
-    sqrt(
-        (
-          pow(cSkill.stdDev, 2)
-          +
-          tauSquared_
-        )
+  double oNewVariance =
+        (cSkill.variance + tauSquared_)
         *
-        (1 - w * oStdDevMultiplier)
-      );
+        (1 - w * oStdDevMultiplier);
 
-
-  assert(!boost::math::isnan(oNewMean) || !boost::math::isnan(oNewStdDev));
+  assert(!boost::math::isnan(oNewMean) || !boost::math::isnan(oNewVariance));
 
   cSkill.mean = oNewMean;
-  cSkill.stdDev = oNewStdDev;
+  cSkill.variance = oNewVariance;
 }; // endOf update_ranked

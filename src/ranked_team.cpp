@@ -18,9 +18,16 @@ const std::string RankedTeam::HEADER = "PKAIR1";
 namespace pt = boost::property_tree;
 
 
-RankedTeam::RankedTeam(const TeamNonVolatile& cTeam, PokemonLeague& league)
-: Ranked(cTeam.hash()), nv_(cTeam), ranked_components_(findSubteams(league)) {
+RankedTeam::RankedTeam(
+    const TeamNonVolatile& cTeam,
+    PokemonLeague& league,
+    const Contribution& contribution)
+  : Ranked(cTeam.hash()),
+    nv_(cTeam),
+    ranked_components_(findSubteams(league)),
+    contribution_(contribution) {
   identify();
+  computeSkill();
 }
 
 
@@ -37,6 +44,24 @@ std::vector<RankedPokemonPtr> RankedTeam::findSubteams(PokemonLeague& league) co
   }
 
   return result;
+}
+
+
+std::vector<GroupContribution> RankedTeam::contributions() {
+  std::vector<GroupContribution> result; result.reserve(teammates().size() + 1);
+
+  result.push_back({synergy_, contribution_.synergy}); // team synergy
+  // individual pokemon
+  for (RankedPokemonPtr& pokemon: teammates()) {
+    result.push_back({pokemon->skill(), contribution_.pokemon});
+  }
+  return result;
+}
+
+
+TrueSkill& RankedTeam::computeSkill() {
+  skill() = TrueSkill::combine(contributions());
+  return skill();
 }
 
 

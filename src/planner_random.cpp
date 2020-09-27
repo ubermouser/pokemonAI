@@ -1,14 +1,13 @@
 //#define PKAI_IMPORT
 #include "../inc/planner_random.h"
 
-#include <typeinfo>
 #include <boost/program_options.hpp>
+#include <boost/format.hpp>
 
 #include "../inc/pkCU.h"
 #include "../inc/environment_possible.h"
 
 namespace po = boost::program_options;
-const std::string PlannerRandom::ident = "Random_Planner-NULLEVAL";
 
 
 po::options_description PlannerRandom::Config::options(
@@ -23,6 +22,11 @@ po::options_description PlannerRandom::Config::options(
       "likelihood for the random action selected to be a move.");
 
   return desc;
+}
+
+
+void PlannerRandom::resetName() {
+  setName((boost::format("%s(c=%3.1f)") % baseName() % cfg_.moveChance).str());
 }
 
 

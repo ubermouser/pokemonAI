@@ -11,7 +11,7 @@
 #include "pkai.h"
 
 #include <deque>
-#include <ostream>
+#include <iosfwd>
 #include <memory>
 #include <stdint.h>
 

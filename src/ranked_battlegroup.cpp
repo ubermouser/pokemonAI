@@ -1,8 +1,10 @@
 #include "../inc/ranked_battlegroup.h"
 
+#include <algorithm>
 #include <cmath>
 #include <boost/functional/hash.hpp>
 #include <boost/format.hpp>
+#include <vector>
 
 
 Battlegroup::Battlegroup(
@@ -21,33 +23,19 @@ Battlegroup::Battlegroup(
 
 
 std::vector<GroupContribution> Battlegroup::contributions() {
-  std::vector<GroupContribution> result;
+  std::vector<GroupContribution> result = team().contributions();
 
-  result.push_back({skill(), contribution_.synergy}); // battlegroup synergy
+  result.push_back({synergy_, contribution_.synergy}); // battlegroup synergy
   result.push_back({planner().skill(), contribution_.planner}); // planner
   result.push_back({evaluator().skill(), contribution_.evaluator}); // evaluator
-  result.push_back({team().skill(), contribution_.team}); // team synergy
 
-  // individual pokemon
-  for (RankedPokemonPtr& pokemon: team().teammates()) {
-    result.push_back({pokemon->skill(), contribution_.pokemon});
-  }
   return result;
 }
 
 
 TrueSkill& Battlegroup::computeSkill() {
-  double totalContribution = 0;
-  TrueSkill result{0.0, 0.0};
-  for (auto& cnt: contributions()) {
-    result.mean += cnt.skill.mean * cnt.contribution;
-    result.stdDev += std::pow(cnt.skill.stdDev, 2) * cnt.contribution;
-    totalContribution += cnt.contribution;
-  }
-
-  //result.mean /= totalContribution;
-  result.stdDev = std::sqrt(result.stdDev);
-  skill() = result;
+  team().computeSkill();
+  skill() = TrueSkill::combine(contributions());
   return skill();
 }
 
@@ -71,6 +59,6 @@ Battlegroup::Hash Battlegroup::generateHash(bool generateSubHashes) {
 
 
 std::string Battlegroup::defineName() {
-  name_ = (boost::format("%s %s") % planner_->getName() % team_->getName()).str();
+  name_ = (boost::format("%s-%s-%s") % planner_->getName() % evaluator_->getName() % team_->getName()).str();
   return name_;
 }

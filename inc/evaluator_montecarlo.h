@@ -46,6 +46,9 @@ protected:
   Config cfg_;
 
   std::shared_ptr<Game> game_;
+
+  virtual std::string baseName() const override { return "MonteCarlo"; }
+  virtual void resetName() override;
 };
 
 #endif /* EVALUATOR_MONTECARLO_H */

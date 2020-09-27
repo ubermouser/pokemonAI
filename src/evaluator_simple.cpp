@@ -10,9 +10,7 @@
 
 EvaluatorSimple::EvaluatorSimple(const Config& cfg)
     : Evaluator(cfg), cfg_(cfg) {
-  std::ostringstream name;
-  name << "Simple_Evaluator-" << cfg_.aliveBias;
-  setName(name.str());
+  resetName();
 };
 
 

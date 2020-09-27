@@ -1,7 +1,6 @@
 //#define PKAI_IMPORT
 #include "../inc/evaluator_random.h"
 
-const std::string EvaluatorRandom::ident = "Random_Evaluator";
 
 EvalResult EvaluatorRandom::calculateFitness(
     const ConstEnvironmentVolatile& env, size_t iTeam) const {

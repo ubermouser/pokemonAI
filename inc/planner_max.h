@@ -6,12 +6,10 @@
 
 class PlannerMax : public Planner {
 public:
-  PlannerMax(const Config& cfg = Config()) : Planner(cfg) {};
+  PlannerMax(const Config& cfg = Config()) : Planner(cfg) { resetName(); };
   PlannerMax(const PlannerMax& other) = default;
   
   virtual ~PlannerMax() {};
-
-  virtual std::string baseName() const override { return "MaxPlanner"; }
 
   virtual PlannerMax* clone() const override { return new PlannerMax(*this); }
 
@@ -20,6 +18,9 @@ public:
     // TODO(@drendleman) why do we need to override this?
     return setEngine(std::make_shared<PkCU>(cu));
   }
+
+protected:
+  virtual std::string baseName() const override { return "Max"; }
 
   virtual size_t maxImplDepth() const override { return MAXTRIES; }
 

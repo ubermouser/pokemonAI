@@ -4,7 +4,7 @@
 
 #include "pkai.h"
 
-#include <ostream>
+#include <iosfwd>
 #include <stdint.h>
 
 #include "nonvolatile_volatile.h"

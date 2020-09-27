@@ -35,9 +35,10 @@ protected:
   fpType fitness_move(const ConstMoveVolatile& mV) const;
   fpType fitness_pokemon(const ConstPokemonVolatile& pV) const;
   fpType fitness_team(const ConstTeamVolatile& tV) const;
+  
+  virtual std::string baseName() const override { return "Simple"; }
 
   Config cfg_;
-  
 };
 
 #endif /* SIMPLE_EVALUATOR_H */

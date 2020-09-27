@@ -4,6 +4,7 @@
 #include "../inc/team_nonvolatile.h"
 
 #include <cstring>
+#include <ostream>
 #include <boost/static_assert.hpp>
 
 BOOST_STATIC_ASSERT(sizeof(NonVolatileStatus) == (sizeof(uint32_t)*1));

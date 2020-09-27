@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <boost/program_options.hpp>
+#include <boost/format.hpp>
 
 #include "../inc/fitness.h"
 #include "../inc/fp_compare.h"
@@ -21,7 +22,11 @@ po::options_description Evaluator::Config::options(const std::string& category, 
       "home team vs away team bias.");
 
   return desc;
+}
 
+
+void Evaluator::resetName() {
+  setName(baseName());
 }
 
 

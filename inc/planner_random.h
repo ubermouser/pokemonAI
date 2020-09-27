@@ -9,31 +9,36 @@ public:
   struct Config: public Planner::Config {
     double moveChance = 0.75;
 
-    Config() : Planner::Config() {};
+    Config() : Planner::Config() {maxDepth = 0;};
 
     virtual boost::program_options::options_description options(
         const std::string& category="agent options", std::string prefix="") override;
   };
 
-  PlannerRandom(const Config& cfg = Config()) : Planner(cfg, ident), cfg_(dynamic_cast<const Config&>(cfg)) {};
+  PlannerRandom(
+      const Config& cfg = Config())
+    : Planner(cfg),
+      cfg_(dynamic_cast<const Config&>(cfg)) {
+    resetName();
+  };
 
   PlannerRandom(const PlannerRandom& other) = default;
   virtual ~PlannerRandom() { };
 
   virtual PlannerRandom* clone() const override { return new PlannerRandom(*this); }
 
+protected:
   virtual bool isEvaluatorRequired() const override { return false; }
   virtual size_t maxImplDepth() const override { return 0; }
 
-  virtual const std::string& getName() const override { return ident; };
+  virtual std::string baseName() const override { return "Random"; }
+  virtual void resetName() override;
 
   virtual PlyResult generateSolutionAtLeaf(
     const ConstEnvironmentPossible& origin) const override;
 
 protected:
   Config cfg_;
-
-  static const std::string ident;
 };
 
 #endif /* PLANNER_RANDOM_H */

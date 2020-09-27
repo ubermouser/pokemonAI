@@ -3,25 +3,26 @@
 
 #include "planner.h"
 
-#include <iostream>
+#include <iosfwd>
+#include <functional>
 
 class PlannerHuman : public Planner {
 public:
-  PlannerHuman(const Config& cfg = Config(), std::istream& input = std::cin) : Planner(cfg, ident), istream_(&input) {};
+  PlannerHuman(const Config& cfg = Config());
+  PlannerHuman(
+      const Config& cfg,
+      std::istream& input)
+    : Planner(cfg),
+      in_(input) {
+    resetName();
+  };
   PlannerHuman(const PlannerHuman& other) = default;
   ~PlannerHuman() { };
 
   virtual PlannerHuman* clone() const override { return new PlannerHuman(*this); }
 
-  virtual size_t maxImplDepth() const override { return 0; }
-  virtual bool isEvaluatorRequired() const override { return false; }
-
-  virtual PlyResult generateSolutionAtLeaf(
-      const ConstEnvironmentPossible& origin) const override;
 protected:
-  static const std::string ident;
-
-  std::istream* istream_;
+  std::reference_wrapper<std::istream> in_;
 
   /* Returns a valid action as per the user's choice
    * AT_MOVE_0-3: pokemon's move
@@ -37,7 +38,13 @@ protected:
    */
   void printActions(const ConstEnvironmentVolatile& env) const;
 
-  virtual std::string baseName() const override { return "HumanPlanner"; }
+  virtual std::string baseName() const override { return "Human"; }
+
+  virtual size_t maxImplDepth() const override { return 0; }
+  virtual bool isEvaluatorRequired() const override { return false; }
+
+  virtual PlyResult generateSolutionAtLeaf(
+      const ConstEnvironmentPossible& origin) const override;
 };
 
 #endif /* PLANNER_HUMAN_H */

@@ -5,8 +5,8 @@
 
 #include <vector>
 #include <string>
-#include <ostream>
-#include <boost/property_tree/ptree.hpp>
+#include <iosfwd>
+#include <boost/property_tree/ptree_fwd.hpp>
 
 #include "game.h"
 #include "true_skill.h"

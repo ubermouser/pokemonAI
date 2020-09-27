@@ -4,7 +4,7 @@
 #include "../inc/pkai.h"
 
 #include <stdint.h>
-#include <ostream>
+#include <iosfwd>
 #include <assert.h>
 
 #include "../inc/signature.h"

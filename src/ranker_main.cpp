@@ -28,8 +28,8 @@ struct Config {
 
 int main(int argc, char** argv) {
   Config cfg;
-  cfg.trainer.verbosity = 1;
-  cfg.trainer.minGamesPerBattlegroup = 5;
+  cfg.trainer.verbosity = 2;
+  cfg.trainer.minGamesPerBattlegroup = 100;
   cfg.trainer.game.verbosity = 0;
   cfg.trainer.game.maxMatches = 1;
 
@@ -39,10 +39,6 @@ int main(int argc, char** argv) {
   auto pokedex = PokedexStatic(cfg.pokedex);
 
   Ranker ranker(cfg.trainer);
-  ranker.addTeam(TeamNonVolatile::loadFromFile("teams/hexTeamA.txt"));
-  ranker.addTeam(TeamNonVolatile::loadFromFile("teams/hexTeamB.txt"));
-  ranker.addTeam(TeamNonVolatile::loadFromFile("teams/hexTeamC.txt"));
-  ranker.addTeam(TeamNonVolatile::loadFromFile("teams/hexTeamD.txt"));
   ranker.addPlanner(planners::choose("random", *planners::config("random"))->setEngine(PkCU()));
   ranker.addPlanner(planners::choose("maximin", *planners::config("maximin"))->setEngine(PkCU()));
   ranker.addPlanner(planners::choose("max", *planners::config("max"))->setEngine(PkCU()));

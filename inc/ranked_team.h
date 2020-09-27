@@ -7,7 +7,7 @@
 #include <array>
 #include <vector>
 #include <unordered_map>
-#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ptree_fwd.hpp>
 
 #include "ranked.h"
 #include "ranked_pokemon.h"
@@ -32,13 +32,22 @@ class RankedTeam : public Ranked {
 public:
   static const std::string HEADER;
 
-  RankedTeam(const TeamNonVolatile& cTeam, PokemonLeague& league);
+  struct Contribution {
+    double synergy = 1.0;
+    double pokemon = 1.0;
+
+    Contribution(){};
+  };
+
+  RankedTeam(const TeamNonVolatile& cTeam, PokemonLeague& league, const Contribution& = Contribution{});
 
   virtual const std::string& getName() const override { return nv_.getName(); };
 
   const TeamNonVolatile& nv() const { return nv_; }
   TeamNonVolatile& nv() { return nv_; }
 
+  std::vector<GroupContribution> contributions();
+  TrueSkill& computeSkill();
   std::vector<RankedPokemonPtr>& teammates() { return ranked_components_; }
 
   virtual void update(const HeatResult& hResult, size_t iTeam) override;
@@ -57,6 +66,10 @@ protected:
   TeamNonVolatile nv_;
 
   std::vector<RankedPokemonPtr> ranked_components_;
+
+  Contribution contribution_;
+
+  TrueSkill synergy_;
 };
 
 using RankedTeamPtr = std::shared_ptr<RankedTeam>;

@@ -25,6 +25,7 @@ PlannerMiniMax::PlannerMiniMax(const Config& cfg)
     cfg_(cfg),
     transpositionTable_(cfg_.transposition_table_size),
     orderHeuristic_() {
+  resetName();
 }
 
 PlannerMiniMax& PlannerMiniMax::initialize() {

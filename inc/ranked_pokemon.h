@@ -10,7 +10,7 @@
 
 #include <memory>
 #include <unordered_map>
-#include <ostream>
+#include <iosfwd>
 
 #include "ranked.h"
 #include "pokemon_nonvolatile.h"
