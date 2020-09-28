@@ -10,6 +10,8 @@
 
 #include "ranker.h"
 
+#include "team_factory.h"
+
 class Trainer : public Ranker {
 public:
   struct Config : public Ranker::Config {
@@ -24,23 +26,45 @@ public:
 
     /* probability that an entirely new pokemon will spontaneously find its self in the population */
     double seedProbability = 0.035;
-    
+
     /* sizes of the six populations aka "leagues" */
-    std::array<size_t, 6> teamPopulationSize = {490, 240, 194, 150, 121, 106};
+    //LeagueCount teamPopulationSize = {25, 12, 10, 8, 6, 5};
+    LeagueCount teamPopulationSize = {490, 240, 194, 150, 121, 106};
+
+    /* if value is nonzero, the number of generations between writeOuts to disk. Otherwise, do not write out */
+    size_t writeOutEvery = 0;
+
+    boost::program_options::options_description options(
+        const std::string& category="trainer configuration",
+        std::string prefix = "");
+
+    Config() : Ranker::Config() {}
   };
 
+  Trainer(const Config& cfg);
+
+  virtual void initialize() override;
+
   /* begin evolution process */
-  void evolve();
+  LeagueHeat evolve() const;
 protected:
   Config cfg_;
 
-  /* generates a random population from previous leagues, or from random functions if at single pokemon league */
-  size_t seedRandomTeamPopulation(size_t iLeague, size_t targetSize);
+  TeamFactory teamFactory_;
 
-  void spawnTeamChildren(size_t iLeague, size_t& numMutated, size_t& numCrossed, size_t& numSeeded);
+  double doNothingProbability_;
+
+  void evolveGeneration(LeagueHeat& league) const;
+
+  virtual LeagueHeat constructLeague() const override;
+
+  /* generates a random population from previous leagues, or from random functions if at single pokemon league */
+  size_t seedRandomTeamPopulation(League& league) const;
+
+  TeamLeague spawnTeamChildren(League& league) const;
 
   /* destroy the elements with the lowest rank from the league */
-  void shrinkTeamPopulation(size_t iLeague, size_t targetSize);
+  size_t shrinkPopulations(League& league, const LeagueCount& children) const;
 };
 
 #endif /* TRAINER_H */

@@ -65,6 +65,6 @@ protected:
 };
 
 using BattlegroupPtr = std::shared_ptr<Battlegroup>;
-using BattlegroupLeague = std::vector<BattlegroupPtr>;
+using BattlegroupLeague = std::unordered_map<Battlegroup::Hash, BattlegroupPtr>;
 
 #endif /* TRUESKILL_TEAM_H */

@@ -108,6 +108,7 @@ Game& Game::setEvaluator(const std::shared_ptr<Evaluator>& eval) {
   eval_ = eval;
 
   if (nv_ != NULL) { eval_->setEnvironment(nv_); }
+  isInitialized_ = false;
   return *this;
 }
 

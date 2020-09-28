@@ -259,6 +259,9 @@ public:
    */
   void initFV();
 
+
+  const std::string& defineName();
+
   /* output a single pokemon */
   void printSummary(std::ostream& out) const;
   void output(std::ostream& oFile, bool printHeader = true) const;

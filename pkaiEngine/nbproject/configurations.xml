@@ -180,7 +180,7 @@
       </toolsSet>
       <compileType>
         <ccTool>
-          <commandLine>-O0 -fopenmp</commandLine>
+          <commandLine>-O0 -fopenmp -std=c++17</commandLine>
           <preprocessorList>
             <Elem>DOUBLEPRECISION</Elem>
             <Elem>GEN4_STATIC</Elem>
@@ -500,7 +500,7 @@
         </cTool>
         <ccTool>
           <developmentMode>6</developmentMode>
-          <commandLine>-g -mtune=native -march=native -fopenmp</commandLine>
+          <commandLine>-g -mtune=native -march=native -fopenmp -std=c++17</commandLine>
           <preprocessorList>
             <Elem>DOUBLEPRECISION</Elem>
             <Elem>GEN4_STATIC</Elem>

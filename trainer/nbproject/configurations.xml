@@ -14,7 +14,10 @@
           <itemPath>../inc/ranked_pokemon.h</itemPath>
           <itemPath>../inc/ranked_team.h</itemPath>
         </logicalFolder>
+        <itemPath>../inc/league.h</itemPath>
         <itemPath>../inc/ranker.h</itemPath>
+        <itemPath>../inc/team_factory.h</itemPath>
+        <itemPath>../inc/trainer.h</itemPath>
         <itemPath>../inc/true_skill.h</itemPath>
       </logicalFolder>
     </logicalFolder>
@@ -35,7 +38,10 @@
           <itemPath>../src/ranked_team.cpp</itemPath>
         </logicalFolder>
         <itemPath>../src/game_factory.cpp</itemPath>
+        <itemPath>../src/league.cpp</itemPath>
         <itemPath>../src/ranker.cpp</itemPath>
+        <itemPath>../src/team_factory.cpp</itemPath>
+        <itemPath>../src/trainer.cpp</itemPath>
         <itemPath>../src/true_skill.cpp</itemPath>
       </logicalFolder>
       <itemPath>../src/ranker_main.cpp</itemPath>
@@ -69,6 +75,7 @@
           <incDir>
             <pElem>..</pElem>
           </incDir>
+          <commandLine>-O0 -fopenmp -std=c++17</commandLine>
           <preprocessorList>
             <Elem>GEN4_STATIC</Elem>
             <Elem>_DEBUG</Elem>
@@ -99,6 +106,8 @@
       </compileType>
       <item path="../inc/game_factory.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../inc/league.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../inc/ranked.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/ranked_battlegroup.h" ex="false" tool="3" flavor2="0">
@@ -113,9 +122,15 @@
       </item>
       <item path="../inc/ranker.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../inc/team_factory.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/trainer.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../inc/true_skill.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/game_factory.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/league.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/ranked.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -132,6 +147,10 @@
       <item path="../src/ranker.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/ranker_main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/team_factory.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/trainer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/true_skill.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -151,7 +170,7 @@
           <incDir>
             <pElem>..</pElem>
           </incDir>
-          <commandLine>-g -mtune=native -march=native</commandLine>
+          <commandLine>-g -mtune=native -march=native -std=c++17 -fopenmp</commandLine>
           <preprocessorList>
             <Elem>GEN4_STATIC</Elem>
             <Elem>NDEBUG</Elem>
@@ -189,6 +208,8 @@
       </compileType>
       <item path="../inc/game_factory.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../inc/league.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../inc/ranked.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/ranked_battlegroup.h" ex="false" tool="3" flavor2="0">
@@ -203,9 +224,15 @@
       </item>
       <item path="../inc/ranker.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../inc/team_factory.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../inc/trainer.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../inc/true_skill.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/game_factory.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/league.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/ranked.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -222,6 +249,10 @@
       <item path="../src/ranker.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/ranker_main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/team_factory.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/trainer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/true_skill.cpp" ex="false" tool="1" flavor2="0">
       </item>

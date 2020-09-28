@@ -80,6 +80,8 @@ public:
   
   const PokemonNonVolatile& teammate(size_t iTeammate) const;
 
+  const std::string& defineName();
+
   void printSummary(std::ostream& os, const std::string& prefix) const;
   void output(std::ostream& oFile, bool printHeader = true) const;
 

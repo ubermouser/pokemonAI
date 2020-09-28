@@ -42,7 +42,7 @@
           <incDir>
             <pElem>..</pElem>
           </incDir>
-          <commandLine>-O0</commandLine>
+          <commandLine>-O0 -std=c++17</commandLine>
           <preprocessorList>
             <Elem>DOUBLEPRECISION</Elem>
             <Elem>GEN4_STATIC</Elem>
@@ -94,7 +94,7 @@
           <incDir>
             <pElem>..</pElem>
           </incDir>
-          <commandLine>-g -mtune=native -march=native</commandLine>
+          <commandLine>-g -mtune=native -march=native -std=c++17</commandLine>
           <preprocessorList>
             <Elem>DOUBLEPRECISION</Elem>
             <Elem>GEN4_STATIC</Elem>

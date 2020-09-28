@@ -98,8 +98,8 @@ TESTOBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=-O0 -fopenmp
-CXXFLAGS=-O0 -fopenmp
+CCFLAGS=-O0 -fopenmp -std=c++17
+CXXFLAGS=-O0 -fopenmp -std=c++17
 
 # Fortran Compiler Flags
 FFLAGS=

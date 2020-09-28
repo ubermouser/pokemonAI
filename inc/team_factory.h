@@ -10,8 +10,15 @@
 
 #include "engine.h"
 
+#include <random>
+
 class TeamFactory {
 public:
+  struct Config {
+    size_t minMutations = 1;
+
+    size_t maxMutations = 3;
+  };
 
   TeamNonVolatile createRandom(size_t numPokemon) const;
 
@@ -36,6 +43,7 @@ public:
   /* randomize a number of the pokemon's moves */
   void randomMove(PokemonNonVolatile& cPokemon, size_t numMoves = 1) const;
 
+  TeamNonVolatile mutate(const TeamNonVolatile& cTeam) const;
   void mutate_single(TeamNonVolatile& cTeam, size_t iTeammate, size_t numMutations) const;
 
   PokemonNonVolatile crossover_single(
@@ -47,6 +55,9 @@ public:
       const TeamNonVolatile& parentB) const;
 
 protected:
+  Config cfg_;
+
+  mutable std::default_random_engine rand_;
 };
 
 #endif /* TEAM_FACTORY_H */

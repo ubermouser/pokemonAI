@@ -74,30 +74,6 @@ void RankedTeam::identify() {
 }
 
 
-std::string RankedTeam::defineName() {
-  std::ostringstream os;
-  size_t numPokemon = nv_.getNumTeammates();
-  os << boost::format("_%d-x%020x ") % numPokemon % hash();
-
-  // print a few characters from each teammate:
-  size_t teammateStringSize = 0;
-  size_t sizeAccumulator = 0;
-  for (size_t iTeammate = 0; iTeammate != nv_.getNumTeammates(); ++iTeammate) {
-    teammateStringSize = (24 - sizeAccumulator) / (nv_.getNumTeammates() - iTeammate);
-
-    const std::string& baseName = nv_.teammate(iTeammate).getBase().getName();
-    os << baseName.substr(0, teammateStringSize);
-
-    sizeAccumulator += std::min(baseName.size(), teammateStringSize);
-  }
-  // pad with zeros 
-  while (sizeAccumulator < 24) { os << " "; sizeAccumulator++; };
-
-  nv_.setName(os.str());
-  return os.str();
-}
-
-
 pt::ptree RankedTeam::output(bool printHeader) const {
   pt::ptree result;
   // header:
@@ -153,3 +129,24 @@ void RankedTeam::update(const HeatResult& result, size_t iTeam) {
     ranked_components_[iPokemon]->update(result, iTeam, iPokemon);
   }
 } //endOf update
+
+
+LeagueCount TeamLeague::countTeamLeague() const {
+  LeagueCount result; result.fill(0);
+  for (auto& team: *this) {
+    result[team.second->nv().getNumTeammates() - 1] += 1;
+  }
+
+  return result;
+}
+
+
+std::vector<RankedTeamPtr> TeamLeague::getLeague(size_t numPokemon) const {
+  std::vector<RankedTeamPtr> result;
+  for (auto& team: *this) {
+    if (team.second->nv().getNumTeammates() != numPokemon) { continue; }
+    result.push_back(team.second);
+  }
+
+  return result;
+}

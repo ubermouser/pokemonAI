@@ -38,7 +38,7 @@ public:
 protected:
   virtual void identify() override;
   virtual Hash generateHash(bool generateSubHashes = true) override;
-  virtual std::string defineName() override;
+  virtual std::string defineName() override { return pokemon_.defineName(); }
 
   PokemonRankedRecord record_;
 

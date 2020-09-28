@@ -1,7 +1,7 @@
-#ifndef TRAINER_H
-#define TRAINER_H
+#ifndef RANKER_H
+#define RANKER_H
 
-#include "../inc/pkai.h"
+#include "pkai.h"
 
 #include <stdint.h>
 #include <array>
@@ -10,7 +10,6 @@
 #include <random>
 #include <string>
 #include <vector>
-#include <unordered_map>
 #include <boost/program_options.hpp>
 
 #include "game.h"
@@ -18,6 +17,7 @@
 #include "true_skill.h"
 #include "ranked.h"
 
+#include "league.h"
 #include "ranked_battlegroup.h"
 #include "ranked_team.h"
 #include "ranked_pokemon.h"
@@ -25,45 +25,23 @@
 #include "ranked_planner.h"
 
 
-struct TrainerResult {
-  // averages: (rank, mean, stdDev, plies, games, wins, draws)
-  std::array<fpType, 7> averages;
-  // stdDevs:
-  std::array<fpType, 7> stdDevs;
-  // minimums:
-  std::array<fpType, 7> mins;
-  // maximums:
-  std::array<fpType, 7> maxes;
-  // highest counts:
-  const PokemonBase* highestPokemon;
-  const Ability* highestAbility;
-  const Item* highestItem;
-  const Type* highestType;
-  const Nature* highestNature;
-  const Move* highestMove;
-  size_t highestPokemonCount, highestAbilityCount, highestItemCount, highestTypeCount, highestNatureCount, highestMoveCount;
-};
+
 
 struct GameHeat {
   BattlegroupPtr team_a;
   
   BattlegroupPtr team_b;
 
+  double matchQuality;
+
   HeatResult heatResult;
 };
 
-struct LeagueHeat {
-  PlannerLeague planners;
 
-  EvaluatorLeague evaluators;
-
-  TeamLeague teams;
-
-  PokemonLeague pokemon;
-
-  BattlegroupLeague battlegroups;
-
+struct LeagueHeat : public League {
   std::vector<GameHeat> games;
+
+  LeagueHeat(const League& league = League{}) : League(league) {}
 };
 
 class Ranker {
@@ -78,6 +56,9 @@ public:
     /*when above 0, thread parallelism is used to invoke games*/
     size_t numThreads = 0;
 
+    /* when choosing a possible match, consider at most this many pairs */
+    size_t maxMatchesToConsider = 1000;
+
     /* The maximum number of elements in a leaderboard to print*/
     size_t leaderboardPrintCount = 20;
 
@@ -86,9 +67,6 @@ public:
 
     /* if a team population is to be loaded to memory from a directory, this is where it is */
     std::string teamPath = "teams";
-
-    /* if value is nonzero, the number of generations between writeOuts to disk. Otherwise, do not write out */
-    size_t writeOutEvery = 0;
 
     /* minimum amount of time to work on a given league, in seconds */
     double minimumWorkTime = 20;
@@ -122,7 +100,7 @@ public:
   virtual ~Ranker() {};
 
   /* create all variables, prepare trainer for running */
-  void initialize();
+  virtual void initialize();
 
   LeagueHeat rank() const;
 
@@ -154,14 +132,7 @@ protected:
   GameFactory gameFactory_;
 
   /* population of teams to be run on. 0 implies no work will be done on the league */
-  TeamLeague teams_;
-
-  PokemonLeague pokemon_;
-
-  /* population of evaluators to be run on. If networks is 0, this MUST be greater than 0. */
-  EvaluatorLeague evaluators_;
-
-  PlannerLeague planners_;
+  League initialLeague_;
 
   std::reference_wrapper<std::ostream> out_;
 
@@ -178,9 +149,10 @@ protected:
 
   /* stochastically find a match of ideal skill for a given team. If enforceSameLeague is false, allow matches from nearby leagues */
   BattlegroupPtr findMatch(const Battlegroup& oTeam, const LeagueHeat& league) const;
+  BattlegroupPtr findSubsampledMatch(const Battlegroup& oTeam, const BattlegroupLeague& leauge) const;
 
   /* calculates interesting things about the given league */
-  void calculateDescriptiveStatistics(size_t iLeague, TrainerResult& cResult) const;
+  void calculateDescriptiveStatistics(const LeagueHeat& league) const;
 
   /* print information about the top n members of league iLeague */
   void printLeagueStatistics(LeagueHeat& league) const;
@@ -191,14 +163,15 @@ protected:
   /*load a population of pokemon and their rankings from a filepath */
   size_t loadTeamPopulation();
 
-  bool saveTeamPopulation();
+  size_t saveTeamPopulation();
 
-  LeagueHeat constructLeague() const;
+  virtual LeagueHeat constructLeague() const;
+
+  //BattlegroupLeague constructBattlegroups(const League& league) const;
+
   void digestGame(GameHeat& gameHeat, LeagueHeat& league) const;
 
   void testInitialized() const;
-public:
-
 };
 
-#endif /* TRAINER_H */
+#endif /* RANKER_H */

@@ -12,14 +12,6 @@ void RankedPokemon::identify() {
   }
 }
 
-std::string RankedPokemon::defineName() {
-  std::ostringstream os;
-  os << boost::format("-x%016x") % hash();
-  
-  pokemon_.setName(os.str());
-  return os.str();
-}
-
 
 RankedPokemon::Hash RankedPokemon::generateHash(bool generateSubHashes) {
   hash_ = pokemon_.hash();

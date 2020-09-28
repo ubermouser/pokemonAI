@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <algorithm>
 #include <iostream>
+#include <iterator>
 #include <omp.h>
 #include <random>
 #include <stdexcept>
@@ -45,13 +46,11 @@ Ranker::Ranker(const Config& cfg) : cfg_(cfg), out_(std::cout), rand_(cfg.random
 
 void Ranker::initialize() {
   if (games_.empty()) {throw std::runtime_error("game undefined"); }
-  if (evaluators_.empty()) { throw std::runtime_error("no evaluators defined"); }
-  if (planners_.empty()) { throw std::runtime_error("no planners defined"); }
+  if (initialLeague_.evaluators.empty()) { throw std::runtime_error("no evaluators defined"); }
+  if (initialLeague_.planners.empty()) { throw std::runtime_error("no planners defined"); }
 
-  if (!cfg_.teamPath.empty()) {
-    loadTeamPopulation();
-  }
-  if (teams_.empty()) { throw std::runtime_error("no teams defined"); }
+  if (!cfg_.teamPath.empty()) { loadTeamPopulation(); }
+  if (initialLeague_.teams.empty()) { throw std::runtime_error("no teams defined"); }
 
   initialized_ = true;
 }
@@ -68,38 +67,24 @@ LeagueHeat Ranker::rank() const {
   LeagueHeat league = constructLeague();
   runLeague(league);
 
-  if (cfg_.verbosity >= 1) { printLeagueStatistics(league); }
   return league;
 }
 
 
 LeagueHeat Ranker::constructLeague() const {
-  LeagueHeat league;
-  league.planners = planners_;
-  league.evaluators = evaluators_;
-  league.teams = teams_;
-  league.pokemon = pokemon_;
-  for (auto& planner: league.planners) {
-    for (auto& evaluator: league.evaluators) {
-      for (auto& team: league.teams) {
-        league.battlegroups.push_back(std::make_shared<Battlegroup>(
-            team.second, evaluator.second, planner.second, cfg_.contributions));
-      }
-    }
-  }
-
-  assert(!league.battlegroups.empty());
+  LeagueHeat league{initialLeague_};
   return league;
 }
 
 
 void Ranker::runLeague(LeagueHeat& league) const {
   testInitialized();
-  for (size_t iBG = 0; iBG < league.battlegroups.size(); ++iBG) {
-    BattlegroupPtr& cBG = league.battlegroups.at(iBG);
-
-    gauntlet(cBG, league);
+  // TODO(@drendleman) - multithread this loop?
+  for (auto& bg: league.battlegroups) {
+    gauntlet(bg.second, league);
   }
+
+  if (cfg_.verbosity >= 1) { printLeagueStatistics(league); }
 }
 
 
@@ -120,6 +105,7 @@ void Ranker::gauntlet(BattlegroupPtr& battlegroup, LeagueHeat& league) const {
 GameHeat Ranker::singleGame(
     BattlegroupPtr& battlegroup_a,
     BattlegroupPtr& battlegroup_b) const {
+  double matchQuality = gameFactory_.matchQuality(*battlegroup_a, *battlegroup_b);
   auto& game = games_.at(omp_get_thread_num());
 
   auto setTSTeam = [&](size_t iTeam, BattlegroupPtr& battlegroup){
@@ -136,58 +122,78 @@ GameHeat Ranker::singleGame(
   setTSTeam(1, battlegroup_b);
   HeatResult result = game.run();
 
-  return GameHeat{battlegroup_a, battlegroup_b, result};
+  return GameHeat{battlegroup_a, battlegroup_b, matchQuality, result};
 }
 
 
 BattlegroupPtr Ranker::findMatch(const Battlegroup& cBG, const LeagueHeat& league) const {
-  size_t numMatches = league.battlegroups.size();
+  size_t maxMatches = std::min(league.battlegroups.size(), cfg_.maxMatchesToConsider);
+
+  // subsample the number of opponents if there are too many:
+  if (maxMatches < league.battlegroups.size()) {
+    BattlegroupLeague opponents; opponents.reserve(maxMatches);
+    std::sample(
+        league.battlegroups.begin(),
+        league.battlegroups.end(),
+        std::inserter(opponents, opponents.end()),
+        maxMatches,
+        rand_);
+    return findSubsampledMatch(cBG, opponents);
+  } else {
+    return findSubsampledMatch(cBG, league.battlegroups);
+  }
+}
+
+
+BattlegroupPtr Ranker::findSubsampledMatch(const Battlegroup& cBG, const BattlegroupLeague& league) const {
+  size_t numMatches = league.size();
   std::vector<double> matchQualities; matchQualities.reserve(numMatches);
+  std::vector<Battlegroup::Hash> opponentHashes; opponentHashes.reserve(numMatches);
 
   // compute match quality between all pairs in the league:
-  for (size_t iBG = 0; iBG < league.battlegroups.size(); ++iBG) {
-    const BattlegroupPtr& oBG = league.battlegroups.at(iBG);
-    matchQualities.push_back(gameFactory_.matchQuality(cBG, *oBG));
+  for (auto& bg : league) {
+    matchQualities.push_back(gameFactory_.matchQuality(cBG, *bg.second));
+    opponentHashes.push_back(bg.first);
   }
 
   auto filterByPredicate = [&](auto predicate){
-    for (size_t iBG = 0; iBG < league.battlegroups.size() && numMatches > 0; ++iBG) {
-      const BattlegroupPtr& oBG = league.battlegroups.at(iBG);
-      if (!predicate(iBG, *oBG)) { continue; }
-      matchQualities[iBG] = 0.;
+    for (size_t iBg = 0; iBg < matchQualities.size(); ++iBg) {
+      const BattlegroupPtr& oBG = league.at(opponentHashes[iBg]);
+      if (!predicate(*oBG)) { continue; }
+      matchQualities[iBg] = 0.;
       numMatches--;
     }
   };
 
   // filter matches that aren't in the same league:
   if (cfg_.enforceSameLeague) {
-    filterByPredicate([&](size_t iBG, const Battlegroup& oBG){
+    filterByPredicate([&](const Battlegroup& oBG){
       return cBG.team().nv().getNumTeammates() != oBG.team().nv().getNumTeammates();
     });
   }
 
   // filter matches that feature the same elements
   if (!cfg_.allowSameTeam) {
-    filterByPredicate([&](size_t iBG, const Battlegroup& oBG){
+    filterByPredicate([&](const Battlegroup& oBG){
       return cBG.team() == oBG.team();
     });
   }
 
   if (!cfg_.allowSameEvaluator) {
-    filterByPredicate([&](size_t iBG, const Battlegroup& oBG){
+    filterByPredicate([&](const Battlegroup& oBG){
       return cBG.evaluator() == oBG.evaluator();
     });
   }
 
   if (!cfg_.allowSamePlanner) {
-    filterByPredicate([&](size_t iBG, const Battlegroup& oBG){
+    filterByPredicate([&](const Battlegroup& oBG){
       return cBG.planner() == oBG.planner();
     });
   }
 
   // choose a random good match:
   std::discrete_distribution<size_t> probabilities{matchQualities.begin(), matchQualities.end()};
-  return league.battlegroups.at(probabilities(rand_));
+  return league.at(opponentHashes.at(probabilities(rand_)));
 }
 
 
@@ -198,30 +204,42 @@ Ranker& Ranker::setGame(const Game& game) {
 }
 
 
-template<typename League, typename LeagueType>
-void addToLeague(const LeagueType& obj, League& league, const std::string& itemType) {
+template<typename League, typename LeagueType, typename AddFn>
+void addToLeague(const LeagueType& obj, const std::string& itemType, League& league, AddFn add_fn) {
   if (league.count(obj.hash()) > 0) {
     std::cerr << boost::format("Duplicate %s added to league \"%s\"!\n") % itemType % obj.getName();
   }
-  
-  league[obj.hash()] = std::make_shared<LeagueType>(obj);
+
+  add_fn(std::make_shared<LeagueType>(obj));
 }
 
 
 Ranker& Ranker::addTeam(const TeamNonVolatile& team) {
-  addToLeague(RankedTeam{team, pokemon_}, teams_, "team");
+  addToLeague(
+      RankedTeam{team, initialLeague_.pokemon},
+      "team",
+      initialLeague_.teams,
+      [&](const auto& obj){initialLeague_.addTeam(obj);});
   return *this;
 }
 
 
 Ranker& Ranker::addEvaluator(const std::shared_ptr<Evaluator>& evaluator) {
-  addToLeague(RankedEvaluator{evaluator}, evaluators_ , "evaluator");
+  addToLeague(
+      RankedEvaluator{evaluator},
+      "evaluator",
+      initialLeague_.evaluators,
+      [&](const auto& obj){initialLeague_.addEvaluator(obj);});
   return *this;
 }
 
 
 Ranker& Ranker::addPlanner(const std::shared_ptr<Planner>& planner) {
-  addToLeague(RankedPlanner{planner}, planners_, "planner");
+  addToLeague(
+      RankedPlanner{planner},
+      "planner",
+      initialLeague_.planners,
+      [&](const auto& obj){initialLeague_.addPlanner(obj);});
   return *this;
 }
 
@@ -275,7 +293,7 @@ void Ranker::printLeagueStatistics(LeagueHeat& league) const {
   }
   if (cfg_.printBattlegroupLeaderboard) {
     out_.get() << "---- BATTLEGROUP LEADERBOARD ----\n";
-    printLeaderboard(out_, league.battlegroups, cfg_.leaderboardPrintCount);
+    printMapLeaderboard(out_, league.battlegroups, cfg_.leaderboardPrintCount);
   }
 }
 
@@ -295,8 +313,10 @@ void Ranker::printHeatResult(const GameHeat& heat) const {
 
 void Ranker::digestGame(GameHeat& gameHeat, LeagueHeat& league) const {
   // update ranks of both teams
-  // TODO(@drendleman) - this should update all battlegroups which reference the specified component
   gameFactory_.update(*gameHeat.team_a, *gameHeat.team_b, gameHeat.heatResult);
+  // TODO(@drendleman) - too many adjacent ranks! Compute only when determining skill?
+  //league.recomputeAdjacentRanks(gameHeat.team_a);
+  //league.recomputeAdjacentRanks(gameHeat.team_b);
   // update statistics:
   gameHeat.team_a->update(gameHeat.heatResult, TEAM_A);
   gameHeat.team_b->update(gameHeat.heatResult, TEAM_B);

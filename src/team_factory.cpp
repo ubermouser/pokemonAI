@@ -1,17 +1,27 @@
 #include "../inc/team_factory.h"
 
 
-void TeamFactory::mutate_single(TeamNonVolatile& team, size_t iTeammate, size_t numMutations) {
+TeamNonVolatile TeamFactory::mutate(const TeamNonVolatile& team) const {
+  size_t numMutations = (rand() % (cfg_.maxMutations - cfg_.minMutations)) + cfg_.minMutations;
+  size_t iTeammate = rand() % team.getNumTeammates();
+
+  TeamNonVolatile result{team};
+  mutate_single(result, iTeammate, numMutations);
+  result.defineName();
+  return result;
+}
+
+
+void TeamFactory::mutate_single(TeamNonVolatile& team, size_t iTeammate, size_t numMutations) const {
   PokemonNonVolatile& cPokemon = team.teammate(iTeammate);
 
   // if it's requested that we perform more than 8 unique mutations, just create a random teammate
-  if (numMutations > 8) { cPokemon  = createRandom_single(cRankteam.team, iTeammate); return; }
+  if (numMutations > 8) { cPokemon  = createRandom_single(team, iTeammate); return; }
 
   std::array<bool, 9> isMutated;
   isMutated.fill(false);
 
-  for (size_t iMutation = 0; iMutation != numMutations; ++iMutation)
-  {
+  for (size_t iMutation = 0; iMutation != numMutations; ++iMutation) {
     unsigned int mutationType = rand() % 27;
     // only select a mutation that has not been performed yet:
     while (isMutated[mutationType / 3])
@@ -62,33 +72,28 @@ void TeamFactory::mutate_single(TeamNonVolatile& team, size_t iTeammate, size_t 
     case 22:
     case 23:
       // TODO: probability of choosing a similar species instead of a random one
-      randomSpecies(cRankteam.team, cPokemon, iTeammate);
+      randomSpecies(team, cPokemon, iTeammate);
       break;
     case 24: // change EVERYTHING:
     case 25:
     case 26:
-      cPokemon = createRandom_single(cRankteam.team, iTeammate);
+      cPokemon = createRandom_single(team, iTeammate);
       return; // there's no point in performing any more random changes if we've changed EVERYTHING
     } // endOf mutation Switch
   } // endOf foreach mutation
+
+  cPokemon.defineName();
 } // endOf mutate_single
 
 
 TeamNonVolatile TeamFactory::crossover(
-  const TeamNonVolatile& parentA,
-  const TeamNonVolatile& parentB)
-{
-  assert(parentA.team.getNumTeammates() == parentB.team.getNumTeammates());
-  std::vector<const Ranked*> componentTeams;
-  componentTeams.push_back(&parentA);
-  componentTeams.push_back(&parentB);
-  std::vector<fpType> numCTeam(2, 0.0);
-  RankedTeam crossedTeam;
-  size_t maxGeneration = std::max(parentA.generation, parentB.generation);
-  size_t numTeammates = parentA.team.getNumTeammates();
+    const TeamNonVolatile& parentA,
+    const TeamNonVolatile& parentB) const {
+  assert(parentA.getNumTeammates() == parentB.getNumTeammates());
+  TeamNonVolatile cTeam;
+  size_t numTeammates = parentA.getNumTeammates();
 
   {
-    TeamNonVolatile& cTeam = crossedTeam.team;
     // first element of each team to begin crossover loop with:
     size_t iParentA = rand() % numTeammates;
     size_t iParentB = rand() % numTeammates;
@@ -103,32 +108,32 @@ TeamNonVolatile TeamFactory::crossover(
       case 0: // fully expressed parent A
         {
           // try adding parentA's pokemon first:
-          const PokemonNonVolatile& candidate = parentA.team.teammate(iParentA);
-          if (crossedTeam.team.isLegalAdd(candidate)) { cTeam.addPokemon(candidate); numCTeam[0]+= 1.0; break; }
+          const PokemonNonVolatile& candidate = parentA.teammate(iParentA);
+          if (cTeam.isLegalAdd(candidate)) { cTeam.addPokemon(candidate); break; }
 
           // try adding parentB's pokemon:
-          const PokemonNonVolatile& backup = parentB.team.teammate(iParentB);
-          if (crossedTeam.team.isLegalAdd(backup)) { cTeam.addPokemon(backup); numCTeam[1]+= 1.0; break; }
+          const PokemonNonVolatile& backup = parentB.teammate(iParentB);
+          if (cTeam.isLegalAdd(backup)) { cTeam.addPokemon(backup); break; }
 
           // try adding a random pokemon: (guaranteed to be a legal add by createRandom_single)
-          PokemonNonVolatile cTeammate = createRandom_single(crossedTeam.team);
-          if (!cTeam.isLegalAdd(cTeammate)) { return createRandom(settings, numTeammates, 0); }
+          PokemonNonVolatile cTeammate = createRandom_single(cTeam);
+          if (!cTeam.isLegalAdd(cTeammate)) { return createRandom(numTeammates); }
           cTeam.addPokemon(cTeammate);
           break;
         }
       case 1: // fully expressed parent B
         {
           // try adding parentB's pokemon first:
-          const PokemonNonVolatile& candidate = parentB.team.teammate(iParentB);
-          if (crossedTeam.team.isLegalAdd(candidate)) { cTeam.addPokemon(candidate); numCTeam[TEAM_B]+= 1.0; break; }
+          const PokemonNonVolatile& candidate = parentB.teammate(iParentB);
+          if (cTeam.isLegalAdd(candidate)) { cTeam.addPokemon(candidate); break; }
 
           // try adding parentA's pokemon:
-          const PokemonNonVolatile& backup = parentA.team.teammate(iParentA);
-          if (crossedTeam.team.isLegalAdd(backup)) { cTeam.addPokemon(backup); numCTeam[TEAM_A]+= 1.0; break; }
+          const PokemonNonVolatile& backup = parentA.teammate(iParentA);
+          if (cTeam.isLegalAdd(backup)) { cTeam.addPokemon(backup); break; }
 
           // try adding a random pokemon: (guaranteed to be a legal add by createRandom_single)
-          PokemonNonVolatile cTeammate = createRandom_single(crossedTeam.team);
-          if (!cTeam.isLegalAdd(cTeammate)) { return createRandom(settings, numTeammates, 0); }
+          PokemonNonVolatile cTeammate = createRandom_single(cTeam);
+          if (!cTeam.isLegalAdd(cTeammate)) { return createRandom(numTeammates); }
           cTeam.addPokemon(cTeammate);
           break;
         }
@@ -137,11 +142,11 @@ TeamNonVolatile TeamFactory::crossover(
       case 3:
         {
           // generate a crossover of parentA and parentB's pokemon:
-          PokemonNonVolatile candidate = crossover_single(parentA.team.teammate(iParentA), parentB.team.teammate(iParentB));
-          if (crossedTeam.team.isLegalAdd(candidate)) { cTeam.addPokemon(candidate); break; }
+          PokemonNonVolatile candidate = crossover_single(parentA.teammate(iParentA), parentB.teammate(iParentB));
+          if (cTeam.isLegalAdd(candidate)) { cTeam.addPokemon(candidate); break; }
           // try adding a random pokemon: (guaranteed to be a legal add by createRandom_single)
-          candidate = createRandom_single(crossedTeam.team);
-          if (!cTeam.isLegalAdd(candidate)) { return createRandom(settings, numTeammates, 0); }
+          candidate = createRandom_single(cTeam);
+          if (!cTeam.isLegalAdd(candidate)) { return createRandom(numTeammates); }
           cTeam.addPokemon(candidate);
           break;
         }
@@ -154,38 +159,16 @@ TeamNonVolatile TeamFactory::crossover(
     } // endOf foreach crossover
   }
 
-  // set generation of team:
-  crossedTeam.generation = maxGeneration + 1;
-
-  BOOST_FOREACH(fpType& cProportion, numCTeam)
-  {
-    cProportion /= ((fpType)numTeammates) * 1.5;
-  }
-
-  // determine team's skill from its component skills (crossovers are assumed to have default skill)
-  crossedTeam.getSkill() = TrueSkill::teamRank(componentTeams.begin(), componentTeams.end(), numCTeam.begin(), 1.0, settings);
-  //crossedTeam.getSkill().feather(settings);
-
-  // reset the team's win record:
-  //crossedTeam.resetRecord(); (performed implicitly by creation)
-
-  // generate hash of the team (not components)
-  crossedTeam.generateHash();
-
   // rename the team:
-  crossedTeam.defineNames();
+  cTeam.defineName();
 
-  // set that the team has not been saved:
-  crossedTeam.stateSaved = false;
-
-  return crossedTeam;
+  return cTeam;
 } // endOf crossover
 
 
 PokemonNonVolatile TeamFactory::crossover_single(
-  const PokemonNonVolatile& parentA,
-  const PokemonNonVolatile& parentB)
-{
+    const PokemonNonVolatile& parentA,
+    const PokemonNonVolatile& parentB) const {
   const PokemonNonVolatile& basePokemon = (((rand()%2)==TEAM_A)?parentA:parentB);
   const PokemonNonVolatile& otherPokemon = (&basePokemon==&parentA)?parentB:parentA;
 
@@ -213,12 +196,12 @@ PokemonNonVolatile TeamFactory::crossover_single(
   // sex:
   crossedPokemon.setSex(otherPokemon.getSex());
 
+  crossedPokemon.defineName();
   return crossedPokemon;
 } // endOf crossover_single
 
 
-TeamNonVolatile TeamFactory::createRandom(size_t numPokemon)
-{
+TeamNonVolatile TeamFactory::createRandom(size_t numPokemon) const {
   assert(numPokemon >= 1 && numPokemon <= TeamNonVolatile::getMaxNumTeammates());
   TeamNonVolatile cTeam;
 
@@ -227,12 +210,12 @@ TeamNonVolatile TeamFactory::createRandom(size_t numPokemon)
     cTeam.addPokemon(createRandom_single(cTeam));
   }
 
+  cTeam.defineName();
   return cTeam;
 }; // end of createRandom_team
 
 
-PokemonNonVolatile TeamFactory::createRandom_single(const TeamNonVolatile& cTeam, size_t iReplace)
-{
+PokemonNonVolatile TeamFactory::createRandom_single(const TeamNonVolatile& cTeam, size_t iReplace) const {
   PokemonNonVolatile cPokemon;
 
   // determine species:
@@ -262,12 +245,14 @@ PokemonNonVolatile TeamFactory::createRandom_single(const TeamNonVolatile& cTeam
   // determine moves based on species:
   randomMove(cPokemon, 4);
 
+  // create a name for the pokemon:
+  cPokemon.defineName();
+
   return cPokemon;
 } // endOf createRandom_single
 
 
-void TeamFactory::randomSpecies(const TeamNonVolatile& cTeam, PokemonNonVolatile& cPokemon, size_t iReplace)
-{
+void TeamFactory::randomSpecies(const TeamNonVolatile& cTeam, PokemonNonVolatile& cPokemon, size_t iReplace) const {
   std::vector<const PokemonBase*> pokemons = pkdex->getPokemon().toVector();
   bool revalidate = cPokemon.pokemonExists();
   bool isSuccessful = false;
@@ -303,21 +288,18 @@ void TeamFactory::randomSpecies(const TeamNonVolatile& cTeam, PokemonNonVolatile
       // increment in reverse order, since a delete will remove the last element from the move array
       size_t iMove = iSize - iNMove - 1;
 
-      if (!cPokemon.isLegalSet(iMove + AT_MOVE_0, cPokemon.getMove(iMove + AT_MOVE_0)))
-      {
-        cPokemon.removeMove(iMove + AT_MOVE_0);
+      if (!cPokemon.isLegalSet(iMove, cPokemon.getMove(iMove))) {
+        cPokemon.removeMove(iMove);
         numInvalidMoves++;
       }
     }
     // and replace the invalid moves with new, valid ones:
-    if (numInvalidMoves > 0)
-    {
+    if (numInvalidMoves > 0) {
       randomMove(cPokemon, numInvalidMoves);
     }
 
     // determine if ability is invalid:
-    if (cPokemon.abilityExists())
-    {
+    if (cPokemon.abilityExists()) {
       const PokemonBase& cBase = cPokemon.getBase();
       bool isMatched = cBase.abilities_.count(&cPokemon.getAbility());
       if (!isMatched)
@@ -332,8 +314,7 @@ void TeamFactory::randomSpecies(const TeamNonVolatile& cTeam, PokemonNonVolatile
 } // endOf randomSpecies
 
 
-void TeamFactory::randomAbility(PokemonNonVolatile& cPokemon)
-{
+void TeamFactory::randomAbility(PokemonNonVolatile& cPokemon) const {
   const PokemonBase& cBase = cPokemon.getBase();
 
   std::vector<const Ability*> abilities{begin(cBase.getAbilities()), end(cBase.getAbilities())};
@@ -357,16 +338,14 @@ void TeamFactory::randomAbility(PokemonNonVolatile& cPokemon)
 } // endOf randomAbility
 
 
-void TeamFactory::randomNature(PokemonNonVolatile& cPokemon)
-{
+void TeamFactory::randomNature(PokemonNonVolatile& cPokemon) const {
   std::vector<const Nature*> natures = pkdex->getNatures().toVector();
   size_t iNature = rand() % natures.size();
   cPokemon.setNature(*natures[iNature]);
 }
 
 
-void TeamFactory::randomItem(PokemonNonVolatile& cPokemon)
-{
+void TeamFactory::randomItem(PokemonNonVolatile& cPokemon) const {
   std::vector<const Item*> items = pkdex->getItems().toVector();
   size_t iNSize = (items.size() + 1);
   size_t iItem = (rand() % iNSize) - 1;
@@ -392,8 +371,7 @@ void TeamFactory::randomItem(PokemonNonVolatile& cPokemon)
 } // endOf randomItem
 
 
-void TeamFactory::randomIV(PokemonNonVolatile& cPokemon, size_t numIVs)
-{
+void TeamFactory::randomIV(PokemonNonVolatile& cPokemon, size_t numIVs) const {
   std::array<bool, 6> isValid;
   isValid.fill(true);
   bool isSuccessful;
@@ -456,8 +434,7 @@ void TeamFactory::randomIV(PokemonNonVolatile& cPokemon, size_t numIVs)
 } // endOf randomIV
 
 
-void TeamFactory::randomEV(PokemonNonVolatile& cPokemon)
-{
+void TeamFactory::randomEV(PokemonNonVolatile& cPokemon) const {
   std::array<unsigned int, 6> tempEV;
   uint32_t evAccumulator;
   bool isSuccessful = false;
@@ -499,8 +476,7 @@ void TeamFactory::randomEV(PokemonNonVolatile& cPokemon)
 } // endOf randomEV
 
 
-void TeamFactory::randomMove(PokemonNonVolatile& cPokemon, size_t numMoves)
-{
+void TeamFactory::randomMove(PokemonNonVolatile& cPokemon, size_t numMoves) const {
   const std::vector<const Move*>& cMovelist{
       begin(cPokemon.getBase().moves_), end(cPokemon.getBase().moves_)};
   std::vector<bool> isValid(cMovelist.size(), true);
@@ -509,7 +485,7 @@ void TeamFactory::randomMove(PokemonNonVolatile& cPokemon, size_t numMoves)
   // remove duplicate moves from the valid move array:
   for (size_t iMove = 0; iMove != cPokemon.getNumMoves(); ++iMove)
   {
-    const Move* base = &cPokemon.getMove_base(iMove + AT_MOVE_0);
+    const Move* base = &cPokemon.getMove_base(iMove);
 
     for (size_t iValidMove = 0, iValidSize = cMovelist.size(); iValidMove != iValidSize; ++iValidMove)
     {
@@ -569,8 +545,7 @@ void TeamFactory::randomMove(PokemonNonVolatile& cPokemon, size_t numMoves)
 } // endOf randomMove
 
 
-void TeamFactory::randomGender(PokemonNonVolatile& cPokemon)
-{
+void TeamFactory::randomGender(PokemonNonVolatile& cPokemon) const {
   unsigned int gender = rand() % 3;
   // TODO: allowed genders based on species
   cPokemon.setSex(gender);

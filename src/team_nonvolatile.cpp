@@ -1,6 +1,7 @@
 #include "../inc/team_nonvolatile.h"
 
 #include <stdexcept>
+#include <boost/format.hpp>
 
 #include "../inc/pokemon_base.h"
 #include "../inc/team_volatile.h"
@@ -277,6 +278,27 @@ void TeamNonVolatile::createDigest_impl(std::array<uint8_t, TEAM_NONVOLATILE_DIG
   pack(numTeammates, digest, iDigest);
 
   assert(iDigest == TEAM_NONVOLATILE_DIGESTSIZE);
+}
+
+
+const std::string& TeamNonVolatile::defineName() {
+  std::ostringstream os;
+  size_t numPokemon = getNumTeammates();
+  os << boost::format("%d-x%06x_") % numPokemon % (hash() & 0xffffff);
+
+  // print a few characters from each teammate:
+  size_t teammateStringSize = 0;
+  size_t sizeAccumulator = 0;
+  for (size_t iTeammate = 0; iTeammate != getNumTeammates(); ++iTeammate) {
+    teammateStringSize = (24 - sizeAccumulator) / (getNumTeammates() - iTeammate);
+
+    const std::string& baseName = teammate(iTeammate).getBase().getName();
+    os << baseName.substr(0, teammateStringSize);
+
+    sizeAccumulator += std::min(baseName.size(), teammateStringSize);
+  }
+  setName(os.str());
+  return getName();
 }
 
 

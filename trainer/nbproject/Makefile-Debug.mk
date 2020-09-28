@@ -36,6 +36,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/_ext/511e4115/game_factory.o \
+	${OBJECTDIR}/_ext/511e4115/league.o \
 	${OBJECTDIR}/_ext/511e4115/ranked.o \
 	${OBJECTDIR}/_ext/511e4115/ranked_battlegroup.o \
 	${OBJECTDIR}/_ext/511e4115/ranked_evaluator.o \
@@ -44,6 +45,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/511e4115/ranked_team.o \
 	${OBJECTDIR}/_ext/511e4115/ranker.o \
 	${OBJECTDIR}/_ext/511e4115/ranker_main.o \
+	${OBJECTDIR}/_ext/511e4115/team_factory.o \
+	${OBJECTDIR}/_ext/511e4115/trainer.o \
 	${OBJECTDIR}/_ext/511e4115/true_skill.o
 
 
@@ -51,8 +54,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=
-CXXFLAGS=
+CCFLAGS=-O0 -fopenmp -std=c++17
+CXXFLAGS=-O0 -fopenmp -std=c++17
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -77,6 +80,11 @@ ${OBJECTDIR}/_ext/511e4115/game_factory.o: ../src/game_factory.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -DGEN4_STATIC -D_DEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/game_factory.o ../src/game_factory.cpp
+
+${OBJECTDIR}/_ext/511e4115/league.o: ../src/league.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -DGEN4_STATIC -D_DEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/league.o ../src/league.cpp
 
 ${OBJECTDIR}/_ext/511e4115/ranked.o: ../src/ranked.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
@@ -117,6 +125,16 @@ ${OBJECTDIR}/_ext/511e4115/ranker_main.o: ../src/ranker_main.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -DGEN4_STATIC -D_DEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/ranker_main.o ../src/ranker_main.cpp
+
+${OBJECTDIR}/_ext/511e4115/team_factory.o: ../src/team_factory.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -DGEN4_STATIC -D_DEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/team_factory.o ../src/team_factory.cpp
+
+${OBJECTDIR}/_ext/511e4115/trainer.o: ../src/trainer.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -DGEN4_STATIC -D_DEBUG -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/trainer.o ../src/trainer.cpp
 
 ${OBJECTDIR}/_ext/511e4115/true_skill.o: ../src/true_skill.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115

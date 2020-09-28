@@ -1,6 +1,7 @@
 #include "../inc/pokemon_nonvolatile.h"
 
 #include <algorithm>
+#include <boost/format.hpp>
 
 #include "../inc/pokedex.h"
 #include "../inc/pokemon_volatile.h"
@@ -622,6 +623,12 @@ void PokemonNonVolatile::initFV()
 }
 
 
+const std::string& PokemonNonVolatile::defineName() {
+  setName((boost::format("-x%06x_%.14s")
+      % (hash() & 0xffffff)
+      % getBase().getName()).str());
+  return getName();
+}
 
 
 std::ostream& operator <<(std::ostream& os, const PokemonNonVolatile& cPKNV) {

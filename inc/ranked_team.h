@@ -13,6 +13,7 @@
 #include "ranked_pokemon.h"
 #include "team_nonvolatile.h"
 
+using LeagueCount = std::array<size_t, 6>;
 
 struct TeamRankedRecord : public RankedRecord {
   /* number of plies a given pokemon has been active in */
@@ -60,7 +61,7 @@ protected:
   /* generate the hash, and the pokemon subhashes too if true */
   virtual void identify() override;
   virtual Hash generateHash(bool generateSubHashes = true) override;
-  std::string defineName() override;
+  std::string defineName() override { return nv_.defineName(); }
 
   /* team that this ranked_team represents */
   TeamNonVolatile nv_;
@@ -73,6 +74,14 @@ protected:
 };
 
 using RankedTeamPtr = std::shared_ptr<RankedTeam>;
-using TeamLeague = std::unordered_map<RankedPokemon::Hash, RankedTeamPtr >;
+
+class TeamLeague: public std::unordered_map<RankedTeam::Hash, RankedTeamPtr> {
+public:
+  /* count the number of pokemon within each league */
+  LeagueCount countTeamLeague() const;
+
+  /* retrieve all teams in a specified league */
+  std::vector<RankedTeamPtr> getLeague(size_t numPokemon) const;
+};
 
 #endif /* TEAM_RANKED_H */
