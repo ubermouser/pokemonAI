@@ -50,6 +50,11 @@ public:
       const PokemonNonVolatile& parentA,
       const PokemonNonVolatile& parentB) const;
 
+  TeamNonVolatile crossover_eltwise(
+      const TeamNonVolatile& parentA,
+      const TeamNonVolatile& parentB) const;
+
+
   TeamNonVolatile crossover(
       const TeamNonVolatile& parentA,
       const TeamNonVolatile& parentB) const;

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <boost/math/distributions/normal.hpp>
 #include <numeric>
+#include <unordered_set>
 
 GameFactory::GameFactory(const Config& cfg)
   : cfg_(cfg),
@@ -147,6 +148,27 @@ double GameFactory::matchQuality(
 }; //endOf matchQuality
 
 
+std::unordered_set<uint64_t> findCommonContributions(
+    const std::vector<GroupContribution>& team_a,
+    const std::vector<GroupContribution>& team_b) {
+  auto createUnorderedSet = [](const auto& vec) {
+    std::unordered_set<uint64_t> result;
+    for (const GroupContribution& cnt: vec) { result.insert(cnt.identity); }
+    return result;
+  };
+  auto set_a = createUnorderedSet(team_a);
+  auto set_b = createUnorderedSet(team_b);
+
+  // find common elements:
+  std::unordered_set<uint64_t> result;
+  for (uint64_t id: set_a) {
+    if (set_b.count(id) > 0) { result.insert(id); }
+  }
+
+  return result;
+}
+
+
 size_t GameFactory::update(
   Battlegroup& team_A,
   Battlegroup& team_B,
@@ -154,7 +176,10 @@ size_t GameFactory::update(
   int outcome = hResult.endStatus;
   std::array<Battlegroup*, 2 > teams{&team_A, &team_B};
   std::array<TrueSkill*, 2> ratings{ &team_A.record().skill , &team_B.record().skill };
+  std::array<std::vector<GroupContribution>, 2> contributions{team_A.contributions(), team_B.contributions()};
   std::array<double, 2> rankMultiplier;
+  std::unordered_set<uint64_t> commonContributions =
+      findCommonContributions(contributions[0], contributions[1]);
 
   double c, cSquared, v, w, winningMean, losingMean, meanDelta;
 
@@ -205,15 +230,12 @@ size_t GameFactory::update(
   //bool evaluatorsSame = *(teams[0]->baseEvaluator) == *(teams[1]->baseEvaluator);
   for (size_t iTeam = 0; iTeam != 2; ++iTeam) {
     Battlegroup& tTeam = *teams[iTeam];
-    auto contributions = tTeam.contributions();
-    /*double totalContribution = std::accumulate(
-        contributions.begin(), contributions.end(), 0., [](auto& a, auto& b){
-          return a + b.contribution;
-    });*/
+    std::vector<GroupContribution>& contribs = contributions[iTeam];
 
-    for (auto& cnt: tTeam.contributions()) {
+    for (auto& cnt: contribs) {
+      // don't update a contribution that is both a winner and a loser at the same time:
+      if (commonContributions.count(cnt.identity) > 0) { continue; }
       // update contribution:
-      //double partialContribution = cnt.contribution / totalContribution;
       update_ranked(cnt.skill, v, w, c, cSquared, rankMultiplier[iTeam], cnt.contribution);
       numUpdates++;
     }

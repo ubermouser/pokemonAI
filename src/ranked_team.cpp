@@ -25,7 +25,8 @@ RankedTeam::RankedTeam(
   : Ranked(cTeam.hash()),
     nv_(cTeam),
     ranked_components_(findSubteams(league)),
-    contribution_(contribution) {
+    contribution_(contribution),
+    synergy_(TrueSkill::synergy()) {
   identify();
   computeSkill();
 }
@@ -50,10 +51,10 @@ std::vector<RankedPokemonPtr> RankedTeam::findSubteams(PokemonLeague& league) co
 std::vector<GroupContribution> RankedTeam::contributions() {
   std::vector<GroupContribution> result; result.reserve(teammates().size() + 1);
 
-  result.push_back({synergy_, contribution_.synergy}); // team synergy
+  result.push_back({synergy_, contribution_.synergy, hash()}); // team synergy
   // individual pokemon
   for (RankedPokemonPtr& pokemon: teammates()) {
-    result.push_back({pokemon->skill(), contribution_.pokemon});
+    result.push_back({pokemon->skill(), contribution_.pokemon, pokemon->hash()});
   }
   return result;
 }
@@ -147,6 +148,14 @@ std::vector<RankedTeamPtr> TeamLeague::getLeague(size_t numPokemon) const {
     if (team.second->nv().getNumTeammates() != numPokemon) { continue; }
     result.push_back(team.second);
   }
+
+  return result;
+}
+
+
+std::vector<RankedTeamPtr> TeamLeague::getAll() const {
+  std::vector<RankedTeamPtr> result; result.reserve(size());
+  for (auto& team: *this) { result.push_back(team.second); }
 
   return result;
 }

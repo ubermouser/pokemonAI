@@ -53,6 +53,10 @@ struct RankedRecord {
     if (numPlayed == 0) { return 0.0; }
     return  ((double)numPlies / (double)numGamesPlayed());
   };
+
+  double winRate() const {
+    return double(numWins) / double(numGamesPlayed());
+  };
 };
 
 class Ranked {

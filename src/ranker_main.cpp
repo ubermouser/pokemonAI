@@ -31,10 +31,13 @@ struct Config {
 
 int main(int argc, char** argv) {
   Config cfg;
+  cfg.trainer.maxGenerations = 100;
   cfg.trainer.verbosity = 2;
   cfg.trainer.minGamesPerBattlegroup = 10;
   cfg.trainer.game.verbosity = 0;
   cfg.trainer.game.maxMatches = 1;
+  cfg.trainer.printBattlegroupLeaderboard = false;
+  cfg.trainer.leaderboardPrintCount = 30;
 
   verbose = cfg.verbosity;
   srand((cfg.random_seed < 0)?time(NULL):cfg.random_seed);
@@ -44,7 +47,7 @@ int main(int argc, char** argv) {
   Trainer trainer(cfg.trainer);
   trainer.addPlanner(planners::choose("random", *planners::config("random"))->setEngine(PkCU()));
   trainer.addPlanner(planners::choose("maximin", *planners::config("maximin"))->setEngine(PkCU()));
-  trainer.addPlanner(planners::choose("max", *planners::config("max"))->setEngine(PkCU()));
+  //trainer.addPlanner(planners::choose("max", *planners::config("max"))->setEngine(PkCU()));
   trainer.addEvaluator(evaluators::choose("simple", *evaluators::config("simple")));
 
   trainer.initialize();

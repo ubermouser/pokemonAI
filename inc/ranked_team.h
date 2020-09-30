@@ -82,6 +82,9 @@ public:
 
   /* retrieve all teams in a specified league */
   std::vector<RankedTeamPtr> getLeague(size_t numPokemon) const;
+
+  /* retrieve all teams */
+  std::vector<RankedTeamPtr> getAll() const;
 };
 
 #endif /* TEAM_RANKED_H */

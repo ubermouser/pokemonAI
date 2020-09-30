@@ -40,9 +40,9 @@ std::ostream& Ranked::print(std::ostream& os) const {
 
 
 std::ostream& Ranked::printStats(std::ostream& os) const {
-  os << boost::format("%s w=%5d / %5d")
+  os << boost::format("%s w=%4.2f g=%d")
       % skill()
-      % record().numWins
+      % record().winRate()
       % record().numGamesPlayed();
   return os;
 }

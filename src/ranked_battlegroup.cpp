@@ -13,6 +13,7 @@ Battlegroup::Battlegroup(
     const RankedPlannerPtr& planner,
     const Contribution& contribution)
   : Ranked(),
+    synergy_(TrueSkill::synergy()),
     team_(team),
     evaluator_(evaluator),
     planner_(planner),
@@ -25,9 +26,9 @@ Battlegroup::Battlegroup(
 std::vector<GroupContribution> Battlegroup::contributions() {
   std::vector<GroupContribution> result = team().contributions();
 
-  result.push_back({synergy_, contribution_.synergy}); // battlegroup synergy
-  result.push_back({planner().skill(), contribution_.planner}); // planner
-  result.push_back({evaluator().skill(), contribution_.evaluator}); // evaluator
+  result.push_back({synergy_, contribution_.synergy, hash()}); // battlegroup synergy
+  result.push_back({planner().skill(), contribution_.planner, planner().hash()}); // planner
+  result.push_back({evaluator().skill(), contribution_.evaluator, evaluator().hash()}); // evaluator
 
   return result;
 }

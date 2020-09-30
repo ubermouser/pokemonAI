@@ -19,17 +19,17 @@ public:
     size_t maxGenerations = 12;
 
     /* probability that a pokemon will undergo a mutation */
-    double mutationProbability = 0.55;
+    double mutationProbability = 0.35;
 
     /* probability that two pokemon will crossover to create another */
-    double crossoverProbability = 0.035;
+    double crossoverProbability = 0.10;
 
     /* probability that an entirely new pokemon will spontaneously find its self in the population */
-    double seedProbability = 0.035;
+    double seedProbability = 0.05;
 
     /* sizes of the six populations aka "leagues" */
     //LeagueCount teamPopulationSize = {25, 12, 10, 8, 6, 5};
-    LeagueCount teamPopulationSize = {490, 240, 194, 150, 121, 106};
+    LeagueCount teamPopulationSize = {600, 300, 200, 150, 120, 100};
 
     /* if value is nonzero, the number of generations between writeOuts to disk. Otherwise, do not write out */
     size_t writeOutEvery = 0;
@@ -55,6 +55,7 @@ protected:
   double doNothingProbability_;
 
   void evolveGeneration(LeagueHeat& league) const;
+  void resetLeague(LeagueHeat& league) const;
 
   virtual LeagueHeat constructLeague() const override;
 

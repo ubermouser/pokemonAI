@@ -37,6 +37,7 @@ protected:
   fpType fitness_team(const ConstTeamVolatile& tV) const;
   
   virtual std::string baseName() const override { return "Simple"; }
+  virtual void resetName() override;
 
   Config cfg_;
 };

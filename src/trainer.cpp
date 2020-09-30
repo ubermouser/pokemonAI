@@ -1,6 +1,7 @@
 #include "../inc/trainer.h"
 
 #include <algorithm>
+#include <random>
 #include <stdexcept>
 
 
@@ -28,8 +29,8 @@ LeagueHeat Trainer::evolve() const {
 
   LeagueHeat league = constructLeague();
   for (size_t iGeneration = 0; iGeneration < cfg_.maxGenerations; ++iGeneration) {
-    // new generation:
-    league.games.clear();
+    // reset league counting:
+    resetLeague(league);
 
     // rank the league:
     runLeague(league);
@@ -38,6 +39,16 @@ LeagueHeat Trainer::evolve() const {
   }
 
   return league;
+}
+
+
+void Trainer::resetLeague(LeagueHeat& league) const {
+  // destroy the record of the last played games:
+  league.games.clear();
+  // existing battlegroups should play existing games:
+  for (auto& bg : league.battlegroups) {
+    bg.second->record().resetRecord();
+  }
 }
 
 
@@ -53,6 +64,9 @@ void Trainer::evolveGeneration(LeagueHeat& league) const {
 
     // merge the children into the new population:
     for (auto& child: children) { league.addTeam(child.second); }
+
+    // seed additional teams if we don't have the proper number:
+    seedRandomTeamPopulation(league);
   }
   // remove pokemon that are no longer used:
   league.removeUnusedPokemon();
@@ -86,6 +100,7 @@ size_t Trainer::seedRandomTeamPopulation(League& league) const {
 
 
 TeamLeague Trainer::spawnTeamChildren(League& league) const {
+  std::vector<RankedTeamPtr> teams = league.teams.getAll();
   TeamLeague newChildren;
   std::discrete_distribution<size_t> mutationChoices{
       cfg_.mutationProbability,
@@ -93,22 +108,38 @@ TeamLeague Trainer::spawnTeamChildren(League& league) const {
       cfg_.seedProbability,
       doNothingProbability_
   };
+  auto randomOtherTeam = [&](size_t iTeam) {
+    size_t iOTeam = std::uniform_int_distribution<size_t>{1, teams.size() - 1}(rand_);
+    size_t iNOTeam = (iTeam + iOTeam) % teams.size();
+    return teams[iNOTeam];
+  };
 
-  for(auto& team : league.teams) {
+  for (size_t iTeam = 0; iTeam != teams.size(); ++iTeam) {
+    const RankedTeamPtr& team = teams[iTeam];
     size_t choice = mutationChoices(rand_);
     switch(choice) {
       case 0: // mutation:
       {
-        RankedTeamPtr mutated = std::make_shared<RankedTeam>(teamFactory_.mutate(team.second->nv()), league.pokemon);
+        RankedTeamPtr mutated = std::make_shared<RankedTeam>(
+            teamFactory_.mutate(team->nv()),
+            league.pokemon);
         newChildren.insert({mutated->hash(), mutated});
         break;
       }
       case 1: // crossover:
-        // TODO(@drendleman) - crossover:
+      {
+        const RankedTeamPtr& oTeam = randomOtherTeam(iTeam);
+        RankedTeamPtr crossover = std::make_shared<RankedTeam>(
+            teamFactory_.crossover(team->nv(), oTeam->nv()),
+            league.pokemon);
+        newChildren.insert({crossover->hash(), crossover});
         break;
+      }
       case 2: // seed:
       {
-        RankedTeamPtr seeded = std::make_shared<RankedTeam>(teamFactory_.createRandom(team.second->nv().getNumTeammates()), league.pokemon);
+        RankedTeamPtr seeded = std::make_shared<RankedTeam>(
+            teamFactory_.createRandom(team->nv().getNumTeammates()),
+            league.pokemon);
         newChildren.insert({seeded->hash(), seeded});
         break;
       }

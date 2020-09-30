@@ -2,8 +2,8 @@
 #include "../inc/evaluator_simple.h"
 
 #include <algorithm>
-#include <sstream>
 #include <stdexcept>
+#include <boost/format.hpp>
 
 #include "../inc/engine.h"
 
@@ -22,6 +22,11 @@ EvaluatorSimple& EvaluatorSimple::initialize() {
   if (cfg_.teamBias > 1.0 || cfg_.teamBias < 0.0) { throw std::invalid_argument("teamBias"); }
   if (cfg_.teamAliveBias > 1.0 || cfg_.teamAliveBias < 0.0) { throw std::invalid_argument("teamAliveBias"); }
   return *this;
+}
+
+
+void EvaluatorSimple::resetName() {
+  setName((boost::format("%s(m=%3.1f)") % baseName() % cfg_.movesBias).str());
 }
 
 

@@ -20,9 +20,6 @@ public:
     /* probability of a draw given two equal teams */
     double drawProbability = 0.1;
 
-    /* proportion of a win/loss/draw that an evaluator is responsible for */
-    double evaluatorContribution = 0.5;
-
     Config(){};
   };
 

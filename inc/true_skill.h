@@ -33,6 +33,9 @@ struct TrueSkill {
   /* A trueskill containing zero mean and stddev. Useful for accumulation */
   static TrueSkill zero() { return TrueSkill{0.0, 0.0}; }
 
+  /* Zero mean and initial variance. For bias / synergy computation. */
+  static TrueSkill synergy() { return TrueSkill{0.0, initialVariance()}; }
+
   /* Combines  set of trueskills by their contribution amount */
   static TrueSkill combine(const std::vector<GroupContribution>& contributions);
 
@@ -68,8 +71,14 @@ struct TrueSkill {
 
 
 struct GroupContribution {
+  /* modifiable trueskill of this ranked object */
   TrueSkill& skill;
+
+  /* contribution to the game this ranked object has */
   double contribution;
+  
+  /* the hash of the ranked object representing this contribution */
+  uint64_t identity;
 };
 
 

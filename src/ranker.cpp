@@ -266,35 +266,41 @@ void printLeaderboard(std::ostream& os, VectorLeagueType& league, size_t numToPr
 
   for (size_t iRanked = 0; iRanked < numToPrint; ++iRanked) {
     const auto& ranked = league[iRanked];
-    const auto& record = ranked->record();
-
     os << boost::format(" %02d: %s\n") % (iRanked+1) % *ranked;
   }
 }
 
 
 void Ranker::printLeagueStatistics(LeagueHeat& league) const {
-  out_.get() << boost::format("played %d games!\n") % league.games.size();
+  std::ostringstream os;
+  auto printHeader = [&](auto& subleague, auto& name) {
+    os << boost::format("---- %s LEADERBOARD (top %d of %d)----\n")
+        % name
+        % std::min(cfg_.leaderboardPrintCount, subleague.size())
+        % subleague.size();
+  };
+  os << boost::format("played %d games!\n") % league.games.size();
   if (league.evaluators.size() >= 2) {
-    out_.get() << "---- EVALUATOR LEADERBOARD ----\n";
-    printMapLeaderboard(out_, league.evaluators, cfg_.leaderboardPrintCount);
+    printHeader(league.evaluators, "EVALUATOR");
+    printMapLeaderboard(os, league.evaluators, cfg_.leaderboardPrintCount);
   }
   if (league.planners.size() >= 2) {
-    out_.get() << "---- PLANNER LEADERBOARD ----\n";
-    printMapLeaderboard(out_, league.planners, cfg_.leaderboardPrintCount);
+    printHeader(league.planners, "PLANNER");
+    printMapLeaderboard(os, league.planners, cfg_.leaderboardPrintCount);
   }
   if (league.pokemon.size() >= 2 && cfg_.printPokemonLeaderboard) {
-    out_.get() << "---- POKEMON LEADERBOARD ----\n";
-    printMapLeaderboard(out_, league.pokemon, cfg_.leaderboardPrintCount);
+    printHeader(league.pokemon, "POKEMON");
+    printMapLeaderboard(os, league.pokemon, cfg_.leaderboardPrintCount);
   }
   if (league.teams.size() >= 2) {
-    out_.get() << "---- TEAM LEADERBOARD ----\n";
-    printMapLeaderboard(out_, league.teams, cfg_.leaderboardPrintCount);
+    printHeader(league.teams, "TEAM");
+    printMapLeaderboard(os, league.teams, cfg_.leaderboardPrintCount);
   }
   if (cfg_.printBattlegroupLeaderboard) {
-    out_.get() << "---- BATTLEGROUP LEADERBOARD ----\n";
-    printMapLeaderboard(out_, league.battlegroups, cfg_.leaderboardPrintCount);
+    printHeader(league.battlegroups, "BATTLEGROUP");
+    printMapLeaderboard(os, league.battlegroups, cfg_.leaderboardPrintCount);
   }
+  out_.get() << os.str();
 }
 
 

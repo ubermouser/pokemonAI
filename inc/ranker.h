@@ -93,7 +93,7 @@ public:
         const std::string& category="trainer configuration",
         std::string prefix = "");
 
-    Config() {};
+    Config() {game.storeSubcomponents = false;};
   };
 
   Ranker(const Config& cfg = Config{});
