@@ -2,6 +2,7 @@
 
 #include <boost/static_assert.hpp>
 #include <cstring>
+#include <ostream>
 
 #include "../inc/move_nonvolatile.h"
 #include "../inc/move.h"

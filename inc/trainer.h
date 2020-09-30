@@ -28,8 +28,7 @@ public:
     double seedProbability = 0.05;
 
     /* sizes of the six populations aka "leagues" */
-    //LeagueCount teamPopulationSize = {25, 12, 10, 8, 6, 5};
-    LeagueCount teamPopulationSize = {600, 300, 200, 150, 120, 100};
+    std::vector<int64_t> teamPopulationSize = {30, 15, 10, 8, 6, 5};
 
     /* if value is nonzero, the number of generations between writeOuts to disk. Otherwise, do not write out */
     size_t writeOutEvery = 0;

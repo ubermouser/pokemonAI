@@ -113,6 +113,17 @@ Game& Game::setEvaluator(const std::shared_ptr<Evaluator>& eval) {
 }
 
 
+Game& Game::clear() {
+  eval_.reset();
+  cu_.reset();
+  nv_.reset();
+  agents_[0].reset();
+  agents_[1].reset();
+  isInitialized_ = false;
+  return *this;
+}
+
+
 Game& Game::initialize() {
   // teams must be set before initialize is called
   if (nv_ == NULL ||

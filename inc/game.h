@@ -131,6 +131,9 @@ public:
   /* create all variables, prepare game for running */
   Game& initialize();
 
+  /* release all planners, engines, evaluators, and nonvolatile states */
+  Game& clear();
+
   HeatResult rollout(const EnvironmentVolatileData& initialState) const;
   HeatResult rollout() const { return rollout(initialState_); }
 

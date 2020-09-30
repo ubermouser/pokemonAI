@@ -1,6 +1,7 @@
 //#define PKAI_IMPORT
 #include "../inc/planner.h"
 
+#include <algorithm>
 #include <chrono>
 #include <iomanip>
 #include <iostream>
@@ -107,7 +108,7 @@ PlannerResult Planner::generateSolution(const ConstEnvironmentPossible& origin) 
     } else {
       plyResult = generateSolutionAtDepth(origin, iDepth);
     }
-    iDepth = std::max(iDepth, plyResult.depth);
+    iDepth = std::max(iDepth, size_t(plyResult.depth));
 
     // determine time between last checkpoint and current checkpoint:
     auto checkpoint = std::chrono::steady_clock::now();

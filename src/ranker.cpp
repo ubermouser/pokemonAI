@@ -11,7 +11,6 @@
 #include <boost/format.hpp>
 #include <boost/filesystem.hpp>
 
-
 namespace bf = boost::filesystem;
 namespace po = boost::program_options;
 
@@ -22,6 +21,30 @@ po::options_description Ranker::Config::options(const std::string& category, std
 
   if (prefix.size() > 0) { prefix.append("-"); }
   desc.add_options()
+      ((prefix + "allow-same-planner").c_str(),
+      po::value<bool>(&allowSamePlanner)->default_value(defaults.allowSamePlanner),
+      "when true, a given planner may fight itself.")
+      ((prefix + "allow-same-evaluator").c_str(),
+      po::value<bool>(&allowSameEvaluator)->default_value(defaults.allowSameEvaluator),
+      "when true, a given evaluator may fight itself.")
+      ((prefix + "allow-same-team").c_str(),
+      po::value<bool>(&allowSameTeam)->default_value(defaults.allowSameTeam),
+      "when true, a given team may fight itself.")
+      ((prefix + "enforce-same-league").c_str(),
+      po::value<bool>(&allowSameTeam)->default_value(defaults.allowSameTeam),
+      "when true, teams will only fight teams with the same number of pokemon.")
+      ((prefix + "print-battlegroup-leaderboard").c_str(),
+      po::value<bool>(&printBattlegroupLeaderboard)->default_value(defaults.printBattlegroupLeaderboard),
+      "Prints a leaderboard of battlegroups.")
+      ((prefix + "print-pokemon-leaderboard").c_str(),
+      po::value<bool>(&printPokemonLeaderboard)->default_value(defaults.printPokemonLeaderboard),
+      "Prints a leaderboard of pokemon.")
+      ((prefix + "leaderboard-size").c_str(),
+      po::value<size_t>(&leaderboardPrintCount)->default_value(defaults.leaderboardPrintCount),
+      "number of entities displayed per leaderboard.")
+      ((prefix + "games-per-battlegroup").c_str(),
+      po::value<size_t>(&minGamesPerBattlegroup)->default_value(defaults.minGamesPerBattlegroup),
+      "minimum number of games played per battlegroup per league.")
       ((prefix + "ranker-verbosity").c_str(),
       po::value<int>(&verbosity)->default_value(defaults.verbosity),
       "verbosity level, controls intermediate rank printing.")
@@ -33,7 +56,9 @@ po::options_description Ranker::Config::options(const std::string& category, std
       "number of threads to use when ranking teams")
       ((prefix + "team-path").c_str(),
       po::value<std::string>(&teamPath)->default_value(defaults.teamPath),
-      "folder for loading / saving pokemon teams");;
+      "folder for loading / saving pokemon teams");
+  desc.add(game.options());
+  desc.add(engine.options());
 
   return desc;
 }
@@ -41,6 +66,8 @@ po::options_description Ranker::Config::options(const std::string& category, std
 
 Ranker::Ranker(const Config& cfg) : cfg_(cfg), out_(std::cout), rand_(cfg.randomSeed) {
   setGame(Game{cfg_.game});
+  setEngine(PkCU{cfg_.engine});
+  //setStateEvaluator(EvaluatorSimple()); // TODO(@drendleman) why does uncommenting this let the demons out?
 }
 
 
@@ -106,20 +133,39 @@ GameHeat Ranker::singleGame(
     BattlegroupPtr& battlegroup_a,
     BattlegroupPtr& battlegroup_b) const {
   double matchQuality = gameFactory_.matchQuality(*battlegroup_a, *battlegroup_b);
-  auto& game = games_.at(omp_get_thread_num());
+  int iThread = omp_get_thread_num();
+  // game reference:
+  auto& game = games_.at(iThread);
+  // engine pointer:
+  auto& engine = engines_.at(iThread);
+  // state evaluator pointer:
+  //auto& stateEvaluator = stateEvaluators_.at(iThread);
+  // environment pointer:
+  auto environment = std::make_shared<EnvironmentNonvolatile>(
+      battlegroup_a->team().nv(), battlegroup_b->team().nv(), true);
 
-  auto setTSTeam = [&](size_t iTeam, BattlegroupPtr& battlegroup){
+  auto game_setPlanner = [&](size_t iTeam, BattlegroupPtr& battlegroup){
     // clone a planner by pointer:
-    std::unique_ptr<Planner> planner{battlegroup->planner().get().clone()};
+    std::shared_ptr<Planner> planner{battlegroup->planner().get().clone()};
+    // clone an evaluator by pointer:
+    std::shared_ptr<Evaluator> evaluator{battlegroup->evaluator().get().clone()};
     // clone an evaluator by reference:
-    planner->setEvaluator(battlegroup->evaluator().get());
+    planner->setEvaluator(evaluator);
+    // use this thread's engine:
+    planner->setEngine(engine);
 
-    game.setPlanner(iTeam, *planner);
-    game.setTeam(iTeam, battlegroup->team().nv());
+    // assign game planner / evaluator / engine combo:
+    game.setPlanner(iTeam, planner);
   };
 
-  setTSTeam(0, battlegroup_a);
-  setTSTeam(1, battlegroup_b);
+  // assign game environment, propagating to planners/evaluators/engine:
+  game.clear();
+  //game.setEvaluator(stateEvaluator);
+  game.setEnvironment(environment);
+  game.setEngine(engine);
+  game_setPlanner(0, battlegroup_a);
+  game_setPlanner(1, battlegroup_b);
+  // initialize and run the game:
   HeatResult result = game.run();
 
   return GameHeat{battlegroup_a, battlegroup_b, matchQuality, result};
@@ -199,9 +245,27 @@ BattlegroupPtr Ranker::findSubsampledMatch(const Battlegroup& cBG, const Battleg
 
 Ranker& Ranker::setGame(const Game& game) {
   games_.clear();
-  games_.resize(std::max(cfg_.numThreads, 1U), game);
+  games_.resize(std::max(cfg_.numThreads, size_t(1U)), game);
   return *this;
 }
+
+
+Ranker& Ranker::setEngine(const PkCU& cu) {
+  engines_.clear();
+  for (size_t iThread = 0; iThread < std::max(cfg_.numThreads, size_t(1U)); ++iThread) {
+    engines_.push_back(std::make_shared<PkCU>(cu));
+  }
+  return *this;
+}
+
+
+/*Ranker& Ranker::setStateEvaluator(const Evaluator& eval) {
+  stateEvaluators_.clear();
+  for (size_t iThread = 0; iThread < std::max(cfg_.numThreads, size_t(1U)); ++iThread) {
+    stateEvaluators_.push_back(std::shared_ptr<Evaluator>(eval.clone()));
+  }
+  return *this;
+}*/
 
 
 template<typename League, typename LeagueType, typename AddFn>
@@ -310,7 +374,7 @@ void Ranker::printHeatResult(const GameHeat& heat) const {
       endStatus==MATCH_TEAM_A_WINS?">":
       endStatus==MATCH_TEAM_B_WINS?"<":
       endStatus==MATCH_TIE?"=":"~";
-  out_.get() << boost::format("%32.32s %s %-32.32s\n")
+  out_.get() << boost::format("%34.34s %s %-34.34s\n")
       % heat.team_a->getName()
       % winDrawLoss
       % heat.team_b->getName();

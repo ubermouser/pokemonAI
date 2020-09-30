@@ -14,6 +14,7 @@
 
 #include "game.h"
 #include "game_factory.h"
+#include "pkCU.h"
 #include "true_skill.h"
 #include "ranked.h"
 
@@ -23,8 +24,6 @@
 #include "ranked_pokemon.h"
 #include "ranked_evaluator.h"
 #include "ranked_planner.h"
-
-
 
 
 struct GameHeat {
@@ -73,6 +72,8 @@ public:
 
     Game::Config game;
 
+    PkCU::Config engine;
+
     Battlegroup::Contribution contributions;
 
     bool printPokemonLeaderboard = true;
@@ -93,7 +94,10 @@ public:
         const std::string& category="trainer configuration",
         std::string prefix = "");
 
-    Config() {game.storeSubcomponents = false;};
+    Config() {
+      game.storeSubcomponents = false;
+      game.maxMatches = 1;
+    };
   };
 
   Ranker(const Config& cfg = Config{});
@@ -113,6 +117,8 @@ public:
   Ranker& setGameFactory(const GameFactory& gameFactory) { gameFactory_ = gameFactory; return *this; }
 
   Ranker& setGame(const Game& game);
+  Ranker& setEngine(const PkCU& cu);
+  //Ranker& setStateEvaluator(const Evaluator& eval);
 
   Ranker& addEvaluator(const std::shared_ptr<Evaluator>& evaluator);
   Ranker& addEvaluator(const Evaluator& evaluator) {
@@ -138,6 +144,12 @@ protected:
 
   /* game instance used for evaluation, per thread */
   mutable std::vector<Game> games_;
+
+  /* engine instance used for state evaluation, per thread */
+  mutable std::vector<std::shared_ptr<PkCU>> engines_;
+
+  /* state evaluator used per engine, per thread */
+  //mutable std::vector<std::shared_ptr<Evaluator>> stateEvaluators_;
 
   mutable std::default_random_engine rand_;
 

@@ -46,7 +46,7 @@ fpType EvaluatorSimple::fitness_pokemon(const ConstPokemonVolatile& pV) const {
     moveAccumulator += fitness_move(pV.getMV(iMove));
   }
   // TODO(@drendleman) does a valid pokemon have at least one move?
-  moveAccumulator /= std::max(pV.nv().getNumMoves(), 1U);
+  moveAccumulator /= std::max(pV.nv().getNumMoves(), size_t(1U));
 
   fpType fitness =
       (moveAccumulator * cfg_.movesBias) +

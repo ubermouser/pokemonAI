@@ -19,11 +19,7 @@ struct FitnessDepth {
   Fitness fitness;
   uint32_t depth;
 
-  FitnessDepth(
-      const Fitness& fitness_ = Fitness::worst(),
-      const size_t depth_ = 0) :
-    fitness(fitness_),
-    depth(std::min(depth_, MAXTRIES)) { }
+  FitnessDepth(const Fitness& fitness_ = Fitness::worst(), const size_t depth_ = 0);
 
   bool fullyEvaluated() const { return depth >= MAXTRIES; }
 

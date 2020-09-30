@@ -15,36 +15,40 @@
 
 std::shared_ptr<Planner::Config> planners::config(const std::string& _type) {
   auto type = boost::to_lower_copy(_type);
+  std::shared_ptr<Planner::Config> result;
   if (type == "maximin") {
-    return std::make_shared<PlannerMaxiMin::Config>();
+    result = std::make_shared<PlannerMaxiMin::Config>();
   } else if (type == "minimax") {
-    return std::make_shared<PlannerMiniMax::Config>();
+    result = std::make_shared<PlannerMiniMax::Config>();
   } else if (type == "random") {
-    return std::make_shared<PlannerRandom::Config>();
+    result = std::make_shared<PlannerRandom::Config>();
   } else if (type == "max") {
-    return std::make_shared<PlannerMax::Config>();
+    result = std::make_shared<PlannerMax::Config>();
   } else if (type == "human") {
-    return std::make_shared<PlannerHuman::Config>();
+    result = std::make_shared<PlannerHuman::Config>();
   } else {
-    return std::make_shared<Planner::Config>();
+    result = std::make_shared<Planner::Config>();
   }
+  return result;
 }
 
 
 std::shared_ptr<Planner> planners::choose(const std::string& _type, const Planner::Config& cfg) {
   auto type = boost::to_lower_copy(_type);
+  std::shared_ptr<Planner> result;
   if (type == "maximin") {
-    return std::make_shared<PlannerMaxiMin>(dynamic_cast<const PlannerMaxiMin::Config&>(cfg));
+    result = std::make_shared<PlannerMaxiMin>(dynamic_cast<const PlannerMaxiMin::Config&>(cfg));
   } else if (type == "minimax") {
-    return std::make_shared<PlannerMiniMax>(dynamic_cast<const PlannerMiniMax::Config&>(cfg));
+    result = std::make_shared<PlannerMiniMax>(dynamic_cast<const PlannerMiniMax::Config&>(cfg));
   } else if (type == "random") {
-    return std::make_shared<PlannerRandom>(dynamic_cast<const PlannerRandom::Config&>(cfg));
+    result = std::make_shared<PlannerRandom>(dynamic_cast<const PlannerRandom::Config&>(cfg));
   } else if (type == "max") {
-    return std::make_shared<PlannerMax>(dynamic_cast<const PlannerMax::Config&>(cfg));
+    result = std::make_shared<PlannerMax>(dynamic_cast<const PlannerMax::Config&>(cfg));
   } else if (type == "human") {
-    return std::make_shared<PlannerHuman>(dynamic_cast<const PlannerHuman::Config&>(cfg));
+    result = std::make_shared<PlannerHuman>(dynamic_cast<const PlannerHuman::Config&>(cfg));
   } else {
     std::cerr << "unknown planner type \"" << _type << "\"!\n";
     throw std::invalid_argument("planner type");
   }
+  return result;
 }

@@ -1,6 +1,7 @@
 //#define PKAI_IMPORT
 #include "../inc/evaluator.h"
 
+#include <algorithm>
 #include <stdexcept>
 #include <boost/program_options.hpp>
 #include <boost/format.hpp>
@@ -9,6 +10,14 @@
 #include "../inc/fp_compare.h"
 
 namespace po = boost::program_options;
+
+
+FitnessDepth::FitnessDepth(
+    const Fitness& fitness_,
+    const size_t depth_)
+  : fitness(fitness_),
+    depth(std::min(depth_, size_t(MAXTRIES))) {
+}
 
 
 po::options_description Evaluator::Config::options(const std::string& category, std::string prefix) {

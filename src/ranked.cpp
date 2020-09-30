@@ -32,7 +32,7 @@ void Ranked::update(const HeatResult& hResult, size_t iTeam) {
 
 
 std::ostream& Ranked::print(std::ostream& os) const {
-  os << boost::format("%-32.32s ") % getName();
+  os << boost::format("%-34.34s ") % getName();
   printStats(os);
 
   return os;
