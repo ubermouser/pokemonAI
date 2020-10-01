@@ -624,9 +624,11 @@ void PokemonNonVolatile::initFV()
 
 
 const std::string& PokemonNonVolatile::defineName() {
+  std::string capitalizedName = getBase().getName();
+  if (capitalizedName.size() > 0) { capitalizedName[0] = std::toupper(capitalizedName[0]); }
   setName((boost::format("-x%06x_%.14s")
       % (hash() & 0xffffff)
-      % getBase().getName()).str());
+      % capitalizedName).str());
   return getName();
 }
 

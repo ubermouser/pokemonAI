@@ -1,5 +1,6 @@
 #include "../inc/team_nonvolatile.h"
 
+#include <cctype>
 #include <stdexcept>
 #include <boost/format.hpp>
 
@@ -290,12 +291,14 @@ const std::string& TeamNonVolatile::defineName() {
   size_t teammateStringSize = 0;
   size_t sizeAccumulator = 0;
   for (size_t iTeammate = 0; iTeammate != getNumTeammates(); ++iTeammate) {
+    const auto& pknv = teammate(iTeammate);
     teammateStringSize = (24 - sizeAccumulator) / (getNumTeammates() - iTeammate);
 
-    const std::string& baseName = teammate(iTeammate).getBase().getName();
-    os << baseName.substr(0, teammateStringSize);
+    std::string basePrefix = pknv.getBase().getName().substr(0, teammateStringSize);
+    if (basePrefix.size() > 0) { basePrefix[0] = std::toupper(basePrefix[0]); }
+    os << basePrefix;
 
-    sizeAccumulator += std::min(baseName.size(), teammateStringSize);
+    sizeAccumulator += basePrefix.size();
   }
   setName(os.str());
   return getName();

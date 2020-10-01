@@ -57,7 +57,7 @@ EvaluatorMonteCarlo::EvaluatorMonteCarlo(const Config& cfg)
 
 
 void EvaluatorMonteCarlo::resetName() {
-  setName((boost::format("%s(r=%d") % baseName() % cfg_.maxRollouts).str());
+  setName((boost::format("%s(r=%d)") % baseName() % cfg_.maxRollouts).str());
 }
 
 
