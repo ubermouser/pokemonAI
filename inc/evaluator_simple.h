@@ -22,7 +22,7 @@ public:
   };
 
   EvaluatorSimple(const Config& cfg = Config());
-  ~EvaluatorSimple() = default;
+  virtual ~EvaluatorSimple() override {};
   EvaluatorSimple(const EvaluatorSimple& other) = default;
 
   EvaluatorSimple* clone() const override { return new EvaluatorSimple(*this); }

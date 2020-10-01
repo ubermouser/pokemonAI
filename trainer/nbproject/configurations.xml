@@ -77,6 +77,7 @@
           </incDir>
           <commandLine>-O0 -fopenmp -std=c++17</commandLine>
           <preprocessorList>
+            <Elem>DOUBLEPRECISION</Elem>
             <Elem>GEN4_STATIC</Elem>
             <Elem>_DEBUG</Elem>
             <Elem>_LINUX</Elem>
@@ -172,6 +173,7 @@
           </incDir>
           <commandLine>-g -mtune=native -march=native -std=c++17 -fopenmp</commandLine>
           <preprocessorList>
+            <Elem>DOUBLEPRECISION</Elem>
             <Elem>GEN4_STATIC</Elem>
             <Elem>NDEBUG</Elem>
             <Elem>_LINUX</Elem>

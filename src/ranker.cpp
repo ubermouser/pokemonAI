@@ -57,22 +57,22 @@ po::options_description Ranker::Config::options(const std::string& category, std
       ((prefix + "team-path").c_str(),
       po::value<std::string>(&teamPath)->default_value(defaults.teamPath),
       "folder for loading / saving pokemon teams");
-  desc.add(game.options());
-  desc.add(engine.options());
-
   return desc;
 }
 
 
-Ranker::Ranker(const Config& cfg) : cfg_(cfg), out_(std::cout), rand_(cfg.randomSeed) {
-  setGame(Game{cfg_.game});
-  setEngine(PkCU{cfg_.engine});
-  //setStateEvaluator(EvaluatorSimple()); // TODO(@drendleman) why does uncommenting this let the demons out?
+Ranker::Ranker(const Config& cfg)
+: cfg_(cfg), 
+  out_(std::cout),
+  threads_(std::vector<RankerThread>(std::max(size_t(1U), cfg_.numThreads))),
+  rand_(cfg.randomSeed) {
 }
 
 
 void Ranker::initialize() {
-  if (games_.empty()) {throw std::runtime_error("game undefined"); }
+  if (threads_[0].engine == NULL) {throw std::runtime_error("engine undefined"); }
+  if (threads_[0].game == NULL) {throw std::runtime_error("game undefined"); }
+  if (threads_[0].stateEvaluator == NULL) {throw std::runtime_error("state evaluator undefined"); }
   if (initialLeague_.evaluators.empty()) { throw std::runtime_error("no evaluators defined"); }
   if (initialLeague_.planners.empty()) { throw std::runtime_error("no planners defined"); }
 
@@ -133,13 +133,7 @@ GameHeat Ranker::singleGame(
     BattlegroupPtr& battlegroup_a,
     BattlegroupPtr& battlegroup_b) const {
   double matchQuality = gameFactory_.matchQuality(*battlegroup_a, *battlegroup_b);
-  int iThread = omp_get_thread_num();
-  // game reference:
-  auto& game = games_.at(iThread);
-  // engine pointer:
-  auto& engine = engines_.at(iThread);
-  // state evaluator pointer:
-  //auto& stateEvaluator = stateEvaluators_.at(iThread);
+  auto& thread = threads_.at(omp_get_thread_num());
   // environment pointer:
   auto environment = std::make_shared<EnvironmentNonvolatile>(
       battlegroup_a->team().nv(), battlegroup_b->team().nv(), true);
@@ -152,21 +146,21 @@ GameHeat Ranker::singleGame(
     // clone an evaluator by reference:
     planner->setEvaluator(evaluator);
     // use this thread's engine:
-    planner->setEngine(engine);
+    planner->setEngine(thread.engine);
 
     // assign game planner / evaluator / engine combo:
-    game.setPlanner(iTeam, planner);
+    thread.game->setPlanner(iTeam, planner);
   };
 
   // assign game environment, propagating to planners/evaluators/engine:
-  game.clear();
-  //game.setEvaluator(stateEvaluator);
-  game.setEnvironment(environment);
-  game.setEngine(engine);
+  thread.game->clear();
+  thread.game->setEvaluator(thread.stateEvaluator);
+  thread.game->setEnvironment(environment);
+  thread.game->setEngine(thread.engine);
   game_setPlanner(0, battlegroup_a);
   game_setPlanner(1, battlegroup_b);
   // initialize and run the game:
-  HeatResult result = game.run();
+  HeatResult result = thread.game->run();
 
   return GameHeat{battlegroup_a, battlegroup_b, matchQuality, result};
 }
@@ -244,28 +238,27 @@ BattlegroupPtr Ranker::findSubsampledMatch(const Battlegroup& cBG, const Battleg
 
 
 Ranker& Ranker::setGame(const Game& game) {
-  games_.clear();
-  games_.resize(std::max(cfg_.numThreads, size_t(1U)), game);
+  for (auto& thread: threads_) {
+    thread.game = std::make_shared<Game>(game);
+  }
   return *this;
 }
 
 
 Ranker& Ranker::setEngine(const PkCU& cu) {
-  engines_.clear();
-  for (size_t iThread = 0; iThread < std::max(cfg_.numThreads, size_t(1U)); ++iThread) {
-    engines_.push_back(std::make_shared<PkCU>(cu));
+  for (auto& thread: threads_) {
+    thread.engine = std::make_shared<PkCU>(cu);
   }
   return *this;
 }
 
 
-/*Ranker& Ranker::setStateEvaluator(const Evaluator& eval) {
-  stateEvaluators_.clear();
-  for (size_t iThread = 0; iThread < std::max(cfg_.numThreads, size_t(1U)); ++iThread) {
-    stateEvaluators_.push_back(std::shared_ptr<Evaluator>(eval.clone()));
+Ranker& Ranker::setStateEvaluator(const Evaluator& eval) {
+  for (auto& thread: threads_) {
+    thread.stateEvaluator = std::shared_ptr<Evaluator>(eval.clone());
   }
   return *this;
-}*/
+}
 
 
 template<typename League, typename LeagueType, typename AddFn>
