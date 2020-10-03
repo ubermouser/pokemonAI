@@ -1,2 +1,38 @@
-PKAIE0	soloTeamB	1
-PKAIP0	LeadMachamp	Machamp	100	Lum Berry	0	No Guard	Adamant	Bullet Punch	DynamicPunch	Ice Punch	Payback	31	31	31	31	31	31	248	0	0	16	4	240
+{
+  "header": "PKAIE0",
+  "name": "soloTeamB",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "LeadMachamp",
+      "species": "Machamp",
+      "level": 100,
+      "item": "Lum Berry",
+      "sex": 0,
+      "ability": "No Guard",
+      "nature": "Adamant",
+      "moves": [
+        "Bullet Punch",
+        "DynamicPunch",
+        "Ice Punch",
+        "Payback"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 248,
+        "spa": 0,
+        "def": 0,
+        "spd": 16,
+        "spe": 4,
+        "hp": 240
+      }
+    }
+  ]
+}

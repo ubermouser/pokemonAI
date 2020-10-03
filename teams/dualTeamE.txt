@@ -1,3 +1,70 @@
-PKAIE0	dualTeamE	2
-PKAIP0	sleepyRoserade	Roserade	100	Choice Scarf	1	Natural Cure	Timid	leaf storm	sludge bomb	sleep powder	double team	31	31	31	31	31	31	0	252	0	0	252	4
-PKAIP0	RevengeHeatran	Heatran	100	Choice Scarf	0	Flash Fire	Naive	fire blast	earth power	dragon pulse	metal sound	31	31	31	31	31	31	0	252	0	4	252	0
+{
+  "header": "PKAIE0",
+  "name": "dualTeamE",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "sleepyRoserade",
+      "species": "Roserade",
+      "level": 100,
+      "item": "Choice Scarf",
+      "sex": 1,
+      "ability": "Natural Cure",
+      "nature": "Timid",
+      "moves": [
+        "leaf storm",
+        "sludge bomb",
+        "sleep powder",
+        "double team"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 252,
+        "def": 0,
+        "spd": 0,
+        "spe": 252,
+        "hp": 4
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "RevengeHeatran",
+      "species": "Heatran",
+      "level": 100,
+      "item": "Choice Scarf",
+      "sex": 0,
+      "ability": "Flash Fire",
+      "nature": "Naive",
+      "moves": [
+        "fire blast",
+        "earth power",
+        "dragon pulse",
+        "metal sound"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 252,
+        "def": 0,
+        "spd": 4,
+        "spe": 252,
+        "hp": 0
+      }
+    }
+  ]
+}

@@ -72,6 +72,7 @@ LeagueHeat Trainer::evolve() const {
     evolveGeneration(league);
   }
 
+  if (cfg_.saveOnCompletion) { saveTeamPopulation(league); }
   return league;
 }
 

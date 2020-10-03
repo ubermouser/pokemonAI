@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/format.hpp>
 
 std::string orphan::lowerCase(const std::string& source) {
   std::string result(source);
@@ -30,4 +31,32 @@ void orphan::printOrphans(
       }
     }
   }
+}
+
+
+void orphan::Orphanage::printAllOrphans(
+      const std::string& source,
+      const std::string& prefix,
+      int verbosity_level) const {
+  auto formatter = boost::format("%s-%s");
+
+  // print mismatched pokemon
+  printOrphans(
+      pokemon, source, (formatter % prefix % "pokemon").str(), "pokemon", verbosity_level);
+
+  // print mismatched items
+  printOrphans(
+      items, source, (formatter % prefix % "items").str(), "item", verbosity_level);
+
+  // print mismatched abilities
+  printOrphans(
+      abilities, source, (formatter % prefix % "abilities").str(), "ability", verbosity_level);
+
+  // print mismatched natures
+  printOrphans(
+      natures, source, (formatter % prefix % "natures").str(), "nature", verbosity_level);
+
+  // print mismatched moves
+  printOrphans(
+      moves, source, (formatter % prefix % "moves").str(), "move", verbosity_level);
 }

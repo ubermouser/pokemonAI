@@ -1,2 +1,38 @@
-PKAIE0	soloTeamG	1
-PKAIP0	Dusknoir	Dusknoir	100	Leftovers	0	Pressure	Impish	will-o-wisp	pain split	ice punch	toxic	31	31	31	31	31	31	28	0	228	0	0	252
+{
+  "header": "PKAIE0",
+  "name": "soloTeamG",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "Dusknoir",
+      "species": "Dusknoir",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 0,
+      "ability": "Pressure",
+      "nature": "Impish",
+      "moves": [
+        "will-o-wisp",
+        "pain split",
+        "ice punch",
+        "toxic"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 28,
+        "spa": 0,
+        "def": 228,
+        "spd": 0,
+        "spe": 0,
+        "hp": 252
+      }
+    }
+  ]
+}

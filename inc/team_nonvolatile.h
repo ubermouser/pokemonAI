@@ -19,39 +19,34 @@
 #include "name.h"
 #include "pokemon_nonvolatile.h"
 #include "signature.h"
+#include "serializable.h"
 
 
 class TeamVolatile;
 
 #define TEAM_NONVOLATILE_DIGESTSIZE (POKEMON_NONVOLATILE_DIGESTSIZE * 6 + 1)
 
-class PKAISHARED TeamNonVolatile : public Name, public Signature<TeamNonVolatile, TEAM_NONVOLATILE_DIGESTSIZE> 
-{
+class PKAISHARED TeamNonVolatile
+  : public Name,
+    public Signature<TeamNonVolatile, TEAM_NONVOLATILE_DIGESTSIZE>,
+    public Serializable<TeamNonVolatile> {
 public:
   /* nonvolatile teammmates of this team */ 
-  std::array<PokemonNonVolatile, 6> teammates;
-
-  /* number of pokemon in this team */
-  uint8_t numTeammates;
+  std::vector<PokemonNonVolatile> teammates_;
   
   TeamNonVolatile();
-  TeamNonVolatile(const TeamNonVolatile& orig);
-  ~TeamNonVolatile() { };
+  TeamNonVolatile(const TeamNonVolatile& orig) = default;
+  ~TeamNonVolatile() = default;
 
   PokemonNonVolatile& teammate(size_t iTeammate);
+  const PokemonNonVolatile& teammate(size_t iTeammate) const;
 
   const PokemonNonVolatile& getPKNV(const TeamVolatile& source) const;
 
   /* returns number of teammates current pokemon team has */
-  size_t getNumTeammates() const
-  {
-    return (size_t) numTeammates;
-  };
+  size_t getNumTeammates() const { return teammates_.size(); };
 
-  static size_t getMaxNumTeammates()
-  {
-    return 6;
-  }
+  static size_t getMaxNumTeammates() { return 6; }
 
   /* is this pokemon allowed to be on the given team according to the current ruleset? */
   bool isLegalAdd(const PokemonNonVolatile& cPokemon) const;
@@ -77,20 +72,15 @@ public:
   TeamNonVolatile& initialize();
 
   void uninitialize();
-  
-  const PokemonNonVolatile& teammate(size_t iTeammate) const;
 
   const std::string& defineName();
 
-  void printSummary(std::ostream& os, const std::string& prefix) const;
-  void output(std::ostream& oFile, bool printHeader = true) const;
+  void printSummary(std::ostream& os, const std::string& prefix="") const;
 
-  bool input(const std::vector<std::string>& lines, size_t& iLine);
+  void input(const boost::property_tree::ptree& ptree);
+  boost::property_tree::ptree output(bool printHeader = true) const;
   
   void createDigest_impl(std::array<uint8_t, TEAM_NONVOLATILE_DIGESTSIZE>& digest) const;
-
-  static TeamNonVolatile loadFromFile(const std::string& path);
-
 };
 
 

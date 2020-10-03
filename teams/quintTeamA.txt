@@ -1,6 +1,166 @@
-PKAIE0	quintTeamA	5
-PKAIP0	EvilGengar	Gengar	100	Life Orb	0	Levitate	Timid	shadow ball	focus blast	thunderbolt	icy wind	31	31	31	31	31	31	0	252	4	0	252	0
-PKAIP0	OffensiveDD	Dragonite	100	Life Orb	0	Inner Focus	Jolly	dragon dance	dragon claw	earthquake	extremespeed	31	31	31	31	31	31	252	0	4	0	252	0
-PKAIP0	StrikerInfernape	Infernape	100	Choice Band	0	Blaze	Naive	close combat	u-turn	stone edge	overheat	31	31	31	31	31	31	252	64	0	0	192	0
-PKAIP0	AgilityLucario	Lucario	100	Life Orb	1	Inner Focus	Adamant	agility	close combat	crunch	ice punch	31	31	31	31	31	31	252	0	0	4	252	0
-PKAIP0	Dusknoir	Dusknoir	100	Leftovers	0	Pressure	Impish	will-o-wisp	thunderpunch	ice punch	toxic	31	31	31	31	31	31	28	0	228	0	0	252
+{
+  "header": "PKAIE0",
+  "name": "quintTeamA",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "EvilGengar",
+      "species": "Gengar",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 0,
+      "ability": "Levitate",
+      "nature": "Timid",
+      "moves": [
+        "shadow ball",
+        "focus blast",
+        "thunderbolt",
+        "icy wind"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 252,
+        "def": 4,
+        "spd": 0,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "OffensiveDD",
+      "species": "Dragonite",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 0,
+      "ability": "Inner Focus",
+      "nature": "Jolly",
+      "moves": [
+        "dragon dance",
+        "dragon claw",
+        "earthquake",
+        "extremespeed"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 4,
+        "spd": 0,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "StrikerInfernape",
+      "species": "Infernape",
+      "level": 100,
+      "item": "Choice Band",
+      "sex": 0,
+      "ability": "Blaze",
+      "nature": "Naive",
+      "moves": [
+        "close combat",
+        "u-turn",
+        "stone edge",
+        "overheat"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 64,
+        "def": 0,
+        "spd": 0,
+        "spe": 192,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "AgilityLucario",
+      "species": "Lucario",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 1,
+      "ability": "Inner Focus",
+      "nature": "Adamant",
+      "moves": [
+        "agility",
+        "close combat",
+        "crunch",
+        "ice punch"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 0,
+        "spd": 4,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Dusknoir",
+      "species": "Dusknoir",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 0,
+      "ability": "Pressure",
+      "nature": "Impish",
+      "moves": [
+        "will-o-wisp",
+        "thunderpunch",
+        "ice punch",
+        "toxic"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 28,
+        "spa": 0,
+        "def": 228,
+        "spd": 0,
+        "spe": 0,
+        "hp": 252
+      }
+    }
+  ]
+}

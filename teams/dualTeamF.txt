@@ -1,3 +1,70 @@
-PKAIE0	dualTeamF	2
-PKAIP0	PorygonStriker	Porygon2	100	Choice Specs	2	Download	Modest	tri attack	agility	ice beam	signal beam	31	31	31	31	31	31	0	252	4	0	252	0
-PKAIP0	Machamp	Machamp	100	Lum Berry	0	No Guard	Adamant	bullet punch	dig	facade	brick break	31	31	31	31	31	31	248	0	0	16	4	240
+{
+  "header": "PKAIE0",
+  "name": "dualTeamF",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "PorygonStriker",
+      "species": "Porygon2",
+      "level": 100,
+      "item": "Choice Specs",
+      "sex": 2,
+      "ability": "Download",
+      "nature": "Modest",
+      "moves": [
+        "tri attack",
+        "agility",
+        "ice beam",
+        "signal beam"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 252,
+        "def": 4,
+        "spd": 0,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Machamp",
+      "species": "Machamp",
+      "level": 100,
+      "item": "Lum Berry",
+      "sex": 0,
+      "ability": "No Guard",
+      "nature": "Adamant",
+      "moves": [
+        "bullet punch",
+        "dig",
+        "facade",
+        "brick break"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 248,
+        "spa": 0,
+        "def": 0,
+        "spd": 16,
+        "spe": 4,
+        "hp": 240
+      }
+    }
+  ]
+}

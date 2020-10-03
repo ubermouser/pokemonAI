@@ -1,7 +1,198 @@
-PKAIE0	hexTeamD	6
-PKAIP0	ROCKBOT	Azelf	100	Choice Scarf	0	Levitate	Naive	Stealth Rock	Explosion	Psychic	Trick	31	31	31	31	31	31	4	244	0	0	252	8
-PKAIP0	DRAGONBOT	Flygon	100	Choice Band	0	Natural Cure	Jolly	Earthquake	U-turn	Outrage	Dragon Claw	31	31	31	31	31	31	252	0	0	0	252	4
-PKAIP0	STARBOT	Starmie	100	Life Orb	2	Natural Cure	Timid	Rapid Spin	Ice Beam	Hydro Pump	Thunderbolt	31	31	31	31	31	31	0	252	0	0	252	4
-PKAIP0	HOTBOT	Heatran	100	Life Orb	0	Flash Fire	Timid	fire blast	earth power	explosion	hidden power	31	30	31	31	31	30	4	252	0	0	252	0
-PKAIP0	STOVEBOT	Rotom-H	100	Choice Scarf	2	Levitate	Timid	Trick	Overheat	Thunderbolt	Shadow Ball	31	31	31	31	31	31	0	216	0	0	252	40
-PKAIP0	KILLBOT	Scizor	100	Choice Band	0	Technician	Adamant	Bullet Punch	Superpower	U-turn	Pursuit	31	31	31	31	31	31	252	0	0	0	32	224
+{
+  "header": "PKAIE0",
+  "name": "hexTeamD",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "ROCKBOT",
+      "species": "Azelf",
+      "level": 100,
+      "item": "Choice Scarf",
+      "sex": 0,
+      "ability": "Levitate",
+      "nature": "Naive",
+      "moves": [
+        "Stealth Rock",
+        "Explosion",
+        "Psychic",
+        "Trick"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 4,
+        "spa": 244,
+        "def": 0,
+        "spd": 0,
+        "spe": 252,
+        "hp": 8
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "DRAGONBOT",
+      "species": "Flygon",
+      "level": 100,
+      "item": "Choice Band",
+      "sex": 0,
+      "ability": "Natural Cure",
+      "nature": "Jolly",
+      "moves": [
+        "Earthquake",
+        "U-turn",
+        "Outrage",
+        "Dragon Claw"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 0,
+        "spd": 0,
+        "spe": 252,
+        "hp": 4
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "STARBOT",
+      "species": "Starmie",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 2,
+      "ability": "Natural Cure",
+      "nature": "Timid",
+      "moves": [
+        "Rapid Spin",
+        "Ice Beam",
+        "Hydro Pump",
+        "Thunderbolt"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 252,
+        "def": 0,
+        "spd": 0,
+        "spe": 252,
+        "hp": 4
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "HOTBOT",
+      "species": "Heatran",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 0,
+      "ability": "Flash Fire",
+      "nature": "Timid",
+      "moves": [
+        "fire blast",
+        "earth power",
+        "explosion",
+        "hidden power"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 30,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 30
+      },
+      "ev": {
+        "atk": 4,
+        "spa": 252,
+        "def": 0,
+        "spd": 0,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "STOVEBOT",
+      "species": "Rotom-H",
+      "level": 100,
+      "item": "Choice Scarf",
+      "sex": 2,
+      "ability": "Levitate",
+      "nature": "Timid",
+      "moves": [
+        "Trick",
+        "Overheat",
+        "Thunderbolt",
+        "Shadow Ball"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 216,
+        "def": 0,
+        "spd": 0,
+        "spe": 252,
+        "hp": 40
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "KILLBOT",
+      "species": "Scizor",
+      "level": 100,
+      "item": "Choice Band",
+      "sex": 0,
+      "ability": "Technician",
+      "nature": "Adamant",
+      "moves": [
+        "Bullet Punch",
+        "Superpower",
+        "U-turn",
+        "Pursuit"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 0,
+        "spd": 0,
+        "spe": 32,
+        "hp": 224
+      }
+    }
+  ]
+}

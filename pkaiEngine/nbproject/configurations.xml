@@ -64,6 +64,7 @@
         <itemPath>../inc/init_toolbox.h</itemPath>
         <itemPath>../inc/name.h</itemPath>
         <itemPath>../inc/orphan.h</itemPath>
+        <itemPath>../inc/serializable.h</itemPath>
         <itemPath>../inc/signature.h</itemPath>
       </logicalFolder>
       <itemPath>../inc/pkai.h</itemPath>
@@ -125,6 +126,7 @@
         <itemPath>../src/init_toolbox.cpp</itemPath>
         <itemPath>../src/name.cpp</itemPath>
         <itemPath>../src/orphan.cpp</itemPath>
+        <itemPath>../src/serializable.cpp</itemPath>
         <itemPath>../src/signature.cpp</itemPath>
       </logicalFolder>
       <itemPath>../src/gen4_scripts.cpp</itemPath>
@@ -279,6 +281,8 @@
       </item>
       <item path="../inc/pokemon_volatile.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../inc/serializable.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../inc/signature.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/team_nonvolatile.h" ex="false" tool="3" flavor2="0">
@@ -368,6 +372,8 @@
       <item path="../src/pokemon_nonvolatile.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/pokemon_volatile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/serializable.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/signature.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -606,6 +612,8 @@
       </item>
       <item path="../inc/pokemon_volatile.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../inc/serializable.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../inc/signature.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../inc/team_nonvolatile.h" ex="false" tool="3" flavor2="0">
@@ -695,6 +703,8 @@
       <item path="../src/pokemon_nonvolatile.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/pokemon_volatile.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/serializable.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/signature.cpp" ex="false" tool="1" flavor2="0">
       </item>

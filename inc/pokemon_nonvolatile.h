@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "signature.h"
+#include "serializable.h"
 
 #include "action.h"
 #include "orphan.h"
@@ -36,30 +37,31 @@ class PokemonVolatile;
 #define POKEMON_NONVOLATILE_DIGESTSIZE (MOVE_NONVOLATILE_DIGESTSIZE*4 + 94)
 
 /* contains metrics that the user can modify, but are not modified in combat */
-class PKAISHARED PokemonNonVolatile : public Name, public Signature<PokemonNonVolatile, POKEMON_NONVOLATILE_DIGESTSIZE>
-{
+class PKAISHARED PokemonNonVolatile
+  : public Name,
+    public Signature<PokemonNonVolatile, POKEMON_NONVOLATILE_DIGESTSIZE>,
+    public Serializable<PokemonNonVolatile> {
 public:
   using OrphanSet = orphan::OrphanSet;
+  using Orphanage = orphan::Orphanage;
 
   /* The pokemon in which this volatile set is based off of*/
-  const PokemonBase* base; 
+  const PokemonBase* base_;
   
   /* Pointer to the ability that the pokemon has currently */
-  const Ability* chosenAbility; 
+  const Ability* chosenAbility_;
   
   /* Pointer to the nature that the pokemon has */
-  const Nature* chosenNature;
+  const Nature* chosenNature_;
 
   /* Pointer to the initial item (may change in combat) */
-  const Item* initialItem;
+  const Item* initialItem_;
 
   /* pointers to actions the pokemon may perform in combat */
-  std::array<MoveNonVolatile, 4> actions;
-
-  uint8_t numMoves;
+  std::vector<MoveNonVolatile> actions_;
   
   /* Pokemon's current level, from 1..100 */
-  uint8_t level;
+  uint8_t level_;
   
   /*
    * Pokemon's sex. Used for some damage calculations and moves
@@ -67,13 +69,13 @@ public:
    * SEX_FEMALE: for female, 
    * SEX_NEUTER: for other or unspecified
    */
-  uint8_t sex;
+  uint8_t sex_;
   
   /* Pokemon's individual values (never referenced in combat) */
-  std::array<uint8_t, 6> IV;
+  std::array<uint8_t, 6> IV_;
   
   /* Pokemon's effort values (never referenced in combat) */
-  std::array<uint8_t, 6> EV;
+  std::array<uint8_t, 6> EV_;
   
   /*
    * pokemon's final values, or values used for computation.
@@ -86,7 +88,7 @@ public:
    * CRIT = .0625 * ACCURACY_EVASION_INTEGER
    * Formula: http://www.smogon.com/dp/articles/stats
    */
-  std::array< std::array<uint16_t, 13>, 6> FV_base;
+  std::array< std::array<uint16_t, 13>, 6> FV_base_;
 
   static std::array< std::array<fpType, 13>, 3> aFV_base;
 
@@ -110,11 +112,10 @@ public:
    */
   void setFV(unsigned int targetFV);
 
-  PokemonNonVolatile& operator=(const PokemonNonVolatile& other);
-
   PokemonNonVolatile();
-  PokemonNonVolatile(const PokemonNonVolatile& orig);
-  ~PokemonNonVolatile() {};
+  PokemonNonVolatile(const PokemonNonVolatile& orig) = default;
+  PokemonNonVolatile& operator=(const PokemonNonVolatile& other) = default;
+  ~PokemonNonVolatile() = default;
 
   bool pokemonExists() const;
 
@@ -122,53 +123,36 @@ public:
 
   bool natureExists() const;
   
-  const PokemonBase& getBase() const
-  {
-    assert(pokemonExists());
-    return *base;
+  const PokemonBase& getBase() const {
+    return *base_;
   };
 
-  PokemonNonVolatile& setBase(const PokemonBase& _base)
-  {
-    base = &_base;
-    return *this;
+  PokemonNonVolatile& setNoBase();
+  PokemonNonVolatile& setBase(const PokemonBase& _base);
+
+  unsigned int getLevel() const {
+    return level_;
   };
 
-  unsigned int getLevel() const
-  {
-    return level;
+  PokemonNonVolatile& setLevel(unsigned int _level);
+
+  unsigned int getSex() const {
+    return sex_;
   };
 
-  PokemonNonVolatile& setLevel(unsigned int _level)
-  {
-    level = _level;
-    return *this;
-  };
-
-  unsigned int getSex() const
-  {
-    return sex;
-  };
-
-  PokemonNonVolatile& setSex(unsigned int _sex)
-  {
-    sex = _sex;
-    return *this;
-  };
+  PokemonNonVolatile& setSex(unsigned int _sex);
 
   const Ability& getAbility() const
   {
-    assert(abilityExists());
-    return *chosenAbility;
+    return *chosenAbility_;
   };
 
   PokemonNonVolatile& setAbility(const Ability& _chosenAbility);
 
   PokemonNonVolatile& setNoAbility();
 
-  const Nature& getNature() const
-  {
-    return *chosenNature;
+  const Nature& getNature() const {
+    return *chosenNature_;
   };
 
   PokemonNonVolatile& setNoNature();
@@ -183,37 +167,24 @@ public:
 
   const Item& getInitialItem() const;
 
-  PokemonNonVolatile& setIV(size_t type, unsigned int value)
-  {
-    IV[type] = value;
-    return *this;
-  };
+  PokemonNonVolatile& setIV(size_t type, unsigned int value);
 
   unsigned int getIV(size_t type) const
   {
-    return IV[type];
+    return IV_[type];
   };
 
-  PokemonNonVolatile& setEV(size_t type, unsigned int value)
-  {
-    EV[type] = value;
-    return *this;
-  };
+  PokemonNonVolatile& setEV(size_t type, unsigned int value);
 
   unsigned int getEV(size_t type) const
   {
-    return EV[type];
+    return EV_[type];
   };
 
-  size_t getNumMoves() const
-  {
-    return (size_t) numMoves;
-  };
+  size_t getNumMoves() const { return actions_.size(); };
+  size_t getMaxNumMoves() const { return 4; };
 
-  size_t getMaxNumMoves() const
-  {
-    return actions.size();
-  };
+  bool isLegalAbility(const Ability& ability) const;
 
   /* is this pokemon allowed to be on the given team according to the current ruleset? */
   bool isLegalAdd(const MoveNonVolatile& cPokemon) const;
@@ -244,7 +215,7 @@ public:
 
   uint32_t getFV_base(size_t type) const
   {
-    return FV_base[type][STAGE0];
+    return FV_base_[type][STAGE0];
   };
 
   void createDigest_impl(std::array<uint8_t, POKEMON_NONVOLATILE_DIGESTSIZE>& digest) const;
@@ -264,17 +235,11 @@ public:
 
   /* output a single pokemon */
   void printSummary(std::ostream& out) const;
-  void output(std::ostream& oFile, bool printHeader = true) const;
 
-  /* input a single pokemon */
-  bool input(
-    const std::vector<std::string>& lines, 
-    size_t& iLine, 
-    OrphanSet* mismatchedPokemon = NULL,
-    OrphanSet* mismatchedItems = NULL,
-    OrphanSet* mismatchedAbilities = NULL,
-    OrphanSet* mismatchedNatures = NULL,
-    OrphanSet* mismatchedMoves = NULL);
+
+  void input(const boost::property_tree::ptree& ptree) override;
+  void input(const boost::property_tree::ptree& ptree, Orphanage& orphanage);
+  boost::property_tree::ptree output(bool printHeader = true) const override;
 };
 
 

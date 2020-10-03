@@ -41,6 +41,6 @@ TEST(StaticPokedexTest, LoadsGen4Items) {
 
 
 TEST_F(PokedexTest, PrintsTeamWithoutCrashing) {
-  auto team = TeamNonVolatile::loadFromFile("teams/hexTeamA.txt");
-  team.output(std::cout);
+  auto team = TeamNonVolatile::load("teams/hexTeamA.txt");
+  team.printSummary(std::cout);
 }

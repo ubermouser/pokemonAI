@@ -1,6 +1,166 @@
-PKAIE0	quintTeamB	5
-PKAIP0	SwordsDanceSZ	Scizor	100	Life Orb	0	Technician	Adamant	swords dance	bullet punch	brick break	bug bite	31	31	31	31	31	31	252	0	0	0	252	4
-PKAIP0	PorygonStriker	Porygon2	100	Choice Specs	2	Download	Modest	tri attack	agility	ice beam	signal beam	31	31	31	31	31	31	0	252	4	0	252	0
-PKAIP0	NastyPlotAzelf	Azelf	100	Life Orb	0	Levitate	Timid	nasty plot	psychic	flamethrower	u-turn	31	31	31	31	31	31	0	252	0	4	252	0
-PKAIP0	LeadMachamp	Machamp	100	Lum Berry	0	No Guard	Adamant	bullet punch	dig	facade	brick break	31	31	31	31	31	31	248	0	0	16	4	240
-PKAIP0	TankSwampert	Swampert	100	Choice Band	0	Torrent	Adamant	earthquake	ice punch	stone edge	waterfall	31	31	31	31	31	31	252	0	0	0	84	172
+{
+  "header": "PKAIE0",
+  "name": "quintTeamB",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "SwordsDanceSZ",
+      "species": "Scizor",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 0,
+      "ability": "Technician",
+      "nature": "Adamant",
+      "moves": [
+        "swords dance",
+        "bullet punch",
+        "brick break",
+        "bug bite"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 0,
+        "spd": 0,
+        "spe": 252,
+        "hp": 4
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "PorygonStriker",
+      "species": "Porygon2",
+      "level": 100,
+      "item": "Choice Specs",
+      "sex": 2,
+      "ability": "Download",
+      "nature": "Modest",
+      "moves": [
+        "tri attack",
+        "agility",
+        "ice beam",
+        "signal beam"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 252,
+        "def": 4,
+        "spd": 0,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "NastyPlotAzelf",
+      "species": "Azelf",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 0,
+      "ability": "Levitate",
+      "nature": "Timid",
+      "moves": [
+        "nasty plot",
+        "psychic",
+        "flamethrower",
+        "u-turn"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 252,
+        "def": 0,
+        "spd": 4,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "LeadMachamp",
+      "species": "Machamp",
+      "level": 100,
+      "item": "Lum Berry",
+      "sex": 0,
+      "ability": "No Guard",
+      "nature": "Adamant",
+      "moves": [
+        "bullet punch",
+        "dig",
+        "facade",
+        "brick break"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 248,
+        "spa": 0,
+        "def": 0,
+        "spd": 16,
+        "spe": 4,
+        "hp": 240
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "TankSwampert",
+      "species": "Swampert",
+      "level": 100,
+      "item": "Choice Band",
+      "sex": 0,
+      "ability": "Torrent",
+      "nature": "Adamant",
+      "moves": [
+        "earthquake",
+        "ice punch",
+        "stone edge",
+        "waterfall"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 0,
+        "spd": 0,
+        "spe": 84,
+        "hp": 172
+      }
+    }
+  ]
+}

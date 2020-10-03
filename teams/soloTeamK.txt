@@ -1,2 +1,38 @@
-PKAIE0	soloTeamK	1
-PKAIP0	sleepyRoserade	Roserade	100	Choice Scarf	1	Natural Cure	Timid	leaf storm	sludge bomb	sleep powder	hidden power	30	31	30	31	31	31	0	252	0	0	252	4
+{
+  "header": "PKAIE0",
+  "name": "soloTeamK",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "sleepyRoserade",
+      "species": "Roserade",
+      "level": 100,
+      "item": "Choice Scarf",
+      "sex": 1,
+      "ability": "Natural Cure",
+      "nature": "Timid",
+      "moves": [
+        "leaf storm",
+        "sludge bomb",
+        "sleep powder",
+        "hidden power"
+      ],
+      "iv": {
+        "atk": 30,
+        "spa": 31,
+        "def": 30,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 252,
+        "def": 0,
+        "spd": 0,
+        "spe": 252,
+        "hp": 4
+      }
+    }
+  ]
+}

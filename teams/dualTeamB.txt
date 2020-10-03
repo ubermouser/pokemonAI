@@ -1,3 +1,70 @@
-PKAIE0	dualTeamB	2
-PKAIP0	NastyPlotAzelf	Azelf	100	Life Orb	0	Levitate	Timid	nasty plot	psychic	flamethrower	u-turn	31	31	31	31	31	31	0	252	0	4	252	0
-PKAIP0	AgilityLucario	Lucario	100	Life Orb	1	Inner Focus	Adamant	agility	close combat	crunch	ice punch	31	31	31	31	31	31	252	0	0	4	252	0
+{
+  "header": "PKAIE0",
+  "name": "dualTeamB",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "NastyPlotAzelf",
+      "species": "Azelf",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 0,
+      "ability": "Levitate",
+      "nature": "Timid",
+      "moves": [
+        "nasty plot",
+        "psychic",
+        "flamethrower",
+        "u-turn"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 252,
+        "def": 0,
+        "spd": 4,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "AgilityLucario",
+      "species": "Lucario",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 1,
+      "ability": "Inner Focus",
+      "nature": "Adamant",
+      "moves": [
+        "agility",
+        "close combat",
+        "crunch",
+        "ice punch"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 0,
+        "spd": 4,
+        "spe": 252,
+        "hp": 0
+      }
+    }
+  ]
+}

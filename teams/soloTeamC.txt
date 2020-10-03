@@ -1,2 +1,38 @@
-PKAIE0	soloTeamC	1
-PKAIP0	TankSwampert	Swampert	100	Choice Band	0	Torrent	Adamant	earthquake	ice punch	stone edge	waterfall	31	31	31	31	31	31	252	0	0	0	84	172
+{
+  "header": "PKAIE0",
+  "name": "soloTeamC",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "TankSwampert",
+      "species": "Swampert",
+      "level": 100,
+      "item": "Choice Band",
+      "sex": 0,
+      "ability": "Torrent",
+      "nature": "Adamant",
+      "moves": [
+        "earthquake",
+        "ice punch",
+        "stone edge",
+        "waterfall"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 0,
+        "spd": 0,
+        "spe": 84,
+        "hp": 172
+      }
+    }
+  ]
+}

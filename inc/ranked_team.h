@@ -11,6 +11,7 @@
 
 #include "ranked.h"
 #include "ranked_pokemon.h"
+#include "serializable.h"
 #include "team_nonvolatile.h"
 
 using LeagueCount = std::array<size_t, 6>;
@@ -29,7 +30,7 @@ struct TeamRankedRecord : public RankedRecord {
   };
 };
 
-class RankedTeam : public Ranked {
+class RankedTeam : public Ranked, public Serializer {
 public:
   static const std::string HEADER;
 
@@ -40,7 +41,10 @@ public:
     Contribution(){};
   };
 
-  RankedTeam(const TeamNonVolatile& cTeam, PokemonLeague& league, const Contribution& = Contribution{});
+  RankedTeam(
+      const TeamNonVolatile& cTeam,
+      PokemonLeague& league,
+      const Contribution& = Contribution{});
 
   virtual const std::string& getName() const override { return nv_.getName(); };
 

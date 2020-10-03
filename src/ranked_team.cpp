@@ -85,10 +85,7 @@ pt::ptree RankedTeam::output(bool printHeader) const {
   result.put_child("record", Ranked::output());
   result.put("hash", hash());
   
-  // TODO: save as ptree
-  std::ostringstream os;
-  nv_.output(os);
-  result.put("team", os.str());
+  result.put_child("team", nv_.output(printHeader));
 
   return result;
 } // endOf outputRankedTeam
@@ -108,12 +105,10 @@ void RankedTeam::input(const pt::ptree& tree) {
   Ranked::input(tree.get_child("record"));
   hash_ = tree.get<RankedTeam::Hash>("hash");
 
-  std::string team = tree.get<std::string>("team");
-  std::vector<std::string> lines = INI::tokenize(team, "\n\r");
-  size_t iLine = 0;
+  nv_.input(tree.get_child("team"));
 
-  // input actual team:
-  if (!nv_.input(lines, iLine)) { throw std::invalid_argument("TeamNonVolatile deserialization failure"); }
+  PokemonLeague dummyLeague;
+  findSubteams(dummyLeague);
 } // endOf inputTeam (ranked)
 
 

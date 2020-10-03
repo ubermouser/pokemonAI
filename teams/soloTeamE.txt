@@ -1,2 +1,38 @@
-PKAIE0	soloTeamE	1
-PKAIP0	AgilityLucario	Lucario	100	Life Orb	1	Inner Focus	Adamant	agility	close combat	crunch	ice punch	31	31	31	31	31	31	252	0	0	4	252	0
+{
+  "header": "PKAIE0",
+  "name": "soloTeamE",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "AgilityLucario",
+      "species": "Lucario",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 1,
+      "ability": "Inner Focus",
+      "nature": "Adamant",
+      "moves": [
+        "agility",
+        "close combat",
+        "crunch",
+        "ice punch"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 0,
+        "spd": 4,
+        "spe": 252,
+        "hp": 0
+      }
+    }
+  ]
+}

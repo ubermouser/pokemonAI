@@ -71,6 +71,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/511e4115/pokemon_base.o \
 	${OBJECTDIR}/_ext/511e4115/pokemon_nonvolatile.o \
 	${OBJECTDIR}/_ext/511e4115/pokemon_volatile.o \
+	${OBJECTDIR}/_ext/511e4115/serializable.o \
 	${OBJECTDIR}/_ext/511e4115/signature.o \
 	${OBJECTDIR}/_ext/511e4115/team_nonvolatile.o \
 	${OBJECTDIR}/_ext/511e4115/team_volatile.o \
@@ -299,6 +300,11 @@ ${OBJECTDIR}/_ext/511e4115/pokemon_volatile.o: ../src/pokemon_volatile.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pokemon_volatile.o ../src/pokemon_volatile.cpp
+
+${OBJECTDIR}/_ext/511e4115/serializable.o: ../src/serializable.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/serializable.o ../src/serializable.cpp
 
 ${OBJECTDIR}/_ext/511e4115/signature.o: ../src/signature.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
@@ -839,6 +845,19 @@ ${OBJECTDIR}/_ext/511e4115/pokemon_volatile_nomain.o: ${OBJECTDIR}/_ext/511e4115
 	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/pokemon_volatile_nomain.o ../src/pokemon_volatile.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/_ext/511e4115/pokemon_volatile.o ${OBJECTDIR}/_ext/511e4115/pokemon_volatile_nomain.o;\
+	fi
+
+${OBJECTDIR}/_ext/511e4115/serializable_nomain.o: ${OBJECTDIR}/_ext/511e4115/serializable.o ../src/serializable.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/serializable.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/serializable_nomain.o ../src/serializable.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/511e4115/serializable.o ${OBJECTDIR}/_ext/511e4115/serializable_nomain.o;\
 	fi
 
 ${OBJECTDIR}/_ext/511e4115/signature_nomain.o: ${OBJECTDIR}/_ext/511e4115/signature.o ../src/signature.cpp 

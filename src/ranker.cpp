@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <boost/format.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/filesystem/operations.hpp>
 
 namespace bf = boost::filesystem;
 namespace po = boost::program_options;
@@ -21,6 +22,9 @@ po::options_description Ranker::Config::options(const std::string& category, std
 
   if (prefix.size() > 0) { prefix.append("-"); }
   desc.add_options()
+      ((prefix + "save-on-completion").c_str(),
+      po::value<bool>(&saveOnCompletion)->default_value(defaults.saveOnCompletion),
+      "when true, resulting artifacts are saved to disk.")
       ((prefix + "allow-same-planner").c_str(),
       po::value<bool>(&allowSamePlanner)->default_value(defaults.allowSamePlanner),
       "when true, a given planner may fight itself.")
@@ -94,6 +98,7 @@ LeagueHeat Ranker::rank() const {
   LeagueHeat league = constructLeague();
   runLeague(league);
 
+  if (cfg_.saveOnCompletion) { saveTeamPopulation(league); }
   return league;
 }
 
@@ -401,10 +406,10 @@ size_t Ranker::loadTeamPopulation() {
     if (!bf::is_regular_file(pathIt.path())) { continue; }
 
     try {
-      addTeam(TeamNonVolatile::loadFromFile(pathIt.path().string()));
+      addTeam(TeamNonVolatile::load(pathIt.path().string()));
     } catch(std::invalid_argument& e) {
       if (cfg_.verbosity >= 2) {
-        std::cerr << boost::format("Failed to load team at \"%s\"\n") % pathIt.path();
+        std::cerr << boost::format("Failed to load team at \"%s\": %s\n") % pathIt.path() % e.what();
       }
       continue;
     }
@@ -413,4 +418,25 @@ size_t Ranker::loadTeamPopulation() {
   }
 
   return numLoaded;
+}
+
+
+size_t Ranker::saveTeamPopulation(const League& league) const {
+  bf::path teamPath{cfg_.teamPath};
+  if (bf::exists(teamPath) && !bf::is_directory(teamPath)) {
+    std::cerr <<
+        boost::format("Team population path at \"%s\" is not a folder!\n")
+        % cfg_.teamPath;
+    return 0;
+  }
+
+  bf::create_directory(teamPath);
+
+  size_t numSaved = 0;
+  for (const auto& team: league.teams) {
+    bf::path path = teamPath / (boost::format("%s.txt") % team.second->getName()).str();
+    team.second->save(path.string());
+  }
+
+  return numSaved;
 }

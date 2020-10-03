@@ -1,3 +1,70 @@
-PKAIE0	dualTeamD	2
-PKAIP0	EvilGengar	Gengar	100	Life Orb	0	Levitate	Timid	shadow ball	focus blast	thunderbolt	icy wind	31	31	31	31	31	31	0	252	4	0	252	0
-PKAIP0	PorygonStriker	Porygon2	100	Choice Specs	2	Download	Modest	tri attack	agility	ice beam	signal beam	31	31	31	31	31	31	0	252	4	0	252	0
+{
+  "header": "PKAIE0",
+  "name": "dualTeamD",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "EvilGengar",
+      "species": "Gengar",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 0,
+      "ability": "Levitate",
+      "nature": "Timid",
+      "moves": [
+        "shadow ball",
+        "focus blast",
+        "thunderbolt",
+        "icy wind"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 252,
+        "def": 4,
+        "spd": 0,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "PorygonStriker",
+      "species": "Porygon2",
+      "level": 100,
+      "item": "Choice Specs",
+      "sex": 2,
+      "ability": "Download",
+      "nature": "Modest",
+      "moves": [
+        "tri attack",
+        "agility",
+        "ice beam",
+        "signal beam"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 252,
+        "def": 4,
+        "spd": 0,
+        "spe": 252,
+        "hp": 0
+      }
+    }
+  ]
+}

@@ -1,2 +1,38 @@
-PKAIE0	soloTeamD	1
-PKAIP0	NastyPlotAzelf	Azelf	100	Life Orb	0	Levitate	Timid	nasty plot	psychic	flamethrower	u-turn	31	31	31	31	31	31	0	252	0	4	252	0
+{
+  "header": "PKAIE0",
+  "name": "soloTeamD",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "NastyPlotAzelf",
+      "species": "Azelf",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 0,
+      "ability": "Levitate",
+      "nature": "Timid",
+      "moves": [
+        "nasty plot",
+        "psychic",
+        "flamethrower",
+        "u-turn"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 252,
+        "def": 0,
+        "spd": 4,
+        "spe": 252,
+        "hp": 0
+      }
+    }
+  ]
+}

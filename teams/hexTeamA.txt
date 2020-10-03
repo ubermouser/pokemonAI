@@ -1,7 +1,198 @@
-PKAIE0	hexTeamA	6
-PKAIP0	MAtkLead	Machamp	100	Lum Berry	0	No Guard	Adamant	DynamicPunch	Payback	Bullet Punch	Ice Punch	31	31	31	31	31	31	248	0	0	16	4	240
-PKAIP0	GSubSplit	Gengar	100	Life Orb	1	Levitate	Timid	Substitute	Pain Split	Shadow Ball	Focus Blast	31	31	31	31	31	31	0	252	4	0	252	0
-PKAIP0	SCSwords	Scizor	100	Leftovers	0	Technician	Adamant	Swords Dance	Bullet Punch	Brick Break	Roost	31	31	31	31	31	31	252	0	0	0	252	4
-PKAIP0	STRapidSpin	Starmie	100	Life Orb	2	Natural Cure	Timid	Rapid Spin	Hydro Pump	Thunderbolt	Ice Beam	31	31	31	31	31	31	0	252	0	4	252	0
-PKAIP0	DTank	Dusknoir	100	Leftovers	0	Pressure	Impish	Will-O-Wisp	Pain Split	Ice Punch	Earthquake	31	31	31	31	31	31	28	0	228	0	0	252
-PKAIP0	BFatass	Blissey	100	Leftovers	1	Natural Cure	Bold	Aromatherapy	Softboiled	Seismic Toss	Toxic	31	31	31	31	31	31	0	0	252	0	4	252
+{
+  "header": "PKAIE0",
+  "name": "hexTeamA",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "MAtkLead",
+      "species": "Machamp",
+      "level": 100,
+      "item": "Lum Berry",
+      "sex": 0,
+      "ability": "No Guard",
+      "nature": "Adamant",
+      "moves": [
+        "DynamicPunch",
+        "Payback",
+        "Bullet Punch",
+        "Ice Punch"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 248,
+        "spa": 0,
+        "def": 0,
+        "spd": 16,
+        "spe": 4,
+        "hp": 240
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "GSubSplit",
+      "species": "Gengar",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 1,
+      "ability": "Levitate",
+      "nature": "Timid",
+      "moves": [
+        "Substitute",
+        "Pain Split",
+        "Shadow Ball",
+        "Focus Blast"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 252,
+        "def": 4,
+        "spd": 0,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "SCSwords",
+      "species": "Scizor",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 0,
+      "ability": "Technician",
+      "nature": "Adamant",
+      "moves": [
+        "Swords Dance",
+        "Bullet Punch",
+        "Brick Break",
+        "Roost"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 0,
+        "spd": 0,
+        "spe": 252,
+        "hp": 4
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "STRapidSpin",
+      "species": "Starmie",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 2,
+      "ability": "Natural Cure",
+      "nature": "Timid",
+      "moves": [
+        "Rapid Spin",
+        "Hydro Pump",
+        "Thunderbolt",
+        "Ice Beam"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 252,
+        "def": 0,
+        "spd": 4,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "DTank",
+      "species": "Dusknoir",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 0,
+      "ability": "Pressure",
+      "nature": "Impish",
+      "moves": [
+        "Will-O-Wisp",
+        "Pain Split",
+        "Ice Punch",
+        "Earthquake"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 28,
+        "spa": 0,
+        "def": 228,
+        "spd": 0,
+        "spe": 0,
+        "hp": 252
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "BFatass",
+      "species": "Blissey",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 1,
+      "ability": "Natural Cure",
+      "nature": "Bold",
+      "moves": [
+        "Aromatherapy",
+        "Softboiled",
+        "Seismic Toss",
+        "Toxic"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 0,
+        "def": 252,
+        "spd": 0,
+        "spe": 4,
+        "hp": 252
+      }
+    }
+  ]
+}

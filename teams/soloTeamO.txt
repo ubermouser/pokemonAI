@@ -1,2 +1,38 @@
-PKAIE0	soloTeamO	1
-PKAIP0	defenseForretress	Forretress	100	Leftovers	1	Sturdy	Relaxed	Stealth Rock	Toxic Spikes	Rapid Spin	Explosion	31	31	31	31	31	31	112	0	144	0	0	252
+{
+  "header": "PKAIE0",
+  "name": "soloTeamO",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "defenseForretress",
+      "species": "Forretress",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 1,
+      "ability": "Sturdy",
+      "nature": "Relaxed",
+      "moves": [
+        "Stealth Rock",
+        "Toxic Spikes",
+        "Rapid Spin",
+        "Explosion"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 112,
+        "spa": 0,
+        "def": 144,
+        "spd": 0,
+        "spe": 0,
+        "hp": 252
+      }
+    }
+  ]
+}

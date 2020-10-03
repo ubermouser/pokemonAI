@@ -1,3 +1,70 @@
-PKAIE0	dualTeamC	2
-PKAIP0	OffensiveDD	Dragonite	100	Life Orb	0	Inner Focus	Jolly	dragon dance	dragon claw	earthquake	extremespeed	31	31	31	31	31	31	252	0	4	0	252	0
-PKAIP0	Dusknoir	Dusknoir	100	Leftovers	0	Pressure	Impish	will-o-wisp	thunderpunch	ice punch	toxic	31	31	31	31	31	31	28	0	228	0	0	252
+{
+  "header": "PKAIE0",
+  "name": "dualTeamC",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "OffensiveDD",
+      "species": "Dragonite",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 0,
+      "ability": "Inner Focus",
+      "nature": "Jolly",
+      "moves": [
+        "dragon dance",
+        "dragon claw",
+        "earthquake",
+        "extremespeed"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 4,
+        "spd": 0,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Dusknoir",
+      "species": "Dusknoir",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 0,
+      "ability": "Pressure",
+      "nature": "Impish",
+      "moves": [
+        "will-o-wisp",
+        "thunderpunch",
+        "ice punch",
+        "toxic"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 28,
+        "spa": 0,
+        "def": 228,
+        "spd": 0,
+        "spe": 0,
+        "hp": 252
+      }
+    }
+  ]
+}

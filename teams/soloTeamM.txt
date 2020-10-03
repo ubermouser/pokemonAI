@@ -1,2 +1,38 @@
-PKAIE0	soloTeamM	1
-PKAIP0	fatBlissey	Blissey	100	Leftovers	1	Natural Cure	Bold	Aromatherapy	Softboiled	Seismic Toss	Toxic	31	31	31	31	31	31	0	0	252	0	4	252
+{
+  "header": "PKAIE0",
+  "name": "soloTeamM",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "fatBlissey",
+      "species": "Blissey",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 1,
+      "ability": "Natural Cure",
+      "nature": "Bold",
+      "moves": [
+        "Aromatherapy",
+        "Softboiled",
+        "Seismic Toss",
+        "Toxic"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 0,
+        "def": 252,
+        "spd": 0,
+        "spe": 4,
+        "hp": 252
+      }
+    }
+  ]
+}

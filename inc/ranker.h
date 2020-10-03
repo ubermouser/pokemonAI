@@ -72,6 +72,8 @@ public:
 
     Battlegroup::Contribution contributions;
 
+    bool saveOnCompletion = false;
+
     bool printPokemonLeaderboard = true;
 
     bool printBattlegroupLeaderboard = true;
@@ -173,7 +175,7 @@ protected:
   /*load a population of pokemon and their rankings from a filepath */
   size_t loadTeamPopulation();
 
-  size_t saveTeamPopulation();
+  size_t saveTeamPopulation(const League& league) const;
 
   virtual LeagueHeat constructLeague() const;
 

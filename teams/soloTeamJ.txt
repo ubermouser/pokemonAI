@@ -1,2 +1,38 @@
-PKAIE0	soloTeamJ	1
-PKAIP0	RevengeHeatran	Heatran	100	Choice Scarf	0	Flash Fire	Naive	fire blast	earth power	dragon pulse	metal sound	31	31	31	31	31	31	0	252	0	4	252	0
+{
+  "header": "PKAIE0",
+  "name": "soloTeamJ",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "RevengeHeatran",
+      "species": "Heatran",
+      "level": 100,
+      "item": "Choice Scarf",
+      "sex": 0,
+      "ability": "Flash Fire",
+      "nature": "Naive",
+      "moves": [
+        "fire blast",
+        "earth power",
+        "dragon pulse",
+        "metal sound"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 252,
+        "def": 0,
+        "spd": 4,
+        "spe": 252,
+        "hp": 0
+      }
+    }
+  ]
+}

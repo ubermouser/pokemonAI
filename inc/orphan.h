@@ -13,6 +13,19 @@ namespace orphan
 {
   using OrphanSet = std::unordered_set<std::string>;
 
+  struct Orphanage {
+    OrphanSet pokemon;
+    OrphanSet items;
+    OrphanSet abilities;
+    OrphanSet natures;
+    OrphanSet moves;
+
+    void printAllOrphans(
+      const std::string& source,
+      const std::string& prefix,
+      int verbosity_level = 5) const;
+  };
+
   PKAISHARED std::string lowerCase(const std::string& source);
 
   PKAISHARED void printOrphans(

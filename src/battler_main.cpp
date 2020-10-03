@@ -135,8 +135,8 @@ int main(int argc, char** argv) {
 
   auto game = Game(cfg.game)
       .setEngine(PkCU(cfg.engine))
-      .setTeam(0, TeamNonVolatile::loadFromFile(cfg.team[0]))
-      .setTeam(1, TeamNonVolatile::loadFromFile(cfg.team[1]))
+      .setTeam(0, TeamNonVolatile::load(cfg.team[0]))
+      .setTeam(1, TeamNonVolatile::load(cfg.team[1]))
       .setPlanner(0, buildPlanner(cfg, 0))
       .setPlanner(1, buildPlanner(cfg, 1));
 

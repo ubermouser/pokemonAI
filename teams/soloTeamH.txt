@@ -1,2 +1,38 @@
-PKAIE0	soloTeamH	1
-PKAIP0	EvilGengar	Gengar	100	Life Orb	0	Levitate	Timid	shadow ball	focus blast	thunderbolt	icy wind	31	31	31	31	31	31	0	252	4	0	252	0
+{
+  "header": "PKAIE0",
+  "name": "soloTeamH",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "EvilGengar",
+      "species": "Gengar",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 0,
+      "ability": "Levitate",
+      "nature": "Timid",
+      "moves": [
+        "shadow ball",
+        "focus blast",
+        "thunderbolt",
+        "icy wind"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 252,
+        "def": 4,
+        "spd": 0,
+        "spe": 252,
+        "hp": 0
+      }
+    }
+  ]
+}

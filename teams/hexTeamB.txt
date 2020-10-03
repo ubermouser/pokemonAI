@@ -1,7 +1,198 @@
-PKAIE0	AltayHunterTeam	6
-PKAIP0	Pawn	Ambipom	100	Silk Scarf	0	Technician	Jolly	Fake Out	Return	U-turn	Shadow Claw	31	31	31	31	31	31	252	0	0	4	252	0
-PKAIP0	Knight	Spiritomb	100	Choice Band	0	Pressure	Adamant	Will-o-Wisp	Sucker Punch	Pursuit	Trick	31	31	31	31	31	31	252	0	4	0	0	252
-PKAIP0	Bishop	Gyarados	100	Leftovers	0	Intimidate	Jolly	Dragon Dance	Taunt	Waterfall	Stone Edge	31	31	31	31	31	31	252	0	4	0	252	0
-PKAIP0	Rook	Flygon	100	Choice Scarf	0	Levitate	Adamant	Earthquake	Fire Blast	Outrage	U-turn	31	31	31	31	31	31	252	0	0	4	252	0
-PKAIP0	Queen	Starmie	100	Leftovers	2	Natural Cure	Timid	Rapid Spin	Recover	Surf	Thunderbolt	31	31	31	31	31	31	0	0	156	0	216	136
-PKAIP0	King	Scizor	100	Choice Band	0	Technician	Adamant	Bullet Punch	Superpower	U-turn	Pursuit	31	31	31	31	31	31	252	0	0	0	8	248
+{
+  "header": "PKAIE0",
+  "name": "AltayHunterTeam",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "Pawn",
+      "species": "Ambipom",
+      "level": 100,
+      "item": "Silk Scarf",
+      "sex": 0,
+      "ability": "Technician",
+      "nature": "Jolly",
+      "moves": [
+        "Fake Out",
+        "Return",
+        "U-turn",
+        "Shadow Claw"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 0,
+        "spd": 4,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Knight",
+      "species": "Spiritomb",
+      "level": 100,
+      "item": "Choice Band",
+      "sex": 0,
+      "ability": "Pressure",
+      "nature": "Adamant",
+      "moves": [
+        "Will-o-Wisp",
+        "Sucker Punch",
+        "Pursuit",
+        "Trick"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 4,
+        "spd": 0,
+        "spe": 0,
+        "hp": 252
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Bishop",
+      "species": "Gyarados",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 0,
+      "ability": "Intimidate",
+      "nature": "Jolly",
+      "moves": [
+        "Dragon Dance",
+        "Taunt",
+        "Waterfall",
+        "Stone Edge"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 4,
+        "spd": 0,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Rook",
+      "species": "Flygon",
+      "level": 100,
+      "item": "Choice Scarf",
+      "sex": 0,
+      "ability": "Levitate",
+      "nature": "Adamant",
+      "moves": [
+        "Earthquake",
+        "Fire Blast",
+        "Outrage",
+        "U-turn"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 0,
+        "spd": 4,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Queen",
+      "species": "Starmie",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 2,
+      "ability": "Natural Cure",
+      "nature": "Timid",
+      "moves": [
+        "Rapid Spin",
+        "Recover",
+        "Surf",
+        "Thunderbolt"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 0,
+        "def": 156,
+        "spd": 0,
+        "spe": 216,
+        "hp": 136
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "King",
+      "species": "Scizor",
+      "level": 100,
+      "item": "Choice Band",
+      "sex": 0,
+      "ability": "Technician",
+      "nature": "Adamant",
+      "moves": [
+        "Bullet Punch",
+        "Superpower",
+        "U-turn",
+        "Pursuit"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 0,
+        "spd": 0,
+        "spe": 8,
+        "hp": 248
+      }
+    }
+  ]
+}

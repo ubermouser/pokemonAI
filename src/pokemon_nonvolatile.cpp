@@ -1,7 +1,10 @@
 #include "../inc/pokemon_nonvolatile.h"
 
 #include <algorithm>
+#include <stdexcept>
 #include <boost/format.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <numeric>
 
 #include "../inc/pokedex.h"
 #include "../inc/pokemon_volatile.h"
@@ -16,86 +19,36 @@
 #include "../inc/orphan.h"
 
 using namespace orphan;
+namespace pt = boost::property_tree;
 
 std::array< std::array<fpType, 13>, 3> PokemonNonVolatile::aFV_base;
 
 PokemonNonVolatile::PokemonNonVolatile() 
   : Name(),
   Signature<PokemonNonVolatile, POKEMON_NONVOLATILE_DIGESTSIZE>(),
-  base(PokemonBase::no_base),
-  chosenAbility(Ability::no_ability), 
-  chosenNature(Nature::no_nature),
-  initialItem(Item::no_item),
-  actions(),
-  numMoves(0),
-  level(0), 
-  sex(SEX_NEUTER)
-{	
+  Serializable<PokemonNonVolatile>(),
+  base_(PokemonBase::no_base),
+  chosenAbility_(Ability::no_ability),
+  chosenNature_(Nature::no_nature),
+  initialItem_(Item::no_item),
+  actions_(),
+  level_(0),
+  sex_(SEX_NEUTER) {
   // zero IV and EV
-  IV.fill(0);
-  EV.fill(0);
+  IV_.fill(0);
+  EV_.fill(0);
   
   // zero FV
-  for (size_t iFV = 0; iFV < FV_base.size(); iFV++)
+  for (size_t iFV = 0; iFV < FV_base_.size(); iFV++)
   {
-    FV_base[iFV].fill(0);
+    FV_base_[iFV].fill(0);
   }
   
 }
 
 
-
-
-
-PokemonNonVolatile::PokemonNonVolatile(const PokemonNonVolatile& orig) 
-  : Name(orig),
-  Signature<PokemonNonVolatile, POKEMON_NONVOLATILE_DIGESTSIZE>(orig),
-  base(orig.base),
-  chosenAbility(orig.chosenAbility), 
-  chosenNature(orig.chosenNature), 
-  actions(orig.actions),
-  numMoves(orig.numMoves),
-  initialItem(orig.initialItem),
-  level(orig.level), 
-  sex(orig.sex),
-  IV(orig.IV),
-  EV(orig.EV),
-  FV_base(orig.FV_base)
-{
-}
-
-PokemonNonVolatile& PokemonNonVolatile::operator=(const PokemonNonVolatile& other)
-{
-  // identity theorem - simply return what we have now if equal address
-  if (this == &other) { return *this; } 
-  
-  Name::operator=(other);
-  Signature<PokemonNonVolatile, POKEMON_NONVOLATILE_DIGESTSIZE>::operator=(other);
-  base = other.base;
-  chosenAbility = other.chosenAbility;
-  chosenNature = other.chosenNature;
-  actions = other.actions;
-  numMoves = other.numMoves;
-  initialItem = other.initialItem;
-  level = other.level;
-  sex = other.sex;
-  IV = other.IV;
-  EV = other.EV;
-  FV_base = other.FV_base;
-  
-  return *this;
-}
-
-
-
-
-
-void PokemonNonVolatile::initialize()
-{
-  for (size_t iAction = 0; iAction < getNumMoves(); iAction++)
-  {
-    MoveNonVolatile& cMove = getMove(iAction);
-
+void PokemonNonVolatile::initialize() {
+  for (auto& cMove: actions_) {
     // do not initialize if the move_nonvolatile object does not reference a valid move
     if (!cMove.moveExists()) { continue; }
 
@@ -105,15 +58,8 @@ void PokemonNonVolatile::initialize()
 };
 
 
-
-
-
-void PokemonNonVolatile::uninitialize()
-{
-  for (size_t iAction = 0; iAction < getNumMoves(); iAction++)
-  {
-    MoveNonVolatile& cMove = getMove(iAction);
-
+void PokemonNonVolatile::uninitialize() {
+  for (auto& cMove: actions_) {
     // do not initialize if the move_nonvolatile object does not reference a valid move
     if (!cMove.moveExists()) { continue; }
 
@@ -122,11 +68,7 @@ void PokemonNonVolatile::uninitialize()
 }
 
 
-
-
-
-void PokemonNonVolatile::createDigest_impl(std::array<uint8_t, POKEMON_NONVOLATILE_DIGESTSIZE>& digest) const
-{
+void PokemonNonVolatile::createDigest_impl(std::array<uint8_t, POKEMON_NONVOLATILE_DIGESTSIZE>& digest) const {
   digest.fill(0);
 
   std::array<bool, 4> hashedMoves;
@@ -194,171 +136,194 @@ void PokemonNonVolatile::createDigest_impl(std::array<uint8_t, POKEMON_NONVOLATI
   iDigest += 20;
 
   // pack level:
-  pack(level, digest, iDigest);
+  pack(level_, digest, iDigest);
 
   // pack sex:
-  pack(sex, digest, iDigest);
+  pack(sex_, digest, iDigest);
 
   // pack IVEV:
-  for (size_t iIEV = 0; iIEV < IV.size(); ++iIEV)
+  for (size_t iIEV = 0; iIEV < IV_.size(); ++iIEV)
   {
-    pack(IV[iIEV], digest, iDigest);
-    pack(EV[iIEV], digest, iDigest);
+    pack(IV_[iIEV], digest, iDigest);
+    pack(EV_[iIEV], digest, iDigest);
   }
 
   assert(iDigest == POKEMON_NONVOLATILE_DIGESTSIZE);
 };
 
 
-
-
-
-bool PokemonNonVolatile::pokemonExists() const
-{
-  return (base!=PokemonBase::no_base)?true:false;
+bool PokemonNonVolatile::pokemonExists() const {
+  return (base_!=PokemonBase::no_base)?true:false;
 };
 
 
+PokemonNonVolatile& PokemonNonVolatile::setNoBase() {
+  base_ = PokemonBase::no_base;
+  setNoAbility();
+  actions_.clear();
+
+  return *this;
+}
 
 
+PokemonNonVolatile& PokemonNonVolatile::setBase(const PokemonBase& _base) {
+  if (&_base == PokemonBase::no_base) { return setNoBase(); }
+  // replace abilities / moves which are no longer valid with the new base:
+  if (!isLegalAbility(getAbility())) { setNoAbility(); }
+  for (size_t iMove = 0; iMove != getNumMoves(); ++iMove) {
+    if (isLegalSet(iMove, getMove(iMove))) { continue; }
+    removeMove(iMove);
+    iMove--;
+  }
 
-bool PokemonNonVolatile::abilityExists() const
-{
-  return (chosenAbility!=Ability::no_ability)?true:false;
-};
-
-
-
-
-
-PokemonNonVolatile& PokemonNonVolatile::setAbility(const Ability& _chosenAbility)
-{
-  assert(pokemonExists());
-  assert(_chosenAbility.isImplemented());
-  assert(getBase().abilities_.count(&_chosenAbility) > 0);
-
-  chosenAbility = &_chosenAbility;
+  base_ = &_base;
   return *this;
 };
 
 
-
-
-
-PokemonNonVolatile& PokemonNonVolatile::setNoAbility()
-{
-  chosenAbility = Ability::no_ability;
+PokemonNonVolatile& PokemonNonVolatile::setLevel(unsigned int _level) {
+  level_ = _level;
   return *this;
 };
 
 
+PokemonNonVolatile& PokemonNonVolatile::setSex(unsigned int _sex) {
+  if (!INI::checkRangeB(_sex, (uint32_t)0, (uint32_t)2)) {
+    throw std::invalid_argument("PokemonNonVolatile sex");
+  }
 
-
-
-PokemonNonVolatile& PokemonNonVolatile::setNoNature()
-{
-  chosenNature = Nature::no_nature;
+  sex_ = _sex;
   return *this;
 };
 
 
+PokemonNonVolatile& PokemonNonVolatile::setIV(size_t type, unsigned int value) {
+  if (!INI::checkRangeB(value, (uint32_t)0, (uint32_t)31)) { 
+    throw std::invalid_argument("PokemonNonVolatile IV");
+  }
+  IV_.at(type) = value;
+  return *this;
+}
 
 
+PokemonNonVolatile& PokemonNonVolatile::setEV(size_t type, unsigned int value) {
+  // validate value is within range:
+  if (!INI::checkRangeB(value, (uint32_t)0, (uint32_t)255)) {
+    throw std::invalid_argument("PokemonNonVolatile EV");
+  }
+  // validate array is within range:
+  if (std::accumulate(EV_.begin(), EV_.end(), value) > (MAXEFFORTVALUE - getEV(type))) {
+    throw std::invalid_argument("PokemonNonVolatile EV count");
+  }
 
-bool PokemonNonVolatile::natureExists() const
-{
-  return (chosenNature!=Nature::no_nature)?true:false;
+  EV_.at(type) = value;
+  return *this;
+}
+
+
+bool PokemonNonVolatile::abilityExists() const {
+  return (chosenAbility_!=Ability::no_ability)?true:false;
 };
 
 
+PokemonNonVolatile& PokemonNonVolatile::setAbility(const Ability& _chosenAbility) {
+  if (&_chosenAbility == Ability::no_ability) { setNoAbility(); }
+
+  if(!isLegalAbility(_chosenAbility)) {
+    throw std::invalid_argument("PokemonNonVolatile illegal ability");
+  }
+
+  chosenAbility_ = &_chosenAbility;
+  return *this;
+};
 
 
+PokemonNonVolatile& PokemonNonVolatile::setNoAbility() {
+  chosenAbility_ = Ability::no_ability;
+  return *this;
+};
 
-PokemonNonVolatile& PokemonNonVolatile::setNature(const Nature& _chosenNature)
-{
+
+PokemonNonVolatile& PokemonNonVolatile::setNoNature() {
+  chosenNature_ = Nature::no_nature;
+  return *this;
+};
+
+
+bool PokemonNonVolatile::natureExists() const {
+  return (chosenNature_!=Nature::no_nature)?true:false;
+};
+
+
+PokemonNonVolatile& PokemonNonVolatile::setNature(const Nature& _chosenNature) {
   assert(pkdex->getNatures().count(_chosenNature.getName()) > 0);
-  chosenNature = &_chosenNature;
+  chosenNature_ = &_chosenNature;
   return *this;
 };
 
 
-
-
-
-PokemonNonVolatile& PokemonNonVolatile::setNoInitialItem()
-{
-  initialItem = Item::no_item;
+PokemonNonVolatile& PokemonNonVolatile::setNoInitialItem() {
+  initialItem_ = Item::no_item;
   return *this;
 };
 
 
+PokemonNonVolatile& PokemonNonVolatile::setInitialItem(const Item& _chosenItem) {
+  if (&_chosenItem == Item::no_item) { setNoInitialItem(); }
 
-
-
-PokemonNonVolatile& PokemonNonVolatile::setInitialItem(const Item& _chosenItem)
-{
   assert(pkdex->getItems().count(_chosenItem.getName()) > 0);
-  assert(_chosenItem.isImplemented());
-  initialItem = &_chosenItem;
+  if (!_chosenItem.isImplemented()) {
+    throw std::invalid_argument("PokemonNonVolatile item not implemented");
+  }
+  
+  initialItem_ = &_chosenItem;
   return *this;
 }
 
 
-
-
-
-bool PokemonNonVolatile::hasInitialItem() const
-{
-  return initialItem != Item::no_item;
+bool PokemonNonVolatile::hasInitialItem() const {
+  return initialItem_ != Item::no_item;
 }
 
 
-
-
-
-const Item& PokemonNonVolatile::getInitialItem() const
-{
-  return *initialItem;
+const Item& PokemonNonVolatile::getInitialItem() const {
+  return *initialItem_;
 }
 
 
+bool PokemonNonVolatile::isLegalAbility(const Ability& candidate) const {
+  if (&candidate == Ability::no_ability) { return true; }
+
+  assert(pkdex->getAbilities().count(candidate.getName()) > 0);
+  if(!candidate.isImplemented()) {
+    return false;
+  }
+  if (pokemonExists() && getBase().getAbilities().count(&candidate) == 0) {
+    return false;
+  }
+  return true;
+}
 
 
-
-bool PokemonNonVolatile::isLegalAdd(const MoveNonVolatile& candidate) const
-{
+bool PokemonNonVolatile::isLegalAdd(const MoveNonVolatile& candidate) const {
   if ( !candidate.moveExists() ) { return false; }
   return isLegalAdd(candidate.getBase());
 }
 
 
-
-
-
-
-bool PokemonNonVolatile::isLegalSet(size_t iAction, const MoveNonVolatile& candidate) const
-{
-  if ( !candidate.moveExists() ) { return false; }
-  return isLegalSet(iAction, candidate.getBase());
-}
-
-
-
-
-
-bool PokemonNonVolatile::isLegalAdd(const Move& candidate) const
-{
+bool PokemonNonVolatile::isLegalAdd(const Move& candidate) const {
   if ((getNumMoves() + 1) > getMaxNumMoves()) { return false; }
   return isLegalSet(SIZE_MAX, candidate);
 }
 
 
+bool PokemonNonVolatile::isLegalSet(size_t iAction, const MoveNonVolatile& candidate) const {
+  if ( !candidate.moveExists() ) { return false; }
+  return isLegalSet(iAction, candidate.getBase());
+}
 
 
-
-
-bool PokemonNonVolatile::isLegalSet(size_t iAction, const Move& candidate) const
-{
+bool PokemonNonVolatile::isLegalSet(size_t iAction, const Move& candidate) const {
   size_t iPosition = iAction;
   if (!pokemonExists()) { return false; }
   if ((iPosition != SIZE_MAX) && (iPosition >= getNumMoves()) ) { return false; }
@@ -369,8 +334,7 @@ bool PokemonNonVolatile::isLegalSet(size_t iAction, const Move& candidate) const
   if (!cMovelist.count(&candidate)) { return false; }
 
   // ensure that the move is not assigned multiple times to the same pokemon
-  for (size_t iMove = 0; iMove != getNumMoves(); ++iMove)
-  {
+  for (size_t iMove = 0; iMove != getNumMoves(); ++iMove) {
     if (iPosition == iMove) { continue; }
     if (&getMove_base(iMove) == &candidate) { return false; }
   }
@@ -379,25 +343,18 @@ bool PokemonNonVolatile::isLegalSet(size_t iAction, const Move& candidate) const
 }
 
 
+PokemonNonVolatile& PokemonNonVolatile::addMove(const MoveNonVolatile& _cMove) {
+  if (!isLegalAdd(_cMove)) {
+    throw std::invalid_argument("PokemonNonVolatile illegal move");
+  }
 
-
-
-PokemonNonVolatile& PokemonNonVolatile::addMove(const MoveNonVolatile& _cMove)
-{
-  assert(isLegalAdd(_cMove));
-
-  actions[numMoves] = _cMove;
-  numMoves++;
+  actions_.push_back(_cMove);
   return *this;
 }
 
 
-
-
-MoveNonVolatile& PokemonNonVolatile::getMove(size_t index)
-{
-  switch(index)
-  {
+MoveNonVolatile& PokemonNonVolatile::getMove(size_t index) {
+  switch(index) {
     default:
       assert(false && "attempted to get volatile move of non-move action");
     case 4:
@@ -407,18 +364,13 @@ MoveNonVolatile& PokemonNonVolatile::getMove(size_t index)
     case 2:
     case 3:
       assert(index < getNumMoves());
-      return actions[index];
+      return actions_[index];
   }
 };
 
 
-
-
-
-const MoveNonVolatile& PokemonNonVolatile::getMove(size_t index) const
-{
-  switch(index)
-  {
+const MoveNonVolatile& PokemonNonVolatile::getMove(size_t index) const {
+  switch(index) {
     default:
       assert(false && "attempted to get volatile move of non-move action");
     case 4:
@@ -428,79 +380,39 @@ const MoveNonVolatile& PokemonNonVolatile::getMove(size_t index) const
     case 2:
     case 3:
       assert(index < getNumMoves());
-      return actions[index];
+      return actions_[index];
   }
 };
 
 
-
-
-
-PokemonNonVolatile& PokemonNonVolatile::setMove(size_t iAction, const MoveNonVolatile& _cMove)
-{
-  assert(isLegalSet(iAction, _cMove));
+PokemonNonVolatile& PokemonNonVolatile::setMove(size_t iAction, const MoveNonVolatile& _cMove) {
+  if (!isLegalSet(iAction, _cMove)) {
+    throw std::invalid_argument("PokemonNonVolatile illegal move");
+  }
+  
   getMove(iAction) = _cMove;
   return *this;
 };
 
 
-
-
-
-PokemonNonVolatile& PokemonNonVolatile::removeMove(size_t iRemovedAction)
-{
+PokemonNonVolatile& PokemonNonVolatile::removeMove(size_t iRemovedAction) {
   // don't bother removing a move that doesn't exist
   if (iRemovedAction >= getNumMoves()) { return *this; }
-
-  {
-    MoveNonVolatile& removedMove = getMove(iRemovedAction);
-
-    // remove move:
-    removedMove = MoveNonVolatile();
-  }
-
-  // there's a "hole" in the contiguous move array now, so 
-  // refactor moves above the removed move:
-  for (size_t iSource = iRemovedAction + 1; iSource < getNumMoves(); iSource++) {
-    MoveNonVolatile& source = getMove(iSource);
-
-    for (size_t iNDestination = 0; iNDestination < iSource; iNDestination++)
-    {
-      size_t iDestination = (iSource - iNDestination - 1);
-
-      MoveNonVolatile& destination = actions[iDestination];
-
-      // don't replace a move that exists already
-      if (destination.moveExists()) { continue; }
-
-      // perform copy
-      destination = source;
-      // delete source (no duplicates)
-      source = MoveNonVolatile();
-      break;
-    }
-  }
-
-  // update number of moves in move array:
-  numMoves--;
+  actions_.erase(actions_.begin() + iRemovedAction);
+  
   return *this;
 };
 
 
-
-
-
-void PokemonNonVolatile::setFV(unsigned int targetFV)
-{	
-
+void PokemonNonVolatile::setFV(unsigned int targetFV) {
   // set default value:
   if (targetFV == FV_HITPOINTS)
   {
-    unsigned int baseStat = base->baseStats_[targetFV];
-    unsigned int iv = IV[targetFV];
-    unsigned int ev = EV[targetFV];
+    unsigned int baseStat = base_->baseStats_[targetFV];
+    unsigned int iv = IV_[targetFV];
+    unsigned int ev = EV_[targetFV];
     
-    FV_base[targetFV][STAGE0] = ((2 * baseStat + iv + (ev / 4)) * level / 100 + level + 10);
+    FV_base_[targetFV][STAGE0] = ((2 * baseStat + iv + (ev / 4)) * level_ / 100 + level_ + 10);
   }
   else if (targetFV == FV_ACCURACY || targetFV == FV_EVASION)
   {
@@ -513,13 +425,13 @@ void PokemonNonVolatile::setFV(unsigned int targetFV)
   }
   else // for atk, spa, def, spd, spe
   {
-    unsigned int baseStat = base->baseStats_[targetFV];
-    unsigned int iv = IV[targetFV];
-    unsigned int ev = EV[targetFV];
-    unsigned int natureModification = chosenNature->modTable_[targetFV];
+    unsigned int baseStat = base_->baseStats_[targetFV];
+    unsigned int iv = IV_[targetFV];
+    unsigned int ev = EV_[targetFV];
+    unsigned int natureModification = chosenNature_->modTable_[targetFV];
     
-    unsigned int base_FV = ((((2 * baseStat + iv + (ev / 4)) * level / 100 + 5) * natureModification) / FPMULTIPLIER);
-    FV_base[targetFV][STAGE0] = base_FV;
+    unsigned int base_FV = ((((2 * baseStat + iv + (ev / 4)) * level_ / 100 + 5) * natureModification) / FPMULTIPLIER);
+    FV_base_[targetFV][STAGE0] = base_FV;
   }
 
   // set boosted values:
@@ -532,7 +444,7 @@ void PokemonNonVolatile::setFV(unsigned int targetFV)
     if (targetFV == FV_HITPOINTS)
     {
       // hitpoints cannot be boosted
-      FV_base[targetFV][iBoost] = FV_base[targetFV][STAGE0];
+      FV_base_[targetFV][iBoost] = FV_base_[targetFV][STAGE0];
     }
     else if (targetFV == FV_ACCURACY || targetFV == FV_EVASION)
     {
@@ -604,20 +516,15 @@ void PokemonNonVolatile::setFV(unsigned int targetFV)
         boostDenominator = 2 - boostStage;
       }
 
-      FV_base[targetFV][iBoost] = (FV_base[targetFV][STAGE0] * boostNumerator) / boostDenominator;
+      FV_base_[targetFV][iBoost] = (FV_base_[targetFV][STAGE0] * boostNumerator) / boostDenominator;
     } // endOf atk, spa, def, spd, spe
   } // endOf foreach boost stage
 } // endOf setFV
 
 
-
-
-
-void PokemonNonVolatile::initFV()
-{
+void PokemonNonVolatile::initFV() {
   // generate final values for a pokemon
-  for (unsigned int indexFV = 0; indexFV < 9; indexFV++)
-  {
+  for (unsigned int indexFV = 0; indexFV < 9; indexFV++) {
     setFV(indexFV);
   }
 }
@@ -653,303 +560,108 @@ void PokemonNonVolatile::printSummary(std::ostream& os) const {
 
 
 static const std::string header = "PKAIP0";
+static const std::array<std::string, 6> statHeaders = {"atk", "spa", "def", "spd", "spe", "hp"};
 
-void PokemonNonVolatile::output(std::ostream& oFile, bool printHeader) const
-{
-  // header:
-  if (printHeader)
-  {
-    oFile << header << "\t";
+
+boost::property_tree::ptree PokemonNonVolatile::output(bool printHeader) const {
+  pt::ptree result;
+  if (printHeader) {
+    result.put("header", header);
   }
-
-  /* PKAIP0 <nickname> <species> <level> <item> <gender> <ability> <nature> <hp.type> <hp.dmg> <move 1> <move 2> <move 3> <move 4> <atk.iv> <spatck.iv> <def.iv> <spdef.iv> <spd.iv> <hp.iv> <atk.ev> <spatck.ev> <def.ev> <spdef.ev> <spd.ev> <hp.ev> */
-  oFile 
-    << getName() <<
-    "\t" << (pokemonExists()?getBase().getName():"NONE") <<
-    "\t" << getLevel() <<
-    "\t" << (hasInitialItem()?getInitialItem().getName():"NONE") <<
-    "\t" << getSex() <<
-    "\t" << (abilityExists()?getAbility().getName():"NONE") <<
-    "\t" << getNature().getName() <<
-    "\t";
+  result.put("name", getName());
+  result.put("species", getBase().getName());
+  result.put("level", getLevel());
+  result.put("item", getInitialItem().getName());
+  result.put("sex", getSex());
+  result.put("ability", getAbility().getName());
+  result.put("nature", getNature().getName());
 
   // moves:
-  for (size_t iMove = 0; iMove != 4; ++iMove)
-  {
-    oFile << ((iMove < getNumMoves())?getMove_base(iMove).getName():"NONE") << "\t";
+  pt::ptree& moves = result.put_child("moves", pt::ptree{});
+  for (size_t iMove = 0; iMove < getNumMoves(); ++iMove) {
+    pt::ptree move;
+    move.put("", getMove_base(iMove).getName());
+    moves.push_back(pt::ptree::value_type{"", move});
   }
 
-  // IVs:
-  for (size_t iIV = 0; iIV != 6; ++iIV)
-  {
-    oFile << getIV(iIV) << "\t";
+  // IVs / EVs:
+  pt::ptree& ivs = result.put_child("iv", pt::ptree{});
+  pt::ptree& evs = result.put_child("ev", pt::ptree{});
+  for (size_t iStat = 0; iStat < 6; ++iStat) {
+    ivs.put(statHeaders[iStat], getIV(iStat));
+    evs.put(statHeaders[iStat], getEV(iStat));
   }
 
-  // EVs:
-  for (size_t iEV = 0; iEV != 6; ++iEV)
-  {
-    oFile << getEV(iEV) << "\t";
-  }
+  return result;
+}
 
-  // end of line
-  oFile << "\n";
-} // endOf outputPokemon
 
-bool PokemonNonVolatile::input(
-    const std::vector<std::string>& lines, 
-    size_t& iLine, 
-    OrphanSet* mismatchedPokemon,
-    OrphanSet* mismatchedItems,
-    OrphanSet* mismatchedAbilities,
-    OrphanSet* mismatchedNatures,
-    OrphanSet* mismatchedMoves)
-{
-  // are the enough lines in the input stream:
-  if ((lines.size() - iLine) < 1U)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": unexpected end of input stream at line " << iLine << "!\n";
-    return false; 
-  }
+void PokemonNonVolatile::input(const pt::ptree& ptree) {
+  Orphanage orphans;
+  input(ptree, orphans);
 
-  // compare pokemon_nonvolatile header:
-  if (lines.at(iLine).compare(0, header.size(), header) != 0)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": pokemon_nonvolatile stream has header of type \"" << lines.at(0).substr(0, header.size()) << 
-      "\" (needs to be \"" << header <<
-      "\") and is incompatible with this program!\n";
+  orphans.printAllOrphans(getName(), "team", 4);
+}
 
-    return false;
-  }
 
-  std::vector<std::string> tokens = INI::tokenize(lines.at(iLine), "\t");
-    
-  if (!INI::checkRangeB(tokens.size(), (size_t)24, (size_t)24)) { return false; }
-    
-  //teammate nickname
-  size_t iToken = 1;
-  setName(tokens.at(iToken).substr(0, 20));
+void PokemonNonVolatile::input(const pt::ptree& ptree, Orphanage& orphanage) {
+  setName(ptree.get<std::string>("name"));
+  setLevel(ptree.get<uint32_t>("level"));
+  setSex(ptree.get<uint32_t>("sex"));
 
-  // find species index:
-  iToken = 2;
-  {
-    const PokemonBase* cSpecies = orphanCheck(pkdex->getPokemon(), tokens.at(iToken), mismatchedPokemon);
-    if (cSpecies == NULL) 
-    { } //orphan!
-    else 
-    { setBase(*cSpecies); }
-  }
-    
-  // teammate level
-  iToken = 3;
-  {
-    uint32_t _level;
-    if (!INI::setArgAndPrintError("pokemon_nonvolatile level", tokens.at(iToken), _level, iLine, iToken)) { return false; }
-    if (!INI::checkRangeB(_level, (uint32_t)1, (uint32_t)100)) { return false; }
-    setLevel(_level);
-  }
+  const PokemonBase* species =
+      orphanCheck(pkdex->getPokemon(), ptree.get<std::string>("species"), &orphanage.pokemon);
+  setBase(*(species==NULL?PokemonBase::no_base:species));
 
-  // find item index:
-  iToken = 4;
-  {
-    const Item* cItem = NULL;
+  const Item* item =
+      orphanCheck(pkdex->getItems(), ptree.get<std::string>("item"), &orphanage.items);
+  setInitialItem(*(item==NULL?Item::no_item:item));
 
-    if (tokens.at(iToken).compare("NONE") != 0)
-    {
-      cItem = orphanCheck(pkdex->getItems(), tokens.at(iToken), mismatchedItems);
+  const Ability* ability =
+      orphanCheck(pkdex->getAbilities(), ptree.get<std::string>("ability"), &orphanage.abilities);
+  try {
+    setAbility(*(ability==NULL?Ability::no_ability:ability));
+  } catch (std::invalid_argument& e) {
+    if (verbose >= 5) {
+      std::cerr << "WAR " << __FILE__ << "." << __LINE__ <<
+        ": pokemon " << *this <<
+        " cannot use illegal ability \"" << ability->getName() <<
+        "\"!\n";
     }
-      
-    if (cItem == NULL) { } // orphan!
-    else if (!cItem->isImplemented())
-    {
-      if (mismatchedItems != NULL) { mismatchedItems->insert(lowerCase(tokens.at(iToken))); }
-      if (verbose >= 5)
-      {
-        std::cerr << "WAR " << __FILE__ << "." << __LINE__ << 
-          ": pokemon \"" << getBase().getName() <<
-          "\" cannot use unimplemented item \"" << cItem->getName() <<
+  }
+
+  const Nature* nature =
+      orphanCheck(pkdex->getNatures(), ptree.get<std::string>("nature"), &orphanage.natures);
+  setNature(*(nature==NULL?Nature::no_nature:nature));
+
+  for (auto& e: ptree.get_child("moves")) {
+    const Move* move =
+      orphanCheck(pkdex->getMoves(), e.second.get<std::string>(""), &orphanage.moves);
+    if (move == NULL) { continue; }
+    try {
+      addMove(*move);
+    } catch (std::invalid_argument& e) {
+      if (verbose >= 5) {
+        std::cerr << "WAR " << __FILE__ << "." << __LINE__ <<
+          ": pokemon " << *this <<
+          " cannot use illegal move \"" << move->getName() <<
           "\"!\n";
       }
-      cItem = NULL;
-    }
-
-    if (cItem == NULL)
-    {
-      setNoInitialItem();
-    }
-    else
-    {
-      setInitialItem(*cItem); 
-    }
-  }
-    
-  // teammate gender
-  iToken = 5;
-  {
-    uint32_t _sex;
-    if (!INI::setArgAndPrintError("pokemon_nonvolatile sex", tokens.at(iToken), _sex, iLine, iToken)) { return false; }
-    if (!INI::checkRangeB(_sex, (uint32_t)0, (uint32_t)2)) { return false; }
-    setSex(_sex);
-  }
-
-  // find ability index:
-  iToken = 6;
-  {
-    const Ability* cAbility = NULL;
-
-    if (pokemonExists())
-    {
-      if (tokens.at(iToken).compare("NONE") != 0)
-      {
-        cAbility = orphan::orphanCheck(pkdex->getAbilities(), tokens.at(iToken), mismatchedAbilities);
-      }
-
-      const PokemonBase& cBase = getBase();
-      if (cAbility == NULL) { } // orphan!
-      else if (!cBase.abilities_.count(cAbility))
-      {
-        if (mismatchedAbilities != NULL) { mismatchedAbilities->insert(lowerCase(tokens.at(iToken))); }
-        if (verbose >= 5)
-        {
-          std::cerr << "WAR " << __FILE__ << "." << __LINE__ << 
-            ": pokemon \"" << getBase().getName() <<
-            "\" does not own ability \"" << cAbility->getName() <<
-            "\"!\n";
-        }
-        cAbility = NULL;
-      }
-      else if (!cAbility->isImplemented())
-      {
-        if (mismatchedAbilities != NULL) { mismatchedAbilities->insert(lowerCase(tokens.at(iToken))); }
-        if (verbose >= 5)
-        {
-          std::cerr << "WAR " << __FILE__ << "." << __LINE__ << 
-            ": pokemon \"" << getBase().getName() <<
-            "\" cannot use unimplemented ability \"" << cAbility->getName() <<
-            "\"!\n";
-        }
-        cAbility = NULL;
-      }
-    } // endOf if pokemon exists
-    if (cAbility != NULL)
-    {
-      setAbility(*cAbility);
-    }
-    else
-    {
-      setNoAbility();
     }
   }
 
-  // find nature index:
-  iToken = 7;
-  {
-    const Nature* cNature = NULL;
-
-    if (tokens.at(iToken).compare("NONE") != 0)
-    {
-      cNature = orphanCheck(pkdex->getNatures(), tokens.at(iToken), mismatchedNatures);
-    }
-
-    if (cNature != NULL)
-    {
-      setNature(*cNature);
-    }
-    else
-    {
-      setNoNature();
-    }
+  const pt::ptree& ivs = ptree.get_child("iv");
+  const pt::ptree& evs = ptree.get_child("ev");
+  for (size_t iStat = 0; iStat < 6; ++iStat) {
+    setIV(iStat, ivs.get<uint32_t>(statHeaders[iStat]));
+    setEV(iStat, evs.get<uint32_t>(statHeaders[iStat]));
   }
 
-  // find move indecies:
-  iToken = 8;
-  for (size_t iAction = 0; iAction < 4; iAction++)
-  {
-    if (tokens.at(iToken + iAction).compare("NONE") == 0)
-    {
-      continue;
-    }
-    const Move* cMove = orphanCheck(pkdex->getMoves(), tokens.at(iToken + iAction), mismatchedMoves);
-    if (cMove == NULL) 
-    { 
-      if (verbose >= 5)
-      {
-        // printed out later
-        std::cerr << "WAR " << __FILE__ << "." << __LINE__ << 
-          ": pokemon \"" << getBase().getName() <<
-          "\" has nonexistent move at index " << iAction <<
-          ":\"" << tokens.at(iToken + iAction) <<
-          "\"!\n";
-      }
-      continue;
-    } //orphan!
-#ifndef _ALLOWINVALIDTEAMS
-    if (pokemonExists())
-    {
-      if (!isLegalAdd(*cMove)) // TODO: warning, asserts pokemonExists
-      {
-        if (mismatchedMoves != NULL) { mismatchedMoves->insert(lowerCase(tokens.at(iToken + iAction))); }
-        if (verbose >= 5)
-        {
-          std::cerr << "WAR " << __FILE__ << "." << __LINE__ << 
-            ": pokemon \"" << getBase().getName() <<
-            "\" cannot use " << (!cMove->isImplemented()?"unimplemented":"illegal") <<
-            " move at index " << iAction <<
-            ":\"" << tokens.at(iToken + iAction) <<
-            "\"!\n";
-        }
-        continue;
-      }
-    }
-#endif
-    // add move, only if all preconditions for its being added have been met:
-    {
-      addMove(MoveNonVolatile(*cMove)); 
-    }
-  } //end of move indecies
-
-#ifndef _ALLOWINVALIDTEAMS
-  if (getNumMoves() == 0)
-  {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": pokemon \"" << getName() <<
-      "\" - \"" << getBase().getName() <<
+  if (getNumMoves() == 0) {
+    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
+      ": pokemon " << *this <<
       " does not have enough valid moves (" << getNumMoves() <<
       ")!\n";
-    return false;
+    throw std::invalid_argument("PokemonNonVolatile numMoves");
   }
-#endif
-    
-  // input IV's and EV's:
-  iToken = 12;
-  unsigned int evAccumulator = 0;
-  for (size_t ieValueIndex = 0; ieValueIndex < 6; ieValueIndex++)
-  {
-    uint32_t temp_IVEV;
-    if (!INI::setArgAndPrintError("pokemon_nonvolatile IV", tokens.at(iToken + ieValueIndex), temp_IVEV, iLine, iToken + ieValueIndex)) { return false; }
-    if (!INI::checkRangeB(temp_IVEV, (uint32_t)0, (uint32_t)31)) { return false; } 
-    setIV(ieValueIndex, temp_IVEV);
-
-    if (!INI::setArgAndPrintError("pokemon_nonvolatile EV", tokens.at(iToken + 6 + ieValueIndex), temp_IVEV, iLine, iToken + 6 + ieValueIndex)) { return false; }
-    if (!INI::checkRangeB(temp_IVEV, (uint32_t)0, (uint32_t)255)) { return false; } 
-    setEV(ieValueIndex, temp_IVEV);
-      
-    // if we haven't reached the max value yet:
-    if (evAccumulator == UINT_MAX) { continue; }
-      
-    evAccumulator += temp_IVEV;
-    if (evAccumulator > MAXEFFORTVALUE)
-    {
-      evAccumulator = UINT_MAX;
-      std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": pokemon \"" << getName() <<
-        "\" - \"" << getBase().getName() <<
-        "\" has greater than maximum EV count of 510!\n";
-      return false;
-    }
-  } // end of IV / EV
-
-  iLine++;
-  return pokemonExists();
-} // endOf inputPokemon
+}

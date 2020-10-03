@@ -29,7 +29,7 @@ bool PokemonVolatileData::operator !=(const PokemonVolatileData& other) const {
 void PokemonVolatile::initialize(bool isActive)
 {
   // reassign initial item
-  data().iHeldItem = nv().initialItem->index_;
+  data().iHeldItem = nv().initialItem_->index_;
   
   // raise HP back to normal
   data().HPcurrent = nv().getFV_base(FV_HITPOINTS);
@@ -126,7 +126,7 @@ POKEMON_VOLATILE_IMPL::getMV(size_t index) const {
   case 2:
   case 3:
     return movevolatile_t{
-        nv().actions[index],
+        nv().actions_[index],
         data().actions[index]};
   default:
     assert(false && "attempted to access an unknown non volatile move!\n");
@@ -247,7 +247,7 @@ POKEMON_VOLATILE_IMPL_TEMPLATE
 uint32_t POKEMON_VOLATILE_IMPL::getFV_boosted(size_t type, int32_t tempBoost) const {
   int32_t cBoost = getBoost(type) + tempBoost;
   cBoost = std::min(std::max(cBoost, -6), 6);
-  return nv().FV_base[type][cBoost + 6];
+  return nv().FV_base_[type][cBoost + 6];
 }
 
 

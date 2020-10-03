@@ -133,6 +133,7 @@ int main(int argc, char** argv) {
 
   trainer.initialize();
   trainer.evolve();
+  //trainer.rank();
   
   std::exit(EXIT_SUCCESS);
 }
