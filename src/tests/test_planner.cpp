@@ -31,9 +31,9 @@ protected:
           .addMove(pokedex_->getMoves().at("explosion"))
           .addMove(pokedex_->getMoves().at("focus blast")))
         .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->getPokemon().at("weavile"))
-          .addMove(pokedex_->getMoves().at("leer"))
-          .addMove(pokedex_->getMoves().at("night slash")));
+          .setBase(pokedex_->getPokemon().at("metagross"))
+          .addMove(pokedex_->getMoves().at("agility"))
+          .addMove(pokedex_->getMoves().at("meteor mash")));
     auto team_b = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->getPokemon().at("alakazam"))

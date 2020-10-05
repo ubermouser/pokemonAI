@@ -63,13 +63,14 @@ LeagueHeat Trainer::evolve() const {
 
   LeagueHeat league = constructLeague();
   for (size_t iGeneration = 0; iGeneration < cfg_.maxGenerations; ++iGeneration) {
+    // perform an evolution step (if this is not the first generation):
+    if (iGeneration > 0 ) {evolveGeneration(league);}
+
     // reset league counting:
     resetLeague(league);
 
     // rank the league:
     runLeague(league);
-    // perform an evolution step:
-    evolveGeneration(league);
   }
 
   if (cfg_.saveOnCompletion) { saveTeamPopulation(league); }

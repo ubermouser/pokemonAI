@@ -154,8 +154,8 @@ PokemonNonVolatile TeamFactory::crossover_single(
   PokemonNonVolatile crossedPokemon(basePokemon);
 
   // otherokemon maintains EV, IV, nature, gender, item
-  for (size_t iIEV = 0; iIEV != 6; ++iIEV)
-  {
+  crossedPokemon.setZeroEV();
+  for (size_t iIEV = 0; iIEV != 6; ++iIEV) {
     crossedPokemon.setEV(iIEV, otherPokemon.getEV(iIEV));
     crossedPokemon.setIV(iIEV, otherPokemon.getIV(iIEV));
   }
@@ -447,8 +447,8 @@ void TeamFactory::randomEV(PokemonNonVolatile& cPokemon) const {
   }
 
   // writeOut evs:
-  for (size_t iEV = 0; iEV < 6; iEV++)
-  {
+  cPokemon.setZeroEV();
+  for (size_t iEV = 0; iEV < 6; iEV++) {
     cPokemon.setEV(iEV, tempEV[iEV]);
   }
 } // endOf randomEV

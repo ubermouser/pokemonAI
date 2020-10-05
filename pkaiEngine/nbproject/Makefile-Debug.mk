@@ -45,6 +45,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/511e4115/evaluator_random.o \
 	${OBJECTDIR}/_ext/511e4115/evaluator_simple.o \
 	${OBJECTDIR}/_ext/511e4115/evaluators.o \
+	${OBJECTDIR}/_ext/511e4115/fitness.o \
 	${OBJECTDIR}/_ext/e96877d6/fixed_func.o \
 	${OBJECTDIR}/_ext/511e4115/game.o \
 	${OBJECTDIR}/_ext/511e4115/gen4_scripts.o \
@@ -84,6 +85,7 @@ TESTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}/tests
 # Test Files
 TESTFILES= \
 	${TESTDIR}/TestFiles/f1 \
+	${TESTDIR}/TestFiles/f5 \
 	${TESTDIR}/TestFiles/f3 \
 	${TESTDIR}/TestFiles/f4 \
 	${TESTDIR}/TestFiles/f2
@@ -91,6 +93,7 @@ TESTFILES= \
 # Test Object Files
 TESTOBJECTFILES= \
 	${TESTDIR}/_ext/a55270a7/test_engine.o \
+	${TESTDIR}/_ext/a55270a7/test_evaluator.o \
 	${TESTDIR}/_ext/a55270a7/test_game.o \
 	${TESTDIR}/_ext/a55270a7/test_planner.o \
 	${TESTDIR}/_ext/a55270a7/test_pokedex.o
@@ -170,6 +173,11 @@ ${OBJECTDIR}/_ext/511e4115/evaluators.o: ../src/evaluators.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluators.o ../src/evaluators.cpp
+
+${OBJECTDIR}/_ext/511e4115/fitness.o: ../src/fitness.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/fitness.o ../src/fitness.cpp
 
 ${OBJECTDIR}/_ext/e96877d6/fixed_func.o: ../src/fixedpoint/fixed_func.cpp
 	${MKDIR} -p ${OBJECTDIR}/_ext/e96877d6
@@ -342,6 +350,10 @@ ${TESTDIR}/TestFiles/f1: ${TESTDIR}/_ext/a55270a7/test_engine.o ${OBJECTFILES:%.
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc} -o ${TESTDIR}/TestFiles/f1 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -lboost_program_options -ldl -lpthread -fopenmp -lgtest_main -lgtest 
 
+${TESTDIR}/TestFiles/f5: ${TESTDIR}/_ext/a55270a7/test_evaluator.o ${OBJECTFILES:%.o=%_nomain.o}
+	${MKDIR} -p ${TESTDIR}/TestFiles
+	${LINK.cc} -o ${TESTDIR}/TestFiles/f5 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -lboost_program_options -fopenmp -lgtest_main -lgtest -ldl -lpthread 
+
 ${TESTDIR}/TestFiles/f3: ${TESTDIR}/_ext/a55270a7/test_game.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc} -o ${TESTDIR}/TestFiles/f3 $^ ${LDLIBSOPTIONS}   -lboost_filesystem -lboost_system -lboost_program_options -ldl -lpthread -fopenmp -lgtest_main -lgtest 
@@ -359,6 +371,12 @@ ${TESTDIR}/_ext/a55270a7/test_engine.o: ../src/tests/test_engine.cpp
 	${MKDIR} -p ${TESTDIR}/_ext/a55270a7
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${TESTDIR}/_ext/a55270a7/test_engine.o ../src/tests/test_engine.cpp
+
+
+${TESTDIR}/_ext/a55270a7/test_evaluator.o: ../src/tests/test_evaluator.cpp 
+	${MKDIR} -p ${TESTDIR}/_ext/a55270a7
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -I.. -MMD -MP -MF "$@.d" -o ${TESTDIR}/_ext/a55270a7/test_evaluator.o ../src/tests/test_evaluator.cpp
 
 
 ${TESTDIR}/_ext/a55270a7/test_game.o: ../src/tests/test_game.cpp 
@@ -507,6 +525,19 @@ ${OBJECTDIR}/_ext/511e4115/evaluators_nomain.o: ${OBJECTDIR}/_ext/511e4115/evalu
 	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/evaluators_nomain.o ../src/evaluators.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/_ext/511e4115/evaluators.o ${OBJECTDIR}/_ext/511e4115/evaluators_nomain.o;\
+	fi
+
+${OBJECTDIR}/_ext/511e4115/fitness_nomain.o: ${OBJECTDIR}/_ext/511e4115/fitness.o ../src/fitness.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/511e4115
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/_ext/511e4115/fitness.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Wall -DDOUBLEPRECISION -DGEN4_STATIC -DPKAI_EXPORT -D_DEBUG -D_DISABLEFINEGRAINEDLOCKING -D_HTCOLLECTSTATISTICS -D_LINUX -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/511e4115/fitness_nomain.o ../src/fitness.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/_ext/511e4115/fitness.o ${OBJECTDIR}/_ext/511e4115/fitness_nomain.o;\
 	fi
 
 ${OBJECTDIR}/_ext/e96877d6/fixed_func_nomain.o: ${OBJECTDIR}/_ext/e96877d6/fixed_func.o ../src/fixedpoint/fixed_func.cpp 
@@ -930,6 +961,7 @@ ${OBJECTDIR}/_ext/511e4115/type_nomain.o: ${OBJECTDIR}/_ext/511e4115/type.o ../s
 	@if [ "${TEST}" = "" ]; \
 	then  \
 	    ${TESTDIR}/TestFiles/f1 || true; \
+	    ${TESTDIR}/TestFiles/f5 || true; \
 	    ${TESTDIR}/TestFiles/f3 || true; \
 	    ${TESTDIR}/TestFiles/f4 || true; \
 	    ${TESTDIR}/TestFiles/f2 || true; \

@@ -174,6 +174,7 @@ public:
     return IV_[type];
   };
 
+  PokemonNonVolatile& setZeroEV();
   PokemonNonVolatile& setEV(size_t type, unsigned int value);
 
   unsigned int getEV(size_t type) const

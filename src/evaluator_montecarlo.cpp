@@ -31,7 +31,6 @@ po::options_description EvaluatorMonteCarlo::Config::options(
       "If greater than 0, thread-parallelism is used.");
 
   return desc;
-
 }
 
 
@@ -48,7 +47,7 @@ EvaluatorMonteCarlo::EvaluatorMonteCarlo(const Config& cfg)
   gamecfg.storeSubcomponents = false;
   gamecfg.verbosity = 0;
   game_ = std::make_shared<Game>(gamecfg);
-  game_->setEvaluator(EvaluatorSimple())
+  game_->setEvaluator(EvaluatorSimple().setEngine(PkCU()))
       .setPlanner(0, PlannerRandom(plannercfg).setEngine(PkCU()))
       .setPlanner(1, PlannerRandom(plannercfg).setEngine(PkCU()));
 
@@ -66,6 +65,13 @@ EvaluatorMonteCarlo& EvaluatorMonteCarlo::setEnvironment(
   Evaluator::setEnvironment(env);
 
   if (game_ != NULL) { game_->setEnvironment(env); }
+  return *this;
+}
+
+
+EvaluatorMonteCarlo& EvaluatorMonteCarlo::setEngine(const std::shared_ptr<PkCU>& cu) {
+  Evaluator::setEngine(cu);
+  if (game_ != NULL) { game_->setEngine(cu);}
   return *this;
 }
 

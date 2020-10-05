@@ -58,19 +58,21 @@ Game::Game(const Config& cfg):
 
 
 Game& Game::setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& nv) {
-  nv_ = nv;
-  
-  for(auto& planner: agents_) {
-    if (planner == NULL) { continue; }
-    planner->setEnvironment(nv_);
-  }
-  if (eval_ != NULL) { eval_->setEnvironment(nv_); }
-  if (cu_ != NULL) {
-    cu_->setEnvironment(nv_);
-    initialState_ = cu_->initialState();
-  }
+  if (nv_ != nv) {
+    nv_ = nv;
 
-  isInitialized_ = false;
+    for(auto& planner: agents_) {
+      if (planner == NULL) { continue; }
+      planner->setEnvironment(nv_);
+    }
+    if (eval_ != NULL) { eval_->setEnvironment(nv_); }
+    if (cu_ != NULL) {
+      cu_->setEnvironment(nv_);
+      initialState_ = cu_->initialState();
+    }
+
+    isInitialized_ = false;
+  }
   return *this;
 }
 
@@ -138,7 +140,7 @@ Game& Game::initialize() {
   if (cu_ == NULL) { setEngine(PkCU()); }
 
   // initialize evaluator:
-  if (eval_ == NULL) {setEvaluator(EvaluatorSimple()); }
+  if (eval_ == NULL) {setEvaluator(EvaluatorSimple().setEngine(cu_)); }
   try {
     eval_->initialize();
   } catch (const std::exception& e) {
@@ -304,7 +306,7 @@ Turn Game::digestTurn(
     auto& turn = cTurn.teams[iTeam];
     const PlannerResult& action = actions[iTeam];
     // set simple fitness to fitness as it would be evaluated depth 0 by the simple non perceptron evaluation function
-    turn.simpleFitness = eval_->calculateFitness(envP.getEnv(), iTeam).fitness.lowerBound();
+    turn.simpleFitness = eval_->evaluate(envP, iTeam).fitness.lowerBound();
     if (!action.atDepth.empty()) {
       // simple, d-0 and d-M fitness at the BEGINNING of the turn:
         turn.depth0Fitness = action.atDepth.front().fitness.value();
@@ -364,7 +366,7 @@ GameResult Game::digestGame(
     auto& team = cResult.teams[iTeam];
     // terminal state fitness:
     ConstEnvironmentVolatile terminalState = cLog.size()>0?ConstEnvironmentVolatile{*nv_, cLog.back().env.env}:initialState;
-    team.lastSimpleFitness = eval_->calculateFitness(terminalState, iTeam).fitness.lowerBound();
+    team.lastSimpleFitness = eval_->evaluate(terminalState, iTeam).fitness.lowerBound();
     // delta fitness change:
     for (size_t iPly = 1; iPly < cLog.size(); ++iPly) {
       // the previous turn. The previous turn was responsible for the delta between turn n-1 and n

@@ -67,6 +67,7 @@ Planner& Planner::setEnvironment(const std::shared_ptr<const EnvironmentNonvolat
 Planner& Planner::setEngine(const std::shared_ptr<PkCU>& cu) {
   cu_ = cu;
   if (nv_ != NULL) { cu_->setEnvironment(nv_); }
+  if (eval_ != NULL) { eval_->setEngine(cu_); }
   return *this;
 }
 
@@ -74,6 +75,7 @@ Planner& Planner::setEngine(const std::shared_ptr<PkCU>& cu) {
 Planner& Planner::setEvaluator(const std::shared_ptr<Evaluator>& eval) {
   eval_ = eval;
   if (nv_ != NULL) { eval_->setEnvironment(nv_); }
+  if (cu_ != NULL) { eval_->setEngine(cu_); }
   resetName();
   return *this;
 }
@@ -137,7 +139,7 @@ PlyResult Planner::generateSolutionAtDepth(
 PlyResult Planner::generateSolutionAtLeaf(const ConstEnvironmentPossible& origin) const {
   assert(eval_ != NULL);
 
-  PlyResult result = eval_->calculateFitness(origin, agentTeam_);
+  PlyResult result = eval_->evaluate(origin, agentTeam_);
   result.numNodes = 1;
 
   return result;
@@ -251,8 +253,7 @@ FitnessDepth Planner::recurse_gamma(
     bool isGameOver = cu_->isGameOver(cEnvP);
     if (isGameOver || iDepth == 0) {
       // evaluate as a leaf node:
-      child = eval_->calculateFitness(cEnvP, agentTeam_);
-      child.depth = (isGameOver)?MAXTRIES:child.depth; // TODO(@drendleman) - move into eval
+      child = eval_->evaluate(cEnvP, agentTeam_);
       ++numNodes;
     } else { // else, recurse to a deeper level:
       // recurse into another depth, widening the cutoffs by the probability of the move:

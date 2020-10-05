@@ -28,9 +28,8 @@ public:
   EvaluatorSimple* clone() const override { return new EvaluatorSimple(*this); }
 
   EvaluatorSimple& initialize() override;
-
-  EvalResult calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const override;
 protected:
+  EvalResult calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const override;
 
   fpType fitness_move(const ConstMoveVolatile& mV) const;
   fpType fitness_pokemon(const ConstPokemonVolatile& pV) const;

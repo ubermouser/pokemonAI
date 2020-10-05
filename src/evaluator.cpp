@@ -41,8 +41,39 @@ void Evaluator::resetName() {
 
 Evaluator& Evaluator::initialize() {
   if (nv_ == NULL) { throw std::invalid_argument("evaluator nonvolatile environment undefined"); }
+  if (cu_ == NULL) { throw std::invalid_argument("evaluator engine undefined"); }
 
   return *this;
+}
+
+
+Evaluator& Evaluator::setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& nv) {
+  nv_ = nv;
+  if (cu_ != NULL) { cu_->setEnvironment(nv); }
+  return *this;
+}
+
+
+Evaluator& Evaluator::setEngine(const std::shared_ptr<PkCU>& cu) {
+  cu_ = cu;
+  if (nv_ != NULL) { cu_->setEnvironment(nv_); }
+  return *this;
+}
+
+
+EvalResult Evaluator::evaluate(const ConstEnvironmentVolatile& env, size_t iTeam) const {
+  auto gameState = cu_->getGameState(env);
+  // perform a full evaluation if this is a midgame state:
+  if (gameState == MATCH_MIDGAME) { 
+    return calculateFitness(env, iTeam);
+  }
+  // this is a terminal state, evaluate terminal node:
+  Fitness fitness =
+      gameState==MATCH_TIE ? Fitness{0.5} :
+      gameState==iTeam ? Fitness{1.0} : Fitness{0.0};
+
+  // evaluation occurs at terminal depth:
+  return EvalResult{fitness, Action{}, Action{}, MAXTRIES};
 }
 
 

@@ -48,10 +48,12 @@ po::options_description PkCU::Config::options(
 
 
 PkCU& PkCU::setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& nv) {
-  nv_ = nv;
-  initialState_ = EnvironmentVolatileData::create(*nv_);
-  if (!initialize()) {
-    throw std::runtime_error("Could not generate a script database!");
+  if (nv_ != nv) {
+    nv_ = nv;
+    initialState_ = EnvironmentVolatileData::create(*nv_);
+    if (!initialize()) {
+      throw std::runtime_error("Could not generate a script database!");
+    }
   }
 
   return *this;

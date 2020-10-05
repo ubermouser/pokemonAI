@@ -206,6 +206,12 @@ PokemonNonVolatile& PokemonNonVolatile::setIV(size_t type, unsigned int value) {
 }
 
 
+PokemonNonVolatile& PokemonNonVolatile::setZeroEV() {
+  EV_.fill(0);
+  return *this;
+}
+
+
 PokemonNonVolatile& PokemonNonVolatile::setEV(size_t type, unsigned int value) {
   // validate value is within range:
   if (!INI::checkRangeB(value, (uint32_t)0, (uint32_t)255)) {

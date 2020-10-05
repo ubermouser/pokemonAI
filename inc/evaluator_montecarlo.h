@@ -39,13 +39,15 @@ public:
   virtual EvaluatorMonteCarlo& setEnvironment(
       const std::shared_ptr<const EnvironmentNonvolatile>& env) override;
 
-  virtual EvaluatorMonteCarlo& initialize() override;
+  virtual EvaluatorMonteCarlo& setEngine(const std::shared_ptr<PkCU>& cu) override;
 
-  virtual EvalResult calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const override;
+  virtual EvaluatorMonteCarlo& initialize() override;
 protected:
   Config cfg_;
 
   std::shared_ptr<Game> game_;
+
+  virtual EvalResult calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const override;
 
   virtual std::string baseName() const override { return "MonteCarlo"; }
   virtual void resetName() override;

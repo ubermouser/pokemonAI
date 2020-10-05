@@ -82,6 +82,7 @@
         <itemPath>../src/environment_nonvolatile.cpp</itemPath>
         <itemPath>../src/environment_possible.cpp</itemPath>
         <itemPath>../src/environment_volatile.cpp</itemPath>
+        <itemPath>../src/fitness.cpp</itemPath>
         <itemPath>../src/game.cpp</itemPath>
         <itemPath>../src/item.cpp</itemPath>
         <itemPath>../src/move.cpp</itemPath>
@@ -140,6 +141,12 @@
                      projectFiles="true"
                      kind="TEST">
         <itemPath>../src/tests/test_engine.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f5"
+                     displayName="test_evaluator"
+                     projectFiles="true"
+                     kind="TEST">
+        <itemPath>../src/tests/test_evaluator.cpp</itemPath>
       </logicalFolder>
       <logicalFolder name="f3"
                      displayName="test_game"
@@ -315,6 +322,8 @@
       </item>
       <item path="../src/evaluators.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/fitness.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/fixedpoint/fixed_class.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/fixedpoint/fixed_func.cpp" ex="false" tool="1" flavor2="0">
@@ -382,6 +391,8 @@
       <item path="../src/team_volatile.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/tests/test_engine.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/tests/test_evaluator.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/tests/test_game.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -481,6 +492,31 @@
         </ccTool>
         <linkerTool>
           <output>${TESTDIR}/TestFiles/f4</output>
+          <linkerLibItems>
+            <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
+            <linkerOptionItem>-lboost_system</linkerOptionItem>
+            <linkerOptionItem>-lboost_program_options</linkerOptionItem>
+            <linkerOptionItem>-fopenmp</linkerOptionItem>
+            <linkerOptionItem>-lgtest_main</linkerOptionItem>
+            <linkerOptionItem>-lgtest</linkerOptionItem>
+            <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
+            <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
+      <folder path="TestFiles/f5">
+        <cTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </cTool>
+        <ccTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f5</output>
           <linkerLibItems>
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
             <linkerOptionItem>-lboost_system</linkerOptionItem>
@@ -646,6 +682,8 @@
       </item>
       <item path="../src/evaluators.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="../src/fitness.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="../src/fixedpoint/fixed_class.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../src/fixedpoint/fixed_func.cpp" ex="false" tool="1" flavor2="0">
@@ -713,6 +751,8 @@
       <item path="../src/team_volatile.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/tests/test_engine.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="../src/tests/test_evaluator.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="../src/tests/test_game.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -782,6 +822,21 @@
         </ccTool>
         <linkerTool>
           <output>${TESTDIR}/TestFiles/f4</output>
+        </linkerTool>
+      </folder>
+      <folder path="TestFiles/f5">
+        <cTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </cTool>
+        <ccTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f5</output>
         </linkerTool>
       </folder>
     </conf>

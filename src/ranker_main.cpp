@@ -123,7 +123,7 @@ int main(int argc, char** argv) {
   Trainer trainer{cfg.trainer};
   trainer.setEngine(PkCU{cfg.engine});
   trainer.setGame(Game{cfg.game});
-  trainer.setStateEvaluator(EvaluatorSimple());
+  trainer.setStateEvaluator(EvaluatorSimple().setEngine(PkCU{cfg.engine}));
   for (size_t iPlan = 0; iPlan != cfg.plannerTypes.size(); ++iPlan) {
     trainer.addPlanner(planners::choose(cfg.plannerTypes[iPlan], *cfg.plannerConfigs[iPlan]));
   }

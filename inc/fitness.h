@@ -10,19 +10,19 @@
 
 #include "pkai.h"
 
-#include <assert.h>
+#include <iosfwd>
 #include <limits>
 
 #include "fp_compare.h"
 
-template<
-    typename PrecisionType,
-    int min_fitness_t=0,
-    int max_fitness_t=1,
-    int fitness_d=1>
+
+#define FITNESS_TEMPLATE template<typename PrecisionType, int min_fitness_t, int max_fitness_t, int fitness_d>
+#define FITNESS_IMPL FitnessType<PrecisionType, min_fitness_t, max_fitness_t, fitness_d>
+
+FITNESS_TEMPLATE
 class FitnessType {
 public:
-  using fitness_t = FitnessType<PrecisionType, min_fitness_t, max_fitness_t, fitness_d>;
+  using fitness_t = FITNESS_IMPL;
   static constexpr PrecisionType one() { return PrecisionType(1.0); }
   static constexpr PrecisionType zero() { return PrecisionType(0.0); }
   static constexpr PrecisionType max_fitness() { 
@@ -83,6 +83,8 @@ public:
   const PrecisionType& value() const { return value_; }
   const PrecisionType& certainty() const { return certainty_; }
   PrecisionType uncertainty() const { return one() - certainty_; }
+
+  std::ostream& print(std::ostream& os) const;
 protected:
   explicit FitnessType(
       const PrecisionType& value,
@@ -91,11 +93,7 @@ protected:
     if (doAssertValidity) { assertValidity(); }
   }
 
-  void assertValidity() const {
-    assert(value_ >= min_fitness() && value_ <= max_fitness());
-    assert(certainty_ >= zero() && certainty_ <= one());
-    assert(upperBound() <= max_fitness() && lowerBound() >= min_fitness());
-  }
+  void assertValidity() const;
 
   PrecisionType value_;
 
@@ -103,6 +101,10 @@ protected:
 };
 
 using Fitness = FitnessType<fpType, 0, 1, 1>;
+
+
+std::ostream& operator <<(std::ostream& os, const Fitness& fitness);
+
 
 #endif /* FITNESS_H */
 

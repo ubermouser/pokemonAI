@@ -13,6 +13,7 @@
 #include "environment_volatile.h"
 #include "environment_possible.h"
 #include "fitness.h"
+#include "pkCU.h"
 
 
 struct FitnessDepth {
@@ -83,23 +84,34 @@ public:
   /* returns a NEW copy of the current evaluator */
   virtual Evaluator* clone() const = 0;
 
-  virtual Evaluator& setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& nv) {
-    nv_ = nv;
-    return *this;
+  virtual Evaluator& setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& env);
+  virtual Evaluator& setEnvironment(const EnvironmentNonvolatile& nv) {
+    return setEnvironment(std::make_shared<EnvironmentNonvolatile>(nv));
+  }
+
+  virtual Evaluator& setEngine(const std::shared_ptr<PkCU>& cu);
+  virtual Evaluator& setEngine(const PkCU& cu) {
+    return setEngine(std::make_shared<PkCU>(cu));
   }
 
   /* does the evaluator have all acceptable data required to perform evaluation? */
   virtual Evaluator& initialize();
 
   /* evaluate the fitness of a given environment for team iTeam */
-  virtual EvalResult calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const = 0;
-  virtual EvalResult calculateFitness(const ConstEnvironmentPossible& env, size_t iTeam) const {
-    return calculateFitness(env.getEnv(), iTeam);
+  virtual EvalResult evaluate(const ConstEnvironmentVolatile& env, size_t iTeam) const;
+  virtual EvalResult evaluate(const ConstEnvironmentPossible& env, size_t iTeam) const {
+    return evaluate(env.getEnv(), iTeam);
   }
 protected:
+  Config cfg_;
+
+  /* nonvolatile environment description */
   std::shared_ptr<const EnvironmentNonvolatile> nv_;
 
-  Config cfg_;
+  /* state transition engine */
+  std::shared_ptr<PkCU> cu_;
+
+  virtual EvalResult calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const = 0;
 
   virtual Fitness combineTeamFitness(fpType agentFitness, fpType otherFitness) const;
 
