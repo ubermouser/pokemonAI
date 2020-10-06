@@ -233,7 +233,7 @@ bool PokemonNonVolatile::abilityExists() const {
 
 
 PokemonNonVolatile& PokemonNonVolatile::setAbility(const Ability& _chosenAbility) {
-  if (&_chosenAbility == Ability::no_ability) { setNoAbility(); }
+  if (&_chosenAbility == Ability::no_ability) { return setNoAbility(); }
 
   if(!isLegalAbility(_chosenAbility)) {
     throw std::invalid_argument("PokemonNonVolatile illegal ability");
@@ -275,7 +275,7 @@ PokemonNonVolatile& PokemonNonVolatile::setNoInitialItem() {
 
 
 PokemonNonVolatile& PokemonNonVolatile::setInitialItem(const Item& _chosenItem) {
-  if (&_chosenItem == Item::no_item) { setNoInitialItem(); }
+  if (&_chosenItem == Item::no_item) { return setNoInitialItem(); }
 
   assert(pkdex->getItems().count(_chosenItem.getName()) > 0);
   if (!_chosenItem.isImplemented()) {

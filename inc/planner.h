@@ -50,7 +50,9 @@ struct PlannerResult {
     return best().otherAction;
   }
 
-
+  const double bestFitness() const {
+    return best().fitness.lowerBound();
+  }
 };
 
 class Planner : public Name {
@@ -178,6 +180,11 @@ protected:
       const ConstEnvironmentPossible& origin) const;
 
   virtual void printSolution(const PlannerResult& result, bool isLast) const;
+  virtual void printStateEvaluation(
+      const ConstEnvironmentPossible& origin,
+      const Action& agentAction,
+      const Action& otherAction,
+      const FitnessDepth& fitness) const;
 };
 
 #endif /* PLANNER_H */

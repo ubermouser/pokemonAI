@@ -42,6 +42,10 @@ bool ConstEnvironmentPossible::isEmpty() const {
 
 
 ENV_POSSIBLE_IMPL_TEMPLATE
+void ENV_POSSIBLE_IMPL::printState() const { printState(std::cout); }
+
+
+ENV_POSSIBLE_IMPL_TEMPLATE
 void ENV_POSSIBLE_IMPL::printState(std::ostream& os) const {
   // print environment status:
   os << ConstEnvironmentPossible{nv(), data()};

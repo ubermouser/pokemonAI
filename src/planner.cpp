@@ -277,8 +277,27 @@ FitnessDepth Planner::recurse_gamma(
     if (result.fitness > highCutoff) { break; }
   }
 
+  if (cfg_.verbosity >= 4) { printStateEvaluation(origin, agentAction, otherAction, result); }
   if (nodesEvaluated != NULL) { *nodesEvaluated += numNodes; }
   return result;
+}
+
+
+void Planner::printStateEvaluation(
+    const ConstEnvironmentPossible& origin,
+    const Action& agentAction,
+    const Action& otherAction,
+    const FitnessDepth& fitness) const {
+  std::stringstream out;
+  out << boost::format("T%s: s=x%06x a=%4s o=%4s d=%2d %s\n")
+      % (agentTeam_==TEAM_A?"A":"B")
+      % (origin.getHash() & 0xffffff)
+      % agentAction
+      % otherAction
+      % fitness.depth
+      % fitness.fitness;
+
+  std::cout << out.str();
 }
 
 

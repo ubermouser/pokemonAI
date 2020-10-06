@@ -396,8 +396,8 @@ public:
   PokemonVolatile getPKV(size_t iState);
   PokemonVolatile getTPKV(size_t iState);
   MoveVolatile getMV() { return getMV(iBase_); }
+  MoveVolatile getTMV() { return getTMV(iBase_); }
   MoveVolatile getMV(size_t iState);
-  MoveVolatile getTMV();
   MoveVolatile getTMV(size_t iState);
   DamageComponents_t& getDamageComponent(size_t iStack) { return damageComponents_[iStack]; };
   DamageComponents_t& getDamageComponent() { return damageComponents_[iBase_]; };

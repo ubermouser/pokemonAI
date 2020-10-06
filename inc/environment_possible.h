@@ -131,6 +131,7 @@ public:
   using base_t::nv;
 
   /* print details of a single state */
+  void printState() const;
   void printState(std::ostream& os) const;
   void printEnvironment(std::ostream& os) const;
 

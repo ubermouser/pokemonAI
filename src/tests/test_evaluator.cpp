@@ -91,7 +91,6 @@ TEST_F(EvaluatorTest, TerminalStatesProduceTerminalFitness) {
   terminalTieState.getTeam(1).cSetHP(0); 
 
   for (auto& evaluator : evaluators) {
-    evaluator->initialize();
     validateTerminalState(*evaluator, terminalState, 0.0);
     validateTerminalState(*evaluator, terminalTieState, 0.5);
   }

@@ -29,16 +29,20 @@ protected:
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->getPokemon().at("gengar"))
           .addMove(pokedex_->getMoves().at("explosion"))
-          .addMove(pokedex_->getMoves().at("focus blast")))
+          .addMove(pokedex_->getMoves().at("focus blast"))
+          .setLevel(100)
+          .setIV(FV_SPEED, 31)) // ensure Gengar wins the speed tie
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->getPokemon().at("metagross"))
           .addMove(pokedex_->getMoves().at("agility"))
-          .addMove(pokedex_->getMoves().at("meteor mash")));
+          .addMove(pokedex_->getMoves().at("meteor mash"))
+          .setLevel(100));
     auto team_b = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->getPokemon().at("alakazam"))
           .addMove(pokedex_->getMoves().at("recover"))
-          .addMove(pokedex_->getMoves().at("psychic")))
+          .addMove(pokedex_->getMoves().at("psychic"))
+          .setLevel(100))
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->getPokemon().at("pikachu")));
     environment_ = std::make_shared<EnvironmentNonvolatile>(team_a, team_b, true);
@@ -72,6 +76,7 @@ TEST_F(PlannerTest, MaxPlannerChoosesGreedyOption) {
 
   EXPECT_EQ(agent_result.bestAgentAction(), Action::move(1));
   EXPECT_EQ(other_result.bestAgentAction(), Action::move(1));
+  // agents do not take into account the enemy's move
 }
 
 
@@ -94,8 +99,8 @@ TEST_F(PlannerTest, MaximinPlannerChooses1PlyOption) {
   auto other_result = planners[TEAM_B].generateSolution(engine_->initialState());
 
   EXPECT_EQ(agent_result.bestAgentAction(), Action::move(0));
-  EXPECT_EQ(agent_result.bestOtherAction(), other_result.bestAgentAction());
-  EXPECT_EQ(other_result.bestOtherAction(), agent_result.bestAgentAction());
+  // other agent best move is ambiguous
+  EXPECT_FLOAT_EQ(agent_result.bestFitness() + other_result.bestFitness(), 1.0);
 }
 
 
@@ -118,8 +123,8 @@ TEST_F(PlannerTest, MaximinPlannerChooses2PlyOption) {
   auto other_result = planners[TEAM_B].generateSolution(engine_->initialState());
 
   EXPECT_EQ(agent_result.bestAgentAction(), Action::swap(1));
-  EXPECT_EQ(agent_result.bestOtherAction(), other_result.bestAgentAction());
-  EXPECT_EQ(other_result.bestOtherAction(), agent_result.bestAgentAction());
+    // other agent best move is ambiguous
+  EXPECT_FLOAT_EQ(agent_result.bestFitness() + other_result.bestFitness(), 1.0);
 }
 
 

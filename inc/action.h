@@ -92,6 +92,7 @@ public:
   bool operator ==(const Action& other) const;
   bool operator !=(const Action& other) const { return !(*this == other); }
 
+  void print() const;
   void print(std::ostream& os) const;
 
 protected:

@@ -84,6 +84,7 @@ public:
   const PrecisionType& certainty() const { return certainty_; }
   PrecisionType uncertainty() const { return one() - certainty_; }
 
+  void print() const;
   std::ostream& print(std::ostream& os) const;
 protected:
   explicit FitnessType(
