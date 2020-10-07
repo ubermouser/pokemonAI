@@ -64,8 +64,6 @@ protected:
   AdjacencyMap<RankedEvaluator::Hash, Battlegroup::Hash> evaluator_to_battlegroup_;
 
   AdjacencyMap<RankedPlanner::Hash, Battlegroup::Hash> planner_to_battlegroup_;
-
-  //AdjacencyMap<RankedPokemon::Hash, Battlegroup::Hash> pokemon_to_team_;
 };
 
 #endif /* LEAGUE_H */

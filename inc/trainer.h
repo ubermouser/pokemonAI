@@ -12,6 +12,17 @@
 
 #include "team_factory.h"
 
+
+struct MutationStats {
+  size_t numMutations = 0;
+
+  size_t numCrossovers = 0;
+
+  size_t numSeeds = 0;
+
+  size_t numTotal() const { return numMutations + numCrossovers + numSeeds; }
+};
+
 class Trainer : public Ranker {
 public:
   struct Config : public Ranker::Config {
@@ -56,7 +67,10 @@ protected:
   void evolveGeneration(LeagueHeat& league) const;
   void resetLeague(LeagueHeat& league) const;
 
-  virtual LeagueHeat constructLeague() const override;
+  virtual size_t loadTeamPopulation() override;
+
+  void printGenerationStart(const League& league, size_t iGeneration) const;
+  void printMutationStats(const MutationStats& stats) const;
 
   /* generates a random population from previous leagues, or from random functions if at single pokemon league */
   size_t seedRandomTeamPopulation(League& league) const;

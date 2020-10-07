@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <vector>
+#include <unordered_map>
 
 #include "true_skill.h"
 #include "ranked.h"
@@ -65,6 +66,12 @@ protected:
 };
 
 using BattlegroupPtr = std::shared_ptr<Battlegroup>;
-using BattlegroupLeague = std::unordered_map<Battlegroup::Hash, BattlegroupPtr>;
+
+class BattlegroupLeague: public std::unordered_map<Battlegroup::Hash, BattlegroupPtr> {
+public:
+
+  /* retrieve all battlegroups */
+  std::vector<BattlegroupPtr> getAll() const;
+};
 
 #endif /* TRUESKILL_TEAM_H */

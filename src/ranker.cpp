@@ -79,8 +79,12 @@ void Ranker::initialize() {
   if (threads_[0].stateEvaluator == NULL) {throw std::runtime_error("state evaluator undefined"); }
   if (initialLeague_.evaluators.empty()) { throw std::runtime_error("no evaluators defined"); }
   if (initialLeague_.planners.empty()) { throw std::runtime_error("no planners defined"); }
+  if (cfg_.numThreads == SIZE_MAX) {
+    cfg_.numThreads = omp_get_num_procs();
+    std::cerr << "Ranker thread parallelism set to " << cfg_.numThreads << "!\n";
+  }
 
-  if (!cfg_.teamPath.empty()) { loadTeamPopulation(); }
+  loadTeamPopulation();
   if (initialLeague_.teams.empty()) { throw std::runtime_error("no teams defined"); }
 
   initialized_ = true;
@@ -111,10 +115,15 @@ LeagueHeat Ranker::constructLeague() const {
 
 void Ranker::runLeague(LeagueHeat& league) const {
   testInitialized();
-  // TODO(@drendleman) - multithread this loop?
-  for (auto& bg: league.battlegroups) {
-    gauntlet(bg.second, league);
+  if (cfg_.numThreads > 0) {
+    std::vector<BattlegroupPtr> bgs = league.battlegroups.getAll();
+
+    #pragma omp parallel for num_threads(cfg_.numThreads)
+    for (size_t iBG = 0; iBG < bgs.size(); ++iBG) { gauntlet(bgs[iBG], league); }
+  } else {
+    for (auto& bg: league.battlegroups) { gauntlet(bg.second, league); }
   }
+  
 
   if (cfg_.verbosity >= 1) { printLeagueStatistics(league); }
 }
@@ -138,7 +147,9 @@ GameHeat Ranker::singleGame(
     BattlegroupPtr& battlegroup_a,
     BattlegroupPtr& battlegroup_b) const {
   double matchQuality = gameFactory_.matchQuality(*battlegroup_a, *battlegroup_b);
-  auto& thread = threads_.at(omp_get_thread_num());
+  size_t iThread = omp_get_thread_num();
+  auto& thread = threads_.at(iThread);
+  auto& game = thread.game;
   // environment pointer:
   auto environment = std::make_shared<EnvironmentNonvolatile>(
       battlegroup_a->team().nv(), battlegroup_b->team().nv(), true);
@@ -154,18 +165,20 @@ GameHeat Ranker::singleGame(
     planner->setEngine(thread.engine);
 
     // assign game planner / evaluator / engine combo:
-    thread.game->setPlanner(iTeam, planner);
+    game->setPlanner(iTeam, planner);
   };
 
+  // TODO(@drendleman) avoid double initialization of engine
+  thread.stateEvaluator->setEngine(thread.engine);
   // assign game environment, propagating to planners/evaluators/engine:
-  thread.game->clear();
-  thread.game->setEvaluator(thread.stateEvaluator);
-  thread.game->setEnvironment(environment);
-  thread.game->setEngine(thread.engine);
+  game->clear();
+  game->setEvaluator(thread.stateEvaluator);
+  game->setEngine(thread.engine);
   game_setPlanner(0, battlegroup_a);
   game_setPlanner(1, battlegroup_b);
+  game->setEnvironment(environment);
   // initialize and run the game:
-  HeatResult result = thread.game->run();
+  HeatResult result = game->run();
 
   return GameHeat{battlegroup_a, battlegroup_b, matchQuality, result};
 }
@@ -245,6 +258,9 @@ BattlegroupPtr Ranker::findSubsampledMatch(const Battlegroup& cBG, const Battleg
 Ranker& Ranker::setGame(const Game& game) {
   for (auto& thread: threads_) {
     thread.game = std::make_shared<Game>(game);
+
+    if (thread.engine != NULL) { thread.game->setEngine(thread.engine); }
+    if (thread.stateEvaluator != NULL) { thread.game->setEvaluator(thread.stateEvaluator); }
   }
   return *this;
 }
@@ -253,6 +269,9 @@ Ranker& Ranker::setGame(const Game& game) {
 Ranker& Ranker::setEngine(const PkCU& cu) {
   for (auto& thread: threads_) {
     thread.engine = std::make_shared<PkCU>(cu);
+
+    if (thread.game != NULL) { thread.game->setEngine(thread.engine); }
+    if (thread.stateEvaluator != NULL) { thread.stateEvaluator->setEngine(thread.engine); }
   }
   return *this;
 }
@@ -261,6 +280,9 @@ Ranker& Ranker::setEngine(const PkCU& cu) {
 Ranker& Ranker::setStateEvaluator(const Evaluator& eval) {
   for (auto& thread: threads_) {
     thread.stateEvaluator = std::shared_ptr<Evaluator>(eval.clone());
+
+    if (thread.engine != NULL) { thread.stateEvaluator->setEngine(thread.engine); }
+    if (thread.game != NULL) { thread.game->setEvaluator(thread.stateEvaluator); }
   }
   return *this;
 }
@@ -380,19 +402,25 @@ void Ranker::printHeatResult(const GameHeat& heat) const {
 
 
 void Ranker::digestGame(GameHeat& gameHeat, LeagueHeat& league) const {
-  // update ranks of both teams
-  gameFactory_.update(*gameHeat.team_a, *gameHeat.team_b, gameHeat.heatResult);
-  // TODO(@drendleman) - too many adjacent ranks! Compute only when determining skill?
-  //league.recomputeAdjacentRanks(gameHeat.team_a);
-  //league.recomputeAdjacentRanks(gameHeat.team_b);
-  // update statistics:
-  gameHeat.team_a->update(gameHeat.heatResult, TEAM_A);
-  gameHeat.team_b->update(gameHeat.heatResult, TEAM_B);
-  league.games.push_back(gameHeat);
+  #pragma omp critical
+  {
+    // update ranks of both teams
+    gameFactory_.update(*gameHeat.team_a, *gameHeat.team_b, gameHeat.heatResult);
+    // TODO(@drendleman) - too many adjacent ranks! Compute only when determining skill?
+    //league.recomputeAdjacentRanks(gameHeat.team_a);
+    //league.recomputeAdjacentRanks(gameHeat.team_b);
+    // update statistics:
+    gameHeat.team_a->update(gameHeat.heatResult, TEAM_A);
+    gameHeat.team_b->update(gameHeat.heatResult, TEAM_B);
+    league.games.push_back(gameHeat);
+  }
 }
 
 
 size_t Ranker::loadTeamPopulation() {
+  // load nothing if the team population is an empty path:
+  if (cfg_.teamPath.empty()) { return 0; }
+
   bf::path teamPath{cfg_.teamPath};
   if (!bf::exists(teamPath) || !bf::is_directory(teamPath)) {
     std::cerr << 
@@ -401,6 +429,7 @@ size_t Ranker::loadTeamPopulation() {
     return 0;
   }
 
+  if (cfg_.verbosity > 0) { out_.get() << boost::format("loading teams from \"%s\"...\n") % cfg_.teamPath; }
   size_t numLoaded = 0;
   for (auto& pathIt : bf::directory_iterator(teamPath)) {
     if (!bf::is_regular_file(pathIt.path())) { continue; }
@@ -422,6 +451,8 @@ size_t Ranker::loadTeamPopulation() {
 
 
 size_t Ranker::saveTeamPopulation(const League& league) const {
+  if (cfg_.teamPath.empty()) { return 0; }
+
   bf::path teamPath{cfg_.teamPath};
   if (bf::exists(teamPath) && !bf::is_directory(teamPath)) {
     std::cerr <<
@@ -430,6 +461,7 @@ size_t Ranker::saveTeamPopulation(const League& league) const {
     return 0;
   }
 
+  if (cfg_.verbosity > 0) { out_.get() << boost::format("saving teams to \"%s\"...\n") % cfg_.teamPath; }
   bf::create_directory(teamPath);
 
   size_t numSaved = 0;

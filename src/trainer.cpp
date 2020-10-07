@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <random>
 #include <stdexcept>
+#include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
 namespace po = boost::program_options;
@@ -47,14 +48,14 @@ Trainer::Trainer(
 
 
 void Trainer::initialize() {
-  Ranker::initialize();
-
   if (cfg_.teamPopulationSize.size() != 6) { throw std::invalid_argument("teamPopulationSize"); }
   if (*std::min_element(begin(cfg_.teamPopulationSize), end(cfg_.teamPopulationSize)) < 0) { throw std::invalid_argument("teamPopulationSize count"); }
   if (cfg_.mutationProbability > 1.0 || cfg_.mutationProbability < 0.0) { throw std::invalid_argument("mutationProbability"); }
   if (cfg_.crossoverProbability > 1.0 || cfg_.crossoverProbability < 0.0) { throw std::invalid_argument("crossoverProbability"); }
   if (cfg_.seedProbability > 1.0 || cfg_.seedProbability < 0.0) { throw std::invalid_argument("seedProbability"); }
   if (doNothingProbability_ > 1.0 || doNothingProbability_ < 0.0) { throw std::invalid_argument("doNothingProbability"); }
+
+  Ranker::initialize();
 }
 
 
@@ -63,16 +64,21 @@ LeagueHeat Trainer::evolve() const {
 
   LeagueHeat league = constructLeague();
   for (size_t iGeneration = 0; iGeneration < cfg_.maxGenerations; ++iGeneration) {
-    // perform an evolution step (if this is not the first generation):
-    if (iGeneration > 0 ) {evolveGeneration(league);}
+    if (iGeneration > 0 ) {
+      // perform an evolution step (if this is not the first generation):
+      evolveGeneration(league);
+      
+      // reset league counting:
+      resetLeague(league);
+    }
 
-    // reset league counting:
-    resetLeague(league);
+    if (cfg_.verbosity >= 1) { printGenerationStart(league, iGeneration); }
 
     // rank the league:
     runLeague(league);
   }
 
+  if (cfg_.verbosity > 0) { out_.get() << "Evolution Complete!\n"; }
   if (cfg_.saveOnCompletion) { saveTeamPopulation(league); }
   return league;
 }
@@ -109,9 +115,9 @@ void Trainer::evolveGeneration(LeagueHeat& league) const {
 }
 
 
-LeagueHeat Trainer::constructLeague() const {
-  LeagueHeat result = Ranker::constructLeague();
-  seedRandomTeamPopulation(result);
+size_t Trainer::loadTeamPopulation() {
+  size_t result = Ranker::loadTeamPopulation();
+  result += seedRandomTeamPopulation(initialLeague_);
 
   return result;
 }
@@ -123,7 +129,7 @@ size_t Trainer::seedRandomTeamPopulation(League& league) const {
   for (size_t iLeague = 0; iLeague < 6; ++iLeague) {
     int64_t deltaPopulation = (cfg_.teamPopulationSize[iLeague] - population[iLeague]);
     
-    for (size_t iAdded = 0; iAdded < deltaPopulation; ++iAdded) {
+    for (int64_t iAdded = 0; iAdded < deltaPopulation; ++iAdded) {
       RankedTeamPtr seeded = std::make_shared<RankedTeam>(teamFactory_.createRandom(iLeague + 1), league.pokemon);
       // insert into league:
       league.addTeam(seeded);
@@ -137,6 +143,7 @@ size_t Trainer::seedRandomTeamPopulation(League& league) const {
 
 TeamLeague Trainer::spawnTeamChildren(League& league) const {
   std::vector<RankedTeamPtr> teams = league.teams.getAll();
+  MutationStats stats;
   TeamLeague newChildren;
   std::discrete_distribution<size_t> mutationChoices{
       cfg_.mutationProbability,
@@ -159,7 +166,9 @@ TeamLeague Trainer::spawnTeamChildren(League& league) const {
         RankedTeamPtr mutated = std::make_shared<RankedTeam>(
             teamFactory_.mutate(team->nv()),
             league.pokemon);
-        newChildren.insert({mutated->hash(), mutated});
+        if (newChildren.insert({mutated->hash(), mutated}).second) {
+          stats.numMutations++;
+        }
         break;
       }
       case 1: // crossover:
@@ -168,7 +177,9 @@ TeamLeague Trainer::spawnTeamChildren(League& league) const {
         RankedTeamPtr crossover = std::make_shared<RankedTeam>(
             teamFactory_.crossover(team->nv(), oTeam->nv()),
             league.pokemon);
-        newChildren.insert({crossover->hash(), crossover});
+        if(newChildren.insert({crossover->hash(), crossover}).second) {
+          stats.numCrossovers++;
+        }
         break;
       }
       case 2: // seed:
@@ -176,7 +187,9 @@ TeamLeague Trainer::spawnTeamChildren(League& league) const {
         RankedTeamPtr seeded = std::make_shared<RankedTeam>(
             teamFactory_.createRandom(team->nv().getNumTeammates()),
             league.pokemon);
-        newChildren.insert({seeded->hash(), seeded});
+        if (newChildren.insert({seeded->hash(), seeded}).second) {
+          stats.numSeeds++;
+        }
         break;
       }
       default:
@@ -185,6 +198,7 @@ TeamLeague Trainer::spawnTeamChildren(League& league) const {
     };
   }
 
+  if (cfg_.verbosity >= 1) { printMutationStats(stats); }
   return newChildren;
 }
 
@@ -208,9 +222,27 @@ size_t Trainer::shrinkPopulations(League& league, const LeagueCount& newChildren
     });
 
     // erase the item:
-    for (size_t iTeam = 0; iTeam < deltaPopulation; ++iTeam) {
+    for (size_t iTeam = 0, iMax = deltaPopulation; iTeam < iMax; ++iTeam) {
       numRemoved += league.removeTeam(teams[iTeam]->hash());
     }
   }
   return numRemoved;
+}
+
+
+void Trainer::printGenerationStart(const League& league, size_t iGeneration) const {
+  out_.get() << boost::format("Begin generation %d of %d! %d battlegroups playing %d heats each.\n")
+      % (iGeneration + 1)
+      % cfg_.maxGenerations
+      % league.battlegroups.size()
+      % cfg_.minGamesPerBattlegroup;
+}
+
+
+void Trainer::printMutationStats(const MutationStats& stats) const {
+  out_.get() << boost::format("Evolution step mutations=% 5d crossovers=% 5d seeds=% 5d total=%d\n")
+      % stats.numMutations
+      % stats.numCrossovers
+      % stats.numSeeds
+      % stats.numTotal();
 }

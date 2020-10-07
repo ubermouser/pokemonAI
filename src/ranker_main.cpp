@@ -29,6 +29,7 @@ struct Config {
   Trainer::Config trainer;
   Game::Config game;
   PkCU::Config engine;
+  std::vector<std::string> teams;
   std::vector<std::string> evalTypes = {"simple"};
   std::vector<std::shared_ptr<Evaluator::Config> > evalConfigs;
   std::vector<std::string> plannerTypes = {"random", "maximin"};
@@ -58,6 +59,9 @@ struct Config {
         ("evaluators",
         po::value<std::vector<std::string>>(&evalTypes)->multitoken(),
         "evaluator types to seed.")
+        ("teams",
+        po::value<std::vector<std::string>>(&teams)->multitoken(),
+        "teams to seed.")
         ("help", "produce this help message")
         ("random-seed",
         po::value<int>(&random_seed)->default_value(defaults.random_seed),
@@ -67,7 +71,7 @@ struct Config {
         "static verbosity level.");
     desc.add(pokedex.options());
     desc.add(trainer.options());
-    desc.add(game.options());
+    desc.add(game.options("game configuration", "game"));
     desc.add(engine.options());
     for (size_t iPlan = 0; iPlan != plannerConfigs.size(); ++iPlan) {
       desc.add(plannerConfigs[iPlan]->options(
@@ -129,6 +133,9 @@ int main(int argc, char** argv) {
   }
   for (size_t iEval = 0; iEval != cfg.evalTypes.size(); ++iEval) {
     trainer.addEvaluator(evaluators::choose(cfg.evalTypes[iEval], *cfg.evalConfigs[iEval]));
+  }
+  for (const auto& teamPath: cfg.teams) {
+    trainer.addTeam(TeamNonVolatile::load(teamPath));
   }
 
   trainer.initialize();

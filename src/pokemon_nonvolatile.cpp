@@ -611,6 +611,8 @@ void PokemonNonVolatile::input(const pt::ptree& ptree) {
 
 
 void PokemonNonVolatile::input(const pt::ptree& ptree, Orphanage& orphanage) {
+  if (ptree.count("pokemon") > 0) { return input(ptree.get_child("pokemon"), orphanage); }
+
   setName(ptree.get<std::string>("name"));
   setLevel(ptree.get<uint32_t>("level"));
   setSex(ptree.get<uint32_t>("sex"));

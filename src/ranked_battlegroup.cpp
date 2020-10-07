@@ -63,3 +63,12 @@ std::string Battlegroup::defineName() {
   name_ = (boost::format("%s-%s-%s") % planner_->getName() % evaluator_->getName() % team_->getName()).str();
   return name_;
 }
+
+
+std::vector<BattlegroupPtr> BattlegroupLeague::getAll() const {
+  //TODO(@drendleman) dedupe with TeamLeague::getAll
+  std::vector<BattlegroupPtr> result; result.reserve(size());
+  for (auto& battlegroup: *this) { result.push_back(battlegroup.second); }
+
+  return result;
+}

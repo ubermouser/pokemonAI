@@ -65,7 +65,7 @@ public:
     size_t minGamesPerBattlegroup = 10;
 
     /* if a team population is to be loaded to memory from a directory, this is where it is */
-    std::string teamPath = "teams";
+    std::string teamPath = "";
 
     /* minimum amount of time to work on a given league, in seconds */
     double minimumWorkTime = 20;
@@ -163,9 +163,6 @@ protected:
   BattlegroupPtr findMatch(const Battlegroup& oTeam, const LeagueHeat& league) const;
   BattlegroupPtr findSubsampledMatch(const Battlegroup& oTeam, const BattlegroupLeague& leauge) const;
 
-  /* calculates interesting things about the given league */
-  void calculateDescriptiveStatistics(const LeagueHeat& league) const;
-
   /* print information about the top n members of league iLeague */
   void printLeagueStatistics(LeagueHeat& league) const;
 
@@ -173,13 +170,11 @@ protected:
   void printHeatResult(const GameHeat& heat) const;
   
   /*load a population of pokemon and their rankings from a filepath */
-  size_t loadTeamPopulation();
+  virtual size_t loadTeamPopulation();
 
   size_t saveTeamPopulation(const League& league) const;
 
   virtual LeagueHeat constructLeague() const;
-
-  //BattlegroupLeague constructBattlegroups(const League& league) const;
 
   void digestGame(GameHeat& gameHeat, LeagueHeat& league) const;
 
