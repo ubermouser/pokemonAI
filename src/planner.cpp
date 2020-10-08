@@ -46,10 +46,13 @@ Planner& Planner::initialize() {
 
   if (cfg_.maxDepth > maxImplDepth()) {
     std::cerr <<
-        getName() << " evaluator has maximum implementation depth of " <<
+        getName() << " planner has maximum implementation depth of " <<
         maxImplDepth() << ", ignoring depth " <<
         cfg_.maxDepth << "!\n";
     cfg_.maxDepth = maxImplDepth();
+  }
+  if (cfg_.minDepth > cfg_.maxDepth) {
+    cfg_.minDepth = cfg_.maxDepth;
   }
 
   return *this;
@@ -103,7 +106,7 @@ PlannerResult Planner::generateSolution(const ConstEnvironmentPossible& origin) 
   auto start = std::chrono::steady_clock::now();
 
   // evaluate 0..nth state:
-  for (size_t iDepth = 0; iDepth <= cfg_.maxDepth; ++iDepth) {
+  for (size_t iDepth = cfg_.minDepth; iDepth <= cfg_.maxDepth; ++iDepth) {
     PlyResult plyResult;
     if (iDepth == 0) {
       plyResult = generateSolutionAtLeaf(origin);
@@ -166,11 +169,10 @@ ActionVector Planner::getValidActions(
 }
 
 
-bool Planner::testAgentCutoff(
+bool Planner::testAgentSelection(
     EvalResult& bestOfWorst,
     const EvalResult& worst,
     const ConstEnvironmentPossible& origin) const {
-  // TODO(@drendleman) in the case of a tie, the agent should always bias towards a damaging action
   if (worst > bestOfWorst) {
     bestOfWorst = worst;
     return true;
@@ -179,7 +181,7 @@ bool Planner::testAgentCutoff(
 }
 
 
-bool Planner::testOtherCutoff(
+bool Planner::testOtherSelection(
     EvalResult& worst,
     const EvalResult& current,
     const ConstEnvironmentPossible& origin) const {
@@ -191,58 +193,87 @@ bool Planner::testOtherCutoff(
 }
 
 
+bool Planner::testAlphaBetaCutoff(
+    const FitnessDepth& lowCutoff,
+    const FitnessDepth& highCutoff) const {
+  // if a solution was found at a lower depth, we will never choose a solution at a higher depth:
+  if (highCutoff < lowCutoff) {
+    return true;
+  }
+  // continue evaluation at this depth
+  return false;
+}
+
+
+bool Planner::testGammaCutoff(
+    const EvalResult& child,
+    const FitnessDepth& lowCutoff,
+    const FitnessDepth& highCutoff) const {
+  // TODO(@drendleman) cutoff when solution has been found at a shallower depth
+  if (child < lowCutoff) {
+    // if there's no possibility this action is the best for the agent, do not continue:
+    return true;
+  } else if (child > highCutoff) {
+    // if the other team would never choose this move against the agent, do not continue:
+    return true;
+  }
+  // continue evaluation at this depth.
+  return false;
+}
+
+
 EvalResult Planner::recurse_alphabeta(
       const ConstEnvironmentPossible& origin,
-      size_t iDepth,
-      const Fitness& lowCutoff,
-      const Fitness& highCutoff,
+      size_t searchDepth,
+      const FitnessDepth& lowCutoff,
+      const FitnessDepth& highCutoff,
       size_t* nodesEvaluated) const {
   // the best agent move fitness:
   EvalResult bestOfWorst{lowCutoff};
 
-  // TODO(@drendleman) - evaluate these in accordance to butterfly heuristic:
   // for every possible move by both agent team and other team:
   for (const auto& agentAction: getValidActions(origin, agentTeam_)) {
     EvalResult worst{highCutoff};
     // the worst possible other team choice is the one which causes the agent to decide to use it:
     for (const auto& otherAction: getValidActions(origin, otherTeam_)) {
+      // if other agent has already performed worse than the worst possible bestOfWorst, do not continue:
+      if (testAlphaBetaCutoff(bestOfWorst, worst)) { break; }
+
       // evaluate what probabilistically will occur if agent and other teams perform action at state:
-      FitnessDepth child = recurse_gamma(
+      EvalResult child = recurse_gamma(
           origin,
           agentAction,
           otherAction,
-          iDepth - 1,
-          bestOfWorst.fitness,
-          worst.fitness,
+          searchDepth - 1,
+          bestOfWorst, // low cutoff (cannot do worse)
+          worst, // high cutoff (cannot do better)
           nodesEvaluated);
-      // TODO(@drendleman) mark that the node is fully evaluated
+
       // has the other agent improved upon its best score by reducing our score more?
-      testOtherCutoff(
-          worst, EvalResult{child.fitness, agentAction, otherAction, child.depth + 1}, origin);
-    }
+      testOtherSelection(worst, child, origin);
+    } // endOf foreach other move
     
     // is the min of all other agent moves better than the best of our current moves?
-    testAgentCutoff(bestOfWorst, worst, origin);
-  }
+    testAgentSelection(bestOfWorst, worst, origin);
+  } // endOf foreach agent move
 
   return bestOfWorst;
 }
 
 
-FitnessDepth Planner::recurse_gamma(
+EvalResult Planner::recurse_gamma(
       const ConstEnvironmentPossible& origin,
       const Action& agentAction,
       const Action& otherAction,
-      size_t iDepth,
-      const Fitness& lowCutoff,
-      const Fitness& highCutoff,
+      size_t searchDepth,
+      const FitnessDepth& lowCutoff,
+      const FitnessDepth& highCutoff,
       size_t* nodesEvaluated) const {
   size_t numNodes = 0;
   // average fitness of all states combined:
-  FitnessDepth result{Fitness{0., 0.}, MAXTRIES};
-  auto rEnvP = generateStates(origin, agentAction, otherAction);
+  EvalResult result{Fitness{0., 0.}, agentAction, otherAction};
 
-  // TODO(@drendleman) - evaluate these in order of greatest probability to least
+  auto rEnvP = generateStates(origin, agentAction, otherAction);
   for (const auto& cEnvP : rEnvP.getValidEnvironments(true)) {
     // the likelihood that this state occurs:
     fpType stateProbability = cEnvP.getProbability().to_double();
@@ -251,7 +282,7 @@ FitnessDepth Planner::recurse_gamma(
 
     // if this is either a terminal node or if we are at terminal depth:
     bool isGameOver = cu_->isGameOver(cEnvP);
-    if (isGameOver || iDepth == 0) {
+    if (isGameOver || searchDepth == 0) {
       // evaluate as a leaf node:
       child = eval_->evaluate(cEnvP, agentTeam_);
       ++numNodes;
@@ -259,7 +290,7 @@ FitnessDepth Planner::recurse_gamma(
       // recurse into another depth, widening the cutoffs by the probability of the move:
       child = recurse_alphabeta(
           cEnvP,
-          iDepth,
+          searchDepth,
           lowCutoff.expand(stateProbability),
           highCutoff.expand(stateProbability),
           nodesEvaluated);
@@ -268,34 +299,33 @@ FitnessDepth Planner::recurse_gamma(
     // reduce the certainty of the deeper fitness result by state's occurrence probability, and
     //  accumulate:
     result.fitness += child.fitness.expand(stateProbability);
-    result.depth = std::min(result.depth, child.depth);
+    // TODO(@drendleman) - this can sometimes produce weird depths, why?
+    result.depth = std::max(result.depth, child.depth);
 
-    // TODO(@drendleman) cutoff when solution has been found at a shallower depth
-    // if there's no possibility this action is the best for the agent, do not continue:
-    if (result.fitness < lowCutoff) { break; }
-    // if the other team would never choose this move against the agent, do not continue:
-    if (result.fitness > highCutoff) { break; }
-  }
+    // if this action will never be chosen by either agent or other, do not continue:
+    if (testGammaCutoff(result, lowCutoff, highCutoff)) { break; }
+  } // endOf foreach environment
 
-  if (cfg_.verbosity >= 4) { printStateEvaluation(origin, agentAction, otherAction, result); }
+  if (cfg_.verbosity >= 4) { printStateEvaluation(origin, searchDepth, result); }
   if (nodesEvaluated != NULL) { *nodesEvaluated += numNodes; }
-  return result;
+  return EvalResult{result.fitness, agentAction, otherAction, result.depth + 1};
 }
 
 
 void Planner::printStateEvaluation(
     const ConstEnvironmentPossible& origin,
-    const Action& agentAction,
-    const Action& otherAction,
-    const FitnessDepth& fitness) const {
+    size_t searchDepth,
+    const EvalResult& evalResult) const {
   std::stringstream out;
-  out << boost::format("T%s: s=x%06x a=%4s o=%4s d=%2d %s\n")
+  for (size_t iSpace = 0; iSpace < searchDepth; ++iSpace) { out << " "; }
+  out << boost::format("T%s: s=x%06x i=%2d a=%4s o=%4s d=%2d %s\n")
       % (agentTeam_==TEAM_A?"A":"B")
       % (origin.getHash() & 0xffffff)
-      % agentAction
-      % otherAction
-      % fitness.depth
-      % fitness.fitness;
+      % searchDepth
+      % evalResult.agentAction
+      % evalResult.otherAction
+      % evalResult.depth
+      % evalResult.fitness;
 
   std::cout << out.str();
 }

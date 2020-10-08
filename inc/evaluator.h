@@ -24,10 +24,17 @@ struct FitnessDepth {
 
   bool fullyEvaluated() const { return depth >= MAXTRIES; }
 
+  static FitnessDepth worst() { return FitnessDepth{Fitness::worst(), MAXTRIES}; }
+  static FitnessDepth best() { return FitnessDepth{Fitness::best(), MAXTRIES}; }
+
+  FitnessDepth expand(const Fitness::precision_t& probability) const {
+    return FitnessDepth{fitness.expand(probability), depth};
+  }
+
   bool operator < (const FitnessDepth& other) const {
     // bias towards shallower depth
     if (fitness == other.fitness) {
-      return depth > other.depth;
+      return depth < other.depth;
     }
     return fitness < other.fitness;
   }

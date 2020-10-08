@@ -23,6 +23,8 @@ FITNESS_TEMPLATE
 class FitnessType {
 public:
   using fitness_t = FITNESS_IMPL;
+  using precision_t = PrecisionType;
+
   static constexpr PrecisionType one() { return PrecisionType(1.0); }
   static constexpr PrecisionType zero() { return PrecisionType(0.0); }
   static constexpr PrecisionType max_fitness() { 

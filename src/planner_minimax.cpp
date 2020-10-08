@@ -56,11 +56,11 @@ ActionVector PlannerMiniMax::getValidActions(
 }
 
 
-bool PlannerMiniMax::testAgentCutoff(
+bool PlannerMiniMax::testAgentSelection(
     EvalResult& bestOfWorst,
     const EvalResult& worst,
     const ConstEnvironmentPossible& origin) const {
-  bool cutoff = base_t::testAgentCutoff(bestOfWorst, worst, origin);
+  bool cutoff = base_t::testAgentSelection(bestOfWorst, worst, origin);
   if (cutoff) { 
     orderHeuristic_.increment(origin, agentTeam_, worst.agentAction);
   }
@@ -69,11 +69,11 @@ bool PlannerMiniMax::testAgentCutoff(
 }
 
 
-bool PlannerMiniMax::testOtherCutoff(
+bool PlannerMiniMax::testOtherSelection(
     EvalResult& worst,
     const EvalResult& current,
     const ConstEnvironmentPossible& origin) const {
-  bool cutoff = base_t::testOtherCutoff(worst, current, origin);
+  bool cutoff = base_t::testOtherSelection(worst, current, origin);
   if (cutoff) { 
     orderHeuristic_.increment(origin, otherTeam_, current.otherAction);
   }
@@ -85,8 +85,8 @@ bool PlannerMiniMax::testOtherCutoff(
 EvalResult PlannerMiniMax::recurse_alphabeta(
       const ConstEnvironmentPossible& origin,
       size_t iDepth,
-      const Fitness& lowCutoff,
-      const Fitness& highCutoff,
+      const FitnessDepth& lowCutoff,
+      const FitnessDepth& highCutoff,
       size_t* nodesEvaluated) const {
   EvalResult result;
   bool doRecurse = true;
@@ -98,8 +98,7 @@ EvalResult PlannerMiniMax::recurse_alphabeta(
       if (result.fitness.fullyEvaluated()) {
         doRecurse = false;
       // else, if this result is evaluated enough to produce a cutoff:
-      } else if (result.fitness < lowCutoff ||
-                 result.fitness > highCutoff) {
+      } else if (testGammaCutoff(result, lowCutoff, highCutoff)) {
         doRecurse = false;
       }
     }

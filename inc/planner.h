@@ -58,6 +58,9 @@ struct PlannerResult {
 class Planner : public Name {
 public:
   struct Config {
+    /* Minimum ply depth of computation. */
+    size_t minDepth = 0;
+
     /* Maximum ply depth of computation. */
     size_t maxDepth = 1;
 
@@ -144,22 +147,36 @@ protected:
 
   virtual PlyResult generateSolutionAtLeaf(const ConstEnvironmentPossible& origin) const;
 
-  /* Recurse through agent and other actions, pruning nodes above high and below low */
+  /* Recurse through agent and other actions, pruning nodes above high and below low.
+   *
+   * @param origin - the state to be recursed upon
+   * @param searchDepth - maximum depth to recurse
+   * @param lowCutoff - the fitness and solution depth of the best current agent move
+   * @param highCutoff - the fitness and solution depth of the best current other move
+   *  */
   virtual EvalResult recurse_alphabeta(
       const ConstEnvironmentPossible& origin,
-      size_t iDepth,
-      const Fitness& lowCutoff = Fitness::worst(),
-      const Fitness& highCutoff = Fitness::best(),
+      size_t searchDepth,
+      const FitnessDepth& lowCutoff = FitnessDepth::worst(),
+      const FitnessDepth& highCutoff = FitnessDepth::best(),
       size_t* nodesEvaluated=NULL) const;
 
-  /* Recurse through chance nodes, pruning nodes above high and below low*/
-  virtual FitnessDepth recurse_gamma(
+  /* Recurse through chance nodes, pruning nodes above high and below low.
+
+   * @param origin - the state to be recursed upon
+   * @param agentAction - action performed by the agent
+   * @param otherAction - action performed by the other
+   * @param searchDepth - maximum depth to recurse
+   * @param lowCutoff - the fitness and solution depth of the best current agent move
+   * @param highCutoff - the fitness and solution depth of the best current other move
+   */
+  virtual EvalResult recurse_gamma(
       const ConstEnvironmentPossible& origin,
       const Action& agentAction,
       const Action& otherAction,
-      size_t iDepth,
-      const Fitness& lowCutoff = Fitness::worst(),
-      const Fitness& highCutoff = Fitness::best(),
+      size_t searchDepth,
+      const FitnessDepth& lowCutoff = FitnessDepth::worst(),
+      const FitnessDepth& highCutoff = FitnessDepth::best(),
       size_t* nodesEvaluated=NULL) const;
 
   /* generate all possible environments from a given origin, agent and other action pair. */
@@ -170,11 +187,25 @@ protected:
 
   virtual ActionVector getValidActions(const ConstEnvironmentPossible& origin, size_t iTeam) const;
 
-  virtual bool testAgentCutoff(
+  /* test if another previously seen action always better than the current */
+  virtual bool testGammaCutoff(
+      const EvalResult& child,
+      const FitnessDepth& lowCutoff,
+      const FitnessDepth& highCutoff) const;
+
+  /* test if gamma window size is negative; that no possible solution can exist */
+  virtual bool testAlphaBetaCutoff(
+      const FitnessDepth& lowCutoff,
+      const FitnessDepth& highCutoff) const;
+
+  /* test if the current agent action is better than the best seen agent action */
+  virtual bool testAgentSelection(
       EvalResult& bestOfWorst, 
       const EvalResult& worst,
       const ConstEnvironmentPossible& origin) const;
-  virtual bool testOtherCutoff(
+
+  /* test if the current other action is worse than the worst seen other action */
+  virtual bool testOtherSelection(
       EvalResult& worst, 
       const EvalResult& current,
       const ConstEnvironmentPossible& origin) const;
@@ -182,9 +213,8 @@ protected:
   virtual void printSolution(const PlannerResult& result, bool isLast) const;
   virtual void printStateEvaluation(
       const ConstEnvironmentPossible& origin,
-      const Action& agentAction,
-      const Action& otherAction,
-      const FitnessDepth& fitness) const;
+      size_t iDepth,
+      const EvalResult& evalResult) const;
 };
 
 #endif /* PLANNER_H */

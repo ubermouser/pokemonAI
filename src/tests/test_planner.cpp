@@ -75,7 +75,12 @@ TEST_F(PlannerTest, MaxPlannerChoosesGreedyOption) {
   auto other_result = planners[TEAM_B].generateSolution(engine_->initialState());
 
   EXPECT_EQ(agent_result.bestAgentAction(), Action::move(1));
+  EXPECT_LE(agent_result.best().numNodes, 7);
+  EXPECT_EQ(agent_result.best().depth, 1);
+
   EXPECT_EQ(other_result.bestAgentAction(), Action::move(1));
+  EXPECT_LE(other_result.best().numNodes, 3);
+  EXPECT_EQ(other_result.best().depth, 1);
   // agents do not take into account the enemy's move
 }
 
@@ -99,8 +104,10 @@ TEST_F(PlannerTest, MaximinPlannerChooses1PlyOption) {
   auto other_result = planners[TEAM_B].generateSolution(engine_->initialState());
 
   EXPECT_EQ(agent_result.bestAgentAction(), Action::move(0));
-  // other agent best move is ambiguous
+  EXPECT_LE(agent_result.best().numNodes, 21);
+  EXPECT_EQ(agent_result.best().depth, 1);
   EXPECT_FLOAT_EQ(agent_result.bestFitness() + other_result.bestFitness(), 1.0);
+  // other agent best move is ambiguous
 }
 
 
@@ -123,8 +130,45 @@ TEST_F(PlannerTest, MaximinPlannerChooses2PlyOption) {
   auto other_result = planners[TEAM_B].generateSolution(engine_->initialState());
 
   EXPECT_EQ(agent_result.bestAgentAction(), Action::swap(1));
-    // other agent best move is ambiguous
+  EXPECT_LE(agent_result.best().numNodes, 235);
+  EXPECT_EQ(agent_result.best().depth, 2);
   EXPECT_FLOAT_EQ(agent_result.bestFitness() + other_result.bestFitness(), 1.0);
+  EXPECT_LE(other_result.best().numNodes, 235);
+  EXPECT_EQ(other_result.best().depth, 2);
+  // other agent best move is ambiguous
+}
+
+
+TEST_F(PlannerTest, MaximinPlannerChoosesNPlyOption) {
+  PlannerMaxiMin::Config cfg;
+  cfg.minDepth = 4;
+  cfg.maxDepth = 4; // success is possible in 2 turns
+  cfg.verbosity = 4;
+  cfg.maxTime = std::numeric_limits<double>::infinity();
+  auto team_a = TeamNonVolatile()
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("gengar"))
+        .addMove(pokedex_->getMoves().at("double team"))
+        .addMove(pokedex_->getMoves().at("drain punch")));
+  auto team_b = TeamNonVolatile()
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("rattata"))
+        .addMove(pokedex_->getMoves().at("return")));
+  auto environment = EnvironmentNonvolatile(team_a, team_b, true);
+
+  auto planner = PlannerMaxiMin(cfg);
+  planner
+      .setEvaluator(evaluator_)
+      .setTeam(TEAM_A)
+      .setEngine(engine_)
+      .setEnvironment(environment)
+      .initialize();
+
+  auto agent_result = planner.generateSolution(engine_->initialState());
+
+  EXPECT_EQ(agent_result.bestAgentAction(), Action::move(1));
+  EXPECT_LE(agent_result.best().numNodes, 114);
+  EXPECT_FLOAT_EQ(agent_result.bestFitness(), 1.0);
 }
 
 
@@ -160,5 +204,4 @@ TEST_F(PlannerTest, HumanPlannerActionReader) {
 }
 
 
-// TODO(@drendleman) - test that planner ;chooses a guaranteed winning move in the shortest depth
 // TODO(@drendleman) - test that minimax planner does the same things that maximin planner does

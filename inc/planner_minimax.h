@@ -42,15 +42,15 @@ protected:
   virtual EvalResult recurse_alphabeta(
       const ConstEnvironmentPossible& origin,
       size_t iDepth,
-      const Fitness& lowCutoff = Fitness::worst(),
-      const Fitness& highCutoff = Fitness::best(),
+      const FitnessDepth& lowCutoff = FitnessDepth::worst(),
+      const FitnessDepth& highCutoff = FitnessDepth::best(),
       size_t* nodesEvaluated=NULL) const override;
 
-  virtual bool testAgentCutoff(
+  virtual bool testAgentSelection(
       EvalResult& bestOfWorst, 
       const EvalResult& worst,
       const ConstEnvironmentPossible& origin) const override;
-  virtual bool testOtherCutoff(
+  virtual bool testOtherSelection(
       EvalResult& worst, 
       const EvalResult& current,
       const ConstEnvironmentPossible& origin) const override;
