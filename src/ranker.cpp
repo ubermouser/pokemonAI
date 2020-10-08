@@ -133,6 +133,7 @@ void Ranker::gauntlet(BattlegroupPtr& battlegroup, LeagueHeat& league) const {
   testInitialized();
   const auto& record = battlegroup->record();
   size_t maxGames = cfg_.minGamesPerBattlegroup - record.numGamesPlayed();
+  // TODO(@drendleman) - parallelize this loop as well
   for (size_t iGame=0; iGame < maxGames && record.numGamesPlayed() < cfg_.minGamesPerBattlegroup; ++iGame) {
     BattlegroupPtr adversary = findMatch(*battlegroup, league);
 

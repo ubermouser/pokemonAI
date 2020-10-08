@@ -49,10 +49,12 @@ protected:
   virtual bool testAgentSelection(
       EvalResult& bestOfWorst, 
       const EvalResult& worst,
+      const FitnessDepth& lowCutoff,
       const ConstEnvironmentPossible& origin) const override;
   virtual bool testOtherSelection(
       EvalResult& worst, 
       const EvalResult& current,
+      const FitnessDepth& highCutoff,
       const ConstEnvironmentPossible& origin) const override;
 
   Config cfg_;

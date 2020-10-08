@@ -59,8 +59,9 @@ ActionVector PlannerMiniMax::getValidActions(
 bool PlannerMiniMax::testAgentSelection(
     EvalResult& bestOfWorst,
     const EvalResult& worst,
+    const FitnessDepth& lowCutoff,
     const ConstEnvironmentPossible& origin) const {
-  bool cutoff = base_t::testAgentSelection(bestOfWorst, worst, origin);
+  bool cutoff = base_t::testAgentSelection(bestOfWorst, worst, lowCutoff, origin);
   if (cutoff) { 
     orderHeuristic_.increment(origin, agentTeam_, worst.agentAction);
   }
@@ -72,8 +73,9 @@ bool PlannerMiniMax::testAgentSelection(
 bool PlannerMiniMax::testOtherSelection(
     EvalResult& worst,
     const EvalResult& current,
+    const FitnessDepth& highCutoff,
     const ConstEnvironmentPossible& origin) const {
-  bool cutoff = base_t::testOtherSelection(worst, current, origin);
+  bool cutoff = base_t::testOtherSelection(worst, current, highCutoff, origin);
   if (cutoff) { 
     orderHeuristic_.increment(origin, otherTeam_, current.otherAction);
   }

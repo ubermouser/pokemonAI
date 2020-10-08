@@ -193,21 +193,18 @@ protected:
       const FitnessDepth& lowCutoff,
       const FitnessDepth& highCutoff) const;
 
-  /* test if gamma window size is negative; that no possible solution can exist */
-  virtual bool testAlphaBetaCutoff(
-      const FitnessDepth& lowCutoff,
-      const FitnessDepth& highCutoff) const;
-
   /* test if the current agent action is better than the best seen agent action */
   virtual bool testAgentSelection(
       EvalResult& bestOfWorst, 
       const EvalResult& worst,
+      const FitnessDepth& lowCutoff,
       const ConstEnvironmentPossible& origin) const;
 
   /* test if the current other action is worse than the worst seen other action */
   virtual bool testOtherSelection(
       EvalResult& worst, 
       const EvalResult& current,
+      const FitnessDepth& highCutoff,
       const ConstEnvironmentPossible& origin) const;
 
   virtual void printSolution(const PlannerResult& result, bool isLast) const;

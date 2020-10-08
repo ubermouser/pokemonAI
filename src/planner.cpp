@@ -172,6 +172,7 @@ ActionVector Planner::getValidActions(
 bool Planner::testAgentSelection(
     EvalResult& bestOfWorst,
     const EvalResult& worst,
+    const FitnessDepth& lowCutoff,
     const ConstEnvironmentPossible& origin) const {
   if (worst > bestOfWorst) {
     bestOfWorst = worst;
@@ -184,23 +185,12 @@ bool Planner::testAgentSelection(
 bool Planner::testOtherSelection(
     EvalResult& worst,
     const EvalResult& current,
+    const FitnessDepth& highCutoff,
     const ConstEnvironmentPossible& origin) const {
   if (current < worst) {
     worst = current;
     return true;
   }
-  return false;
-}
-
-
-bool Planner::testAlphaBetaCutoff(
-    const FitnessDepth& lowCutoff,
-    const FitnessDepth& highCutoff) const {
-  // if a solution was found at a lower depth, we will never choose a solution at a higher depth:
-  if (highCutoff < lowCutoff) {
-    return true;
-  }
-  // continue evaluation at this depth
   return false;
 }
 
@@ -216,6 +206,9 @@ bool Planner::testGammaCutoff(
   } else if (child > highCutoff) {
     // if the other team would never choose this move against the agent, do not continue:
     return true;
+  } else if (highCutoff < lowCutoff) {
+    // if there exists no solution that can satisfy both the agent and the other, do not continue:
+    return true;
   }
   // continue evaluation at this depth.
   return false;
@@ -225,19 +218,20 @@ bool Planner::testGammaCutoff(
 EvalResult Planner::recurse_alphabeta(
       const ConstEnvironmentPossible& origin,
       size_t searchDepth,
-      const FitnessDepth& lowCutoff,
-      const FitnessDepth& highCutoff,
+      const FitnessDepth& _lowCutoff,
+      const FitnessDepth& _highCutoff,
       size_t* nodesEvaluated) const {
   // the best agent move fitness:
-  EvalResult bestOfWorst{lowCutoff};
+  EvalResult bestOfWorst{Fitness::worst()};
 
   // for every possible move by both agent team and other team:
   for (const auto& agentAction: getValidActions(origin, agentTeam_)) {
-    EvalResult worst{highCutoff};
+    const FitnessDepth& lowCutoff = std::max((const FitnessDepth&)bestOfWorst, _lowCutoff); // low cutoff (cannot do worse)
+    EvalResult worst{Fitness::best()};
+
     // the worst possible other team choice is the one which causes the agent to decide to use it:
     for (const auto& otherAction: getValidActions(origin, otherTeam_)) {
-      // if other agent has already performed worse than the worst possible bestOfWorst, do not continue:
-      if (testAlphaBetaCutoff(bestOfWorst, worst)) { break; }
+      const FitnessDepth& highCutoff = std::min((const FitnessDepth&)worst, _highCutoff); // high cutoff (cannot do better)
 
       // evaluate what probabilistically will occur if agent and other teams perform action at state:
       EvalResult child = recurse_gamma(
@@ -245,16 +239,16 @@ EvalResult Planner::recurse_alphabeta(
           agentAction,
           otherAction,
           searchDepth - 1,
-          bestOfWorst, // low cutoff (cannot do worse)
-          worst, // high cutoff (cannot do better)
+          lowCutoff, // low cutoff (cannot do worse)
+          highCutoff, // high cutoff (cannot do better)
           nodesEvaluated);
 
       // has the other agent improved upon its best score by reducing our score more?
-      testOtherSelection(worst, child, origin);
+      testOtherSelection(worst, child, highCutoff, origin);
     } // endOf foreach other move
     
     // is the min of all other agent moves better than the best of our current moves?
-    testAgentSelection(bestOfWorst, worst, origin);
+    testAgentSelection(bestOfWorst, worst, lowCutoff, origin);
   } // endOf foreach agent move
 
   return bestOfWorst;
