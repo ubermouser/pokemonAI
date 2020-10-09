@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <algorithm>
+#include <chrono>
 #include <iostream>
 #include <iterator>
 #include <omp.h>
@@ -115,16 +116,24 @@ LeagueHeat Ranker::constructLeague() const {
 
 void Ranker::runLeague(LeagueHeat& league) const {
   testInitialized();
+  // keep an elapsed time counter
+  auto start = std::chrono::steady_clock::now();
+
   if (cfg_.numThreads > 0) {
     std::vector<BattlegroupPtr> bgs = league.battlegroups.getAll();
 
-    #pragma omp parallel for num_threads(cfg_.numThreads) schedule(dynamic)
-    for (size_t iBG = 0; iBG < bgs.size(); ++iBG) { gauntlet(bgs[iBG], league); }
+    #pragma omp parallel for num_threads(cfg_.numThreads) schedule(dynamic) collapse(2)
+    for (size_t iGame = 0; iGame < cfg_.minGamesPerBattlegroup; ++iGame) {
+      for (size_t iBG = 0; iBG < bgs.size(); ++iBG) {
+        singleHeat(bgs[iBG], league);
+      }
+    }
   } else {
+    // TODO(@drendleman) playing games one BG at a time is up to 50% less efficient
     for (auto& bg: league.battlegroups) { gauntlet(bg.second, league); }
   }
-  
 
+  league.elapsedTime = std::chrono::duration<double>(std::chrono::steady_clock::now() - start).count();
   if (cfg_.verbosity >= 1) { printLeagueStatistics(league); }
 }
 
@@ -132,15 +141,31 @@ void Ranker::runLeague(LeagueHeat& league) const {
 void Ranker::gauntlet(BattlegroupPtr& battlegroup, LeagueHeat& league) const {
   testInitialized();
   const auto& record = battlegroup->record();
-  size_t maxGames = cfg_.minGamesPerBattlegroup - record.numGamesPlayed();
-  // TODO(@drendleman) - parallelize this loop as well
-  for (size_t iGame=0; iGame < maxGames && record.numGamesPlayed() < cfg_.minGamesPerBattlegroup; ++iGame) {
-    BattlegroupPtr adversary = findMatch(*battlegroup, league);
-
-    GameHeat result = singleGame(battlegroup, adversary);
-    digestGame(result, league);
-    if (cfg_.verbosity >= 3) { printHeatResult(result); }
+  bool shouldContinue = true;
+  for (size_t iGame = record.numGamesPlayed(); shouldContinue && iGame < cfg_.minGamesPerBattlegroup; ++iGame) {
+    shouldContinue = singleHeat(battlegroup, league);
   }
+}
+
+
+bool Ranker::singleHeat(
+    BattlegroupPtr& battlegroup,
+    LeagueHeat& league) const {
+  // exit early if this battlegroup has played enough games in this generation:
+  size_t numGamesPlayed = battlegroup->record().numGamesPlayed();
+  if (numGamesPlayed >= cfg_.minGamesPerBattlegroup) { return false; }
+
+  // find a worthy opponent:
+  BattlegroupPtr adversary = findMatch(*battlegroup, league);
+
+  // play the game:
+  GameHeat result = singleGame(battlegroup, adversary);
+
+  // increment score:
+  digestGame(result, league);
+  if (cfg_.verbosity >= 3) { printHeatResult(result); }
+
+  return true;
 }
 
 
@@ -364,7 +389,13 @@ void Ranker::printLeagueStatistics(LeagueHeat& league) const {
         % std::min(cfg_.leaderboardPrintCount, subleague.size())
         % subleague.size();
   };
-  os << boost::format("played %d games!\n") % league.games.size();
+  os << boost::format("played %d games over %.2f seconds!\n  drawRate=%3.2f tieRate=%3.2f plies/game=%5.1f games/sec=%6.2f\n")
+      % league.games.size()
+      % league.elapsedTime
+      % league.drawRate()
+      % league.tieRate()
+      % league.pliesPerGame()
+      % league.gamesPerSecond();
   if (league.evaluators.size() >= 2) {
     printHeader(league.evaluators, "EVALUATOR");
     printMapLeaderboard(os, league.evaluators, cfg_.leaderboardPrintCount);
@@ -402,18 +433,31 @@ void Ranker::printHeatResult(const GameHeat& heat) const {
 }
 
 
-void Ranker::digestGame(GameHeat& gameHeat, LeagueHeat& league) const {
+void Ranker::digestGame(GameHeat& heat, LeagueHeat& league) const {
   #pragma omp critical
   {
     // update ranks of both teams
-    gameFactory_.update(*gameHeat.team_a, *gameHeat.team_b, gameHeat.heatResult);
+    gameFactory_.update(*heat.team_a, *heat.team_b, heat.heatResult);
     // TODO(@drendleman) - too many adjacent ranks! Compute only when determining skill?
     //league.recomputeAdjacentRanks(gameHeat.team_a);
     //league.recomputeAdjacentRanks(gameHeat.team_b);
-    // update statistics:
-    gameHeat.team_a->update(gameHeat.heatResult, TEAM_A);
-    gameHeat.team_b->update(gameHeat.heatResult, TEAM_B);
-    league.games.push_back(gameHeat);
+    // update individual statistics:
+    heat.team_a->update(heat.heatResult, TEAM_A);
+    heat.team_b->update(heat.heatResult, TEAM_B);
+    // update aggregate statistics:
+    league.totalPlies += heat.heatResult.numPlies;
+    league.numGames += heat.heatResult.matchesPlayed;
+    switch(heat.heatResult.endStatus) {
+      case MATCH_TIE:
+        league.numTies++;
+        break;
+      case MATCH_DRAW:
+        league.numDraws++;
+        break;
+      default:
+        break;
+    }
+    league.games.push_back(heat);
   }
 }
 

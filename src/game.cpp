@@ -443,7 +443,7 @@ HeatResult Game::digestMatch(std::vector<GameResult>& gLog) const {
     // add a point for the winning team:
     incrementScore(log.endStatus, hResult.score);
     // accumulate average numPlies:
-    hResult.numPlies += (fpType) log.numPlies;
+    hResult.numPlies += log.numPlies;
 
     for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
       const auto& source = log.teams[iTeam];
@@ -453,7 +453,6 @@ HeatResult Game::digestMatch(std::vector<GameResult>& gLog) const {
       team.averageTimeSpent += source.timeSpent;
     }
   }
-  hResult.numPlies /= hResult.matchesPlayed;
   for (auto& team: hResult.teams) {
     team.lastSimpleFitness /= hResult.matchesPlayed;
     team.averageNodesEvaluated /= hResult.matchesPlayed;
@@ -743,7 +742,7 @@ void Game::printHeatOutline(const HeatResult& result) const {
     << "--- MATCH STATISTICS ---\n "
     << result.matchesPlayed << " out of " << result.matchesTotal << " games played\n "
     << "final score: " << result.score[0] << " to " << result.score[1] << "\n "
-    << result.numPlies << " average plies per game\n"
+    << result.averagePlies() << " average plies per game\n"
     " Leaderboard: (index: name  r=rank  aC=avG-score  aP=avG-participation)\n";
 
   for (size_t iTeam = 0; iTeam < 2; iTeam++) {

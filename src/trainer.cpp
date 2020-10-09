@@ -86,7 +86,7 @@ LeagueHeat Trainer::evolve() const {
 
 void Trainer::resetLeague(LeagueHeat& league) const {
   // destroy the record of the last played games:
-  league.games.clear();
+  league.resetStats();
   // existing battlegroups should play existing games:
   for (auto& bg : league.battlegroups) {
     bg.second->record().resetRecord();

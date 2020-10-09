@@ -81,10 +81,12 @@ struct HeatResult {
   std::vector<GameResult> gameResults;
   std::array<PerTeam, 2> teams;
   std::array<uint32_t, 2> score;
-  double numPlies = 0.;
+  uint64_t numPlies = 0.;
   int endStatus = MATCH_UNPLAYED;
   size_t matchesPlayed = 0;
   size_t matchesTotal = 0;
+
+  double averagePlies() const { return double(numPlies) / double(matchesPlayed); }
 };
 
 class Game {

@@ -40,7 +40,31 @@ struct GameHeat {
 struct LeagueHeat : public League {
   std::vector<GameHeat> games;
 
+  uint64_t numTies = 0;
+
+  uint64_t numDraws = 0;
+
+  uint64_t numGames = 0;
+
+  uint64_t totalPlies = 0;
+
+  double elapsedTime = 0.;
+
   LeagueHeat(const League& league = League{}) : League(league) {}
+
+  double pliesPerGame() const { return double(totalPlies) / numGames; }
+  double gamesPerSecond() const { return double(numGames) / elapsedTime; }
+  double drawRate() const { return double(numDraws) / games.size(); }
+  double tieRate() const { return double(numTies) / games.size(); }
+
+  void resetStats() {
+    games.clear();
+    numTies = 0;
+    numDraws = 0;
+    numGames = 0;
+    totalPlies = 0;
+    elapsedTime = 0;
+  }
 };
 
 class Ranker {
@@ -154,6 +178,10 @@ protected:
   mutable std::default_random_engine rand_;
 
   bool initialized_;
+
+  bool singleHeat(
+      BattlegroupPtr& team_a,
+      LeagueHeat& league) const;
 
   GameHeat singleGame(
       BattlegroupPtr& team_a,
