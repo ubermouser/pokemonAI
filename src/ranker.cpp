@@ -118,7 +118,7 @@ void Ranker::runLeague(LeagueHeat& league) const {
   if (cfg_.numThreads > 0) {
     std::vector<BattlegroupPtr> bgs = league.battlegroups.getAll();
 
-    #pragma omp parallel for num_threads(cfg_.numThreads)
+    #pragma omp parallel for num_threads(cfg_.numThreads) schedule(dynamic)
     for (size_t iBG = 0; iBG < bgs.size(); ++iBG) { gauntlet(bgs[iBG], league); }
   } else {
     for (auto& bg: league.battlegroups) { gauntlet(bg.second, league); }

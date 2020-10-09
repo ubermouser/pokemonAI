@@ -19,6 +19,9 @@ public:
     fpType teamAliveBias = 0.05;
 
     Config() : Evaluator::Config() {};
+
+    virtual boost::program_options::options_description options(
+        const std::string& category="evaluator options", std::string prefix="") override;
   };
 
   EvaluatorSimple(const Config& cfg = Config());

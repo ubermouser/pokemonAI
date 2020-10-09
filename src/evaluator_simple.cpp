@@ -7,6 +7,32 @@
 
 #include "../inc/engine.h"
 
+namespace po = boost::program_options;
+
+
+po::options_description EvaluatorSimple::Config::options(
+    const std::string& category, std::string prefix) {
+  Config defaults{};
+  po::options_description desc = Evaluator::Config::options(category, prefix);
+
+  if (prefix.size() > 0) { prefix.append("-"); }
+  desc.add_options()
+      ((prefix + "any-move-bias").c_str(),
+      po::value<fpType>(&canMoveBias)->default_value(defaults.canMoveBias),
+      "Individual move PP remaining bias")
+      ((prefix + "move-bias").c_str(),
+      po::value<fpType>(&movesBias)->default_value(defaults.movesBias),
+      "Individual pokemon Move remaining bias")
+      ((prefix + "alive-bias").c_str(),
+      po::value<fpType>(&aliveBias)->default_value(defaults.aliveBias),
+      "individual pokemon HP remaining bias")
+      ((prefix + "any-alive-bias").c_str(),
+      po::value<fpType>(&teamAliveBias)->default_value(defaults.teamAliveBias),
+      "Any pokemon HP remaining bias");
+
+  return desc;
+}
+
 
 EvaluatorSimple::EvaluatorSimple(const Config& cfg)
     : Evaluator(cfg), cfg_(cfg) {
