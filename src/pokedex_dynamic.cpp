@@ -3,8 +3,7 @@
 #include <iostream>
 
 #include <boost/dll/shared_library.hpp>
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
 #include "../inc/orphan.h"
