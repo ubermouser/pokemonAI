@@ -9,7 +9,7 @@
 
 #if defined(_MSC_VER)
 
-#define FORCE_INLINE	__forceinline
+#define FORCE_INLINE
 
 #include <stdlib.h>
 
@@ -22,7 +22,7 @@
 
 #else	// defined(_MSC_VER)
 
-#define	FORCE_INLINE __attribute__((always_inline))
+#define	FORCE_INLINE
 
 inline uint32_t rotl32 ( uint32_t x, int8_t r )
 {

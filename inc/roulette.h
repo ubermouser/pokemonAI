@@ -46,7 +46,7 @@ private:
       fpType cValue = comparator.getValue(*value_ptr);
 
       if (boost::math::isnan(cValue)) { *isValid_ptr = false; numValid--; continue; }
-      if (mostlyLTE(cValue, 0.0)) { *isValid_ptr = false; numValid--; continue; }
+      if (mostlyLTE(cValue, (fpType)0.0)) { *isValid_ptr = false; numValid--; continue; }
 
       accumulator += cValue;
       *partition_ptr = cValue;
