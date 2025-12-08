@@ -105,12 +105,12 @@ void evaluator_network16::resetEvaluator(const EnvironmentNonvolatile& _envNV)
   if (network != NULL) { network->clearInput(); }
 };
 
-EvalResult evaluator_network16::calculateFitness(const EnvironmentVolatile& env, size_t iTeam)
+EvalResult evaluator_network16::calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const
 {
   return calculateFitness(*network, env, iTeam);
 };
 
-EvalResult evaluator_network16::calculateFitness(neuralNet& cNet, const EnvironmentVolatile& env, size_t iTeam)
+EvalResult evaluator_network16::calculateFitness(neuralNet& cNet, const ConstEnvironmentVolatile& env, size_t iTeam) const
 {
   // seed network with values:
   seed(&*cNet.inputBegin(), env, iTeam);
@@ -122,7 +122,7 @@ EvalResult evaluator_network16::calculateFitness(neuralNet& cNet, const Environm
   fpType fitness = *output;
   fitness = std::max(0.0, std::min(1.0, scale(fitness, 0.85, 0.15)));
 
-  EvalResult result= { fitness , -1/*agentMove*/ , -1/*otherMove*/ };
+  EvalResult result{ Fitness{fitness}};
   return result;
 };
 
@@ -130,14 +130,14 @@ EvalResult evaluator_network16::calculateFitness(neuralNet& cNet, const Environm
 
 
 
-void evaluator_network16::seed(float* inputBegin, const EnvironmentVolatile& env, size_t _iTeam) const
+void evaluator_network16::seed(float* inputBegin, const ConstEnvironmentVolatile& env, size_t _iTeam) const
 {
   float* cInput;
 
   for (size_t iNTeam = 0; iNTeam < 2; ++iNTeam)
   {
     size_t iTeam = (_iTeam + iNTeam) & 1;
-    const TeamVolatile& cTV = env.getTeam(iTeam);
+    const ConstTeamVolatile& cTV = env.getTeam(iTeam);
     const TeamNonVolatile& cTNV = envNV->getTeam(iTeam);
 
     // order of inputs:
@@ -150,7 +150,7 @@ void evaluator_network16::seed(float* inputBegin, const EnvironmentVolatile& env
     for (size_t iNTeammate = 0; iNTeammate != cTNV.getNumTeammates(); ++iNTeammate)
     {
       size_t iTeammate = iTeammates[iNTeammate];
-      const PokemonVolatile& cPKV = cTV.teammate(iTeammate);
+      const ConstPokemonVolatile& cPKV = cTV.teammate(iTeammate);
       if (!cPKV.isAlive()) 
       {
         // special case when this is the first teammate
@@ -161,7 +161,7 @@ void evaluator_network16::seed(float* inputBegin, const EnvironmentVolatile& env
       const PokemonNonVolatile& cPKNV = cTNV.teammate(iTeammate);
 
       // percent hitpoints of pokemon: (guaranteed to be nonzero)
-      float percentHP = (float)cPKV.getPercentHP(cPKNV);
+      float percentHP = (float)cPKV.getPercentHP();
       *cInput++ = percentHP; //scale(percentHP + 0.1f, 1.1f, 0.0f);
     } // endof current team teammates
     {
@@ -175,7 +175,7 @@ void evaluator_network16::seed(float* inputBegin, const EnvironmentVolatile& env
     // volatile status:
     {
       assert((cInput - inputBegin) == ((NEURONSPERTEAM * iNTeam) + (NEURONSPERTEAMMATE * 6)));
-      const PokemonVolatile& cPKV = cTV.getPKV();
+      const ConstPokemonVolatile& cPKV = cTV.getPKV();
 
       // 2 neurons per status:
       // if pokemon has been statused:

@@ -116,12 +116,12 @@ void evaluator_network64::resetEvaluator(const EnvironmentNonvolatile& _envNV)
   if (network != NULL) { network->clearInput(); }
 };
 
-EvalResult evaluator_network64::calculateFitness(const EnvironmentVolatile& env, size_t iTeam)
+EvalResult evaluator_network64::calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const
 {
   return calculateFitness(*network, env, iTeam);
 };
 
-EvalResult evaluator_network64::calculateFitness(neuralNet& cNet, const EnvironmentVolatile& env, size_t iTeam)
+EvalResult evaluator_network64::calculateFitness(neuralNet& cNet, const ConstEnvironmentVolatile& env, size_t iTeam) const
 {
   // seed network with values:
   seed(&*cNet.inputBegin(), env, iTeam);
@@ -133,11 +133,11 @@ EvalResult evaluator_network64::calculateFitness(neuralNet& cNet, const Environm
   fpType fitness = *output;
   fitness = std::max(0.0, std::min(1.0, scale(fitness, 0.85, 0.15)));
 
-  EvalResult result= { fitness , -1/*agentMove*/ , -1/*otherMove*/ };
+  EvalResult result{ Fitness{fitness}};
   return result;
 };
 
-void evaluator_network64::seed(float* inputBegin, const EnvironmentVolatile& env, size_t _iTeam) const
+void evaluator_network64::seed(float* inputBegin, const ConstEnvironmentVolatile& env, size_t _iTeam) const
 {
   float* cInput;
 
@@ -146,16 +146,16 @@ void evaluator_network64::seed(float* inputBegin, const EnvironmentVolatile& env
     size_t iTeam = (_iTeam + iNTeam) & 1;
     size_t iOTeam = (iTeam + 1) & 1;
     //size_t iTeam = iNTeam;
-    const TeamVolatile& cTV = env.getTeam(iTeam);
+    const ConstTeamVolatile& cTV = env.getTeam(iTeam);
     const TeamNonVolatile& cTNV = envNV->getTeam(iTeam);
 
-    const TeamVolatile& tTV = env.getTeam(iOTeam);
+    const ConstTeamVolatile& tTV = env.getTeam(iOTeam);
 
     // order of inputs:
     const std::array<uint8_t, 6>& iTeammates = orders[iTeam][cTV.getICPKV()];
     const std::array<uint8_t, 6>& iOTeammates = orders[iOTeam][tTV.getICPKV()];
 
-    const PokemonVolatile& tPKV = tTV.teammate(iOTeammates[0]);
+    const ConstPokemonVolatile& tPKV = tTV.teammate(iOTeammates[0]);
 
     // affect of boosts:
     static const std::array<float, 13> statMultipliers = 
@@ -175,7 +175,7 @@ void evaluator_network64::seed(float* inputBegin, const EnvironmentVolatile& env
     for (size_t iNTeammate = 0; iNTeammate != cTNV.getNumTeammates(); ++iNTeammate)
     {
       size_t iTeammate = iTeammates[iNTeammate];
-      const PokemonVolatile& cPKV = cTV.teammate(iTeammate);
+      const ConstPokemonVolatile& cPKV = cTV.teammate(iTeammate);
       if (!cPKV.isAlive()) 
       {
         // special case when this is the first teammate
@@ -186,7 +186,7 @@ void evaluator_network64::seed(float* inputBegin, const EnvironmentVolatile& env
       const PokemonNonVolatile& cPKNV = cTNV.teammate(iTeammate);
 
       // percent hitpoints of pokemon: (guaranteed to be nonzero)
-      float percentHP = (float)cPKV.getPercentHP(cPKNV);
+      float percentHP = (float)cPKV.getPercentHP();
       cInput[0] = percentHP; //scale(percentHP + 0.1f, 1.1f, 0.0f);
       // if pokemon is burned, poisoned, or badly poisoned:
       uint32_t statusAilment = cPKV.getStatusAilment();
@@ -214,7 +214,7 @@ void evaluator_network64::seed(float* inputBegin, const EnvironmentVolatile& env
 
           if (!cPKV.getMV(iMove).hasPP()) { continue; }
           bestDamage = dBestMoves[iTeam][iTeammate][0][iNMove];
-          dType = cPKNV.getMove_base(iMove + AT_MOVE_0).getDamageType() % ATK_FIXED; // atk_fixed becomes atk_no damage
+          dType = cPKNV.getMove_base(iMove).getDamageType() % ATK_FIXED; // atk_fixed becomes atk_no damage
           break;
         }
         // if we weren't able to find a best move:

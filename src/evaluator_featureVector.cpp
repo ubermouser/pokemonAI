@@ -175,7 +175,7 @@ void featureVector_impl::generateBestMoves(const EnvironmentNonvolatile& envNV, 
           {
             if (!valid[iMove]) { continue; }
 
-            const Move& cMove = cPKNV.getMove_base(iMove + AT_MOVE_0);
+            const Move& cMove = cPKNV.getMove_base(iMove);
             const Type& cType = cMove.getType();
 
             bool hasStab = ((&cPKB.getType(0) == &cType) || (&cPKB.getType(1) == &cType));

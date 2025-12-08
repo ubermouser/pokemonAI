@@ -106,7 +106,10 @@ public:
 
   
   VolatileStatus& getVolatile() { return data().status.cTeammate; };
+  const VolatileStatus& getVolatile() const { return data().status.cTeammate; };
+
   NonVolatileStatus& getNonVolatile() { return data().status.nonvolatile; };
+  const NonVolatileStatus& getNonVolatile() const { return data().status.nonvolatile; };
 
   /* Resets all pokemon in this team */
   void initialize();

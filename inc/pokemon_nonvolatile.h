@@ -209,10 +209,17 @@ public:
    * move "struggle" if AT_MOVE_STRUGGLE,
    * NULL if AT_MOVE_NOTHING */
   MoveNonVolatile& getMove(size_t index);
+  MoveNonVolatile& getMove(const Action& action) {
+    return getMove(action.iMove());
+  }
 
   const Move& getMove_base(size_t index) const { return getMove(index).getBase(); }
+  const Move& getMove_base(const Action& action) const { return getMove(action).getBase(); }
 
   const MoveNonVolatile& getMove(size_t index) const;
+  const MoveNonVolatile& getMove(const Action& action) const {
+    return getMove(action.iMove());
+  }
 
   uint32_t getFV_base(size_t type) const
   {

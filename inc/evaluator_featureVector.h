@@ -35,16 +35,16 @@ public:
   /* delete evaluator */
   virtual ~featureVector() { };
 
-  void seed(neuralNet& cNet, const EnvironmentVolatile& env, size_t iTeam) const
+  void seed(neuralNet& cNet, const ConstEnvironmentVolatile& env, size_t iTeam) const
   {
     assert(cNet.numInputs() >= inputSize());
     seed(cNet.inputBegin(), env, iTeam);
   };
   
   /* output feature vector defined by env starting at cInput */
-  virtual void seed(float* cInput, const EnvironmentVolatile& env, size_t iTeam) const = 0;
+  virtual void seed(float* cInput, const ConstEnvironmentVolatile& env, size_t iTeam) const = 0;
 
-  void seed(floatIterator_t cInput, const EnvironmentVolatile& env, size_t iTeam) const
+  void seed(floatIterator_t cInput, const ConstEnvironmentVolatile& env, size_t iTeam) const
   {
     seed(&*cInput, env, iTeam);
   };

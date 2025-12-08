@@ -418,7 +418,7 @@ void Trainer::calculateDescriptiveStatistics(size_t iLeague, TrainerResult& cR) 
       // foreach move:
       for (size_t iMove = 0; iMove != cTeammate.getNumMoves(); ++iMove)
       {
-        const Move* cMove = &cTeammate.getMove_base(iMove + AT_MOVE_0);
+        const Move* cMove = &cTeammate.getMove_base(Action::move(iMove));
 
         // move counts:
         moveCounts[cMove]++;

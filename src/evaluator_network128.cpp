@@ -117,12 +117,12 @@ void evaluator_network128::resetEvaluator(const EnvironmentNonvolatile& _envNV)
   if (network != NULL) { network->clearInput(); }
 };
 
-EvalResult evaluator_network128::calculateFitness(const EnvironmentVolatile& env, size_t iTeam)
+EvalResult evaluator_network128::calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const
 {
   return calculateFitness(*network, env, iTeam);
 };
 
-EvalResult evaluator_network128::calculateFitness(neuralNet& cNet, const EnvironmentVolatile& env, size_t iTeam)
+EvalResult evaluator_network128::calculateFitness(neuralNet& cNet, const ConstEnvironmentVolatile& env, size_t iTeam) const
 {
   // seed network with values:
   seed(&*cNet.inputBegin(), env, iTeam);
@@ -134,11 +134,11 @@ EvalResult evaluator_network128::calculateFitness(neuralNet& cNet, const Environ
   fpType fitness = *output;
   fitness = std::max(0.0, std::min(1.0, scale(fitness, 0.85, 0.15)));
 
-  EvalResult result= { fitness , -1/*agentMove*/ , -1/*otherMove*/ };
+  EvalResult result{ Fitness{fitness}};
   return result;
 };
 
-void evaluator_network128::seed(float* inputBegin, const EnvironmentVolatile& env, size_t _iTeam) const
+void evaluator_network128::seed(float* inputBegin, const ConstEnvironmentVolatile& env, size_t _iTeam) const
 {
   float* cInput;
 
@@ -147,10 +147,10 @@ void evaluator_network128::seed(float* inputBegin, const EnvironmentVolatile& en
     size_t iTeam = (_iTeam + iNTeam) & 1;
     size_t iOTeam = (iTeam + 1) & 1;
     //size_t iTeam = iNTeam;
-    const TeamVolatile& cTV = env.getTeam(iTeam);
+    const ConstTeamVolatile& cTV = env.getTeam(iTeam);
     const TeamNonVolatile& cTNV = envNV->getTeam(iTeam);
 
-    const TeamVolatile& tTV = env.getTeam(iOTeam);
+    const ConstTeamVolatile& tTV = env.getTeam(iOTeam);
     const TeamNonVolatile& tTNV = envNV->getTeam(iOTeam);
 
     // order of inputs:
@@ -179,7 +179,7 @@ void evaluator_network128::seed(float* inputBegin, const EnvironmentVolatile& en
     for (size_t iNTeammate = 0; iNTeammate != cTNV.getNumTeammates(); ++iNTeammate)
     {
       size_t iTeammate = iTeammates[iNTeammate];
-      const PokemonVolatile& cPKV = cTV.teammate(iTeammate);
+      const ConstPokemonVolatile& cPKV = cTV.teammate(iTeammate);
       if (!cPKV.isAlive()) 
       {
         // special case when this is the first teammate
@@ -190,7 +190,7 @@ void evaluator_network128::seed(float* inputBegin, const EnvironmentVolatile& en
       const PokemonNonVolatile& cPKNV = cTNV.teammate(iTeammate);
 
       // percent hitpoints of pokemon: (guaranteed to be nonzero)
-      float percentHP = (float)cPKV.getPercentHP(cPKNV);
+      float percentHP = (float)cPKV.getPercentHP();
       cInput[0] = percentHP; //scale(percentHP + 0.1f, 1.1f, 0.0f);
       // if pokemon is burned, poisoned, or badly poisoned:
       uint32_t statusAilment = cPKV.getStatusAilment();
@@ -212,7 +212,7 @@ void evaluator_network128::seed(float* inputBegin, const EnvironmentVolatile& en
       for (size_t iNOTeammate = 0; iNOTeammate != tTNV.getNumTeammates(); ++iNOTeammate)
       {
         size_t iOTeammate = iOTeammates[iNOTeammate];
-        const PokemonVolatile& tPKV = tTV.teammate(iOTeammate);
+        const ConstPokemonVolatile& tPKV = tTV.teammate(iOTeammate);
         if (!tPKV.isAlive()) 
         {
           // special case when this is the first oTeammate
@@ -231,7 +231,7 @@ void evaluator_network128::seed(float* inputBegin, const EnvironmentVolatile& en
 
           if (!cPKV.getMV(iMove).hasPP()) { continue; }
           bestDamage = dBestMoves[iTeam][iTeammate][iOTeammate][iNMove];
-          dType = cPKNV.getMove_base(iMove + AT_MOVE_0).getDamageType() % ATK_FIXED; // atk_fixed becomes atk_no damage
+          dType = cPKNV.getMove_base(iMove).getDamageType() % ATK_FIXED; // atk_fixed becomes atk_no damage
           break;
         }
         // if we weren't able to find a best move:
@@ -272,7 +272,7 @@ void evaluator_network128::seed(float* inputBegin, const EnvironmentVolatile& en
 
       // 4 neurons per status:
       // pokemon's speed:
-      cInput[0] = (float)(cTV.cGetFV_boosted(cTNV, FV_SPEED) > tTV.cGetFV_boosted(tTNV, FV_SPEED));
+      cInput[0] = (float)(cTV.cGetFV_boosted(FV_SPEED) > tTV.cGetFV_boosted(FV_SPEED));
       // accuracy / evasion:
       float accuracy = (float)(cTV.cGetAccuracy_boosted(FV_ACCURACY) * tTV.cGetAccuracy_boosted(FV_EVASION));
       cInput[1] = std::max(0.0f, std::min(1.0f, accuracy));

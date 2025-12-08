@@ -18,7 +18,7 @@
 #include "../inc/pokedex.h"
 #include "../inc/pokedex_dynamic.h"
 #include "../inc/team_volatile.h"
-#include "../inc/trueSkill.h"
+#include "../inc/true_skill.h"
 #include "../inc/neuralNet.h"
 #include "../inc/temporalpropNet.h"
 #include "../inc/experienceNet.h"

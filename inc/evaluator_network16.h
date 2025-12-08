@@ -27,24 +27,24 @@ public:
   evaluator_network16(const evaluator_network16& other);
   evaluator_network16(const neuralNet& cNet);
 
-  const std::string& getName() const { return ident; };
+  const std::string& getName() const override { return ident; };
 
-  evaluator_network16* clone() const { return new evaluator_network16(*this); }
+  evaluator_network16* clone() const override { return new evaluator_network16(*this); }
 
   bool isInitialized() const;
 
-  void resetNetwork(const neuralNet& cNet);
+  void resetNetwork(const neuralNet& cNet) override;
   void resetEvaluator(const EnvironmentNonvolatile& envNV);
-  EvalResult calculateFitness(const EnvironmentVolatile& env, size_t iTeam);
+  EvalResult calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const override;
 
-  EvalResult calculateFitness(neuralNet& cNet, const EnvironmentVolatile& env, size_t iTeam);
+  EvalResult calculateFitness(neuralNet& cNet, const ConstEnvironmentVolatile& env, size_t iTeam) const;
 
-  void seed(float* cInput, const EnvironmentVolatile& env, size_t iTeam) const;
-  size_t inputSize() const { return numInputNeurons; };
-  size_t outputSize() const { return numOutputNeurons; };
-  const float* getInput() const;
+  void seed(float* cInput, const ConstEnvironmentVolatile& env, size_t iTeam) const override;
+  size_t inputSize() const override { return numInputNeurons; };
+  size_t outputSize() const override { return numOutputNeurons; };
+  const float* getInput() const override;
 
-  void outputNames(std::ostream& oS) const;
+  void outputNames(std::ostream& oS) const override;
 };
 
 #endif /* EVALUATOR_NETWORK_16_H */
