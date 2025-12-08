@@ -14,14 +14,14 @@ GREP=grep
 NM=nm
 CCADMIN=CCadmin
 RANLIB=ranlib
-CC=gcc
-CCC=g++
-CXX=g++
+CC=clang
+CCC=clang++
+CXX=clang++
 FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-Linux
+CND_PLATFORM=CLANG-Linux
 CND_DLIB_EXT=so
 CND_CONF=Release
 CND_DISTDIR=dist
@@ -52,13 +52,13 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=../pkaiEngine/dist/Release/GNU-Linux/libpkaiengine.a -lboost_filesystem -lboost_program_options -fopenmp -ldl
+LDLIBSOPTIONS=../pkaiEngine/dist/Release/CLANG-Linux/libpkaiengine.a -lboost_filesystem -lboost_program_options -fopenmp -ldl
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/battler
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/battler: ../pkaiEngine/dist/Release/GNU-Linux/libpkaiengine.a
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/battler: ../pkaiEngine/dist/Release/CLANG-Linux/libpkaiengine.a
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/battler: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
