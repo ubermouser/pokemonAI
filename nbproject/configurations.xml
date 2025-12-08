@@ -179,7 +179,6 @@
               </makeArtifact>
             </linkerLibProjectItem>
             <linkerOptionItem>-lboost_thread</linkerOptionItem>
-            <linkerOptionItem>-lboost_system</linkerOptionItem>
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
             <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
             <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
@@ -410,7 +409,6 @@
               </makeArtifact>
             </linkerLibProjectItem>
             <linkerOptionItem>-lboost_thread</linkerOptionItem>
-            <linkerOptionItem>-lboost_system</linkerOptionItem>
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
             <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
             <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>

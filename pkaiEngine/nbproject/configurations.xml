@@ -419,7 +419,6 @@
           <output>${TESTDIR}/TestFiles/f1</output>
           <linkerLibItems>
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
-            <linkerOptionItem>-lboost_system</linkerOptionItem>
             <linkerOptionItem>-lboost_program_options</linkerOptionItem>
             <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
             <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
@@ -444,7 +443,6 @@
           <output>${TESTDIR}/TestFiles/f2</output>
           <linkerLibItems>
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
-            <linkerOptionItem>-lboost_system</linkerOptionItem>
             <linkerOptionItem>-lboost_program_options</linkerOptionItem>
             <linkerOptionItem>-fopenmp</linkerOptionItem>
             <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
@@ -469,7 +467,6 @@
           <output>${TESTDIR}/TestFiles/f3</output>
           <linkerLibItems>
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
-            <linkerOptionItem>-lboost_system</linkerOptionItem>
             <linkerOptionItem>-lboost_program_options</linkerOptionItem>
             <linkerLibStdlibItem>DynamicLinking</linkerLibStdlibItem>
             <linkerLibStdlibItem>PosixThreads</linkerLibStdlibItem>
@@ -494,7 +491,6 @@
           <output>${TESTDIR}/TestFiles/f4</output>
           <linkerLibItems>
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
-            <linkerOptionItem>-lboost_system</linkerOptionItem>
             <linkerOptionItem>-lboost_program_options</linkerOptionItem>
             <linkerOptionItem>-fopenmp</linkerOptionItem>
             <linkerOptionItem>-lgtest_main</linkerOptionItem>
@@ -519,7 +515,6 @@
           <output>${TESTDIR}/TestFiles/f5</output>
           <linkerLibItems>
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
-            <linkerOptionItem>-lboost_system</linkerOptionItem>
             <linkerOptionItem>-lboost_program_options</linkerOptionItem>
             <linkerOptionItem>-fopenmp</linkerOptionItem>
             <linkerOptionItem>-lgtest_main</linkerOptionItem>

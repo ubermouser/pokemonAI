@@ -68,7 +68,6 @@
                             OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libpkaiengine.a">
               </makeArtifact>
             </linkerLibProjectItem>
-            <linkerOptionItem>-lboost_system</linkerOptionItem>
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
             <linkerOptionItem>-lboost_program_options</linkerOptionItem>
             <linkerOptionItem>-fopenmp</linkerOptionItem>
@@ -125,7 +124,6 @@
                             OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libpkaiengine.a">
               </makeArtifact>
             </linkerLibProjectItem>
-            <linkerOptionItem>-lboost_system</linkerOptionItem>
             <linkerOptionItem>-lboost_filesystem</linkerOptionItem>
             <linkerOptionItem>-lboost_program_options</linkerOptionItem>
             <linkerOptionItem>-fopenmp</linkerOptionItem>

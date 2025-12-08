@@ -69,7 +69,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-L${CND_DISTDIR}/pkaiEngine/${CND_CONF}/${CND_PLATFORM}/ pkaiEngine/dist/Release/GNU-Linux/libpkaiengine.a -lboost_thread -lboost_system -lboost_filesystem -lpthread -ldl
+LDLIBSOPTIONS=-L${CND_DISTDIR}/pkaiEngine/${CND_CONF}/${CND_PLATFORM}/ pkaiEngine/dist/Release/GNU-Linux/libpkaiengine.a -lboost_thread -lboost_filesystem -lpthread -ldl
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
