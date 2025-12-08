@@ -51,9 +51,9 @@ void Battlegroup::update(const HeatResult& hResult, size_t iTeam) {
 
 Battlegroup::Hash Battlegroup::generateHash(bool generateSubHashes) {
   hash_ = 0;
-  boost::hash_detail::hash_combine_impl(hash_, team_->hash());
-  boost::hash_detail::hash_combine_impl(hash_, evaluator_->hash());
-  boost::hash_detail::hash_combine_impl(hash_, planner_->hash());
+  boost::hash_combine(hash_, team_->hash());
+  boost::hash_combine(hash_, evaluator_->hash());
+  boost::hash_combine(hash_, planner_->hash());
 
   return hash_;
 }

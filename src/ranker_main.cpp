@@ -10,16 +10,16 @@
 #include <boost/program_options.hpp>
 #include <boost/format.hpp>
 
-#include <inc/ranker.h>
-#include <inc/trainer.h>
-#include <inc/engine.h>
-#include <inc/pkCU.h>
-#include <inc/pokedex_static.h>
-#include <inc/evaluators.h>
-#include <inc/evaluator_simple.h>
-#include <inc/planners.h>
+#include "../inc/ranker.h"
+#include "../inc/trainer.h"
+#include "../inc/engine.h"
+#include "../inc/pkCU.h"
+#include "../inc/pokedex_static.h"
+#include "../inc/evaluators.h"
+#include "../inc/evaluator_simple.h"
+#include "../inc/planners.h"
 
-#include "inc/trainer.h"
+#include "../inc/trainer.h"
 
 namespace po = boost::program_options;
 
