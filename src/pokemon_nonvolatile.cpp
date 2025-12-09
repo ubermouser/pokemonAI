@@ -171,7 +171,7 @@ PokemonNonVolatile& PokemonNonVolatile::setBase(const PokemonBase& _base) {
   // replace abilities / moves which are no longer valid with the new base:
   if (!isLegalAbility(getAbility())) { setNoAbility(); }
   for (size_t iMove = 0; iMove != getNumMoves(); ++iMove) {
-    if (isLegalSet(iMove, getMove(iMove))) { continue; }
+    if (isLegalSet(iMove, getMove(iMove)) == MoveLearnResult::SUCCESS) { continue; }
     removeMove(iMove);
     iMove--;
   }
@@ -311,49 +311,70 @@ bool PokemonNonVolatile::isLegalAbility(const Ability& candidate) const {
 }
 
 
-bool PokemonNonVolatile::isLegalAdd(const MoveNonVolatile& candidate) const {
-  if ( !candidate.moveExists() ) { return false; }
+MoveLearnResult PokemonNonVolatile::isLegalAdd(const MoveNonVolatile& candidate) const {
+  if ( !candidate.moveExists() ) { return MoveLearnResult::MOVE_NOT_IN_MOVELIST; }
   return isLegalAdd(candidate.getBase());
 }
 
 
-bool PokemonNonVolatile::isLegalAdd(const Move& candidate) const {
-  if ((getNumMoves() + 1) > getMaxNumMoves()) { return false; }
+MoveLearnResult PokemonNonVolatile::isLegalAdd(const Move& candidate) const {
+  if ((getNumMoves() + 1) > getMaxNumMoves()) { return MoveLearnResult::MAX_MOVES_REACHED; }
   return isLegalSet(SIZE_MAX, candidate);
 }
 
 
-bool PokemonNonVolatile::isLegalSet(size_t iAction, const MoveNonVolatile& candidate) const {
-  if ( !candidate.moveExists() ) { return false; }
+MoveLearnResult PokemonNonVolatile::isLegalSet(size_t iAction, const MoveNonVolatile& candidate) const {
+  if ( !candidate.moveExists() ) { return MoveLearnResult::MOVE_NOT_IN_MOVELIST; }
   return isLegalSet(iAction, candidate.getBase());
 }
 
 
-bool PokemonNonVolatile::isLegalSet(size_t iAction, const Move& candidate) const {
+MoveLearnResult PokemonNonVolatile::isLegalSet(size_t iAction, const Move& candidate) const {
   size_t iPosition = iAction;
-  if (!pokemonExists()) { return false; }
-  if ((iPosition != SIZE_MAX) && (iPosition >= getNumMoves()) ) { return false; }
-  if ((candidate.lostChild == true) || (candidate.isImplemented() == false)) { return false; }
+  if (!pokemonExists()) { return MoveLearnResult::POKEMON_DOES_NOT_EXIST; }
+  if ((iPosition != SIZE_MAX) && (iPosition >= getNumMoves()) ) { return MoveLearnResult::INVALID_MOVE_INDEX; }
+  if ((candidate.lostChild == true) || (candidate.isImplemented() == false)) { return MoveLearnResult::MOVE_NOT_IMPLEMENTED; }
 
   // ensure that the move is within the pokemon's moveset
   const auto& cMovelist = getBase().moves_;
-  if (!cMovelist.count(&candidate)) { return false; }
+  if (!cMovelist.count(&candidate)) { return MoveLearnResult::MOVE_NOT_IN_MOVELIST; }
 
   // ensure that the move is not assigned multiple times to the same pokemon
   for (size_t iMove = 0; iMove != getNumMoves(); ++iMove) {
     if (iPosition == iMove) { continue; }
-    if (&getMove_base(iMove) == &candidate) { return false; }
+    if (&getMove_base(iMove) == &candidate) { return MoveLearnResult::MOVE_ALREADY_KNOWN; }
   }
 
-  return true;
+  return MoveLearnResult::SUCCESS;
 }
 
+void PokemonNonVolatile::handleMoveLearnResult(MoveLearnResult result) {
+  switch (result)
+  {
+  case MoveLearnResult::SUCCESS:
+    break;
+  case MoveLearnResult::POKEMON_DOES_NOT_EXIST:
+    throw std::invalid_argument("Pokemon does not exist");
+  case MoveLearnResult::MAX_MOVES_REACHED:
+    throw std::invalid_argument("Pokemon cannot learn more than 4 moves");
+  case MoveLearnResult::INVALID_MOVE_INDEX:
+    throw std::invalid_argument("Invalid move index");
+  case MoveLearnResult::MOVE_NOT_IMPLEMENTED:
+    throw std::invalid_argument("Move is not implemented");
+  case MoveLearnResult::MOVE_NOT_IN_MOVELIST:
+    throw std::invalid_argument("Move is not in the Pokemon's movelist");
+  case MoveLearnResult::MOVE_ALREADY_KNOWN:
+    throw std::invalid_argument("Pokemon already knows this move");
+  default:
+    throw std::invalid_argument("Unknown error");
+  }
+}
 
 PokemonNonVolatile& PokemonNonVolatile::addMove(const MoveNonVolatile& _cMove) {
-  if (!isLegalAdd(_cMove)) {
-    throw std::invalid_argument("PokemonNonVolatile illegal move");
+  MoveLearnResult result = isLegalAdd(_cMove);
+  if (result != MoveLearnResult::SUCCESS) {
+    handleMoveLearnResult(result);
   }
-
   actions_.push_back(_cMove);
   return *this;
 }
@@ -392,10 +413,10 @@ const MoveNonVolatile& PokemonNonVolatile::getMove(size_t index) const {
 
 
 PokemonNonVolatile& PokemonNonVolatile::setMove(size_t iAction, const MoveNonVolatile& _cMove) {
-  if (!isLegalSet(iAction, _cMove)) {
-    throw std::invalid_argument("PokemonNonVolatile illegal move");
+  MoveLearnResult result = isLegalSet(iAction, _cMove);
+  if (result != MoveLearnResult::SUCCESS) {
+    handleMoveLearnResult(result);
   }
-  
   getMove(iAction) = _cMove;
   return *this;
 };

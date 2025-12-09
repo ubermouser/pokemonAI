@@ -31,6 +31,17 @@ class Ability;
 class Nature;
 class PokemonBase;
 
+enum class MoveLearnResult
+{
+  SUCCESS,
+  POKEMON_DOES_NOT_EXIST,
+  MAX_MOVES_REACHED,
+  MOVE_NOT_IMPLEMENTED,
+  MOVE_NOT_IN_MOVELIST,
+  MOVE_ALREADY_KNOWN,
+  INVALID_MOVE_INDEX
+};
+
 class TeamVolatile;
 class PokemonVolatile;
 
@@ -188,13 +199,13 @@ public:
   bool isLegalAbility(const Ability& ability) const;
 
   /* is this pokemon allowed to be on the given team according to the current ruleset? */
-  bool isLegalAdd(const MoveNonVolatile& cPokemon) const;
+  MoveLearnResult isLegalAdd(const MoveNonVolatile& cPokemon) const;
 
-  bool isLegalSet(size_t iAction, const MoveNonVolatile& cBase) const;
+  MoveLearnResult isLegalSet(size_t iAction, const MoveNonVolatile& cBase) const;
 
-  bool isLegalAdd(const Move& cPokemon) const;
+  MoveLearnResult isLegalAdd(const Move& cPokemon) const;
 
-  bool isLegalSet(size_t iAction, const Move& cBase) const;
+  MoveLearnResult isLegalSet(size_t iAction, const Move& cBase) const;
 
   PokemonNonVolatile& addMove(const MoveNonVolatile& cMove);
 
@@ -248,6 +259,9 @@ public:
   void input(const boost::property_tree::ptree& ptree) override;
   void input(const boost::property_tree::ptree& ptree, Orphanage& orphanage);
   boost::property_tree::ptree output(bool printHeader = true) const override;
+
+private:
+  void handleMoveLearnResult(MoveLearnResult result);
 };
 
 
