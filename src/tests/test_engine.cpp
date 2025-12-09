@@ -477,7 +477,7 @@ TEST_F(EngineTest, UTurn) {
   }
   { // u-turn with an ally:
     EXPECT_EQ(uturn_to_ally.at(0).getEnv().getTeam(0).teammate(0).getMV(0).getPP(), 31); // pp decremented
-    EXPECT_NEAR(uturn_to_ally.at(0).getEnv().getTeam(0).teammate(0).getPercentHP(), 0.9, 0.005); // item effect applies
+    EXPECT_NEAR(uturn_to_ally.at(0).getEnv().getTeam(0).teammate(0).getPercentHP(), 0.7875, 0.005); // item effect AND stealth-rock apply
     EXPECT_EQ(uturn_to_ally.at(0).getEnv().getTeam(0).getICPKV(), 1); // ally has swapped out
     EXPECT_EQ(uturn_to_ally.at(0).getEnv().getTeam(1).teammate(1).getPercentHP(), 0.); // enemy weakling deleted
   }
