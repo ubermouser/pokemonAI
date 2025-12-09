@@ -49,7 +49,7 @@ std::ostream& operator <<(std::ostream& os, const Action& action) {
 
 
 std::istream& operator >>(std::istream& is, Action& action) {
-  static const std::regex moveExpr("m(\\d)"); // TODO(@drendleman) old expression "m(\\d)(?:-(\\d))?"
+  static const std::regex moveExpr("m(\\d)(?:-(\\d))?");
   static const std::regex swapExpr("s(\\d)");
 
   // read input into string:
@@ -64,10 +64,10 @@ std::istream& operator >>(std::istream& is, Action& action) {
     success = true;
   } else if (input[0] == 'm') {
     if (std::regex_match(input, match, moveExpr)) {
-      /*if (match.size() == 4) {
-        action = Action::moveAlly(std::stoi(match[1].str()) - 1, std::stoi(match[3].str()) - 1);
+      if (match[2].matched) {
+        action = Action::moveAlly(std::stoi(match[1].str()) - 1, std::stoi(match[2].str()) - 1);
         success = true;
-      } else*/ if (match.size() == 2) {
+      } else {
         action = Action::move(std::stoi(match[1].str()) - 1);
         success = true;
       }
