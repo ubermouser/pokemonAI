@@ -1,4 +1,4 @@
-#include "../inc/old_trainer.h"
+#include "pokemonai/old_trainer.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -8,16 +8,16 @@
 #include <boost/timer.hpp>
 #include <boost/foreach.hpp>
 
-#include "../inc/game.h"
+#include "pokemonai/game.h"
 
-#include "../inc/pokemon_nonvolatile.h"
-#include "../inc/team_nonvolatile.h"
+#include "pokemonai/pokemon_nonvolatile.h"
+#include "pokemonai/team_nonvolatile.h"
 
-#include "../inc/planner.h"
+#include "pokemonai/planner.h"
 
-#include "../inc/genetic.h"
-#include "../inc/fp_compare.h"
-#include "../inc/roulette.h"
+#include "pokemonai/genetic.h"
+#include "pokemonai/fp_compare.h"
+#include "pokemonai/roulette.h"
 
 template<class dataType>
 size_t findInData(const std::vector<dataType>& data, uint64_t hash);

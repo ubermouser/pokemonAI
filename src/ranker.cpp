@@ -1,4 +1,4 @@
-#include "../inc/ranker.h"
+#include "pokemonai/ranker.h"
 
 #include <assert.h>
 #include <algorithm>

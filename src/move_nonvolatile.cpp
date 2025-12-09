@@ -1,12 +1,12 @@
 
 //#define PKAI_EXPORT
-#include "../inc/move_nonvolatile.h"
+#include "pokemonai/move_nonvolatile.h"
 
 //#define PKAI_STATIC
-#include "../inc/move.h"
-#include "../inc/pokemon_nonvolatile.h"
-#include "../inc/move_volatile.h"
-#include "../inc/pluggable_types.h"
+#include "pokemonai/move.h"
+#include "pokemonai/pokemon_nonvolatile.h"
+#include "pokemonai/move_volatile.h"
+#include "pokemonai/pluggable_types.h"
 //#undef PKAI_STATIC
 
 MoveNonVolatile* MoveNonVolatile::mNV_struggle = NULL;

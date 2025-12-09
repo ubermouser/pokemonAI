@@ -1,13 +1,13 @@
 //#define PKAI_IMPORT
-#include "../inc/planner_human.h"
+#include "pokemonai/planner_human.h"
 
 #include <string>
 #include <sstream>
 #include <iostream>
 
-#include "../inc/pkCU.h"
-#include "../inc/environment_possible.h"
-#include "../inc/environment_nonvolatile.h"
+#include "pokemonai/pkCU.h"
+#include "pokemonai/environment_possible.h"
+#include "pokemonai/environment_nonvolatile.h"
 
 
 PlannerHuman::PlannerHuman(const Config& cfg) : PlannerHuman(cfg, std::cin) {};

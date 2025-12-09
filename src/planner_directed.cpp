@@ -1,4 +1,4 @@
-#include "../inc/planner_directed.h"
+#include "pokemonai/planner_directed.h"
 
 #include <iostream>
 #include <iomanip>
@@ -9,15 +9,15 @@
 #include <math.h>
 #include <boost/math/special_functions/fpclassify.hpp>
 
-#include "../inc/evaluator.h"
-#include "../inc/pkCU.h"
-#include "../inc/fp_compare.h"
+#include "pokemonai/evaluator.h"
+#include "pokemonai/pkCU.h"
+#include "pokemonai/fp_compare.h"
 
-#include "../inc/environment_possible.h"
-#include "../inc/environment_nonvolatile.h"
+#include "pokemonai/environment_possible.h"
+#include "pokemonai/environment_nonvolatile.h"
 
-#include "../inc/experienceNet.h"
-#include "../inc/evaluator_featureVector.h"
+#include "pokemonai/experienceNet.h"
+#include "pokemonai/evaluator_featureVector.h"
 
 planner_directed::planner_directed(const experienceNet& _exp, size_t _engineAccuracy, fpType _bias, bool _updateExperience)
   : ident(),

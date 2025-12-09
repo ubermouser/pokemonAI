@@ -1,4 +1,4 @@
-#include "../inc/serializable.h"
+#include "pokemonai/serializable.h"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>

@@ -1,5 +1,5 @@
 //#define PKAI_IMPORT
-#include "../inc/planner_max.h"
+#include "pokemonai/planner_max.h"
 
 #include <iostream>
 #include <iomanip>
@@ -7,13 +7,13 @@
 #include <string>
 #include <boost/foreach.hpp>
 
-#include "../inc/evaluator.h"
-#include "../inc/pkCU.h"
-#include "../inc/fp_compare.h"
-#include "../inc/fitness.h"
+#include "pokemonai/evaluator.h"
+#include "pokemonai/pkCU.h"
+#include "pokemonai/fp_compare.h"
+#include "pokemonai/fitness.h"
 
-#include "../inc/environment_possible.h"
-#include "../inc/environment_nonvolatile.h"
+#include "pokemonai/environment_possible.h"
+#include "pokemonai/environment_nonvolatile.h"
 
 
 PlannerMax& PlannerMax::setEngine(const std::shared_ptr<PkCU>& cu) {

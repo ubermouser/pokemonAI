@@ -1,12 +1,12 @@
-#include "../inc/environment_possible.h"
+#include "pokemonai/environment_possible.h"
 
 #include <algorithm>
 #include <iostream>
 #include <boost/format.hpp>
 #include <boost/static_assert.hpp>
 
-#include "../inc/environment_nonvolatile.h"
-#include "../inc/roulette.h"
+#include "pokemonai/environment_nonvolatile.h"
+#include "pokemonai/roulette.h"
 
 
 BOOST_STATIC_ASSERT(sizeof(EnvironmentPossibleData) == (sizeof(uint64_t)*18));

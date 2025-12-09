@@ -1,12 +1,12 @@
-#include "../inc/environment_volatile.h"
+#include "pokemonai/environment_volatile.h"
 
 #include <boost/static_assert.hpp>
 #include <cstring>
 #include <ostream>
 
-#include "../inc/environment_nonvolatile.h"
-#include "../inc/signature.h"
-#include "../inc/team_nonvolatile.h"
+#include "pokemonai/environment_nonvolatile.h"
+#include "pokemonai/signature.h"
+#include "pokemonai/team_nonvolatile.h"
 
 BOOST_STATIC_ASSERT(sizeof(EnvironmentVolatileData) == (sizeof(uint64_t)*16));
 

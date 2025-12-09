@@ -1,4 +1,4 @@
-#include "../inc/evaluator_featureVector.h"
+#include "pokemonai/evaluator_featureVector.h"
 
 #include <typeinfo>
 #include <map>
@@ -10,22 +10,22 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 //#include <boost/ptr_container/ptr_map.hpp>
 
-#include "../inc/fp_compare.h"
+#include "pokemonai/fp_compare.h"
 
-#include "../inc/type.h"
-#include "../inc/move.h"
-#include "../inc/pokemon_base.h"
-#include "../inc/environment_nonvolatile.h"
-#include "../inc/team_nonvolatile.h"
-#include "../inc/pokemon_nonvolatile.h"
-#include "../inc/environment_volatile.h"
-#include "../inc/team_volatile.h"
-#include "../inc/pokemon_volatile.h"
+#include "pokemonai/type.h"
+#include "pokemonai/move.h"
+#include "pokemonai/pokemon_base.h"
+#include "pokemonai/environment_nonvolatile.h"
+#include "pokemonai/team_nonvolatile.h"
+#include "pokemonai/pokemon_nonvolatile.h"
+#include "pokemonai/environment_volatile.h"
+#include "pokemonai/team_volatile.h"
+#include "pokemonai/pokemon_volatile.h"
 
-#include "../inc/evaluator_network16.h"
-#include "../inc/evaluator_network32.h"
-#include "../inc/evaluator_network64.h"
-#include "../inc/evaluator_network128.h"
+#include "pokemonai/evaluator_network16.h"
+#include "pokemonai/evaluator_network32.h"
+#include "pokemonai/evaluator_network64.h"
+#include "pokemonai/evaluator_network128.h"
 
 static size_t evalIndex(size_t numInput, size_t numOutput) { return numInput * MAXNETWORKWIDTH + numOutput; }
 

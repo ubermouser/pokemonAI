@@ -2,9 +2,9 @@
 
 #include <memory>
 
-#include <inc/engine.h>
-#include <inc/pokedex_static.h>
-#include <inc/pkCU.h>
+#include "pokemonai/engine.h"
+#include "pokemonai/pokedex_static.h"
+#include "pokemonai/pkCU.h"
 
 
 class EngineTest : public ::testing::Test {

@@ -1,13 +1,13 @@
 
-#include "../inc/temporalpropNet.h"
+#include "pokemonai/temporalpropNet.h"
 
 #include <math.h>
 #include <boost/math/special_functions/fpclassify.hpp>
 
 #include <boost/foreach.hpp>
 
-#include "../inc/neuralNet.h"
-#include "../inc/fp_compare.h"
+#include "pokemonai/neuralNet.h"
+#include "pokemonai/fp_compare.h"
 
 temporalpropSettings temporalpropSettings::defaultSettings(0.1f, 0.01f, 0.25f, 0.7f, 0.6f);
 

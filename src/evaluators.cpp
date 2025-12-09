@@ -1,4 +1,4 @@
-#include "../inc/evaluators.h"
+#include "pokemonai/evaluators.h"
 
 #include <iostream>
 #include <memory>
@@ -6,10 +6,10 @@
 #include <stdexcept>
 #include <boost/algorithm/string/case_conv.hpp>
 
-#include "../inc/orphan.h"
-#include "../inc/evaluator_montecarlo.h"
-#include "../inc/evaluator_random.h"
-#include "../inc/evaluator_simple.h"
+#include "pokemonai/orphan.h"
+#include "pokemonai/evaluator_montecarlo.h"
+#include "pokemonai/evaluator_random.h"
+#include "pokemonai/evaluator_simple.h"
 
 std::shared_ptr<Evaluator::Config> evaluators::config(const std::string& _type) {
   auto type = boost::to_lower_copy(_type);

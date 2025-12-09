@@ -1,4 +1,4 @@
-#include "../inc/signature.h"
+#include "pokemonai/signature.h"
 
 #include <stdint.h>
 

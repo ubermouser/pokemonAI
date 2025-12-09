@@ -1,21 +1,21 @@
 //#define PKAI_IMPORT
-#include "../inc/evaluator_network16.h"
+#include "pokemonai/evaluator_network16.h"
 
 #include <sstream>
 #include <assert.h>
 #include <iostream>
 #include <boost/foreach.hpp>
 
-#include "../inc/fp_compare.h"
+#include "pokemonai/fp_compare.h"
 
-#include "../inc/evaluator_featureVector.h"
+#include "pokemonai/evaluator_featureVector.h"
 
-#include "../inc/environment_nonvolatile.h"
-#include "../inc/team_nonvolatile.h"
-#include "../inc/pokemon_nonvolatile.h"
-#include "../inc/environment_volatile.h"
-#include "../inc/team_volatile.h"
-#include "../inc/pokemon_volatile.h"
+#include "pokemonai/environment_nonvolatile.h"
+#include "pokemonai/team_nonvolatile.h"
+#include "pokemonai/pokemon_nonvolatile.h"
+#include "pokemonai/environment_volatile.h"
+#include "pokemonai/team_volatile.h"
+#include "pokemonai/pokemon_volatile.h"
 
 #define NEURONSPERTEAMMATE 1
 #define NEURONSPERSTATUS 2

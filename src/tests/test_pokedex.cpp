@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 #include <iostream>
 
-#include <inc/pokedex_static.h>
-#include <inc/pokedex_dynamic.h>
+#include "pokemonai/pokedex_static.h"
+#include "pokemonai/pokedex_dynamic.h"
 
-#include "inc/team_nonvolatile.h"
+#include "pokemonai/team_nonvolatile.h"
 
 class PokedexTest : public ::testing::Test {
 protected:

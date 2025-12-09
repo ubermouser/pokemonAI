@@ -1,5 +1,5 @@
 //#define PKAI_IMPORT
-#include "../inc/neuralNet.h"
+#include "pokemonai/neuralNet.h"
 
 #include <math.h>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -9,8 +9,8 @@
 #include <boost/static_assert.hpp>
 
 #include <iomanip>
-#include "../inc/fp_compare.h"
-#include "../inc/init_toolbox.h"
+#include "pokemonai/fp_compare.h"
+#include "pokemonai/init_toolbox.h"
 
 static const std::string header = "PKNNT2";
 

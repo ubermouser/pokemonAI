@@ -4,14 +4,14 @@
 #include <sstream>
 #include <limits>
 
-#include <inc/engine.h>
-#include <inc/evaluator_simple.h>
-#include <inc/pokedex_static.h>
-#include <inc/pkCU.h>
-#include <inc/planner_random.h>
-#include <inc/planner_max.h>
-#include <inc/planner_maximin.h>
-#include <inc/planner_human.h>
+#include "pokemonai/engine.h"
+#include "pokemonai/evaluator_simple.h"
+#include "pokemonai/pokedex_static.h"
+#include "pokemonai/pkCU.h"
+#include "pokemonai/planner_random.h"
+#include "pokemonai/planner_max.h"
+#include "pokemonai/planner_maximin.h"
+#include "pokemonai/planner_human.h"
 
 
 class PlannerTest : public ::testing::Test {

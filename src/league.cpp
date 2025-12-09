@@ -1,4 +1,4 @@
-#include "../inc/league.h"
+#include "pokemonai/league.h"
 
 
 League& League::addTeam(const RankedTeamPtr& team) {

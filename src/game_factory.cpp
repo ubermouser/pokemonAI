@@ -1,4 +1,4 @@
-#include "../inc/game_factory.h"
+#include "pokemonai/game_factory.h"
 
 #include <algorithm>
 #include <boost/math/distributions/normal.hpp>

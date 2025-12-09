@@ -1,4 +1,4 @@
-#include "../inc/action.h"
+#include "pokemonai/action.h"
 
 #include <cstring>
 #include <functional>

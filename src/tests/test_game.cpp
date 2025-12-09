@@ -3,12 +3,12 @@
 #include <memory>
 #include <stdexcept>
 
-#include <inc/engine.h>
-#include <inc/game.h>
-#include <inc/pokedex_static.h>
-#include <inc/pkCU.h>
-#include <inc/planner_random.h>
-#include <inc/planner_max.h>
+#include "pokemonai/engine.h"
+#include "pokemonai/game.h"
+#include "pokemonai/pokedex_static.h"
+#include "pokemonai/pkCU.h"
+#include "pokemonai/planner_random.h"
+#include "pokemonai/planner_max.h"
 
 
 class GameTest : public ::testing::Test {

@@ -1,4 +1,4 @@
-#include "../inc/old_trainer.h"
+#include "pokemonai/old_trainer.h"
 
 #include <iomanip>
 #include <iostream>
@@ -12,8 +12,8 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
 
-#include "../inc/engine.h"
-#include "../inc/pkIO.h"
+#include "pokemonai/engine.h"
+#include "pokemonai/pkIO.h"
 
 template <class data_t>
 void saveElements(

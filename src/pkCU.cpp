@@ -1,4 +1,4 @@
-#include "../inc/pkCU.h"
+#include "pokemonai/pkCU.h"
 
 #include <algorithm>
 #include <iostream>
@@ -9,12 +9,12 @@
 #include <string>
 #include <boost/program_options.hpp>
 
-#include "../inc/fp_compare.h"
-#include "../src/fixedpoint/fixed_func.h"
+#include "pokemonai/fp_compare.h"
+#include "pokemonai/fixedpoint/fixed_func.h"
 
-#include "../inc/pluggable_types.h"
-#include "../inc/plugin.h"
-#include "../inc/engine.h"
+#include "pokemonai/pluggable_types.h"
+#include "pokemonai/plugin.h"
+#include "pokemonai/engine.h"
 
 namespace po = boost::program_options;
 typedef std::vector<plugin_t>::const_iterator pluginIt;

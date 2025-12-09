@@ -1,4 +1,4 @@
-#include "../inc/pokedex_dynamic.h"
+#include "pokemonai/pokedex_dynamic.h"
 
 #include <iostream>
 
@@ -6,7 +6,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
-#include "../inc/orphan.h"
+#include "pokemonai/orphan.h"
 
 using namespace boost::dll;
 using namespace orphan;

@@ -1,4 +1,4 @@
-#include "../inc/true_skill.h"
+#include "pokemonai/true_skill.h"
 
 #include <cmath>
 #include <boost/format.hpp>

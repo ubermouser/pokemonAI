@@ -1,4 +1,4 @@
-#include "../inc/trainer.h"
+#include "pokemonai/trainer.h"
 
 #include <algorithm>
 #include <random>

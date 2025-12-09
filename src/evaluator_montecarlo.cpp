@@ -1,11 +1,11 @@
-#include "../inc/evaluator_montecarlo.h"
+#include "pokemonai/evaluator_montecarlo.h"
 
 #include <boost/program_options.hpp>
 #include <boost/format.hpp>
 
-#include "../inc/evaluator_simple.h"
-#include "../inc/pkCU.h"
-#include "../inc/planner_random.h"
+#include "pokemonai/evaluator_simple.h"
+#include "pokemonai/pkCU.h"
+#include "pokemonai/planner_random.h"
 
 namespace po = boost::program_options;
 

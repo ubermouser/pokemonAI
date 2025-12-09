@@ -1,11 +1,11 @@
 //#define PKAI_IMPORT
-#include "../inc/planner_random.h"
+#include "pokemonai/planner_random.h"
 
 #include <boost/program_options.hpp>
 #include <boost/format.hpp>
 
-#include "../inc/pkCU.h"
-#include "../inc/environment_possible.h"
+#include "pokemonai/pkCU.h"
+#include "pokemonai/environment_possible.h"
 
 namespace po = boost::program_options;
 

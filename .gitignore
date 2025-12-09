@@ -16,6 +16,7 @@ nbproject/private
 [Dd]ebugPublic/
 [Rr]elease/
 x64/
+.cache/
 build/
 bld/
 [Bb]in/

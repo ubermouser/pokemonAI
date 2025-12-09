@@ -1,6 +1,6 @@
 
 //#define PKAI_EXPORT
-#include "../inc/pokedex_static.h"
+#include "pokemonai/pokedex_static.h"
 
 #include <stdexcept>
 
@@ -10,12 +10,12 @@
 #include <boost/filesystem/fstream.hpp>
 #include <boost/program_options.hpp>
 
-#include "../inc/init_toolbox.h"
-#include "../inc/orphan.h"
-#include "../inc/pluggable.h"
+#include "pokemonai/init_toolbox.h"
+#include "pokemonai/orphan.h"
+#include "pokemonai/pluggable.h"
 
 #ifdef GEN4_STATIC
-#include "../inc/gen4_scripts.h"
+#include "pokemonai/gen4_scripts.h"
 #endif
 
 using namespace INI;

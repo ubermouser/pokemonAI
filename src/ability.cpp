@@ -1,9 +1,9 @@
-#include "../inc/ability.h"
+#include "pokemonai/ability.h"
 
 #include <ostream>
 
-#include "../inc/init_toolbox.h"
-#include "../inc/orphan.h"
+#include "pokemonai/init_toolbox.h"
+#include "pokemonai/orphan.h"
 
 using namespace INI;
 using namespace orphan;

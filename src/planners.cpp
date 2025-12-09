@@ -1,4 +1,4 @@
-#include "../inc/planners.h"
+#include "pokemonai/planners.h"
 
 #include <iostream>
 #include <memory>
@@ -6,12 +6,12 @@
 #include <stdexcept>
 #include <boost/algorithm/string/case_conv.hpp>
 
-#include "../inc/orphan.h"
-#include "../inc/planner_random.h"
-#include "../inc/planner_human.h"
-#include "../inc/planner_max.h"
-#include "../inc/planner_maximin.h"
-#include "../inc/planner_minimax.h"
+#include "pokemonai/orphan.h"
+#include "pokemonai/planner_random.h"
+#include "pokemonai/planner_human.h"
+#include "pokemonai/planner_max.h"
+#include "pokemonai/planner_maximin.h"
+#include "pokemonai/planner_minimax.h"
 
 std::shared_ptr<Planner::Config> planners::config(const std::string& _type) {
   auto type = boost::to_lower_copy(_type);

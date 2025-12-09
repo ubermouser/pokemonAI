@@ -1,4 +1,4 @@
-#include "../inc/game.h"
+#include "pokemonai/game.h"
 
 #include <algorithm>
 #include <iostream>
@@ -10,14 +10,14 @@
 #include <omp.h>
 #include <numeric>
 
-#include "../inc/planner.h"
-#include "../inc/planner_max.h"
-#include "../inc/evaluator.h"
-#include "../inc/evaluator_simple.h"
-#include "../inc/fp_compare.h"
+#include "pokemonai/planner.h"
+#include "pokemonai/planner_max.h"
+#include "pokemonai/evaluator.h"
+#include "pokemonai/evaluator_simple.h"
+#include "pokemonai/fp_compare.h"
 
-#include "../inc/pkCU.h"
-#include "../inc/engine.h"
+#include "pokemonai/pkCU.h"
+#include "pokemonai/engine.h"
 
 namespace po = boost::program_options;
 

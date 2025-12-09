@@ -1,14 +1,14 @@
 
-#include "../inc/backpropNet.h"
+#include "pokemonai/backpropNet.h"
 
 #include <math.h>
 #include <boost/math/special_functions/fpclassify.hpp>
 
 #include <boost/foreach.hpp>
 
-#include "../inc/temporalpropNet.h"
-#include "../inc/neuralNet.h"
-#include "../inc/fp_compare.h"
+#include "pokemonai/temporalpropNet.h"
+#include "pokemonai/neuralNet.h"
+#include "pokemonai/fp_compare.h"
 
 backpropSettings backpropSettings::defaultSettings(0.3f, 0.2f, 0.25f);
 

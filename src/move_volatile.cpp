@@ -1,11 +1,11 @@
-#include "../inc/move_volatile.h"
+#include "pokemonai/move_volatile.h"
 
 #include <boost/static_assert.hpp>
 #include <cstring>
 #include <ostream>
 
-#include "../inc/move_nonvolatile.h"
-#include "../inc/move.h"
+#include "pokemonai/move_nonvolatile.h"
+#include "pokemonai/move.h"
 
 BOOST_STATIC_ASSERT(sizeof(MoveVolatileData) == sizeof(uint8_t));
 

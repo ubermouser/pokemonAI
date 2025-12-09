@@ -10,14 +10,14 @@
 #include <boost/program_options.hpp>
 #include <boost/format.hpp>
 
-#include "../inc/engine.h"
-#include "../inc/pkCU.h"
-#include "../inc/pokedex_static.h"
-#include "../inc/evaluators.h"
-#include "../inc/evaluator_simple.h"
-#include "../inc/planners.h"
+#include "pokemonai/engine.h"
+#include "pokemonai/pkCU.h"
+#include "pokemonai/pokedex_static.h"
+#include "pokemonai/evaluators.h"
+#include "pokemonai/evaluator_simple.h"
+#include "pokemonai/planners.h"
 
-#include "../inc/ranker.h"
+#include "pokemonai/ranker.h"
 
 namespace po = boost::program_options;
 

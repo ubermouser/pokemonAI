@@ -1,4 +1,4 @@
-#include "../inc/fitness.h"
+#include "pokemonai/fitness.h"
 
 #include <iostream>
 #include <boost/format.hpp>

@@ -1,4 +1,4 @@
-#include "../inc/planner_minimax.h"
+#include "pokemonai/planner_minimax.h"
 
 #include <boost/program_options.hpp>
 

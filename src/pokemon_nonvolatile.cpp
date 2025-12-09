@@ -1,4 +1,4 @@
-#include "../inc/pokemon_nonvolatile.h"
+#include "pokemonai/pokemon_nonvolatile.h"
 
 #include <algorithm>
 #include <stdexcept>
@@ -6,17 +6,17 @@
 #include <boost/property_tree/ptree.hpp>
 #include <numeric>
 
-#include "../inc/pokedex.h"
-#include "../inc/pokemon_volatile.h"
-#include "../inc/team_volatile.h"
-#include "../inc/pokemon_base.h"
-#include "../inc/nature.h"
-#include "../inc/ability.h"
-#include "../inc/item.h"
-#include "../inc/move.h"
+#include "pokemonai/pokedex.h"
+#include "pokemonai/pokemon_volatile.h"
+#include "pokemonai/team_volatile.h"
+#include "pokemonai/pokemon_base.h"
+#include "pokemonai/nature.h"
+#include "pokemonai/ability.h"
+#include "pokemonai/item.h"
+#include "pokemonai/move.h"
 
-#include "../inc/init_toolbox.h"
-#include "../inc/orphan.h"
+#include "pokemonai/init_toolbox.h"
+#include "pokemonai/orphan.h"
 
 using namespace orphan;
 namespace pt = boost::property_tree;

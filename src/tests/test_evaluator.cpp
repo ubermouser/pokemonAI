@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
 
-#include <inc/engine.h>
-#include <inc/pokedex_static.h>
-#include <inc/pkCU.h>
+#include "pokemonai/engine.h"
+#include "pokemonai/pokedex_static.h"
+#include "pokemonai/pkCU.h"
 
-#include "inc/evaluator.h"
-#include "inc/evaluator_simple.h"
-#include "inc/evaluator_random.h"
-#include "inc/evaluator_montecarlo.h"
+#include "pokemonai/evaluator.h"
+#include "pokemonai/evaluator_simple.h"
+#include "pokemonai/evaluator_random.h"
+#include "pokemonai/evaluator_montecarlo.h"
 
 
 class EvaluatorTest : public ::testing::Test {

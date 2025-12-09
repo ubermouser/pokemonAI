@@ -1,4 +1,4 @@
-#include "../inc/ranked.h"
+#include "pokemonai/ranked.h"
 
 #include <algorithm>
 #include <iostream>
@@ -7,8 +7,8 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../inc/true_skill.h"
-#include "../inc/game.h"
+#include "pokemonai/true_skill.h"
+#include "pokemonai/game.h"
 
 namespace pt = boost::property_tree;
 const std::string Ranked::HEADER = "PKART0";

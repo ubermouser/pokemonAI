@@ -1,4 +1,4 @@
-#include "../inc/ranked_planner.h"
+#include "pokemonai/ranked_planner.h"
 
 #include <functional>
 

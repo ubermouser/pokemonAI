@@ -1,4 +1,4 @@
-#include "../inc/team_nonvolatile.h"
+#include "pokemonai/team_nonvolatile.h"
 
 #include <algorithm>
 #include <cctype>
@@ -6,10 +6,10 @@
 #include <boost/format.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "../inc/pokemon_base.h"
-#include "../inc/team_volatile.h"
-#include "../inc/init_toolbox.h"
-#include "../inc/orphan.h"
+#include "pokemonai/pokemon_base.h"
+#include "pokemonai/team_volatile.h"
+#include "pokemonai/init_toolbox.h"
+#include "pokemonai/orphan.h"
 
 using namespace orphan;
 namespace pt = boost::property_tree;

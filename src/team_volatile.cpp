@@ -1,7 +1,7 @@
-#include "../inc/team_volatile.h"
+#include "pokemonai/team_volatile.h"
 
-#include "../inc/pokemon_nonvolatile.h"
-#include "../inc/team_nonvolatile.h"
+#include "pokemonai/pokemon_nonvolatile.h"
+#include "pokemonai/team_nonvolatile.h"
 
 #include <cstring>
 #include <ostream>

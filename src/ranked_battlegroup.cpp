@@ -1,4 +1,4 @@
-#include "../inc/ranked_battlegroup.h"
+#include "pokemonai/ranked_battlegroup.h"
 
 #include <algorithm>
 #include <cmath>

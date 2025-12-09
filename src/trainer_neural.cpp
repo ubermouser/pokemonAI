@@ -1,7 +1,7 @@
-#include "../inc/trainer_neural.h"
+#include "pokemonai/trainer_neural.h"
 
-#include "../inc/evaluator_featureVector.h"
-#include "inc/neural_trainer.h"
+#include "pokemonai/evaluator_featureVector.h"
+#include "pokemonai/neural_trainer.h"
 
 
 void TrainerNeural::initialize() {

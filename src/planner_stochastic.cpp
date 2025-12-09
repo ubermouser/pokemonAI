@@ -1,5 +1,5 @@
 //#define PKAI_IMPORT
-#include "../inc/planner_stochastic.h"
+#include "pokemonai/planner_stochastic.h"
 
 #include <iostream>
 #include <iomanip>
@@ -10,15 +10,15 @@
 #include <math.h>
 #include <boost/math/special_functions/fpclassify.hpp>
 
-#include "../inc/evaluator.h"
-#include "../inc/pkCU.h"
-#include "../inc/fp_compare.h"
-#include "../inc/roulette.h"
+#include "pokemonai/evaluator.h"
+#include "pokemonai/pkCU.h"
+#include "pokemonai/fp_compare.h"
+#include "pokemonai/roulette.h"
 
-#include "../inc/planner_max.h"
+#include "pokemonai/planner_max.h"
 
-#include "../inc/environment_possible.h"
-#include "../inc/environment_nonvolatile.h"
+#include "pokemonai/environment_possible.h"
+#include "pokemonai/environment_nonvolatile.h"
 
 planner_stochastic::planner_stochastic(size_t _engineAccuracy, fpType _temperature, fpType _exploration)
   : ident(),

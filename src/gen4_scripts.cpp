@@ -1,21 +1,21 @@
 //#define PKAI_STATIC
-#include "../inc/pkai.h"
+#include "pokemonai/pkai.h"
 //#undef PKAI_STATIC
 
-#include "../inc/gen4_scripts.h"
+#include "pokemonai/gen4_scripts.h"
 
 #include <stdint.h>
 #include <vector>
 #include <algorithm>
 
 //#define PKAI_IMPORT
-#include "../inc/orphan.h"
-#include "../inc/engine.h"
-#include "../inc/pkCU.h"
+#include "pokemonai/orphan.h"
+#include "pokemonai/engine.h"
+#include "pokemonai/pkCU.h"
 //#undef PKAI_IMPORT
 
 //#define PKAI_EXPORT
-#include "../inc/plugin.h"
+#include "pokemonai/plugin.h"
 //#undef PKAI_EXPORT
 
 const Pokedex* dex;

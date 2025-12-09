@@ -1,10 +1,10 @@
-#include "../inc/item.h"
+#include "pokemonai/item.h"
 
 #include <iostream>
 
-#include "../inc/init_toolbox.h"
-#include "../inc/orphan.h"
-#include "../inc/type.h"
+#include "pokemonai/init_toolbox.h"
+#include "pokemonai/orphan.h"
+#include "pokemonai/type.h"
 
 using namespace INI;
 using namespace orphan;

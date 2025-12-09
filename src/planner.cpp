@@ -1,5 +1,5 @@
 //#define PKAI_IMPORT
-#include "../inc/planner.h"
+#include "pokemonai/planner.h"
 
 #include <algorithm>
 #include <chrono>

@@ -1,4 +1,4 @@
-#include "../inc/order_heuristic.h"
+#include "pokemonai/order_heuristic.h"
 
 #include <algorithm>
 #include <unordered_map>

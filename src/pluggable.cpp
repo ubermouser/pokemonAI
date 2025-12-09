@@ -1,10 +1,10 @@
 
 //#define PKAI_EXPORT
-#include "../inc/pluggable.h"
+#include "pokemonai/pluggable.h"
 //#undef PKAI_EXPORT
 
 //#define PKAI_STATIC
-#include "../inc/plugin.h"
+#include "pokemonai/plugin.h"
 //#undef PKAI_STATIC
 
 plugin_t Pluggable::emptyPlugin = { NULL, 0, 0 };

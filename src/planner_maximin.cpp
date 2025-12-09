@@ -1,4 +1,4 @@
-#include "../inc/planner_maximin.h"
+#include "pokemonai/planner_maximin.h"
 
 #include <unordered_map>
 

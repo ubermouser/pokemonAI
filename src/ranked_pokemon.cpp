@@ -1,4 +1,4 @@
-#include "../inc/ranked_pokemon.h"
+#include "pokemonai/ranked_pokemon.h"
 
 #include <sstream>
 #include <string>

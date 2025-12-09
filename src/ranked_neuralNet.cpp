@@ -1,5 +1,5 @@
 
-#include "../inc/ranked_neuralNet.h"
+#include "pokemonai/ranked_neuralNet.h"
 
 #include <map>
 #include <algorithm>
@@ -9,19 +9,19 @@
 #include <boost/foreach.hpp>
 #include <boost/scoped_ptr.hpp>
 
-#include "../inc/environment_nonvolatile.h"
-#include "../inc/environment_volatile.h"
+#include "pokemonai/environment_nonvolatile.h"
+#include "pokemonai/environment_volatile.h"
 
-#include "../inc/planner_directed.h"
+#include "pokemonai/planner_directed.h"
 
-#include "../inc/evaluator_featureVector.h"
+#include "pokemonai/evaluator_featureVector.h"
 
-#include "../inc/signature.h"
-#include "../inc/fp_compare.h"
-#include "../inc/init_toolbox.h"
+#include "pokemonai/signature.h"
+#include "pokemonai/fp_compare.h"
+#include "pokemonai/init_toolbox.h"
 
-#include "../inc/planner_random.h"
-#include "../inc/game.h"
+#include "pokemonai/planner_random.h"
+#include "pokemonai/game.h"
 
 const std::string ranked_neuralNet::header = "PKNTR1";
 

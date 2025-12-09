@@ -1,11 +1,11 @@
-#include "../inc/pokemon_base.h"
+#include "pokemonai/pokemon_base.h"
 
-#include "../inc/init_toolbox.h"
-#include "../inc/orphan.h"
+#include "pokemonai/init_toolbox.h"
+#include "pokemonai/orphan.h"
 
-#include "../inc/ability.h"
-#include "../inc/type.h"
-#include "../inc/move.h"
+#include "pokemonai/ability.h"
+#include "pokemonai/type.h"
+#include "pokemonai/move.h"
 
 using namespace INI;
 using namespace orphan;

@@ -1,13 +1,13 @@
-#include "../inc/move.h"
+#include "pokemonai/move.h"
 
 #include <algorithm>
 
-#include "../inc/init_toolbox.h"
-#include "../inc/orphan.h"
+#include "pokemonai/init_toolbox.h"
+#include "pokemonai/orphan.h"
 
-#include "../inc/move_nonvolatile.h"
-#include "../inc/type.h"
-#include "../inc/pokedex.h"
+#include "pokemonai/move_nonvolatile.h"
+#include "pokemonai/type.h"
+#include "pokemonai/pokedex.h"
 
 using namespace INI;
 using namespace orphan;

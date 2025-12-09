@@ -1,11 +1,11 @@
 //#define PKAI_IMPORT
-#include "../inc/evaluator_simple.h"
+#include "pokemonai/evaluator_simple.h"
 
 #include <algorithm>
 #include <stdexcept>
 #include <boost/format.hpp>
 
-#include "../inc/engine.h"
+#include "pokemonai/engine.h"
 
 namespace po = boost::program_options;
 

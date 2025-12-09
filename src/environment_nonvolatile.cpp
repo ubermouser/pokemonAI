@@ -1,12 +1,12 @@
 
 //#define PKAI_EXPORT
-#include "../inc/environment_nonvolatile.h"
+#include "pokemonai/environment_nonvolatile.h"
 //#undef PKAI_EXPORT
 
 #include <assert.h>
 
 //#define PKAI_STATIC
-#include "../inc/team_nonvolatile.h"
+#include "pokemonai/team_nonvolatile.h"
 //#undef PKAI_STATIC
 
 EnvironmentNonvolatile& EnvironmentNonvolatile::initialize() {

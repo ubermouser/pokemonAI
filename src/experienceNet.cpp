@@ -1,14 +1,14 @@
-#include "../inc/experienceNet.h"
+#include "pokemonai/experienceNet.h"
 
 #include <assert.h>
 #include <cstring>
 #include <boost/math/distributions/normal.hpp>
 #include <math.h>
 
-#include "../inc/fp_compare.h"
+#include "pokemonai/fp_compare.h"
 
-#include "../inc/evaluator_featureVector.h"
-#include "../inc/neuralNet.h"
+#include "pokemonai/evaluator_featureVector.h"
+#include "pokemonai/neuralNet.h"
 
 #define ALIGN_SIZE 4
 #define ALIGN_OF(size) (size & 3)

@@ -1,5 +1,5 @@
 //#define PKAI_EXPORT
-#include "../inc/name.h"
+#include "pokemonai/name.h"
 
 #include <algorithm>
 

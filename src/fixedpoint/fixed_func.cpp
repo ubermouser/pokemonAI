@@ -33,7 +33,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fixed_func.h"
+#include "pokemonai/fixedpoint/fixed_func.h"
 
 namespace fixedpoint {
 

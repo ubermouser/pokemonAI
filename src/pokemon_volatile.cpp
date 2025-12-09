@@ -1,14 +1,14 @@
-#include "../inc/pokemon_volatile.h"
+#include "pokemonai/pokemon_volatile.h"
 
-#include "../inc/pokedex.h"
-#include "../inc/name.h"
-#include "../inc/pokemon_base.h"
-#include "../inc/move.h"
-#include "../inc/item.h"
-#include "../inc/ability.h"
-#include "../inc/nature.h"
-#include "../inc/pokemon_nonvolatile.h"
-#include "../inc/move_volatile.h"
+#include "pokemonai/pokedex.h"
+#include "pokemonai/name.h"
+#include "pokemonai/pokemon_base.h"
+#include "pokemonai/move.h"
+#include "pokemonai/item.h"
+#include "pokemonai/ability.h"
+#include "pokemonai/nature.h"
+#include "pokemonai/pokemon_nonvolatile.h"
+#include "pokemonai/move_volatile.h"
 
 #include <boost/format.hpp>
 #include <boost/static_assert.hpp>

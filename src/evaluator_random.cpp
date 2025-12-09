@@ -1,5 +1,5 @@
 //#define PKAI_IMPORT
-#include "../inc/evaluator_random.h"
+#include "pokemonai/evaluator_random.h"
 
 
 EvalResult EvaluatorRandom::calculateFitness(

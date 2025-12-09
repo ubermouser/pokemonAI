@@ -1,1 +1,1 @@
-#include "../inc/transposition_table.h"
+#include "pokemonai/transposition_table.h"
