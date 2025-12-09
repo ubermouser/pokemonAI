@@ -286,6 +286,9 @@ int move_spikes_switch(
   PkCUEngine& cu,
   PokemonVolatile cPKV)
 {
+  // spikes deals no damage if the pokemon is flying type:
+  if (cPKV.getBase().hasType(flying_t)) { return 0; }
+
   switch (cPKV.status().nonvolatile.spikes) {
   case 3: // deal damage based on tier:
     cPKV.modPercentHP(-0.25); return 1;

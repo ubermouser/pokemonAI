@@ -176,36 +176,36 @@ TEST_F(EngineTest, GroundConditions) {
   { // test rapid-spin removal:
     auto spikes_removed = engine_->updateState(spikes.at(0), Action::wait(), Action::move(3));
     auto removed_vs_spikes = engine_->updateState(spikes_removed.at(0), Action::wait(), Action::swap(1));
-    EXPECT_EQ(removed_vs_spikes.at(0).getEnv().getTeam(1).getPKV().getHP(), 170); // 100%
+    EXPECT_EQ(removed_vs_spikes.at(0).getEnv().getTeam(1).getPKV().getPercentHP(), 1.); // 100%
   }
   { // test normal harmed vs spikes:
     auto normal_vs_spikes = engine_->updateState(spikes.at(0), Action::wait(), Action::swap(1));
-    EXPECT_EQ(normal_vs_spikes.at(0).getEnv().getTeam(1).getPKV().getHP(), 149); // 87.5%
+    EXPECT_NEAR(normal_vs_spikes.at(0).getEnv().getTeam(1).getPKV().getPercentHP(), 0.875, 0.005); // 87.5%
   }
   { // test normal harmed vs toxic spikes:
     auto normal_vs_toxic = engine_->updateState(toxic_spikes.at(0), Action::wait(), Action::swap(1));
-    EXPECT_EQ(normal_vs_toxic.at(0).getEnv().getTeam(1).getPKV().getHP(), 149); // 87.5%
+    EXPECT_NEAR(normal_vs_toxic.at(0).getEnv().getTeam(1).getPKV().getPercentHP(), 0.875, 0.005); // 87.5%
     EXPECT_EQ(normal_vs_toxic.at(0).getEnv().getTeam(1).getPKV().getStatusAilment(), AIL_NV_POISON); // 87.5%
   }
   { // test levitate unharmed vs spikes:
     auto lev_vs_spikes = engine_->updateState(spikes.at(0), Action::wait(), Action::swap(2));
-    EXPECT_EQ(lev_vs_spikes.at(0).getEnv().getTeam(1).getPKV().getHP(), 260); // 100%
+    EXPECT_EQ(lev_vs_spikes.at(0).getEnv().getTeam(1).getPKV().getPercentHP(), 1.); // 100%
   }
   { // test levitate unharmed vs toxic spikes:
     auto lev_vs_toxic = engine_->updateState(toxic_spikes.at(0), Action::wait(), Action::swap(2));
-    EXPECT_EQ(lev_vs_toxic.at(0).getEnv().getTeam(1).getPKV().getHP(), 260); // 100%
+    EXPECT_EQ(lev_vs_toxic.at(0).getEnv().getTeam(1).getPKV().getPercentHP(), 1.); // 100%
   }
   { // test levitate harmed vs stealth rock:
     auto lev_vs_sr = engine_->updateState(stealth_rock.at(0), Action::wait(), Action::swap(2));
-    EXPECT_EQ(lev_vs_sr.at(0).getEnv().getTeam(1).getPKV().getHP(), 260); // 87.5%
+    EXPECT_NEAR(lev_vs_sr.at(0).getEnv().getTeam(1).getPKV().getPercentHP(), 0.875, 0.005); // 87.5%
   }
   { // test flying unharmed vs spikes:
     auto flying_vs_spikes = engine_->updateState(spikes.at(0), Action::wait(), Action::swap(3));
-    EXPECT_EQ(flying_vs_spikes.at(0).getEnv().getTeam(1).getPKV().getHP(), 190); // 100%
+    EXPECT_EQ(flying_vs_spikes.at(0).getEnv().getTeam(1).getPKV().getPercentHP(), 1.); // 100%
   }
   { // test flying harmed vs stealth rock:
     auto flying_vs_sr = engine_->updateState(stealth_rock.at(0), Action::wait(), Action::swap(3));
-    EXPECT_EQ(flying_vs_sr.at(0).getEnv().getTeam(1).getPKV().getHP(), 143); // 75%
+    EXPECT_NEAR(flying_vs_sr.at(0).getEnv().getTeam(1).getPKV().getPercentHP(), 0.75, 0.005); // 75%
   }
 }
 
@@ -434,7 +434,7 @@ TEST_F(EngineTest, UTurn) {
   }
   { // u-turn with an ally:
     EXPECT_EQ(uturn_to_ally.at(0).getEnv().getTeam(0).teammate(0).getMV(0).getPP(), 31); // pp decremented
-    EXPECT_FLOAT_EQ(uturn_to_ally.at(0).getEnv().getTeam(0).teammate(0).getPercentHP(), 0.7875); // item effect AND stealth-rock apply
+    EXPECT_NEAR(uturn_to_ally.at(0).getEnv().getTeam(0).teammate(0).getPercentHP(), 0.7875, 0.005); // item effect AND stealth-rock apply
     EXPECT_EQ(uturn_to_ally.at(0).getEnv().getTeam(0).getICPKV(), 1); // ally has swapped out
     EXPECT_EQ(uturn_to_ally.at(0).getEnv().getTeam(1).teammate(1).getPercentHP(), 0.); // enemy weakling deleted
   }

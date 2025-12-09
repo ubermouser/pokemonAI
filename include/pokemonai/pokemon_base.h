@@ -92,6 +92,8 @@ public:
 
   const Type& getType(size_t iType) const { return *types_[iType]; };
 
+  bool hasType(const Type* oType) const { return types_[0] == oType || types_[1] == oType; }
+
   const AbilitySet& getAbilities() const { return abilities_; }
 
   PokemonBase() = default;
