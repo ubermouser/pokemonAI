@@ -71,6 +71,58 @@ class PkCUEngine;
 #define VALID_SWAP_SIZE 4
 
 
+struct IsValidResult {
+  enum InvalidActionReason {
+    VALID,
+    MOVE_INVALID,
+    MOVE_TARGET_DEAD,
+    MOVE_SELF_DEAD,
+    MOVE_NO_PP,
+    MOVE_FRIENDLY_TARGET_DEAD,
+    MOVE_FRIENDLY_TARGET_SELF,
+    MOVE_LOCKED_BY_SCRIPT,
+    SWITCH_INVALID_POKEMON,
+    SWITCH_TO_SELF,
+    SWITCH_POKEMON_DEAD,
+    SWITCH_MUST_WAIT,
+    SWITCH_LOCKED_BY_SCRIPT,
+    WAIT_NOT_ALLOWED,
+    STRUGGLE_NOT_ALLOWED,
+    ACTION_TYPE_DISABLED,
+    INVALID_FRIENDLY_TARGET,
+  };
+
+  InvalidActionReason reason;
+
+  IsValidResult(InvalidActionReason reason) : reason(reason) {}
+
+  explicit operator bool() const { return reason == VALID; }
+};
+
+static const char* invalidActionReasonToString(IsValidResult result) {
+  switch (result.reason) {
+    case IsValidResult::VALID: return "Valid action";
+    case IsValidResult::MOVE_INVALID: return "Move index out of bounds";
+    case IsValidResult::MOVE_TARGET_DEAD: return "Target is dead";
+    case IsValidResult::MOVE_SELF_DEAD: return "Current pokemon is dead";
+    case IsValidResult::MOVE_NO_PP: return "Move has no PP left";
+    case IsValidResult::MOVE_FRIENDLY_TARGET_DEAD: return "Friendly target is dead";
+    case IsValidResult::MOVE_FRIENDLY_TARGET_SELF: return "Cannot target self with this move";
+    case IsValidResult::MOVE_LOCKED_BY_SCRIPT: return "Move locked by script";
+    case IsValidResult::SWITCH_INVALID_POKEMON: return "Teammate index is out of bounds";
+    case IsValidResult::SWITCH_TO_SELF: return "Cannot switch to self";
+    case IsValidResult::SWITCH_POKEMON_DEAD: return "Cannot switch to a dead pokemon";
+    case IsValidResult::SWITCH_MUST_WAIT: return "Must wait for opponent's free move";
+    case IsValidResult::SWITCH_LOCKED_BY_SCRIPT: return "Switch locked by script";
+    case IsValidResult::WAIT_NOT_ALLOWED: return "Wait is not allowed unless opponent has a free move";
+    case IsValidResult::STRUGGLE_NOT_ALLOWED: return "Struggle is not a valid action";
+    case IsValidResult::ACTION_TYPE_DISABLED: return "Action type disabled";
+    case IsValidResult::INVALID_FRIENDLY_TARGET: return "Invalid friendly target";
+    default: return "Unknown invalid action reason";
+  }
+}
+
+
 struct DamageComponents_t {
   uint32_t damage;
   uint32_t damageCrit;
@@ -160,8 +212,8 @@ public:
   ActionPairVector getAllValidActions(const ConstEnvironmentVolatile& envV, size_t agentTeam=TEAM_A) const;
 
   /* determines whether a given action is a selectable one, given the current state */
-  bool isValidAction(const ConstEnvironmentVolatile& envV, const Action& action, size_t iTeam) const;
-  bool isValidAction(const ConstEnvironmentPossible& envV, const Action& action, size_t iTeam) const {
+  IsValidResult isValidAction(const ConstEnvironmentVolatile& envV, const Action& action, size_t iTeam) const;
+  IsValidResult isValidAction(const ConstEnvironmentPossible& envV, const Action& action, size_t iTeam) const {
     return isValidAction(envV.getEnv(), action, iTeam);
   }
 
