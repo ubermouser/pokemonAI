@@ -11,6 +11,9 @@ nbproject/private
 */nbproject/private
 *.dep.inc
 
+# VSCode projects:
+.vscode/
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -60,6 +63,9 @@ dlldata.c
 *.pidb
 *.svclog
 *.scc
+
+# CMake test files
+cmake_test_discovery*
 
 # Chutzpah Test files
 _Chutzpah*
