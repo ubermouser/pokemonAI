@@ -140,6 +140,9 @@ TEST_F(PlannerTest, MaximinPlannerChooses2PlyOption) {
 
 
 TEST_F(PlannerTest, MaximinPlannerChoosesNPlyOption) {
+  // Though team_a can defeat team_b in 2 turns, team_a might choose not to end
+  // the game because team_a cannot be hurt by team_b. This test ensures that
+  // planners are greedy in the face of equally good options.
   PlannerMaxiMin::Config cfg;
   cfg.minDepth = 4;
   cfg.maxDepth = 4; // success is possible in 2 turns
