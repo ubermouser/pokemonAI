@@ -709,12 +709,12 @@ int move_uTurn_testMoveSwap(
   return 1;
 }
 
-int move_suckerPunch_alwaysMissesOnCondition
+int move_suckerPunch_noDamageOnCondition
   (PkCUEngine& cu,
   MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV,
-  fpType& probabilityToHit) {
+  uint32_t& raw_damage) {
   if (&mV.getBase() != suckerPunch_t) { return 0; }
 
   // if the enemy's move is NOT a damaging move:
@@ -725,8 +725,8 @@ int move_suckerPunch_alwaysMissesOnCondition
   // if the enemy moves first:
   bool enemyMovedFirst = cu.getBase().hasMovedFirst(cu.getIOTeam());
   if (!enemyDamagingAction || enemyMovedFirst) {
-    // the move never hits if these conditions are met:
-    probabilityToHit = 0.0;
+    // the move does not deal damage if these conditions are met:
+    raw_damage = 0;
   }
   
   return 1;
@@ -1545,7 +1545,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(MOVE_PLUGIN, "stealth rock", PLUGIN_ON_SWITCHIN, move_stealthRock_switch, 0, 2));
   extensions.push_back(plugin(MOVE_PLUGIN, "stealth rock", PLUGIN_ON_EVALUATEMOVE, move_stealthRock_set, 0, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "stone edge", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, 0));
-  extensions.push_back(plugin(MOVE_PLUGIN, "sucker punch", PLUGIN_ON_MODIFYHITPROBABILITY, move_suckerPunch_alwaysMissesOnCondition, 0, 0));
+  extensions.push_back(plugin(MOVE_PLUGIN, "sucker punch", PLUGIN_ON_CALCULATEDAMAGE, move_suckerPunch_noDamageOnCondition, 0, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "swift", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "toxic spikes", PLUGIN_ON_SWITCHIN, move_toxicSpikes_switch, 2, 2));
   extensions.push_back(plugin(MOVE_PLUGIN, "toxic spikes", PLUGIN_ON_EVALUATEMOVE, move_toxicSpikes_set, 0, 0));

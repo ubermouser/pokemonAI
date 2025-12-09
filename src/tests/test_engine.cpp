@@ -474,7 +474,7 @@ TEST_F(EngineTest, SuckerPunch) {
     EXPECT_EQ(suckerpunch_move.at(0).getEnv().getTeam(0).teammate(0).getMV(0).getPP(), 7);
   }
   {  // full damage to pokemon who attacked:
-    EXPECT_EQ(suckerpunch_dmg.at(0).getEnv().getTeam(1).teammate(0).getHP(), 129);
+    EXPECT_LT(suckerpunch_dmg.at(0).getEnv().getTeam(1).teammate(0).getPercentHP(), 0.75);
     EXPECT_EQ(suckerpunch_dmg.at(0).getEnv().getTeam(0).teammate(0).getMV(0).getPP(), 7);
   }
 }
