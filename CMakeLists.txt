@@ -13,6 +13,23 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Include directories
 include_directories(. inc ${Boost_INCLUDE_DIRS})
 
+# Add preprocessor definitions
+add_compile_definitions(
+    WIN32
+    _SCL_SECURE_NO_WARNINGS
+    _DISABLEFINEGRAINEDLOCKING
+    _DISABLETEMPORALTRACE
+    _CONSOLE
+    _HTCOLLECTSTATISTICS
+    DOUBLEPRECISION
+)
+
+# Configuration-specific settings
+add_compile_definitions(
+    $<$<CONFIG:Debug>:DEBUG>
+    $<$<CONFIG:Release>:NDEBUG>
+)
+
 # Add subdirectories
 add_subdirectory(pkaiEngine)
 add_subdirectory(gen4_scripts)
@@ -27,20 +44,3 @@ find_package(OpenMP REQUIRED)
 
 # Link libraries
 target_link_libraries(pokemonAI pkaiEngine gen4_scripts Boost::program_options Boost::filesystem OpenMP::OpenMP_CXX)
-
-# Add preprocessor definitions
-target_compile_definitions(pokemonAI PRIVATE
-    WIN32
-    _SCL_SECURE_NO_WARNINGS
-    _DISABLEFINEGRAINEDLOCKING
-    _DISABLETEMPORALTRACE
-    _CONSOLE
-    _HTCOLLECTSTATISTICS
-    DOUBLEPRECISION
-)
-
-# Configuration-specific settings
-target_compile_definitions(pokemonAI PRIVATE
-    $<$<CONFIG:Debug>:DEBUG>
-    $<$<CONFIG:Release>:NDEBUG>
-)

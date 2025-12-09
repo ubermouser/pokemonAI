@@ -1,4 +1,4 @@
-#include "trainer.h"
+#include "../inc/old_trainer.h"
 
 #include <iomanip>
 #include <iostream>
@@ -12,8 +12,8 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
 
-#include <engine.h>
-#include <pkIO.h>
+#include "../inc/engine.h"
+#include "../inc/pkIO.h"
 
 template <class data_t>
 void saveElements(
