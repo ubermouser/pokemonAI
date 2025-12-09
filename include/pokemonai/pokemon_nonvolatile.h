@@ -261,7 +261,7 @@ public:
   boost::property_tree::ptree output(bool printHeader = true) const override;
 
 private:
-  void handleMoveLearnResult(MoveLearnResult result);
+  void handleMoveLearnResult(MoveLearnResult result, const MoveNonVolatile& candidate) const;
 };
 
 

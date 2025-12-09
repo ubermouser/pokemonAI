@@ -11,6 +11,10 @@ public:
   virtual ~HasName() {}
 
   virtual const std::string& getName() const = 0;
+
+  bool hasName() const {
+    return !getName().empty();
+  }
 };
 
 

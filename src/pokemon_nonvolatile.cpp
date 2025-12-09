@@ -348,23 +348,34 @@ MoveLearnResult PokemonNonVolatile::isLegalSet(size_t iAction, const Move& candi
   return MoveLearnResult::SUCCESS;
 }
 
-void PokemonNonVolatile::handleMoveLearnResult(MoveLearnResult result) {
+void PokemonNonVolatile::handleMoveLearnResult(MoveLearnResult result, const MoveNonVolatile& candidate) const {
+  const auto& move_name = candidate.getBase().getName();
+  const auto& species_name = this->getBase().getName();
   switch (result)
   {
   case MoveLearnResult::SUCCESS:
     break;
   case MoveLearnResult::POKEMON_DOES_NOT_EXIST:
-    throw std::invalid_argument("Pokemon does not exist");
+    throw std::invalid_argument(
+      "Pokemon \"" + getName() + "\" has no base class");
   case MoveLearnResult::MAX_MOVES_REACHED:
-    throw std::invalid_argument("Pokemon cannot learn more than 4 moves");
+    throw std::invalid_argument(
+      "Pokemon \"" + getName() + "\" cannot learn more than 4 moves");
   case MoveLearnResult::INVALID_MOVE_INDEX:
-    throw std::invalid_argument("Invalid move index");
+    throw std::invalid_argument(
+      "Invalid move index");
   case MoveLearnResult::MOVE_NOT_IMPLEMENTED:
-    throw std::invalid_argument("Move is not implemented");
+    throw std::invalid_argument(
+      "Move is not implemented / has no base class");
   case MoveLearnResult::MOVE_NOT_IN_MOVELIST:
-    throw std::invalid_argument("Move is not in the Pokemon's movelist");
+    throw std::invalid_argument(
+      "Move " + move_name +
+      " is not in species " + species_name +
+      "'s movelist");
   case MoveLearnResult::MOVE_ALREADY_KNOWN:
-    throw std::invalid_argument("Pokemon already knows this move");
+    throw std::invalid_argument(
+      "Pokemon n=" + getName() +
+      " already knows move" + move_name);
   default:
     throw std::invalid_argument("Unknown error");
   }
@@ -373,7 +384,7 @@ void PokemonNonVolatile::handleMoveLearnResult(MoveLearnResult result) {
 PokemonNonVolatile& PokemonNonVolatile::addMove(const MoveNonVolatile& _cMove) {
   MoveLearnResult result = isLegalAdd(_cMove);
   if (result != MoveLearnResult::SUCCESS) {
-    handleMoveLearnResult(result);
+    handleMoveLearnResult(result, _cMove);
   }
   actions_.push_back(_cMove);
   return *this;
@@ -415,7 +426,7 @@ const MoveNonVolatile& PokemonNonVolatile::getMove(size_t index) const {
 PokemonNonVolatile& PokemonNonVolatile::setMove(size_t iAction, const MoveNonVolatile& _cMove) {
   MoveLearnResult result = isLegalSet(iAction, _cMove);
   if (result != MoveLearnResult::SUCCESS) {
-    handleMoveLearnResult(result);
+    handleMoveLearnResult(result, _cMove);
   }
   getMove(iAction) = _cMove;
   return *this;
@@ -654,8 +665,9 @@ void PokemonNonVolatile::input(const pt::ptree& ptree, Orphanage& orphanage) {
     if (verbose >= 5) {
       std::cerr << "WAR " << __FILE__ << "." << __LINE__ <<
         ": pokemon " << *this <<
-        " cannot use illegal ability \"" << ability->getName() <<
-        "\"!\n";
+        " cannot use ability \"" << ability->getName() <<
+          "\": " << e.what() <<
+          "!\n";
     }
   }
 
@@ -673,8 +685,9 @@ void PokemonNonVolatile::input(const pt::ptree& ptree, Orphanage& orphanage) {
       if (verbose >= 5) {
         std::cerr << "WAR " << __FILE__ << "." << __LINE__ <<
           ": pokemon " << *this <<
-          " cannot use illegal move \"" << move->getName() <<
-          "\"!\n";
+          " cannot use move \"" << move->getName() <<
+          "\": " << e.what() <<
+          "!\n";
       }
     }
   }
