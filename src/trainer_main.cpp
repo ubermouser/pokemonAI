@@ -1,8 +1,8 @@
 /* 
- * File:   ranker_main.cpp
+ * File:   trainer_main.cpp
  * Author: drendleman
  *
- * Created on December 8, 2025, 5:47 PM
+ * Created on September 17, 2020, 11:15 AM
  */
 #include <iostream>
 #include <memory>
@@ -10,20 +10,23 @@
 #include <boost/program_options.hpp>
 #include <boost/format.hpp>
 
+#include "../inc/ranker.h"
+#include "../inc/trainer.h"
+#include "../inc/engine.h"
 #include "../inc/pkCU.h"
 #include "../inc/pokedex_static.h"
 #include "../inc/evaluators.h"
 #include "../inc/evaluator_simple.h"
 #include "../inc/planners.h"
 
-#include "../inc/ranker.h"
+#include "../inc/trainer.h"
 
 namespace po = boost::program_options;
 
 
 struct Config {
   PokedexStatic::Config pokedex;
-  Ranker::Config ranker;
+  Trainer::Config trainer;
   Game::Config game;
   PkCU::Config engine;
   std::vector<std::string> teams;
@@ -67,7 +70,7 @@ struct Config {
         po::value<int>(&verbosity)->default_value(defaults.verbosity),
         "static verbosity level.");
     desc.add(pokedex.options());
-    desc.add(ranker.options());
+    desc.add(trainer.options());
     desc.add(game.options("game configuration", "game"));
     desc.add(engine.options());
     for (size_t iPlan = 0; iPlan != plannerConfigs.size(); ++iPlan) {
@@ -121,22 +124,22 @@ int main(int argc, char** argv) {
 
   auto pokedex = PokedexStatic(cfg.pokedex);
 
-  Ranker ranker{cfg.ranker};
-  ranker.setEngine(PkCU{cfg.engine});
-  ranker.setGame(Game{cfg.game});
-  ranker.setStateEvaluator(EvaluatorSimple().setEngine(PkCU{cfg.engine}));
+  Trainer trainer{cfg.trainer};
+  trainer.setEngine(PkCU{cfg.engine});
+  trainer.setGame(Game{cfg.game});
+  trainer.setStateEvaluator(EvaluatorSimple().setEngine(PkCU{cfg.engine}));
   for (size_t iPlan = 0; iPlan != cfg.plannerTypes.size(); ++iPlan) {
-    ranker.addPlanner(planners::choose(cfg.plannerTypes[iPlan], *cfg.plannerConfigs[iPlan]));
+    trainer.addPlanner(planners::choose(cfg.plannerTypes[iPlan], *cfg.plannerConfigs[iPlan]));
   }
   for (size_t iEval = 0; iEval != cfg.evalTypes.size(); ++iEval) {
-    ranker.addEvaluator(evaluators::choose(cfg.evalTypes[iEval], *cfg.evalConfigs[iEval]));
+    trainer.addEvaluator(evaluators::choose(cfg.evalTypes[iEval], *cfg.evalConfigs[iEval]));
   }
   for (const auto& teamPath: cfg.teams) {
-    ranker.addTeam(TeamNonVolatile::load(teamPath));
+    trainer.addTeam(TeamNonVolatile::load(teamPath));
   }
 
-  ranker.initialize();
-  ranker.rank();
+  trainer.initialize();
+  trainer.evolve();
   
   std::exit(EXIT_SUCCESS);
 }

@@ -34,6 +34,7 @@ add_compile_definitions(
 # Add subdirectories
 add_subdirectory(pkaiEngine)
 add_subdirectory(gen4_scripts)
+add_subdirectory(ranker)
 add_subdirectory(trainer)
 add_subdirectory(battler)
 

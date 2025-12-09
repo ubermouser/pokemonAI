@@ -113,7 +113,7 @@ public:
     bool allowSamePlanner = true;
 
     boost::program_options::options_description options(
-        const std::string& category="trainer configuration",
+        const std::string& category="ranker configuration",
         std::string prefix = "");
 
     Config() {};
