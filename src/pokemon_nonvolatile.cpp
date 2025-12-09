@@ -348,13 +348,10 @@ MoveLearnResult PokemonNonVolatile::isLegalSet(size_t iAction, const Move& candi
   return MoveLearnResult::SUCCESS;
 }
 
-
-PokemonNonVolatile& PokemonNonVolatile::addMove(const MoveNonVolatile& _cMove) {
-  MoveLearnResult result = isLegalAdd(_cMove);
+void PokemonNonVolatile::handleMoveLearnResult(MoveLearnResult result) {
   switch (result)
   {
   case MoveLearnResult::SUCCESS:
-    actions_.push_back(_cMove);
     break;
   case MoveLearnResult::POKEMON_DOES_NOT_EXIST:
     throw std::invalid_argument("Pokemon does not exist");
@@ -371,6 +368,14 @@ PokemonNonVolatile& PokemonNonVolatile::addMove(const MoveNonVolatile& _cMove) {
   default:
     throw std::invalid_argument("Unknown error");
   }
+}
+
+PokemonNonVolatile& PokemonNonVolatile::addMove(const MoveNonVolatile& _cMove) {
+  MoveLearnResult result = isLegalAdd(_cMove);
+  if (result != MoveLearnResult::SUCCESS) {
+    handleMoveLearnResult(result);
+  }
+  actions_.push_back(_cMove);
   return *this;
 }
 
@@ -409,24 +414,10 @@ const MoveNonVolatile& PokemonNonVolatile::getMove(size_t index) const {
 
 PokemonNonVolatile& PokemonNonVolatile::setMove(size_t iAction, const MoveNonVolatile& _cMove) {
   MoveLearnResult result = isLegalSet(iAction, _cMove);
-  switch (result)
-  {
-  case MoveLearnResult::SUCCESS:
-    getMove(iAction) = _cMove;
-    break;
-  case MoveLearnResult::POKEMON_DOES_NOT_EXIST:
-    throw std::invalid_argument("Pokemon does not exist");
-  case MoveLearnResult::MAX_MOVES_REACHED:
-    throw std::invalid_argument("Pokemon cannot learn more than 4 moves");
-  case MoveLearnResult::MOVE_NOT_IMPLEMENTED:
-    throw std::invalid_argument("Move is not implemented");
-  case MoveLearnResult::MOVE_NOT_IN_MOVELIST:
-    throw std::invalid_argument("Move is not in the Pokemon's movelist");
-  case MoveLearnResult::MOVE_ALREADY_KNOWN:
-    throw std::invalid_argument("Pokemon already knows this move");
-  default:
-    throw std::invalid_argument("Unknown error");
+  if (result != MoveLearnResult::SUCCESS) {
+    handleMoveLearnResult(result);
   }
+  getMove(iAction) = _cMove;
   return *this;
 };
 

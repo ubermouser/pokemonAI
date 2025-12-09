@@ -259,6 +259,9 @@ public:
   void input(const boost::property_tree::ptree& ptree) override;
   void input(const boost::property_tree::ptree& ptree, Orphanage& orphanage);
   boost::property_tree::ptree output(bool printHeader = true) const override;
+
+private:
+  void handleMoveLearnResult(MoveLearnResult result);
 };
 
 
