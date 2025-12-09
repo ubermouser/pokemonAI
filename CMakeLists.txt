@@ -22,6 +22,7 @@ add_compile_definitions(
     _CONSOLE
     _HTCOLLECTSTATISTICS
     DOUBLEPRECISION
+    GEN4_STATIC
 )
 
 # Configuration-specific settings
