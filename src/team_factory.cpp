@@ -266,7 +266,7 @@ void TeamFactory::randomSpecies(const TeamNonVolatile& cTeam, PokemonNonVolatile
       // increment in reverse order, since a delete will remove the last element from the move array
       size_t iMove = iSize - iNMove - 1;
 
-      if (!cPokemon.isLegalSet(iMove, cPokemon.getMove(iMove))) {
+      if (cPokemon.isLegalSet(iMove, cPokemon.getMove(iMove)) != MoveLearnResult::SUCCESS) {
         cPokemon.removeMove(iMove);
         numInvalidMoves++;
       }
