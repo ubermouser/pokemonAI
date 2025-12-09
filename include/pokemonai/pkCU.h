@@ -71,6 +71,50 @@ class PkCUEngine;
 #define VALID_SWAP_SIZE 4
 
 
+enum InvalidActionReason {
+  VALID,
+  MOVE_INVALID,
+  MOVE_TARGET_DEAD,
+  MOVE_SELF_DEAD,
+  MOVE_NO_PP,
+  MOVE_FRIENDLY_TARGET_DEAD,
+  MOVE_FRIENDLY_TARGET_SELF,
+  MOVE_LOCKED_BY_SCRIPT,
+  SWITCH_INVALID_POKEMON,
+  SWITCH_TO_SELF,
+  SWITCH_POKEMON_DEAD,
+  SWITCH_MUST_WAIT,
+  SWITCH_LOCKED_BY_SCRIPT,
+  WAIT_NOT_ALLOWED,
+  STRUGGLE_NOT_ALLOWED,
+  ACTION_TYPE_DISABLED,
+  INVALID_FRIENDLY_TARGET,
+};
+
+static const char* invalidActionReasonToString(InvalidActionReason reason) {
+  switch (reason) {
+    case VALID: return "Valid action";
+    case MOVE_INVALID: return "Invalid move";
+    case MOVE_TARGET_DEAD: return "Target is dead";
+    case MOVE_SELF_DEAD: return "Current pokemon is dead";
+    case MOVE_NO_PP: return "Move has no PP left";
+    case MOVE_FRIENDLY_TARGET_DEAD: return "Friendly target is dead";
+    case MOVE_FRIENDLY_TARGET_SELF: return "Cannot target self with this move";
+    case MOVE_LOCKED_BY_SCRIPT: return "Move locked by script";
+    case SWITCH_INVALID_POKEMON: return "Invalid pokemon to switch to";
+    case SWITCH_TO_SELF: return "Cannot switch to self";
+    case SWITCH_POKEMON_DEAD: return "Cannot switch to a dead pokemon";
+    case SWITCH_MUST_WAIT: return "Must wait for opponent's free move";
+    case SWITCH_LOCKED_BY_SCRIPT: return "Switch locked by script";
+    case WAIT_NOT_ALLOWED: return "Wait is not a valid action";
+    case STRUGGLE_NOT_ALLOWED: return "Struggle is not a valid action";
+    case ACTION_TYPE_DISABLED: return "Action type disabled";
+    case INVALID_FRIENDLY_TARGET: return "Invalid friendly target";
+    default: return "Unknown invalid action reason";
+  }
+}
+
+
 struct DamageComponents_t {
   uint32_t damage;
   uint32_t damageCrit;
@@ -160,8 +204,8 @@ public:
   ActionPairVector getAllValidActions(const ConstEnvironmentVolatile& envV, size_t agentTeam=TEAM_A) const;
 
   /* determines whether a given action is a selectable one, given the current state */
-  bool isValidAction(const ConstEnvironmentVolatile& envV, const Action& action, size_t iTeam) const;
-  bool isValidAction(const ConstEnvironmentPossible& envV, const Action& action, size_t iTeam) const {
+  InvalidActionReason isValidAction(const ConstEnvironmentVolatile& envV, const Action& action, size_t iTeam) const;
+  InvalidActionReason isValidAction(const ConstEnvironmentPossible& envV, const Action& action, size_t iTeam) const {
     return isValidAction(envV.getEnv(), action, iTeam);
   }
 

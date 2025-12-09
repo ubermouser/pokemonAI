@@ -8,7 +8,7 @@ add_executable(test_pokedex test_pokedex.cpp)
 add_executable(test_gen4_scripts test_gen4_scripts.cpp)
 
 target_link_libraries(test_game pkaiEngine Boost::program_options Boost::filesystem GTest::GTest GTest::Main)
-target_link_libraries(test_engine pkaiEngine Boost::program_options Boost::filesystem GTest::GTest GTest::Main)
+target_link_libraries(test_engine pkaiEngine gen4_scripts Boost::program_options Boost::filesystem GTest::GTest GTest::Main)
 target_link_libraries(test_evaluator pkaiEngine Boost::program_options Boost::filesystem GTest::GTest GTest::Main)
 target_link_libraries(test_planner pkaiEngine Boost::program_options Boost::filesystem GTest::GTest GTest::Main)
 target_link_libraries(test_pokedex pkaiEngine Boost::program_options Boost::filesystem GTest::GTest GTest::Main)
