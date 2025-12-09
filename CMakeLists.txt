@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 project(pokemonAI)
 
+enable_testing()
+include(CTest)
+
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -32,18 +35,19 @@ add_compile_definitions(
     $<$<CONFIG:Release>:NDEBUG>
 )
 
+# Find OpenMP
+find_package(OpenMP REQUIRED)
+
 # Add subdirectories
 add_subdirectory(pkaiEngine)
 add_subdirectory(gen4_scripts)
 add_subdirectory(ranker)
 add_subdirectory(trainer)
 add_subdirectory(battler)
+add_subdirectory(src/tests)
 
 # Add the executable
 add_executable(pokemonAI src/battler_main.cpp)
-
-# Find OpenMP
-find_package(OpenMP REQUIRED)
 
 # Link libraries
 target_link_libraries(pokemonAI pkaiEngine gen4_scripts Boost::program_options Boost::filesystem OpenMP::OpenMP_CXX)

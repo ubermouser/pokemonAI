@@ -1,5 +1,5 @@
 //#define PKAI_IMPORT
-#include "../../inc/pkai.h"
+#include "pokemonai/pkai.h"
 
 #include <fstream>
 #include <iostream>
@@ -8,32 +8,32 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/foreach.hpp>
 
-#include "../../inc/team_nonvolatile.h"
-#include "../../inc/environment_nonvolatile.h"
-#include "../../inc/environment_volatile.h"
-#include "../../inc/environment_possible.h"
+#include "pokemonai/team_nonvolatile.h"
+#include "pokemonai/environment_nonvolatile.h"
+#include "pokemonai/environment_volatile.h"
+#include "pokemonai/environment_possible.h"
 
-#include "../../inc/pokedex.h"
-#include "../../inc/plugin.h"
-#include "../../inc/pkCU.h"
+#include "pokemonai/pokedex.h"
+#include "pokemonai/plugin.h"
+#include "pokemonai/pkCU.h"
 
-#include "../../inc/ranked_team.h"
+#include "pokemonai/ranked_team.h"
 
-#include "../../inc/planner_max.h"
-#include "../../inc/planner_stochastic.h"
-#include "../../inc/planner_directed.h"
-#include "../../inc/planner_minimax.h"
-#include "../../inc/planner_human.h"
-#include "../../inc/planner_random.h"
-#include "../../inc/evaluator_simple.h"
-#include "../../inc/evaluator_featureVector.h"
-#include "../../inc/experienceNet.h"
+#include "pokemonai/planner_max.h"
+#include "pokemonai/planner_stochastic.h"
+#include "pokemonai/planner_directed.h"
+#include "pokemonai/planner_minimax.h"
+#include "pokemonai/planner_human.h"
+#include "pokemonai/planner_random.h"
+#include "pokemonai/evaluator_simple.h"
+#include "pokemonai/evaluator_featureVector.h"
+#include "pokemonai/experienceNet.h"
 
-#include "../../inc/init_toolbox.h"
-#include "../../inc/orphan.h"
-#include "../../inc/roulette.h"
+#include "pokemonai/init_toolbox.h"
+#include "pokemonai/orphan.h"
+#include "pokemonai/roulette.h"
 
-#include "../../inc/game.h"
+#include "pokemonai/game.h"
 
 class tinyAI : public pokedex
 {

@@ -3,10 +3,12 @@
 #include <vector>
 #include <assert.h>
 #include <boost/array.hpp>
-#include <boost/timer.hpp>
+#include <chrono>
+#include <random>
+#include <algorithm>
 
-#include "../../inc/neuralNet.h"
-#include "../../inc/backpropNet.h"
+#include "pokemonai/neuralNet.h"
+#include "pokemonai/backpropNet.h"
 
 static boost::array< boost::array<float, 16>, 4 > xorTrials =
 {{
@@ -79,14 +81,16 @@ bool trial(const backpropSettings& bSettings, const boost::array< boost::array<f
 
   double _MSE = 1.0;
   double MSE = 0.0;
-  double numTrials = 0.0;
-  boost::timer cTimer;
+  double trialCount = 0.0;
+  auto startTime = std::chrono::high_resolution_clock::now();
   for (size_t iEpoch = 0; iEpoch < 3000; ++iEpoch)
   {
     // determine an order that we intend to visit the trials:
     std::vector<size_t> order(cTrials.size());
     for (size_t iTurn = 0; iTurn != order.size(); ++iTurn) { order[iTurn] = iTurn; }
-    std::random_shuffle(order.begin(), order.end());
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(order.begin(), order.end(), g);
 
     // jitter:
     if ((iEpoch % 1000) == 0)
@@ -102,7 +106,7 @@ bool trial(const backpropSettings& bSettings, const boost::array< boost::array<f
       bpNet.getNeuralNet().feedForward(cTrials[iTrial].begin());
       MSE += bpNet.backPropagate(cResults[iTrial].begin());
       assert(MSE == MSE);
-      numTrials += 1.0;
+      trialCount += 1.0;
       bpNet.updateWeights();
     }
 
@@ -111,14 +115,16 @@ bool trial(const backpropSettings& bSettings, const boost::array< boost::array<f
     if ((iEpoch+1) % 100 == 0)
     {
       //rankedNet.updateWeights();
-      _MSE = MSE/numTrials;
+      _MSE = MSE/trialCount;
       std::cout << std::setw(4) << iEpoch << " " << _MSE << "\n";
       MSE = 0.0;
-      numTrials = 0.0;
+      trialCount = 0.0;
     }
   }
 
-  std::cout << "test " << ((_MSE<0.05)?"passed":"FAILED") << "! Elapsed time = " << cTimer.elapsed() << "\n";
+  auto endTime = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed = endTime - startTime;
+  std::cout << "test " << ((_MSE<0.05)?"passed":"FAILED") << "! Elapsed time = " << elapsed.count() << "\n";
   return _MSE<0.05;
 };
 
