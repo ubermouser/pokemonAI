@@ -7,9 +7,9 @@
 
 #include <math.h>
 
-#include "../../inc/neuralNet.h"
-#include "../../inc/temporalpropNet.h"
-#include "../../inc/backpropNet.h"
+#include "pokemonai/neuralNet.h"
+#include "pokemonai/temporalpropNet.h"
+#include "pokemonai/backpropNet.h"
 
 static boost::array< boost::array<float, 16>, 13 > hpTrials =
 {{

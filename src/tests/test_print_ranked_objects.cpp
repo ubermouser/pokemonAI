@@ -12,9 +12,9 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
 
-#include "../../inc/ranked.h"
+#include "pokemonai/ranked.h"
 
-#include "../../inc/init_toolbox.h"
+#include "pokemonai/init_toolbox.h"
 
 void printRankedInfo(const boost::filesystem::path& cPath)
 {

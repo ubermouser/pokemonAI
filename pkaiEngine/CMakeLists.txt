@@ -71,3 +71,5 @@ target_compile_definitions(pkaiEngine PUBLIC
     PKAI_STATIC
     FORCE_INLINE=
 )
+
+target_link_libraries(pkaiEngine PUBLIC OpenMP::OpenMP_CXX)

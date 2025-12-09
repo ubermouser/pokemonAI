@@ -6,7 +6,7 @@
 #include <boost/array.hpp>
 #include <boost/static_assert.hpp>
 
-#include "../../inc/experienceNet.h"
+#include "pokemonai/experienceNet.h"
 
 static boost::array< boost::array<float, 16>, 13 > hpTrials =
 {{
@@ -110,7 +110,7 @@ BOOST_STATIC_ASSERT(numTrials > 0 && trialSize > 0);
   return true;
 };
 
-void main()
+int main()
 {
   std::cout << "simpleTrials:\n\n";
   networkExperienceTest(simpleTrials, experienceNetSettings(8, 1.0f / 12.0f, 0.95f, EXPERIENCENET_RECENCY));
@@ -120,4 +120,5 @@ void main()
   networkExperienceTest(noEntropyTrials, experienceNetSettings(8, 1.0f / 36.0f, 1.0f, EXPERIENCENET_HISTOGRAM));
   std::cout << "fullEntropyTrials:\n\n";
   networkExperienceTest(fullEntropyTrials, experienceNetSettings(2, 1.0f / 36.0f, 1.0f, EXPERIENCENET_HISTOGRAM));
+  return 0;
 };
