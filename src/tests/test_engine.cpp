@@ -33,7 +33,7 @@ TEST_F(EngineTest, PrimaryHitAndCrit) {
       engine_->initialState(), Action::move(0), Action::wait());
 
   // pokemon may move freely when both are alive:
-  EXPECT_EQ(engine_->isValidAction(engine_->initialState(), Action::move(0), TEAM_A), VALID);
+  EXPECT_TRUE(engine_->isValidAction(engine_->initialState(), Action::move(0), TEAM_A));
   EXPECT_EQ(result.size(), 3);
   EXPECT_EQ(result.at(0).hasHit(0), true);
   EXPECT_EQ(result.at(1).hasHit(0), false);
@@ -61,19 +61,19 @@ TEST_F(EngineTest, Swap) {
   EXPECT_EQ(swap_squirtle.at(0).getEnv().getTeam(0).getICPKV(), 1);
 
   // pokemon may not swap to themselves:
-  EXPECT_NE(engine_->isValidAction(engine_->initialState(), Action::swap(0), TEAM_A), VALID);
-  EXPECT_NE(engine_->isValidAction(swap_squirtle.at(0), Action::swap(1), TEAM_A), VALID);
+  EXPECT_FALSE(engine_->isValidAction(engine_->initialState(), Action::swap(0), TEAM_A));
+  EXPECT_FALSE(engine_->isValidAction(swap_squirtle.at(0), Action::swap(1), TEAM_A));
   // pokemon may swap when alive:
-  EXPECT_EQ(engine_->isValidAction(engine_->initialState(), Action::swap(1), TEAM_A), VALID);
-  EXPECT_EQ(engine_->isValidAction(engine_->initialState(), Action::swap(1), TEAM_B), VALID);
+  EXPECT_TRUE(engine_->isValidAction(engine_->initialState(), Action::swap(1), TEAM_A));
+  EXPECT_TRUE(engine_->isValidAction(engine_->initialState(), Action::swap(1), TEAM_B));
   // dead pokemon may swap:
-  EXPECT_EQ(engine_->isValidAction(torkoal_dead.at(0), Action::swap(1), TEAM_B), VALID);
+  EXPECT_TRUE(engine_->isValidAction(torkoal_dead.at(0), Action::swap(1), TEAM_B));
   // living pokemon may NOT swap when the enemy is dead:
-  EXPECT_NE(engine_->isValidAction(torkoal_dead.at(0), Action::swap(0), TEAM_A), VALID);
-  EXPECT_EQ(engine_->isValidAction(torkoal_dead.at(0), Action::wait(), TEAM_A), VALID);
+  EXPECT_FALSE(engine_->isValidAction(torkoal_dead.at(0), Action::swap(0), TEAM_A));
+  EXPECT_TRUE(engine_->isValidAction(torkoal_dead.at(0), Action::wait(), TEAM_A));
   // if BOTH pokemon are dead, both pokemon may swap:
-  EXPECT_EQ(engine_->isValidAction(both_dead.at(0), Action::swap(0), TEAM_A), VALID);
-  EXPECT_EQ(engine_->isValidAction(both_dead.at(0), Action::swap(1), TEAM_B), VALID);
+  EXPECT_TRUE(engine_->isValidAction(both_dead.at(0), Action::swap(0), TEAM_A));
+  EXPECT_TRUE(engine_->isValidAction(both_dead.at(0), Action::swap(1), TEAM_B));
   // move counts should be accurate:
   EXPECT_EQ(engine_->getValidActions(torkoal_dead.at(0).getEnv(), TEAM_B).size(), 1);
 }
@@ -109,7 +109,7 @@ TEST_F(EngineTest, InvalidAction) {
   ConstEnvironmentVolatile initialState(constInitialState.nv(), mutableStateData);
 
   // Pokemon may not swap to a dead pokemon
-  EXPECT_EQ(engine_->isValidAction(initialState, Action::swap(1), TEAM_A), SWITCH_POKEMON_DEAD);
+  EXPECT_EQ(engine_->isValidAction(initialState, Action::swap(1), TEAM_A).reason, IsValidResult::SWITCH_POKEMON_DEAD);
 
   try {
     engine_->updateState(initialState, Action::swap(1), Action::wait());
@@ -348,15 +348,15 @@ TEST_F(EngineTest, ChoiceItems) {
   auto dracometeor_none = engine_->updateState(flygon_pair.at(0), Action::wait(), Action::move(0));
 
   { // other moves are locked out after using a choice move:
-    EXPECT_EQ(engine_->isValidAction(bulletpunch_cb.at(0), Action::move(0), TEAM_A), VALID);
-    EXPECT_NE(engine_->isValidAction(bulletpunch_cb.at(0), Action::move(1), TEAM_A), VALID);
+    EXPECT_TRUE(engine_->isValidAction(bulletpunch_cb.at(0), Action::move(0), TEAM_A));
+    EXPECT_FALSE(engine_->isValidAction(bulletpunch_cb.at(0), Action::move(1), TEAM_A));
   }
   { // when all PP have been used, only struggle is available:
     auto noPPState = bulletpunch_cb.at(1);
     noPPState.getEnv().getTeam(0).getPKV().getMV(0).setPP(0);
-    EXPECT_NE(engine_->isValidAction(noPPState, Action::move(0), TEAM_A), VALID); // locked due to PP
-    EXPECT_NE(engine_->isValidAction(noPPState, Action::move(1), TEAM_A), VALID); // locked due to Choice
-    EXPECT_EQ(engine_->isValidAction(noPPState, Action::struggle(), TEAM_A), VALID);
+    EXPECT_FALSE(engine_->isValidAction(noPPState, Action::move(0), TEAM_A)); // locked due to PP
+    EXPECT_FALSE(engine_->isValidAction(noPPState, Action::move(1), TEAM_A)); // locked due to Choice
+    EXPECT_TRUE(engine_->isValidAction(noPPState, Action::struggle(), TEAM_A));
   }
   { // physical attack with choice band deals additional damage:
     EXPECT_GT(bulletpunch_cb.at(0).getEnv().getTeam(0).teammate(0).getHP(),
@@ -426,17 +426,17 @@ TEST_F(EngineTest, Outrage) {
   auto outrage_2 = engine_->updateState(outrage_1.at(0), Action::move(0), Action::wait());
 
   // the pokemon cannot switch out or perform other moves when outraging:
-  EXPECT_EQ(engine_->isValidAction(outrage_0.at(0), Action::move(0), TEAM_A), VALID);
-  EXPECT_NE(engine_->isValidAction(outrage_0.at(0), Action::move(1), TEAM_A), VALID);
-  EXPECT_NE(engine_->isValidAction(outrage_0.at(0), Action::swap(1), TEAM_A), VALID);
+  EXPECT_TRUE(engine_->isValidAction(outrage_0.at(0), Action::move(0), TEAM_A));
+  EXPECT_FALSE(engine_->isValidAction(outrage_0.at(0), Action::move(1), TEAM_A));
+  EXPECT_FALSE(engine_->isValidAction(outrage_0.at(0), Action::swap(1), TEAM_A));
 
   // the pokemon is confused after outraging:
   EXPECT_EQ(
       outrage_2.at(0).getEnv().getTeam(0).teammate(0).status().cTeammate.confused, AIL_V_CONFUSED_5T);
   // the pokemon may switch out or perform other moves:
-  EXPECT_EQ(engine_->isValidAction(outrage_2.at(0), Action::move(0), TEAM_A), VALID);
-  EXPECT_EQ(engine_->isValidAction(outrage_2.at(0), Action::move(1), TEAM_A), VALID);
-  EXPECT_EQ(engine_->isValidAction(outrage_2.at(0), Action::swap(1), TEAM_A), VALID);
+  EXPECT_TRUE(engine_->isValidAction(outrage_2.at(0), Action::move(0), TEAM_A));
+  EXPECT_TRUE(engine_->isValidAction(outrage_2.at(0), Action::move(1), TEAM_A));
+  EXPECT_TRUE(engine_->isValidAction(outrage_2.at(0), Action::swap(1), TEAM_A));
 
   // TODO(@drendleman) the pokemon's outrage counter doesn't decrease when the enemy is dead:
 }
@@ -466,14 +466,14 @@ TEST_F(EngineTest, UTurn) {
   //EXPECT_DEATH(engine_->updateState(swap_to_scyzor.at(0), Action::nothing(), Action::move(0)));
 
   { // swap condition with an ally:
-    EXPECT_NE(engine_->isValidAction(setup_sr.at(0), Action::move(0), TEAM_A), VALID);
-    EXPECT_EQ(engine_->isValidAction(setup_sr.at(0), Action::moveAlly(0, 1), TEAM_A), VALID);
-    EXPECT_NE(engine_->isValidAction(setup_sr.at(0), Action::moveAlly(0, 0), TEAM_A), VALID);
+    EXPECT_FALSE(engine_->isValidAction(setup_sr.at(0), Action::move(0), TEAM_A));
+    EXPECT_TRUE(engine_->isValidAction(setup_sr.at(0), Action::moveAlly(0, 1), TEAM_A));
+    EXPECT_FALSE(engine_->isValidAction(setup_sr.at(0), Action::moveAlly(0, 0), TEAM_A));
   }
   { // swap condition with no ally:
-    EXPECT_NE(engine_->isValidAction(swap_to_scyzor.at(0), Action::move(0), TEAM_B), VALID);
-    EXPECT_EQ(engine_->isValidAction(swap_to_scyzor.at(0), Action::moveAlly(0, 0), TEAM_B), VALID);
-    EXPECT_NE(engine_->isValidAction(swap_to_scyzor.at(0), Action::moveAlly(0, 1), TEAM_B), VALID);
+    EXPECT_FALSE(engine_->isValidAction(swap_to_scyzor.at(0), Action::move(0), TEAM_B));
+    EXPECT_TRUE(engine_->isValidAction(swap_to_scyzor.at(0), Action::moveAlly(0, 0), TEAM_B));
+    EXPECT_FALSE(engine_->isValidAction(swap_to_scyzor.at(0), Action::moveAlly(0, 1), TEAM_B));
   }
   { // u-turn with an ally:
     EXPECT_EQ(uturn_to_ally.at(0).getEnv().getTeam(0).teammate(0).getMV(0).getPP(), 31); // pp decremented

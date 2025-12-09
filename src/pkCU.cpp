@@ -1186,12 +1186,12 @@ PossibleEnvironments PkCU::updateState(
 
   guardNonvolatileState(cEnv);
   if (!cfg_.allowInvalidMoves) {
-    InvalidActionReason reasonA = isValidAction(cEnv, actionA, TEAM_A);
-    if (reasonA != VALID) {
+    auto reasonA = isValidAction(cEnv, actionA, TEAM_A);
+    if (!reasonA) {
       throw std::runtime_error("Invalid Action for Team A: " + std::string(invalidActionReasonToString(reasonA)));
     }
-    InvalidActionReason reasonB = isValidAction(cEnv, actionB, TEAM_B);
-    if (reasonB != VALID) {
+    auto reasonB = isValidAction(cEnv, actionB, TEAM_B);
+    if (!reasonB) {
       throw std::runtime_error("Invalid Action for Team B: " + std::string(invalidActionReasonToString(reasonB)));
     }
   }
@@ -1274,7 +1274,7 @@ ActionVector PkCU::getValidActionsInRange(
       for (size_t iHostile = iHostileMin; iHostile <= iHostileMax; ++iHostile) {
         // test if move is valid:
         action = Action{iType, iFriendly, iHostile};
-        if (isValidAction(envV, action, iTeam) == VALID) {
+        if (isValidAction(envV, action, iTeam)) {
           // and if so, add it to result vector
           result.push_back(action);
         }
@@ -1286,7 +1286,7 @@ ActionVector PkCU::getValidActionsInRange(
 }
 
 
-InvalidActionReason PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Action& action, size_t iTeam) const {
+IsValidResult PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Action& action, size_t iTeam) const {
   guardNonvolatileState(envV);
   ConstTeamVolatile cTV = envV.getTeam(iTeam);
   ConstTeamVolatile oTV = envV.getOtherTeam(iTeam);
@@ -1300,7 +1300,7 @@ InvalidActionReason PkCU::isValidAction(const ConstEnvironmentVolatile& envV, co
     case Action::MOVE_3:
     {
       // is this a valid move?
-      if (action.iMove() >= cPKV.nv().getNumMoves()) { return MOVE_INVALID; }
+      if (action.iMove() >= cPKV.nv().getNumMoves()) { return IsValidResult::MOVE_INVALID; }
 
       // By default, allow moves
       ValidMoveSet doAllowMove((1 << VALID_MOVE_SIZE) - 1);
@@ -1318,7 +1318,7 @@ InvalidActionReason PkCU::isValidAction(const ConstEnvironmentVolatile& envV, co
       // if the target of the move is friendly, is the friendly pokemon alive?
       if (cMV.getBase().targetsAlly()) {
         // is this a valid friendly-targeting move?
-        if (action.iFriendly() >= cTV.nv().getNumTeammates()) { return INVALID_FRIENDLY_TARGET; }
+        if (action.iFriendly() >= cTV.nv().getNumTeammates()) { return IsValidResult::INVALID_FRIENDLY_TARGET; }
         ConstPokemonVolatile fPKV = cTV.teammate(action.iFriendly());
 
         // is the friendly target alive?
@@ -1327,7 +1327,7 @@ InvalidActionReason PkCU::isValidAction(const ConstEnvironmentVolatile& envV, co
         // is the friendly target us?
         doAllowMove[VALID_MOVE_FRIENDLY_IS_OTHER] = action.iFriendly() != cTV.getICPKV();
       } else if (action.friendlyTarget() != Action::FRIENDLY_DEFAULT) {
-        return INVALID_FRIENDLY_TARGET;
+        return IsValidResult::INVALID_FRIENDLY_TARGET;
       }
     
       // Are we locked out of the current move? 
@@ -1336,21 +1336,21 @@ InvalidActionReason PkCU::isValidAction(const ConstEnvironmentVolatile& envV, co
         if (pFunction(cTV, cPKV, cMV, action, doAllowMove) > 1) { break; }
       }
 
-      if (!doAllowMove[VALID_MOVE_TARGET_ALIVE]) { return MOVE_TARGET_DEAD; }
-      if (!doAllowMove[VALID_MOVE_SELF_ALIVE]) { return MOVE_SELF_DEAD; }
-      if (!doAllowMove[VALID_MOVE_HAS_PP]) { return MOVE_NO_PP; }
+      if (!doAllowMove[VALID_MOVE_TARGET_ALIVE]) { return IsValidResult::MOVE_TARGET_DEAD; }
+      if (!doAllowMove[VALID_MOVE_SELF_ALIVE]) { return IsValidResult::MOVE_SELF_DEAD; }
+      if (!doAllowMove[VALID_MOVE_HAS_PP]) { return IsValidResult::MOVE_NO_PP; }
       if (cMV.getBase().targetsAlly()) {
-        if (!doAllowMove[VALID_MOVE_FRIENDLY_ALIVE]) { return MOVE_FRIENDLY_TARGET_DEAD; }
-        if (!doAllowMove[VALID_MOVE_FRIENDLY_IS_OTHER]) { return MOVE_FRIENDLY_TARGET_SELF; }
+        if (!doAllowMove[VALID_MOVE_FRIENDLY_ALIVE]) { return IsValidResult::MOVE_FRIENDLY_TARGET_DEAD; }
+        if (!doAllowMove[VALID_MOVE_FRIENDLY_IS_OTHER]) { return IsValidResult::MOVE_FRIENDLY_TARGET_SELF; }
       }
-      if (!doAllowMove[VALID_MOVE_SCRIPT]) { return MOVE_LOCKED_BY_SCRIPT; }
+      if (!doAllowMove[VALID_MOVE_SCRIPT]) { return IsValidResult::MOVE_LOCKED_BY_SCRIPT; }
 
-      return VALID;
+      return IsValidResult::VALID;
     }
     case Action::MOVE_SWITCH:
     {
       // is the pokemon we're switching to a valid teammate?
-      if (action.iFriendly() >= cTV.nv().getNumTeammates()) { return SWITCH_INVALID_POKEMON; }
+      if (action.iFriendly() >= cTV.nv().getNumTeammates()) { return IsValidResult::SWITCH_INVALID_POKEMON; }
 
       // By default, allow switches
       ValidSwapSet doAllowSwitch((1 << VALID_SWAP_SIZE) - 1);
@@ -1371,35 +1371,35 @@ InvalidActionReason PkCU::isValidAction(const ConstEnvironmentVolatile& envV, co
         if (pFunction(cPKV, fPKV, action, doAllowSwitch) > 1) { break; }
       }
 
-      if (!doAllowSwitch[VALID_SWAP_FRIENDLY_IS_OTHER]) { return SWITCH_TO_SELF; }
-      if (!doAllowSwitch[VALID_SWAP_FRIENDLY_ALIVE]) { return SWITCH_POKEMON_DEAD; }
-      if (!doAllowSwitch[VALID_SWAP_MUST_WAIT]) { return SWITCH_MUST_WAIT; }
-      if (!doAllowSwitch[VALID_SWAP_SCRIPT]) { return SWITCH_LOCKED_BY_SCRIPT; }
+      if (!doAllowSwitch[VALID_SWAP_FRIENDLY_IS_OTHER]) { return IsValidResult::SWITCH_TO_SELF; }
+      if (!doAllowSwitch[VALID_SWAP_FRIENDLY_ALIVE]) { return IsValidResult::SWITCH_POKEMON_DEAD; }
+      if (!doAllowSwitch[VALID_SWAP_MUST_WAIT]) { return IsValidResult::SWITCH_MUST_WAIT; }
+      if (!doAllowSwitch[VALID_SWAP_SCRIPT]) { return IsValidResult::SWITCH_LOCKED_BY_SCRIPT; }
 
-      return VALID;
+      return IsValidResult::VALID;
     }
     case Action::MOVE_WAIT:
       // are we waiting for the other team to take its free move?
-      if (!(tPKV.isAlive()) && cPKV.isAlive()) { return VALID; }
+      if (!(tPKV.isAlive()) && cPKV.isAlive()) { return IsValidResult::VALID; }
 
       // in most cases, do not allow not moving
-      return WAIT_NOT_ALLOWED;
+      return IsValidResult::WAIT_NOT_ALLOWED;
     case Action::MOVE_STRUGGLE:
       // is the other pokemon alive?
-      if (!(tPKV.isAlive())) { return MOVE_TARGET_DEAD; }
+      if (!(tPKV.isAlive())) { return IsValidResult::MOVE_TARGET_DEAD; }
 
       // is the pokemon we're currently using alive?
-      if (!cPKV.isAlive()) { return MOVE_SELF_DEAD; }
+      if (!cPKV.isAlive()) { return IsValidResult::MOVE_SELF_DEAD; }
 
       // are all other moves unusable?
       for (size_t iMove = 0, iSize = cPKV.nv().getNumMoves(); iMove != iSize; ++iMove) {
-        if (isValidAction(envV, Action::move(iMove), iTeam) == VALID) { return STRUGGLE_NOT_ALLOWED; }
+        if (isValidAction(envV, Action::move(iMove), iTeam)) { return IsValidResult::STRUGGLE_NOT_ALLOWED; }
       }
 
       // may struggle when all other moves are unusable:
-      return VALID;
+      return IsValidResult::VALID;
     default: // disabled action types (item use):
-      return ACTION_TYPE_DISABLED;
+      return IsValidResult::ACTION_TYPE_DISABLED;
   }
 } // endOf is valid action
 
