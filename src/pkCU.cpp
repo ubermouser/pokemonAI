@@ -560,7 +560,7 @@ void PkCUEngine::evaluateMove_postMove() {
     if (!getPKV().isAlive()) { stackStage_[iBase_] = STAGE_POSTTURN; continue; }
 
     // does this move even have a secondary effect? (this check is in-loop because multiple environments could arise from previous call)
-    if (!mostlyGT(cMove.getSecondaryAccuracy(), 0.0)) { stackStage_[iBase_] = STAGE_POSTSECONDARY; continue; }
+    if (!mostlyGT(cMove.getSecondaryAccuracy(), (fpType)0.0)) { stackStage_[iBase_] = STAGE_POSTSECONDARY; continue; }
 
     fpType& secondaryHitProbability = getDamageComponent().tProbability;
 
@@ -585,12 +585,12 @@ void PkCUEngine::evaluateMove_postMove() {
     secondaryHitProbability = std::max(std::min(secondaryHitProbability, (fpType)1.0), (fpType)0.0);
 
     // did the ability hit its target? Is it possible for the secondary ability to miss?
-    if (getBase().hasHit(iCTeam) && (mostlyGT(secondaryHitProbability, 0.0)))
+    if (getBase().hasHit(iCTeam) && (mostlyGT(secondaryHitProbability, (fpType)0.0)))
     {
       // if there's a chance the secondary effect will not occur:
-      if (mostlyLT(secondaryHitProbability, 1.0)) {
+      if (mostlyLT(secondaryHitProbability, (fpType)1.0)) {
         // duplicate the environment (duplicated environment is the secondary effect missed):
-        duplicateState(iREnv, (1.0 - secondaryHitProbability));
+        duplicateState(iREnv, ((fpType)1.0 - secondaryHitProbability));
       }
 
       // modify bitmask as secondary effect occuring:
@@ -872,11 +872,11 @@ void PkCUEngine::evaluateMove_damage() {
 
     std::array<size_t, 2> iHEnv = {{ getIBase(), SIZE_MAX }};
     // did the move hit its target? Is it possible for the move to miss?
-    if (mostlyGT(probabilityToHit, 0.0)) {
+    if (mostlyGT(probabilityToHit, (fpType)0.0)) {
       // if there's a chance the primary effect will not occur:
-      if (mostlyLT(probabilityToHit, 1.0)) {
+      if (mostlyLT(probabilityToHit, (fpType)1.0)) {
         // duplicate the environment (duplicated environment is the miss environment):
-        duplicateState(iHEnv, (1.0 - probabilityToHit));
+        duplicateState(iHEnv, ((fpType)1.0 - probabilityToHit));
       }
 
       // modify bitmask as the hit effect occuring:
@@ -918,8 +918,8 @@ void PkCUEngine::evaluateMove_damage() {
     // determine the possibility that the move crit:
     std::array<size_t, 2> iCEnv = {{ SIZE_MAX, getIBase() }};
     
-    if (mostlyGT(probabilityToCrit, 0.0) ) {
-      if (mostlyLT(probabilityToCrit, 1.0)) {
+    if (mostlyGT(probabilityToCrit, (fpType)0.0) ) {
+      if (mostlyLT(probabilityToCrit, (fpType)1.0)) {
         // duplicate the environment (duplicated environment is the crit environment):
         duplicateState(iCEnv, probabilityToCrit);
       }
@@ -992,11 +992,11 @@ void PkCUEngine::evaluateMove_script() {
 
     std::array<size_t, 2> iHEnv = {{ getIBase(), SIZE_MAX }};
     // did the move hit its target? Is it possible for the move to miss?
-    if (mostlyGT(probabilityToHit, 0.0)) {
+    if (mostlyGT(probabilityToHit, (fpType)0.0)) {
       // if there's a chance the primary effect will not occur:
-      if (mostlyLT(probabilityToHit, 1.0)) {
+      if (mostlyLT(probabilityToHit, (fpType)1.0)) {
         // duplicate the environment (duplicated environment is the miss environment):
-        duplicateState(iHEnv, (1.0 - probabilityToHit));
+        duplicateState(iHEnv, ((fpType)1.0 - probabilityToHit));
       }
 
       // modify bitmask as the hit effect occuring:
@@ -1042,10 +1042,10 @@ void PkCUEngine::calculateDamage(bool hasCrit) {
 
     // find the mean random value for this partition of the random environment
     fpType randomValue =
-        (iEnv / (fpType)cfg_.numRandomEnvironments) + ( 1.0 / (fpType)cfg_.numRandomEnvironments / 2.0);
+        (iEnv / (fpType)cfg_.numRandomEnvironments) + ( (fpType)1.0 / (fpType)cfg_.numRandomEnvironments / (fpType)2.0);
 
     // scale our random value modifier to 0.85..1.0
-    randomValue = deScale(randomValue, 1.0, 0.85);
+    randomValue = deScale(randomValue, (fpType)1.0, (fpType)0.85);
 
     uint32_t& actualDamage = getDamageComponent(iREnv[1]).damage;
     actualDamage = (uint32_t)((fpType)power * randomValue);
@@ -1128,11 +1128,11 @@ size_t PkCUEngine::combineSimilarEnvironments() {
     probabilityAccumulator += oProbability;
 #endif
 #endif
-    assert(mostlyGT(oProbability, 0.0) && mostlyLTE(oProbability, 1.0));
+    assert(mostlyGT(oProbability, (fpType)0.0) && mostlyLTE(oProbability, (fpType)1.0));
   } // endOf iOuter
 
 #ifndef _DISABLEPROBABILITYCHECK
-  assert(mostlyEQ(probabilityAccumulator, 1.0));
+  assert(mostlyEQ(probabilityAccumulator, (fpType)1.0));
 #endif
 
   return stack.getNumUnique();
@@ -1397,17 +1397,17 @@ bool saneStackProbability(std::deque<DamageComponents_t>& dComponents) {
   for (auto begin = dComponents.begin(), end = dComponents.end(); begin != end; ++begin)
   {
     sum += begin->cProbability;
-    if (!mostlyGT(begin->cProbability, 0.0) || !mostlyLTE(begin->cProbability, 1.0)) { return false; }
+    if (!mostlyGT(begin->cProbability, (fpType)0.0) || !mostlyLTE(begin->cProbability, (fpType)1.0)) { return false; }
   }
 
-  return mostlyEQ(sum, 1.0);
+  return mostlyEQ(sum, (fpType)1.0);
 }
 
 void PkCUEngine::duplicateState(
     std::array<size_t, 2>& result,
     fpType _probability,
     size_t iState) {
-  assert(mostlyLTE(_probability, 1.0));
+  assert(mostlyLTE(_probability, (fpType)1.0));
 
   // duplicate state 2 times
   nPlicateState(result, iState);
@@ -1426,7 +1426,7 @@ void PkCUEngine::triplicateState(
     fpType _probability,
     fpType _oProbability,
     size_t iState) {
-  assert(mostlyLTE(_probability + _oProbability, 1.0));
+  assert(mostlyLTE(_probability + _oProbability, (fpType)1.0));
 
   // duplicate state 3 times
   nPlicateState(result, iState);

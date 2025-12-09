@@ -210,7 +210,7 @@ std::vector<ConstEnvironmentPossible> PossibleEnvironments::getValidEnvironments
   }
 
   if (sort) {
-    std::sort(std::begin(result), std::end(result), [&](auto& a, auto& b){
+    std::sort(std::begin(result), std::end(result), [&](const ConstEnvironmentPossible& a, const ConstEnvironmentPossible& b){
       return a.getProbability() > b.getProbability();
     });
   }

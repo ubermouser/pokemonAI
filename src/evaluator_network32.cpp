@@ -131,7 +131,7 @@ EvalResult evaluator_network32::calculateFitness(neuralNet& cNet, const ConstEnv
   constFloatIterator_t output = cNet.outputBegin();
   // values returned less than 0.15 have 0 fitness, greater than 0.85 have 1 fitness
   fpType fitness = *output;
-  fitness = std::max(0.0, std::min(1.0, scale(fitness, 0.85, 0.15)));
+  fitness = std::max((fpType)0.0, std::min((fpType)1.0, scale(fitness, (fpType)0.85, (fpType)0.15)));
 
   EvalResult result{ Fitness{fitness}};
   return result;
