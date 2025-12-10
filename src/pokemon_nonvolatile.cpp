@@ -249,7 +249,7 @@ PokemonNonVolatile& PokemonNonVolatile::setAbility(const Ability& _chosenAbility
         "Pokemon \"" + getName() + "\" has no base class");
     case AbilityLearnResult::ABILITY_NOT_IMPLEMENTED:
       throw std::invalid_argument(
-        "Ability is not implemented / has no base class");
+        "Ability '" + ability_name + "' is not implemented / has no base class");
     case AbilityLearnResult::ABILITY_NOT_IN_POKEDEX:
       throw std::invalid_argument(
         "Ability " + ability_name +
