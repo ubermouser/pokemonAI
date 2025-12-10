@@ -73,6 +73,7 @@ const Move* struggle_t;
 const Move* suckerPunch_t;
 const Move* swift_t;
 const Move* toxicSpikes_t;
+const Move* trick_t;
 const Move* uTurn_t;
 const Move* voltTackle_t;
 const Move* woodHammer_t;
@@ -87,6 +88,7 @@ const Item* lumBerry_t;
 const Ability* levitate_t;
 const Ability* naturalCure_t;
 const Ability* noGuard_t;
+const Ability* stickyHold_t;
 const Ability* technician_t;
 const Ability* sereneGrace_t;
 
@@ -190,6 +192,43 @@ int move_hiddenPower_setType(
   if (&(mV.getBase()) != hiddenPower_t) { return 0; }
 
   cType = dex->getTypes().atByIndex(mV.nv().getScriptVal_a());
+  return 1;
+};
+
+int move_trick(
+  PkCUEngine& cu,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
+{
+  if (&mV.getBase() != trick_t) { return 0; }
+
+  // TODO: Trick fails if the target is behind a substitute.
+  if (tPKV.nv().abilityExists()) {
+    const auto& ability = tPKV.nv().getAbility();
+    if (&ability == stickyHold_t) {
+      return 1;
+    }
+  }
+
+  const bool cHasItem = cPKV.hasItem();
+  const bool tHasItem = tPKV.hasItem();
+
+  const Item* cItem = cHasItem ? &cPKV.getItem() : nullptr;
+  const Item* tItem = tHasItem ? &tPKV.getItem() : nullptr;
+
+  if (tHasItem) {
+    cPKV.setItem(*tItem);
+  } else {
+    cPKV.setNoItem();
+  }
+
+  if (cHasItem) {
+    tPKV.setItem(*cItem);
+  } else {
+    tPKV.setNoItem();
+  }
+
   return 1;
 };
 
@@ -1473,6 +1512,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   suckerPunch_t = orphan::orphanCheck(moves, "sucker punch");
   swift_t = orphan::orphanCheck(moves, "swift");
   toxicSpikes_t = orphan::orphanCheck(moves, "toxic spikes");
+  trick_t = orphan::orphanCheck(moves, "trick");
   uTurn_t = orphan::orphanCheck(moves, "u-turn");
   voltTackle_t = orphan::orphanCheck(moves, "volt tackle");
   woodHammer_t = orphan::orphanCheck(moves, "wood hammer");
@@ -1489,6 +1529,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   levitate_t = orphan::orphanCheck(abilities, "levitate");
   naturalCure_t = orphan::orphanCheck(abilities, "natural cure");
   noGuard_t = orphan::orphanCheck(abilities, "no guard");
+  stickyHold_t = orphan::orphanCheck(abilities, "sticky hold");
   technician_t = orphan::orphanCheck(abilities, "technician");
   sereneGrace_t = orphan::orphanCheck(abilities, "serene grace");
   //types:
@@ -1576,6 +1617,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(MOVE_PLUGIN, "swift", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "toxic spikes", PLUGIN_ON_SWITCHIN, move_toxicSpikes_switch, 2, 2));
   extensions.push_back(plugin(MOVE_PLUGIN, "toxic spikes", PLUGIN_ON_EVALUATEMOVE, move_toxicSpikes_set, 0, 0));
+  extensions.push_back(plugin(MOVE_PLUGIN, "trick", PLUGIN_ON_EVALUATEMOVE, move_trick, 0, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "u-turn", PLUGIN_ON_ENDOFMOVE, move_uTurn_swapOnTurnEnd, 1, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "u-turn", PLUGIN_ON_TESTMOVE, move_uTurn_testMoveSwap, 1, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "wood hammer", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, 0));
@@ -1599,6 +1641,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(ABILITY_PLUGIN, "no guard", PLUGIN_ON_MODIFYHITPROBABILITY, ability_noGuard, -2, 2));
   extensions.push_back(plugin(ABILITY_PLUGIN, "levitate", PLUGIN_ON_SETDEFENSETYPE, ability_levitate, -1, 1));
   extensions.push_back(plugin(ABILITY_PLUGIN, "levitate", PLUGIN_ON_SWITCHIN, ability_levitate_switch, 1, 0));
+  extensions.push_back(plugin(ABILITY_PLUGIN, "sticky hold", PLUGIN_ON_SWITCHOUT, ability_naturalCure, 99, 0));
   extensions.push_back(plugin(ABILITY_PLUGIN, "technician", PLUGIN_ON_MODIFYBASEPOWER, ability_technician, -1, 0));
   extensions.push_back(plugin(ABILITY_PLUGIN, "serene grace", PLUGIN_ON_MODIFYSECONDARYPROBABILITY, ability_sereneGrace, -1, 0));
 

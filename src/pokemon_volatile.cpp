@@ -171,6 +171,13 @@ void PokemonVolatile::setNoItem(bool resetVolatile) {
 }
 
 
+void PokemonVolatile::setItem(const Item& newItem, bool resetVolatile) {
+  data().iHeldItem = newItem.index_;
+  // item state is reset when the item is swapped out:
+  if (resetVolatile) { status().cTeammate.itemScratch = 0; }
+}
+
+
 POKEMON_VOLATILE_IMPL_TEMPLATE
 bool POKEMON_VOLATILE_IMPL::hasItem() const {
   return data().iHeldItem != Item::no_item->index_;
