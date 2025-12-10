@@ -144,6 +144,12 @@ fpType POKEMON_VOLATILE_IMPL::getPercentHP() const {
 
 
 POKEMON_VOLATILE_IMPL_TEMPLATE
+uint32_t POKEMON_VOLATILE_IMPL::getMissingHP() const {
+  return nv().getMaxHP() - data().HPcurrent;
+}
+
+
+POKEMON_VOLATILE_IMPL_TEMPLATE
 uint32_t POKEMON_VOLATILE_IMPL::getHP() const {
   return data().HPcurrent;
 }

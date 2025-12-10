@@ -395,7 +395,8 @@ void PokemonNonVolatile::handleMoveLearnResult(MoveLearnResult result, const Mov
       "Invalid move index");
   case MoveLearnResult::MOVE_NOT_IMPLEMENTED:
     throw std::invalid_argument(
-      "Move is not implemented / has no base class");
+      "Move " + move_name +
+      " is not implemented / has no base class");
   case MoveLearnResult::MOVE_NOT_IN_MOVELIST:
     throw std::invalid_argument(
       "Move " + move_name +

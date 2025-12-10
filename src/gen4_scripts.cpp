@@ -51,6 +51,7 @@ const Move* nightShade_t;
 const Move* nightSlash_t;
 const Move* outrage_t;
 const Move* painSplit_t;
+const Move* payback_t;
 const Move* pursuit_t;
 const Move* psychoCut_t;
 const Move* rapidSpin_t;
@@ -221,6 +222,27 @@ int move_painSplit(
 
   return 1;
 };
+
+int move_payback_modPower(
+    PkCUEngine& cu,
+    MoveVolatile mV,
+    PokemonVolatile cPKV,
+    PokemonVolatile tPKV,
+    fpType& modifier) {
+  if (&mV.getBase() != payback_t) { return 0; }
+
+  // if the enemy's move is NOT a damaging move:
+  const Action& oAction = cu.getOAction();
+  bool enemyMoveAction = (cu.getOAction().isMove());
+  // if the enemy moves first:
+  bool enemyMovedFirst = cu.getBase().hasMovedFirst(cu.getIOTeam());
+
+  if (!enemyMoveAction || !enemyMovedFirst) { return 1; }
+
+  // greatly increase the power of the move:
+  modifier *= 2.0;
+  return 1;
+}
 
 int move_stealthRock_set(
   PkCUEngine& cu,
@@ -1430,6 +1452,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   nightSlash_t = orphan::orphanCheck(moves, "night slash");
   outrage_t = orphan::orphanCheck(moves, "outrage");
   painSplit_t = orphan::orphanCheck(moves, "pain split");
+  payback_t = orphan::orphanCheck(moves, "payback");
   pursuit_t = orphan::orphanCheck(moves, "pursuit");
   psychoCut_t = orphan::orphanCheck(moves, "psycho cut");
   rapidSpin_t = orphan::orphanCheck(moves, "rapid spin");
@@ -1526,6 +1549,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(MOVE_PLUGIN, "outrage", PLUGIN_ON_TESTSWITCH, move_testLockedSwitch, 0, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "outrage", PLUGIN_ON_BEGINNINGOFTURN, move_outrage_lockMove, 0, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "pain split", PLUGIN_ON_EVALUATEMOVE, move_painSplit, 0, 0));
+  extensions.push_back(plugin(MOVE_PLUGIN, "payback", PLUGIN_ON_MODIFYRAWDAMAGE, move_payback_modPower, 0, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "psycho cut", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "pursuit", PLUGIN_ON_SETSPEEDBRACKET, move_pursuit_modBracket, 0, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "pursuit", PLUGIN_ON_MODIFYHITPROBABILITY, move_pursuit_modAccuracy, 0, 0));

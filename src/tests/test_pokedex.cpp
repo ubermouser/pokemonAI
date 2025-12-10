@@ -33,11 +33,11 @@ TEST(StaticPokedexTest, LoadsGen4Items) {
 
 
 // TODO(@drendleman) - test fails due to not linking correctly? Why not?
-/*TEST(DynamicPokedexTest, LoadsGen4Items) {
+TEST(DynamicPokedexTest, DISABLED_LoadsGen4Items) {
   PokedexDynamic pkdex;
   validateGen4Counts(pkdex);
   EXPECT_GE(pkdex.getExtensions().getNumPlugins(), 10);
-}*/
+}
 
 
 TEST_F(PokedexTest, PrintsTeamWithoutCrashing) {

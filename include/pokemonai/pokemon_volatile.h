@@ -106,6 +106,9 @@ public:
   /* return the integer amount of this pokemon's HP that remains, from 0..<max hp> */
   uint32_t getHP() const;
 
+  /* return the integer amount of this pokemon's HP that's missing */
+  uint32_t getMissingHP() const;
+
   /* get the boost pip value for the specified stat */
   int32_t getBoost(size_t type) const;
 
