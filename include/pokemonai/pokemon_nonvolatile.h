@@ -31,6 +31,15 @@ class Ability;
 class Nature;
 class PokemonBase;
 
+enum class AbilityLearnResult
+{
+  SUCCESS,
+  POKEMON_DOES_NOT_EXIST,
+  ABILITY_NOT_IMPLEMENTED,
+  ABILITY_NOT_IN_POKEDEX,
+  INVALID_ABILITY_FOR_SPECIES
+};
+
 enum class MoveLearnResult
 {
   SUCCESS,
@@ -198,7 +207,7 @@ public:
 
   uint32_t getMaxHP() const { return getFV_base(FV_HITPOINTS); };
 
-  bool isLegalAbility(const Ability& ability) const;
+  AbilityLearnResult isLegalAbility(const Ability& ability) const;
 
   /* is this pokemon allowed to be on the given team according to the current ruleset? */
   MoveLearnResult isLegalAdd(const MoveNonVolatile& cPokemon) const;
