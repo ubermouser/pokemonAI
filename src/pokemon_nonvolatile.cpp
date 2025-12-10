@@ -169,7 +169,7 @@ PokemonNonVolatile& PokemonNonVolatile::setNoBase() {
 PokemonNonVolatile& PokemonNonVolatile::setBase(const PokemonBase& _base) {
   if (&_base == PokemonBase::no_base) { return setNoBase(); }
   // replace abilities / moves which are no longer valid with the new base:
-  if (!isLegalAbility(getAbility())) { setNoAbility(); }
+  if (isLegalAbility(getAbility()) != AbilityLearnResult::SUCCESS) { setNoAbility(); }
   for (size_t iMove = 0; iMove != getNumMoves(); ++iMove) {
     if (isLegalSet(iMove, getMove(iMove)) == MoveLearnResult::SUCCESS) { continue; }
     removeMove(iMove);
@@ -235,8 +235,32 @@ bool PokemonNonVolatile::abilityExists() const {
 PokemonNonVolatile& PokemonNonVolatile::setAbility(const Ability& _chosenAbility) {
   if (&_chosenAbility == Ability::no_ability) { return setNoAbility(); }
 
-  if(!isLegalAbility(_chosenAbility)) {
-    throw std::invalid_argument("PokemonNonVolatile illegal ability");
+  AbilityLearnResult result = isLegalAbility(_chosenAbility);
+
+  if(result != AbilityLearnResult::SUCCESS) {
+    const auto& ability_name = _chosenAbility.getName();
+    const auto& species_name = this->getBase().getName();
+    switch (result)
+    {
+    case AbilityLearnResult::SUCCESS:
+      break;
+    case AbilityLearnResult::POKEMON_DOES_NOT_EXIST:
+      throw std::invalid_argument(
+        "Pokemon \"" + getName() + "\" has no base class");
+    case AbilityLearnResult::ABILITY_NOT_IMPLEMENTED:
+      throw std::invalid_argument(
+        "Ability '" + ability_name + "' is not implemented / has no base class");
+    case AbilityLearnResult::ABILITY_NOT_IN_POKEDEX:
+      throw std::invalid_argument(
+        "Ability " + ability_name +
+        " is not in the pokedex");
+    case AbilityLearnResult::INVALID_ABILITY_FOR_SPECIES:
+      throw std::invalid_argument(
+        "Ability " + ability_name +
+        " is not a valid ability for species " + species_name);
+    default:
+      throw std::invalid_argument("Unknown error");
+    }
   }
 
   chosenAbility_ = &_chosenAbility;
@@ -297,17 +321,22 @@ const Item& PokemonNonVolatile::getInitialItem() const {
 }
 
 
-bool PokemonNonVolatile::isLegalAbility(const Ability& candidate) const {
-  if (&candidate == Ability::no_ability) { return true; }
+AbilityLearnResult PokemonNonVolatile::isLegalAbility(const Ability& candidate) const {
+  if (&candidate == Ability::no_ability) { return AbilityLearnResult::SUCCESS; }
 
-  assert(pkdex->getAbilities().count(candidate.getName()) > 0);
+  if (pkdex->getAbilities().count(candidate.getName()) == 0) {
+    return AbilityLearnResult::ABILITY_NOT_IN_POKEDEX;
+  }
   if(!candidate.isImplemented()) {
-    return false;
+    return AbilityLearnResult::ABILITY_NOT_IMPLEMENTED;
   }
-  if (pokemonExists() && getBase().getAbilities().count(&candidate) == 0) {
-    return false;
+  if (!pokemonExists()) {
+    return AbilityLearnResult::POKEMON_DOES_NOT_EXIST;
   }
-  return true;
+  if (getBase().getAbilities().count(&candidate) == 0) {
+    return AbilityLearnResult::INVALID_ABILITY_FOR_SPECIES;
+  }
+  return AbilityLearnResult::SUCCESS;
 }
 
 
