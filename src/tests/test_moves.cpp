@@ -305,6 +305,7 @@ TEST_F(UTurnTest, can_still_be_used_without_swap_if_no_allies_exist) {
   EXPECT_FALSE(engine_->isValidAction(swap_to_scyzor.at(0), Action::moveAlly(0, 1), TEAM_B));
 }
 
+
 TEST_F(UTurnTest, damages_enemy_and_swaps_to_ally) {
   // pp decremented
   EXPECT_EQ(uturn_to_ally.at(0).getEnv().getTeam(0).teammate(0).getMV(0).getPP(), 31);
@@ -332,6 +333,7 @@ TEST_F(UTurnTest, damages_enemy_but_doesnt_swap_if_no_allies_exist) {
   // ally NOT swapped out
   EXPECT_EQ(uturn_no_ally.at(0).getEnv().getTeam(1).getICPKV(), 0);
 }
+
 
 class PaybackTest : public MoveTest {
 protected:
@@ -367,12 +369,14 @@ protected:
   PossibleEnvironments setup_payback;
 };
 
+
 TEST_F(PaybackTest, normal_power_when_moving_first) {
   auto payback_normal_power = engine_->updateState(
     setup_payback.at(0), Action::move(0), Action::move(0));
 
   EXPECT_EQ(payback_normal_power.at(0).getEnv().getTeam(1).getPKV().getMissingHP(), 31);
 }
+
 
 TEST_F(PaybackTest, normal_power_when_enemy_switching) {
   // NOTE: normal damage on switching is technically gen-V+ behavior, but
@@ -383,6 +387,7 @@ TEST_F(PaybackTest, normal_power_when_enemy_switching) {
   EXPECT_EQ(payback_normal_power.at(0).getEnv().getTeam(1).getPKV().getMissingHP(), 31);
 }
 
+
 TEST_F(PaybackTest, double_power_when_moving_second) {
   // machoke uses a priority move, machamp will move second
   auto payback_doubled_power = engine_->updateState(
@@ -390,6 +395,7 @@ TEST_F(PaybackTest, double_power_when_moving_second) {
 
   EXPECT_EQ(payback_doubled_power.at(0).getEnv().getTeam(1).getPKV().getMissingHP(), 63);
 }
+
 
 class TrickTest : public MoveTest {
 protected:
@@ -410,6 +416,7 @@ protected:
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->getPokemon().at("blissey"))
           .addMove(pokedex_->getMoves().at("softboiled"))
+          .addMove(pokedex_->getMoves().at("charm"))
           .setInitialItem(pokedex_->getItems().at("leftovers"))
           .setLevel(100))
         .addPokemon(PokemonNonVolatile()
@@ -424,6 +431,7 @@ protected:
   EnvironmentNonvolatile environment_nv;
 };
 
+
 TEST_F(TrickTest, item_for_item) {
   auto trick_item = engine_->updateState(
     engine_->initialState(), Action::move(0), Action::wait());
@@ -432,6 +440,16 @@ TEST_F(TrickTest, item_for_item) {
   EXPECT_EQ(final_env_v.getTeam(0).getPKV().getItem().getName(), "leftovers");
   EXPECT_EQ(final_env_v.getTeam(1).getPKV().getItem().getName(), "choice specs");
 }
+
+
+TEST_F(TrickTest, item_behavior_propagates) {
+  auto trick_item = engine_->updateState(
+    engine_->initialState(), Action::move(0), Action::move(0));
+
+  auto final_env_v = trick_item.at(0).getEnv();
+  EXPECT_FALSE(engine_->isValidAction(final_env_v, Action::move(1), 1));
+}
+
 
 TEST_F(TrickTest, no_item_for_item) {
   auto trick_no_item = engine_->updateState(
@@ -443,6 +461,7 @@ TEST_F(TrickTest, no_item_for_item) {
   EXPECT_EQ(final_env_v.getTeam(0).getPKV().getItem().getName(), "leftovers");
   EXPECT_FALSE(final_env_v.getTeam(1).getPKV().hasItem());
 }
+
 
 TEST_F(TrickTest, item_for_no_item) {
   auto team_b = TeamNonVolatile()
@@ -459,6 +478,7 @@ TEST_F(TrickTest, item_for_no_item) {
   EXPECT_FALSE(final_env_v.getTeam(0).getPKV().hasItem());
   EXPECT_EQ(final_env_v.getTeam(1).getPKV().getItem().getName(), "choice specs");
 }
+
 
 TEST_F(TrickTest, sticky_hold_fails) {
   auto trick_item = engine_->updateState(

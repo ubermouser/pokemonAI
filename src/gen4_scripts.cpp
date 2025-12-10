@@ -116,7 +116,7 @@ int move_hiddenPower_calculate(
 {
   // formula from http://www.smogon.com/dp/moves/hidden_power
 
-  uint16_t cType = 
+  uint16_t cType =
     ((
       (cPKNV.getIV(FV_HITPOINTS)%2) * 1 +
       (cPKNV.getIV(FV_ATTACK)%2) * 2 +
@@ -126,7 +126,7 @@ int move_hiddenPower_calculate(
       (cPKNV.getIV(FV_SPDEFENSE)%2) * 32
     ) * 15) / 63;
 
-  uint16_t cPower = 
+  uint16_t cPower =
     (((
       ((cPKNV.getIV(FV_HITPOINTS)%4)>1? 1 : 0 ) +
       ((cPKNV.getIV(FV_ATTACK)%4)>1? 2 : 0 ) +
@@ -330,7 +330,7 @@ int move_stealthRock_switch(
 {
   if (cPKV.status().nonvolatile.stealthRock > 0) {
     // deal damage:
-    fpType damage = 
+    fpType damage =
       -0.125 * // base damage
       rock_t->getModifier(cPKV.getBase().getType(0)) *  // resistance to rock
       rock_t->getModifier(cPKV.getBase().getType(1));
@@ -388,7 +388,7 @@ int move_toxicSpikes_switch(
 
 int move_rapidSpin(
   PkCUEngine& cu,
-  MoveVolatile mV, 
+  MoveVolatile mV,
   PokemonVolatile cPKV,
   PokemonVolatile tPKV)
 {
@@ -412,7 +412,7 @@ int move_cureNonVolatile_team(
 {
   const Move* tMove = &mV.getBase();
   if (
-    (tMove != aromatherapy_t) && 
+    (tMove != aromatherapy_t) &&
     (tMove != healBell_t)) { return 0; }
 
   // clear nonvolatile:
@@ -447,11 +447,11 @@ int move_heal50(
 {
   const Move* tMove = &mV.getBase();
   if (
-    (tMove != recover_t) && 
+    (tMove != recover_t) &&
     (tMove != milkDrink_t) &&
-    (tMove != slackOff_t) && 
-    (tMove != softBoiled_t) && 
-    (tMove != healOrder_t) && 
+    (tMove != slackOff_t) &&
+    (tMove != softBoiled_t) &&
+    (tMove != healOrder_t) &&
     (tMove != roost_t)) { return 0; }
 
   cPKV.modPercentHP(0.50);
@@ -470,10 +470,10 @@ int move_lifeLeech50(
 
   const Move* cMove = &mV.getBase();
   if (
-    (cMove != absorb_t) && 
+    (cMove != absorb_t) &&
     (cMove != leechLife_t) &&
     (cMove != gigaDrain_t) &&
-    (cMove != megaDrain_t) && 
+    (cMove != megaDrain_t) &&
     (cMove != drainPunch_t)) { return 0; }
 
   // add to hitpoints:
@@ -493,10 +493,10 @@ int move_recoil33(
 
   const Move* cMove = &mV.getBase();
   if (
-    (cMove != doubleEdge_t) && 
+    (cMove != doubleEdge_t) &&
     (cMove != woodHammer_t) &&
     (cMove != flareBlitz_t) &&
-    (cMove != braveBird_t) && 
+    (cMove != braveBird_t) &&
     (cMove != voltTackle_t)) { return 0; }
 
   // subtract hitpoints:
@@ -535,18 +535,18 @@ int move_highCrit
 {
   const Move* tMove = &mV.getBase();
   if (
-    (tMove != airCutter_t) && 
+    (tMove != airCutter_t) &&
     (tMove != attackOrder_t) &&
-    (tMove != blazeKick_t) && 
-    (tMove != crabHammer_t) && 
-    (tMove != crossChop_t) && 
-    (tMove != crossPoison_t) && 
-    (tMove != leafBlade_t) && 
-    (tMove != nightSlash_t) && 
-    (tMove != psychoCut_t) && 
-    (tMove != razorLeaf_t) && 
-    (tMove != shadowClaw_t) && 
-    (tMove != slash_t) && 
+    (tMove != blazeKick_t) &&
+    (tMove != crabHammer_t) &&
+    (tMove != crossChop_t) &&
+    (tMove != crossPoison_t) &&
+    (tMove != leafBlade_t) &&
+    (tMove != nightSlash_t) &&
+    (tMove != psychoCut_t) &&
+    (tMove != razorLeaf_t) &&
+    (tMove != shadowClaw_t) &&
+    (tMove != slash_t) &&
     (tMove != stoneEdge_t)) { return 0; }
 
   // raise move's crit stage by 1:
@@ -596,13 +596,13 @@ int move_alwaysHits
 {
   const Move* cMove = &mV.getBase();
   if (
-    (cMove != auraSphere_t) && 
-    (cMove != shockWave_t) && 
+    (cMove != auraSphere_t) &&
+    (cMove != shockWave_t) &&
     (cMove != magnetBomb_t) &&
-    (cMove != shadowPunch_t) && 
-    (cMove != magicalLeaf_t) && 
-    (cMove != aerialAce_t) && 
-    (cMove != faintAttack_t) && 
+    (cMove != shadowPunch_t) &&
+    (cMove != magicalLeaf_t) &&
+    (cMove != aerialAce_t) &&
+    (cMove != faintAttack_t) &&
     (cMove != swift_t) &&
     (cMove != struggle_t)) { return 0; }
 
@@ -691,7 +691,7 @@ int move_outrage_endLockOn(
 
   // 50% chance to end at stage 1:
   if (status.cTeammate.lockIn_duration == 2) {
-    
+
       std::array<size_t, 2> iREnv;
       cu.duplicateState(iREnv, 0.5);
 
@@ -700,13 +700,13 @@ int move_outrage_endLockOn(
       rPKV.status().cTeammate.lockIn_duration = 0;
       rPKV.status().cTeammate.lockIn_action = 0;
       rPKV.status().cTeammate.confused = AIL_V_CONFUSED_5T;
-      
+
   }
   // state #2 / else: dragon dance counts down for another turn:
   status.cTeammate.lockIn_duration--;
 
   // if this was the last dragon dance stage, confuse the pokemon:
-  if (status.cTeammate.lockIn_duration == 0) { 
+  if (status.cTeammate.lockIn_duration == 0) {
     status.cTeammate.confused = AIL_V_CONFUSED_5T;
     status.cTeammate.lockIn_action = 0;
   }
@@ -724,7 +724,7 @@ int move_testLockedIn(
   // if locked in, only the locked-in move may be used. Other move actions are not permitted.
 
   size_t action_idx = action.iMove() + 1;
-  moveAllowed[VALID_MOVE_SCRIPT] = 
+  moveAllowed[VALID_MOVE_SCRIPT] =
       moveAllowed[VALID_MOVE_SCRIPT] & (cPKV.status().cTeammate.lockIn_action == action_idx);
 
   return 1;
@@ -799,7 +799,7 @@ int move_suckerPunch_noDamageOnCondition
     // the move does not deal damage if these conditions are met:
     raw_damage = 0;
   }
-  
+
   return 1;
 }
 
@@ -815,7 +815,7 @@ int ability_noGuard
       (cPKV.nv().abilityExists() && (&(cPKV.nv().getAbility()) == noGuard_t))
       ||
       (tPKV.nv().abilityExists() && (&(tPKV.nv().getAbility()) == noGuard_t))
-    ) 
+    )
   { doNoGuard = true; }
 
   if (!doNoGuard) { return 0; }
@@ -851,7 +851,7 @@ int ability_levitate_switch(
 {
 
   if (!cPKV.nv().abilityExists() || (&(cPKV.nv().getAbility()) != levitate_t)) { return 0; }
-  
+
   // preempt scripts which deal damage on switchin
   return 2;
 };
@@ -932,7 +932,7 @@ int item_lumBerry
   if (!tPKV.isAlive()) { return 0; }
 
   bool conditionCured = false;
-  // volatile status condition confusion will be cured 
+  // volatile status condition confusion will be cured
   if (tPKV.status().cTeammate.confused > 0)
   {
     tPKV.status().cTeammate.confused = 0;
@@ -1056,9 +1056,9 @@ int item_choiceItem_testLockedMove(
 
   // else, if the choice item has chosen a move, the only acceptable move is the choice move:
   size_t action_idx = action.iMove() + 1;
-  moveAllowed[VALID_MOVE_SCRIPT] = 
+  moveAllowed[VALID_MOVE_SCRIPT] =
       moveAllowed[VALID_MOVE_SCRIPT] & (choice_item_idx == action_idx);
-  
+
   return 1;
 }
 
@@ -1161,17 +1161,17 @@ int engine_endRoundDamageEffect(
   else if (condition == AIL_NV_POISON_TOXIC)
   {
     uint32_t toxicTier = cPKV.status().cTeammate.toxicPoison_tier;
-      
+
     // increment toxic tier, more added damage per round
     if (toxicTier < 15)
     {
       cPKV.status().cTeammate.toxicPoison_tier++;
     }
-      
+
     cPKV.modPercentHP(-0.0625 * (fpType)(toxicTier + 1));
   }
 
-  // volatile: 
+  // volatile:
   // flinch only lasts for the current round. Only a pokemon moving first can flinch the other pokemon
   cPKV.status().cTeammate.flinch = 0;
 
@@ -1281,7 +1281,7 @@ int engine_beginTurnVolatileEffect(
         fpType terminalProbability = ((fpType) numTerminalEnv) / ((fpType)numTotalEnv);
 
         std::array<size_t, 2> iTEnv;
-      
+
         if ((numTerminalEnv > 0) && (numTotalEnv > numTerminalEnv)) {
           cu.duplicateState(iTEnv, terminalProbability, iREnv[1]);
 
@@ -1332,7 +1332,7 @@ int engine_secondaryNonvolatileEffect(
   PokemonVolatile tPKV)
 {
   const Move& cMove = mV.getBase();
-  
+
   if (tPKV.getStatusAilment() != AIL_NV_NONE) { return 0; }
 
   // apply status conditions to the other pokemon:
@@ -1427,12 +1427,12 @@ int engine_endRoundWeatherDamageEffect(
   // nonvolatile:
   nonvolatileStatus& cNV = cu.getBase().getEnv().getTeam(TEAM_A).getNonVolatile();
   uint32_t weatherCondition = cNV.weather_type;
-  
+
   // nasty hack: if second team, perform end of round decrement effects
   if (cu.getICTeam() == TEAM_B) { engine_endRoundWeatherDecrementEffect(cu, cPKNV, cTMV, cPKV); }
 
-  std::array<const type*, 2> cTypes = 
-  {{ 
+  std::array<const type*, 2> cTypes =
+  {{
     &cPKNV.getBase().getType(0),
     &cPKNV.getBase().getType(1)
   }};
@@ -1630,19 +1630,19 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(MOVE_PLUGIN, "wood hammer", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, 0));
   extensions.push_back(plugin(MOVE_PLUGIN, "volt tackle", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, 0));
   // item effects:
-  extensions.push_back(plugin(ITEM_PLUGIN, "choice band", PLUGIN_ON_BEGINNINGOFTURN, item_choiceItem_lockMove, 0, 0));
-  extensions.push_back(plugin(ITEM_PLUGIN, "choice band", PLUGIN_ON_TESTMOVE, item_choiceItem_testLockedMove, 0, 0));
-  extensions.push_back(plugin(ITEM_PLUGIN, "choice band", PLUGIN_ON_MODIFYRAWDAMAGE, item_choiceItem_modPower, 0, 0));
-  extensions.push_back(plugin(ITEM_PLUGIN, "choice scarf", PLUGIN_ON_BEGINNINGOFTURN, item_choiceItem_lockMove, 0, 0));
-  extensions.push_back(plugin(ITEM_PLUGIN, "choice scarf", PLUGIN_ON_TESTMOVE, item_choiceItem_testLockedMove, 0, 0));
-  extensions.push_back(plugin(ITEM_PLUGIN, "choice scarf", PLUGIN_ON_MODIFYSPEED, item_choiceScarf_modSpeed, 0, 0));
-  extensions.push_back(plugin(ITEM_PLUGIN, "choice specs", PLUGIN_ON_BEGINNINGOFTURN, item_choiceItem_lockMove, 0, 0));
-  extensions.push_back(plugin(ITEM_PLUGIN, "choice specs", PLUGIN_ON_TESTMOVE, item_choiceItem_testLockedMove, 0, 0));
-  extensions.push_back(plugin(ITEM_PLUGIN, "choice specs", PLUGIN_ON_MODIFYRAWDAMAGE, item_choiceItem_modPower, 0, 0));
-  extensions.push_back(plugin(ITEM_PLUGIN, "leftovers", PLUGIN_ON_ENDOFROUND, item_leftovers, 0, 0));
-  extensions.push_back(plugin(ITEM_PLUGIN, "life orb", PLUGIN_ON_MODIFYRAWDAMAGE, item_lifeOrb_modPower, 0, 0));
-  extensions.push_back(plugin(ITEM_PLUGIN, "life orb", PLUGIN_ON_ENDOFMOVE, item_lifeOrb_modLife, 0, 0));
-  extensions.push_back(plugin(ITEM_PLUGIN, "lum berry", PLUGIN_ON_ENDOFTURN, item_lumBerry, 0, 1));
+  extensions.push_back(plugin(ITEM_PLUGIN, "choice band", PLUGIN_ON_BEGINNINGOFTURN, item_choiceItem_lockMove, 0, 2));
+  extensions.push_back(plugin(ITEM_PLUGIN, "choice band", PLUGIN_ON_TESTMOVE, item_choiceItem_testLockedMove, 0, 2));
+  extensions.push_back(plugin(ITEM_PLUGIN, "choice band", PLUGIN_ON_MODIFYRAWDAMAGE, item_choiceItem_modPower, 0, 2));
+  extensions.push_back(plugin(ITEM_PLUGIN, "choice scarf", PLUGIN_ON_BEGINNINGOFTURN, item_choiceItem_lockMove, 0, 2));
+  extensions.push_back(plugin(ITEM_PLUGIN, "choice scarf", PLUGIN_ON_TESTMOVE, item_choiceItem_testLockedMove, 0, 2));
+  extensions.push_back(plugin(ITEM_PLUGIN, "choice scarf", PLUGIN_ON_MODIFYSPEED, item_choiceScarf_modSpeed, 0, 2));
+  extensions.push_back(plugin(ITEM_PLUGIN, "choice specs", PLUGIN_ON_BEGINNINGOFTURN, item_choiceItem_lockMove, 0, 2));
+  extensions.push_back(plugin(ITEM_PLUGIN, "choice specs", PLUGIN_ON_TESTMOVE, item_choiceItem_testLockedMove, 0, 2));
+  extensions.push_back(plugin(ITEM_PLUGIN, "choice specs", PLUGIN_ON_MODIFYRAWDAMAGE, item_choiceItem_modPower, 0, 2));
+  extensions.push_back(plugin(ITEM_PLUGIN, "leftovers", PLUGIN_ON_ENDOFROUND, item_leftovers, 0, 2));
+  extensions.push_back(plugin(ITEM_PLUGIN, "life orb", PLUGIN_ON_MODIFYRAWDAMAGE, item_lifeOrb_modPower, 0, 2));
+  extensions.push_back(plugin(ITEM_PLUGIN, "life orb", PLUGIN_ON_ENDOFMOVE, item_lifeOrb_modLife, 0, 2));
+  extensions.push_back(plugin(ITEM_PLUGIN, "lum berry", PLUGIN_ON_ENDOFTURN, item_lumBerry, 0, 2));
   // ability effects:
   extensions.push_back(plugin(ABILITY_PLUGIN, "natural cure", PLUGIN_ON_SWITCHOUT, ability_naturalCure, 0, 0));
   extensions.push_back(plugin(ABILITY_PLUGIN, "no guard", PLUGIN_ON_MODIFYHITPROBABILITY, ability_noGuard, -2, 2));
