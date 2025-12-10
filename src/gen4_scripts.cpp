@@ -343,6 +343,13 @@ int move_stealthRock_switch(
   return 0;
 };
 
+int ability_doNothing(
+  PkCUEngine& cu,
+  PokemonVolatile cPKV)
+{
+  return 0;
+};
+
 int move_spikes_switch(
   PkCUEngine& cu,
   PokemonVolatile cPKV)
@@ -1641,7 +1648,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(ABILITY_PLUGIN, "no guard", PLUGIN_ON_MODIFYHITPROBABILITY, ability_noGuard, -2, 2));
   extensions.push_back(plugin(ABILITY_PLUGIN, "levitate", PLUGIN_ON_SETDEFENSETYPE, ability_levitate, -1, 1));
   extensions.push_back(plugin(ABILITY_PLUGIN, "levitate", PLUGIN_ON_SWITCHIN, ability_levitate_switch, 1, 0));
-  extensions.push_back(plugin(ABILITY_PLUGIN, "sticky hold", PLUGIN_ON_SWITCHOUT, ability_naturalCure, 99, 0));
+  extensions.push_back(plugin(ABILITY_PLUGIN, "sticky hold", PLUGIN_ON_SWITCHOUT, ability_doNothing, 99, 0));
   extensions.push_back(plugin(ABILITY_PLUGIN, "technician", PLUGIN_ON_MODIFYBASEPOWER, ability_technician, -1, 0));
   extensions.push_back(plugin(ABILITY_PLUGIN, "serene grace", PLUGIN_ON_MODIFYSECONDARYPROBABILITY, ability_sereneGrace, -1, 0));
 
