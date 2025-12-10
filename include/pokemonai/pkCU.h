@@ -197,7 +197,9 @@ public:
   };
 
   /* Seed an initial state from an EnvironmentNonvolatile, then return its volatile state. */
-  ConstEnvironmentVolatile initialState() const;
+  ConstEnvironmentVolatile initialState() const {
+    return ConstEnvironmentVolatile{*nv_, initialState_};
+  };
 
   /* Return a collection of all valid actions for the given state. */
   ActionVector getValidActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {

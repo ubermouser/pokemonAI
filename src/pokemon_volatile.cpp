@@ -32,7 +32,7 @@ void PokemonVolatile::initialize(bool isActive)
   data().iHeldItem = nv().initialItem_->index_;
   
   // raise HP back to normal
-  data().HPcurrent = nv().getFV_base(FV_HITPOINTS);
+  data().HPcurrent = nv().getMaxHP();
 
   // if lead pokemon, set isLead to true
   data().active = isActive;
@@ -63,7 +63,7 @@ bool POKEMON_VOLATILE_IMPL::hasPP() const {
 void PokemonVolatile::modHP(int32_t quantity) {
   int32_t _HP = data().HPcurrent + quantity; // an integer type so std::max will accept 0 if _HP is below 0
   
-  data().HPcurrent = (uint16_t) std::min((uint32_t)std::max(_HP,0), nv().getFV_base(FV_HITPOINTS));
+  data().HPcurrent = (uint16_t) std::min((uint32_t)std::max(_HP,0), nv().getMaxHP());
   
   // this pokemon has died, standardize its stats so comparisons work better - they're not important anymore
   if (!isAlive()) 
@@ -76,7 +76,7 @@ void PokemonVolatile::modHP(int32_t quantity) {
 
 
 void PokemonVolatile::setHP(uint32_t _HP) {
-  data().HPcurrent = (uint16_t) std::min((uint32_t)std::max(_HP,0U), nv().getFV_base(FV_HITPOINTS));
+  data().HPcurrent = (uint16_t) std::min((uint32_t)std::max(_HP,0U), nv().getMaxHP());
   
   // this pokemon has died, standardize its stats so comparisons work better - they're not important anymore
   if (!isAlive()) 
@@ -89,13 +89,13 @@ void PokemonVolatile::setHP(uint32_t _HP) {
 
 
 void PokemonVolatile::modPercentHP(fpType percent) {
-  int32_t quantity = percent * (fpType)nv().getFV_base(FV_HITPOINTS);
+  int32_t quantity = percent * (fpType)nv().getMaxHP();
   modHP(quantity);
 }
 
 
 void PokemonVolatile::setPercentHP(fpType percent) {
-  uint32_t quantity = percent * (fpType)nv().getFV_base(FV_HITPOINTS);
+  uint32_t quantity = percent * (fpType)nv().getMaxHP();
   setHP(quantity);
 }
 
@@ -139,7 +139,7 @@ POKEMON_VOLATILE_IMPL::getMV(size_t index) const {
 
 POKEMON_VOLATILE_IMPL_TEMPLATE
 fpType POKEMON_VOLATILE_IMPL::getPercentHP() const {
-  return ((fpType) data().HPcurrent) / ((fpType)nv().getFV_base(FV_HITPOINTS));
+  return ((fpType) data().HPcurrent) / ((fpType)nv().getMaxHP());
 }
 
 

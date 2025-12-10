@@ -194,7 +194,7 @@ void featureVector_impl::generateBestMoves(const EnvironmentNonvolatile& envNV, 
           } // endOf foreach move
 
           // scale by percentage of target pokemon's HP:
-          bestDamage = scale(bestDamage, (float)tPKNV.getFV_base(FV_HITPOINTS), 0.0f);
+          bestDamage = scale(bestDamage, (float)tPKNV.getMaxHP(), 0.0f);
 
           valid[iBestDamage] = false;
           cIBestMoves[iNMove] = iBestDamage;

@@ -196,6 +196,8 @@ public:
   size_t getNumMoves() const { return actions_.size(); };
   size_t getMaxNumMoves() const { return 4; };
 
+  uint32_t getMaxHP() const { return getFV_base(FV_HITPOINTS); };
+
   bool isLegalAbility(const Ability& ability) const;
 
   /* is this pokemon allowed to be on the given team according to the current ruleset? */

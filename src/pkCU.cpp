@@ -1205,11 +1205,6 @@ PossibleEnvironments PkCU::updateState(
 }; // end of updateState
 
 
-ConstEnvironmentVolatile PkCU::initialState() const {
-  return ConstEnvironmentVolatile{*nv_, initialState_};
-}
-
-
 MatchState PkCU::getGameState(const ConstEnvironmentVolatile& envV) const {
   guardNonvolatileState(envV);
   bool teamAisDead = !envV.getTeam(TEAM_A).isAlive();

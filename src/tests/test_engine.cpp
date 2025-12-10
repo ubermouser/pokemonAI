@@ -11,7 +11,7 @@ class EngineTest : public ::testing::Test {
 protected:
   void SetUp() override {
     verbose = 4;
-    pokedex_ = std::make_shared<PokedexStatic>(PokedexStatic::Config(), true);
+    pokedex_ = std::make_shared<PokedexStatic>();
     engine_ = std::make_shared<PkCU>();
     engine_->setAllowInvalidMoves(true);
   }

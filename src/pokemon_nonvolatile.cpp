@@ -586,7 +586,7 @@ std::ostream& operator <<(std::ostream& os, const PokemonNonVolatile& cPKNV) {
 
 void PokemonNonVolatile::printSummary(std::ostream& os) const {
   os << *this
-     << "  " << getFV_base(FV_HITPOINTS)
+     << "  " << getMaxHP()
      << "HP  A[" << (abilityExists()?getAbility().getName():"")
      << "]  I[" << (hasInitialItem()?getInitialItem().getName():"")
      << "]  M[";
