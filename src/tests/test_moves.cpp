@@ -390,3 +390,81 @@ TEST_F(PaybackTest, double_power_when_moving_second) {
 
   EXPECT_EQ(payback_doubled_power.at(0).getEnv().getTeam(1).getPKV().getMissingHP(), 63);
 }
+
+class TrickTest : public MoveTest {
+protected:
+  void SetUp() override {
+    MoveTest::SetUp();
+
+    auto team_a = TeamNonVolatile()
+        .addPokemon(PokemonNonVolatile()
+          .setBase(pokedex_->getPokemon().at("kadabra"))
+          .addMove(pokedex_->getMoves().at("trick"))
+          .setInitialItem(pokedex_->getItems().at("choice specs"))
+          .setLevel(100))
+        .addPokemon(PokemonNonVolatile()
+          .setBase(pokedex_->getPokemon().at("alakazam"))
+          .addMove(pokedex_->getMoves().at("trick"))
+          .setLevel(100));
+    auto team_b = TeamNonVolatile()
+        .addPokemon(PokemonNonVolatile()
+          .setBase(pokedex_->getPokemon().at("blissey"))
+          .addMove(pokedex_->getMoves().at("softboiled"))
+          .setInitialItem(pokedex_->getItems().at("leftovers"))
+          .setLevel(100))
+        .addPokemon(PokemonNonVolatile()
+          .setBase(pokedex_->getPokemon().at("gastrodon"))
+          .setAbility(pokedex_->getAbilities().at("sticky hold"))
+          .setInitialItem(pokedex_->getItems().at("choice band"))
+          .setLevel(100));
+    environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
+    engine_->setEnvironment(environment_nv);
+  }
+
+  EnvironmentNonvolatile environment_nv;
+};
+
+TEST_F(TrickTest, item_for_item) {
+  auto trick_item = engine_->updateState(
+    engine_->initialState(), Action::move(0), Action::wait());
+
+  auto final_env_v = trick_item.at(0).getEnv();
+  EXPECT_EQ(final_env_v.getTeam(0).getPKV().getItem().getName(), "leftovers");
+  EXPECT_EQ(final_env_v.getTeam(1).getPKV().getItem().getName(), "choice specs");
+}
+
+TEST_F(TrickTest, no_item_for_item) {
+  auto trick_no_item = engine_->updateState(
+    engine_->initialState(), Action::swap(1), Action::wait());
+  auto final_trick = engine_->updateState(
+    trick_no_item.at(0), Action::move(0), Action::wait());
+
+  auto final_env_v = final_trick.at(0).getEnv();
+  EXPECT_EQ(final_env_v.getTeam(0).getPKV().getItem().getName(), "leftovers");
+  EXPECT_FALSE(final_env_v.getTeam(1).getPKV().hasItem());
+}
+
+TEST_F(TrickTest, item_for_no_item) {
+  auto team_b = TeamNonVolatile()
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("blissey"))
+        .addMove(pokedex_->getMoves().at("softboiled"))
+        .setLevel(100));
+  engine_->setEnvironment(EnvironmentNonvolatile(environment_nv.getTeam(0), team_b, true));
+
+  auto trick_item = engine_->updateState(
+    engine_->initialState(), Action::move(0), Action::wait());
+
+  auto final_env_v = trick_item.at(0).getEnv();
+  EXPECT_FALSE(final_env_v.getTeam(0).getPKV().hasItem());
+  EXPECT_EQ(final_env_v.getTeam(1).getPKV().getItem().getName(), "choice specs");
+}
+
+TEST_F(TrickTest, sticky_hold_fails) {
+  auto trick_item = engine_->updateState(
+    engine_->initialState(), Action::move(0), Action::swap(1));
+
+  auto final_env_v = trick_item.at(0).getEnv();
+  EXPECT_EQ(final_env_v.getTeam(0).getPKV().getItem().getName(), "choice specs");
+  EXPECT_EQ(final_env_v.getTeam(1).getPKV().getItem().getName(), "choice band");
+}

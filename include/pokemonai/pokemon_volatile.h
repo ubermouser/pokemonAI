@@ -168,6 +168,8 @@ public:
 
   void setNoItem(bool resetVolatile=true);
 
+  void setItem(const Item& newItem, bool resetVolatile=true);
+
   /*
    * initialize an empty pokemon_volatile for combat, zeroing
    * all status conditions, increasing all PP back to max, 
