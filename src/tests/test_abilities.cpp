@@ -6,7 +6,7 @@
 #include "pokemonai/pokedex_static.h"
 #include "pokemonai/pkCU.h"
 
-class Gen4ScriptsTest : public ::testing::Test {
+class AbilitiesTest : public ::testing::Test {
 protected:
   void SetUp() override {
     pokedex_ = std::make_shared<PokedexStatic>();
@@ -18,7 +18,8 @@ protected:
   std::shared_ptr<PkCU> engine_;
 };
 
-TEST_F(Gen4ScriptsTest, NaturalCure) {
+
+TEST_F(AbilitiesTest, NaturalCure) {
   auto team_a = TeamNonVolatile()
       .addPokemon(PokemonNonVolatile()
         .setBase(pokedex_->getPokemon().at("starmie"))
