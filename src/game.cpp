@@ -57,6 +57,22 @@ Game::Game(const Config& cfg):
 }
 
 
+Game* Game::clone() const {
+  Game* newGame = new Game(*this);
+  for (size_t iAgent = 0; iAgent < 2; ++iAgent) {
+    if (!agents_[iAgent]) { continue; }
+    newGame->agents_[iAgent] = std::shared_ptr<Planner>(agents_[iAgent]->clone());
+  }
+  if (cu_) {
+    newGame->cu_ = std::shared_ptr<PkCU>(cu_->clone());
+  }
+  if (eval_) {
+    newGame->eval_ = std::shared_ptr<Evaluator>(eval_->clone());
+  }
+  return newGame;
+}
+
+
 Game& Game::setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& nv) {
   if (nv_ != nv) {
     nv_ = nv;

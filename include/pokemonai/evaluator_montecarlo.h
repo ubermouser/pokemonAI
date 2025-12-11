@@ -34,7 +34,7 @@ public:
   EvaluatorMonteCarlo(const Config& cfg = Config());
   virtual ~EvaluatorMonteCarlo() override {};
 
-  virtual EvaluatorMonteCarlo* clone() const override { return new EvaluatorMonteCarlo(*this); }
+  virtual EvaluatorMonteCarlo* clone() const override;
 
   virtual EvaluatorMonteCarlo& setEnvironment(
       const std::shared_ptr<const EnvironmentNonvolatile>& env) override;

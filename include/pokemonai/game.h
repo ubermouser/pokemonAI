@@ -130,6 +130,8 @@ public:
   Game(const Game& other) = default;
   ~Game() {};
 
+  Game* clone() const;
+
   /* create all variables, prepare game for running */
   Game& initialize();
 

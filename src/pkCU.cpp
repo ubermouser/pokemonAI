@@ -56,6 +56,11 @@ typedef std::vector<plugin_t>::const_iterator pluginIt;
 }
 
 
+PkCU* PkCU::clone() const {
+  return new PkCU(*this);
+}
+
+
 po::options_description PkCU::Config::options(
     const std::string& category, std::string prefix) {
   Config defaults{};
