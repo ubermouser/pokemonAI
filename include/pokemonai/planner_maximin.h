@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   planner_maximin.h
  * Author: ubermouser
  *
@@ -11,6 +11,13 @@
 #include "pkai.h"
 #include "planner.h"
 
+/**
+ * @class PlannerMaxiMin
+ * @brief A planner implementing depth-first-search over leaf evaluation.
+ *
+ * No search optimization is implemented at all for this planner, offering a stable
+ * baseline of performance versus more efficient pruning methods.
+ */
 class PlannerMaxiMin : public Planner {
 public:
   PlannerMaxiMin(const Config& cfg = Config()) : Planner(cfg) { resetName(); };

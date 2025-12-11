@@ -64,7 +64,7 @@ Evaluator& Evaluator::setEngine(const std::shared_ptr<PkCU>& cu) {
 EvalResult Evaluator::evaluate(const ConstEnvironmentVolatile& env, size_t iTeam) const {
   auto gameState = cu_->getGameState(env);
   // perform a full evaluation if this is a midgame state:
-  if (gameState == MATCH_MIDGAME) { 
+  if (gameState == MATCH_MIDGAME) {
     return calculateFitness(env, iTeam);
   }
   // this is a terminal state, evaluate terminal node:
@@ -73,7 +73,7 @@ EvalResult Evaluator::evaluate(const ConstEnvironmentVolatile& env, size_t iTeam
       gameState==iTeam ? Fitness{1.0} : Fitness{0.0};
 
   // evaluation occurs at terminal depth:
-  return EvalResult{fitness, Action{}, Action{}, MAXTRIES};
+  return EvalResult{fitness, Action{}, Action{}, 0};
 }
 
 

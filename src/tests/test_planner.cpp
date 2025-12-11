@@ -11,6 +11,7 @@
 #include "pokemonai/planner_random.h"
 #include "pokemonai/planner_max.h"
 #include "pokemonai/planner_maximin.h"
+#include "pokemonai/planner_minimax.h"
 #include "pokemonai/planner_human.h"
 
 
@@ -139,38 +140,87 @@ TEST_F(PlannerTest, MaximinPlannerChooses2PlyOption) {
 }
 
 
-TEST_F(PlannerTest, DISABLED_MaximinPlannerChoosesNPlyOption) {
-  // Though team_a can defeat team_b in 2 turns, team_a might choose not to end
-  // the game because team_a cannot be hurt by team_b. This test ensures that
-  // planners are greedy in the face of equally good options.
-  PlannerMaxiMin::Config cfg;
-  cfg.minDepth = 4;
-  cfg.maxDepth = 4; // success is possible in 2 turns
-  cfg.verbosity = 4;
-  cfg.maxTime = std::numeric_limits<double>::infinity();
-  auto team_a = TeamNonVolatile()
-      .addPokemon(PokemonNonVolatile()
-        .setBase(pokedex_->getPokemon().at("gengar"))
-        .addMove(pokedex_->getMoves().at("double team"))
-        .addMove(pokedex_->getMoves().at("drain punch")));
-  auto team_b = TeamNonVolatile()
-      .addPokemon(PokemonNonVolatile()
-        .setBase(pokedex_->getPokemon().at("rattata"))
-        .addMove(pokedex_->getMoves().at("return")));
-  auto environment = EnvironmentNonvolatile(team_a, team_b, true);
+class PlannerNPlyTest : public PlannerTest {
+protected:
+  void SetUp() override {
+    // Though team_a can defeat team_b in 2 turns, team_a might choose not to end
+    // the game because team_a cannot be hurt by team_b. This test ensures that
+    // planners are greedy in the face of equally good options.
+    PlannerTest::SetUp();
+    auto team_a = TeamNonVolatile()
+        .addPokemon(PokemonNonVolatile()
+          .setBase(pokedex_->getPokemon().at("gengar"))
+          .addMove(pokedex_->getMoves().at("double team"))
+          .addMove(pokedex_->getMoves().at("drain punch")));
+    auto team_b = TeamNonVolatile()
+        .addPokemon(PokemonNonVolatile()
+          .setBase(pokedex_->getPokemon().at("rattata"))
+          .addMove(pokedex_->getMoves().at("return")));
+    environment_ = std::make_shared<EnvironmentNonvolatile>(team_a, team_b, true);
+    engine_->setEnvironment(environment_);
+  }
+};
 
-  auto planner = PlannerMaxiMin(cfg);
-  planner
-      .setEvaluator(evaluator_)
-      .setTeam(TEAM_A)
-      .setEngine(engine_)
-      .setEnvironment(environment)
-      .initialize();
 
-  auto agent_result = planner.generateSolution(engine_->initialState());
+class PlannerMaximinTest : public PlannerNPlyTest {
+protected:
+  void SetUp() override {
+    PlannerNPlyTest::SetUp();
+    PlannerMaxiMin::Config cfg;
+    cfg.minDepth = 4;
+    cfg.maxDepth = 4; // success is possible in 2 turns
+    cfg.verbosity = 4;
+    cfg.maxTime = std::numeric_limits<double>::infinity();
+
+    planner_ = std::make_shared<PlannerMaxiMin>(cfg);
+    planner_->setEvaluator(evaluator_)
+        .setTeam(TEAM_A)
+        .setEngine(engine_)
+        .setEnvironment(environment_)
+        .initialize();
+  }
+
+  std::shared_ptr<Planner> planner_;
+};
+
+
+class PlannerMinimaxTest : public PlannerNPlyTest {
+protected:
+  void SetUp() override {
+    PlannerNPlyTest::SetUp();
+    PlannerMiniMax::Config cfg;
+    cfg.minDepth = 4;
+    cfg.maxDepth = 4; // success is possible in 2 turns
+    cfg.verbosity = 4;
+    cfg.transposition_table_size = 256;
+    cfg.maxTime = std::numeric_limits<double>::infinity();
+
+    planner_ = std::make_shared<PlannerMiniMax>(cfg);
+    planner_->setEvaluator(evaluator_)
+        .setTeam(TEAM_A)
+        .setEngine(engine_)
+        .setEnvironment(environment_)
+        .initialize();
+  }
+
+  std::shared_ptr<Planner> planner_;
+};
+
+
+TEST_F(PlannerMaximinTest, planner_chooses_n_ply_option) {
+  auto agent_result = planner_->generateSolution(engine_->initialState());
 
   EXPECT_EQ(agent_result.bestAgentAction(), Action::move(1));
-  EXPECT_LE(agent_result.best().numNodes, 114);
+  EXPECT_EQ(agent_result.best().numNodes, 114);
+  EXPECT_FLOAT_EQ(agent_result.bestFitness(), 1.0);
+}
+
+
+TEST_F(PlannerMinimaxTest, planner_chooses_n_ply_option) {
+  auto agent_result = planner_->generateSolution(engine_->initialState());
+
+  EXPECT_EQ(agent_result.bestAgentAction(), Action::move(1));
+  EXPECT_LE(agent_result.best().numNodes, 45);
   EXPECT_FLOAT_EQ(agent_result.bestFitness(), 1.0);
 }
 
@@ -205,6 +255,3 @@ TEST_F(PlannerTest, HumanPlannerActionReader) {
     EXPECT_FALSE(input);
   }
 }
-
-
-// TODO(@drendleman) - test that minimax planner does the same things that maximin planner does

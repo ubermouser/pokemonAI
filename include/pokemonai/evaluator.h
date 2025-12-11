@@ -22,7 +22,7 @@ struct FitnessDepth {
 
   FitnessDepth(const Fitness& fitness_ = Fitness::worst(), const size_t depth_ = 0);
 
-  bool fullyEvaluated() const { return depth >= MAXTRIES; }
+  bool fullyEvaluated() const { return fitness.fullyEvaluated(); }
 
   static FitnessDepth worst() { return FitnessDepth{Fitness::worst(), MAXTRIES}; }
   static FitnessDepth best() { return FitnessDepth{Fitness::best(), MAXTRIES}; }

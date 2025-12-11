@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   fitness.h
  * Author: ubermouser
  *
@@ -27,17 +27,17 @@ public:
 
   static constexpr PrecisionType one() { return PrecisionType(1.0); }
   static constexpr PrecisionType zero() { return PrecisionType(0.0); }
-  static constexpr PrecisionType max_fitness() { 
+  static constexpr PrecisionType max_fitness() {
     return PrecisionType(max_fitness_t) / PrecisionType(fitness_d);
   }
-  static constexpr PrecisionType min_fitness() { 
+  static constexpr PrecisionType min_fitness() {
     return PrecisionType(min_fitness_t) / PrecisionType(fitness_d);
   }
 
-  static constexpr fitness_t worst() { 
+  static constexpr fitness_t worst() {
     return fitness_t{-std::numeric_limits<PrecisionType>::infinity(), one(), false};
   }
-  static constexpr fitness_t best() { 
+  static constexpr fitness_t best() {
     return fitness_t{std::numeric_limits<PrecisionType>::infinity(), one(), false};
   }
 
@@ -76,6 +76,7 @@ public:
   bool operator ==(const fitness_t& rhs) const { return mostlyEQ(lowerBound(), rhs.upperBound()); }
   bool operator !=(const fitness_t& rhs) const { return !(*this == rhs); }
 
+  /* @brief when true, this fitness score includes only leaf evaluations. */
   bool fullyEvaluated() const {
     return mostlyEQ(certainty(), one());
   }

@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   planner_minimax.h
  * Author: drendleman
  *
@@ -15,6 +15,12 @@
 #include "planner_maximin.h"
 #include "transposition_table.h"
 
+/**
+ * @class PlannerMaxiMin
+ * @brief A planner implementing expectiminimax search over leaf evaluation.
+ *
+ * Includes alpha-beta-gamma pruning.
+ */
 class PlannerMiniMax : public PlannerMaxiMin {
 public:
   using base_t = PlannerMaxiMin;
@@ -47,12 +53,12 @@ protected:
       size_t* nodesEvaluated=NULL) const override;
 
   virtual bool testAgentSelection(
-      EvalResult& bestOfWorst, 
+      EvalResult& bestOfWorst,
       const EvalResult& worst,
       const FitnessDepth& lowCutoff,
       const ConstEnvironmentPossible& origin) const override;
   virtual bool testOtherSelection(
-      EvalResult& worst, 
+      EvalResult& worst,
       const EvalResult& current,
       const FitnessDepth& highCutoff,
       const ConstEnvironmentPossible& origin) const override;

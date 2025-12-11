@@ -38,7 +38,7 @@ po::options_description Planner::Config::options(const std::string& category, st
 Planner& Planner::initialize() {
   if (agentTeam_ >= 2) { throw std::invalid_argument("planner agentTeam undefined"); }
   otherTeam_ = (agentTeam_ + 1) % 2;
-  
+
   if (nv_ == NULL) { throw std::invalid_argument("planner nonvolatile environment undefined"); }
   if (cu_ == NULL) { throw std::invalid_argument("planner engine undefined"); }
   if (eval_ == NULL && isEvaluatorRequired()) { throw std::invalid_argument("planner evaluator undefined"); }
@@ -246,7 +246,7 @@ EvalResult Planner::recurse_alphabeta(
       // has the other agent improved upon its best score by reducing our score more?
       testOtherSelection(worst, child, highCutoff, origin);
     } // endOf foreach other move
-    
+
     // is the min of all other agent moves better than the best of our current moves?
     testAgentSelection(bestOfWorst, worst, lowCutoff, origin);
   } // endOf foreach agent move
