@@ -113,7 +113,6 @@ PlannerResult Planner::generateSolution(const ConstEnvironmentPossible& origin) 
     } else {
       plyResult = generateSolutionAtDepth(origin, iDepth);
     }
-    iDepth = std::max(iDepth, size_t(plyResult.depth));
 
     // determine time between last checkpoint and current checkpoint:
     auto checkpoint = std::chrono::steady_clock::now();
@@ -121,12 +120,18 @@ PlannerResult Planner::generateSolution(const ConstEnvironmentPossible& origin) 
     result.atDepth.push_back(plyResult);
 
     bool hasSolution = result.hasSolution();
-    bool terminalDepth = (iDepth >= cfg_.maxDepth);
+    // increasing the search depth did not lead to the search deepening:
+    bool terminalDepth  = plyResult.depth < iDepth;
+    // a memoized evaluation has a depth greater than what we asked for:
+    bool memoizedDepth = plyResult.depth >= cfg_.maxDepth;
+    // we're out of time:
     bool terminalTime = plyResult.timeSpent > cfg_.maxTime;
-    printSolution(result, terminalDepth || terminalTime);
+    printSolution(result, terminalDepth || memoizedDepth || terminalTime);
 
-    // break loop early if we are over maximum time
-    if (hasSolution && terminalTime) { break; }
+    // break loop early if we are over maximum time or cannot evaluate further:
+    if (hasSolution && (terminalTime || terminalDepth)) { break; }
+
+    iDepth = std::max(iDepth, size_t(plyResult.depth));
   }
 
   return result;
