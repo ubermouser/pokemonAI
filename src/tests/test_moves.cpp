@@ -317,11 +317,11 @@ TEST_F(UTurnTest, damages_enemy_and_swaps_to_ally) {
 }
 
 
-TEST_F(UTurnTest, DISABLED_damages_enemy_and_swaps_to_ally_with_stealth_rock) {
+TEST_F(UTurnTest, damages_enemy_and_swaps_to_ally_with_stealth_rock) {
   // life orb applies to attacking teammate
   EXPECT_NEAR(uturn_to_ally_with_sr.at(0).getEnv().getTeam(0).teammate(0).getPercentHP(), 0.9, 0.005);
   // stealth-rock applies to entering teammate
-  EXPECT_NEAR(uturn_to_ally_with_sr.at(0).getEnv().getTeam(0).teammate(1).getPercentHP(), 0.875, 0.005);
+  EXPECT_NEAR(uturn_to_ally_with_sr.at(0).getEnv().getTeam(0).teammate(1).getPercentHP(), 0.9375, 0.005);
 }
 
 

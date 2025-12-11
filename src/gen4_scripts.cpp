@@ -16,6 +16,7 @@
 
 //#define PKAI_EXPORT
 #include "pokemonai/plugin.h"
+#include "pokemonai/pluggable_types.h"
 //#undef PKAI_EXPORT
 
 const Pokedex* dex;
@@ -758,7 +759,15 @@ int move_uTurn_swapOnTurnEnd(
   cu.getBase().setSwitched(cu.getICTeam());
   tV.swapPokemon(action.iFriendly());
   cu.setCPluginSet();
-  // TODO(@drendleman) - swap-in should cause entry-hazards to trigger
+
+  int result = 0;
+  const std::vector<plugin_t>& cPlugins = cu.getCPluginSet()[(size_t)PLUGIN_ON_SWITCHIN];
+  for (auto iPlugin = cPlugins.cbegin(), iPSize = cPlugins.cend(); iPlugin != iPSize; ++iPlugin)
+  {
+    onSwitch_rawType cPlugin = (onSwitch_rawType)iPlugin->pFunction;
+    result = result | cPlugin(cu, cu.getPKV());
+    if (result > 1) { break; }
+  }
 
   return 2;
 }
