@@ -18,10 +18,10 @@ protected:
 
   void SetUp() override {
     pokedex_ = std::make_shared<PokedexStatic>();
-    trainer_cfg_.verbosity = 0;
+    trainer_cfg_.verbosity = 10;
     trainer_cfg_.minGamesPerBattlegroup = 1;
     trainer_cfg_.maxGenerations = 1;
-    trainer_cfg_.teamPopulationSize = {1, 0, 0, 0, 0, 0};
+    trainer_cfg_.teamPopulationSize = {10, 0, 0, 0, 0, 0};
     trainer_ = std::make_shared<Trainer>(trainer_cfg_);
     trainer_->setEngine(PkCU{engine_cfg_});
     trainer_->setGame(Game{game_cfg_});
