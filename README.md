@@ -1,6 +1,6 @@
 # Pokémon AI
 
-This project is a C++-based Pokémon battle engine and AI. It allows users to simulate Pokémon battles, train AI models, and rank Pokémon teams.
+This project is a C++-based Pokémon battle engine and AI. It allows users to simulate Pokémon battles, build teams of pokemon using evolutionary methods, and rank Pokémon teams.
 
 ## Project Structure
 
@@ -8,7 +8,7 @@ The project is organized into the following modules:
 
 *   **pkaiEngine**: The core of the project, containing the logic for the Pokémon battle simulator and the AI engine.
 *   **battler**: An executable that runs Pokémon battles between two teams, using the `pkaiEngine`.
-*   **trainer**: An executable used to train the AI models.
+*   **trainer**: An executable used to build teams of pokemon using evolutionary methods.
 *   **ranker**: An executable for ranking Pokémon teams.
 *   **gen4_scripts**: Contains scripts and data specific to Generation 4 Pokémon games.
 *   **data**: Contains general game data used by the simulator.
