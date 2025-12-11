@@ -49,19 +49,40 @@ All executables must be run from the project root directory.
 #### Battler
 
 ```bash
-./build/battler/battler [options]
+./build/battler/battler \
+    --planner-a=minimax \
+    --evaluator-a=simple \
+    --team-a=./teams/hexTeamA.txt \
+    --team-b=./teams/hexTeamB.txt \
+    --num-threads=32 \
+    --max-matches=64 \
+    --game-verbosity=5
 ```
 
 #### Trainer
 
 ```bash
-./build/trainer/trainer [options]
+./build/trainer/trainer
+    --planners random max maximin minimax \
+    --trainer-verbosity=1 \
+    --p1-max-search-depth=0 \
+    --p3-max-search-depth=2 \
+    --p4-max-search-depth=3 \
+    --num-threads=8 \
+    --team-path ./teams/
 ```
 
 #### Ranker
 
 ```bash
-./build/ranker/ranker [options]
+./build/ranker/ranker \
+    --planners random max maximin minimax \
+    --ranker-verbosity=1 \
+    --p1-max-search-depth=0 \
+    --p3-max-search-depth=2 \
+    --p4-max-search-depth=3 \
+    --num-threads=8 \
+    --team-path ./teams/
 ```
 
 #### Tests

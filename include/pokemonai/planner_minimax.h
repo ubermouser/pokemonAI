@@ -65,6 +65,7 @@ protected:
 
   Config cfg_;
 
+  // TODO(@drendleman) neither of these are thread safe!
   mutable TranspositionTable transpositionTable_;
 
   mutable OrderHeuristic orderHeuristic_;
