@@ -1,3 +1,13 @@
+/**
+ * @file pkCU.cpp
+ * @brief Implements the core battle engine (PkCU) and its internal state
+ * machine (PkCUEngine).
+ *
+ * This file contains the implementation of the PkCU and PkCUEngine classes,
+ * which are responsible for simulating Pokemon battles. The logic follows the
+ * standard Pokemon battle mechanics, including move priority, damage
+ * calculation, status effects, and plugin handling.
+ */
 #include "pokemonai/pkCU.h"
 
 #include <algorithm>
@@ -19,6 +29,21 @@
 namespace po = boost::program_options;
 typedef std::vector<plugin_t>::const_iterator pluginIt;
 
+/**
+ * @def CALLPLUGIN
+ * @brief A macro for invoking plugins of a specific type.
+ *
+ * This macro iterates through all registered plugins of a given `pluginType`
+ * for the current matchup and calls their `pluginFunction`. The return value
+ * of each plugin is OR'd with `retValue`. The loop breaks if `retValue`
+ * becomes greater than 1, which is a convention to indicate that a plugin has
+ * handled the event and no further plugins should be called.
+ *
+ * @param retValue The variable to store the combined return values of the plugins.
+ * @param pluginType The type of plugin to call (e.g., `PLUGIN_ON_MODIFYSPEED`).
+ * @param pluginFunction The function signature of the plugin to be called.
+ * @param ... The arguments to pass to the plugin function.
+ */
 #define CALLPLUGIN(retValue, pluginType, pluginFunction, ...) \
 {\
   const std::vector<plugin_t>& cPlugins = getCPluginSet()[(size_t)pluginType];\
@@ -65,7 +90,17 @@ PkCU& PkCU::setAccuracy(size_t accuracy)
   return *this;
 };
 
-
+/**
+ * @brief Initializes the plugin sets for the configured non-volatile environment.
+ *
+ * This method clears any existing plugin data and then populates the
+ * `pluginSets_` data structure with all the relevant plugins for the upcoming
+ * battle. It iterates through all Pokemon on both teams, adding plugins from
+ * their moves, abilities, and items. It also adds global plugins from the
+ * Pokedex. Finally, it sorts the plugins by priority.
+ *
+ * @return `true` if initialization was successful, `false` otherwise.
+ */
 bool PkCU::initialize() {
   size_t numPlugins = 0;
   // clear plugin arrays:
@@ -149,7 +184,19 @@ bool PkCU::initialize() {
   return true;
 }
 
-
+/**
+ * @brief Inserts a plugin into the appropriate plugin sets based on its target.
+ *
+ * This method adds a given plugin to the `pluginSets_` data structure. The
+ * plugin is added to the plugin sets for all matchups where it is relevant,
+ * based on the plugin's `target` property.
+ *
+ * @param cPlugin The plugin to insert.
+ * @param pluginType The type of the plugin.
+ * @param iNTeammate The index of the teammate the plugin is associated with. If
+ *        `SIZE_MAX`, the plugin is considered global.
+ * @return The number of plugin sets the plugin was added to.
+ */
 size_t PkCU::insertPluginHandler(plugin_t& cPlugin, size_t pluginType, size_t iNTeammate) {
   size_t numAdded = 0;
 
@@ -217,7 +264,16 @@ void PkCUEngine::swapTeamIndexes() {
   setCPluginSet();
 }
 
-
+/**
+ * @brief The main entry point for the engine, simulating a single turn.
+ *
+ * This method orchestrates the entire process of a battle turn. It first
+ * determines the move priority to decide which Pokemon acts first. It then
+ * calls `updateState_move` to process both Pokemon's moves. If there's a
+ * speed tie, it creates two separate scenarios, one for each Pokemon moving
+ * first. Finally, it evaluates end-of-round effects and combines similar
+ * resulting environments.
+ */
 void PkCUEngine::updateState() {
   // determine who moves first
   uint32_t priority = movePriority();
@@ -390,7 +446,16 @@ void PkCUEngine::evaluateRound_end() {
   } // endOf per base
 } // endOf evaluateRound_end
 
-
+/**
+ * @brief Evaluates a single Pokemon's move for the current turn.
+ *
+ * This is the central function for processing a single action. It handles
+ * different action types (switch, wait, or move) and progresses the state
+ * machine through the appropriate stages. For a standard move, it will call
+ * pre-move status checks, then dispatch to either `evaluateMove_damage` for
+ * damaging moves or `evaluateMove_script` for other moves, and finally handle
+ * post-move effects.
+ */
 void PkCUEngine::evaluateMove() {
   // NOTE: ONLY ONE stage is set to preturn at a time
   assert(getStackStage() == STAGE_PRETURN);
@@ -628,6 +693,26 @@ void PkCUEngine::evaluateMove_postTurn() {
 };
 
 
+/**
+ * @brief Evaluates the damage of a move according to the standard formula.
+ *
+ * This function implements the damage calculation process as a multi-stage
+ * state machine. It follows the formula used in the Pokemon games, which is
+ * detailed on sites like Smogon. The calculation is broken down into the
+ * following steps:
+ * 1.  Set the base power of the move.
+ * 2.  Determine the move's type.
+ * 3.  Modify the base power with plugins (e.g., for abilities like Technician).
+ * 4.  Calculate the base damage using the attacker's Attack/Special Attack and
+ *     the defender's Defense/Special Defense.
+ * 5.  Apply modifiers for critical hits, random damage rolls, STAB, type
+ *     effectiveness, and items.
+ * 6.  Calculate the probability of the move hitting and create separate
+ *     environments for hit and miss scenarios.
+ * 7.  Calculate the probability of a critical hit and create separate
+ *     environments for crit and non-crit scenarios.
+ * 8.  Apply the final calculated damage to the target Pokemon.
+ */
 void PkCUEngine::evaluateMove_damage() {
   assert(getStackStage() == STAGE_MOVEBASE);
   assert(getTPKV().isAlive() && getPKV().isAlive());
@@ -1059,7 +1144,18 @@ void PkCUEngine::calculateDamage(bool hasCrit) {
   }
 }
 
-
+/**
+ * @brief Combines environments on the stack that are identical.
+ *
+ * After all the branching from stochastic events, the stack may contain
+ * multiple environments that are in the same state. This function identifies
+ * these duplicates by hashing each environment and then merging the ones with
+ * the same hash. The probabilities of the merged environments are summed up.
+ * This is a crucial optimization to keep the number of possible environments
+ * manageable.
+ *
+ * @return The number of unique environments remaining on the stack.
+ */
 size_t PkCUEngine::combineSimilarEnvironments() {
   PossibleEnvironments& stack = getStack();
 
@@ -1138,7 +1234,16 @@ size_t PkCUEngine::combineSimilarEnvironments() {
   return stack.getNumUnique();
 } //endOf combineSimilarEnvironments
 
-
+/**
+ * @brief Processes the moves of both Pokemon in the correct order.
+ *
+ * This method is responsible for executing the actions of both Pokemon for a
+ * single turn. It first calls `evaluateMove` for the Pokemon that has priority,
+ * then swaps the teams and iterates through all the resulting environments to
+ * call `evaluateMove` for the second Pokemon. This ensures that the second
+ * Pokemon's action is evaluated in the context of every possible outcome of the
+ * first Pokemon's action.
+ */
 void PkCUEngine::updateState_move() {
   assert(getStackStage() == STAGE_SEEDED);
   advanceStackStage();
@@ -1280,7 +1385,23 @@ ActionVector PkCU::getValidActionsInRange(
   return result;
 }
 
-
+/**
+ * @brief Checks if a given action is valid for a team in the current state.
+ *
+ * This function determines if an action is legal according to the rules of
+ * Pokemon. It checks various conditions based on the action type (move,
+ * switch, etc.). For moves, it verifies that the Pokemon is alive, has PP for
+ * the move, and that the target is valid. For switches, it ensures the targeted
+ * Pokemon is a valid, living teammate. The function also allows plugins to
+ * override the default behavior, enabling the implementation of complex
+ * mechanics like Truant or Choice items.
+ *
+ * @param envV The current volatile environment.
+ * @param action The action to check.
+ * @param iTeam The index of the team performing the action.
+ * @return An `IsValidResult` object indicating if the action is valid and, if
+ *         not, the reason why.
+ */
 IsValidResult PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Action& action, size_t iTeam) const {
   guardNonvolatileState(envV);
   ConstTeamVolatile cTV = envV.getTeam(iTeam);
@@ -1417,6 +1538,18 @@ bool saneStackProbability(std::deque<DamageComponents_t>& dComponents) {
   return mostlyEQ(sum, (fpType)1.0);
 }
 
+/**
+ * @brief Duplicates an environment on the stack to represent two possible outcomes.
+ *
+ * This function takes a single environment and splits it into two, each with a
+ * different probability. This is used to model stochastic events, such as a
+ * move hitting or missing.
+ *
+ * @param result An array to store the indices of the two resulting environments.
+ * @param _probability The probability of the second outcome. The probability of
+ *        the first outcome is calculated as `1.0 - _probability`.
+ * @param iState The index of the environment to duplicate.
+ */
 void PkCUEngine::duplicateState(
     std::array<size_t, 2>& result,
     fpType _probability,
@@ -1434,7 +1567,17 @@ void PkCUEngine::duplicateState(
   assert(saneStackProbability(damageComponents_));
 }
 
-
+/**
+ * @brief Duplicates an environment on the stack to represent three possible outcomes.
+ *
+ * This function is similar to `duplicateState` but creates three environments
+ * from a single one. This is used for events with three possible outcomes.
+ *
+ * @param result An array to store the indices of the three resulting environments.
+ * @param _probability The probability of the second outcome.
+ * @param _oProbability The probability of the third outcome.
+ * @param iState The index of the environment to triplicate.
+ */
 void PkCUEngine::triplicateState(
     std::array<size_t, 3>& result,
     fpType _probability,
