@@ -760,6 +760,7 @@ int move_uTurn_swapOnTurnEnd(
   tV.swapPokemon(action.iFriendly());
   cu.setCPluginSet();
 
+  // TODO(@drendleman): add support in PkCU for changing the stackstage via a plugin call
   int result = 0;
   const std::vector<plugin_t>& cPlugins = cu.getCPluginSet()[(size_t)PLUGIN_ON_SWITCHIN];
   for (auto iPlugin = cPlugins.cbegin(), iPSize = cPlugins.cend(); iPlugin != iPSize; ++iPlugin)
