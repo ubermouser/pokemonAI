@@ -99,6 +99,10 @@ void PokemonVolatile::setPercentHP(fpType percent) {
   setHP(quantity);
 }
 
+void PokemonVolatile::modMovePP(size_t index, int8_t value) {
+  getMV(index).modPP(value);
+}
+
 
 void PokemonVolatile::setStatusAilment(uint32_t statusCondition) {
   data().status_nonvolatile = statusCondition;

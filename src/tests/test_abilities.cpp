@@ -55,3 +55,31 @@ TEST_F(AbilitiesTest, NaturalCure) {
     EXPECT_EQ(starmie_after_switch.getStatusAilment(), AIL_NV_NONE);
   }
 }
+
+TEST_F(AbilitiesTest, Pressure) {
+  auto team_a = TeamNonVolatile()
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("starmie"))
+        .addMove(pokedex_->getMoves().at("water gun"))
+        .setLevel(100));
+  auto team_b = TeamNonVolatile()
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("mewtwo"))
+        .setAbility(pokedex_->getAbilities().at("pressure"))
+        .addMove(pokedex_->getMoves().at("psychic"))
+        .setLevel(100));
+  auto environment = EnvironmentNonvolatile(team_a, team_b, true);
+  engine_->setEnvironment(environment);
+  auto env_v = engine_->initialState();
+
+  auto turn1_water_gun = engine_->updateState(
+    env_v, Action::move(0), Action::wait());
+
+  { // Turn 1: Starmie uses water gun
+    EXPECT_EQ(turn1_water_gun.size(), 2);
+    auto starmie_after_water_gun_crit = turn1_water_gun.at(0).getEnv().getTeam(TEAM_A).getPKV();
+    EXPECT_EQ(starmie_after_water_gun_crit.getMV(0).getPP(), 38);
+    auto starmie_after_water_gun_no_crit = turn1_water_gun.at(1).getEnv().getTeam(TEAM_A).getPKV();
+    EXPECT_EQ(starmie_after_water_gun_no_crit.getMV(0).getPP(), 38);
+  }
+}

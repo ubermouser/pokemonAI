@@ -142,6 +142,11 @@ public:
 
   operator ConstPokemonVolatile() const { return ConstPokemonVolatile{nv(), data(), status()}; }
 
+  void modMovePP(size_t index, int8_t value);
+  void modMovePP(const Action& action, int8_t value) {
+    modMovePP(action.iMove(), value);
+  }
+
   /* increment target's hp by quantity. */
   void modHP(int32_t quantity);
 
