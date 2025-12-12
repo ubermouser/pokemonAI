@@ -93,6 +93,10 @@ EvaluatorMonteCarlo& EvaluatorMonteCarlo::initialize() {
       .setPlanner(0, PlannerRandom(plannercfg).setEngine(*cu_))
       .setPlanner(1, PlannerRandom(plannercfg).setEngine(*cu_));
 
+  if (nv_) {
+    game_->setEnvironment(nv_);
+  }
+
   game_->initialize();
   return *this;
 }
