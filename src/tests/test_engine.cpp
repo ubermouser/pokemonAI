@@ -41,7 +41,7 @@ TEST_F(EngineTest, PrimaryHitAndCrit) {
 }
 
 
-TEST_F(EngineTest, DISABLED_HighEngineAccuracy) {
+TEST_F(EngineTest, HighEngineAccuracy) {
   // moves with extremely high numbers of branches might cause stack probability that sums less than 1
   engine_->setAccuracy(16);
   auto team = TeamNonVolatile()
@@ -54,7 +54,7 @@ TEST_F(EngineTest, DISABLED_HighEngineAccuracy) {
   PossibleEnvironments result = engine_->updateState(
       engine_->initialState(), Action::move(0), Action::move(0));
 
-  EXPECT_EQ(result.size(), 65);
+  EXPECT_EQ(result.size(), 8450);
   result.printStates();
 }
 
