@@ -264,6 +264,8 @@ public:
   PkCU(const PkCU& other) = default;
   ~PkCU() {};
 
+  PkCU* clone() const;
+
   /**
    * @brief Sets the non-volatile environment for the battle.
    *

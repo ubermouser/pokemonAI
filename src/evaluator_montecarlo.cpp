@@ -34,23 +34,17 @@ po::options_description EvaluatorMonteCarlo::Config::options(
 }
 
 
+EvaluatorMonteCarlo* EvaluatorMonteCarlo::clone() const {
+  EvaluatorMonteCarlo* newEval = new EvaluatorMonteCarlo(*this);
+  if (game_) {
+    newEval->game_ = std::shared_ptr<Game>(game_->clone());
+  }
+  return newEval;
+}
+
+
 EvaluatorMonteCarlo::EvaluatorMonteCarlo(const Config& cfg)
     : Evaluator(cfg), cfg_(cfg) {
-  PlannerRandom::Config plannercfg;
-  plannercfg.moveChance = cfg.moveChance;
-  Game::Config gamecfg;
-  gamecfg.maxMatches = cfg_.maxRollouts;
-  gamecfg.maxPlies = cfg_.maxPlies;
-  gamecfg.numThreads = cfg_.numThreads;
-  gamecfg.allowUndefinedAgents = false;
-  gamecfg.allowStateSelection = false;
-  gamecfg.storeSubcomponents = false;
-  gamecfg.verbosity = 0;
-  game_ = std::make_shared<Game>(gamecfg);
-  game_->setEvaluator(EvaluatorSimple().setEngine(PkCU()))
-      .setPlanner(0, PlannerRandom(plannercfg).setEngine(PkCU()))
-      .setPlanner(1, PlannerRandom(plannercfg).setEngine(PkCU()));
-
   resetName();
 }
 
@@ -64,20 +58,40 @@ EvaluatorMonteCarlo& EvaluatorMonteCarlo::setEnvironment(
       const std::shared_ptr<const EnvironmentNonvolatile>& env) {
   Evaluator::setEnvironment(env);
 
-  if (game_ != NULL) { game_->setEnvironment(env); }
+  if (game_) {
+    game_->setEnvironment(env);
+  }
   return *this;
 }
 
 
 EvaluatorMonteCarlo& EvaluatorMonteCarlo::setEngine(const std::shared_ptr<PkCU>& cu) {
   Evaluator::setEngine(cu);
-  if (game_ != NULL) { game_->setEngine(cu);}
+
+  if (game_) {
+    game_->setEngine(cu);
+  }
   return *this;
 }
 
 
 EvaluatorMonteCarlo& EvaluatorMonteCarlo::initialize() {
   Evaluator::initialize();
+
+  PlannerRandom::Config plannercfg;
+  plannercfg.moveChance = cfg_.moveChance;
+  Game::Config gamecfg;
+  gamecfg.maxMatches = cfg_.maxRollouts;
+  gamecfg.maxPlies = cfg_.maxPlies;
+  gamecfg.numThreads = 0;
+  gamecfg.allowUndefinedAgents = false;
+  gamecfg.allowStateSelection = false;
+  gamecfg.storeSubcomponents = false;
+  gamecfg.verbosity = 0;
+  game_ = std::make_shared<Game>(gamecfg);
+  game_->setEvaluator(EvaluatorSimple().setEngine(*cu_))
+      .setPlanner(0, PlannerRandom(plannercfg).setEngine(*cu_))
+      .setPlanner(1, PlannerRandom(plannercfg).setEngine(*cu_));
 
   game_->initialize();
   return *this;
