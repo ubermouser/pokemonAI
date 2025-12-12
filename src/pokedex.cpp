@@ -18,6 +18,16 @@
 #include "pokemonai/gen4_scripts.h"
 #endif
 
+const char* pluginCategoryToString(pluginCategory category) {
+  switch(category) {
+    case move: return "move";
+    case item: return "item";
+    case ability: return "ability";
+    case engine: return "engine";
+    default: return "unknown";
+  }
+}
+
 using namespace INI;
 using namespace orphan;
 namespace po = boost::program_options;
@@ -192,7 +202,7 @@ bool PokedexStatic::registerPlugin(
     else // unknown category:
     {
       // orphanCategories.insert(cCPlugin.getCategory());
-      continue;
+      throw std::runtime_error("Unknown plugin category");
     }
 
     bool overwritten = false;
@@ -208,7 +218,7 @@ bool PokedexStatic::registerPlugin(
       if (verbose >= 5)
       {
         std::cerr << "WAR " << __FILE__ << "." << __LINE__ << 
-          ": plugin for [" << (int)cCPlugin.getCategory() <<
+          ": plugin for [" << pluginCategoryToString(cCPlugin.getCategory()) <<
           "][" << cCPlugin.getName() << "] -- overwriting previously defined plugin!\n";
       }
       numOverwritten++;
