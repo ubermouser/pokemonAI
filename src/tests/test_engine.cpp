@@ -41,6 +41,24 @@ TEST_F(EngineTest, PrimaryHitAndCrit) {
 }
 
 
+TEST_F(EngineTest, DISABLED_HighEngineAccuracy) {
+  // moves with extremely high numbers of branches might cause stack probability that sums less than 1
+  engine_->setAccuracy(16);
+  auto team = TeamNonVolatile()
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->getPokemon().at("charmander"))
+        .addMove(pokedex_->getMoves().at("fire blast"))); // move can hit, crit, status, and miss
+  auto environment = EnvironmentNonvolatile(team, team, true);
+  engine_->setEnvironment(environment);
+
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(), Action::move(0), Action::move(0));
+
+  EXPECT_EQ(result.size(), 65);
+  result.printStates();
+}
+
+
 TEST_F(EngineTest, Swap) {
   auto team = TeamNonVolatile()
       .addPokemon(PokemonNonVolatile()
@@ -55,7 +73,7 @@ TEST_F(EngineTest, Swap) {
   auto swap_squirtle = engine_->updateState(engine_->initialState(), Action::swap(1), Action::wait());
   auto torkoal_dead = engine_->updateState(swap_squirtle.at(0), Action::move(0), Action::wait());
   auto both_dead = engine_->updateState(swap_squirtle.at(0), Action::wait(), Action::move(0));
-  
+
   // active pokemon has changed:
   EXPECT_EQ(engine_->initialState().getTeam(0).getICPKV(), 0);
   EXPECT_EQ(swap_squirtle.at(0).getEnv().getTeam(0).getICPKV(), 1);
@@ -148,7 +166,7 @@ TEST_F(EngineTest, GroundConditions) {
   auto stealth_rock = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
   auto spikes = engine_->updateState(engine_->initialState(), Action::move(1), Action::wait());
   auto toxic_spikes = engine_->updateState(engine_->initialState(), Action::move(2), Action::wait());
-  
+
   { // test rapid-spin removal:
     auto spikes_removed = engine_->updateState(spikes.at(0), Action::wait(), Action::move(3));
     auto removed_vs_spikes = engine_->updateState(spikes_removed.at(0), Action::wait(), Action::swap(1));

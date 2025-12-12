@@ -328,7 +328,7 @@ uint32_t PkCUEngine::movePriority_Speed() {
   uint32_t cSpeed = cPKV.getFV_boosted(FV_SPEED);
 
   int result = 0;
-  CALLPLUGIN(result, PLUGIN_ON_MODIFYSPEED, onModifySpeed_rawType, 
+  CALLPLUGIN(result, PLUGIN_ON_MODIFYSPEED, onModifySpeed_rawType,
     *this, cPKV, cSpeed);
 
   return cSpeed;
@@ -337,7 +337,7 @@ uint32_t PkCUEngine::movePriority_Speed() {
 
 int32_t PkCUEngine::movePriority_Bracket() {
   // SOURCE: http://www.smogon.com/dp/articles/move_priority
-  
+
    /* action:
    * AT_MOVE_0-3: pokemon's move
    * AT_MOVE_STRUGGLE  : struggle
@@ -345,13 +345,13 @@ int32_t PkCUEngine::movePriority_Bracket() {
    * AT_SWITCH_0-5: pokemon switches out for pokemon n-6
    * AT_ITEM_USE: pokemon uses an item (not implemented)
    */
-  
+
   // team:
   // 0 - a
   // 1 - b
 
   int32_t actionResult = 0;
-  
+
   // if the pokemon is switching out, its move priority is +6
   switch(actions_[0].type()) {
     case Action::MOVE_SWITCH:
@@ -365,10 +365,10 @@ int32_t PkCUEngine::movePriority_Bracket() {
       // if the pokemon is performing a move, find the move's priority
       MoveVolatile mv = getMV();
       actionResult = mv.getBase().getSpeedPriority();
-      
+
       //script - modify movePriority - action
       int result = 0;
-      CALLPLUGIN(result, PLUGIN_ON_SETSPEEDBRACKET, onModifyBracket_rawType, 
+      CALLPLUGIN(result, PLUGIN_ON_SETSPEEDBRACKET, onModifyBracket_rawType,
           *this, mv, getPKV(), actionResult);
       break;
     }
@@ -380,7 +380,7 @@ int32_t PkCUEngine::movePriority_Bracket() {
       actionResult = 0;
       break;
   }
-  
+
   return actionResult;
 }
 
@@ -390,17 +390,17 @@ uint32_t PkCUEngine::movePriority() {
 
   size_t iCTeam = getICTeam();
   size_t iOTeam = getIOTeam();
-  
+
   // determine speed brackets of the move
   for (size_t iTeam = 0; iTeam != 2; ++iTeam) {
     moveBracket[iTeam].actionBracket = movePriority_Bracket();
 
     swapTeamIndexes();
   }
-  
+
   // exceptions to actionBracket? (pursuit if switch is used)
-  
-  
+
+
   // are the priority brackets equal? If so, use speed as determining factor
   if (moveBracket[iCTeam].actionBracket > moveBracket[iOTeam].actionBracket) {
     return iCTeam;
@@ -415,7 +415,7 @@ uint32_t PkCUEngine::movePriority() {
 
       swapTeamIndexes();
     }
-    
+
     if (moveBracket[iCTeam].speed > moveBracket[iOTeam].speed) { return iCTeam; }
     else if (moveBracket[iCTeam].speed < moveBracket[iOTeam].speed) { return iOTeam; }
     else { return 2; } // speed bracket and speed tie
@@ -434,7 +434,7 @@ void PkCUEngine::evaluateRound_end() {
 
     // ignore end of move environments if we're calculating a dummy move, such as a switch in upon death
     if (getBase().hasFreeMove(TEAM_A) || getBase().hasFreeMove(TEAM_B)) { continue; }
-  
+
     for (size_t iTeam = 0; iTeam != 2; ++iTeam)
     {
       PokemonVolatile pkv = getPKV();
@@ -443,7 +443,7 @@ void PkCUEngine::evaluateRound_end() {
 
       // parse end of round plugins:
       int result = 0;
-      CALLPLUGIN(result, PLUGIN_ON_ENDOFROUND, onEndOfRound_rawType, 
+      CALLPLUGIN(result, PLUGIN_ON_ENDOFROUND, onEndOfRound_rawType,
           *this, pkv);
 
       swapTeamIndexes();
@@ -537,7 +537,7 @@ void PkCUEngine::evaluateMove() {
 
     evaluateMove_postTurn();
   }
-  
+
   return;
 } // end of evaluateMove
 
@@ -565,7 +565,7 @@ void PkCUEngine::evaluateMove_switch()
     } else {
       // pre-move switch scripts:
       int result = 0;
-      CALLPLUGIN(result, PLUGIN_ON_SWITCHOUT, onSwitch_rawType, 
+      CALLPLUGIN(result, PLUGIN_ON_SWITCHOUT, onSwitch_rawType,
           *this, getPKV());
     }
   } // endOf switchout script
@@ -579,11 +579,11 @@ void PkCUEngine::evaluateMove_switch()
 
     // set the current array of plugins:
     setCPluginSet();
-    
+
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_SWITCHIN, onSwitch_rawType, 
+    CALLPLUGIN(result, PLUGIN_ON_SWITCHIN, onSwitch_rawType,
         *this, getPKV());
-    
+
   } // end of switchin script
 } // endOf evaluateMove_switch
 
@@ -593,7 +593,7 @@ void PkCUEngine::evaluateMove_preMove() {
 
   // parse beginning of turn plugins:
   int result = 0;
-  CALLPLUGIN(result, PLUGIN_ON_BEGINNINGOFTURN, onBeginningOfTurn_rawType, 
+  CALLPLUGIN(result, PLUGIN_ON_BEGINNINGOFTURN, onBeginningOfTurn_rawType,
       *this, getPKV());
 }
 
@@ -615,7 +615,7 @@ void PkCUEngine::evaluateMove_postMove() {
     advanceStackStage();
 
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_ENDOFMOVE, onEvaluateMove_rawType, 
+    CALLPLUGIN(result, PLUGIN_ON_ENDOFMOVE, onEvaluateMove_rawType,
         *this, getMV(), getPKV(), getTPKV());
   }
 
@@ -639,7 +639,7 @@ void PkCUEngine::evaluateMove_postMove() {
 
     // to-hit modifying values:
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYSECONDARYPROBABILITY, onModifyPower_rawType, 
+    CALLPLUGIN(result, PLUGIN_ON_MODIFYSECONDARYPROBABILITY, onModifyPower_rawType,
         *this, getMV(), getPKV(), getTPKV(), secondaryHitProbability);
   } // endOf calculate secondary probability
 
@@ -684,7 +684,7 @@ void PkCUEngine::evaluateMove_postMove() {
 
     // parse secondary effect plugins:
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_SECONDARYEFFECT, onEvaluateMove_rawType, 
+    CALLPLUGIN(result, PLUGIN_ON_SECONDARYEFFECT, onEvaluateMove_rawType,
         *this, getMV(), getPKV(), getTPKV());
   } // endOf if primary and secondary attacks hit
 } // endOf evaluateMove_postMove
@@ -693,7 +693,7 @@ void PkCUEngine::evaluateMove_postMove() {
 void PkCUEngine::evaluateMove_postTurn() {
   // parse end of turn plugins:
   int result = 0;
-  CALLPLUGIN(result, PLUGIN_ON_ENDOFTURN, onEndOfTurn_rawType, 
+  CALLPLUGIN(result, PLUGIN_ON_ENDOFTURN, onEndOfTurn_rawType,
       *this, getPKV());
 };
 
@@ -726,7 +726,7 @@ void PkCUEngine::evaluateMove_damage() {
   size_t baseFloor = iBase_, baseCeil = getStack().size();
 
   const Move& cMove = getMV().getBase();
-  
+
   //Source: http://www.smogon.com/dp/articles/damage_formula
 
   /*BasePower = HH × BP × IT × CHG × (MS × WS) × UA × FA*/
@@ -740,7 +740,7 @@ void PkCUEngine::evaluateMove_damage() {
     basePower = cMove.getPower();
 
     int result = (basePower != UINT8_MAX)?1:0;
-    CALLPLUGIN(result, PLUGIN_ON_SETBASEPOWER, onSetPower_rawType, 
+    CALLPLUGIN(result, PLUGIN_ON_SETBASEPOWER, onSetPower_rawType,
         *this, getMV(), getPKV(), getTPKV(), basePower);
 
     assert(result > 0 && basePower > 0);
@@ -755,7 +755,7 @@ void PkCUEngine::evaluateMove_damage() {
     cType = &cMove.getType();
 
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_SETMOVETYPE, onModifyMoveType_rawType, 
+    CALLPLUGIN(result, PLUGIN_ON_SETMOVETYPE, onModifyMoveType_rawType,
         *this, getMV(), getPKV(), getTPKV(), cType);
   }
 
@@ -768,7 +768,7 @@ void PkCUEngine::evaluateMove_damage() {
     fpType baseModifier = 1.0;
 
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYBASEPOWER, onModifyPower_rawType, 
+    CALLPLUGIN(result, PLUGIN_ON_MODIFYBASEPOWER, onModifyPower_rawType,
         *this, getMV(), getPKV(), getTPKV(), baseModifier);
 
     basePower = (uint32_t)(basePower * baseModifier);
@@ -810,7 +810,7 @@ void PkCUEngine::evaluateMove_damage() {
     fpType attackPowerModifier = 1.0;
 
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYATTACKPOWER, onModifyPower_rawType, 
+    CALLPLUGIN(result, PLUGIN_ON_MODIFYATTACKPOWER, onModifyPower_rawType,
         *this, getMV(), cPKV, tPKV, attackPowerModifier);
 
     // incorporate attack power modifier:
@@ -832,7 +832,7 @@ void PkCUEngine::evaluateMove_damage() {
      */
     fpType criticalHitModifier = 2.0;
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYCRITICALPOWER, onModifyPower_rawType, 
+    CALLPLUGIN(result, PLUGIN_ON_MODIFYCRITICALPOWER, onModifyPower_rawType,
         *this, getMV(), getPKV(), getTPKV(), criticalHitModifier);
 
     // incorporate critical power modifier:
@@ -854,7 +854,7 @@ void PkCUEngine::evaluateMove_damage() {
      */
     fpType rawDamageMultiplier = 1.0;
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYRAWDAMAGE, onModifyPower_rawType, 
+    CALLPLUGIN(result, PLUGIN_ON_MODIFYRAWDAMAGE, onModifyPower_rawType,
       *this, getMV(), getPKV(), getTPKV(), rawDamageMultiplier);
 
     // incorporate critical power modifier:
@@ -875,7 +875,7 @@ void PkCUEngine::evaluateMove_damage() {
         (&cPKV.getBase().getType(1) == cDamage.mType));
     fpType STABMultiplier = hasStab?1.5:1.0;
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYSTAB, onModifyPower_rawType, 
+    CALLPLUGIN(result, PLUGIN_ON_MODIFYSTAB, onModifyPower_rawType,
         *this, getMV(), cPKV, getTPKV(), STABMultiplier);
 
     // incorporate STAB modifier:
@@ -899,7 +899,7 @@ void PkCUEngine::evaluateMove_damage() {
       typeModifier *= cDamage.mType->getModifier(tPKV.getBase().getType(1));
     }
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_SETDEFENSETYPE, onModifyTypePower_rawType, 
+    CALLPLUGIN(result, PLUGIN_ON_SETDEFENSETYPE, onModifyTypePower_rawType,
         *this, *cDamage.mType, getMV(), getPKV(), getTPKV(), typeModifier);
 
     // incorporate type modifier:
@@ -917,7 +917,7 @@ void PkCUEngine::evaluateMove_damage() {
     /* Mod3 = SRF × EB × TL × TRB */
     fpType itemModifier = 1.0;
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYITEMPOWER, onModifyPower_rawType, 
+    CALLPLUGIN(result, PLUGIN_ON_MODIFYITEMPOWER, onModifyPower_rawType,
       *this, getMV(), getPKV(), getTPKV(), itemModifier);
 
     // incorporate type modifier:
@@ -938,14 +938,14 @@ void PkCUEngine::evaluateMove_damage() {
     fpType& probabilityToHit = getDamageComponent().tProbability;
 
     /* probability to hit enemy pokemon */
-    probabilityToHit = 
+    probabilityToHit =
         cPKV.getAccuracy_boosted(FV_ACCURACY) // lowest is 33% or 1/3
         * tPKV.getAccuracy_boosted(FV_EVASION) // highest is 300% or 3
         * mV.getBase().getPrimaryAccuracy(); // lowest is 30%
 
     // to-hit modifying values:
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYHITPROBABILITY, onModifyPower_rawType, 
+    CALLPLUGIN(result, PLUGIN_ON_MODIFYHITPROBABILITY, onModifyPower_rawType,
       *this, mV, cPKV, tPKV, probabilityToHit);
 
   }
@@ -994,7 +994,7 @@ void PkCUEngine::evaluateMove_damage() {
 
     // to-crit modifying values:
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYCRITPROBABILITY, onModifyPower_rawType, 
+    CALLPLUGIN(result, PLUGIN_ON_MODIFYCRITPROBABILITY, onModifyPower_rawType,
         *this, getMV(), cPKV, getTPKV(), probabilityToCrit);
   }
 
@@ -1007,7 +1007,7 @@ void PkCUEngine::evaluateMove_damage() {
 
     // determine the possibility that the move crit:
     std::array<size_t, 2> iCEnv = {{ SIZE_MAX, getIBase() }};
-    
+
     if (mostlyGT(probabilityToCrit, (fpType)0.0) ) {
       if (mostlyLT(probabilityToCrit, (fpType)1.0)) {
         // duplicate the environment (duplicated environment is the crit environment):
@@ -1052,7 +1052,7 @@ void PkCUEngine::evaluateMove_script() {
     // TODO: take target into account when calculating probability to hit!
     /* probability to hit enemy pokemon */
     if (cMove.targetsEnemy()) {
-      probabilityToHit = 
+      probabilityToHit =
           getPKV().getAccuracy_boosted(FV_ACCURACY) // lowest is 33% or 3333 / 10000
           * getTPKV().getAccuracy_boosted(FV_EVASION) // highest is 300% or 3
           * cMove.getPrimaryAccuracy(); // lowest is 30% or 30 / 100
@@ -1066,7 +1066,7 @@ void PkCUEngine::evaluateMove_script() {
 
     // to-hit modifying values:
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYHITPROBABILITY, onModifyPower_rawType, 
+    CALLPLUGIN(result, PLUGIN_ON_MODIFYHITPROBABILITY, onModifyPower_rawType,
         *this, getMV(), getPKV(), getTPKV(), probabilityToHit);
   }
 
@@ -1109,7 +1109,7 @@ void PkCUEngine::evaluateMove_script() {
 
     // parse alternative move plugins:
     int result = mV.getBase().isImplemented()?1:0; // TODO: this check isn't working!
-    CALLPLUGIN(result, PLUGIN_ON_EVALUATEMOVE, onEvaluateMove_rawType, 
+    CALLPLUGIN(result, PLUGIN_ON_EVALUATEMOVE, onEvaluateMove_rawType,
         *this, mV, getPKV(), getTPKV());
   }
 
@@ -1141,7 +1141,7 @@ void PkCUEngine::calculateDamage(bool hasCrit) {
     actualDamage = (uint32_t)((fpType)power * randomValue);
 
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_CALCULATEDAMAGE, onSetPower_rawType, 
+    CALLPLUGIN(result, PLUGIN_ON_CALCULATEDAMAGE, onSetPower_rawType,
         *this, getMV(), getPKV(), getTPKV(), actualDamage);
 
     // inflict damage caused upon the targetPokemon:
@@ -1197,7 +1197,7 @@ size_t PkCUEngine::combineSimilarEnvironments() {
 
       // don't re-prune already pruned environments
       if (iEnv.isPruned()) { continue; }
-      
+
       // don't merge non-identical environments
 #ifdef _PKCUCHECKSIGNATURE
       assert((oEnv.hash == iEnv.hash) == (oEnv.env == iEnv.env));
@@ -1206,10 +1206,10 @@ size_t PkCUEngine::combineSimilarEnvironments() {
 
       // combine the two environments by adding their probabilities and deleting the second
       oProbability += iProbability;
-      
+
       // this is probably not representative of the current environment now
       oEnv.getBitmask() &= iEnv.getBitmask();
-      
+
       // flag this environment as merged with another environment
       oEnv.setMerged();
 
@@ -1310,7 +1310,7 @@ PossibleEnvironments PkCU::updateState(
   PkCUEngine engine{*this, result, cEnv.data(), actionA, actionB};
   // and evaluate the state
   engine.updateState();
-  
+
   return result;
 }; // end of updateState
 
@@ -1413,7 +1413,7 @@ IsValidResult PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Ac
   ConstTeamVolatile oTV = envV.getOtherTeam(iTeam);
   ConstPokemonVolatile cPKV = cTV.getPKV();
   ConstPokemonVolatile tPKV = oTV.getPKV();
-  
+
   switch(action.type()) {
     case Action::MOVE_0:
     case Action::MOVE_1:
@@ -1450,8 +1450,8 @@ IsValidResult PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Ac
       } else if (action.friendlyTarget() != Action::FRIENDLY_DEFAULT) {
         return IsValidResult::INVALID_FRIENDLY_TARGET;
       }
-    
-      // Are we locked out of the current move? 
+
+      // Are we locked out of the current move?
       for (const auto& cPlugin : getCPluginSet(envV, iTeam)[PLUGIN_ON_TESTMOVE]) {
         onTestMove_rawType pFunction = (onTestMove_rawType)cPlugin.pFunction;
         if (pFunction(cTV, cPKV, cMV, action, doAllowMove) > 1) { break; }
@@ -1475,7 +1475,7 @@ IsValidResult PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Ac
 
       // By default, allow switches
       ValidSwapSet doAllowSwitch((1 << VALID_SWAP_SIZE) - 1);
-    
+
       // are we trying to switch to ourself?
       doAllowSwitch[VALID_SWAP_FRIENDLY_IS_OTHER] = action.iFriendly() != cTV.getICPKV();
 
@@ -1485,8 +1485,8 @@ IsValidResult PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Ac
 
       // are we trying to move during the other team's free move?
       doAllowSwitch[VALID_SWAP_MUST_WAIT] = tPKV.isAlive() || !cPKV.isAlive();
-    
-      // Are we locked out of switching? 
+
+      // Are we locked out of switching?
       for (const auto& cPlugin : getCPluginSet(envV, iTeam)[PLUGIN_ON_TESTSWITCH]) {
         onTestSwitch_rawType pFunction = (onTestSwitch_rawType)cPlugin.pFunction;
         if (pFunction(cPKV, fPKV, action, doAllowSwitch) > 1) { break; }
