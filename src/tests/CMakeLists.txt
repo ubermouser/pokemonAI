@@ -27,3 +27,7 @@ gtest_discover_tests(test_pokedex WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 gtest_discover_tests(test_abilities WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 gtest_discover_tests(test_moves WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 gtest_discover_tests(test_ranker WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+add_executable(test_trainer test_trainer.cpp)
+target_link_libraries(test_trainer pkaiEngine Boost::program_options Boost::filesystem GTest::GTest GTest::Main)
+gtest_discover_tests(test_trainer WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
