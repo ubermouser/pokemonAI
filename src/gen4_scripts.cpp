@@ -87,13 +87,17 @@ const Item* leftovers_t;
 const Item* lifeOrb_t;
 const Item* lumBerry_t;
 
+const Ability* blaze_t;
 const Ability* levitate_t;
 const Ability* naturalCure_t;
 const Ability* noGuard_t;
+const Ability* overgrow_t;
 const Ability* pressure_t;
 const Ability* sereneGrace_t;
 const Ability* stickyHold_t;
+const Ability* swarm_t;
 const Ability* technician_t;
+const Ability* torrent_t;
 
 const Type* normal_t;
 const Type* fighting_t;
@@ -938,6 +942,35 @@ int ability_naturalCure(
   return 0;
 };
 
+int ability_pinch_type_boost
+  (PkCUEngine& cu,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV,
+  fpType& basePowerModifier)
+{
+  if (!cPKV.nv().abilityExists()) { return 0; }
+  const Ability* ability = &cPKV.nv().getAbility();
+
+  if (cPKV.getPercentHP() > (1.0/3.0)) { return 0; }
+
+  const Type* moveType = &mV.getBase().getType();
+  const Type* boostedType = nullptr;
+
+  if (ability == blaze_t) { boostedType = fire_t; }
+  else if (ability == overgrow_t) { boostedType = grass_t; }
+  else if (ability == swarm_t) { boostedType = bug_t; }
+  else if (ability == torrent_t) { boostedType = water_t; }
+  else { return 0; }
+
+  if (moveType == boostedType) {
+    basePowerModifier *= 1.5;
+    return 1;
+  }
+
+  return 0;
+}
+
 int ability_technician
   (PkCUEngine& cu,
   MoveVolatile mV,
@@ -1621,13 +1654,17 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   lumBerry_t = orphan::orphanCheck(items, "lum berry");
   //abilities:
   const Abilities& abilities = dex->getAbilities();
+  blaze_t = orphan::orphanCheck(abilities, "blaze");
   levitate_t = orphan::orphanCheck(abilities, "levitate");
   naturalCure_t = orphan::orphanCheck(abilities, "natural cure");
   noGuard_t = orphan::orphanCheck(abilities, "no guard");
+  overgrow_t = orphan::orphanCheck(abilities, "overgrow");
   pressure_t = orphan::orphanCheck(abilities, "pressure");
   sereneGrace_t = orphan::orphanCheck(abilities, "serene grace");
   stickyHold_t = orphan::orphanCheck(abilities, "sticky hold");
+  swarm_t = orphan::orphanCheck(abilities, "swarm");
   technician_t = orphan::orphanCheck(abilities, "technician");
+  torrent_t = orphan::orphanCheck(abilities, "torrent");
   //types:
   const Types& types = dex->getTypes();
   normal_t = orphan::orphanCheck(types, "normal");
@@ -1734,14 +1771,18 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(item, "life orb", PLUGIN_ON_ENDOFMOVE, item_lifeOrb_modLife, 0, all_teams));
   extensions.push_back(plugin(item, "lum berry", PLUGIN_ON_ENDOFTURN, item_lumBerry, 0, all_teams));
   // ability effects:
+  extensions.push_back(plugin(ability, "blaze", PLUGIN_ON_MODIFYBASEPOWER, ability_pinch_type_boost, -1, current_team));
   extensions.push_back(plugin(ability, "natural cure", PLUGIN_ON_SWITCHOUT, ability_naturalCure, 0, current_team));
   extensions.push_back(plugin(ability, "no guard", PLUGIN_ON_MODIFYHITPROBABILITY, ability_noGuard, -2, all_teams));
   extensions.push_back(plugin(ability, "levitate", PLUGIN_ON_SETDEFENSETYPE, ability_levitate, -1, other_team));
   extensions.push_back(plugin(ability, "levitate", PLUGIN_ON_SWITCHIN, ability_levitate_switch, 1, current_team));
+  extensions.push_back(plugin(ability, "overgrow", PLUGIN_ON_MODIFYBASEPOWER, ability_pinch_type_boost, -1, current_team));
   extensions.push_back(plugin(ability, "pressure", PLUGIN_ON_ENDOFMOVE, ability_pressure, 0, other_team));
   extensions.push_back(plugin(ability, "serene grace", PLUGIN_ON_MODIFYSECONDARYPROBABILITY, ability_sereneGrace, -1, current_team));
   extensions.push_back(plugin(ability, "sticky hold", PLUGIN_ON_SWITCHOUT, ability_doNothing, 99, current_team));
+  extensions.push_back(plugin(ability, "swarm", PLUGIN_ON_MODIFYBASEPOWER, ability_pinch_type_boost, -1, current_team));
   extensions.push_back(plugin(ability, "technician", PLUGIN_ON_MODIFYBASEPOWER, ability_technician, -1, current_team));
+  extensions.push_back(plugin(ability, "torrent", PLUGIN_ON_MODIFYBASEPOWER, ability_pinch_type_boost, -1, current_team));
 
   // engine effects:
   extensions.push_back(plugin(engine, "pp decrement", PLUGIN_ON_ENDOFMOVE, engine_decrementPP, 0, all_teams));
