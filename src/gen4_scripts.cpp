@@ -90,10 +90,10 @@ const Item* lumBerry_t;
 const Ability* levitate_t;
 const Ability* naturalCure_t;
 const Ability* noGuard_t;
+const Ability* pressure_t;
+const Ability* sereneGrace_t;
 const Ability* stickyHold_t;
 const Ability* technician_t;
-const Ability* sereneGrace_t;
-const Ability* pressure_t;
 
 const Type* normal_t;
 const Type* fighting_t;
@@ -1624,10 +1624,10 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   levitate_t = orphan::orphanCheck(abilities, "levitate");
   naturalCure_t = orphan::orphanCheck(abilities, "natural cure");
   noGuard_t = orphan::orphanCheck(abilities, "no guard");
+  pressure_t = orphan::orphanCheck(abilities, "pressure");
+  sereneGrace_t = orphan::orphanCheck(abilities, "serene grace");
   stickyHold_t = orphan::orphanCheck(abilities, "sticky hold");
   technician_t = orphan::orphanCheck(abilities, "technician");
-  sereneGrace_t = orphan::orphanCheck(abilities, "serene grace");
-  pressure_t = orphan::orphanCheck(abilities, "pressure");
   //types:
   const Types& types = dex->getTypes();
   normal_t = orphan::orphanCheck(types, "normal");
@@ -1738,10 +1738,10 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(ABILITY_PLUGIN, "no guard", PLUGIN_ON_MODIFYHITPROBABILITY, ability_noGuard, -2, 2));
   extensions.push_back(plugin(ABILITY_PLUGIN, "levitate", PLUGIN_ON_SETDEFENSETYPE, ability_levitate, -1, 1));
   extensions.push_back(plugin(ABILITY_PLUGIN, "levitate", PLUGIN_ON_SWITCHIN, ability_levitate_switch, 1, 0));
+  extensions.push_back(plugin(ABILITY_PLUGIN, "pressure", PLUGIN_ON_ENDOFMOVE, ability_pressure, 0, 1));
+  extensions.push_back(plugin(ABILITY_PLUGIN, "serene grace", PLUGIN_ON_MODIFYSECONDARYPROBABILITY, ability_sereneGrace, -1, 0));
   extensions.push_back(plugin(ABILITY_PLUGIN, "sticky hold", PLUGIN_ON_SWITCHOUT, ability_doNothing, 99, 0));
   extensions.push_back(plugin(ABILITY_PLUGIN, "technician", PLUGIN_ON_MODIFYBASEPOWER, ability_technician, -1, 0));
-  extensions.push_back(plugin(ABILITY_PLUGIN, "serene grace", PLUGIN_ON_MODIFYSECONDARYPROBABILITY, ability_sereneGrace, -1, 0));
-  extensions.push_back(plugin(ABILITY_PLUGIN, "pressure", PLUGIN_ON_ENDOFMOVE, ability_pressure, 0, 1));
 
   // engine effects:
   extensions.push_back(plugin(ENGINE_PLUGIN, "pp decrement", PLUGIN_ON_ENDOFMOVE, engine_decrementPP, 0, 2));
