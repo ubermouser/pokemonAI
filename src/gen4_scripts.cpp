@@ -922,15 +922,13 @@ int ability_pressure(
   PokemonVolatile cPKV,
   PokemonVolatile tPKV)
 {
-  if (!tPKV.nv().abilityExists() || (&(tPKV.nv().getAbility()) != pressure_t)) { return 0; }
-
   // this plugin_t only triggered if primary has hit
   if (!cu.getBase().hasHit(cu.getICTeam())) { return 0; }
 
   // Struggle is not affected by Pressure
   if (&mV.getBase() == struggle_t) { return 0; }
 
-  cPKV.modMovePP(cu.getCAction(), -1);
+  mV.modPP(-1);
 
   return 1;
 };
@@ -1420,7 +1418,7 @@ int engine_decrementPP(
   // don't decrement PP if this move is struggle_t or the move did not hit
   if (!cu.getBase().hasHit(cu.getICTeam()) || (&mV.getBase() == struggle_t)) { return 0; }
 
-  cPKV.modMovePP(cu.getCAction(), -1);
+  mV.modPP(-1);
 
   return 1;
 };
@@ -1682,11 +1680,10 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(ABILITY_PLUGIN, "sticky hold", PLUGIN_ON_SWITCHOUT, ability_doNothing, 99, 0));
   extensions.push_back(plugin(ABILITY_PLUGIN, "technician", PLUGIN_ON_MODIFYBASEPOWER, ability_technician, -1, 0));
   extensions.push_back(plugin(ABILITY_PLUGIN, "serene grace", PLUGIN_ON_MODIFYSECONDARYPROBABILITY, ability_sereneGrace, -1, 0));
-  extensions.push_back(plugin(ABILITY_PLUGIN, "pressure", PLUGIN_ON_BEGINNINGOFTURN, ability_doNothing, 0, 0));
+  extensions.push_back(plugin(ABILITY_PLUGIN, "pressure", PLUGIN_ON_ENDOFMOVE, ability_pressure, 0, 1));
 
   // engine effects:
-  extensions.push_back(plugin(ENGINE_PLUGIN, "pressure ability effect", PLUGIN_ON_ENDOFMOVE, ability_pressure, 1, 2));
-  extensions.push_back(plugin(ENGINE_PLUGIN, "pp decrement", PLUGIN_ON_ENDOFMOVE, engine_decrementPP, 2, 2));
+  extensions.push_back(plugin(ENGINE_PLUGIN, "pp decrement", PLUGIN_ON_ENDOFMOVE, engine_decrementPP, 0, 2));
   extensions.push_back(plugin(ENGINE_PLUGIN, "type boosting item effect", PLUGIN_ON_MODIFYBASEPOWER, engine_typeBoostingItem, 0, 2));
   extensions.push_back(plugin(ENGINE_PLUGIN, "type resisting berry effect", PLUGIN_ON_MODIFYITEMPOWER, engine_typeResistingBerry, 0, 2));
   extensions.push_back(plugin(ENGINE_PLUGIN, "struggle damage effect", PLUGIN_ON_ENDOFMOVE, engine_move_struggle, 0, 2));

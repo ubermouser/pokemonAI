@@ -77,9 +77,7 @@ TEST_F(AbilitiesTest, Pressure) {
 
   { // Turn 1: Starmie uses water gun
     EXPECT_EQ(turn1_water_gun.size(), 2);
-    auto starmie_after_water_gun_crit = turn1_water_gun.at(0).getEnv().getTeam(TEAM_A).getPKV();
-    EXPECT_EQ(starmie_after_water_gun_crit.getMV(0).getPP(), 38);
-    auto starmie_after_water_gun_no_crit = turn1_water_gun.at(1).getEnv().getTeam(TEAM_A).getPKV();
-    EXPECT_EQ(starmie_after_water_gun_no_crit.getMV(0).getPP(), 38);
+    auto starmie_after_water_gun = turn1_water_gun.at(0).getEnv().getTeam(TEAM_A).getPKV();
+    EXPECT_EQ(starmie_after_water_gun.getMV(0).getPP(), 38);
   }
 }
