@@ -1537,7 +1537,7 @@ bool saneStackProbability(std::deque<DamageComponents_t>& dComponents) {
   for (auto begin = dComponents.begin(), end = dComponents.end(); begin != end; ++begin)
   {
     sum += begin->cProbability;
-    if (!mostlyGT(begin->cProbability, (fpType)0.0) || !mostlyLTE(begin->cProbability, (fpType)1.0)) { return false; }
+    if (!mostlyGTE(begin->cProbability, (fpType)0.0) || !mostlyLTE(begin->cProbability, (fpType)1.0)) { return false; }
   }
 
   return mostlyEQ(sum, (fpType)1.0);
