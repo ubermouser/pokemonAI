@@ -180,22 +180,22 @@ bool PokedexStatic::registerPlugin(
 
     // find which element this plugin refers to
     plugin& cCPlugin = collectedPlugins[iCPlugin];
-    if (cCPlugin.getCategory() == ::move)
+    if (cCPlugin.getCategory() == move)
     {
       element = orphanCheck(getMoves(), cCPlugin.getName(), &orphanMoves);
       if (element == NULL) { continue; } // orphan!
     }
-    else if (cCPlugin.getCategory() == ::ability)
+    else if (cCPlugin.getCategory() == ability)
     {
       element = orphanCheck(getAbilities(), cCPlugin.getName(), &orphanAbilities);
       if (element == NULL) { continue; } // orphan!
     }
-    else if (cCPlugin.getCategory() == ::item)
+    else if (cCPlugin.getCategory() == item)
     {
       element = orphanCheck(getItems(), cCPlugin.getName(), &orphanItems);
       if (element == NULL) { continue; } // orphan!
     }
-    else if (cCPlugin.getCategory() == ::engine)
+    else if (cCPlugin.getCategory() == engine)
     {
       element = &getExtensions();
     }

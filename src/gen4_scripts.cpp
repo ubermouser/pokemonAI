@@ -942,13 +942,9 @@ int ability_naturalCure(
   return 0;
 };
 
-int ability_pinch_type_boost
-  (PkCUEngine& cu,
-  MoveVolatile mV,
-  PokemonVolatile cPKV,
-  PokemonVolatile tPKV,
-  fpType& basePowerModifier)
-{
+int ability_pinch_type_boost(PkCUEngine& cu, MoveVolatile mV,
+                             PokemonVolatile cPKV, PokemonVolatile tPKV,
+                             fpType& basePowerModifier) {
   if (!cPKV.nv().abilityExists()) { return 0; }
   const Ability* ability = &cPKV.nv().getAbility();
 
