@@ -24,8 +24,8 @@ protected:
 TEST_F(EngineTest, PrimaryHitAndCrit) {
   auto team = TeamNonVolatile()
       .addPokemon(PokemonNonVolatile()
-        .setBase(pokedex_->getPokemon().at("charmander"))
-        .addMove(pokedex_->getMoves().at("cut")));
+        .setBase(pokedex_->pokemon("charmander"))
+        .addMove(pokedex_->move("cut")));
   auto environment = EnvironmentNonvolatile(team, team, true);
   engine_->setEnvironment(environment);
 
@@ -46,8 +46,8 @@ TEST_F(EngineTest, DISABLED_HighEngineAccuracy) {
   engine_->setAccuracy(16);
   auto team = TeamNonVolatile()
       .addPokemon(PokemonNonVolatile()
-        .setBase(pokedex_->getPokemon().at("charmander"))
-        .addMove(pokedex_->getMoves().at("fire blast"))); // move can hit, crit, status, and miss
+        .setBase(pokedex_->pokemon("charmander"))
+        .addMove(pokedex_->move("fire blast"))); // move can hit, crit, status, and miss
   auto environment = EnvironmentNonvolatile(team, team, true);
   engine_->setEnvironment(environment);
 
@@ -62,11 +62,11 @@ TEST_F(EngineTest, DISABLED_HighEngineAccuracy) {
 TEST_F(EngineTest, Swap) {
   auto team = TeamNonVolatile()
       .addPokemon(PokemonNonVolatile()
-        .setBase(pokedex_->getPokemon().at("torkoal"))
-        .addMove(pokedex_->getMoves().at("explosion")))
+        .setBase(pokedex_->pokemon("torkoal"))
+        .addMove(pokedex_->move("explosion")))
       .addPokemon(PokemonNonVolatile()
-        .setBase(pokedex_->getPokemon().at("squirtle"))
-        .addMove(pokedex_->getMoves().at("surf")));
+        .setBase(pokedex_->pokemon("squirtle"))
+        .addMove(pokedex_->move("surf")));
   auto environment = EnvironmentNonvolatile(team, team, true);
   engine_->setEnvironment(environment);
 
@@ -102,11 +102,11 @@ TEST_F(EngineTest, InvalidAction) {
 
   auto team = TeamNonVolatile()
       .addPokemon(PokemonNonVolatile()
-        .setBase(pokedex_->getPokemon().at("charmander"))
-        .addMove(pokedex_->getMoves().at("cut")))
+        .setBase(pokedex_->pokemon("charmander"))
+        .addMove(pokedex_->move("cut")))
       .addPokemon(PokemonNonVolatile()
-        .setBase(pokedex_->getPokemon().at("bulbasaur"))
-        .addMove(pokedex_->getMoves().at("razor leaf")));
+        .setBase(pokedex_->pokemon("bulbasaur"))
+        .addMove(pokedex_->move("razor leaf")));
   auto environment = EnvironmentNonvolatile(team, team, true);
   engine_->setEnvironment(environment);
 
@@ -143,21 +143,21 @@ TEST_F(EngineTest, InvalidAction) {
 TEST_F(EngineTest, GroundConditions) {
   auto team = TeamNonVolatile()
       .addPokemon(PokemonNonVolatile() // has rapid spin
-        .setBase(pokedex_->getPokemon().at("forretress"))
-        .addMove(pokedex_->getMoves().at("stealth rock"))
-        .addMove(pokedex_->getMoves().at("spikes"))
-        .addMove(pokedex_->getMoves().at("toxic spikes"))
-        .addMove(pokedex_->getMoves().at("rapid spin"))
+        .setBase(pokedex_->pokemon("forretress"))
+        .addMove(pokedex_->move("stealth rock"))
+        .addMove(pokedex_->move("spikes"))
+        .addMove(pokedex_->move("toxic spikes"))
+        .addMove(pokedex_->move("rapid spin"))
         .setLevel(100))
       .addPokemon(PokemonNonVolatile() // normal pokemon
-        .setBase(pokedex_->getPokemon().at("rattata"))
+        .setBase(pokedex_->pokemon("rattata"))
         .setLevel(100))
       .addPokemon(PokemonNonVolatile() // has levitate
-        .setBase(pokedex_->getPokemon().at("azelf"))
-        .setAbility(pokedex_->getAbilities().at("levitate"))
+        .setBase(pokedex_->pokemon("azelf"))
+        .setAbility(pokedex_->ability("levitate"))
         .setLevel(100))
       .addPokemon(PokemonNonVolatile() // is flying type
-        .setBase(pokedex_->getPokemon().at("pidgey"))
+        .setBase(pokedex_->pokemon("pidgey"))
         .setLevel(100))
       .initialize();
   auto environment = EnvironmentNonvolatile(team, team, true);
@@ -207,12 +207,12 @@ TEST_F(EngineTest, GroundConditions) {
 TEST_F(EngineTest, LifeOrb) {
   auto team_1 = TeamNonVolatile()
       .addPokemon(PokemonNonVolatile()
-        .setBase(pokedex_->getPokemon().at("dusknoir"))
-        .addMove(pokedex_->getMoves().at("pain split"))
-        .addMove(pokedex_->getMoves().at("shadow punch"))
-        .addMove(pokedex_->getMoves().at("will-o-wisp"))
-        .addMove(pokedex_->getMoves().at("calm mind"))
-        .setInitialItem(pokedex_->getItems().at("life orb"))
+        .setBase(pokedex_->pokemon("dusknoir"))
+        .addMove(pokedex_->move("pain split"))
+        .addMove(pokedex_->move("shadow punch"))
+        .addMove(pokedex_->move("will-o-wisp"))
+        .addMove(pokedex_->move("calm mind"))
+        .setInitialItem(pokedex_->item("life orb"))
         .setLevel(100));
   auto team_2 = team_1;
   team_2.teammate(0).setNoInitialItem();
@@ -247,21 +247,21 @@ TEST_F(EngineTest, LifeOrb) {
 TEST_F(EngineTest, ChoiceItems) {
   auto team_1 = TeamNonVolatile()
       .addPokemon(PokemonNonVolatile()
-        .setBase(pokedex_->getPokemon().at("scizor"))
-        .addMove(pokedex_->getMoves().at("bullet punch")) // increased by choice band
-        .addMove(pokedex_->getMoves().at("swift")) // not increased
-        .setInitialItem(pokedex_->getItems().at("choice band"))
+        .setBase(pokedex_->pokemon("scizor"))
+        .addMove(pokedex_->move("bullet punch")) // increased by choice band
+        .addMove(pokedex_->move("swift")) // not increased
+        .setInitialItem(pokedex_->item("choice band"))
         .setLevel(100))
       .addPokemon(PokemonNonVolatile()
-        .setBase(pokedex_->getPokemon().at("azelf"))
-        .addMove(pokedex_->getMoves().at("swift")) // increased by choice scarf
-        .addMove(pokedex_->getMoves().at("fire punch")) // not increased
-        .setInitialItem(pokedex_->getItems().at("choice specs"))
+        .setBase(pokedex_->pokemon("azelf"))
+        .addMove(pokedex_->move("swift")) // increased by choice scarf
+        .addMove(pokedex_->move("fire punch")) // not increased
+        .setInitialItem(pokedex_->item("choice specs"))
         .setLevel(100))
       .addPokemon(PokemonNonVolatile()
-        .setBase(pokedex_->getPokemon().at("flygon"))
-        .addMove(pokedex_->getMoves().at("draco meteor"))
-        .setInitialItem(pokedex_->getItems().at("choice scarf"))
+        .setBase(pokedex_->pokemon("flygon"))
+        .addMove(pokedex_->move("draco meteor"))
+        .setInitialItem(pokedex_->item("choice scarf"))
         .setLevel(100));
   auto team_2 = team_1;
   team_2.teammate(0).setNoInitialItem();

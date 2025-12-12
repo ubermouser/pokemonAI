@@ -28,24 +28,24 @@ protected:
 
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->getPokemon().at("gengar"))
-          .addMove(pokedex_->getMoves().at("explosion"))
-          .addMove(pokedex_->getMoves().at("focus blast"))
+          .setBase(pokedex_->pokemon("gengar"))
+          .addMove(pokedex_->move("explosion"))
+          .addMove(pokedex_->move("focus blast"))
           .setLevel(100)
           .setIV(FV_SPEED, 31)) // ensure Gengar wins the speed tie
         .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->getPokemon().at("metagross"))
-          .addMove(pokedex_->getMoves().at("agility"))
-          .addMove(pokedex_->getMoves().at("meteor mash"))
+          .setBase(pokedex_->pokemon("metagross"))
+          .addMove(pokedex_->move("agility"))
+          .addMove(pokedex_->move("meteor mash"))
           .setLevel(100));
     auto team_b = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->getPokemon().at("alakazam"))
-          .addMove(pokedex_->getMoves().at("recover"))
-          .addMove(pokedex_->getMoves().at("psychic"))
+          .setBase(pokedex_->pokemon("alakazam"))
+          .addMove(pokedex_->move("recover"))
+          .addMove(pokedex_->move("psychic"))
           .setLevel(100))
         .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->getPokemon().at("pikachu")));
+          .setBase(pokedex_->pokemon("pikachu")));
     environment_ = std::make_shared<EnvironmentNonvolatile>(team_a, team_b, true);
     engine_->setEnvironment(environment_);
   }
@@ -149,13 +149,13 @@ protected:
     PlannerTest::SetUp();
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->getPokemon().at("gengar"))
-          .addMove(pokedex_->getMoves().at("double team"))
-          .addMove(pokedex_->getMoves().at("drain punch")));
+          .setBase(pokedex_->pokemon("gengar"))
+          .addMove(pokedex_->move("double team"))
+          .addMove(pokedex_->move("drain punch")));
     auto team_b = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->getPokemon().at("rattata"))
-          .addMove(pokedex_->getMoves().at("return")));
+          .setBase(pokedex_->pokemon("rattata"))
+          .addMove(pokedex_->move("return")));
     environment_ = std::make_shared<EnvironmentNonvolatile>(team_a, team_b, true);
     engine_->setEnvironment(environment_);
   }
