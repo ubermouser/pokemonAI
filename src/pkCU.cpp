@@ -205,7 +205,7 @@ bool PkCU::initialize() {
 size_t PkCU::insertPluginHandler(plugin_t& cPlugin, size_t pluginType, size_t iNTeammate) {
   size_t numAdded = 0;
 
-  uint32_t target = cPlugin.target;
+  pluginTarget target = cPlugin.target;
   size_t iNTeam = (iNTeammate>=6)?1:0;
   size_t iTeammate = iNTeammate - 6*iNTeam;
 
@@ -215,8 +215,8 @@ size_t PkCU::insertPluginHandler(plugin_t& cPlugin, size_t pluginType, size_t iN
     // don't add to a teammate that doesn't exist:
     if ((iCTeammate) >= nv_->getTeam(iCTeam).getNumTeammates()) { continue; }
 
-    if ((target==TEAM_A) && (iCTeam != iNTeam)) { continue; }
-    else if ((target==TEAM_B) && (iCTeam == iNTeam)) { continue; }
+    if ((target==current_team) && (iCTeam != iNTeam)) { continue; }
+    else if ((target==other_team) && (iCTeam == iNTeam)) { continue; }
 
     //if on team of adding team, only match to this teammate. Otherwise match to all teammates
     if ((iNTeammate != SIZE_MAX) && (iNTeam == iCTeam) && (iTeammate != iCTeammate)) { continue; }

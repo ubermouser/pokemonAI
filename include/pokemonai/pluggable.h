@@ -11,6 +11,13 @@ class plugin;
 typedef void (*voidFunction_rawType)(void*);
 
 #define PLUGIN_MAXSIZE 28
+
+enum pluginTarget {
+  current_team = 0,
+  other_team = 1,
+  all_teams = 2
+};
+
 enum pluginType
 {
   PLUGIN_ON_INIT = 0,
@@ -52,8 +59,8 @@ struct plugin_t
   /* a lower priority function is executed first, and has the ability to stop higher priority functions fro executing */
   int32_t priority;
 
-  /* may be one of TEAM_A(CTEAM), TEAM_B(OTEAM), or  2 (both) to register to all teammates in contact with this plugin */
-  uint32_t target;
+  /* may be one of current_team, other_team, or all_teams to register to all teammates in contact with this plugin */
+  pluginTarget target;
 
   bool operator== (const plugin_t& other) const
   {
@@ -83,7 +90,7 @@ private:
     pluginType pType, 
     voidFunction_rawType _function, 
     int32_t _priority = 0, 
-    uint32_t _target = TEAM_A, 
+    pluginTarget _target = current_team,
     bool setIsImplemented = true);
 protected:
 public:
@@ -112,7 +119,7 @@ public:
     return implemented;
   };
 
-  uint32_t getTarget(size_t pType) const
+  pluginTarget getTarget(size_t pType) const
   {
     return plugins[pType].target;
   };
@@ -166,7 +173,7 @@ public:
     return plugins[pType][iPlugin].priority;
   };
 
-  int32_t getTarget(size_t pType, size_t iPlugin) const
+  pluginTarget getTarget(size_t pType, size_t iPlugin) const
   {
     return plugins[pType][iPlugin].target;
   };

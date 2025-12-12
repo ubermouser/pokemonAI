@@ -18,6 +18,16 @@
 #include "pokemonai/gen4_scripts.h"
 #endif
 
+const char* pluginCategoryToString(pluginCategory category) {
+  switch(category) {
+    case move: return "move";
+    case item: return "item";
+    case ability: return "ability";
+    case engine: return "engine";
+    default: return "unknown";
+  }
+}
+
 using namespace INI;
 using namespace orphan;
 namespace po = boost::program_options;
@@ -170,29 +180,29 @@ bool PokedexStatic::registerPlugin(
 
     // find which element this plugin refers to
     plugin& cCPlugin = collectedPlugins[iCPlugin];
-    if (cCPlugin.getCategory().compare(MOVE_PLUGIN) == 0)
+    if (cCPlugin.getCategory() == move)
     {
       element = orphanCheck(getMoves(), cCPlugin.getName(), &orphanMoves);
       if (element == NULL) { continue; } // orphan!
     }
-    else if (cCPlugin.getCategory().compare(ABILITY_PLUGIN) == 0)
+    else if (cCPlugin.getCategory() == ability)
     {
       element = orphanCheck(getAbilities(), cCPlugin.getName(), &orphanAbilities);
       if (element == NULL) { continue; } // orphan!
     }
-    else if (cCPlugin.getCategory().compare(ITEM_PLUGIN) == 0)
+    else if (cCPlugin.getCategory() == item)
     {
       element = orphanCheck(getItems(), cCPlugin.getName(), &orphanItems);
       if (element == NULL) { continue; } // orphan!
     }
-    else if (cCPlugin.getCategory() == ENGINE_PLUGIN)
+    else if (cCPlugin.getCategory() == engine)
     {
       element = &getExtensions();
     }
     else // unknown category:
     {
-      orphanCategories.insert(cCPlugin.getCategory());
-      continue;
+      // orphanCategories.insert(cCPlugin.getCategory());
+      throw std::runtime_error("Unknown plugin category");
     }
 
     bool overwritten = false;
@@ -208,7 +218,7 @@ bool PokedexStatic::registerPlugin(
       if (verbose >= 5)
       {
         std::cerr << "WAR " << __FILE__ << "." << __LINE__ << 
-          ": plugin for [" << cCPlugin.getCategory() <<
+          ": plugin for [" << pluginCategoryToString(cCPlugin.getCategory()) <<
           "][" << cCPlugin.getName() << "] -- overwriting previously defined plugin!\n";
       }
       numOverwritten++;

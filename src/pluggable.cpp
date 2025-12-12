@@ -7,13 +7,13 @@
 #include "pokemonai/plugin.h"
 //#undef PKAI_STATIC
 
-plugin_t Pluggable::emptyPlugin = { NULL, 0, 0 };
+plugin_t Pluggable::emptyPlugin = { NULL, 0, current_team };
 
 bool Pluggable::registerPlugin_void(
   pluginType pType, 
   voidFunction_rawType _function, 
   int32_t _priority, 
-  uint32_t _target,
+  pluginTarget _target,
   bool setIsImplemented)
 {
   bool existed = (plugins[(size_t)pType].pFunction != NULL);
