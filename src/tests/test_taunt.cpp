@@ -42,7 +42,7 @@ protected:
   EnvironmentNonvolatile environment_nv;
 };
 
-TEST_F(TauntTest, AppiesEffect) {
+TEST_F(TauntTest, AppliesEffect) {
   // Aerodactyl uses Taunt on Shuckle
   auto taunt_result = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
   auto env = taunt_result.at(0).getEnv();
@@ -72,9 +72,6 @@ TEST_F(TauntTest, WearsOff) {
   EXPECT_EQ(env1.getTeam(1).teammate(0).status().cTeammate.taunt_duration, 3);
 
   // Turn 2: Aerodactyl waits. Shuckle uses Constrict (valid). At end of turn/beginning of next, duration decrements.
-  // Wait, taunt decrement is registered as PLUGIN_ON_BEGINNINGOFTURN.
-  // So when we generate the *next* state, it runs.
-
   auto turn2 = engine_->updateState(turn1.at(0), Action::wait(), Action::move(1));
   auto env2 = turn2.at(0).getEnv();
   // Duration should be 2 now.

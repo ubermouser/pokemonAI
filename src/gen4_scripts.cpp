@@ -243,7 +243,25 @@ int move_taunt_set(
 {
   if (&mV.getBase() != taunt_t) { return 0; }
 
-  tPKV.status().cTeammate.taunt_duration = 3;
+  std::array<size_t, 3> iREnv;
+  // equal probability for 3, 4, and 5 turns
+  cu.triplicateState(iREnv, 1.0/3.0, 1.0/3.0);
+
+  // case 1: 3 turns
+  {
+    PokemonVolatile tPKV = cu.getTPKV(iREnv[0]);
+    tPKV.status().cTeammate.taunt_duration = 3;
+  }
+  // case 2: 4 turns
+  {
+    PokemonVolatile tPKV = cu.getTPKV(iREnv[1]);
+    tPKV.status().cTeammate.taunt_duration = 4;
+  }
+  // case 3: 5 turns
+  {
+    PokemonVolatile tPKV = cu.getTPKV(iREnv[2]);
+    tPKV.status().cTeammate.taunt_duration = 5;
+  }
 
   return 1;
 };
@@ -1587,9 +1605,9 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   struggle_t = orphan::orphanCheck(moves, "struggle");
   suckerPunch_t = orphan::orphanCheck(moves, "sucker punch");
   swift_t = orphan::orphanCheck(moves, "swift");
+  taunt_t = orphan::orphanCheck(moves, "taunt");
   toxicSpikes_t = orphan::orphanCheck(moves, "toxic spikes");
   trick_t = orphan::orphanCheck(moves, "trick");
-  taunt_t = orphan::orphanCheck(moves, "taunt");
   uTurn_t = orphan::orphanCheck(moves, "u-turn");
   voltTackle_t = orphan::orphanCheck(moves, "volt tackle");
   woodHammer_t = orphan::orphanCheck(moves, "wood hammer");
