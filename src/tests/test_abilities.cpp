@@ -59,33 +59,29 @@ TEST_F(AbilitiesTest, Blaze) {
   uint32_t normalDamage = getDamage("charizard", "blaze", "flamethrower", false);
   uint32_t boostedDamage = getDamage("charizard", "blaze", "flamethrower", true);
 
-  // Expect boosted damage to be roughly 1.5x normal damage
-  // Due to random damage rolls (0.85-1.0), ranges are:
-  // Normal: 0.85*D - 1.0*D
-  // Boosted: 1.5 * (0.85*D - 1.0*D) = 1.275*D - 1.5*D
-  // Boosted min (1.275) > Normal max (1.0).
-  EXPECT_GT(boostedDamage, normalDamage);
+  // TODO(@drendleman) burn condition is messing with state selection
+  EXPECT_GT(boostedDamage, normalDamage * 1.2);
 }
 
 TEST_F(AbilitiesTest, Overgrow) {
   // Venusaur with Overgrow using Energy Ball (Vine Whip is missing in gen4_moves.txt)
   uint32_t normalDamage = getDamage("venusaur", "overgrow", "energy ball", false);
   uint32_t boostedDamage = getDamage("venusaur", "overgrow", "energy ball", true);
-  EXPECT_GT(boostedDamage, normalDamage);
+  EXPECT_GT(boostedDamage, normalDamage * 1.4);
 }
 
 TEST_F(AbilitiesTest, Swarm) {
   // Scyther with Swarm using X-Scissor
   uint32_t normalDamage = getDamage("scyther", "swarm", "x-scissor", false);
   uint32_t boostedDamage = getDamage("scyther", "swarm", "x-scissor", true);
-  EXPECT_GT(boostedDamage, normalDamage);
+  EXPECT_GT(boostedDamage, normalDamage * 1.4);
 }
 
 TEST_F(AbilitiesTest, Torrent) {
   // Blastoise with Torrent using Water Gun
   uint32_t normalDamage = getDamage("blastoise", "torrent", "water gun", false);
   uint32_t boostedDamage = getDamage("blastoise", "torrent", "water gun", true);
-  EXPECT_GT(boostedDamage, normalDamage);
+  EXPECT_GT(boostedDamage, normalDamage * 1.4);
 }
 
 TEST_F(AbilitiesTest, NaturalCure) {
