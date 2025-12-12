@@ -22,6 +22,7 @@ protected:
           .setBase(pokedex_->getPokemon().at("steelix"))
           .addMove(pokedex_->getMoves().at("taunt"))
           .addMove(pokedex_->getMoves().at("iron tail")) // damage
+          .setInitialItem(pokedex_->getItems().at("leftovers")) // healing to counter potential poison/damage
           .setLevel(100))
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->getPokemon().at("pikachu"))); // backup
@@ -61,7 +62,7 @@ TEST_F(TauntTest, PreventsStatusMoves) {
   // Shuckle tries to use Toxic (Move 0, Status) - Should be invalid
   EXPECT_FALSE(engine_->isValidAction(taunt_result.at(0), Action::move(0), TEAM_B));
 
-  // Shuckle tries to use Constrict (Move 1, Physical) - Should be valid
+  // Shuckle tries to use Body Slam (Move 1, Physical) - Should be valid
   EXPECT_TRUE(engine_->isValidAction(taunt_result.at(0), Action::move(1), TEAM_B));
 }
 
@@ -84,7 +85,11 @@ TEST_F(TauntTest, WearsOff) {
   auto current_state = turn1.at(0);
   for (uint32_t i = 0; i < initial_duration; ++i) {
       // Duration should decrement each turn
-      auto next_turn = engine_->updateState(current_state, Action::wait(), Action::move(1));
+      // Force Shuckle to use Toxic (Move 0) even if Taunted (Invalid Action).
+      // We rely on setAllowInvalidMoves(true) to allow this.
+      // Toxic applies Poison, but Steelix has Leftovers to counter damage.
+      // This avoids accidental KO which was happening with Body Slam in some cases.
+      auto next_turn = engine_->updateState(current_state, Action::wait(), Action::move(0));
       current_state = next_turn.at(0);
 
       auto current_duration = current_state.getEnv().getTeam(1).teammate(0).status().cTeammate.taunt_duration;
