@@ -9,7 +9,7 @@
 #include "pokemonai/roulette.h"
 
 
-BOOST_STATIC_ASSERT(sizeof(EnvironmentPossibleData) == (sizeof(uint64_t)*18));
+BOOST_STATIC_ASSERT(sizeof(EnvironmentPossibleData) == (sizeof(uint64_t)*19));
 
 EnvironmentPossibleData EnvironmentPossibleData::create(
     const EnvironmentVolatileData& source, bool doHash) {

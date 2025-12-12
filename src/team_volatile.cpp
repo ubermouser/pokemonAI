@@ -8,9 +8,9 @@
 #include <boost/static_assert.hpp>
 
 BOOST_STATIC_ASSERT(sizeof(NonVolatileStatus) == (sizeof(uint32_t)*1));
-BOOST_STATIC_ASSERT(sizeof(VolatileStatus) == (sizeof(uint32_t)*3));
-BOOST_STATIC_ASSERT(sizeof(TeamStatus) == (sizeof(uint32_t)*4));
-BOOST_STATIC_ASSERT(sizeof(TeamVolatileData) == (sizeof(uint64_t)*8));
+BOOST_STATIC_ASSERT(sizeof(VolatileStatus) == (sizeof(uint32_t)*4));
+BOOST_STATIC_ASSERT(sizeof(TeamStatus) == (sizeof(uint32_t)*5));
+BOOST_STATIC_ASSERT(sizeof(TeamVolatileData) == (sizeof(uint32_t)*17));
 
 
 
