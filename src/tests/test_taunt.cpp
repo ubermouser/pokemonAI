@@ -19,9 +19,9 @@ protected:
 
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->getPokemon().at("aerodactyl"))
+          .setBase(pokedex_->getPokemon().at("steelix"))
           .addMove(pokedex_->getMoves().at("taunt"))
-          .addMove(pokedex_->getMoves().at("aerial ace")) // damage
+          .addMove(pokedex_->getMoves().at("iron tail")) // damage
           .setLevel(100))
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->getPokemon().at("pikachu"))); // backup
@@ -30,7 +30,7 @@ protected:
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->getPokemon().at("shuckle"))
           .addMove(pokedex_->getMoves().at("toxic")) // status
-          .addMove(pokedex_->getMoves().at("wrap")) // damage
+          .addMove(pokedex_->getMoves().at("body slam")) // damage
           .setLevel(100));
 
     environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
@@ -66,27 +66,34 @@ TEST_F(TauntTest, PreventsStatusMoves) {
 }
 
 TEST_F(TauntTest, WearsOff) {
-  // Turn 1: Aerodactyl uses Taunt. Shuckle is taunted (duration 3).
+  // Turn 1: Aerodactyl uses Taunt. Shuckle is taunted (duration 3-5).
+  // Note: PkCU branches state. We pick the first environment and follow it.
   auto turn1 = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
-  auto env1 = turn1.at(0).getEnv();
-  EXPECT_EQ(env1.getTeam(1).teammate(0).status().cTeammate.taunt_duration, 3);
 
-  // Turn 2: Aerodactyl waits. Shuckle uses Constrict (valid). At end of turn/beginning of next, duration decrements.
-  auto turn2 = engine_->updateState(turn1.at(0), Action::wait(), Action::move(1));
-  auto env2 = turn2.at(0).getEnv();
-  // Duration should be 2 now.
-  EXPECT_EQ(env2.getTeam(1).teammate(0).status().cTeammate.taunt_duration, 2);
+  // Verify we have multiple outcomes (3, 4, 5 turns)
+  // We expect at least 3 states due to triplicateState, possibly more if other RNG happened (but unlikely here)
+  EXPECT_GE(turn1.size(), 3);
 
-  // Turn 3:
-  auto turn3 = engine_->updateState(turn2.at(0), Action::wait(), Action::move(1));
-  auto env3 = turn3.at(0).getEnv();
-  EXPECT_EQ(env3.getTeam(1).teammate(0).status().cTeammate.taunt_duration, 1);
+  // Pick one state to follow.
+  auto initial_env = turn1.at(0);
+  auto initial_duration = initial_env.getEnv().getTeam(1).teammate(0).status().cTeammate.taunt_duration;
 
-  // Turn 4:
-  auto turn4 = engine_->updateState(turn3.at(0), Action::wait(), Action::move(1));
-  auto env4 = turn4.at(0).getEnv();
-  EXPECT_EQ(env4.getTeam(1).teammate(0).status().cTeammate.taunt_duration, 0);
+  EXPECT_GE(initial_duration, 3);
+  EXPECT_LE(initial_duration, 5);
+
+  auto current_state = turn1.at(0);
+  for (uint32_t i = 0; i < initial_duration; ++i) {
+      // Duration should decrement each turn
+      auto next_turn = engine_->updateState(current_state, Action::wait(), Action::move(1));
+      current_state = next_turn.at(0);
+
+      auto current_duration = current_state.getEnv().getTeam(1).teammate(0).status().cTeammate.taunt_duration;
+      EXPECT_EQ(current_duration, initial_duration - 1 - i);
+  }
+
+  // After duration expires, duration should be 0
+  EXPECT_EQ(current_state.getEnv().getTeam(1).teammate(0).status().cTeammate.taunt_duration, 0);
 
   // Now Shuckle can use Toxic again.
-  EXPECT_TRUE(engine_->isValidAction(turn4.at(0), Action::move(0), TEAM_B));
+  EXPECT_TRUE(engine_->isValidAction(current_state, Action::move(0), TEAM_B));
 }
