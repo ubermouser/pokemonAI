@@ -22,18 +22,18 @@ protected:
 TEST_F(AbilitiesTest, NaturalCure) {
   auto team_a = TeamNonVolatile()
       .addPokemon(PokemonNonVolatile()
-        .setBase(pokedex_->getPokemon().at("starmie"))
-        .setAbility(pokedex_->getAbilities().at("natural cure"))
-        .addMove(pokedex_->getMoves().at("surf"))
+        .setBase(pokedex_->pokemon("starmie"))
+        .setAbility(pokedex_->ability("natural cure"))
+        .addMove(pokedex_->move("surf"))
         .setLevel(100))
       .addPokemon(PokemonNonVolatile()
-        .setBase(pokedex_->getPokemon().at("chansey"))
-        .addMove(pokedex_->getMoves().at("softboiled"))
+        .setBase(pokedex_->pokemon("chansey"))
+        .addMove(pokedex_->move("softboiled"))
         .setLevel(100));
   auto team_b = TeamNonVolatile()
       .addPokemon(PokemonNonVolatile()
-        .setBase(pokedex_->getPokemon().at("jolteon"))
-        .addMove(pokedex_->getMoves().at("thunder wave"))
+        .setBase(pokedex_->pokemon("jolteon"))
+        .addMove(pokedex_->move("thunder wave"))
         .setLevel(100));
   auto environment = EnvironmentNonvolatile(team_a, team_b, true);
   engine_->setEnvironment(environment);
@@ -59,14 +59,14 @@ TEST_F(AbilitiesTest, NaturalCure) {
 TEST_F(AbilitiesTest, Pressure) {
   auto team_a = TeamNonVolatile()
       .addPokemon(PokemonNonVolatile()
-        .setBase(pokedex_->getPokemon().at("starmie"))
-        .addMove(pokedex_->getMoves().at("water gun"))
+        .setBase(pokedex_->pokemon("starmie"))
+        .addMove(pokedex_->move("water gun"))
         .setLevel(100));
   auto team_b = TeamNonVolatile()
       .addPokemon(PokemonNonVolatile()
-        .setBase(pokedex_->getPokemon().at("mewtwo"))
-        .setAbility(pokedex_->getAbilities().at("pressure"))
-        .addMove(pokedex_->getMoves().at("psychic"))
+        .setBase(pokedex_->pokemon("mewtwo"))
+        .setAbility(pokedex_->ability("pressure"))
+        .addMove(pokedex_->move("psychic"))
         .setLevel(100));
   auto environment = EnvironmentNonvolatile(team_a, team_b, true);
   engine_->setEnvironment(environment);

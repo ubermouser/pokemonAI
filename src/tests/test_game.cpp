@@ -20,15 +20,15 @@ protected:
 
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->getPokemon().at("charmander"))
-          .addMove(pokedex_->getMoves().at("cut"))
-          .addMove(pokedex_->getMoves().at("swords dance"))
+          .setBase(pokedex_->pokemon("charmander"))
+          .addMove(pokedex_->move("cut"))
+          .addMove(pokedex_->move("swords dance"))
           .setLevel(100));
     auto team_b = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->getPokemon().at("bulbasaur"))
-          .addMove(pokedex_->getMoves().at("cut"))
-          .addMove(pokedex_->getMoves().at("charm"))
+          .setBase(pokedex_->pokemon("bulbasaur"))
+          .addMove(pokedex_->move("cut"))
+          .addMove(pokedex_->move("charm"))
           .setLevel(100));
     environment_ = EnvironmentNonvolatile(team_a, team_b, true);
   }

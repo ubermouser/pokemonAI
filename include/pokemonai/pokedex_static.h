@@ -73,6 +73,13 @@ public:
   
   virtual EnginePlugins& getExtensions() { return engineExtensions_; };
   virtual const EnginePlugins& getExtensions() const { return engineExtensions_; };
+
+  virtual const Move& move(const std::string& name) const override { return moves_.at(name); }
+  virtual const Type& type(const std::string& name) const override { return types_.at(name); }
+  virtual const PokemonBase& pokemon(const std::string& name) const override { return pokemon_.at(name); }
+  virtual const Ability& ability(const std::string& name) const override { return abilities_.at(name); }
+  virtual const Nature& nature(const std::string& name) const override { return natures_.at(name); }
+  virtual const Item& item(const std::string& name) const override { return items_.at(name); }
   
   virtual bool initialize();
   virtual bool inputPlugins(); // input scripts for registered moves

@@ -19,18 +19,18 @@ protected:
 
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->getPokemon().at("steelix"))
-          .addMove(pokedex_->getMoves().at("taunt"))
-          .addMove(pokedex_->getMoves().at("strength")) // damage
+          .setBase(pokedex_->pokemon("steelix"))
+          .addMove(pokedex_->move("taunt"))
+          .addMove(pokedex_->move("strength")) // damage
           .setLevel(100))
         .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->getPokemon().at("pikachu"))); // backup
+          .setBase(pokedex_->pokemon("pikachu"))); // backup
 
     auto team_b = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->getPokemon().at("shuckle"))
-          .addMove(pokedex_->getMoves().at("toxic")) // status
-          .addMove(pokedex_->getMoves().at("strength")) // damage
+          .setBase(pokedex_->pokemon("shuckle"))
+          .addMove(pokedex_->move("toxic")) // status
+          .addMove(pokedex_->move("strength")) // damage
           .setLevel(100));
 
     environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
