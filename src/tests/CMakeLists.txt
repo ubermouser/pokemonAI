@@ -7,6 +7,7 @@ add_executable(test_planner test_planner.cpp)
 add_executable(test_pokedex test_pokedex.cpp)
 add_executable(test_abilities test_abilities.cpp)
 add_executable(test_moves test_moves.cpp)
+add_executable(test_taunt test_taunt.cpp)
 add_executable(test_ranker test_ranker.cpp)
 
 target_link_libraries(test_game pkaiEngine Boost::program_options Boost::filesystem GTest::GTest GTest::Main)
@@ -16,6 +17,7 @@ target_link_libraries(test_pokedex pkaiEngine Boost::program_options Boost::file
 target_link_libraries(test_engine pkaiEngine gen4_scripts Boost::program_options Boost::filesystem GTest::GTest GTest::Main)
 target_link_libraries(test_abilities pkaiEngine gen4_scripts Boost::program_options Boost::filesystem GTest::GTest GTest::Main)
 target_link_libraries(test_moves pkaiEngine gen4_scripts Boost::program_options Boost::filesystem GTest::GTest GTest::Main)
+target_link_libraries(test_taunt pkaiEngine gen4_scripts Boost::program_options Boost::filesystem GTest::GTest GTest::Main)
 target_link_libraries(test_ranker pkaiEngine Boost::program_options Boost::filesystem GTest::GTest GTest::Main)
 
 include(GoogleTest)
@@ -26,6 +28,7 @@ gtest_discover_tests(test_planner WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 gtest_discover_tests(test_pokedex WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 gtest_discover_tests(test_abilities WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 gtest_discover_tests(test_moves WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+gtest_discover_tests(test_taunt WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 gtest_discover_tests(test_ranker WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 add_executable(test_trainer test_trainer.cpp)

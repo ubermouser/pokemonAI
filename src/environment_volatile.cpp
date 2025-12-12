@@ -8,7 +8,7 @@
 #include "pokemonai/signature.h"
 #include "pokemonai/team_nonvolatile.h"
 
-BOOST_STATIC_ASSERT(sizeof(EnvironmentVolatileData) == (sizeof(uint64_t)*16));
+BOOST_STATIC_ASSERT(sizeof(EnvironmentVolatileData) == (sizeof(uint64_t)*17));
 
 
 void EnvironmentVolatile::initialize() {

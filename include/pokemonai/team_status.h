@@ -56,6 +56,7 @@ struct VolatileStatus
   uint32_t defensiveCurl : 1;
   uint32_t imprison : 1;
   uint32_t infatuate : 1;
+  uint32_t taunt_duration : 3;
   // END OF THIRD WORD
 
   void reset();
