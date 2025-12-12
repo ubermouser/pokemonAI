@@ -15,10 +15,12 @@ class plugin;
 
 typedef boost::function<bool (const Pokedex&, std::vector<plugin>&)> regExtension_type;
 
-static const std::string MOVE_PLUGIN = "move";
-static const std::string ITEM_PLUGIN = "item";
-static const std::string ABILITY_PLUGIN = "ability";
-static const std::string ENGINE_PLUGIN = "engine";
+enum pluginCategory {
+  move,
+  item,
+  ability,
+  engine
+};
 
 #if defined(GEN4_SCRIPTS_EXPORTS) || defined(GEN4_SCRIPTS_STATIC)
 #if (defined(WIN32) || defined(_CYGWIN))
@@ -37,12 +39,12 @@ extern "C"
 class PKAISHARED plugin
 {
 private:
-  std::string pCategory;
+  pluginCategory pCategory;
   std::string pName;
   pluginType pType;
   voidFunction_rawType pFunction;
   int32_t priority;
-  uint32_t target;
+  pluginTarget target;
 
 public:
   plugin(const plugin& other)
@@ -56,7 +58,7 @@ public:
   };
 
   template<class unknown_rawType>
-  plugin(const std::string& _category, const std::string& _name, pluginType _pType, unknown_rawType _function, int32_t _priority = 0, uint32_t _target = 0)
+  plugin(pluginCategory _category, const std::string& _name, pluginType _pType, unknown_rawType _function, int32_t _priority = 0, pluginTarget _target = current_team)
     : pCategory(_category),
     pName(_name),
     pType(_pType),
@@ -72,7 +74,7 @@ public:
 
   voidFunction_rawType getFunction() const { return pFunction; };
 
-  const std::string& getCategory() const
+  pluginCategory getCategory() const
   {
     return pCategory;
   };
@@ -87,7 +89,7 @@ public:
     return priority;
   };
 
-  uint32_t getTarget() const
+  pluginTarget getTarget() const
   {
     return target;
   };
