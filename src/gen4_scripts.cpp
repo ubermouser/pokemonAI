@@ -1794,6 +1794,9 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(move, "hidden power", PLUGIN_ON_SETMOVETYPE, move_hiddenPower_setType, 0, current_team));
   extensions.push_back(plugin(move, "leaf blade", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "leech life", PLUGIN_ON_ENDOFMOVE, move_lifeLeech50, 0, current_team));
+  extensions.push_back(plugin(move, "light screen", PLUGIN_ON_EVALUATEMOVE, move_lightScreen_set, 0, current_team));
+  extensions.push_back(plugin(move, "light screen", PLUGIN_ON_BEGINNINGOFTURN, engine_lightScreen_decrement, -1, current_team));
+  extensions.push_back(plugin(move, "light screen", PLUGIN_ON_MODIFYRAWDAMAGE, move_lightScreen_damage, 0, other_team));
   extensions.push_back(plugin(move, "magical leaf", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
   extensions.push_back(plugin(move, "magnet bomb", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
   extensions.push_back(plugin(move, "mega drain", PLUGIN_ON_ENDOFMOVE, move_lifeLeech50, 0, current_team));
@@ -1815,7 +1818,8 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(move, "razor leaf", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "recover", PLUGIN_ON_EVALUATEMOVE, move_heal50, 0, current_team));
   extensions.push_back(plugin(move, "reflect", PLUGIN_ON_EVALUATEMOVE, move_reflect_set, 0, current_team));
-  extensions.push_back(plugin(move, "light screen", PLUGIN_ON_EVALUATEMOVE, move_lightScreen_set, 0, current_team));
+  extensions.push_back(plugin(move, "reflect", PLUGIN_ON_BEGINNINGOFTURN, engine_reflect_decrement, -1, current_team));
+  extensions.push_back(plugin(move, "reflect", PLUGIN_ON_MODIFYRAWDAMAGE, move_reflect_damage, 0, other_team));
   extensions.push_back(plugin(move, "roost", PLUGIN_ON_EVALUATEMOVE, move_heal50, 0, current_team));
   extensions.push_back(plugin(move, "seismic toss", PLUGIN_ON_EVALUATEMOVE, move_leveledDamage, 0, current_team));
   extensions.push_back(plugin(move, "selfdestruct", PLUGIN_ON_MODIFYATTACKPOWER, move_suicide_modPower, 0, current_team));
@@ -1877,11 +1881,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(engine, "type resisting berry effect", PLUGIN_ON_MODIFYITEMPOWER, engine_typeResistingBerry, 0, all_teams));
   extensions.push_back(plugin(engine, "struggle damage effect", PLUGIN_ON_ENDOFMOVE, engine_move_struggle, 0, all_teams));
   extensions.push_back(plugin(engine, "struggle always hits effect", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, all_teams));
-  extensions.push_back(plugin(engine, "reflect damage", PLUGIN_ON_MODIFYRAWDAMAGE, move_reflect_damage, 0, all_teams));
-  extensions.push_back(plugin(engine, "light screen damage", PLUGIN_ON_MODIFYRAWDAMAGE, move_lightScreen_damage, 0, all_teams));
   extensions.push_back(plugin(engine, "nonvolatile speed change", PLUGIN_ON_MODIFYSPEED, engine_onModifySpeed_paralyze, -1, all_teams));
-  extensions.push_back(plugin(engine, "reflect decrement", PLUGIN_ON_BEGINNINGOFTURN, engine_reflect_decrement, -1, all_teams));
-  extensions.push_back(plugin(engine, "light screen decrement", PLUGIN_ON_BEGINNINGOFTURN, engine_lightScreen_decrement, -1, all_teams));
   extensions.push_back(plugin(engine, "nonvolatile beginning-of-round damage", PLUGIN_ON_BEGINNINGOFTURN, engine_beginTurnNonvolatileEffect, -2, all_teams));
   extensions.push_back(plugin(engine, "volatile beginning-of-round damage", PLUGIN_ON_BEGINNINGOFTURN, engine_beginTurnVolatileEffect, -1, all_teams));
   extensions.push_back(plugin(engine, "secondary effect boosts", PLUGIN_ON_SECONDARYEFFECT, engine_secondaryBoostEffect, -3, all_teams));

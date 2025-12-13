@@ -41,7 +41,7 @@
       "level": 100,
       "item": "Choice Band",
       "sex": 0,
-      "ability": "Natural Cure",
+      "ability": "Levitate",
       "nature": "Jolly",
       "moves": [
         "Earthquake",

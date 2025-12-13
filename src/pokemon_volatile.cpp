@@ -342,6 +342,14 @@ std::ostream& operator <<(std::ostream& os, const ConstPokemonVolatile& pkmn)
     if (pkmn.status().nonvolatile.toxicSpikes > 0) {
       os << boost::format(" (T-SPIKES-%d)") % pkmn.status().nonvolatile.toxicSpikes;
     }
+    // light screen:
+    if (pkmn.status().nonvolatile.lightScreen > 0) {
+      os << boost::format(" (L-SCRN-%d)") % pkmn.status().nonvolatile.lightScreen;
+    }
+    // reflect:
+    if (pkmn.status().nonvolatile.reflect > 0) {
+      os << boost::format(" (REFLECT-%d)") % pkmn.status().nonvolatile.reflect;
+    }
 
     os << std::showpos; // show the + or -
     if (pkmn.getBoost(FV_ATTACK) != 0) {
