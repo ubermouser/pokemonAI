@@ -86,6 +86,7 @@ const Move* woodHammer_t;
 const Item* choiceBand_t;
 const Item* choiceScarf_t;
 const Item* choiceSpecs_t;
+const Item* focusSash_t;
 const Item* leftovers_t;
 const Item* lifeOrb_t;
 const Item* lumBerry_t;
@@ -241,6 +242,28 @@ int move_trick(
 
   return 1;
 };
+
+int item_focusSash(
+  PkCUEngine& cu,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV,
+  uint32_t& raw_damage)
+{
+  if (!tPKV.hasItem() || (&tPKV.getItem() != focusSash_t)) { return 0; }
+
+  // Focus Sash only works if HP is full
+  if (tPKV.getHP() != tPKV.nv().getMaxHP()) { return 0; }
+
+  // Focus Sash prevents OHKO
+  if (raw_damage >= tPKV.getHP()) {
+    raw_damage = tPKV.getHP() - 1;
+    tPKV.setNoItem();
+    return 1;
+  }
+
+  return 0;
+}
 
 int move_taunt_set(
   PkCUEngine& cu,
@@ -1755,6 +1778,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   choiceBand_t = orphan::orphanCheck(items, "choice band");
   choiceScarf_t = orphan::orphanCheck(items, "choice scarf");
   choiceSpecs_t = orphan::orphanCheck(items, "choice specs");
+  focusSash_t = orphan::orphanCheck(items, "focus sash");
   leftovers_t = orphan::orphanCheck(items, "leftovers");
   lifeOrb_t = orphan::orphanCheck(items, "life orb");
   lumBerry_t = orphan::orphanCheck(items, "lum berry");
@@ -1881,6 +1905,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(item, "choice specs", PLUGIN_ON_BEGINNINGOFTURN, item_choiceItem_lockMove, 0, all_teams));
   extensions.push_back(plugin(item, "choice specs", PLUGIN_ON_TESTMOVE, item_choiceItem_testLockedMove, 0, all_teams));
   extensions.push_back(plugin(item, "choice specs", PLUGIN_ON_MODIFYRAWDAMAGE, item_choiceItem_modPower, 0, all_teams));
+  extensions.push_back(plugin(item, "focus sash", PLUGIN_ON_CALCULATEDAMAGE, item_focusSash, 0, all_teams));
   extensions.push_back(plugin(item, "leftovers", PLUGIN_ON_ENDOFROUND, item_leftovers, 0, all_teams));
   extensions.push_back(plugin(item, "life orb", PLUGIN_ON_MODIFYRAWDAMAGE, item_lifeOrb_modPower, 0, all_teams));
   extensions.push_back(plugin(item, "life orb", PLUGIN_ON_ENDOFMOVE, item_lifeOrb_modLife, 0, all_teams));
