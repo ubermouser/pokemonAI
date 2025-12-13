@@ -270,7 +270,7 @@ int move_taunt_set(
   return 1;
 };
 
-int engine_taunt_test(
+int move_taunt_test(
     ConstTeamVolatile cTV,
     ConstPokemonVolatile cPKV,
     ConstMoveVolatile mV,
@@ -286,7 +286,7 @@ int engine_taunt_test(
   return 1;
 }
 
-int engine_taunt_preempt(
+int move_taunt_preempt(
   PkCUEngine& cu,
   PokemonVolatile cPKV)
 {
@@ -295,16 +295,7 @@ int engine_taunt_preempt(
     if (mV.getBase().getDamageType() == ATK_NODMG) {
       cu.getBase().setBlocked(cu.getICTeam());
     }
-  }
 
-  return 1;
-}
-
-int engine_taunt_decrement(
-  PkCUEngine& cu,
-  PokemonVolatile cPKV)
-{
-  if (cPKV.status().cTeammate.taunt_duration > 0) {
     cPKV.status().cTeammate.taunt_duration--;
   }
 
@@ -1762,6 +1753,8 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(move, "toxic spikes", PLUGIN_ON_EVALUATEMOVE, move_toxicSpikes_set, 0, current_team));
   extensions.push_back(plugin(move, "trick", PLUGIN_ON_EVALUATEMOVE, move_trick, 0, current_team));
   extensions.push_back(plugin(move, "taunt", PLUGIN_ON_EVALUATEMOVE, move_taunt_set, 0, current_team));
+  extensions.push_back(plugin(move, "taunt", PLUGIN_ON_TESTMOVE, move_taunt_test, 0, other_team));
+  extensions.push_back(plugin(move, "taunt", PLUGIN_ON_BEGINNINGOFTURN, move_taunt_preempt, -1, other_team));
   extensions.push_back(plugin(move, "u-turn", PLUGIN_ON_ENDOFMOVE, move_uTurn_swapOnTurnEnd, 1, current_team));
   extensions.push_back(plugin(move, "u-turn", PLUGIN_ON_TESTMOVE, move_uTurn_testMoveSwap, 1, current_team));
   extensions.push_back(plugin(move, "wood hammer", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, current_team));
@@ -1807,9 +1800,6 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(engine, "secondary effect nonvolatile", PLUGIN_ON_SECONDARYEFFECT, engine_secondaryNonvolatileEffect, -2, all_teams));
   extensions.push_back(plugin(engine, "secondary effect volatile", PLUGIN_ON_SECONDARYEFFECT, engine_secondaryVolatileEffect, -1, all_teams));
   extensions.push_back(plugin(engine, "nonvolatile end-of-round damage", PLUGIN_ON_ENDOFROUND, engine_endRoundDamageEffect, -1, all_teams));
-  extensions.push_back(plugin(engine, "taunt effect", PLUGIN_ON_TESTMOVE, engine_taunt_test, 0, all_teams));
-  extensions.push_back(plugin(engine, "taunt preempt", PLUGIN_ON_BEGINNINGOFTURN, engine_taunt_preempt, -1, all_teams));
-  extensions.push_back(plugin(engine, "taunt decrement", PLUGIN_ON_BEGINNINGOFTURN, engine_taunt_decrement, 0, all_teams));
 
   return true;
 }

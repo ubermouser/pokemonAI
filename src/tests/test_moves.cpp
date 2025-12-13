@@ -572,27 +572,9 @@ TEST_F(TauntTest, WearsOff) {
 
 TEST_F(TauntTest, PreemptsStatusMoveSameTurn) {
   // Scenario:
-  // Aerodactyl (Fast, uses Taunt) vs Shuckle (Slow, uses Toxic)
-  // Aerodactyl moves first. Taunt should apply.
+  // Steelix (Fast, uses Taunt) vs Shuckle (Slow, uses Toxic)
+  // Steelix moves first. Taunt should apply.
   // Shuckle attempts Toxic. It should fail because it is taunted in the same turn.
-
-  auto team_a = TeamNonVolatile()
-      .addPokemon(PokemonNonVolatile()
-        .setBase(pokedex_->pokemon("aerodactyl"))
-        .addMove(pokedex_->move("taunt"))
-        .setIV(FV_SPEED, 31)
-        .setEV(FV_SPEED, 252)
-        .setNature(pokedex_->nature("jolly")) // Max speed
-        .setLevel(100));
-
-  auto team_b = TeamNonVolatile()
-      .addPokemon(PokemonNonVolatile()
-        .setBase(pokedex_->pokemon("shuckle"))
-        .addMove(pokedex_->move("toxic"))
-        .setIV(FV_SPEED, 0) // Min speed
-        .setLevel(100));
-
-  environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
   engine_->setEnvironment(environment_nv);
 
   // Action: P0 uses Taunt (Move 0), P1 uses Toxic (Move 0)
@@ -603,6 +585,6 @@ TEST_F(TauntTest, PreemptsStatusMoveSameTurn) {
   // 1. Shuckle should be taunted
   EXPECT_GT(final_env.getTeam(1).teammate(0).status().cTeammate.taunt_duration, 0);
 
-  // 2. Aerodactyl should NOT be poisoned (Toxic should have failed)
+  // 2. Steelix should NOT be poisoned (Toxic should have failed)
   EXPECT_EQ(final_env.getTeam(0).teammate(0).getStatusAilment(), AIL_NV_NONE);
 }
