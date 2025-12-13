@@ -1,0 +1,198 @@
+{
+  "header": "PKAIE0",
+  "name": "x6_Alarmed_Fill2043",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "fill-rptr",
+      "species": "Staraptor",
+      "level": 100,
+      "item": "Sharp Beak",
+      "sex": 0,
+      "ability": "Intimidate",
+      "nature": "Adamant",
+      "moves": [
+        "Brave Bird",
+        "Close Combat",
+        "Roost",
+        "Substitute"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 4,
+        "spd": 0,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "fill-chomp",
+      "species": "Garchomp",
+      "level": 100,
+      "item": "Choice Scarf",
+      "sex": 0,
+      "ability": "Sand Veil",
+      "nature": "Jolly",
+      "moves": [
+        "Outrage",
+        "Earthquake",
+        "Dragon Claw",
+        "Stone Edge"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 0,
+        "spd": 0,
+        "spe": 252,
+        "hp": 4
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "fill-luca",
+      "species": "Lucario",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 0,
+      "ability": "Inner Focus",
+      "nature": "Adamant",
+      "moves": [
+        "Swords Dance",
+        "Close Combat",
+        "Extremespeed",
+        "Ice Punch"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 0,
+        "spd": 4,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "fill-luxr",
+      "species": "Luxray",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 2,
+      "ability": "Intimidate",
+      "nature": "Bold",
+      "moves": [
+        "Thunderbolt",
+        "Toxic",
+        "Protect",
+        "Ice Fang"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 0,
+        "def": 252,
+        "spd": 0,
+        "spe": 4,
+        "hp": 252
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "fill-iape",
+      "species": "Infernape",
+      "level": 100,
+      "item": "Focus Sash",
+      "sex": 0,
+      "ability": "Blaze",
+      "nature": "Naive",
+      "moves": [
+        "Stealth Rock",
+        "Fake Out",
+        "Close Combat",
+        "Fire Blast"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 66,
+        "spa": 252,
+        "def": 0,
+        "spd": 0,
+        "spe": 192,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "fill-gard",
+      "species": "Gardevoir",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 2,
+      "ability": "Trace",
+      "nature": "Timid",
+      "moves": [
+        "Calm Mind",
+        "Focus Blast",
+        "Shadow Ball",
+        "Psychic"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 66,
+        "spa": 252,
+        "def": 0,
+        "spd": 0,
+        "spe": 192,
+        "hp": 0
+      }
+    }
+  ]
+}

@@ -23,7 +23,7 @@ namespace pt = boost::property_tree;
 
 std::array< std::array<fpType, 13>, 3> PokemonNonVolatile::aFV_base;
 
-PokemonNonVolatile::PokemonNonVolatile() 
+PokemonNonVolatile::PokemonNonVolatile()
   : Name(),
   Signature<PokemonNonVolatile, POKEMON_NONVOLATILE_DIGESTSIZE>(),
   Serializable<PokemonNonVolatile>(),
@@ -37,13 +37,13 @@ PokemonNonVolatile::PokemonNonVolatile()
   // zero IV and EV
   IV_.fill(0);
   EV_.fill(0);
-  
+
   // zero FV
   for (size_t iFV = 0; iFV < FV_base_.size(); iFV++)
   {
     FV_base_[iFV].fill(0);
   }
-  
+
 }
 
 
@@ -108,7 +108,7 @@ void PokemonNonVolatile::createDigest_impl(std::array<uint8_t, POKEMON_NONVOLATI
   } // endOf foreach moveOrdered
   iDigest = MOVE_NONVOLATILE_DIGESTSIZE * 4;
 
-  
+
   if (pokemonExists())
   {
     // pack first 20 characters of name:
@@ -198,7 +198,7 @@ PokemonNonVolatile& PokemonNonVolatile::setSex(unsigned int _sex) {
 
 
 PokemonNonVolatile& PokemonNonVolatile::setIV(size_t type, unsigned int value) {
-  if (!INI::checkRangeB(value, (uint32_t)0, (uint32_t)31)) { 
+  if (!INI::checkRangeB(value, (uint32_t)0, (uint32_t)31)) {
     throw std::invalid_argument("PokemonNonVolatile IV");
   }
   IV_.at(type) = value;
@@ -303,9 +303,11 @@ PokemonNonVolatile& PokemonNonVolatile::setInitialItem(const Item& _chosenItem) 
 
   assert(pkdex->getItems().count(_chosenItem.getName()) > 0);
   if (!_chosenItem.isImplemented()) {
-    throw std::invalid_argument("PokemonNonVolatile item not implemented");
+    throw std::invalid_argument(
+        "PokemonNonVolatile item \"" + _chosenItem.getName() +
+        "\" not implemented");
   }
-  
+
   initialItem_ = &_chosenItem;
   return *this;
 }
@@ -467,7 +469,7 @@ PokemonNonVolatile& PokemonNonVolatile::removeMove(size_t iRemovedAction) {
   // don't bother removing a move that doesn't exist
   if (iRemovedAction >= getNumMoves()) { return *this; }
   actions_.erase(actions_.begin() + iRemovedAction);
-  
+
   return *this;
 };
 
@@ -479,7 +481,7 @@ void PokemonNonVolatile::setFV(unsigned int targetFV) {
     unsigned int baseStat = base_->baseStats_[targetFV];
     unsigned int iv = IV_[targetFV];
     unsigned int ev = EV_[targetFV];
-    
+
     FV_base_[targetFV][STAGE0] = ((2 * baseStat + iv + (ev / 4)) * level_ / 100 + level_ + 10);
   }
   else if (targetFV == FV_ACCURACY || targetFV == FV_EVASION)
@@ -497,7 +499,7 @@ void PokemonNonVolatile::setFV(unsigned int targetFV) {
     unsigned int iv = IV_[targetFV];
     unsigned int ev = EV_[targetFV];
     unsigned int natureModification = chosenNature_->modTable_[targetFV];
-    
+
     unsigned int base_FV = ((((2 * baseStat + iv + (ev / 4)) * level_ / 100 + 5) * natureModification) / FPMULTIPLIER);
     FV_base_[targetFV][STAGE0] = base_FV;
   }
@@ -536,13 +538,13 @@ void PokemonNonVolatile::setFV(unsigned int targetFV) {
       {
         aFV_base[targetFV - 6][iBoost] = (aFV_base[targetFV - 6][STAGE0] * boostDenominator) / boostNumerator;
       }
-      
+
     }// endOf if FV_ACCURACY or FV_EVASION
     else if (targetFV == FV_CRITICALHIT)
     {
       // values of critical hit are hardcoded, and are always 0 when less than stage 0
       fpType boosted_FV;
-    
+
       // values of critical hit hardcoded
       switch(boostStage)
       {
@@ -567,7 +569,7 @@ void PokemonNonVolatile::setFV(unsigned int targetFV) {
           boosted_FV = 0.5; // ACCURACY_EVASION_INTEGER * .5
           break;
       }
-    
+
       aFV_base[targetFV - 6][iBoost] = boosted_FV;
     } // endOf if FV_CRITICALHIT
     else // for atk, spa, def, spd, spe
@@ -685,7 +687,17 @@ void PokemonNonVolatile::input(const pt::ptree& ptree, Orphanage& orphanage) {
 
   const Item* item =
       orphanCheck(pkdex->getItems(), ptree.get<std::string>("item"), &orphanage.items);
-  setInitialItem(*(item==NULL?Item::no_item:item));
+  try {
+    setInitialItem(*(item==NULL?Item::no_item:item));
+  } catch (std::invalid_argument& e) {
+    if (verbose >= 5) {
+      std::cerr << "WAR " << __FILE__ << "." << __LINE__ <<
+        ": pokemon " << *this <<
+        " cannot use item \"" << item->getName() <<
+          "\": " << e.what() <<
+          "!\n";
+    }
+  }
 
   const Ability* ability =
       orphanCheck(pkdex->getAbilities(), ptree.get<std::string>("ability"), &orphanage.abilities);

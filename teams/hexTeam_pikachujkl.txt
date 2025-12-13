@@ -1,0 +1,198 @@
+{
+  "header": "PKAIE0",
+  "name": "x6_Pikachujkl",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "pika-gar",
+      "species": "Garchomp",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 0,
+      "ability": "Sand Veil",
+      "nature": "Jolly",
+      "moves": [
+        "Swords Dance",
+        "Substitute",
+        "Outrage",
+        "Earthquake"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 4,
+        "spd": 0,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "pika-drago",
+      "species": "Dragonite",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 0,
+      "ability": "Inner Focus",
+      "nature": "Jolly",
+      "moves": [
+        "Dragon Dance",
+        "Outrage",
+        "Fire Punch",
+        "Earthquake"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 4,
+        "spd": 0,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "pika-sala",
+      "species": "Salamence",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 0,
+      "ability": "Intimidate",
+      "nature": "Jolly",
+      "moves": [
+        "Dragon Dance",
+        "Outrage",
+        "Fire Blast",
+        "Earthquake"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 4,
+        "spd": 0,
+        "spe": 252,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "pika-blis",
+      "species": "Blissey",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 2,
+      "ability": "Natural Cure",
+      "nature": "Bold",
+      "moves": [
+        "Softboiled",
+        "Thunder Wave",
+        "Stealth Rock",
+        "Ice Beam"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 0,
+        "def": 252,
+        "spd": 0,
+        "spe": 4,
+        "hp": 252
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "pika-metag",
+      "species": "Metagross",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 0,
+      "ability": "Clear Body",
+      "nature": "Adamant",
+      "moves": [
+        "Meteor Mash",
+        "Earthquake",
+        "Explosion",
+        "Thunderpunch"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 0,
+        "spd": 0,
+        "spe": 4,
+        "hp": 252
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "pika-magzone",
+      "species": "Magnezone",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 2,
+      "ability": "Magnet Pull",
+      "nature": "Modest",
+      "moves": [
+        "Magnet Rise",
+        "Thunderbolt",
+        "Hidden Power",
+        "Toxic"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 252,
+        "def": 0,
+        "spd": 4,
+        "spe": 252,
+        "hp": 0
+      }
+    }
+  ]
+}
