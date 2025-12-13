@@ -550,10 +550,11 @@ TEST_F(TauntTest, WearsOff) {
   EXPECT_GE(initial_duration, 3);
   EXPECT_LE(initial_duration, 5);
 
+  auto next_turn = turn1;
   auto current_state = turn1.at(0);
   for (uint32_t i = 0; i < initial_duration; ++i) {
       // Duration should decrement each turn
-      auto next_turn = engine_->updateState(current_state, Action::move(1), Action::move(1));
+      next_turn = engine_->updateState(current_state, Action::move(1), Action::move(1));
       current_state = next_turn.at(0);
       next_turn.printStates();
 
