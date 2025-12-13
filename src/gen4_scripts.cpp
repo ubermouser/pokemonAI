@@ -29,6 +29,7 @@ const Move* aromatherapy_t;
 const Move* auraSphere_t;
 const Move* blazeKick_t;
 const Move* braveBird_t;
+const Move* brickBreak_t;
 const Move* crabHammer_t;
 const Move* crossChop_t;
 const Move* crossPoison_t;
@@ -352,6 +353,27 @@ int move_payback_modPower(
 
   // greatly increase the power of the move:
   modifier *= 2.0;
+  return 1;
+}
+
+int move_brickBreak_removeScreens(
+    PkCUEngine& cu,
+    MoveVolatile mV,
+    PokemonVolatile cPKV,
+    PokemonVolatile tPKV,
+    fpType& modifier) {
+  if (&mV.getBase() != brickBreak_t) { return 0; }
+
+  // if the target is immune to fighting type moves, the screens are not removed
+  fpType effectiveness =
+      fighting_t->getModifier(tPKV.getBase().getType(0)) *
+      fighting_t->getModifier(tPKV.getBase().getType(1));
+  if (effectiveness == 0.0) { return 1; }
+
+  // remove Reflect and Light Screen from the target's team
+  tPKV.status().nonvolatile.reflect = 0;
+  tPKV.status().nonvolatile.lightScreen = 0;
+
   return 1;
 }
 
@@ -1676,6 +1698,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   auraSphere_t = orphan::orphanCheck(moves, "aura sphere");
   blazeKick_t = orphan::orphanCheck(moves, "blaze kick");
   braveBird_t = orphan::orphanCheck(moves, "brave bird");
+  brickBreak_t = orphan::orphanCheck(moves, "brick break");
   crabHammer_t = orphan::orphanCheck(moves, "crabhammer");
   crossChop_t = orphan::orphanCheck(moves, "cross chop");
   crossPoison_t = orphan::orphanCheck(moves, "cross poison");
@@ -1777,6 +1800,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(move, "aura sphere", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
   extensions.push_back(plugin(move, "blaze kick", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "brave bird", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, current_team));
+  extensions.push_back(plugin(move, "brick break", PLUGIN_ON_MODIFYRAWDAMAGE, move_brickBreak_removeScreens, -1, current_team));
   extensions.push_back(plugin(move, "crabhammer", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "cross chop", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "cross poison", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));

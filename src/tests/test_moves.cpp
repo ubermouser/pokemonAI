@@ -705,3 +705,149 @@ TEST_F(ScreenTest, FailsIfAlreadyActive) {
   auto turn2 = engine_->updateState(turn1.at(0), Action::move(0), Action::wait());
   EXPECT_EQ(turn2.at(0).getEnv().getTeam(0).getNonVolatile().reflect, 4);
 }
+
+class BrickBreakTest : public MoveTest {
+protected:
+  void SetUp() override {
+    MoveTest::SetUp();
+
+    auto team_a = TeamNonVolatile()
+        .addPokemon(PokemonNonVolatile()
+          .setBase(pokedex_->pokemon("mew"))
+          .addMove(pokedex_->move("brick break"))
+          .addMove(pokedex_->move("psychic")) // dummy move
+          .setLevel(100));
+
+    auto team_b = TeamNonVolatile()
+        .addPokemon(PokemonNonVolatile()
+          .setBase(pokedex_->pokemon("mewtwo"))
+          .addMove(pokedex_->move("reflect"))
+          .addMove(pokedex_->move("light screen"))
+          .setLevel(100));
+
+    environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
+    engine_->setEnvironment(environment_nv);
+  }
+};
+
+TEST_F(BrickBreakTest, RemovesReflect) {
+  // Setup: Team B uses Reflect
+  auto setup = engine_->updateState(engine_->initialState(), Action::wait(), Action::move(0));
+  auto setup_env = setup.at(0).getEnv();
+
+  EXPECT_EQ(setup_env.getTeam(1).getNonVolatile().reflect, 5);
+
+  // Test: Team A uses Brick Break
+  auto result = engine_->updateState(setup.at(0), Action::move(0), Action::wait());
+  auto result_env = result.at(0).getEnv();
+
+  // Reflect should be removed (set to 0)
+  EXPECT_EQ(result_env.getTeam(1).getNonVolatile().reflect, 0);
+  // Damage should be dealt
+  EXPECT_LT(result_env.getTeam(1).getPKV().getPercentHP(), 1.0);
+}
+
+TEST_F(BrickBreakTest, RemovesLightScreen) {
+  // Setup: Team B uses Light Screen
+  auto setup = engine_->updateState(engine_->initialState(), Action::wait(), Action::move(1));
+  auto setup_env = setup.at(0).getEnv();
+
+  EXPECT_EQ(setup_env.getTeam(1).getNonVolatile().lightScreen, 5);
+
+  // Test: Team A uses Brick Break
+  auto result = engine_->updateState(setup.at(0), Action::move(0), Action::wait());
+  auto result_env = result.at(0).getEnv();
+
+  // Light Screen should be removed
+  EXPECT_EQ(result_env.getTeam(1).getNonVolatile().lightScreen, 0);
+  // Damage should be dealt
+  EXPECT_LT(result_env.getTeam(1).getPKV().getPercentHP(), 1.0);
+}
+
+TEST_F(BrickBreakTest, RemovesBothScreens) {
+  // Setup: Team B uses Reflect, then Light Screen
+  auto setup1 = engine_->updateState(engine_->initialState(), Action::wait(), Action::move(0));
+  auto setup2 = engine_->updateState(setup1.at(0), Action::wait(), Action::move(1));
+
+  auto setup_env = setup2.at(0).getEnv();
+  EXPECT_EQ(setup_env.getTeam(1).getNonVolatile().reflect, 4); // decremented once
+  EXPECT_EQ(setup_env.getTeam(1).getNonVolatile().lightScreen, 5);
+
+  // Test: Team A uses Brick Break
+  auto result = engine_->updateState(setup2.at(0), Action::move(0), Action::wait());
+  auto result_env = result.at(0).getEnv();
+
+  EXPECT_EQ(result_env.getTeam(1).getNonVolatile().reflect, 0);
+  EXPECT_EQ(result_env.getTeam(1).getNonVolatile().lightScreen, 0);
+}
+
+TEST_F(BrickBreakTest, WorksWithoutScreens) {
+  // Test: Team A uses Brick Break without any screens on Team B
+  auto result = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
+  auto result_env = result.at(0).getEnv();
+
+  // Damage should still be dealt
+  EXPECT_LT(result_env.getTeam(1).getPKV().getPercentHP(), 1.0);
+}
+
+TEST_F(BrickBreakTest, DoesNotRemoveUserScreens) {
+  // Create a new environment for this test where Team A also has Reflect
+  auto team_a_with_reflect = TeamNonVolatile()
+        .addPokemon(PokemonNonVolatile()
+          .setBase(pokedex_->pokemon("mew"))
+          .addMove(pokedex_->move("brick break"))
+          .addMove(pokedex_->move("reflect"))
+          .setLevel(100));
+
+  auto team_b = TeamNonVolatile()
+        .addPokemon(PokemonNonVolatile()
+          .setBase(pokedex_->pokemon("mewtwo"))
+          .setLevel(100));
+
+  auto env = EnvironmentNonvolatile(team_a_with_reflect, team_b, true);
+  engine_->setEnvironment(env);
+
+  // Team A uses Reflect
+  auto setup = engine_->updateState(engine_->initialState(), Action::move(1), Action::wait());
+  auto setup_env = setup.at(0).getEnv();
+  EXPECT_EQ(setup_env.getTeam(0).getNonVolatile().reflect, 5);
+
+  // Team A uses Brick Break
+  auto result = engine_->updateState(setup.at(0), Action::move(0), Action::wait());
+  auto result_env = result.at(0).getEnv();
+
+  // Team A's Reflect should remain (decremented to 4)
+  EXPECT_EQ(result_env.getTeam(0).getNonVolatile().reflect, 4);
+}
+
+TEST_F(BrickBreakTest, DoesNotRemoveScreensIfImmune) {
+  // Setup: Team B has a Ghost type (Rotom) and uses Reflect
+  auto team_a = TeamNonVolatile()
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->pokemon("mew"))
+        .addMove(pokedex_->move("brick break"))
+        .setLevel(100));
+
+  auto team_b = TeamNonVolatile()
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->pokemon("rotom"))
+        .addMove(pokedex_->move("reflect"))
+        .setLevel(100));
+
+  auto env = EnvironmentNonvolatile(team_a, team_b, true);
+  engine_->setEnvironment(env);
+
+  // Team B uses Reflect
+  auto setup = engine_->updateState(engine_->initialState(), Action::wait(), Action::move(0));
+  auto setup_env = setup.at(0).getEnv();
+  EXPECT_EQ(setup_env.getTeam(1).getNonVolatile().reflect, 5);
+
+  // Team A uses Brick Break on Rotom (Immune)
+  auto result = engine_->updateState(setup.at(0), Action::move(0), Action::move(0));
+  auto result_env = result.at(0).getEnv();
+
+  // Reflect should REMAIN (decremented to 4) because Ghost is immune to Fighting
+  EXPECT_EQ(result_env.getTeam(1).getNonVolatile().reflect, 4);
+  // No damage dealt
+  EXPECT_EQ(result_env.getTeam(1).getPKV().getPercentHP(), 1.0);
+}
