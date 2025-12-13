@@ -58,7 +58,9 @@ const Move* psychoCut_t;
 const Move* rapidSpin_t;
 const Move* razorLeaf_t;
 const Move* recover_t;
+const Move* reflect_t;
 const Move* roost_t;
+const Move* lightScreen_t;
 const Move* shadowClaw_t;
 const Move* shadowPunch_t;
 const Move* shockWave_t;
@@ -365,6 +367,84 @@ int move_stealthRock_set(
 
   return 1;
 };
+
+int move_reflect_set(
+  PkCUEngine& cu,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
+{
+  if (&mV.getBase() != reflect_t) { return 0; }
+
+  if (cPKV.status().nonvolatile.reflect > 0) { return 1; }
+
+  cPKV.status().nonvolatile.reflect = 5;
+  return 1;
+}
+
+int move_lightScreen_set(
+  PkCUEngine& cu,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
+{
+  if (&mV.getBase() != lightScreen_t) { return 0; }
+
+  if (cPKV.status().nonvolatile.lightScreen > 0) { return 1; }
+
+  cPKV.status().nonvolatile.lightScreen = 5;
+  return 1;
+}
+
+int move_reflect_damage(
+    PkCUEngine& cu,
+    MoveVolatile mV,
+    PokemonVolatile cPKV,
+    PokemonVolatile tPKV,
+    fpType& modifier) {
+  if (tPKV.status().nonvolatile.reflect > 0) {
+     if (mV.getBase().getDamageType() == ATK_PHYSICAL) {
+        modifier *= 0.5;
+     }
+  }
+  return 1;
+}
+
+int move_lightScreen_damage(
+    PkCUEngine& cu,
+    MoveVolatile mV,
+    PokemonVolatile cPKV,
+    PokemonVolatile tPKV,
+    fpType& modifier) {
+  if (tPKV.status().nonvolatile.lightScreen > 0) {
+     if (mV.getBase().getDamageType() == ATK_SPECIAL) {
+        modifier *= 0.5;
+     }
+  }
+  return 1;
+}
+
+int engine_reflect_decrement(
+  PkCUEngine& cu,
+  PokemonVolatile cPKV)
+{
+  if (cPKV.status().nonvolatile.reflect > 0) {
+    cPKV.status().nonvolatile.reflect--;
+  }
+
+  return 1;
+}
+
+int engine_lightScreen_decrement(
+  PkCUEngine& cu,
+  PokemonVolatile cPKV)
+{
+  if (cPKV.status().nonvolatile.lightScreen > 0) {
+    cPKV.status().nonvolatile.lightScreen--;
+  }
+
+  return 1;
+}
 
 int move_spikes_set(
   PkCUEngine& cu,
@@ -1624,6 +1704,8 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   psychoCut_t = orphan::orphanCheck(moves, "psycho cut");
   rapidSpin_t = orphan::orphanCheck(moves, "rapid spin");
   razorLeaf_t = orphan::orphanCheck(moves, "razor leaf");
+  reflect_t = orphan::orphanCheck(moves, "reflect");
+  lightScreen_t = orphan::orphanCheck(moves, "light screen");
   roost_t = orphan::orphanCheck(moves, "roost");
   seismicToss_t = orphan::orphanCheck(moves, "seismic toss");
   selfDestruct_t = orphan::orphanCheck(moves, "selfdestruct");
@@ -1732,6 +1814,8 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(move, "rapid spin", PLUGIN_ON_ENDOFMOVE, move_rapidSpin, 0, current_team));
   extensions.push_back(plugin(move, "razor leaf", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "recover", PLUGIN_ON_EVALUATEMOVE, move_heal50, 0, current_team));
+  extensions.push_back(plugin(move, "reflect", PLUGIN_ON_EVALUATEMOVE, move_reflect_set, 0, current_team));
+  extensions.push_back(plugin(move, "light screen", PLUGIN_ON_EVALUATEMOVE, move_lightScreen_set, 0, current_team));
   extensions.push_back(plugin(move, "roost", PLUGIN_ON_EVALUATEMOVE, move_heal50, 0, current_team));
   extensions.push_back(plugin(move, "seismic toss", PLUGIN_ON_EVALUATEMOVE, move_leveledDamage, 0, current_team));
   extensions.push_back(plugin(move, "selfdestruct", PLUGIN_ON_MODIFYATTACKPOWER, move_suicide_modPower, 0, current_team));
@@ -1793,7 +1877,11 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(engine, "type resisting berry effect", PLUGIN_ON_MODIFYITEMPOWER, engine_typeResistingBerry, 0, all_teams));
   extensions.push_back(plugin(engine, "struggle damage effect", PLUGIN_ON_ENDOFMOVE, engine_move_struggle, 0, all_teams));
   extensions.push_back(plugin(engine, "struggle always hits effect", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, all_teams));
+  extensions.push_back(plugin(engine, "reflect damage", PLUGIN_ON_MODIFYRAWDAMAGE, move_reflect_damage, 0, all_teams));
+  extensions.push_back(plugin(engine, "light screen damage", PLUGIN_ON_MODIFYRAWDAMAGE, move_lightScreen_damage, 0, all_teams));
   extensions.push_back(plugin(engine, "nonvolatile speed change", PLUGIN_ON_MODIFYSPEED, engine_onModifySpeed_paralyze, -1, all_teams));
+  extensions.push_back(plugin(engine, "reflect decrement", PLUGIN_ON_BEGINNINGOFTURN, engine_reflect_decrement, -1, all_teams));
+  extensions.push_back(plugin(engine, "light screen decrement", PLUGIN_ON_BEGINNINGOFTURN, engine_lightScreen_decrement, -1, all_teams));
   extensions.push_back(plugin(engine, "nonvolatile beginning-of-round damage", PLUGIN_ON_BEGINNINGOFTURN, engine_beginTurnNonvolatileEffect, -2, all_teams));
   extensions.push_back(plugin(engine, "volatile beginning-of-round damage", PLUGIN_ON_BEGINNINGOFTURN, engine_beginTurnVolatileEffect, -1, all_teams));
   extensions.push_back(plugin(engine, "secondary effect boosts", PLUGIN_ON_SECONDARYEFFECT, engine_secondaryBoostEffect, -3, all_teams));
