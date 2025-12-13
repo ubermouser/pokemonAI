@@ -286,6 +286,20 @@ int engine_taunt_test(
   return 1;
 }
 
+int engine_taunt_preempt(
+  PkCUEngine& cu,
+  PokemonVolatile cPKV)
+{
+  if (cPKV.status().cTeammate.taunt_duration > 0) {
+    MoveVolatile mV = cPKV.getMV(cu.getCAction());
+    if (mV.getBase().getDamageType() == ATK_NODMG) {
+      cu.getBase().setBlocked(cu.getICTeam());
+    }
+  }
+
+  return 1;
+}
+
 int engine_taunt_decrement(
   PkCUEngine& cu,
   PokemonVolatile cPKV)
@@ -1794,6 +1808,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(engine, "secondary effect volatile", PLUGIN_ON_SECONDARYEFFECT, engine_secondaryVolatileEffect, -1, all_teams));
   extensions.push_back(plugin(engine, "nonvolatile end-of-round damage", PLUGIN_ON_ENDOFROUND, engine_endRoundDamageEffect, -1, all_teams));
   extensions.push_back(plugin(engine, "taunt effect", PLUGIN_ON_TESTMOVE, engine_taunt_test, 0, all_teams));
+  extensions.push_back(plugin(engine, "taunt preempt", PLUGIN_ON_BEGINNINGOFTURN, engine_taunt_preempt, -1, all_teams));
   extensions.push_back(plugin(engine, "taunt decrement", PLUGIN_ON_BEGINNINGOFTURN, engine_taunt_decrement, 0, all_teams));
 
   return true;
