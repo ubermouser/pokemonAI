@@ -489,6 +489,7 @@ TEST_F(TrickTest, sticky_hold_fails) {
 class TauntTest : public MoveTest {
 protected:
   void SetUp() override {
+    MoveTest::SetUp();
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->pokemon("steelix"))
@@ -510,7 +511,7 @@ protected:
   }
 };
 
-TEST_F(TauntTest, DISABLED_AppliesEffect) {
+TEST_F(TauntTest, AppliesEffect) {
   // Steelix uses Taunt on Shuckle
   auto taunt_result = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
   auto env = taunt_result.at(0).getEnv();
@@ -521,7 +522,7 @@ TEST_F(TauntTest, DISABLED_AppliesEffect) {
   EXPECT_EQ(env.getTeam(0).teammate(0).status().cTeammate.taunt_duration, 0);
 }
 
-TEST_F(TauntTest, DISABLED_PreventsStatusMoves) {
+TEST_F(TauntTest, PreventsStatusMoves) {
   // Steelix uses Taunt on Shuckle
   auto taunt_result = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
   auto env = taunt_result.at(0).getEnv();
@@ -533,7 +534,7 @@ TEST_F(TauntTest, DISABLED_PreventsStatusMoves) {
   EXPECT_TRUE(engine_->isValidAction(taunt_result.at(0), Action::move(1), TEAM_B));
 }
 
-TEST_F(TauntTest, DISABLED_WearsOff) {
+TEST_F(TauntTest, WearsOff) {
   // Turn 1: Steelix uses Taunt. Shuckle is taunted (duration 3-5).
   // Note: PkCU branches state. We pick the first environment and follow it.
   auto turn1 = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
