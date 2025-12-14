@@ -93,16 +93,16 @@ Play against an agent yourself:
 
 Construct new teams that play well at a range of skill levels:
 ```bash
-./build/ranker/ranker \
+./build/trainer/trainer \
     --planners=random max minimax minimax \
     --evaluators=simple \
     --p1-max-search-depth=0 \
     --p2-max-search-depth=1 \
-    --p2-max-search-depth=2 \
-    --p2-max-search-depth=3 \
-    --trainer-verbosity=1 \
+    --p3-max-search-depth=2 \
+    --p4-max-search-depth=3 \
+    --ranker-verbosity=1 \
     --verbosity=10 \
-    --num-threads=16
+    --num-threads=32
 ```
 
 #### Ranker
