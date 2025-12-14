@@ -49,40 +49,64 @@ All executables must be run from the project root directory.
 #### Battler
 
 ```bash
-./build/battler/battler \
-    --planner-a=minimax \
-    --evaluator-a=simple \
-    --team-a=./teams/hexTeamA.txt \
-    --team-b=./teams/hexTeamB.txt \
-    --num-threads=32 \
-    --max-matches=64 \
-    --game-verbosity=5
+./build/battler/battler [options]
 ```
+
+Battle two teams against one another using minimax search:
+```bash
+./build/battler/battler \
+    --team-a ./teams/hexTeamD.txt \
+    --team-b ./teams/hexTeamA.txt \
+    --planner-a minimax \
+    --planner-b minimax \
+    --evaluator-a simple \
+    --evaluator-b simple \
+    --b-max-search-depth=4 \
+    --a-max-search-depth=4 \
+    --a-planner-verbosity=2 \
+    --b-planner-verbosity=2 \
+    --game-verbosity=3 \
+    --verbosity=5
+```
+
 
 #### Trainer
 
 ```bash
-./build/trainer/trainer
-    --planners random max maximin minimax \
-    --trainer-verbosity=1 \
+./build/trainer/trainer [options]
+```
+
+Construct new teams that play well at a range of skill levels:
+```bash
+./build/ranker/ranker \
+    --planners=random max minimax minimax \
+    --evaluators=simple \
     --p1-max-search-depth=0 \
-    --p3-max-search-depth=2 \
-    --p4-max-search-depth=3 \
-    --num-threads=8 \
-    --team-path ./teams/
+    --p2-max-search-depth=1 \
+    --p2-max-search-depth=2 \
+    --p2-max-search-depth=3 \
+    --trainer-verbosity=1 \
+    --verbosity=10 \
+    --num-threads=16
 ```
 
 #### Ranker
 
 ```bash
+./build/ranker/ranker [options]
+```
+
+
+Rank all of the teams under a directory against one another:
+```bash
 ./build/ranker/ranker \
-    --planners random max maximin minimax \
+    --team-path ./teams/ \
+    --planners=minimax \
+    --evaluators=simple \
+    --p1-max-search-depth=3 \
     --ranker-verbosity=1 \
-    --p1-max-search-depth=0 \
-    --p3-max-search-depth=2 \
-    --p4-max-search-depth=3 \
-    --num-threads=8 \
-    --team-path ./teams/
+    --verbosity=5 \
+    --num-threads=16
 ```
 
 #### Tests
