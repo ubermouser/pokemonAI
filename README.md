@@ -69,6 +69,21 @@ Battle two teams against one another using minimax search:
     --verbosity=5
 ```
 
+Play against an agent yourself:
+```bash
+./build/battler/battler \
+    --team-a ./teams/hexTeamD.txt \
+    --team-b ./teams/hexTeamA.txt \
+    --planner-a minimax \
+    --planner-b human \
+    --evaluator-a simple \
+    --b-max-search-depth=4 \
+    --a-planner-verbosity=2 \
+    --b-planner-verbosity=2 \
+    --game-verbosity=3 \
+    --verbosity=5
+```
+
 
 #### Trainer
 

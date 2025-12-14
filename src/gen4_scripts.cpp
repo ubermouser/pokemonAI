@@ -93,6 +93,7 @@ const Item* lumBerry_t;
 
 const Ability* blaze_t;
 const Ability* clearBody_t;
+const Ability* intimidate_t;
 const Ability* levitate_t;
 const Ability* naturalCure_t;
 const Ability* noGuard_t;
@@ -1135,6 +1136,27 @@ int ability_sereneGrace
   return 1;
 };
 
+int ability_intimidate_switch(PkCUEngine& cu, PokemonVolatile cPKV) {
+  if (!cPKV.nv().abilityExists() ||
+      (&(cPKV.nv().getAbility()) != intimidate_t)) {
+    return 0;
+  }
+
+  // affects the opponent:
+  PokemonVolatile tPKV = cu.getTPKV();
+  if (!tPKV.isAlive()) { return 0; }
+
+  // blocked by Clear Body:
+  if (tPKV.nv().abilityExists() && (&(tPKV.nv().getAbility()) == clearBody_t)) {
+    return 0;
+  }
+
+  // lowers attack by 1 stage:
+  tPKV.modBoost(FV_ATTACK, -1);
+
+  return 1;
+};
+
 int ability_pressure(
   PkCUEngine& cu,
   MoveVolatile mV,
@@ -1805,6 +1827,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   const Abilities& abilities = dex->getAbilities();
   blaze_t = orphan::orphanCheck(abilities, "blaze");
   clearBody_t = orphan::orphanCheck(abilities, "clear body");
+  intimidate_t = orphan::orphanCheck(abilities, "intimidate");
   levitate_t = orphan::orphanCheck(abilities, "levitate");
   naturalCure_t = orphan::orphanCheck(abilities, "natural cure");
   noGuard_t = orphan::orphanCheck(abilities, "no guard");
@@ -1835,6 +1858,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   dragon_t = orphan::orphanCheck(types, "dragon");
   dark_t = orphan::orphanCheck(types, "dark");
 
+  // NOLINTBEGIN
   // move effects:
   extensions.push_back(plugin(move, "absorb", PLUGIN_ON_ENDOFMOVE, move_lifeLeech50, 0, current_team));
   extensions.push_back(plugin(move, "aerial ace", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
@@ -1933,6 +1957,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   // ability effects:
   extensions.push_back(plugin(ability, "blaze", PLUGIN_ON_MODIFYBASEPOWER, ability_pinch_type_boost, -1, current_team));
   extensions.push_back(plugin(ability, "clear body", PLUGIN_ON_SECONDARYEFFECT, ability_restoreStats, 0, other_team));
+  extensions.push_back(plugin(ability, "intimidate", PLUGIN_ON_SWITCHIN, ability_intimidate_switch, 1, current_team));
   extensions.push_back(plugin(ability, "natural cure", PLUGIN_ON_SWITCHOUT, ability_naturalCure, 0, current_team));
   extensions.push_back(plugin(ability, "no guard", PLUGIN_ON_MODIFYHITPROBABILITY, ability_noGuard, -2, all_teams));
   extensions.push_back(plugin(ability, "levitate", PLUGIN_ON_SETDEFENSETYPE, ability_levitate, -1, other_team));
@@ -1958,6 +1983,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(engine, "secondary effect nonvolatile", PLUGIN_ON_SECONDARYEFFECT, engine_secondaryNonvolatileEffect, -2, all_teams));
   extensions.push_back(plugin(engine, "secondary effect volatile", PLUGIN_ON_SECONDARYEFFECT, engine_secondaryVolatileEffect, -1, all_teams));
   extensions.push_back(plugin(engine, "nonvolatile end-of-round damage", PLUGIN_ON_ENDOFROUND, engine_endRoundDamageEffect, -1, all_teams));
+  // NOLINTEND
 
   return true;
 }
