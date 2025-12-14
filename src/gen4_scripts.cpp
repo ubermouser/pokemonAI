@@ -92,6 +92,7 @@ const Item* lifeOrb_t;
 const Item* lumBerry_t;
 
 const Ability* blaze_t;
+const Ability* clearBody_t;
 const Ability* levitate_t;
 const Ability* naturalCure_t;
 const Ability* noGuard_t;
@@ -1151,6 +1152,24 @@ int ability_pressure(
   return 1;
 };
 
+int ability_restoreStats(
+  PkCUEngine& cu,
+  MoveVolatile mV,
+  PokemonVolatile cPKV,
+  PokemonVolatile tPKV)
+{
+  const Move& cMove = mV.getBase();
+  for (size_t iBuff = 0; iBuff != 9; ++iBuff)
+  {
+    uint32_t debuff = cMove.getTargetDebuff(iBuff);
+    if (debuff > 0) {
+      // restore the stat boost:
+      tPKV.modBoost(iBuff, debuff);
+    }
+  }
+  return 1;
+};
+
 int item_leftovers(
   PkCUEngine& cu,
   PokemonVolatile cPKV)
@@ -1785,6 +1804,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   //abilities:
   const Abilities& abilities = dex->getAbilities();
   blaze_t = orphan::orphanCheck(abilities, "blaze");
+  clearBody_t = orphan::orphanCheck(abilities, "clear body");
   levitate_t = orphan::orphanCheck(abilities, "levitate");
   naturalCure_t = orphan::orphanCheck(abilities, "natural cure");
   noGuard_t = orphan::orphanCheck(abilities, "no guard");
@@ -1912,6 +1932,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions)
   extensions.push_back(plugin(item, "lum berry", PLUGIN_ON_ENDOFTURN, item_lumBerry, 0, all_teams));
   // ability effects:
   extensions.push_back(plugin(ability, "blaze", PLUGIN_ON_MODIFYBASEPOWER, ability_pinch_type_boost, -1, current_team));
+  extensions.push_back(plugin(ability, "clear body", PLUGIN_ON_SECONDARYEFFECT, ability_restoreStats, 0, other_team));
   extensions.push_back(plugin(ability, "natural cure", PLUGIN_ON_SWITCHOUT, ability_naturalCure, 0, current_team));
   extensions.push_back(plugin(ability, "no guard", PLUGIN_ON_MODIFYHITPROBABILITY, ability_noGuard, -2, all_teams));
   extensions.push_back(plugin(ability, "levitate", PLUGIN_ON_SETDEFENSETYPE, ability_levitate, -1, other_team));
