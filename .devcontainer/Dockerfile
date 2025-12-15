@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN apt-get install -y \
   cmake \
   clang \
+  clangd \
   lldb \
   valgrind \
   clang-format \
