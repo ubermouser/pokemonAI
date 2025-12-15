@@ -94,6 +94,7 @@ const Item* lumBerry_t;
 
 const Ability* blaze_t;
 const Ability* clearBody_t;
+const Ability* innerFocus_t;
 const Ability* intimidate_t;
 const Ability* levitate_t;
 const Ability* naturalCure_t;
@@ -1114,6 +1115,14 @@ int ability_sereneGrace(
   return 1;
 };
 
+int ability_innerFocus(PkCUEngine& cu, PokemonVolatile cPKV) {
+  if (!cPKV.nv().abilityExists() || (&cPKV.nv().getAbility() != innerFocus_t)) {
+    return 0;
+  }
+  cPKV.status().cTeammate.flinch = 0;
+  return 1;
+}
+
 int ability_intimidate_switch(PkCUEngine& cu, PokemonVolatile cPKV) {
   if (!cPKV.nv().abilityExists() ||
       (&(cPKV.nv().getAbility()) != intimidate_t)) {
@@ -1765,6 +1774,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   const Abilities& abilities = dex->getAbilities();
   blaze_t = orphan::orphanCheck(abilities, "blaze");
   clearBody_t = orphan::orphanCheck(abilities, "clear body");
+  innerFocus_t = orphan::orphanCheck(abilities, "inner focus");
   intimidate_t = orphan::orphanCheck(abilities, "intimidate");
   levitate_t = orphan::orphanCheck(abilities, "levitate");
   naturalCure_t = orphan::orphanCheck(abilities, "natural cure");
@@ -1895,6 +1905,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   // ability effects:
   extensions.push_back(plugin(ability, "blaze", PLUGIN_ON_MODIFYBASEPOWER, ability_pinch_type_boost, -1, current_team));
   extensions.push_back(plugin(ability, "clear body", PLUGIN_ON_SECONDARYEFFECT, ability_restoreStats, 0, other_team));
+  extensions.push_back(plugin(ability, "inner focus", PLUGIN_ON_BEGINNINGOFTURN, ability_innerFocus, -3, current_team));
   extensions.push_back(plugin(ability, "intimidate", PLUGIN_ON_SWITCHIN, ability_intimidate_switch, 1, current_team));
   extensions.push_back(plugin(ability, "natural cure", PLUGIN_ON_SWITCHOUT, ability_naturalCure, 0, current_team));
   extensions.push_back(plugin(ability, "no guard", PLUGIN_ON_MODIFYHITPROBABILITY, ability_noGuard, -2, all_teams));
