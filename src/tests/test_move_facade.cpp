@@ -3,6 +3,8 @@
 
 class FacadeTest : public EngineTest {
 protected:
+  uint32_t damage_normal;
+
   void SetUp() override {
     EngineTest::SetUp();
 
@@ -31,6 +33,10 @@ protected:
 
     environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
     engine_->setEnvironment(environment_nv);
+
+    // Compute damage_normal
+    auto result_normal = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
+    damage_normal = result_normal.at(0).getEnv().getTeam(1).getPKV().getMissingHP();
   }
 
   // Helper to get environment with user having a specific status
@@ -60,21 +66,15 @@ TEST_F(FacadeTest, NormalPower) {
 }
 
 TEST_F(FacadeTest, BoostedPowerBurn) {
-  auto normal_env = engine_->initialState();
   auto burned_env = getEnvironmentWithStatus(AIL_NV_BURN);
-
-  // Calculate damage for normal Facade
-  auto result_normal = engine_->updateState(normal_env, Action::move(0), Action::wait());
-  auto damage_normal = result_normal.at(0).getEnv().getTeam(1).getPKV().nv().getMaxHP() -
-                       result_normal.at(0).getEnv().getTeam(1).getPKV().getHP();
 
   // Calculate damage for burned Facade
   auto result_burned = engine_->updateState(burned_env, Action::move(0), Action::wait());
-  auto damage_burned = result_burned.at(0).getEnv().getTeam(1).getPKV().nv().getMaxHP() -
-                       result_burned.at(0).getEnv().getTeam(1).getPKV().getHP();
+  auto damage_burned = result_burned.at(0).getEnv().getTeam(1).getPKV().getMissingHP();
 
   // Burn usually halves attack. Facade ignores burn reduction AND doubles power.
   // So effective power is 140 vs 70.
+  // TODO: Implement burn damage reduction in the engine.
   // If burn reduction is NOT implemented in engine (as we found),
   // then normal burned damage (without Facade boost) would be same as normal damage.
   // With Facade boost (double power), damage should be ~2x normal damage.
@@ -84,48 +84,30 @@ TEST_F(FacadeTest, BoostedPowerBurn) {
 }
 
 TEST_F(FacadeTest, BoostedPowerParalysis) {
-  auto normal_env = engine_->initialState();
   auto paralyzed_env = getEnvironmentWithStatus(AIL_NV_PARALYSIS);
 
-  auto result_normal = engine_->updateState(normal_env, Action::move(0), Action::wait());
-  auto damage_normal = result_normal.at(0).getEnv().getTeam(1).getPKV().nv().getMaxHP() -
-                       result_normal.at(0).getEnv().getTeam(1).getPKV().getHP();
-
   auto result_paralyzed = engine_->updateState(paralyzed_env, Action::move(0), Action::wait());
-  auto damage_paralyzed = result_paralyzed.at(0).getEnv().getTeam(1).getPKV().nv().getMaxHP() -
-                          result_paralyzed.at(0).getEnv().getTeam(1).getPKV().getHP();
+  auto damage_paralyzed = result_paralyzed.at(0).getEnv().getTeam(1).getPKV().getMissingHP();
 
   EXPECT_GT(damage_paralyzed, damage_normal * 1.8);
   EXPECT_LT(damage_paralyzed, damage_normal * 2.2);
 }
 
 TEST_F(FacadeTest, BoostedPowerPoison) {
-  auto normal_env = engine_->initialState();
   auto poisoned_env = getEnvironmentWithStatus(AIL_NV_POISON);
 
-  auto result_normal = engine_->updateState(normal_env, Action::move(0), Action::wait());
-  auto damage_normal = result_normal.at(0).getEnv().getTeam(1).getPKV().nv().getMaxHP() -
-                       result_normal.at(0).getEnv().getTeam(1).getPKV().getHP();
-
   auto result_poisoned = engine_->updateState(poisoned_env, Action::move(0), Action::wait());
-  auto damage_poisoned = result_poisoned.at(0).getEnv().getTeam(1).getPKV().nv().getMaxHP() -
-                         result_poisoned.at(0).getEnv().getTeam(1).getPKV().getHP();
+  auto damage_poisoned = result_poisoned.at(0).getEnv().getTeam(1).getPKV().getMissingHP();
 
   EXPECT_GT(damage_poisoned, damage_normal * 1.8);
   EXPECT_LT(damage_poisoned, damage_normal * 2.2);
 }
 
 TEST_F(FacadeTest, BoostedPowerToxic) {
-  auto normal_env = engine_->initialState();
   auto toxic_env = getEnvironmentWithStatus(AIL_NV_POISON_TOXIC);
 
-  auto result_normal = engine_->updateState(normal_env, Action::move(0), Action::wait());
-  auto damage_normal = result_normal.at(0).getEnv().getTeam(1).getPKV().nv().getMaxHP() -
-                       result_normal.at(0).getEnv().getTeam(1).getPKV().getHP();
-
   auto result_toxic = engine_->updateState(toxic_env, Action::move(0), Action::wait());
-  auto damage_toxic = result_toxic.at(0).getEnv().getTeam(1).getPKV().nv().getMaxHP() -
-                      result_toxic.at(0).getEnv().getTeam(1).getPKV().getHP();
+  auto damage_toxic = result_toxic.at(0).getEnv().getTeam(1).getPKV().getMissingHP();
 
   EXPECT_GT(damage_toxic, damage_normal * 1.8);
   EXPECT_LT(damage_toxic, damage_normal * 2.2);
