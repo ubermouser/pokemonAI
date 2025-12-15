@@ -19,7 +19,6 @@ include_directories(. include ${Boost_INCLUDE_DIRS})
 
 # Add preprocessor definitions
 add_compile_definitions(
-    WIN32
     _SCL_SECURE_NO_WARNINGS
     _DISABLEFINEGRAINEDLOCKING
     _DISABLETEMPORALTRACE
