@@ -37,6 +37,7 @@ const Move* crossPoison_t;
 const Move* doubleEdge_t;
 const Move* drainPunch_t;
 const Move* explosion_t;
+const Move* facade_t;
 const Move* faintAttack_t;
 const Move* flareBlitz_t;
 const Move* gigaDrain_t;
@@ -363,6 +364,23 @@ int move_painSplit(
 
   cPKV.setHP(newHP);
   tPKV.setHP(newHP);
+
+  return 1;
+};
+
+int move_facade_modPower(
+    PkCUEngine& cu,
+    MoveVolatile mV,
+    PokemonVolatile cPKV,
+    PokemonVolatile tPKV,
+    fpType& modifier) {
+  if (&mV.getBase() != facade_t) { return 0; }
+
+  uint32_t status = cPKV.getStatusAilment();
+  if (status == AIL_NV_BURN || status == AIL_NV_PARALYSIS ||
+      status == AIL_NV_POISON || status == AIL_NV_POISON_TOXIC) {
+    modifier *= 2.0;
+  }
 
   return 1;
 };
@@ -1716,6 +1734,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   doubleEdge_t = orphan::orphanCheck(moves, "double-edge");
   drainPunch_t = orphan::orphanCheck(moves, "drain punch");
   explosion_t = orphan::orphanCheck(moves, "explosion");
+  facade_t = orphan::orphanCheck(moves, "facade");
   faintAttack_t = orphan::orphanCheck(moves, "faint attack");
   flareBlitz_t = orphan::orphanCheck(moves, "flare blitz");
   gigaDrain_t = orphan::orphanCheck(moves, "giga drain");
@@ -1824,6 +1843,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(move, "double-edge", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, current_team));
   extensions.push_back(plugin(move, "explosion", PLUGIN_ON_MODIFYATTACKPOWER, move_suicide_modPower, 0, current_team));
   extensions.push_back(plugin(move, "explosion", PLUGIN_ON_ENDOFMOVE, move_suicide_modLife, 0, current_team));
+  extensions.push_back(plugin(move, "facade", PLUGIN_ON_MODIFYBASEPOWER, move_facade_modPower, 0, current_team));
   extensions.push_back(plugin(move, "faint attack", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
   extensions.push_back(plugin(move, "flare blitz", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, current_team));
   extensions.push_back(plugin(move, "giga drain", PLUGIN_ON_ENDOFMOVE, move_lifeLeech50, 0, current_team));
