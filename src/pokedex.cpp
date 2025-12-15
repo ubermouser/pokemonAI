@@ -107,6 +107,53 @@ bool PokedexStatic::initialize() {
   return true;
 }
 
+const Move& PokedexStatic::move(const std::string& name) const {
+  try {
+    return moves_.at(name);
+  } catch (const std::out_of_range& e) {
+    throw std::out_of_range("Move not found: " + name);
+  }
+}
+
+const Type& PokedexStatic::type(const std::string& name) const {
+  try {
+    return types_.at(name);
+  } catch (const std::out_of_range& e) {
+    throw std::out_of_range("Type not found: " + name);
+  }
+}
+
+const PokemonBase& PokedexStatic::pokemon(const std::string& name) const {
+  try {
+    return pokemon_.at(name);
+  } catch (const std::out_of_range& e) {
+    throw std::out_of_range("Pokemon not found: " + name);
+  }
+}
+
+const Ability& PokedexStatic::ability(const std::string& name) const {
+  try {
+    return abilities_.at(name);
+  } catch (const std::out_of_range& e) {
+    throw std::out_of_range("Ability not found: " + name);
+  }
+}
+
+const Nature& PokedexStatic::nature(const std::string& name) const {
+  try {
+    return natures_.at(name);
+  } catch (const std::out_of_range& e) {
+    throw std::out_of_range("Nature not found: " + name);
+  }
+}
+
+const Item& PokedexStatic::item(const std::string& name) const {
+  try {
+    return items_.at(name);
+  } catch (const std::out_of_range& e) {
+    throw std::out_of_range("Item not found: " + name);
+  }
+}
 
 bool PokedexStatic::inputPlugins() {
   OrphanSet mismatchedItems;
