@@ -19,7 +19,7 @@ void validateGen4Counts(const Pokedex& pkdex) {
   EXPECT_EQ(pkdex.getAbilities().size(), 123);
   EXPECT_EQ(pkdex.getItems().size(), 97);
   EXPECT_EQ(pkdex.getNatures().size(), 26);
-  EXPECT_EQ(pkdex.getMoves().size(), 383);
+  EXPECT_EQ(pkdex.getMoves().size(), 384);
   EXPECT_EQ(pkdex.getPokemon().size(), 505);
   EXPECT_EQ(pkdex.getTypes().size(), 18);
 }
