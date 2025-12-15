@@ -23,10 +23,6 @@ protected:
     // Target Pokemon
     auto team_b = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->pokemon("blissey")) // High HP, low Def
-          .addMove(pokedex_->move("softboiled"))
-          .setLevel(100))
-        .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->pokemon("mew"))
           .addMove(pokedex_->move("psychic"))
           .setLevel(100));
@@ -39,15 +35,15 @@ protected:
     damage_normal = result_normal.at(0).getEnv().getTeam(1).getPKV().getMissingHP();
   }
 
-  // Helper to get environment with user having a specific status
-  ConstEnvironmentVolatile getEnvironmentWithStatus(uint32_t status) {
+  // Helper to get environment data with user having a specific status
+  EnvironmentVolatileData getDataWithStatus(uint32_t status) {
     auto initial_state = engine_->initialState();
     auto env_data = initial_state.data();
 
     // Set status on team 0, pokemon 0 (active)
     env_data.teams[0].teammates[0].status_nonvolatile = status;
 
-    return EnvironmentVolatile(initial_state.nv(), env_data);
+    return env_data;
   }
 };
 
@@ -66,7 +62,8 @@ TEST_F(FacadeTest, NormalPower) {
 }
 
 TEST_F(FacadeTest, BoostedPowerBurn) {
-  auto burned_env = getEnvironmentWithStatus(AIL_NV_BURN);
+  auto env_data = getDataWithStatus(AIL_NV_BURN);
+  EnvironmentVolatile burned_env(engine_->initialState().nv(), env_data);
 
   // Calculate damage for burned Facade
   auto result_burned = engine_->updateState(burned_env, Action::move(0), Action::wait());
@@ -84,7 +81,8 @@ TEST_F(FacadeTest, BoostedPowerBurn) {
 }
 
 TEST_F(FacadeTest, BoostedPowerParalysis) {
-  auto paralyzed_env = getEnvironmentWithStatus(AIL_NV_PARALYSIS);
+  auto env_data = getDataWithStatus(AIL_NV_PARALYSIS);
+  EnvironmentVolatile paralyzed_env(engine_->initialState().nv(), env_data);
 
   auto result_paralyzed = engine_->updateState(paralyzed_env, Action::move(0), Action::wait());
   auto damage_paralyzed = result_paralyzed.at(0).getEnv().getTeam(1).getPKV().getMissingHP();
@@ -94,7 +92,8 @@ TEST_F(FacadeTest, BoostedPowerParalysis) {
 }
 
 TEST_F(FacadeTest, BoostedPowerPoison) {
-  auto poisoned_env = getEnvironmentWithStatus(AIL_NV_POISON);
+  auto env_data = getDataWithStatus(AIL_NV_POISON);
+  EnvironmentVolatile poisoned_env(engine_->initialState().nv(), env_data);
 
   auto result_poisoned = engine_->updateState(poisoned_env, Action::move(0), Action::wait());
   auto damage_poisoned = result_poisoned.at(0).getEnv().getTeam(1).getPKV().getMissingHP();
@@ -104,7 +103,8 @@ TEST_F(FacadeTest, BoostedPowerPoison) {
 }
 
 TEST_F(FacadeTest, BoostedPowerToxic) {
-  auto toxic_env = getEnvironmentWithStatus(AIL_NV_POISON_TOXIC);
+  auto env_data = getDataWithStatus(AIL_NV_POISON_TOXIC);
+  EnvironmentVolatile toxic_env(engine_->initialState().nv(), env_data);
 
   auto result_toxic = engine_->updateState(toxic_env, Action::move(0), Action::wait());
   auto damage_toxic = result_toxic.at(0).getEnv().getTeam(1).getPKV().getMissingHP();
