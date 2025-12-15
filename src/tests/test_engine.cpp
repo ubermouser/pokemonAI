@@ -10,7 +10,7 @@
 class EngineTest : public ::testing::Test {
 protected:
   void SetUp() override {
-    verbose = 4;
+    verbose = 10;
     pokedex_ = std::make_shared<PokedexStatic>();
     engine_ = std::make_shared<PkCU>();
     engine_->setAllowInvalidMoves(true);
@@ -314,4 +314,31 @@ TEST_F(EngineTest, ChoiceItems) {
     EXPECT_EQ(dracometeor_cs.at(0).getEnv().getTeam(1).teammate(2).getHP(), 0);
     EXPECT_EQ(dracometeor_none.at(0).getEnv().getTeam(0).teammate(2).getHP(), 0);
   }
+}
+
+TEST_F(EngineTest, Flinch) {
+  auto team_a = TeamNonVolatile().addPokemon(
+      PokemonNonVolatile()
+          .setBase(pokedex_->pokemon("jirachi"))
+          .addMove(pokedex_->move("iron head"))
+          .setLevel(100));
+
+  auto team_b = TeamNonVolatile().addPokemon(
+      PokemonNonVolatile()
+          .setBase(pokedex_->pokemon("charmander"))
+          .addMove(pokedex_->move("ember"))
+          .setLevel(100));
+
+  auto environment = EnvironmentNonvolatile(team_a, team_b, true);
+  engine_->setEnvironment(environment);
+
+  // Turn 1: Jirachi uses Iron Head, Mew uses Tackle
+  // Iron Head has 30% chance to flinch.
+  auto result = engine_->updateState(
+      engine_->initialState(), Action::move(0), Action::move(0));
+  result.printStates();
+
+  // Jirachi's health should be full if Charmander flinches
+  EXPECT_EQ(result.at(0).getEnv().getTeam(0).teammate(0).getMissingHP(), 0);
+  EXPECT_GE(result.at(0).getEnv().getTeam(1).teammate(0).getMissingHP(), 100);
 }
