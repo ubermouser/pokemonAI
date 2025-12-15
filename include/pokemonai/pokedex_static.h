@@ -74,48 +74,12 @@ public:
   virtual EnginePlugins& getExtensions() { return engineExtensions_; };
   virtual const EnginePlugins& getExtensions() const { return engineExtensions_; };
 
-  virtual const Move& move(const std::string& name) const override {
-    try {
-      return moves_.at(name);
-    } catch (const std::out_of_range& e) {
-      throw std::out_of_range("Move not found: " + name);
-    }
-  }
-  virtual const Type& type(const std::string& name) const override {
-    try {
-      return types_.at(name);
-    } catch (const std::out_of_range& e) {
-      throw std::out_of_range("Type not found: " + name);
-    }
-  }
-  virtual const PokemonBase& pokemon(const std::string& name) const override {
-    try {
-      return pokemon_.at(name);
-    } catch (const std::out_of_range& e) {
-      throw std::out_of_range("Pokemon not found: " + name);
-    }
-  }
-  virtual const Ability& ability(const std::string& name) const override {
-    try {
-      return abilities_.at(name);
-    } catch (const std::out_of_range& e) {
-      throw std::out_of_range("Ability not found: " + name);
-    }
-  }
-  virtual const Nature& nature(const std::string& name) const override {
-    try {
-      return natures_.at(name);
-    } catch (const std::out_of_range& e) {
-      throw std::out_of_range("Nature not found: " + name);
-    }
-  }
-  virtual const Item& item(const std::string& name) const override {
-    try {
-      return items_.at(name);
-    } catch (const std::out_of_range& e) {
-      throw std::out_of_range("Item not found: " + name);
-    }
-  }
+  virtual const Move& move(const std::string& name) const override;
+  virtual const Type& type(const std::string& name) const override;
+  virtual const PokemonBase& pokemon(const std::string& name) const override;
+  virtual const Ability& ability(const std::string& name) const override;
+  virtual const Nature& nature(const std::string& name) const override;
+  virtual const Item& item(const std::string& name) const override;
   
   virtual bool initialize();
   virtual bool inputPlugins(); // input scripts for registered moves
