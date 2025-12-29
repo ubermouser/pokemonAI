@@ -21,9 +21,7 @@ namespace orphan
     OrphanSet moves;
 
     void printAllOrphans(
-      const std::string& source,
-      const std::string& prefix,
-      int verbosity_level = 5) const;
+        const std::string& source, const std::string& prefix) const;
   };
 
   PKAISHARED std::string lowerCase(const std::string& source);
@@ -32,8 +30,7 @@ namespace orphan
       const OrphanSet& orphans,
       const std::string& source,
       const std::string& categoryName,
-      const std::string& type,
-      int verbosity_level = 5);
+      const std::string& type);
 
   template<class ptrType>
   static const ptrType* orphanCheck(

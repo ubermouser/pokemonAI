@@ -577,18 +577,15 @@ bool ranked_neuralNet::input(const std::vector<std::string>& lines, size_t& iLin
   // are the enough lines in the input stream:
   if ((lines.size() - iLine) < 1U)
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": unexpected end of input stream at line " << iLine << "!\n";
+    SPDLOG_CRITICAL("unexpected end of input stream at line {}!", iLine);
     return false; 
   }
 
   // compare neuralNetwork_ranked header:
   if (lines.at(iLine).compare(0, header.size(), header) != 0)
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": ranked_neuralNet stream has header of type \"" << lines.at(iLine).substr(0, header.size()) << 
-      "\" (needs to be \"" << header << 
-      "\") and is incompatible with this program!\n";
+    SPDLOG_CRITICAL("ranked_neuralNet stream has header of type \"{}\" (needs to be \"{}\") and is incompatible with this program!", 
+      lines.at(iLine).substr(0, header.size()), header);
 
     return false;
   }

@@ -12,15 +12,13 @@ const Nature* Nature::no_nature = NULL;
 bool Natures::initialize(const std::string& path) {
   if (path.empty())
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-        ": A nature list has not been defined!\n";
+    SPDLOG_CRITICAL("A nature list has not been defined!");
     return false;
   }
-  if (verbose >= 1) std::cout << " Loading Pokemon nature library...\n";
+  SPDLOG_INFO("Loading Pokemon nature library...");
   if (!loadFromFile(path))
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-        ": inputNatures failed to populate a list of natures.\n";
+    SPDLOG_CRITICAL("inputNatures failed to populate a list of natures.");
     return false;
   }
 
@@ -75,18 +73,15 @@ bool Natures::loadFromFile_lines(const std::vector<std::string>& lines, size_t& 
   // are the enough lines in the input stream for at least the header:
   if ((lines.size() - iLine) < 2U)
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-      ": unexpected end of input stream at line " << iLine << "!\n";
+    SPDLOG_CRITICAL("unexpected end of input stream at line {}!", iLine);
     return false;
   }
 
   // compare header:
   if (lines.at(iLine).compare(0, header.size(), header) != 0)
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-      ": natures inputStream has header of type \"" << lines.at(iLine).substr(0, header.size()) <<
-      "\" (needs to be \"" << header <<
-      "\") and is incompatible with this program!\n";
+    SPDLOG_CRITICAL("natures inputStream has header of type \"{}\" (needs to be \"{}\") and is incompatible with this program!", 
+      lines.at(iLine).substr(0, header.size()), header);
 
     return false;
   }
@@ -113,9 +108,8 @@ bool Natures::loadFromFile_lines(const std::vector<std::string>& lines, size_t& 
     class Nature cNature;
     if (tokens.size() != 6)
     {
-      std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-        ": natures inputStream has malformed line #" << iLine <<
-        " with " << tokens.size() << " values!\n";
+      SPDLOG_CRITICAL("natures inputStream has malformed line #{} with {} values!", 
+        iLine, tokens.size());
       return false;
     }
 

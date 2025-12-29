@@ -74,15 +74,13 @@ const Type& Move::getType() const
 bool Moves::initialize(const std::string& path, const Types& types) {
   if (path.empty())
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-        ": A move list has not been defined!\n";
+    SPDLOG_CRITICAL("A move list has not been defined!");
     return false;
   }
-  if (verbose >= 1) std::cout << " Loading Pokemon move library...\n";
+  SPDLOG_INFO("Loading Pokemon move library...");
   if (!loadFromFile(path, types))
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-        ": inputMoves failed to populate a list of moves.\n";
+    SPDLOG_CRITICAL("inputMoves failed to populate a list of moves.");
     return false;
   }
 
@@ -311,18 +309,15 @@ bool Moves::loadFromFile_lines(
   // are the enough lines in the input stream for at least the header:
   if ((lines.size() - iLine) < 2U)
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-      ": unexpected end of input stream at line " << iLine << "!\n";
+    SPDLOG_CRITICAL("unexpected end of input stream at line {}!", iLine);
     return false;
   }
 
   // compare header:
   if (lines.at(iLine).compare(0, header.size(), header) != 0)
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-      ": move inputStream has header of type \"" << lines.at(iLine).substr(0, header.size()) <<
-      "\" (needs to be \"" << header <<
-      "\") and is incompatible with this program!\n";
+    SPDLOG_CRITICAL("move inputStream has header of type \"{}\" (needs to be \"{}\") and is incompatible with this program!", 
+        lines.at(iLine).substr(0, header.size()), header);
 
     return false;
   }
@@ -350,9 +345,8 @@ bool Moves::loadFromFile_lines(
     std::vector<std::string> tokens = tokenize(lines.at(iLine), "\t");
     if (tokens.size() != 41)
     {
-      std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-        ": move inputStream has malformed line #" << iLine <<
-        " with " << tokens.size() << " values!\n";
+      SPDLOG_CRITICAL("move inputStream has malformed line #{} with {} values!", 
+          iLine, tokens.size());
       return false;
     }
     std::string name, description;
@@ -395,18 +389,15 @@ bool Moves::loadFromFile_lines(
         hasPlugins,
         description);
     insert({name, move});
-    if (verbose >= 6) std::cout << "\tLoaded move " << iMove << "-\"" << move.getName() << "\"\n";
+    SPDLOG_DEBUG("\tLoaded move {}-\"{}\"", iMove, move.getName());
   } //end of per-move
 
   if (orphanTypes.size() != 0)
   {
-    if (verbose >= 5) std::cerr << "WAR " << __FILE__ << "." << __LINE__ <<
-      ": move inputStream - " << orphanTypes.size() << " Orphaned move-types!\n";
-    if (verbose >= 6)
-    {
-      for (auto orphan : orphanTypes) {
-        std::cout << "\tOrphaned type \"" << orphan << "\"\n";
-      }
+    SPDLOG_WARN("move inputStream - {} Orphaned move-types!", 
+      orphanTypes.size());
+    for (auto orphan : orphanTypes) {
+      SPDLOG_DEBUG("\tOrphaned type \"{}\"", orphan);
     }
   }
 

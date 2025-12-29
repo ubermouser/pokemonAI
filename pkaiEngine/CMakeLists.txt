@@ -1,21 +1,14 @@
 add_library(pkaiEngine STATIC
     ../src/ability.cpp
     ../src/action.cpp
-    ../src/backpropNet.cpp
     ../src/environment_nonvolatile.cpp
     ../src/environment_possible.cpp
     ../src/environment_volatile.cpp
     ../src/evaluator.cpp
-    ../src/evaluator_featureVector.cpp
     ../src/evaluator_montecarlo.cpp
-    ../src/evaluator_network128.cpp
-    ../src/evaluator_network16.cpp
-    ../src/evaluator_network32.cpp
-    ../src/evaluator_network64.cpp
     ../src/evaluator_random.cpp
     ../src/evaluator_simple.cpp
     ../src/evaluators.cpp
-    ../src/experienceNet.cpp
     ../src/fitness.cpp
     ../src/fixedpoint/fixed_func.cpp
     ../src/game.cpp
@@ -24,12 +17,12 @@ add_library(pkaiEngine STATIC
     ../src/init_toolbox.cpp
     ../src/item.cpp
     ../src/league.cpp
+    ../src/logging.cpp
     ../src/move.cpp
     ../src/move_nonvolatile.cpp
     ../src/move_volatile.cpp
     ../src/name.cpp
     ../src/nature.cpp
-    ../src/neuralNet.cpp
     ../src/order_heuristic.cpp
     ../src/orphan.cpp
     ../src/pkCU.cpp
@@ -58,7 +51,6 @@ add_library(pkaiEngine STATIC
     ../src/team_factory.cpp
     ../src/team_nonvolatile.cpp
     ../src/team_volatile.cpp
-    ../src/temporalpropNet.cpp
     ../src/trainer.cpp
     ../src/transposition_table.cpp
     ../src/true_skill.cpp

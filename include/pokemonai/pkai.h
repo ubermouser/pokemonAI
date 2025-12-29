@@ -9,20 +9,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "pokemonai/logging.h"
 #include "pokemonai/fixedpoint/fixed_class.h"
-
-// C++ libraries:
-
-
-// debugging switches:
-
-// pokemonAI macros:
-// determine whether arguments are acceptable, and if so, create datastructures from them:
-
-// errors:
-#define checkRangeE(value, min, max) \
-if (!(value >= min && value <= max)) \
-{ std::cerr << "ERR " << __FILE__ << "." << __LINE__ << ": " << #value << "=" << value << "; Range " << min << ".." << max << " \n"; return false; }
 
 // Floating point precision of the project
 #ifdef DOUBLEPRECISION

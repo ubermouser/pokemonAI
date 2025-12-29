@@ -670,7 +670,7 @@ void PokemonNonVolatile::input(const pt::ptree& ptree) {
   Orphanage orphans;
   input(ptree, orphans);
 
-  orphans.printAllOrphans(getName(), "team", 4);
+  orphans.printAllOrphans(getName(), "team");
 }
 
 
@@ -689,28 +689,20 @@ void PokemonNonVolatile::input(const pt::ptree& ptree, Orphanage& orphanage) {
       orphanCheck(pkdex->getItems(), ptree.get<std::string>("item"), &orphanage.items);
   try {
     setInitialItem(*(item==NULL?Item::no_item:item));
-  } catch (std::invalid_argument& e) {
-    if (verbose >= 5) {
-      std::cerr << "WAR " << __FILE__ << "." << __LINE__ <<
-        ": pokemon " << *this <<
-        " cannot use item \"" << item->getName() <<
-          "\": " << e.what() <<
-          "!\n";
-    }
+  } catch (const std::exception& e) {
+    std::stringstream out;
+    out << "pokemon " << *this << " cannot use item \"" << item->getName() << "\": " << e.what() << "!";
+    SPDLOG_WARN("{}", out.str());
   }
 
   const Ability* ability =
       orphanCheck(pkdex->getAbilities(), ptree.get<std::string>("ability"), &orphanage.abilities);
   try {
     setAbility(*(ability==NULL?Ability::no_ability:ability));
-  } catch (std::invalid_argument& e) {
-    if (verbose >= 5) {
-      std::cerr << "WAR " << __FILE__ << "." << __LINE__ <<
-        ": pokemon " << *this <<
-        " cannot use ability \"" << ability->getName() <<
-          "\": " << e.what() <<
-          "!\n";
-    }
+  } catch (const std::exception& e) {
+    std::stringstream out;
+    out << "pokemon " << *this << " cannot use ability \"" << ability->getName() << "\": " << e.what() << "!";
+    SPDLOG_WARN("{}", out.str());
   }
 
   const Nature* nature =
@@ -723,14 +715,10 @@ void PokemonNonVolatile::input(const pt::ptree& ptree, Orphanage& orphanage) {
     if (move == NULL) { continue; }
     try {
       addMove(*move);
-    } catch (std::invalid_argument& e) {
-      if (verbose >= 5) {
-        std::cerr << "WAR " << __FILE__ << "." << __LINE__ <<
-          ": pokemon " << *this <<
-          " cannot use move \"" << move->getName() <<
-          "\": " << e.what() <<
-          "!\n";
-      }
+    } catch (const std::exception& ex) {
+      std::stringstream out;
+      out << "pokemon " << *this << " cannot use move \"" << move->getName() << "\": " << ex.what() << "!";
+      SPDLOG_WARN("{}", out.str());
     }
   }
 
@@ -741,11 +729,9 @@ void PokemonNonVolatile::input(const pt::ptree& ptree, Orphanage& orphanage) {
     setEV(iStat, evs.get<uint32_t>(statHeaders[iStat]));
   }
 
-  if (getNumMoves() == 0) {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-      ": pokemon " << *this <<
-      " does not have enough valid moves (" << getNumMoves() <<
-      ")!\n";
-    throw std::invalid_argument("PokemonNonVolatile numMoves");
+  if (getNumMoves() == 1) {
+    std::stringstream out;
+    out << "pokemon " << *this << " does not have enough valid moves (" << getNumMoves() << ")!";
+    SPDLOG_ERROR("{}", out.str());
   }
 }

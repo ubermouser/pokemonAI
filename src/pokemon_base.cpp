@@ -37,15 +37,13 @@ bool Pokemons::initialize(
     const Moves& moves) {
   if (pokemonPath.empty())
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-        ": A species list has not been defined!\n";
+    SPDLOG_CRITICAL("A species list has not been defined!");
     return false;
   }
-  if (verbose >= 1) std::cout << " Loading species library...\n";
+  SPDLOG_INFO("Loading species library...");
   if (!loadFromFile(pokemonPath, types, abilities))
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-        ": inputPokemon failed to populate a list of pokemon.\n";
+    SPDLOG_CRITICAL("inputPokemon failed to populate a list of pokemon.");
     return false;
   }
 
@@ -57,15 +55,15 @@ bool Pokemons::initialize(
   //MOVELIST library
   if (movelistPath.empty())
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-        ": A movelist array has not been defined!\n";
+    SPDLOG_CRITICAL("A movelist array has not been defined!");
     return false;
   }
-  if (verbose >= 1) std::cout << " Loading Pokemon move arrays...\n";
+  SPDLOG_INFO("Loading Pokemon move arrays...");
   if (!loadMovelistFromFile(movelistPath, moves))
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-        ": inputMoveList failed to populate an acceptable list of pokemon moves.\n";
+    SPDLOG_CRITICAL(
+        "inputMoveList failed to populate an acceptable list of pokemon "
+        "moves.");
     return false;
   }
   
@@ -118,18 +116,18 @@ bool Pokemons::loadFromFile_lines(
   // are the enough lines in the input stream for at least the header:
   if ((lines.size() - iLine) < 2U)
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-      ": unexpected end of input stream at line " << iLine << "!\n";
+    SPDLOG_CRITICAL("unexpected end of input stream at line {}!", iLine);
     return false;
   }
 
   // compare header:
   if (lines.at(iLine).compare(0, header.size(), header) != 0)
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-      ": pokemon inputStream has header of type \"" << lines.at(iLine).substr(0, header.size()) <<
-      "\" (needs to be \"" << header <<
-      "\") and is incompatible with this program!\n";
+    SPDLOG_CRITICAL(
+        "pokemon inputStream has header of type \"{}\" (needs to be \"{}\") "
+        "and is incompatible with this program!",
+        lines.at(iLine).substr(0, header.size()),
+        header);
 
     return false;
   }
@@ -159,9 +157,10 @@ bool Pokemons::loadFromFile_lines(
     PokemonBase cPokemon;
     if (tokens.size() != 12)
     {
-      std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-        ": pokemon inputStream has malformed line #" << (iLine) <<
-        " with " << tokens.size() << " values!\n";
+      SPDLOG_CRITICAL(
+          "ERR: pokemon inputStream has malformed line #{} with {} values!",
+          iLine,
+          tokens.size());
       return false;
     }
     // init lostChild
@@ -278,18 +277,18 @@ bool Pokemons::loadMovelistFromFile_lines(
   // are the enough lines in the input stream for at least the header:
   if ((lines.size() - iLine) < 2U)
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-      ": unexpected end of input stream at line " << iLine << "!\n";
+    SPDLOG_CRITICAL("unexpected end of input stream at line {}!", iLine);
     return false;
   }
 
   // compare header:
   if (lines.at(iLine).compare(0, header.size(), header) != 0)
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-      ": movelist inputStream has header of type \"" << lines.at(iLine).substr(0, header.size()) <<
-      "\" (needs to be \"" << header <<
-      "\") and is incompatible with this program!\n";
+    SPDLOG_CRITICAL(
+        "movelist inputStream has header of type \"{}\" (needs to be \"{}\") "
+        "and is incompatible with this program!",
+        lines.at(iLine).substr(0, header.size()),
+        header);
 
     return false;
   }
@@ -313,8 +312,9 @@ bool Pokemons::loadMovelistFromFile_lines(
   // check if pokemon has been initialized yet
   if (empty() || moves.empty())
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-      ": Pokemon and moves must be initialized before adding movelists to them!\n";
+    SPDLOG_CRITICAL(
+        "Pokemon and moves must be initialized before adding movelists to "
+        "them!");
     return false;
   }
 
@@ -326,9 +326,10 @@ bool Pokemons::loadMovelistFromFile_lines(
     std::vector<std::string> tokens = tokenize(lines.at(iLine), "\t");
     if (tokens.size() != 2)
     {
-      std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-        ": movelist inputStream has malformed line #" << (iLine) <<
-        " with " << tokens.size() << " values!\n";
+      SPDLOG_CRITICAL(
+          "movelist inputStream has malformed line #{} with {} values!",
+          iLine,
+          tokens.size());
       return false;
     }
 

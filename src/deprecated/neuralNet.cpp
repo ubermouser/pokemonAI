@@ -330,18 +330,15 @@ bool neuralNet::input(const std::vector<std::string>& lines, size_t& iLine)
   // are the enough lines in the input stream:
   if ((lines.size() - iLine) < 2U)
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": unexpected end of input stream at line " << iLine << "!\n";
+    SPDLOG_ERROR("unexpected end of input stream at line {}!", iLine);
     return false; 
   }
 
   // compare neural network header:
   if (lines.at(iLine).compare(0, header.size(), header) != 0)
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": neural network stream has header of type \"" << lines.at(iLine).substr(0, header.size()) << 
-      "\" (needs to be \"" << header 
-      << "\") and is incompatible with this program!\n";
+    SPDLOG_ERROR("neural network stream has header of type \"{}\" (needs to be \"{}\") and is incompatible with this program!", 
+      lines.at(iLine).substr(0, header.size()), header);
     return false;
   }
 
@@ -353,9 +350,8 @@ bool neuralNet::input(const std::vector<std::string>& lines, size_t& iLine)
     // make sure precision is 32:
     if (tokens.at(1).compare("32") != 0)
     {
-      std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": neural network stream has precision of \"" << tokens.at(1) << 
-        "\" (needs to be 32) and is incompatible with this program!\n";
+      SPDLOG_ERROR("neural network stream has precision of \"{}\" (needs to be 32) and is incompatible with this program!", 
+        tokens.at(1));
       return false;
     }
     // set name:
@@ -413,8 +409,7 @@ bool neuralNet::input(const std::vector<std::string>& lines, size_t& iLine)
 
       if (iLine >= lines.size())
       {
-        std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-          ": unexpected end of input stream at line " << iLine << "!\n";
+        SPDLOG_ERROR("unexpected end of input stream at line {}!", iLine);
         return false; 
       }
 
@@ -442,8 +437,7 @@ bool neuralNet::input(const std::vector<std::string>& lines, size_t& iLine)
 
   if ((totalWeightedNeurons != readNeurons) || (totalWeights != readWeights)) 
   { 
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": Defined network topology does not match input!\n";
+    SPDLOG_ERROR("Defined network topology does not match input!");
     return false; 
   } 
   return true;

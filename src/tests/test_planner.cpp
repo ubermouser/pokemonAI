@@ -18,7 +18,8 @@
 class PlannerTest : public ::testing::Test {
 protected:
   void SetUp() override {
-    verbose = 4;
+    verbose = 1;
+    initialize_logger(spdlog::level::debug);
     pokedex_ = std::make_shared<PokedexStatic>();
     engine_ = std::make_shared<PkCU>();
     EvaluatorSimple::Config eval_config;

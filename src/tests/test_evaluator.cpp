@@ -13,7 +13,8 @@
 class EvaluatorTest : public ::testing::Test {
 protected:
   void SetUp() override {
-    verbose = 4;
+    verbose = 0;
+    initialize_logger(spdlog::level::trace);
     pokedex_ = std::make_shared<PokedexStatic>();
     engine_ = std::make_shared<PkCU>();
 

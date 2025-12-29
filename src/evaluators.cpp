@@ -37,7 +37,7 @@ std::shared_ptr<Evaluator> evaluators::choose(const std::string& _type, const Ev
   } else if (type == "montecarlo") {
     result = std::make_shared<EvaluatorMonteCarlo>(dynamic_cast<const EvaluatorMonteCarlo::Config&>(cfg));
   } else {
-    std::cerr << "unknown evaluator type \"" << _type << "\"!\n";
+    SPDLOG_ERROR("unknown evaluator type \"{}\"!", _type);
     throw std::invalid_argument("evaluator type");
   }
   return result;

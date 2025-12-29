@@ -82,7 +82,7 @@ void Ranker::initialize() {
   if (initialLeague_.planners.empty()) { throw std::runtime_error("no planners defined"); }
   if (cfg_.numThreads == SIZE_MAX) {
     cfg_.numThreads = omp_get_num_procs();
-    std::cerr << "Ranker thread parallelism set to " << cfg_.numThreads << "!\n";
+    SPDLOG_INFO("Ranker thread parallelism set to {}!", cfg_.numThreads);
   }
 
   loadTeamPopulation();
@@ -317,7 +317,8 @@ Ranker& Ranker::setStateEvaluator(const Evaluator& eval) {
 template<typename League, typename LeagueType, typename AddFn>
 void addToLeague(const LeagueType& obj, const std::string& itemType, League& league, AddFn add_fn) {
   if (league.count(obj.hash()) > 0) {
-    std::cerr << boost::format("Duplicate %s added to league \"%s\"!\n") % itemType % obj.getName();
+    SPDLOG_ERROR(
+        "Duplicate {} added to league \"{}\"!", itemType, obj.getName());
   }
 
   add_fn(std::make_shared<LeagueType>(obj));
@@ -468,13 +469,14 @@ size_t Ranker::loadTeamPopulation() {
 
   bf::path teamPath{cfg_.teamPath};
   if (!bf::exists(teamPath) || !bf::is_directory(teamPath)) {
-    std::cerr << 
-        boost::format("Team population directory at \"%s\" is not a folder or does not exist!\n")
-        % cfg_.teamPath;
+    SPDLOG_CRITICAL(
+        "Team population directory at \"{}\" is not a folder or does not "
+        "exist!",
+        cfg_.teamPath);
     return 0;
   }
 
-  if (cfg_.verbosity > 0) { out_.get() << boost::format("loading teams from \"%s\"...\n") % cfg_.teamPath; }
+  SPDLOG_WARN("loading teams from \"{}\"...", cfg_.teamPath);
   size_t numLoaded = 0;
   for (auto& pathIt : bf::directory_iterator(teamPath)) {
     if (!bf::is_regular_file(pathIt.path())) { continue; }
@@ -482,15 +484,17 @@ size_t Ranker::loadTeamPopulation() {
     try {
       addTeam(TeamNonVolatile::load(pathIt.path().string()));
     } catch(std::invalid_argument& e) {
-      if (cfg_.verbosity >= 2) {
-        std::cerr << boost::format("Failed to load team at \"%s\": %s\n") % pathIt.path() % e.what();
-      }
+      SPDLOG_ERROR(
+          "Failed to load team at \"{}\": {}",
+          pathIt.path().string(),
+          e.what());
       continue;
     }
     
     numLoaded += 1;
   }
 
+  SPDLOG_INFO("Loaded {} teams from \"{}\"", numLoaded, cfg_.teamPath);
   return numLoaded;
 }
 
@@ -500,13 +504,12 @@ size_t Ranker::saveTeamPopulation(const League& league) const {
 
   bf::path teamPath{cfg_.teamPath};
   if (bf::exists(teamPath) && !bf::is_directory(teamPath)) {
-    std::cerr <<
-        boost::format("Team population path at \"%s\" is not a folder!\n")
-        % cfg_.teamPath;
+    SPDLOG_CRITICAL(
+        "Team population path at \"{}\" is not a folder!", cfg_.teamPath);
     return 0;
   }
 
-  if (cfg_.verbosity > 0) { out_.get() << boost::format("saving teams to \"%s\"...\n") % cfg_.teamPath; }
+  SPDLOG_WARN("saving teams to \"{}\"...", cfg_.teamPath);
   bf::create_directory(teamPath);
 
   size_t numSaved = 0;

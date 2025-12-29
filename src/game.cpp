@@ -147,8 +147,7 @@ Game& Game::initialize() {
   if (nv_ == NULL ||
       nv_->getTeam(TEAM_A).getNumTeammates() == 0 ||
       nv_->getTeam(TEAM_B).getNumTeammates() == 0) {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": One or more teams are undefined!\n";
+    SPDLOG_ERROR("One or more teams are undefined!");
     throw std::runtime_error("team(s) undefined");
   }
 
@@ -160,10 +159,8 @@ Game& Game::initialize() {
   try {
     eval_->initialize();
   } catch (const std::exception& e) {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-      ": Game-state evaluator " <<
-      ": \"" << eval_->getName() << "\" failed to initialize!\n";
-    std::cerr << e.what() << "\n";
+    SPDLOG_ERROR("Game-state evaluator : \"{}\" failed to initialize!", eval_->getName());
+    SPDLOG_ERROR("{}", e.what());
     throw std::runtime_error("game-state evaluator failed to initialize");
   }
   // assign default agents if none exist:
@@ -173,18 +170,15 @@ Game& Game::initialize() {
       if (!cfg_.allowUndefinedAgents) { throw std::runtime_error("agent(s) undefined"); }
 
       setPlanner(iAgent, PlannerMax().setEngine(cu_).setEvaluator(eval_));
-      std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-        ": agent " << iAgent << 
-        " is undefined! Replaced with " << agent->getName() << "\n";
+      SPDLOG_ERROR("agent {} is undefined! Replaced with {}", iAgent, agent->getName());
     }
 
     try {
       agent->initialize();
     } catch (const std::exception& e) {
-      std::cerr << e.what() << "\n";
-      std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-        ": Agent " << iAgent <<
-        ": \"" << agent->getName() << "\" failed to initialize!\n";
+
+      SPDLOG_ERROR("Agent {}: \"{}\" failed to initialize!", iAgent, agent->getName());
+      SPDLOG_ERROR("{}", e.what());
       throw std::runtime_error("agent(s) failed to initialize");
     }
   }
@@ -194,7 +188,7 @@ Game& Game::initialize() {
 
   if (cfg_.numThreads == SIZE_MAX) {
     cfg_.numThreads = omp_get_num_procs();
-    std::cerr << "Game thread parallelism set to " << cfg_.numThreads << "!\n";
+    SPDLOG_INFO("Game thread parallelism set to {}!", cfg_.numThreads);
   }
 
   isInitialized_ = true;
@@ -551,36 +545,6 @@ void Game::incrementScore(int matchState, std::array<uint32_t, 2>& score) const 
 }
 
 
-void Game::printAction(
-    const ConstTeamVolatile& cTeam, const Action& action, unsigned int iTeam) const {
-  std::stringstream out;
-  if (action.isMove()) {
-    out
-      << getPokemonIdentifier(cTeam, iTeam) << " used "
-      << (action.iMove()+1) << "-"
-      << cTeam.getPKV().getMV(action)
-      << "!\n";
-  } else if (action.isSwitch()) {
-    out
-      << getPokemonIdentifier(cTeam, iTeam) << " is switching out with "
-      << (action.friendlyTarget()+1) << ": "
-      << cTeam.teammate(action.friendlyTarget() - Action::FRIENDLY_0).nv().getName() << "!\n";
-  } else if (action.isWait()) {
-    out
-      << getPokemonIdentifier(cTeam, iTeam) << " waited for a turn!\n";
-  } else {
-    out
-      << getPokemonIdentifier(cTeam, iTeam) << " chose unknown action "
-      << action << "!\n";
-  }
-  // if the current pokemon is dead and switching out, print their team:
-  if (!cTeam.getPKV().isAlive()) {
-    cTeam.printTeam(out, "    ");
-  }
-  std::cout << out.str();
-}
-
-
 std::string Game::getGameIdentifier(size_t iMatch) const {
   std::ostringstream gameIdentifier;
   if (iMatch != SIZE_MAX) {
@@ -613,6 +577,36 @@ std::string Game::getPokemonIdentifier(const ConstTeamVolatile& cTeam, size_t iT
       << cTeam.getPKV().nv().getName();
 
   return pkIdentifier.str();
+}
+
+
+void Game::printAction(
+    const ConstTeamVolatile& cTeam, const Action& action, unsigned int iTeam) const {
+  std::stringstream out;
+  if (action.isMove()) {
+    out
+      << getPokemonIdentifier(cTeam, iTeam) << " used "
+      << (action.iMove()+1) << "-"
+      << cTeam.getPKV().getMV(action)
+      << "!\n";
+  } else if (action.isSwitch()) {
+    out
+      << getPokemonIdentifier(cTeam, iTeam) << " is switching out with "
+      << (action.friendlyTarget()+1) << ": "
+      << cTeam.teammate(action.friendlyTarget() - Action::FRIENDLY_0).nv().getName() << "!\n";
+  } else if (action.isWait()) {
+    out
+      << getPokemonIdentifier(cTeam, iTeam) << " waited for a turn!\n";
+  } else {
+    out
+      << getPokemonIdentifier(cTeam, iTeam) << " chose unknown action "
+      << action << "!\n";
+  }
+  // if the current pokemon is dead and switching out, print their team:
+  if (!cTeam.getPKV().isAlive()) {
+    cTeam.printTeam(out, "    ");
+  }
+  std::cout << out.str();
 }
 
 
@@ -709,18 +703,6 @@ void Game::printGameOutline(const GameResult& gResult, size_t iMatch) const {
   std::cout << out.str();
 }
 
-
-void Game::printHeatStart() const {
-  std::stringstream out;
-  for (size_t iTeam = 0; iTeam < 2; iTeam++) {
-    out << "Team " << getTeamIdentifier(iTeam) << ":\n";
-    nv_->getTeam(iTeam).printSummary(out, "    ");
-  }
-
-  std::cout << out.str();
-}
-
-
 void Game::printHeatOutline(const HeatResult& result) const {
   std::stringstream out;
   if (result.endStatus == MATCH_TIE) {
@@ -777,5 +759,16 @@ void Game::printHeatOutline(const HeatResult& result) const {
       printLeaderboard(out, iPokemon, pResult, cPKNV);
     }
   }
+  std::cout << out.str();
+}
+
+
+void Game::printHeatStart() const {
+  std::stringstream out;
+  for (size_t iTeam = 0; iTeam < 2; iTeam++) {
+    out << "Team " << getTeamIdentifier(iTeam) << ":\n";
+    nv_->getTeam(iTeam).printSummary(out, "    ");
+  }
+
   std::cout << out.str();
 }

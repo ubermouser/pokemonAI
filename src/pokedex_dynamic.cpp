@@ -38,16 +38,14 @@ bool PokedexDynamic::inputPlugins()
   // determine if folder exists:
   if (!boost::filesystem::exists(pluginLocation) || !boost::filesystem::is_directory(pluginLocation))
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": A script folder was not found at location \"" << config_.pluginsPath_ << "\"!\n";
+    SPDLOG_CRITICAL("A script folder was not found at location \"{}\"!", config_.pluginsPath_);
     return false;
   }
 
   // determine if folder is a directory:
   if (!boost::filesystem::is_directory(pluginLocation))
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": \"" << config_.pluginsPath_ << "\" is not a directory!\n";
+    SPDLOG_CRITICAL("\"{}\" is not a directory!", config_.pluginsPath_);
     return false;
   }
 
@@ -64,10 +62,7 @@ bool PokedexDynamic::inputPlugins()
     if (iPlugin->path().extension().compare(".so") != 0) { continue; }
 #endif
 
-    if (verbose >= 6)
-    {
-      std::cout << "Loading plugin at " << *iPlugin << "...\n";
-    }
+    SPDLOG_INFO("Loading plugin at {}...", iPlugin->path().string());
 
     numPluginsTotal++;
     std::unique_ptr<shared_library> cPlugin = std::make_unique<shared_library>(iPlugin->path());
@@ -75,9 +70,7 @@ bool PokedexDynamic::inputPlugins()
     // attempt to load plugin:
     if (!cPlugin)
     {
-      std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": plugin \"" << *iPlugin <<
-        "\" could not be loaded:!\n";
+      SPDLOG_ERROR("plugin \"{}\" could not be loaded!", iPlugin->path().string());
       continue;
     }
 
@@ -86,9 +79,7 @@ bool PokedexDynamic::inputPlugins()
     regExtension_type registerExtensions(cPlugin->get<bool(const Pokedex&, std::vector<plugin>&)>("registerExtensions"));
     if (!registerExtensions)
     {
-      std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": could not find registerExtensions method in plugin \"" << *iPlugin << 
-        "\"!\n";
+      SPDLOG_ERROR("could not find registerExtensions method in plugin \"{}\"!", iPlugin->path().string());
       // close faulty module:
       cPlugin->unload();
       continue;
@@ -106,9 +97,7 @@ bool PokedexDynamic::inputPlugins()
     if (!success)
     {
       cPlugin->unload();
-      std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-        ": FATAL - register plugin call failed \"" << *iPlugin << 
-        "\"!\n";
+      SPDLOG_CRITICAL("Register plugin call failed \"{}\"!", iPlugin->path().string());
       return false;
     }
 

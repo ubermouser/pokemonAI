@@ -45,10 +45,8 @@ Planner& Planner::initialize() {
   if (eval_ != NULL) { eval_->initialize(); }
 
   if (cfg_.maxDepth > maxImplDepth()) {
-    std::cerr <<
-        getName() << " planner has maximum implementation depth of " <<
-        maxImplDepth() << ", ignoring depth " <<
-        cfg_.maxDepth << "!\n";
+    SPDLOG_WARN("{} planner has maximum implementation depth of {}, ignoring depth {}!", 
+        getName(), maxImplDepth(), cfg_.maxDepth);
     cfg_.maxDepth = maxImplDepth();
   }
   if (cfg_.minDepth > cfg_.maxDepth) {

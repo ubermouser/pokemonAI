@@ -259,13 +259,10 @@ void TeamNonVolatile::input(const pt::ptree& ptree) {
 
   // determine that the number of teams is adequate:
   if (getNumTeammates() == 0) {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-      ": team \"" << getName() <<
-      " does not have enough valid pokemon (" << getNumTeammates() <<
-      ")!\n";
+    SPDLOG_ERROR("team \"{}\" does not have enough valid pokemon ({})!", getName(), getNumTeammates());
 
     throw std::invalid_argument("TeamNonVolatile numTeammates");
   }
 
-  orphans.printAllOrphans(getName(), "team", 4);
+  orphans.printAllOrphans(getName(), "team");
 }

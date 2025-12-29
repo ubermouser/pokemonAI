@@ -47,7 +47,7 @@ std::shared_ptr<Planner> planners::choose(const std::string& _type, const Planne
   } else if (type == "human") {
     result = std::make_shared<PlannerHuman>(dynamic_cast<const PlannerHuman::Config&>(cfg));
   } else {
-    std::cerr << "unknown planner type \"" << _type << "\"!\n";
+    SPDLOG_ERROR("unknown planner type \"{}\"!", _type);
     throw std::invalid_argument("planner type");
   }
   return result;

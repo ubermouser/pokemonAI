@@ -137,13 +137,8 @@ void planner_directed::setExperience(const experienceNet& _exp)
   if (eval == NULL) { exp = _exp; }
   else if (eval->inputSize() != _exp.inputSize())
   {
-    if (verbose >= 5)
-    {
-      std::cerr << "WAR " << __FILE__ << "." << __LINE__ << 
-        ": Attempted to set planner experienceNet dimensions to a size other evaluator size " << eval->inputSize() << 
-        " ( " << _exp.inputSize() << 
-        " )!\n";
-    }
+    SPDLOG_WARN("Attempted to set planner experienceNet dimensions to a size other evaluator size {} ( {} )!",
+      eval->inputSize(), _exp.inputSize());
     exp.clear();
   }
   else

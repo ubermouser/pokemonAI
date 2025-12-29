@@ -4,19 +4,19 @@
  *
  * Created on December 8, 2025, 5:47 PM
  */
+#include <boost/format.hpp>
+#include <boost/program_options.hpp>
 #include <iostream>
 #include <memory>
 #include <string>
-#include <boost/program_options.hpp>
-#include <boost/format.hpp>
 
 #include "pokemonai/engine.h"
-#include "pokemonai/pkCU.h"
-#include "pokemonai/pokedex_static.h"
-#include "pokemonai/evaluators.h"
 #include "pokemonai/evaluator_simple.h"
+#include "pokemonai/evaluators.h"
+#include "pokemonai/logging.h"
+#include "pokemonai/pkCU.h"
 #include "pokemonai/planners.h"
-
+#include "pokemonai/pokedex_static.h"
 #include "pokemonai/ranker.h"
 
 namespace po = boost::program_options;
@@ -115,9 +115,11 @@ Config parse_command_line(int argc, char**argv) {
 }
 
 int main(int argc, char** argv) {
+  initialize_logger();
   auto cfg = parse_command_line(argc, argv);
 
   verbose = cfg.verbosity;
+  spdlog::set_level(spdlog::level::level_enum(cfg.verbosity));
   srand((cfg.random_seed < 0)?time(NULL):cfg.random_seed);
 
   auto pokedex = PokedexStatic(cfg.pokedex);

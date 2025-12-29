@@ -10,7 +10,8 @@
 class EngineTest : public ::testing::Test {
 protected:
   void SetUp() override {
-    verbose = 10;
+    verbose = 0;
+    initialize_logger(spdlog::level::trace);
     pokedex_ = std::make_shared<PokedexStatic>();
     engine_ = std::make_shared<PkCU>();
     engine_->setAllowInvalidMoves(true);

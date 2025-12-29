@@ -68,9 +68,8 @@ pt::ptree Ranked::output(bool printHeader) const {
 void Ranked::input(const pt::ptree& tree) {
   auto header = tree.get<std::string>("header");
   if (header != HEADER) {
-    std::cerr << boost::format("Ranked header mismatch! Should be \"%s\", was \"%s\"!\n")
-        % HEADER
-        % header;
+    SPDLOG_CRITICAL("Ranked header mismatch! Should be \"{}\", was \"{}\"!", 
+        HEADER, header);
   }
 
   record().numWins = tree.get<uint64_t>("numWins");

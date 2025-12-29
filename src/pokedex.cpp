@@ -96,10 +96,10 @@ bool PokedexStatic::initialize() {
   }
 
   // initialize scripts:
-  if (verbose >= 1) std::cout << " Loading Plugins...\n";
+  SPDLOG_INFO("Loading Plugins...");
   if (!this->inputPlugins()) {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-        ": inputPlugins failed to initialize an acceptable set of plugins!\n";
+    SPDLOG_CRITICAL(
+        "inputPlugins failed to initialize an acceptable set of plugins!");
     return false;
   }
 
@@ -215,8 +215,8 @@ bool PokedexStatic::registerPlugin(
   std::vector<plugin> collectedPlugins;
   if (!registerExtensions(*this, collectedPlugins))
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": engine plugin was not able to generate a list of valid plugins!\n";
+    SPDLOG_CRITICAL(
+        "engine plugin was not able to generate a list of valid plugins!");
     return false;
   }
 
@@ -262,12 +262,10 @@ bool PokedexStatic::registerPlugin(
     // if plugin overwrote a plugin that was previously installed:
     if (overwritten)
     {
-      if (verbose >= 5)
-      {
-        std::cerr << "WAR " << __FILE__ << "." << __LINE__ << 
-          ": plugin for [" << pluginCategoryToString(cCPlugin.getCategory()) <<
-          "][" << cCPlugin.getName() << "] -- overwriting previously defined plugin!\n";
-      }
+      SPDLOG_WARN(
+          "plugin for [{}][{}] -- overwriting previously defined plugin!",
+          pluginCategoryToString(cCPlugin.getCategory()),
+          cCPlugin.getName());
       numOverwritten++;
     }
     numExtensions++;
@@ -309,13 +307,13 @@ void PokedexStatic::registerPlugin_orphanCount(
   // print mismatched categories
   printOrphans(mismatchedCategories, source, "plugin-categories", "category");
 
-  if (verbose >= 6) {
-    std::cerr << "INF " << __FILE__ << "." << __LINE__ << 
-      " Successfully loaded  " << numPluginsLoaded << 
-      " of " << numPluginsTotal <<
-      " plugins, loaded " << numExtensions << 
-      " ( " << numOverwritten << " overwritten ) extensions!\n";
-  }
+  SPDLOG_INFO(
+      "Successfully loaded {} of {} plugins, loaded {} ( {} overwritten ) "
+      "extensions!",
+      numPluginsLoaded,
+      numPluginsTotal,
+      numExtensions,
+      numOverwritten);
 }
 
 

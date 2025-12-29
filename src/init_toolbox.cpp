@@ -8,22 +8,39 @@
 
 void INI::incorrectArgs( const std::string& commandName, size_t line, size_t value)
 {
-  std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-    ": Parse error for args of argument \"" << commandName << "\"";
-
-  if (line != SIZE_MAX ) { std::cerr << ", line #" << line; }
-  if (value != SIZE_MAX) { std::cerr << " value #" << value; }
-  std::cerr << "\n";
+  if (line != SIZE_MAX && value != SIZE_MAX) {
+    SPDLOG_ERROR(
+        "Parse error for args of argument \"{}\", line #{} value #{}",
+        commandName,
+        line,
+        value);
+  } else if (line != SIZE_MAX) {
+    SPDLOG_ERROR(
+        "Parse error for args of argument \"{}\", line #{}", commandName, line);
+  } else if (value != SIZE_MAX) {
+    SPDLOG_ERROR(
+        "Parse error for args of argument \"{}\", value #{}",
+        commandName,
+        value);
+  } else {
+    SPDLOG_ERROR("Parse error for args of argument \"{}\"", commandName);
+  }
 };
 
 void INI::incorrectNumArgs( const std::string& commandName, size_t found, size_t needed)
 {
-  std::cerr << "ERR " << __FILE__ << "." << __LINE__ << ": Insufficient args for argument \"" << commandName << "\". Found " << found << ", Needed " << needed << ".\n";
+  SPDLOG_ERROR(
+      "Insufficient args for argument \"{}\". Found {}, Needed {}.",
+      commandName,
+      found,
+      needed);
 };
 
 void INI::notInitialized(const std::string& commandName)
 {
-  std::cerr << "ERR " << __FILE__ << "." << __LINE__ << ": variable \"" << commandName << "\" must be set before this invocation is called!\n";
+  SPDLOG_ERROR(
+      "variable \"{}\" must be set before this invocation is called!",
+      commandName);
 };
 
 
@@ -87,17 +104,14 @@ bool INI::loadFileToString(const boost::filesystem::path& location, const std::s
   // determine if folder exists:
   if (!boost::filesystem::exists(location))
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": path \"" << location << 
-      "\" must exist!\n";
+    SPDLOG_ERROR("path \"{}\" must exist!", location.string());
     return false;
   }
 
   // determine if folder is a directory:
   if (boost::filesystem::is_directory(location))
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": path \"" << location << "\" is a directory!\n";
+    SPDLOG_ERROR("path \"{}\" is a directory!", location.string());
     return false;
   }
 
@@ -105,8 +119,8 @@ bool INI::loadFileToString(const boost::filesystem::path& location, const std::s
   boost::filesystem::ifstream file(location, std::ios::in | std::ios::binary); // read in, binary
   if (!file.is_open())
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": Unable to open file for binary reading at \"" << location << "\"!\n";
+    SPDLOG_ERROR(
+        "Unable to open file for binary reading at \"{}\"!", location.string());
     return false;
   }
 
@@ -117,21 +131,21 @@ bool INI::loadFileToString(const boost::filesystem::path& location, const std::s
   // no need for file now, close it
   file.close();
 
-  if (verbose >= 6)
-  {
-    std::cout << "INF " << __FILE__ << "." << __LINE__ << 
-      ": read " << freadCount << " bytes from file \"" << location << "\".\n";
-  }
-  
+  SPDLOG_TRACE(
+      "read {} bytes from file \"{}\".", freadCount, location.string());
+
   // do not check for a header if none is defined
   if (testHeader.empty()) { return true; }
 
   // test header data for correctness
   if (inputBuffer.compare(0, testHeader.length(), testHeader, 0, testHeader.length()) != 0)
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": File \"" << location << "\" has header of type \"" << inputBuffer.substr(0, testHeader.length()) << 
-      "\" (needs to be \"" << testHeader << "\") and is incompatible with this program!\n";
+    SPDLOG_ERROR(
+        "file \"{}\" has header of type \"{}\" (needs to be \"{}\") and is "
+        "incompatible with this program!",
+        location.string(),
+        inputBuffer.substr(0, testHeader.length()),
+        testHeader);
 
     return false;
   }

@@ -72,13 +72,14 @@ bool evaluator_network16::isInitialized() const
   // check neural network size:
   if ((network->numInputs() != numInputNeurons) || (network->numOutputs() != numOutputNeurons))
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ << 
-      ": neural_Evaluator(" << numInputNeurons << "." << numOutputNeurons << ")" <<
-      " requires input-" << numInputNeurons <<
-      " (has " << network->numInputs() <<
-      "), output-" << numOutputNeurons <<
-      " (has " << network->numOutputs() << 
-      ")!\n";
+    SPDLOG_ERROR(
+        "ERR: neural_Evaluator({}.{}) requires input-{} (has {}), output-{} (has {})!",
+        numInputNeurons,
+        numOutputNeurons,
+        numInputNeurons,
+        network->numInputs(),
+        numOutputNeurons,
+        network->numOutputs());
     return false; 
   }
 

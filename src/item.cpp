@@ -28,15 +28,13 @@ Item::Item()
 bool Items::initialize(const std::string& path, const Types& types) {
   if (path.empty())
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-        ": An item list has not been defined!\n";
+    SPDLOG_CRITICAL("An item list has not been defined!");
     return false;
   }
-  if (verbose >= 1) std::cout << " Loading Pokemon item library...\n";
+  SPDLOG_INFO("Loading Pokemon item library...");
   if (!loadFromFile(path, types))
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-        ": inputItems failed to populate a list of pokemon items.\n";
+    SPDLOG_CRITICAL("inputItems failed to populate a list of pokemon items.");
     return false;
   }
 
@@ -90,18 +88,15 @@ bool Items::loadFromFile_lines(
   // are the enough lines in the input stream for at least the header:
   if ((lines.size() - iLine) < 2U)
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-      ": unexpected end of input stream at line " << iLine << "!\n";
+    SPDLOG_CRITICAL("unexpected end of input stream at line {}!", iLine);
     return false;
   }
 
   // compare header:
   if (lines.at(iLine).compare(0, header.size(), header) != 0)
   {
-    std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-      ": item inputStream has header of type \"" << lines.at(iLine).substr(0, header.size()) <<
-      "\" (needs to be \"" << header <<
-      "\") and is incompatible with this program!\n";
+    SPDLOG_CRITICAL("item inputStream has header of type \"{}\" (needs to be \"{}\") and is incompatible with this program!", 
+      lines.at(iLine).substr(0, header.size()), header);
 
     return false;
   }
@@ -130,9 +125,8 @@ bool Items::loadFromFile_lines(
     Item cItem;
     if (tokens.size() != 8)
     {
-      std::cerr << "ERR " << __FILE__ << "." << __LINE__ <<
-        ": item inputStream has malformed line #" << iLine <<
-        " with " << tokens.size() << " values!\n";
+      SPDLOG_CRITICAL("item inputStream has malformed line #{} with {} values!", 
+        iLine, tokens.size());
       return false;
     }
 
