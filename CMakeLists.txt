@@ -34,8 +34,10 @@ add_compile_definitions(
     $<$<CONFIG:Release>:NDEBUG>
 )
 
-# Find OpenMP
+# Find Dependencies
 find_package(OpenMP REQUIRED)
+find_package(fmt REQUIRED)
+find_package(spdlog REQUIRED)
 
 # Add subdirectories
 add_subdirectory(pkaiEngine)
@@ -49,4 +51,12 @@ add_subdirectory(src/tests)
 add_executable(pokemonAI src/battler_main.cpp)
 
 # Link libraries
-target_link_libraries(pokemonAI pkaiEngine gen4_scripts Boost::program_options Boost::filesystem OpenMP::OpenMP_CXX)
+target_link_libraries(pokemonAI
+    pkaiEngine
+    gen4_scripts
+    Boost::program_options
+    Boost::filesystem
+    OpenMP::OpenMP_CXX
+    fmt::fmt
+    spdlog::spdlog
+)

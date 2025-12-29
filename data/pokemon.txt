@@ -377,22 +377,22 @@ x		participation and rank currently unused! -- trueskill algorithm as designed d
 			moves:
 				substitute
 				fake out
-				uturn
-				sucker punch
-				pursuit
-				trick
-				taunt
+x				uturn
+x				sucker punch
+x				pursuit
+x				trick
+x				taunt
 				earthquake
-				outrage
+x				outrage
 				roar/whirlwind
 				rest
 				sleep talk
 			abilities:
-				pressure
+x				pressure
 				intimidate
 ?				natural cure
 				synchronize
 			items:
 x				silk scarf
-				choice band
-				choice scarf
+x				choice band
+x				choice scarf

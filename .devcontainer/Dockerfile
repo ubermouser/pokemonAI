@@ -33,6 +33,8 @@ RUN apt-get install -y \
   valgrind \
   clang-format \
   libboost-all-dev \
+  libfmt-dev \
+  libspdlog-dev \
   libgtest-dev \
   libomp-dev \
   && apt-get clean && rm -rf /var/lib/apt/lists/*

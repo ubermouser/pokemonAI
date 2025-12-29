@@ -7,4 +7,7 @@ target_link_libraries(trainer
   pkaiEngine
   Boost::program_options
   Boost::filesystem
-  OpenMP::OpenMP_CXX)
+  OpenMP::OpenMP_CXX
+  fmt::fmt
+  spdlog::spdlog
+)

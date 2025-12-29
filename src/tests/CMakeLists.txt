@@ -8,7 +8,16 @@ foreach(test_file IN LISTS TEST_SOURCES)
 
     add_executable(${test_name} ${test_file})
 
-    target_link_libraries(${test_name} pkaiEngine gen4_scripts Boost::program_options Boost::filesystem GTest::GTest GTest::Main)
+    target_link_libraries(${test_name}
+        pkaiEngine
+        gen4_scripts
+        Boost::program_options
+        Boost::filesystem
+        fmt::fmt
+        spdlog::spdlog
+        GTest::GTest
+        GTest::Main
+    )
 
     gtest_discover_tests(${test_name} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endforeach()

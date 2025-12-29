@@ -72,4 +72,9 @@ target_compile_definitions(pkaiEngine PUBLIC
     FORCE_INLINE=
 )
 
-target_link_libraries(pkaiEngine PUBLIC OpenMP::OpenMP_CXX)
+target_link_libraries(pkaiEngine
+    PUBLIC
+    OpenMP::OpenMP_CXX
+    fmt::fmt
+    spdlog::spdlog
+)

@@ -1,0 +1,115 @@
+modules:
+	Engine:  simulates game state
+		methods:
+			isGameOver
+			getValidMoves
+			executeMove
+		submodules:
+			Action:  describes the behavior of one agent during a turn (move, target)
+			Environment:  describes everything that can never change within a game state
+				Team
+					Pokemon
+						Move
+						Item
+						Nature
+						Type
+						Ability
+			PossibleEnvironments: Deque<EnvironmentPossible>:  collection of all possible environments which can result from an initial state and agent actions.
+				notes:
+					a deque is used to prevent pointer invalidation from new insertions. Whenever a state is replicated, it is added to the end of the deque.
+			EnvironmentPossible:  volatile game state plus probability and hash
+				EnvironmentVolatile:  describes everything that might change within a game state. Hashable.
+					TeamVolatile
+						PokemonVolatile
+							MoveVolatile
+			EnvironmentAll: combination of EnvironmentVolatile and EnvironmentNonvolatile
+				TeamAll:
+					PokemonAll
+						MoveAll
+			EngineStage: defines the set of all parameters that are needed to compute a move's effects.
+				stage
+				action
+				speedBracket
+				speedValue
+				damageStat  - attack / special-attack
+				damageType
+				damageBase
+				damageRandom  - scale from 0.85 to 1.0
+				damageMod  - (STAB, item, high-critical)
+				defenseStat  - defense / special-defense
+				defenseTypeA
+				defenseTypeB
+				defenseMod
+				hasFailed  - preempts hit, crit, secondary
+				hasHit  - preempts crit, secondary
+				hasCrit
+				hasSecondary
+				numHits
+				PPCost
+		psuedocode:
+			executeMove(..):
+				first_pmn, second_pkmn = executeFindPriority()
+				if no tie:
+					states += executeMoveWithOrder(states[0], first_pkmn, second_pkmn)
+				elif tie:
+					states.split(0.5)
+					states += executeMoveWithOrder(states[0], first_pkmn, second_pkmn)
+					states += executeMoveWithOrder(states[1], second_pkmn, first_pkmn)
+				combined_states = combine_states(states)
+
+			executeMoveWithOrder(states, first, second):
+				...
+
+			executeSingleMove(states, move):
+				if is_move_action:
+				elif is_item_use:
+				elif is_switch:
+				elif is_wait:
+
+	Game:  simulates games of pokemon between two planners using an engine.
+		run:  Play games of pokemon between two planners.
+		rollout:  Compute terminal event probabilities given a starting state and planners.
+	Planner:  dictate player behavior
+		methods:
+			evaluateGamma:  evaluates a chance node. States are recursed in order of their probability.
+			evaluateAlphaBeta:  evaluates the choices of both agents. Other choice attempts to minimize fitness, Agent choice is the maximum of other choices. States are recursed in order of their conditional average fitness increase.
+			cutoffs:
+				child.upperBound <= highCutoff.lowerBound - cannot do better than worst other cutoff
+				child.lowerBound >= lowCutoff.upperBound - cannot to worse than best agent cutoff
+				lowCutoff.upperBound >= highCutoff.lowerBound - gamma window size is negative
+		submodules:
+			Evaluator:  - evaluates a game state's fitness
+				extends:
+					EvaluatorSimple:  - human-engineered evaluator
+					EvaluatorPerceptron:  - uses a perceptron to compute fitness
+					EvaluatorMonteCarlo:  - evaluates a state given successive rollouts.
+		extends:
+			PlannerNegamax:  evaluates moves in order of nested probability (best-first traversal)
+			PlannerMinimax:  - uses expectiminimax to determine optimal move
+				submodules:
+					KillerHeuristic:  The first move attempted is the one that produced the strongest cutoff in the transposition table
+					OrderHeuristic:  For a given pair of agent/other pokemon, visit actions in the order most likely to produce a cutoff.
+					TranspositionTable:  recalls evaluated performance of a given state. May recall full and partial evaluations.
+					ply:  an agent move, other move, all possible random outcomes of those moves:
+			PlannerMaximin:  testing module. Simplest minimax algorithm capable of evaluating N-depth.
+			PlannerMax:  testing module. Determines the locally optimal move, not taking into account the other agent's choice.
+			PlannerStochastic:  performs a move in accordance to a probability distribution
+			PlannerHuman:  prints status, accepts moves from STDIN (PY)
+	Trainer:  genetic algorithm for assembling pokemon teams
+		submodule:
+			Ranked - represents a collection of subranks, a synergy, and their total team rank
+			RankedPokemon
+			RankedEvaluator
+			RankedTeam - N RankedPokemon and a Ranked obj representing their synergy
+			RankedPlayer - combination of RankedTeam and RankedEvaluator
+		extends:
+			TrainerNeural:  reinforcement learning shim for training agents
+	Ranker:  compares agents / teams against other agents / teams (PY)
+	Teambuilder:  genetic algorithm for assembling pokemon teams (PY)
+	Pokedex:  describes the world of pokemon
+		Natures: Vector<Nature>
+		Items: Vector<Item>
+		Moves: Vector<Move>
+		Types: Vector<Type>
+		Abilities: Vector<Ability>
+		Pokemons: Vector<PokemonBase>

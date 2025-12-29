@@ -24,6 +24,8 @@ The project is organized into the following modules:
 *   A C++17 compliant compiler
 *   Boost (program_options, filesystem)
 *   OpenMP
+*   fmt 12.1+ ( [String formatting](https://fmt.dev/) )
+*   spdlog 1.16+ ( [Fast logging framework](https://github.com/gabime/spdlog) )
 
 ### Building
 
