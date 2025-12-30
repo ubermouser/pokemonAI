@@ -50,8 +50,8 @@ void ENV_POSSIBLE_IMPL::printState() const {
 ENV_POSSIBLE_IMPL_TEMPLATE
 void ENV_POSSIBLE_IMPL::printState(std::ostream& os) const {
   // print environment status:
-  fmt::println(
-      os, "{}", fmt::streamed(ConstEnvironmentPossible{nv(), data()}));
+  fmt::print(
+      os, "{}\n", fmt::streamed(ConstEnvironmentPossible{nv(), data()}));
 }
 
 
