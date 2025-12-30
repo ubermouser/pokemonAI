@@ -93,9 +93,9 @@ bool TeamVolatile::swapPokemon(size_t iAction, bool preserveVolatile)
 TEAM_VOLATILE_IMPL_TEMPLATE
 void TEAM_VOLATILE_IMPL::printTeam(std::ostream& os, const std::string& linePrefix) const {
   for (size_t iTeammate = 0; iTeammate != nv().getNumTeammates(); ++iTeammate) {
-    fmt::println(
+    fmt::print(
         os,
-        "{}{}-{}",
+        "{}{}-{}\n",
         linePrefix,
         iTeammate,
         fmt::streamed(teammate(iTeammate)));

@@ -21,3 +21,16 @@ foreach(test_file IN LISTS TEST_SOURCES)
 
     gtest_discover_tests(${test_name} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endforeach()
+
+# add_executable(test_ability_synchronize test_ability_synchronize.cpp)
+# target_link_libraries(test_ability_synchronize
+#     pkaiEngine
+#     gen4_scripts
+#     Boost::program_options
+#     Boost::filesystem
+#     fmt::fmt
+#     spdlog::spdlog
+#     GTest::GTest
+#     GTest::Main
+# )
+# gtest_discover_tests(test_ability_synchronize WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
