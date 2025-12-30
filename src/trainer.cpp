@@ -1,10 +1,12 @@
 #include "pokemonai/trainer.h"
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 #include <algorithm>
+#include <boost/program_options.hpp>
 #include <random>
 #include <stdexcept>
-#include <boost/format.hpp>
-#include <boost/program_options.hpp>
 
 namespace po = boost::program_options;
 
@@ -231,18 +233,20 @@ size_t Trainer::shrinkPopulations(League& league, const LeagueCount& newChildren
 
 
 void Trainer::printGenerationStart(const League& league, size_t iGeneration) const {
-  out_.get() << boost::format("Begin generation %d of %d! %d battlegroups playing %d heats each.\n")
-      % (iGeneration + 1)
-      % cfg_.maxGenerations
-      % league.battlegroups.size()
-      % cfg_.minGamesPerBattlegroup;
+  out_.get() << fmt::format(
+      "Begin generation {} of {}! {} battlegroups playing {} heats each.\n",
+      iGeneration + 1,
+      cfg_.maxGenerations,
+      league.battlegroups.size(),
+      cfg_.minGamesPerBattlegroup);
 }
 
 
 void Trainer::printMutationStats(const MutationStats& stats) const {
-  out_.get() << boost::format("Evolution step mutations=% 5d crossovers=% 5d seeds=% 5d total=%d\n")
-      % stats.numMutations
-      % stats.numCrossovers
-      % stats.numSeeds
-      % stats.numTotal();
+  out_.get() << fmt::format(
+      "Evolution step mutations={:5} crossovers={:5} seeds={:5} total={}\n",
+      stats.numMutations,
+      stats.numCrossovers,
+      stats.numSeeds,
+      stats.numTotal());
 }

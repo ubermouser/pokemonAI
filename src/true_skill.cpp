@@ -1,11 +1,12 @@
 #include "pokemonai/true_skill.h"
 
-#include <cmath>
-#include <boost/format.hpp>
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 #include <boost/property_tree/ptree.hpp>
+#include <cmath>
 #include <complex>
 #include <ostream>
-
 
 namespace pt = boost::property_tree;
 
@@ -41,7 +42,7 @@ void TrueSkill::input(const pt::ptree& tree) {
 
 
 std::ostream& TrueSkill::print(std::ostream& os) const {
-  os << boost::format("m=%6.2f s=%5.2f") % mean % stdDev();
+  os << fmt::format("m={:6.2f} s={:5.2f}", mean, stdDev());
   return os;
 }
 

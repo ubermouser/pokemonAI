@@ -1,16 +1,17 @@
-#include "pokemonai/pkai.h"
+#include <fmt/format.h>
 
+#include <boost/program_options.hpp>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include <boost/program_options.hpp>
 
+#include "pokemonai/evaluators.h"
 #include "pokemonai/game.h"
 #include "pokemonai/pkCU.h"
-#include "pokemonai/pokedex_static.h"
-#include "pokemonai/evaluators.h"
+#include "pokemonai/pkai.h"
 #include "pokemonai/planners.h"
+#include "pokemonai/pokedex_static.h"
 
 namespace po = boost::program_options;
 

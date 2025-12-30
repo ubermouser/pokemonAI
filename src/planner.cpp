@@ -1,15 +1,16 @@
 //#define PKAI_IMPORT
 #include "pokemonai/planner.h"
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 #include <algorithm>
+#include <boost/program_options.hpp>
 #include <chrono>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
-
-#include <boost/format.hpp>
-#include <boost/program_options.hpp>
 
 namespace po = boost::program_options;
 
@@ -83,11 +84,10 @@ Planner& Planner::setEvaluator(const std::shared_ptr<Evaluator>& eval) {
 
 
 void Planner::resetName() {
-  std::string evalName = ((eval_!= NULL)?(boost::format("-%s") % eval_->getName()).str(): "");
-  std::string planName = (boost::format("%s(d=%d)%s")
-      % baseName()
-      % cfg_.maxDepth
-      % evalName).str();
+  std::string evalName =
+      ((eval_ != NULL) ? fmt::format("-{}", eval_->getName()) : "");
+  std::string planName =
+      fmt::format("{}(d={}){}", baseName(), cfg_.maxDepth, evalName);
   setName(planName);
 }
 
@@ -313,40 +313,40 @@ void Planner::printStateEvaluation(
     const ConstEnvironmentPossible& origin,
     size_t searchDepth,
     const EvalResult& evalResult) const {
-  std::stringstream out;
-  for (size_t iSpace = 0; iSpace < searchDepth; ++iSpace) { out << " "; }
-  out << boost::format("T%s: s=x%06x i=%2d a=%4s o=%4s d=%2d %s\n")
-      % (agentTeam_==TEAM_A?"A":"B")
-      % (origin.getHash() & 0xffffff)
-      % searchDepth
-      % evalResult.agentAction
-      % evalResult.otherAction
-      % evalResult.depth
-      % evalResult.fitness;
-
-  std::cout << out.str();
+  std::string padding(searchDepth, ' ');
+  fmt::print(
+      "{}T{}: s=x{:06x} i={:2} a={:4} o={:4} d={:2} {}\n",
+      padding,
+      (agentTeam_ == TEAM_A ? "A" : "B"),
+      (origin.getHash() & 0xffffff),
+      searchDepth,
+      fmt::streamed(evalResult.agentAction),
+      fmt::streamed(evalResult.otherAction),
+      evalResult.depth,
+      fmt::streamed(evalResult.fitness));
 }
 
 
 void Planner::printSolution(const PlannerResult& results, bool isLast) const {
-  if (cfg_.verbosity < (isLast?1:2)) { return; }
+  if (cfg_.verbosity < (isLast ? 1 : 2)) { return; }
 
-  std::stringstream out;
   if (!results.atDepth.empty()) {
     const auto& result = results.best();
 
-    out << boost::format("%sT%s: ply=%2d act=%4s oact=%4s fit=% 6.4f time=%6.2f nnod=%d\n")
-        % (isLast?"~~~~":"    ")
-        % (agentTeam_==TEAM_A?"A":"B")
-        % result.depth
-        % result.agentAction
-        % result.otherAction
-        % result.fitness.lowerBound()
-        % result.timeSpent
-        % result.numNodes;
+    fmt::print(
+        "{}T{}: ply={:2} act={:4} oact={:4} fit={:6.4f} time={:6.2f} "
+        "nnod={}\n",
+        (isLast ? "~~~~" : "    "),
+        (agentTeam_ == TEAM_A ? "A" : "B"),
+        result.depth,
+        fmt::streamed(result.agentAction),
+        fmt::streamed(result.otherAction),
+        result.fitness.lowerBound(),
+        result.timeSpent,
+        result.numNodes);
   } else {
-    out << "~~~~T" << (agentTeam_==TEAM_A?"A":"B") <<
-      ": NO SOLUTIONS FOUND FOR ANY DEPTH!\n";
+    fmt::print(
+        "~~~~T{}: NO SOLUTIONS FOUND FOR ANY DEPTH!\n",
+        (agentTeam_ == TEAM_A ? "A" : "B"));
   }
-  std::cout << out.str();
 }

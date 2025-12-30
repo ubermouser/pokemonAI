@@ -1,22 +1,23 @@
 #include "pokemonai/pokemon_nonvolatile.h"
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 #include <algorithm>
-#include <stdexcept>
-#include <boost/format.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <numeric>
+#include <stdexcept>
 
-#include "pokemonai/pokedex.h"
-#include "pokemonai/pokemon_volatile.h"
-#include "pokemonai/team_volatile.h"
-#include "pokemonai/pokemon_base.h"
-#include "pokemonai/nature.h"
 #include "pokemonai/ability.h"
+#include "pokemonai/init_toolbox.h"
 #include "pokemonai/item.h"
 #include "pokemonai/move.h"
-
-#include "pokemonai/init_toolbox.h"
+#include "pokemonai/nature.h"
 #include "pokemonai/orphan.h"
+#include "pokemonai/pokedex.h"
+#include "pokemonai/pokemon_base.h"
+#include "pokemonai/pokemon_volatile.h"
+#include "pokemonai/team_volatile.h"
 
 using namespace orphan;
 namespace pt = boost::property_tree;
@@ -603,9 +604,7 @@ void PokemonNonVolatile::initFV() {
 const std::string& PokemonNonVolatile::defineName() {
   std::string capitalizedName = getBase().getName();
   if (capitalizedName.size() > 0) { capitalizedName[0] = std::toupper(capitalizedName[0]); }
-  setName((boost::format("-x%06x_%.14s")
-      % (hash() & 0xffffff)
-      % capitalizedName).str());
+  setName(fmt::format("-x{:06x}_{:.14}", hash() & 0xffffff, capitalizedName));
   return getName();
 }
 
@@ -617,13 +616,17 @@ std::ostream& operator <<(std::ostream& os, const PokemonNonVolatile& cPKNV) {
 
 
 void PokemonNonVolatile::printSummary(std::ostream& os) const {
-  os << *this
-     << "  " << getMaxHP()
-     << "HP  A[" << (abilityExists()?getAbility().getName():"")
-     << "]  I[" << (hasInitialItem()?getInitialItem().getName():"")
-     << "]  M[";
+  os << fmt::format(
+      "{}  {}HP  A[{}]  I[{}]  M[",
+      fmt::streamed(*this),
+      getMaxHP(),
+      (abilityExists() ? getAbility().getName() : ""),
+      (hasInitialItem() ? getInitialItem().getName() : ""));
   for (size_t iMove = 0; iMove != getNumMoves(); ++iMove) {
-    os << getMove_base(iMove).getName() << ((iMove+1)==getNumMoves()?"":", ");
+    os << fmt::format(
+        "{}{}",
+        getMove_base(iMove).getName(),
+        ((iMove + 1) == getNumMoves() ? "" : ", "));
   }
   os << "]";
 }

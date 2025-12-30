@@ -4,7 +4,8 @@
  *
  * Created on December 8, 2025, 5:47 PM
  */
-#include <boost/format.hpp>
+#include <fmt/format.h>
+
 #include <boost/program_options.hpp>
 #include <iostream>
 #include <memory>
@@ -73,13 +74,15 @@ struct Config {
     desc.add(engine.options());
     for (size_t iPlan = 0; iPlan != plannerConfigs.size(); ++iPlan) {
       desc.add(plannerConfigs[iPlan]->options(
-          (boost::format("planner-%d %s configuration") % (iPlan+1) % plannerTypes[iPlan]).str(),
-          (boost::format("p%d") % (iPlan+1)).str()));
+          fmt::format(
+              "planner-{} {} configuration", iPlan + 1, plannerTypes[iPlan]),
+          fmt::format("p{}", iPlan + 1)));
     }
     for (size_t iEval = 0; iEval != evalConfigs.size(); ++iEval) {
       desc.add(evalConfigs[iEval]->options(
-          (boost::format("evaluator-%d %s configuration") % (iEval+1) % evalTypes[iEval]).str(),
-          (boost::format("e%d") % (iEval+1)).str()));
+          fmt::format(
+              "evaluator-{} {} configuration", iEval + 1, evalTypes[iEval]),
+          fmt::format("e{}", iEval + 1)));
     }
 
     return desc;

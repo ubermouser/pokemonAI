@@ -1,17 +1,19 @@
 #include "pokemonai/pokemon_volatile.h"
 
-#include "pokemonai/pokedex.h"
-#include "pokemonai/name.h"
-#include "pokemonai/pokemon_base.h"
-#include "pokemonai/move.h"
-#include "pokemonai/item.h"
-#include "pokemonai/ability.h"
-#include "pokemonai/nature.h"
-#include "pokemonai/pokemon_nonvolatile.h"
-#include "pokemonai/move_volatile.h"
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 
-#include <boost/format.hpp>
 #include <boost/static_assert.hpp>
+
+#include "pokemonai/ability.h"
+#include "pokemonai/item.h"
+#include "pokemonai/move.h"
+#include "pokemonai/move_volatile.h"
+#include "pokemonai/name.h"
+#include "pokemonai/nature.h"
+#include "pokemonai/pokedex.h"
+#include "pokemonai/pokemon_base.h"
+#include "pokemonai/pokemon_nonvolatile.h"
 
 BOOST_STATIC_ASSERT(sizeof(PokemonVolatileData) == sizeof(uint64_t));
 
@@ -271,44 +273,43 @@ fpType POKEMON_VOLATILE_IMPL::getAccuracy_boosted(size_t type, int32_t tempBoost
   return PokemonNonVolatile::aFV_base[type - 6][cBoost + 6];
 }
 
-
-std::ostream& operator <<(std::ostream& os, const ConstPokemonVolatile& pkmn)
-{
-  os << "\"" << pkmn.nv().getName()
-     << "\"-\"" << pkmn.nv().getBase().getName()
-     << "\" " << pkmn.getHP()
-     << "/" << pkmn.getFV_boosted(FV_HITPOINTS);
+std::ostream& operator<<(std::ostream& os, const ConstPokemonVolatile& pkmn) {
+  os << fmt::format(
+      "\"{}\"-\"{}\" {}/{}",
+      pkmn.nv().getName(),
+      pkmn.nv().getBase().getName(),
+      pkmn.getHP(),
+      pkmn.getFV_boosted(FV_HITPOINTS));
 
   // non-volatile ailments
-  switch(pkmn.getStatusAilment())
-  {
-    case AIL_NV_BURN:
-      os << " BRN";
-      break;
-    case AIL_NV_FREEZE:
-      os << " FRZ";
-      break;
-    case AIL_NV_PARALYSIS:
-      os << " PAR";
-      break;
-    case AIL_NV_POISON_TOXIC:
-      os << " PST";
-      break;
-    case AIL_NV_POISON:
-      os << " PSN";
-      break;
-    case AIL_NV_REST_1T:
-    case AIL_NV_REST_2T:
-    case AIL_NV_REST_3T:
-    case AIL_NV_SLEEP_4T:
-    case AIL_NV_SLEEP_3T:
-    case AIL_NV_SLEEP_2T:
-    case AIL_NV_SLEEP_1T:
-      os << " SLP";
-      break;
-    case AIL_NV_NONE:
-    default:
-      break;
+  switch (pkmn.getStatusAilment()) {
+  case AIL_NV_BURN:
+    os << " BRN";
+    break;
+  case AIL_NV_FREEZE:
+    os << " FRZ";
+    break;
+  case AIL_NV_PARALYSIS:
+    os << " PAR";
+    break;
+  case AIL_NV_POISON_TOXIC:
+    os << " PST";
+    break;
+  case AIL_NV_POISON:
+    os << " PSN";
+    break;
+  case AIL_NV_REST_1T:
+  case AIL_NV_REST_2T:
+  case AIL_NV_REST_3T:
+  case AIL_NV_SLEEP_4T:
+  case AIL_NV_SLEEP_3T:
+  case AIL_NV_SLEEP_2T:
+  case AIL_NV_SLEEP_1T:
+    os << " SLP";
+    break;
+  case AIL_NV_NONE:
+  default:
+    break;
   }
 
   // boosts:
@@ -316,7 +317,7 @@ std::ostream& operator <<(std::ostream& os, const ConstPokemonVolatile& pkmn)
     // volatile ailments:
     // target confused:
     if (pkmn.status().cTeammate.confused > 0) {
-      os << boost::format(" (CNFSD-%d)") % pkmn.status().cTeammate.confused;
+      os << fmt::format(" (CNFSD-{})", pkmn.status().cTeammate.confused);
     }
     // target infatuated:
     if (pkmn.status().cTeammate.infatuate > 0) {
@@ -324,15 +325,16 @@ std::ostream& operator <<(std::ostream& os, const ConstPokemonVolatile& pkmn)
     }
     // target taunted:
     if (pkmn.status().cTeammate.taunt_duration > 0) {
-      os << boost::format(" (TAUNT-%d)") % pkmn.status().cTeammate.taunt_duration;
+      os << fmt::format(" (TAUNT-{})", pkmn.status().cTeammate.taunt_duration);
     }
     // target is locked-n to a certain move
     if (pkmn.status().cTeammate.lockIn_duration > 0) {
-      os << boost::format(" (LOCKIN-%d)") % pkmn.status().cTeammate.lockIn_duration;
+      os << fmt::format(
+          " (LOCKIN-{})", pkmn.status().cTeammate.lockIn_duration);
     }
     // spikes in the ground:
     if (pkmn.status().nonvolatile.spikes > 0) {
-      os << boost::format(" (SPIKES-%d)") % pkmn.status().nonvolatile.spikes;
+      os << fmt::format(" (SPIKES-{})", pkmn.status().nonvolatile.spikes);
     }
     // stealth-rock on the ground:
     if (pkmn.status().nonvolatile.stealthRock > 0) {
@@ -340,50 +342,48 @@ std::ostream& operator <<(std::ostream& os, const ConstPokemonVolatile& pkmn)
     }
     // toxic spikes in the ground:
     if (pkmn.status().nonvolatile.toxicSpikes > 0) {
-      os << boost::format(" (T-SPIKES-%d)") % pkmn.status().nonvolatile.toxicSpikes;
+      os << fmt::format(
+          " (T-SPIKES-{})", pkmn.status().nonvolatile.toxicSpikes);
     }
     // light screen:
     if (pkmn.status().nonvolatile.lightScreen > 0) {
-      os << boost::format(" (L-SCRN-%d)") % pkmn.status().nonvolatile.lightScreen;
+      os << fmt::format(" (L-SCRN-{})", pkmn.status().nonvolatile.lightScreen);
     }
     // reflect:
     if (pkmn.status().nonvolatile.reflect > 0) {
-      os << boost::format(" (REFLECT-%d)") % pkmn.status().nonvolatile.reflect;
+      os << fmt::format(" (REFLECT-{})", pkmn.status().nonvolatile.reflect);
     }
 
-    os << std::showpos; // show the + or -
     if (pkmn.getBoost(FV_ATTACK) != 0) {
-      os << " " << pkmn.getBoost(FV_ATTACK) << "atk";
+      os << fmt::format(" {:+}atk", pkmn.getBoost(FV_ATTACK));
     }
     if (pkmn.getBoost(FV_SPATTACK) != 0) {
-      os << " " << pkmn.getBoost(FV_SPATTACK) << "spa";
+      os << fmt::format(" {:+}spa", pkmn.getBoost(FV_SPATTACK));
     }
     if (pkmn.getBoost(FV_DEFENSE) != 0) {
-      os << " " << pkmn.getBoost(FV_DEFENSE) << "def";
+      os << fmt::format(" {:+}def", pkmn.getBoost(FV_DEFENSE));
     }
     if (pkmn.getBoost(FV_SPDEFENSE) != 0) {
-      os << " " << pkmn.getBoost(FV_SPDEFENSE) << "spd";
+      os << fmt::format(" {:+}spd", pkmn.getBoost(FV_SPDEFENSE));
     }
     if (pkmn.getBoost(FV_SPEED) != 0) {
-      os << " " << pkmn.getBoost(FV_SPEED) << "spe";
+      os << fmt::format(" {:+}spe", pkmn.getBoost(FV_SPEED));
     }
     if (pkmn.getBoost(FV_EVASION) != 0) {
-      os << " " << pkmn.getBoost(FV_EVASION) << "eva";
+      os << fmt::format(" {:+}eva", pkmn.getBoost(FV_EVASION));
     }
     if (pkmn.getBoost(FV_ACCURACY) != 0) {
-      os << " " << pkmn.getBoost(FV_ACCURACY) << "acc";
+      os << fmt::format(" {:+}acc", pkmn.getBoost(FV_ACCURACY));
     }
     if (pkmn.getBoost(FV_CRITICALHIT) != 0) {
-      os << " " << pkmn.getBoost(FV_CRITICALHIT) << "crt";
+      os << fmt::format(" {:+}crt", pkmn.getBoost(FV_CRITICALHIT));
     }
-    os << std::noshowpos; // stop showing + or -
   }
 
   os << "\n";
 
   return os;
 }
-
 
 template class PokemonVolatileImpl<ConstMoveVolatile, const PokemonVolatileData, const TeamStatus>;
 template class PokemonVolatileImpl<MoveVolatile, PokemonVolatileData, TeamStatus>;

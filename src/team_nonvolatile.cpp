@@ -1,15 +1,17 @@
 #include "pokemonai/team_nonvolatile.h"
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 #include <algorithm>
+#include <boost/property_tree/ptree.hpp>
 #include <cctype>
 #include <stdexcept>
-#include <boost/format.hpp>
-#include <boost/property_tree/ptree.hpp>
 
-#include "pokemonai/pokemon_base.h"
-#include "pokemonai/team_volatile.h"
 #include "pokemonai/init_toolbox.h"
 #include "pokemonai/orphan.h"
+#include "pokemonai/pokemon_base.h"
+#include "pokemonai/team_volatile.h"
 
 using namespace orphan;
 namespace pt = boost::property_tree;
@@ -184,35 +186,32 @@ void TeamNonVolatile::createDigest_impl(std::array<uint8_t, TEAM_NONVOLATILE_DIG
 
 
 const std::string& TeamNonVolatile::defineName() {
-  std::ostringstream os;
-  size_t numPokemon = getNumTeammates();
-  os << boost::format("%d-x%06x_") % numPokemon % (hash() & 0xffffff);
+  std::string result =
+      fmt::format("{}-x{:06x}_", getNumTeammates(), hash() & 0xffffff);
 
   // print a few characters from each teammate:
-  size_t teammateStringSize = 0;
   size_t sizeAccumulator = 0;
   for (size_t iTeammate = 0; iTeammate != getNumTeammates(); ++iTeammate) {
     const auto& pknv = teammate(iTeammate);
-    teammateStringSize = (24 - sizeAccumulator) / (getNumTeammates() - iTeammate);
+    size_t teammateStringSize =
+        (24 - sizeAccumulator) / (getNumTeammates() - iTeammate);
 
     std::string basePrefix = pknv.getBase().getName().substr(0, teammateStringSize);
     if (basePrefix.size() > 0) { basePrefix[0] = std::toupper(basePrefix[0]); }
-    os << basePrefix;
-
+    result += basePrefix;
     sizeAccumulator += basePrefix.size();
   }
-  setName(os.str());
+  setName(result);
   return getName();
 }
 
-
-std::ostream& operator <<(std::ostream& os, const TeamNonVolatile& tNV) {
+std::ostream& operator<<(std::ostream& os, const TeamNonVolatile& tNV) {
   for (size_t iTeammate = 0; iTeammate != tNV.getNumTeammates(); ++iTeammate) {
-    os << iTeammate << "-" << tNV.teammate(iTeammate) << "\n";
+    os << fmt::format(
+        "{}-{}\n", iTeammate, fmt::streamed(tNV.teammate(iTeammate)));
   }
   return os;
 }
-
 
 void TeamNonVolatile::printSummary(std::ostream& os, const std::string& prefix) const {
   for (size_t iTeammate = 0; iTeammate != getNumTeammates(); ++iTeammate) {

@@ -1,10 +1,11 @@
 //#define PKAI_IMPORT
 #include "pokemonai/evaluator.h"
 
+#include <fmt/format.h>
+
 #include <algorithm>
-#include <stdexcept>
 #include <boost/program_options.hpp>
-#include <boost/format.hpp>
+#include <stdexcept>
 
 #include "pokemonai/fitness.h"
 #include "pokemonai/fp_compare.h"

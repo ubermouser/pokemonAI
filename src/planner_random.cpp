@@ -1,11 +1,12 @@
 //#define PKAI_IMPORT
 #include "pokemonai/planner_random.h"
 
-#include <boost/program_options.hpp>
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
-#include "pokemonai/pkCU.h"
+#include <boost/program_options.hpp>
+
 #include "pokemonai/environment_possible.h"
+#include "pokemonai/pkCU.h"
 
 namespace po = boost::program_options;
 
@@ -26,7 +27,7 @@ po::options_description PlannerRandom::Config::options(
 
 
 void PlannerRandom::resetName() {
-  setName((boost::format("%s(c=%3.1f)") % baseName() % cfg_.moveChance).str());
+  setName(fmt::format("{}(c={:3.1f})", baseName(), cfg_.moveChance));
 }
 
 

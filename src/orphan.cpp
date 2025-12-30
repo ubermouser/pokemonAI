@@ -1,9 +1,9 @@
 #include "pokemonai/orphan.h"
 
-#include <iostream>
+#include <fmt/format.h>
 
 #include <boost/algorithm/string/case_conv.hpp>
-#include <boost/format.hpp>
+#include <iostream>
 
 std::string orphan::lowerCase(const std::string& source) {
   std::string result(source);
@@ -30,29 +30,21 @@ void orphan::printOrphans(
   }
 }
 
-
 void orphan::Orphanage::printAllOrphans(
-      const std::string& source,
-      const std::string& prefix) const {
-  auto formatter = boost::format("%s-%s");
-
+    const std::string& source, const std::string& prefix) const {
   // print mismatched pokemon
-  printOrphans(
-      pokemon, source, (formatter % prefix % "pokemon").str(), "pokemon");
+  printOrphans(pokemon, source, fmt::format("{}-pokemon", prefix), "pokemon");
 
   // print mismatched items
-  printOrphans(
-      items, source, (formatter % prefix % "items").str(), "item");
+  printOrphans(items, source, fmt::format("{}-items", prefix), "item");
 
   // print mismatched abilities
   printOrphans(
-      abilities, source, (formatter % prefix % "abilities").str(), "ability");
+      abilities, source, fmt::format("{}-abilities", prefix), "ability");
 
   // print mismatched natures
-  printOrphans(
-      natures, source, (formatter % prefix % "natures").str(), "nature");
+  printOrphans(natures, source, fmt::format("{}-natures", prefix), "nature");
 
   // print mismatched moves
-  printOrphans(
-      moves, source, (formatter % prefix % "moves").str(), "move");
+  printOrphans(moves, source, fmt::format("{}-moves", prefix), "move");
 }

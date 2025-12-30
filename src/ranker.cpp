@@ -1,17 +1,19 @@
 #include "pokemonai/ranker.h"
 
 #include <assert.h>
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+#include <omp.h>
+
 #include <algorithm>
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <chrono>
 #include <iostream>
 #include <iterator>
-#include <omp.h>
 #include <random>
 #include <stdexcept>
 #include <unordered_map>
-#include <boost/format.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/operations.hpp>
 
 namespace bf = boost::filesystem;
 namespace po = boost::program_options;
@@ -377,26 +379,29 @@ void printLeaderboard(std::ostream& os, VectorLeagueType& league, size_t numToPr
 
   for (size_t iRanked = 0; iRanked < numToPrint; ++iRanked) {
     const auto& ranked = league[iRanked];
-    os << boost::format(" %02d: %s\n") % (iRanked+1) % *ranked;
+    os << fmt::format(" {:02}: {}\n", iRanked + 1, fmt::streamed(*ranked));
   }
 }
 
 
 void Ranker::printLeagueStatistics(LeagueHeat& league) const {
   std::ostringstream os;
-  auto printHeader = [&](auto& subleague, auto& name) {
-    os << boost::format("---- %s LEADERBOARD (top %d of %d)----\n")
-        % name
-        % std::min(cfg_.leaderboardPrintCount, subleague.size())
-        % subleague.size();
+  auto printHeader = [&](auto& subleague, const std::string& name) {
+    os << fmt::format(
+        "---- {} LEADERBOARD (top {} of {})----\n",
+        name,
+        std::min(cfg_.leaderboardPrintCount, subleague.size()),
+        subleague.size());
   };
-  os << boost::format("played %d games over %.2f seconds!\n  drawRate=%3.2f tieRate=%3.2f plies/game=%5.1f games/sec=%6.2f\n")
-      % league.games.size()
-      % league.elapsedTime
-      % league.drawRate()
-      % league.tieRate()
-      % league.pliesPerGame()
-      % league.gamesPerSecond();
+  os << fmt::format(
+      "played {} games over {:.2f} seconds!\n  drawRate={:3.2f} "
+      "tieRate={:3.2f} plies/game={:5.1f} games/sec={:6.2f}\n",
+      league.games.size(),
+      league.elapsedTime,
+      league.drawRate(),
+      league.tieRate(),
+      league.pliesPerGame(),
+      league.gamesPerSecond());
   if (league.evaluators.size() >= 2) {
     printHeader(league.evaluators, "EVALUATOR");
     printMapLeaderboard(os, league.evaluators, cfg_.leaderboardPrintCount);
@@ -423,14 +428,15 @@ void Ranker::printLeagueStatistics(LeagueHeat& league) const {
 
 void Ranker::printHeatResult(const GameHeat& heat) const {
   auto endStatus = heat.heatResult.endStatus;
-  std::string winDrawLoss =
-      endStatus==MATCH_TEAM_A_WINS?">":
-      endStatus==MATCH_TEAM_B_WINS?"<":
-      endStatus==MATCH_TIE?"=":"~";
-  out_.get() << boost::format("%34.34s %s %-34.34s\n")
-      % heat.team_a->getName()
-      % winDrawLoss
-      % heat.team_b->getName();
+  std::string winDrawLoss = (endStatus == MATCH_TEAM_A_WINS)   ? ">"
+                            : (endStatus == MATCH_TEAM_B_WINS) ? "<"
+                            : (endStatus == MATCH_TIE)         ? "="
+                                                               : "~";
+  out_.get() << fmt::format(
+      "{:>34.34} {} {:<34.34}\n",
+      heat.team_a->getName(),
+      winDrawLoss,
+      heat.team_b->getName());
 }
 
 
@@ -513,8 +519,8 @@ size_t Ranker::saveTeamPopulation(const League& league) const {
   bf::create_directory(teamPath);
 
   size_t numSaved = 0;
-  for (const auto& team: league.teams) {
-    bf::path path = teamPath / (boost::format("%s.txt") % team.second->getName()).str();
+  for (const auto& team : league.teams) {
+    bf::path path = teamPath / fmt::format("{}.txt", team.second->getName());
     team.second->save(path.string());
   }
 

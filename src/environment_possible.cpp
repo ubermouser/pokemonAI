@@ -1,13 +1,14 @@
 #include "pokemonai/environment_possible.h"
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 #include <algorithm>
-#include <iostream>
-#include <boost/format.hpp>
 #include <boost/static_assert.hpp>
+#include <iostream>
 
 #include "pokemonai/environment_nonvolatile.h"
 #include "pokemonai/roulette.h"
-
 
 BOOST_STATIC_ASSERT(sizeof(EnvironmentPossibleData) == (sizeof(uint64_t)*19));
 
@@ -42,8 +43,9 @@ bool ConstEnvironmentPossible::isEmpty() const {
 
 
 ENV_POSSIBLE_IMPL_TEMPLATE
-void ENV_POSSIBLE_IMPL::printState() const { printState(std::cout); }
-
+void ENV_POSSIBLE_IMPL::printState() const {
+  fmt::print("{}", fmt::streamed(ConstEnvironmentPossible{nv(), data()}));
+}
 
 ENV_POSSIBLE_IMPL_TEMPLATE
 void ENV_POSSIBLE_IMPL::printState(std::ostream& os) const {
@@ -55,52 +57,28 @@ void ENV_POSSIBLE_IMPL::printState(std::ostream& os) const {
 ENV_POSSIBLE_IMPL_TEMPLATE
 void ENV_POSSIBLE_IMPL::printEnvironment(std::ostream& os) const {
   // print state and probability:
-  os <<
-    "p=" << getProbability().to_double();
+  os << fmt::format("p={}", getProbability().to_double());
   // print status tokens:
-  for (unsigned int iTeam = 0; iTeam < 2; iTeam++)
-  {
-    if (hasFreeMove(iTeam))
-    {
-      os << " " << (iTeam==TEAM_A?"A":"B") << "-Free";
-    }
-    if (hasSwitched(iTeam))
-    {
-      os << " " << (iTeam==TEAM_A?"A":"B") << "-Switch";
+  for (unsigned int iTeam = 0; iTeam < 2; iTeam++) {
+    std::string teamLabel = (iTeam == TEAM_A ? "A" : "B");
+    if (hasFreeMove(iTeam)) { os << fmt::format(" {}-Free", teamLabel); }
+    if (hasSwitched(iTeam)) {
+      os << fmt::format(" {}-Switch", teamLabel);
       continue;
     }
-    if (hasWaited(iTeam))
-    {
-      os << " " << (iTeam==TEAM_A?"A":"B") << "-Wait";
+    if (hasWaited(iTeam)) {
+      os << fmt::format(" {}-Wait", teamLabel);
       continue;
     }
-    if (!hasHit(iTeam))
-    {
-      os << " " << (iTeam==TEAM_A?"A":"B") << "-Miss";
-    }
-    if (hasSecondary(iTeam))
-    {
-      os << " " << (iTeam==TEAM_A?"A":"B") << "-Status";
-    }
-    if (hasCrit(iTeam))
-    {
-      os << " " << (iTeam==TEAM_A?"A":"B") << "-Crit";
-    }
-    if (wasBlocked(iTeam))
-    {
-      os << " " << (iTeam==TEAM_A?"A":"B") << "-Blocked";
-    }
-  } // endof foreach team
+    if (!hasHit(iTeam)) { os << fmt::format(" {}-Miss", teamLabel); }
+    if (hasSecondary(iTeam)) { os << fmt::format(" {}-Status", teamLabel); }
+    if (hasCrit(iTeam)) { os << fmt::format(" {}-Crit", teamLabel); }
+    if (wasBlocked(iTeam)) { os << fmt::format(" {}-Blocked", teamLabel); }
+  }  // endof foreach team
 
-  if (isMerged())
-  {
-    os << " (MERGED)";
-  }
+  if (isMerged()) { os << " (MERGED)"; }
 
-  if (isPruned())
-  {
-    os << " (PRUNED)";
-  }
+  if (isPruned()) { os << " (PRUNED)"; }
 
   // print active pokemon:
   os << "\n";
@@ -137,61 +115,57 @@ ConstEnvironmentPossible PossibleEnvironments::stateSelect_index(size_t& indexRe
   int32_t indexState;
   
   do {
-    std::cout << "Please select the index of the desired state for the player, -1 for a random state, or -2 to go discard these states\n";
+    fmt::print(
+        "Please select the index of the desired state for the player, -1 for a "
+        "random state, or -2 to go discard these states\n");
     getline(std::cin, input);
     std::stringstream inputResult(input);
-    
+
     // determine if state is valid:
-    
-    if (!(inputResult >> indexState) || 
-      !(indexState < (int32_t) size() && indexState >= -2))
-    {
-      std::cout << "Invalid state \"" << input << "\"!\n";
-      
+
+    if (!(inputResult >> indexState) ||
+        !(indexState < (int32_t)size() && indexState >= -2)) {
+      fmt::print("Invalid state \"{}\"!\n", input);
+
       continue;
     }
 
-    if ((indexState >= 0 && indexState < (int32_t) size()) && at(indexState).isPruned())
-    {
-      std::cout << "State " << input << " was pruned!\n";
+    if ((indexState >= 0 && indexState < (int32_t)size()) &&
+        at(indexState).isPruned()) {
+      fmt::print("State {} was pruned!\n", input);
       continue;
     }
-    
+
     break;
-  }while(true);
-  
+  } while (true);
+
   if (indexState == -2)
   {
     return ConstEnvironmentPossible{*nv_};
   }
-  
-  if (indexState == -1)
-  {
+
+  if (indexState == -1) {
     // choose random state
     ConstEnvironmentPossible result = stateSelect_roulette(indexResult);
-    
-    std::cout << "Randomly chose state " << indexResult << "\n";
+
+    fmt::print("Randomly chose state {}\n", indexResult);
     return result;
   }
-  
+
   // else
   indexResult = indexState;
   return at(indexState);
 } // endOf stateSelect_index
 
-
-void PossibleEnvironments::printStates() const {
-  return printStates(std::cout, "");
-}
+void PossibleEnvironments::printStates() const { printStates(std::cout, ""); }
 
 void PossibleEnvironments::printStates(std::ostream& os, const std::string& linePrefix) const {
-  os << getNumUnique() << "(" << size() << ") possible states!\n";
-  for (size_t iState = 0; iState < size(); iState++)
-  {
+  os << fmt::format("{}({}) possible states!\n", getNumUnique(), size());
+  for (size_t iState = 0; iState < size(); iState++) {
     ConstEnvironmentPossible state = at(iState);
-    if (state.isPruned()) { continue; } // don't display pruned states
+    if (state.isPruned()) { continue; }  // don't display pruned states
 
-    os << boost::format("%sstate=%d ") % linePrefix % iState;
+    os << fmt::format("{}state={} ", linePrefix, iState);
     state.printState(os);
   }
 

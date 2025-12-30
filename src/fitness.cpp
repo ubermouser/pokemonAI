@@ -1,8 +1,9 @@
 #include "pokemonai/fitness.h"
 
-#include <iostream>
-#include <boost/format.hpp>
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 
+#include <iostream>
 
 FITNESS_TEMPLATE
 void FITNESS_IMPL::print() const { std::cout << *this << "\n"; }
@@ -10,7 +11,8 @@ void FITNESS_IMPL::print() const { std::cout << *this << "\n"; }
 
 FITNESS_TEMPLATE
 std::ostream& FITNESS_IMPL::print(std::ostream& os) const {
-  os << boost::format("F{v=%4.2f c=%4.2f}") % double(value_) % double(certainty_);
+  os << fmt::format(
+      "F{{v={:4.2f} c={:4.2f}}}", double(value_), double(certainty_));
   return os;
 }
 

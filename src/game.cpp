@@ -1,23 +1,24 @@
 #include "pokemonai/game.h"
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+#include <omp.h>
+
 #include <algorithm>
+#include <boost/program_options.hpp>
 #include <iostream>
 #include <memory>
-#include <stdexcept>
-#include <sstream>
-#include <boost/format.hpp>
-#include <boost/program_options.hpp>
-#include <omp.h>
 #include <numeric>
+#include <sstream>
+#include <stdexcept>
 
-#include "pokemonai/planner.h"
-#include "pokemonai/planner_max.h"
+#include "pokemonai/engine.h"
 #include "pokemonai/evaluator.h"
 #include "pokemonai/evaluator_simple.h"
 #include "pokemonai/fp_compare.h"
-
 #include "pokemonai/pkCU.h"
-#include "pokemonai/engine.h"
+#include "pokemonai/planner.h"
+#include "pokemonai/planner_max.h"
 
 namespace po = boost::program_options;
 
@@ -266,7 +267,7 @@ GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_
     size_t iNextEnvironment;
     if (cfg_.allowStateSelection) {
       std::stringstream out;
-      possibleEnvironments.printStates(out, (boost::format("ply=%d ") % iPly).str());
+      possibleEnvironments.printStates(out, fmt::format("ply={} ", iPly));
       std::cout << out.str();
       nextEnvironment = possibleEnvironments.stateSelect_index(iNextEnvironment);
     } else {
@@ -544,231 +545,244 @@ void Game::incrementScore(int matchState, std::array<uint32_t, 2>& score) const 
   }
 }
 
-
 std::string Game::getGameIdentifier(size_t iMatch) const {
-  std::ostringstream gameIdentifier;
   if (iMatch != SIZE_MAX) {
-    gameIdentifier << "game " << (iMatch+1) << " of " << cfg_.maxMatches;
-  } else {
-    gameIdentifier << "the game";
+    return fmt::format("game {} of {}", iMatch + 1, cfg_.maxMatches);
   }
-
-  return gameIdentifier.str();
+  return "the game";
 }
 
-
 std::string Game::getTeamIdentifier(size_t iTeam) const {
-  std::ostringstream teamIdentifier;
-  teamIdentifier <<
-      "T" << (iTeam==TEAM_A?"A":"B") <<
-      ": " << agents_[iTeam]->getName() <<
-      " - " << nv_->getTeam(iTeam).getName();
-
-  return teamIdentifier.str();
+  return fmt::format(
+      "T{}: {} - {}",
+      (iTeam == TEAM_A ? "A" : "B"),
+      agents_[iTeam]->getName(),
+      nv_->getTeam(iTeam).getName());
 }
 
 
 std::string Game::getPokemonIdentifier(const ConstTeamVolatile& cTeam, size_t iTeam) const {
-  std::ostringstream pkIdentifier;
-  pkIdentifier
-      << "T" << (iTeam==TEAM_A?"A":"B") <<": "
-      << cTeam.nv().getName() << " - "
-      << cTeam.getICPKV() << ": "
-      << cTeam.getPKV().nv().getName();
-
-  return pkIdentifier.str();
+  return fmt::format(
+      "T{}: {} - {}: {}",
+      (iTeam == TEAM_A ? "A" : "B"),
+      cTeam.nv().getName(),
+      cTeam.getICPKV(),
+      cTeam.getPKV().nv().getName());
 }
 
 
 void Game::printAction(
     const ConstTeamVolatile& cTeam, const Action& action, unsigned int iTeam) const {
-  std::stringstream out;
+  std::string result;
   if (action.isMove()) {
-    out
-      << getPokemonIdentifier(cTeam, iTeam) << " used "
-      << (action.iMove()+1) << "-"
-      << cTeam.getPKV().getMV(action)
-      << "!\n";
+    result = fmt::format(
+        "{} used {}-{}!\n",
+        getPokemonIdentifier(cTeam, iTeam),
+        action.iMove() + 1,
+        fmt::streamed(cTeam.getPKV().getMV(action)));
   } else if (action.isSwitch()) {
-    out
-      << getPokemonIdentifier(cTeam, iTeam) << " is switching out with "
-      << (action.friendlyTarget()+1) << ": "
-      << cTeam.teammate(action.friendlyTarget() - Action::FRIENDLY_0).nv().getName() << "!\n";
+    result = fmt::format(
+        "{} is switching out with {}: {}!\n",
+        getPokemonIdentifier(cTeam, iTeam),
+        action.friendlyTarget() + 1,
+        cTeam.teammate(action.friendlyTarget() - Action::FRIENDLY_0)
+            .nv()
+            .getName());
   } else if (action.isWait()) {
-    out
-      << getPokemonIdentifier(cTeam, iTeam) << " waited for a turn!\n";
+    result = fmt::format(
+        "{} waited for a turn!\n", getPokemonIdentifier(cTeam, iTeam));
   } else {
-    out
-      << getPokemonIdentifier(cTeam, iTeam) << " chose unknown action "
-      << action << "!\n";
+    result = fmt::format(
+        "{} chose unknown action {}!\n",
+        getPokemonIdentifier(cTeam, iTeam),
+        fmt::streamed(action));
   }
   // if the current pokemon is dead and switching out, print their team:
   if (!cTeam.getPKV().isAlive()) {
-    cTeam.printTeam(out, "    ");
+    std::ostringstream team_out;
+    cTeam.printTeam(team_out, "    ");
+    result += team_out.str();
   }
-  std::cout << out.str();
+  fmt::print("{}", result);
 }
 
 
 void Game::printStateTransition(const Turn& cTurn, size_t iPly) const {
-  std::stringstream out;
-  out << "ply " << iPly << ", "
-      << "s=" << cTurn.stateSelected << ", ";
+  std::ostringstream out;
+  out << fmt::format("ply {}, s={}, ", iPly, cTurn.stateSelected);
 
   ConstEnvironmentPossible{*nv_, cTurn.env}.printState(out);
-  out << "\n";
-
-  std::cout << out.str();
+  fmt::print("{}\n", out.str());
 }
 
 
 void Game::printGameStart(size_t iMatch) const {
-  std::stringstream out;
-  std::string gameIdentifier = getGameIdentifier(iMatch);
-  
-  out <<
-    "\nBegin " << gameIdentifier << 
-    " between teams " << getTeamIdentifier(TEAM_A) <<
-    " and " << getTeamIdentifier(TEAM_B) <<
-    ((cfg_.verbosity>=3)?"!\n\n":"!\n");
-  std::cout << out.str();
+  fmt::print(
+      "\nBegin {} between teams {} and {}{}",
+      getGameIdentifier(iMatch),
+      getTeamIdentifier(TEAM_A),
+      getTeamIdentifier(TEAM_B),
+      ((cfg_.verbosity >= 3) ? "!\n\n" : "!\n"));
 }
 
+template <typename ResultType>
+void printLeaderboard(
+    std::string& out,
+    size_t iPokemon,
+    const ResultType& pResult,
+    const PokemonNonVolatile& cPKNV) {
+  std::ostringstream ss;
+  ss << cPKNV;
+  std::string pk_name = ss.str();
 
-template<typename ResultType> void printLeaderboard(
-    std::ostream& out, size_t iPokemon, const ResultType& pResult, const PokemonNonVolatile& cPKNV) {
-  out << boost::format("    %d: %24.24s r=%d  c=% 5.3f  s=% 5.3f  p=%5.3f  ")
-      % (iPokemon+1)
-      % cPKNV
-      % (pResult.ranking + 1)
-      % pResult.aggregateContribution
-      % pResult.simpleContribution
-      % pResult.participation;
+  out += fmt::format(
+      "    {}: {:>24.24} r={}  c={:5.3f}  s={:5.3f}  p={:5.3f}  ",
+      iPokemon + 1,
+      pk_name,
+      pResult.ranking + 1,
+      pResult.aggregateContribution,
+      pResult.simpleContribution,
+      pResult.participation);
   for (size_t iMove = 0; iMove < cPKNV.getNumMoves(); ++iMove) {
-    out << boost::format("%s=%5.3f  ") % Action::move(iMove) % pResult.moveUse[iMove];
+    out += fmt::format(
+        "{}={:5.3f}  ",
+        fmt::streamed(Action::move(iMove)),
+        pResult.moveUse[iMove]);
   }
   // struggle move:
-  out << boost::format("%s=%5.3f\n") % Action::struggle() % pResult.moveUse[4];
-
+  out += fmt::format(
+      "{}={:5.3f}\n", fmt::streamed(Action::struggle()), pResult.moveUse[4]);
 }
 
-
 void Game::printGameOutline(const GameResult& gResult, size_t iMatch) const {
-  std::stringstream out;
+  std::string result;
   std::string gameIdentifier = getGameIdentifier(iMatch);
   int matchState = gResult.endStatus;
 
   if (matchState == MATCH_TIE) {
-    out <<
-      "Teams " << getTeamIdentifier(TEAM_A) <<
-      " and " << getTeamIdentifier(TEAM_B) <<
-      " have tied " << gameIdentifier <<
-      "!\n";
+    result += fmt::format(
+        "Teams {} and {} have tied {}!\n",
+        getTeamIdentifier(TEAM_A),
+        getTeamIdentifier(TEAM_B),
+        gameIdentifier);
   } else if (matchState == MATCH_DRAW) {
-    out <<
-      "Teams " << getTeamIdentifier(TEAM_A) <<
-      " and " << getTeamIdentifier(TEAM_B) <<
-      " have drawn " << gameIdentifier <<
-      "!\n";
+    result += fmt::format(
+        "Teams {} and {} have drawn {}!\n",
+        getTeamIdentifier(TEAM_A),
+        getTeamIdentifier(TEAM_B),
+        gameIdentifier);
   } else {
     size_t losingTeam = (gResult.endStatus + 1) % 2;
-    out <<
-      "Team " << getTeamIdentifier(matchState) <<
-      " has beaten team " << getTeamIdentifier(losingTeam) <<
-      " in " << gameIdentifier <<
-      "!\n";
+    result += fmt::format(
+        "Team {} has beaten team {} in {}!\n",
+        getTeamIdentifier(matchState),
+        getTeamIdentifier(losingTeam),
+        gameIdentifier);
   }
 
-  out
-    << "--- GAME STATISTICS ---\n "
-    << gResult.numPlies << " plies total\n"
-    " Leaderboard: (index: name  r=rank  c=aggregate-score  s=simple-score  p=participation)\n";
+  result += fmt::format(
+      "--- GAME STATISTICS ---\n {} plies total\n"
+      " Leaderboard: (index: name  r=rank  c=aggregate-score  s=simple-score  "
+      "p=participation)\n",
+      gResult.numPlies);
 
   for (size_t iTeam = 0; iTeam < 2; iTeam++) {
     const auto& teamResult = gResult.teams[iTeam];
     const TeamNonVolatile& cTeam = nv_->getTeam(iTeam);
-    out
-      << "  " << getTeamIdentifier(iTeam)
-      << (((int)iTeam==gResult.endStatus)?" (winner)":"")
-      << "\n";
-    out << boost::format("  time=%7.2f  nnod=%d\n")
-        % teamResult.timeSpent
-        % teamResult.numNodesEvaluated;
+    result += fmt::format(
+        "  {}{}\n",
+        getTeamIdentifier(iTeam),
+        ((int)iTeam == gResult.endStatus ? " (winner)" : ""));
+    result += fmt::format(
+        "  time={:7.2f}  nnod={}\n",
+        teamResult.timeSpent,
+        teamResult.numNodesEvaluated);
     for (size_t iPokemon = 0; iPokemon < cTeam.getNumTeammates(); ++iPokemon) {
       const auto& pResult = teamResult.pokemon[iPokemon];
       const PokemonNonVolatile& cPKNV = cTeam.teammate(iPokemon);
-      printLeaderboard(out, iPokemon, pResult, cPKNV);
+      printLeaderboard(result, iPokemon, pResult, cPKNV);
     }
   }
-  std::cout << out.str();
+  fmt::print("{}", result);
 }
 
 void Game::printHeatOutline(const HeatResult& result) const {
-  std::stringstream out;
+  std::string out;
   if (result.endStatus == MATCH_TIE) {
-    out <<
-      ((cfg_.verbosity>=3)?"\n":"") <<
-      "Teams " << getTeamIdentifier(TEAM_A) <<
-      " and " << getTeamIdentifier(TEAM_B) <<
-      " have tied the bo" << cfg_.maxMatches <<
-      " series " << result.score[TEAM_A] <<
-      " to " << result.score[TEAM_B] <<
-      ((cfg_.verbosity>=3)?"!\n\n":"!\n");
+    out += fmt::format(
+        "{}Teams {} and {} have tied the bo{} series {} to {}{}",
+        ((cfg_.verbosity >= 3) ? "\n" : ""),
+        getTeamIdentifier(TEAM_A),
+        getTeamIdentifier(TEAM_B),
+        cfg_.maxMatches,
+        result.score[TEAM_A],
+        result.score[TEAM_B],
+        ((cfg_.verbosity >= 3) ? "!\n\n" : "!\n"));
   } else if (result.endStatus == MATCH_DRAW) {
-    out <<
-      ((cfg_.verbosity>=3)?"\n":"") <<
-      "Teams " << getTeamIdentifier(TEAM_A) <<
-      " and " << getTeamIdentifier(TEAM_B) <<
-      " have drawn the bo" << cfg_.maxMatches <<
-      " series " << result.score[TEAM_A] <<
-      " to " << result.score[TEAM_B] <<
-      ((cfg_.verbosity>=3)?"!\n\n":"!\n");
+    out += fmt::format(
+        "{}Teams {} and {} have drawn the bo{} series {} to {}{}",
+        ((cfg_.verbosity >= 3) ? "\n" : ""),
+        getTeamIdentifier(TEAM_A),
+        getTeamIdentifier(TEAM_B),
+        cfg_.maxMatches,
+        result.score[TEAM_A],
+        result.score[TEAM_B],
+        ((cfg_.verbosity >= 3) ? "!\n\n" : "!\n"));
   } else {
     int matchState = result.endStatus;
     size_t losingTeam = (matchState + 1) % 2;
-    out <<
-      ((cfg_.verbosity>=3)?"\n":"") <<
-      "Team " << getTeamIdentifier(matchState) <<
-      " has beaten team " << getTeamIdentifier(losingTeam) <<
-      ", winning the bo" << cfg_.maxMatches <<
-      " series " << result.score[matchState] <<
-      " to " << result.score[losingTeam] <<
-      ((cfg_.verbosity>=3)?"!\n\n":"!\n");
+    out += fmt::format(
+        "{}Team {} has beaten team {}, winning the bo{} series {} to {}{}",
+        ((cfg_.verbosity >= 3) ? "\n" : ""),
+        getTeamIdentifier(matchState),
+        getTeamIdentifier(losingTeam),
+        cfg_.maxMatches,
+        result.score[matchState],
+        result.score[losingTeam],
+        ((cfg_.verbosity >= 3) ? "!\n\n" : "!\n"));
   }
 
-  out
-    << "--- MATCH STATISTICS ---\n "
-    << result.matchesPlayed << " out of " << result.matchesTotal << " games played\n "
-    << "final score: " << result.score[0] << " to " << result.score[1] << "\n "
-    << result.averagePlies() << " average plies per game\n"
-    " Leaderboard: (index: name  r=rank  aC=avG-score  aP=avG-participation)\n";
+  out += fmt::format(
+      "--- MATCH STATISTICS ---\n {} out of {} games played\n "
+      "final score: {} to {}\n "
+      "{:g} average plies per game\n"
+      " Leaderboard: (index: name  r=rank  aC=avG-score  "
+      "aP=avG-participation)\n",
+      result.matchesPlayed,
+      result.matchesTotal,
+      result.score[0],
+      result.score[1],
+      result.averagePlies());
 
   for (size_t iTeam = 0; iTeam < 2; iTeam++) {
     const auto& teamResult = result.teams[iTeam];
     const TeamNonVolatile& cTeam = nv_->getTeam(iTeam);
-    out
-      << "  " << getTeamIdentifier(iTeam)
-      << (((int)iTeam==result.endStatus)?" (winner)":"")
-      << "\n";
-    out << boost::format("  aTime=%7.2f  aNod=%d\n")
-        % teamResult.averageTimeSpent
-        % teamResult.averageNodesEvaluated;
+    out += fmt::format(
+        "  {}{}\n",
+        getTeamIdentifier(iTeam),
+        (((int)iTeam == result.endStatus) ? " (winner)" : ""));
+    out += fmt::format(
+        "  aTime={:7.2f}  aNod={}\n",
+        teamResult.averageTimeSpent,
+        teamResult.averageNodesEvaluated);
     for (size_t iPokemon = 0; iPokemon < cTeam.getNumTeammates(); ++iPokemon) {
       const auto& pResult = teamResult.pokemon[iPokemon];
       const PokemonNonVolatile& cPKNV = cTeam.teammate(iPokemon);
       printLeaderboard(out, iPokemon, pResult, cPKNV);
     }
   }
-  std::cout << out.str();
+  fmt::print("{}", out);
 }
 
 
 void Game::printHeatStart() const {
-  std::stringstream out;
+  std::string out;
   for (size_t iTeam = 0; iTeam < 2; iTeam++) {
-    out << "Team " << getTeamIdentifier(iTeam) << ":\n";
-    nv_->getTeam(iTeam).printSummary(out, "    ");
+    out += fmt::format("Team {}:\n", getTeamIdentifier(iTeam));
+    std::ostringstream team_summary;
+    nv_->getTeam(iTeam).printSummary(team_summary, "    ");
+    out += team_summary.str();
   }
 
-  std::cout << out.str();
+  fmt::print("{}", out);
 }

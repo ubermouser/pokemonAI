@@ -1,11 +1,12 @@
 #include "pokemonai/ranked_battlegroup.h"
 
-#include <algorithm>
-#include <cmath>
-#include <boost/functional/hash.hpp>
-#include <boost/format.hpp>
-#include <vector>
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 
+#include <algorithm>
+#include <boost/functional/hash.hpp>
+#include <cmath>
+#include <vector>
 
 Battlegroup::Battlegroup(
     const RankedTeamPtr& team,
@@ -60,7 +61,8 @@ Battlegroup::Hash Battlegroup::generateHash(bool generateSubHashes) {
 
 
 std::string Battlegroup::defineName() {
-  name_ = (boost::format("%s-%s-%s") % planner_->getName() % evaluator_->getName() % team_->getName()).str();
+  name_ = fmt::format(
+      "{}-{}-{}", planner_->getName(), evaluator_->getName(), team_->getName());
   return name_;
 }
 

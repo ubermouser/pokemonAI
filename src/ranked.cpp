@@ -1,14 +1,16 @@
 #include "pokemonai/ranked.h"
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 #include <algorithm>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 #include <iostream>
 #include <numeric>
-#include <boost/format.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
 
-#include "pokemonai/true_skill.h"
 #include "pokemonai/game.h"
+#include "pokemonai/true_skill.h"
 
 namespace pt = boost::property_tree;
 const std::string Ranked::HEADER = "PKART0";
@@ -32,7 +34,7 @@ void Ranked::update(const HeatResult& hResult, size_t iTeam) {
 
 
 std::ostream& Ranked::print(std::ostream& os) const {
-  os << boost::format("%-34.34s ") % getName();
+  os << fmt::format("{:<34.34} ", getName());
   printStats(os);
 
   return os;
@@ -40,10 +42,11 @@ std::ostream& Ranked::print(std::ostream& os) const {
 
 
 std::ostream& Ranked::printStats(std::ostream& os) const {
-  os << boost::format("%s w=%4.2f g=%d")
-      % skill()
-      % record().winRate()
-      % record().numGamesPlayed();
+  os << fmt::format(
+      "{} w={:4.2f} g={}",
+      fmt::streamed(skill()),
+      record().winRate(),
+      record().numGamesPlayed());
   return os;
 }
 

@@ -1,9 +1,10 @@
 //#define PKAI_IMPORT
 #include "pokemonai/evaluator_simple.h"
 
+#include <fmt/format.h>
+
 #include <algorithm>
 #include <stdexcept>
-#include <boost/format.hpp>
 
 #include "pokemonai/engine.h"
 
@@ -52,7 +53,7 @@ EvaluatorSimple& EvaluatorSimple::initialize() {
 
 
 void EvaluatorSimple::resetName() {
-  setName((boost::format("%s(m=%3.1f)") % baseName() % cfg_.movesBias).str());
+  setName(fmt::format("{}(m={:3.1f})", baseName(), cfg_.movesBias));
 }
 
 

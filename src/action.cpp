@@ -1,15 +1,16 @@
 #include "pokemonai/action.h"
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/static_assert.hpp>
 #include <cstring>
 #include <functional>
 #include <iostream>
 #include <regex>
-#include <string>
 #include <stdexcept>
-
-#include <boost/algorithm/string/case_conv.hpp>
-#include <boost/format.hpp>
-#include <boost/static_assert.hpp>
+#include <string>
 
 BOOST_STATIC_ASSERT(sizeof(Action) == sizeof(uint16_t));
 
@@ -18,20 +19,18 @@ bool Action::operator ==(const Action& other) const {
   return std::memcmp(this, &other, sizeof(Action)) == 0;
 }
 
-
-void Action::print() const { std::cout << *this << "\n"; }
-
+void Action::print() const { fmt::print("{}\n", fmt::streamed(*this)); }
 
 void Action::print(std::ostream& os) const {
   if (isStruggle()) {
     os << "mS";
   } else if (isMove()) {
-    os << boost::format("m%d") % (iMove()+1);
+    os << fmt::format("m{}", iMove() + 1);
     if (friendlyTarget() != FRIENDLY_DEFAULT) {
-      os << boost::format("-%d") % (friendlyTarget());
+      os << fmt::format("-{}", friendlyTarget());
     }
   } else if (isSwitch()) {
-    os << boost::format("s%d") % (iFriendly()+1);
+    os << fmt::format("s{}", iFriendly() + 1);
   } else if (isWait()) {
     os << "w";
   } else if (isUndefined()) {

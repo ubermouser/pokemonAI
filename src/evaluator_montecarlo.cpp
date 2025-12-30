@@ -1,7 +1,8 @@
 #include "pokemonai/evaluator_montecarlo.h"
 
+#include <fmt/format.h>
+
 #include <boost/program_options.hpp>
-#include <boost/format.hpp>
 
 #include "pokemonai/evaluator_simple.h"
 #include "pokemonai/pkCU.h"
@@ -50,7 +51,7 @@ EvaluatorMonteCarlo::EvaluatorMonteCarlo(const Config& cfg)
 
 
 void EvaluatorMonteCarlo::resetName() {
-  setName((boost::format("%s(r=%d)") % baseName() % cfg_.maxRollouts).str());
+  setName(fmt::format("{}(r={})", baseName(), cfg_.maxRollouts));
 }
 
 

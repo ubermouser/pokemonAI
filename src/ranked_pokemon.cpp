@@ -1,8 +1,10 @@
 #include "pokemonai/ranked_pokemon.h"
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 #include <sstream>
 #include <string>
-#include <boost/format.hpp>
 
 void RankedPokemon::identify() {
   Hash newHash = get().hash();
