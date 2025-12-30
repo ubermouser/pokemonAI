@@ -332,6 +332,10 @@ std::ostream& operator<<(std::ostream& os, const ConstPokemonVolatile& pkmn) {
       os << fmt::format(
           " (LOCKIN-{})", pkmn.status().cTeammate.lockIn_duration);
     }
+    // target has a substitute:
+    if (pkmn.status().cTeammate.substitute > 0) {
+      os << fmt::format(" (SUB-{})", pkmn.status().cTeammate.substitute);
+    }
     // spikes in the ground:
     if (pkmn.status().nonvolatile.spikes > 0) {
       os << fmt::format(" (SPIKES-{})", pkmn.status().nonvolatile.spikes);

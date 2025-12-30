@@ -76,6 +76,7 @@ const Move* spikes_t;
 const Move* stealthRock_t;
 const Move* stoneEdge_t;
 const Move* struggle_t;
+const Move* substitute_t;
 const Move* suckerPunch_t;
 const Move* swift_t;
 const Move* toxicSpikes_t;
@@ -339,6 +340,106 @@ int move_taunt_preempt(PkCUEngine& cu, PokemonVolatile cPKV) {
 
   return 1;
 }
+
+int move_substitute(
+    PkCUEngine& cu,
+    MoveVolatile mV,
+    PokemonVolatile cPKV,
+    PokemonVolatile tPKV) {
+  if (&mV.getBase() != substitute_t) { return 0; }
+
+  // Fails if a substitute already exists
+  if (cPKV.status().cTeammate.substitute > 0) { return 1; }
+
+  uint32_t cost = cPKV.nv().getMaxHP() / 4;
+  // Fails if HP is not enough to create a substitute
+  if (cPKV.getHP() <= cost) { return 1; }
+
+  cPKV.modHP(-(int32_t)cost);
+  cPKV.status().cTeammate.substitute = cost;
+
+  return 1;
+};
+
+int move_substitute_damage(
+    PkCUEngine& cu,
+    MoveVolatile mV,
+    PokemonVolatile cPKV,
+    PokemonVolatile tPKV,
+    uint32_t& raw_damage) {
+  SPDLOG_TRACE(
+      "move_substitute_damage: move={} damage={} sub={}",
+      mV.getBase().getName(),
+      raw_damage,
+      (uint32_t)tPKV.status().cTeammate.substitute);
+  if (tPKV.status().cTeammate.substitute == 0) { return 0; }
+
+  uint32_t subHP = tPKV.status().cTeammate.substitute;
+  if (raw_damage >= subHP) {
+    SPDLOG_TRACE("move_substitute_damage: Substitute BROKE");
+    tPKV.status().cTeammate.substitute = 0;
+  } else {
+    SPDLOG_TRACE(
+        "move_substitute_damage: Substitute absorbed {} damage", raw_damage);
+    tPKV.status().cTeammate.substitute -= raw_damage;
+  }
+
+  raw_damage = 0;
+  return 2;  // Halts other damage plugins
+};
+
+int move_substitute_block_secondary(
+    PkCUEngine& cu,
+    MoveVolatile mV,
+    PokemonVolatile cPKV,
+    PokemonVolatile tPKV) {
+  SPDLOG_TRACE(
+      "move_substitute_block_secondary: move={} cPKV_nv={} tPKV_nv={} sub={}",
+      mV.getBase().getName(),
+      (void*)&cPKV.nv(),
+      (void*)&tPKV.nv(),
+      (uint32_t)tPKV.status().cTeammate.substitute);
+  if (tPKV.status().cTeammate.substitute > 0) {
+    // Does not block self-targeting secondary effects
+    if (&cPKV.nv() == &tPKV.nv()) {
+      SPDLOG_TRACE("move_substitute_block_secondary: Bypassing self-target");
+      return 0;
+    }
+
+    SPDLOG_TRACE("move_substitute_block_secondary: BLOCKING secondary effect");
+    return 2;
+  }
+  return 0;
+};
+
+int move_substitute_block_status(
+    PkCUEngine& cu,
+    MoveVolatile mV,
+    PokemonVolatile cPKV,
+    PokemonVolatile tPKV) {
+  SPDLOG_TRACE(
+      "move_substitute_block_status: move={} cPKV_nv={} tPKV_nv={} sub={}",
+      mV.getBase().getName(),
+      (void*)&cPKV.nv(),
+      (void*)&tPKV.nv(),
+      (uint32_t)tPKV.status().cTeammate.substitute);
+  if (tPKV.status().cTeammate.substitute > 0) {
+    if (mV.getBase().getDamageType() == ATK_NODMG) {
+      // Gen 4 exceptions: Taunt bypasses Substitute
+      if (&mV.getBase() == taunt_t) { return 0; }
+
+      // Does not block self-targeting moves
+      if (&cPKV.nv() == &tPKV.nv()) {
+        SPDLOG_TRACE("move_substitute_block_status: Bypassing self-target");
+        return 0;
+      }
+
+      SPDLOG_TRACE("move_substitute_block_status: BLOCKING status move");
+      return 2;  // Consume evaluation, effective failure
+    }
+  }
+  return 0;
+};
 
 int move_hiddenPower_setPower(
     PkCUEngine& cu,
@@ -1841,6 +1942,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   suckerPunch_t = orphan::orphanCheck(moves, "sucker punch");
   swift_t = orphan::orphanCheck(moves, "swift");
   taunt_t = orphan::orphanCheck(moves, "taunt");
+  substitute_t = orphan::orphanCheck(moves, "substitute");
   toxicSpikes_t = orphan::orphanCheck(moves, "toxic spikes");
   trick_t = orphan::orphanCheck(moves, "trick");
   uTurn_t = orphan::orphanCheck(moves, "u-turn");
@@ -1962,6 +2064,10 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(move, "stealth rock", PLUGIN_ON_SWITCHIN, move_stealthRock_switch, 0, all_teams));
   extensions.push_back(plugin(move, "stealth rock", PLUGIN_ON_EVALUATEMOVE, move_stealthRock_set, 0, current_team));
   extensions.push_back(plugin(move, "stone edge", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
+  extensions.push_back(plugin(move, "substitute", PLUGIN_ON_EVALUATEMOVE, move_substitute, 0, current_team));
+  extensions.push_back(plugin(move, "substitute_damage", PLUGIN_ON_CALCULATEDAMAGE, move_substitute_damage, 0, all_teams));
+  extensions.push_back(plugin(move, "substitute_block_secondary", PLUGIN_ON_SECONDARYEFFECT, move_substitute_block_secondary, -10, all_teams));
+  extensions.push_back(plugin(engine, "substitute_block_status", PLUGIN_ON_EVALUATEMOVE, move_substitute_block_status, -10, all_teams));   // TODO - conflicts with move_substitute!
   extensions.push_back(plugin(move, "sucker punch", PLUGIN_ON_CALCULATEDAMAGE, move_suckerPunch_noDamageOnCondition, 0, current_team));
   extensions.push_back(plugin(move, "swift", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
   extensions.push_back(plugin(move, "toxic spikes", PLUGIN_ON_SWITCHIN, move_toxicSpikes_switch, 2, all_teams));
