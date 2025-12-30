@@ -2065,8 +2065,8 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(move, "stealth rock", PLUGIN_ON_EVALUATEMOVE, move_stealthRock_set, 0, current_team));
   extensions.push_back(plugin(move, "stone edge", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "substitute", PLUGIN_ON_EVALUATEMOVE, move_substitute, 0, current_team));
-  extensions.push_back(plugin(move, "substitute_damage", PLUGIN_ON_CALCULATEDAMAGE, move_substitute_damage, 0, all_teams));
-  extensions.push_back(plugin(move, "substitute_block_secondary", PLUGIN_ON_SECONDARYEFFECT, move_substitute_block_secondary, -10, all_teams));
+  extensions.push_back(plugin(move, "substitute", PLUGIN_ON_CALCULATEDAMAGE, move_substitute_damage, 0, all_teams));
+  extensions.push_back(plugin(move, "substitute", PLUGIN_ON_SECONDARYEFFECT, move_substitute_block_secondary, -10, all_teams));
   extensions.push_back(plugin(engine, "substitute_block_status", PLUGIN_ON_EVALUATEMOVE, move_substitute_block_status, -10, all_teams));   // TODO - conflicts with move_substitute!
   extensions.push_back(plugin(move, "sucker punch", PLUGIN_ON_CALCULATEDAMAGE, move_suckerPunch_noDamageOnCondition, 0, current_team));
   extensions.push_back(plugin(move, "swift", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
@@ -2108,8 +2108,8 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(ability, "pressure", PLUGIN_ON_ENDOFMOVE, ability_pressure, 0, other_team));
   extensions.push_back(plugin(ability, "serene grace", PLUGIN_ON_MODIFYSECONDARYPROBABILITY, ability_sereneGrace, -1, current_team));
   extensions.push_back(plugin(ability, "sticky hold", PLUGIN_ON_SWITCHOUT, ability_doNothing, 99, current_team));
-  extensions.push_back(plugin(ability, "synchronize", PLUGIN_ON_SECONDARYEFFECT, ability_synchronize, -1, other_team));
   extensions.push_back(plugin(ability, "swarm", PLUGIN_ON_MODIFYBASEPOWER, ability_pinch_type_boost, -1, current_team));
+  extensions.push_back(plugin(ability, "synchronize", PLUGIN_ON_SECONDARYEFFECT, ability_synchronize, -1, other_team));
   extensions.push_back(plugin(ability, "technician", PLUGIN_ON_MODIFYBASEPOWER, ability_technician, -1, current_team));
   extensions.push_back(plugin(ability, "torrent", PLUGIN_ON_MODIFYBASEPOWER, ability_pinch_type_boost, -1, current_team));
 
