@@ -44,13 +44,14 @@ bool ConstEnvironmentPossible::isEmpty() const {
 
 ENV_POSSIBLE_IMPL_TEMPLATE
 void ENV_POSSIBLE_IMPL::printState() const {
-  fmt::print("{}", fmt::streamed(ConstEnvironmentPossible{nv(), data()}));
+  printState(std::cout);
 }
 
 ENV_POSSIBLE_IMPL_TEMPLATE
 void ENV_POSSIBLE_IMPL::printState(std::ostream& os) const {
   // print environment status:
-  os << ConstEnvironmentPossible{nv(), data()};
+  fmt::println(
+      os, "{}", fmt::streamed(ConstEnvironmentPossible{nv(), data()}));
 }
 
 
@@ -113,7 +114,7 @@ ConstEnvironmentPossible PossibleEnvironments::stateSelect_roulette(size_t& inde
 ConstEnvironmentPossible PossibleEnvironments::stateSelect_index(size_t& indexResult) const {
   std::string input;
   int32_t indexState;
-  
+
   do {
     fmt::print(
         "Please select the index of the desired state for the player, -1 for a "

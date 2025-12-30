@@ -1,24 +1,23 @@
 #include "pokemonai/team_volatile.h"
 
-#include "pokemonai/pokemon_nonvolatile.h"
-#include "pokemonai/team_nonvolatile.h"
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 
+#include <boost/static_assert.hpp>
 #include <cstring>
 #include <ostream>
-#include <boost/static_assert.hpp>
+
+#include "pokemonai/pokemon_nonvolatile.h"
+#include "pokemonai/team_nonvolatile.h"
 
 BOOST_STATIC_ASSERT(sizeof(NonVolatileStatus) == (sizeof(uint32_t)*1));
 BOOST_STATIC_ASSERT(sizeof(VolatileStatus) == (sizeof(uint32_t)*4));
 BOOST_STATIC_ASSERT(sizeof(TeamStatus) == (sizeof(uint32_t)*5));
 BOOST_STATIC_ASSERT(sizeof(TeamVolatileData) == (sizeof(uint32_t)*17));
 
-
-
-bool TeamVolatileData::operator ==(const TeamVolatileData& other) const
-{	
+bool TeamVolatileData::operator==(const TeamVolatileData& other) const {
   return std::memcmp(this, &other, sizeof(TeamVolatileData)) == 0;
 }
-
 
 bool TeamVolatileData::operator !=(const TeamVolatileData& other) const
 {
@@ -28,7 +27,7 @@ bool TeamVolatileData::operator !=(const TeamVolatileData& other) const
 
 void TeamVolatile::initialize()
 {
-  // status and all other variables have been zeroed from a different context 
+  // status and all other variables have been zeroed from a different context
   for (size_t iTeammate = 0, _numTeammates = nv_->getNumTeammates(); iTeammate != _numTeammates; ++iTeammate)
   {
     // 0th teammate is active at the start of the game
@@ -54,7 +53,7 @@ uint32_t TEAM_VOLATILE_IMPL::numTeammatesAlive() const {
   for (size_t iPokemon= 0; iPokemon != nv().getNumTeammates(); ++iPokemon) {
     result += teammate(iPokemon).isAlive();
   }
-  
+
   return result;
 }
 
@@ -78,7 +77,7 @@ bool TeamVolatile::swapPokemon(size_t iAction, bool preserveVolatile)
 
   // make sure we're not switching to ourself
   if (iNewPokemon == iOldPokemon) { return false; }
-  
+
   // reset the volatile status:
   if (!preserveVolatile) { resetVolatile(); };
 
@@ -86,7 +85,7 @@ bool TeamVolatile::swapPokemon(size_t iAction, bool preserveVolatile)
   data_->status.nonvolatile.iCPokemon = (uint8_t)iNewPokemon;
   teammate(iOldPokemon).data().active = false;
   teammate(iNewPokemon).data().active = true;
-  
+
   return true;
 }
 
@@ -94,7 +93,12 @@ bool TeamVolatile::swapPokemon(size_t iAction, bool preserveVolatile)
 TEAM_VOLATILE_IMPL_TEMPLATE
 void TEAM_VOLATILE_IMPL::printTeam(std::ostream& os, const std::string& linePrefix) const {
   for (size_t iTeammate = 0; iTeammate != nv().getNumTeammates(); ++iTeammate) {
-    os << linePrefix << iTeammate << "-" << teammate(iTeammate);
+    fmt::println(
+        os,
+        "{}{}-{}",
+        linePrefix,
+        iTeammate,
+        fmt::streamed(teammate(iTeammate)));
   }
 }
 

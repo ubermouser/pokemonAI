@@ -380,8 +380,6 @@ std::ostream& operator<<(std::ostream& os, const ConstPokemonVolatile& pkmn) {
     }
   }
 
-  os << "\n";
-
   return os;
 }
 

@@ -1,5 +1,8 @@
 #include "pokemonai/environment_volatile.h"
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 #include <boost/static_assert.hpp>
 #include <cstring>
 #include <ostream>
@@ -50,8 +53,10 @@ bool EnvironmentVolatileData::operator !=(const EnvironmentVolatileData& other) 
 
 ENV_VOLATILE_IMPL_TEMPLATE
 void ENV_VOLATILE_IMPL::printActivePokemon(std::ostream& os, size_t first) const {
-  os << "\tagent: " << getTeam(first).getPKV();
-  os << "\tother: " << getOtherTeam(first).getPKV();
+  os << fmt::format(
+      "\tagent: {}\n\tother: {}\n",
+      fmt::streamed(getTeam(first).getPKV()),
+      fmt::streamed(getOtherTeam(first).getPKV()));
 }
 
 
