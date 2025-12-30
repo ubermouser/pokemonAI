@@ -19,7 +19,7 @@ bool Action::operator ==(const Action& other) const {
   return std::memcmp(this, &other, sizeof(Action)) == 0;
 }
 
-void Action::print() const { fmt::print("{}\n", fmt::streamed(*this)); }
+void Action::print() const { print(std::cout); }
 
 void Action::print(std::ostream& os) const {
   if (isStruggle()) {
@@ -82,7 +82,7 @@ std::istream& operator >>(std::istream& is, Action& action) {
     action = Action::wait();
     success = true;
   }
-  
+
   if (!success) { is.setstate(std::ios::failbit); }
   return is;
 }

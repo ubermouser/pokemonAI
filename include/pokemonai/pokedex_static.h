@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   pokedex_static.h
  * Author: drendleman
  *
@@ -49,30 +49,32 @@ public:
         const std::string& category="pokedex configuration",
         std::string prefix = "");
   };
-  
+
   PokedexStatic(const Config& config=Config(), bool doInitialize=true);
   virtual ~PokedexStatic();
-    
-  virtual Moves& getMoves() { return moves_; };
-  virtual const Moves& getMoves() const { return moves_; };
-  
-  virtual Types& getTypes() { return types_; };
-  virtual const Types& getTypes() const { return types_; };
-  
-  virtual Pokemons& getPokemon() { return pokemon_; };
-  virtual const Pokemons& getPokemon() const { return pokemon_; };
-  
-  virtual Abilities& getAbilities() { return abilities_; };
-  virtual const Abilities& getAbilities() const { return abilities_; };
-  
-  virtual Natures& getNatures() { return natures_; };
-  virtual const Natures& getNatures() const { return natures_; };
-  
-  virtual Items& getItems() { return items_; };
-  virtual const Items& getItems() const { return items_; };
-  
-  virtual EnginePlugins& getExtensions() { return engineExtensions_; };
-  virtual const EnginePlugins& getExtensions() const { return engineExtensions_; };
+
+  virtual Moves& getMoves() override { return moves_; };
+  virtual const Moves& getMoves() const override { return moves_; };
+
+  virtual Types& getTypes() override { return types_; };
+  virtual const Types& getTypes() const override { return types_; };
+
+  virtual Pokemons& getPokemon() override { return pokemon_; };
+  virtual const Pokemons& getPokemon() const override { return pokemon_; };
+
+  virtual Abilities& getAbilities() override { return abilities_; };
+  virtual const Abilities& getAbilities() const override { return abilities_; };
+
+  virtual Natures& getNatures() override { return natures_; };
+  virtual const Natures& getNatures() const override { return natures_; };
+
+  virtual Items& getItems() override { return items_; };
+  virtual const Items& getItems() const override { return items_; };
+
+  virtual EnginePlugins& getExtensions() override { return engineExtensions_; };
+  virtual const EnginePlugins& getExtensions() const override {
+    return engineExtensions_;
+  };
 
   virtual const Move& move(const std::string& name) const override;
   virtual const Type& type(const std::string& name) const override;
@@ -80,7 +82,7 @@ public:
   virtual const Ability& ability(const std::string& name) const override;
   virtual const Nature& nature(const std::string& name) const override;
   virtual const Item& item(const std::string& name) const override;
-  
+
   virtual bool initialize();
   virtual bool inputPlugins(); // input scripts for registered moves
 
@@ -103,7 +105,7 @@ protected:
       const OrphanSet& mismatchedAbilities,
       const OrphanSet& mismatchedMoves,
       const OrphanSet& mismatchedCategories) const;
-  
+
   Config config_;
 
   Moves moves_; // list of all acceptable moves

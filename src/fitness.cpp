@@ -6,8 +6,7 @@
 #include <iostream>
 
 FITNESS_TEMPLATE
-void FITNESS_IMPL::print() const { std::cout << *this << "\n"; }
-
+void FITNESS_IMPL::print() const { print(std::cout); }
 
 FITNESS_TEMPLATE
 std::ostream& FITNESS_IMPL::print(std::ostream& os) const {

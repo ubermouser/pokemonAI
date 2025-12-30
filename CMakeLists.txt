@@ -31,6 +31,7 @@ add_compile_definitions(
 # Configuration-specific settings
 add_compile_definitions(
     $<$<CONFIG:Debug>:DEBUG>
+    $<$<CONFIG:Debug>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE>
     $<$<CONFIG:Release>:NDEBUG>
 )
 
