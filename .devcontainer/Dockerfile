@@ -70,7 +70,7 @@ RUN ARCH=$(dpkg --print-architecture) && \
 USER node
 
 # Setup a dummy git config:
-RUN echo -e "[user]\n\temail = gemini@google.com\n\tname = Antigravity Gemini 3.0\n" > /home/node/.gitconfig
+RUN printf "[user]\n\temail = gemini@google.com\n\tname = Antigravity Gemini 3.0\n" > /home/node/.gitconfig
 
 # Install global packages
 ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global
