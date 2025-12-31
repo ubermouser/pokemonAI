@@ -1514,7 +1514,21 @@ IsValidResult PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Ac
 
       // are all other moves unusable?
       for (size_t iMove = 0, iSize = cPKV.nv().getNumMoves(); iMove != iSize; ++iMove) {
-        if (isValidAction(envV, Action::move(iMove), iTeam)) { return IsValidResult::STRUGGLE_NOT_ALLOWED; }
+        const Move& move = cPKV.nv().getMove_base(iMove);
+
+        if (move.targetsAlly()) {
+          for (size_t iFriendly = 0, numTeammates = cTV.nv().getNumTeammates();
+               iFriendly != numTeammates;
+               ++iFriendly) {
+            if (isValidAction(envV, Action::moveAlly(iMove, iFriendly), iTeam)) {
+              return IsValidResult::STRUGGLE_NOT_ALLOWED;
+            }
+          }
+        } else {
+          if (isValidAction(envV, Action::move(iMove), iTeam)) {
+            return IsValidResult::STRUGGLE_NOT_ALLOWED;
+          }
+        }
       }
 
       // may struggle when all other moves are unusable:
