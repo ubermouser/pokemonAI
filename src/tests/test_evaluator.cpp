@@ -1,22 +1,14 @@
-#include <gtest/gtest.h>
-
-#include "pokemonai/engine.h"
-#include "pokemonai/pokedex_static.h"
-#include "pokemonai/pkCU.h"
-
+#include "engine_test.hpp"
 #include "pokemonai/evaluator.h"
-#include "pokemonai/evaluator_simple.h"
-#include "pokemonai/evaluator_random.h"
 #include "pokemonai/evaluator_montecarlo.h"
+#include "pokemonai/evaluator_random.h"
+#include "pokemonai/evaluator_simple.h"
 
-
-class EvaluatorTest : public ::testing::Test {
-protected:
+class EvaluatorTest : public EngineTest {
+ protected:
   void SetUp() override {
-    verbose = 0;
-    initialize_logger(spdlog::level::trace);
-    pokedex_ = std::make_shared<PokedexStatic>();
-    engine_ = std::make_shared<PkCU>();
+    EngineTest::SetUp();
+    engine_->setAllowInvalidMoves(false);
 
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
@@ -32,13 +24,12 @@ protected:
           .setLevel(100));
     environment_ = std::make_shared<EnvironmentNonvolatile>(team_a, team_b, true);
     engine_->setEnvironment(environment_);
+
+    spdlog::set_level(spdlog::level::debug);
   }
 
   std::shared_ptr<EnvironmentNonvolatile> environment_;
-  std::shared_ptr<Pokedex> pokedex_;
-  std::shared_ptr<PkCU> engine_;
 };
-
 
 void validateTerminalState(Evaluator& eval, const ConstEnvironmentVolatile& envp, fpType fitness=0.0) {
   EvalResult losingFitness = eval.evaluate(envp, TEAM_A);

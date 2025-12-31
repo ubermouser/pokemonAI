@@ -121,7 +121,6 @@ int main(int argc, char** argv) {
   initialize_logger();
   auto cfg = parse_command_line(argc, argv);
 
-  verbose = cfg.verbosity;
   spdlog::set_level(spdlog::level::level_enum(cfg.verbosity));
   srand((cfg.random_seed < 0)?time(NULL):cfg.random_seed);
 

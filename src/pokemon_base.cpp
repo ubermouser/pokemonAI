@@ -40,7 +40,7 @@ bool Pokemons::initialize(
     SPDLOG_CRITICAL("A species list has not been defined!");
     return false;
   }
-  SPDLOG_INFO("Loading species library...");
+  SPDLOG_WARN("Loading species library at {}...", pokemonPath);
   if (!loadFromFile(pokemonPath, types, abilities))
   {
     SPDLOG_CRITICAL("inputPokemon failed to populate a list of pokemon.");
@@ -58,7 +58,7 @@ bool Pokemons::initialize(
     SPDLOG_CRITICAL("A movelist array has not been defined!");
     return false;
   }
-  SPDLOG_INFO("Loading Pokemon move arrays...");
+  SPDLOG_WARN("Loading Pokemon move arrays at {}...", movelistPath);
   if (!loadMovelistFromFile(movelistPath, moves))
   {
     SPDLOG_CRITICAL(
@@ -150,6 +150,7 @@ bool Pokemons::loadFromFile_lines(
 
   OrphanSet orphanedTypes;
   OrphanSet orphanedAbilities;
+  size_t num_loaded = 0;
 
   for (size_t iPokemon = 0; iLine < lines.size(); ++iPokemon, ++iLine)
   {
@@ -224,7 +225,10 @@ bool Pokemons::loadFromFile_lines(
     }
 
     insert({cPokemon.getName(), cPokemon});
+    num_loaded++;
   } //end of per-pokemon
+
+  SPDLOG_INFO("Loaded {} pokemon!", num_loaded);
 
   //output orphans
   printOrphans(orphanedTypes, "pokemon inputStream", "pokemon-types", "type");
@@ -320,6 +324,7 @@ bool Pokemons::loadMovelistFromFile_lines(
 
   OrphanSet orphanedPokemon;
   OrphanSet orphanedMoves;
+  size_t num_loaded = 0;
 
   for (size_t iPair = 0; iPair < lines.size() - 2; ++iPair, ++iLine)
   {
@@ -340,7 +345,10 @@ bool Pokemons::loadMovelistFromFile_lines(
     if (cPokemon == NULL || cMove == NULL) { continue; }
     // add this name to the current Pokemon's move list.
     cPokemon->moves_.insert(cMove);
+    num_loaded++;
   } //end of per-pair
+
+  SPDLOG_INFO("Loaded {} move-pairs!", num_loaded);
 
   // mark orphans with no movesets:
   for (auto& cBase : *this) {

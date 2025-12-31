@@ -15,7 +15,7 @@ bool Natures::initialize(const std::string& path) {
     SPDLOG_CRITICAL("A nature list has not been defined!");
     return false;
   }
-  SPDLOG_INFO("Loading Pokemon nature library...");
+  SPDLOG_WARN("Loading Pokemon nature library at {}...", path);
   if (!loadFromFile(path))
   {
     SPDLOG_CRITICAL("inputNatures failed to populate a list of natures.");
@@ -101,6 +101,7 @@ bool Natures::loadFromFile_lines(const std::vector<std::string>& lines, size_t& 
   // make sure number of lines in the file is correct for the number of moves we were given:
   if (!INI::checkRangeB(lines.size() - iLine, (size_t)_numElements, (size_t)SIZE_MAX)) { return false; }
   reserve(_numElements);
+  size_t num_loaded = 0;
 
   for (size_t iNature = 0; iLine < lines.size(); ++iNature, ++iLine)
   {
@@ -126,7 +127,10 @@ bool Natures::loadFromFile_lines(const std::vector<std::string>& lines, size_t& 
     }
 
     insert({cNature.getName(), cNature});
+    num_loaded++;
   } //end of per-nature
+
+  SPDLOG_INFO("Loaded {} natures!", num_loaded);
 
   return true; // import success
 } // endof import natures

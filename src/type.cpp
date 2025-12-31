@@ -25,7 +25,7 @@ bool Types::initialize(const std::string& path) {
     SPDLOG_CRITICAL("An item list has not been defined!");
     return false;
   }
-  SPDLOG_INFO("Loading Pokemon type library...");
+  SPDLOG_WARN("Loading Pokemon type library at {}...", path);
   if (!loadFromFile(path))
   {
     SPDLOG_CRITICAL("InputTypes failed to populate an array of types.");
@@ -113,6 +113,7 @@ bool Types::loadFromFile_lines(const std::vector<std::string>& lines, size_t& iL
 
   // pre-insert the types by name:
   std::vector<const Type*> typeNames;
+  size_t num_loaded = 0;
   for (size_t iType = 0, iCLine=iLine; iCLine < lines.size(); ++iType, ++iCLine) {
     std::vector<std::string> tokens = tokenize(lines.at(iCLine), "\t");
 
@@ -152,7 +153,10 @@ bool Types::loadFromFile_lines(const std::vector<std::string>& lines, size_t& iL
       checkRangeB(cTypeVal, 0.0, 2.0);
       cType.modTable_[typeNames[indexInnerType]] = cTypeVal * FPMULTIPLIER;
     }
+    num_loaded++;
   } //end of per-type
+
+  SPDLOG_INFO("Loaded {} types!", num_loaded);
 
   return true; // import success
 } // endof import types

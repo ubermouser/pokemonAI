@@ -1,26 +1,4 @@
-#include <gtest/gtest.h>
-
-#include <memory>
-
-#include "pokemonai/engine.h"
-#include "pokemonai/pokedex_static.h"
-#include "pokemonai/pkCU.h"
-
-
-class EngineTest : public ::testing::Test {
-protected:
-  void SetUp() override {
-    verbose = 0;
-    initialize_logger(spdlog::level::trace);
-    pokedex_ = std::make_shared<PokedexStatic>();
-    engine_ = std::make_shared<PkCU>();
-    engine_->setAllowInvalidMoves(true);
-  }
-
-  std::shared_ptr<Pokedex> pokedex_;
-  std::shared_ptr<PkCU> engine_;
-};
-
+#include "engine_test.hpp"
 
 TEST_F(EngineTest, PrimaryHitAndCrit) {
   auto team = TeamNonVolatile()

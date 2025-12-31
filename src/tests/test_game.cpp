@@ -1,23 +1,14 @@
-#include <gtest/gtest.h>
-
-#include <memory>
 #include <stdexcept>
 
-#include "pokemonai/engine.h"
+#include "engine_test.hpp"
 #include "pokemonai/game.h"
-#include "pokemonai/pokedex_static.h"
-#include "pokemonai/pkCU.h"
-#include "pokemonai/planner_random.h"
 #include "pokemonai/planner_max.h"
+#include "pokemonai/planner_random.h"
 
-
-class GameTest : public ::testing::Test {
-protected:
+class GameTest : public EngineTest {
+ protected:
   void SetUp() override {
-    verbose = 0;
-    initialize_logger(spdlog::level::trace);
-    pokedex_ = std::make_shared<PokedexStatic>();
-    engine_ = std::make_shared<PkCU>();
+    EngineTest::SetUp();
 
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
@@ -31,20 +22,13 @@ protected:
           .addMove(pokedex_->move("cut"))
           .addMove(pokedex_->move("charm"))
           .setLevel(100));
-    environment_ = EnvironmentNonvolatile(team_a, team_b, true);
+    environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
   }
-
-  EnvironmentNonvolatile environment_;
-  std::shared_ptr<Pokedex> pokedex_;
-  std::shared_ptr<PkCU> engine_;
 };
 
-
 TEST_F(GameTest, RolloutPokemon) {
-  auto game = Game()
-      .setMaxMatches(3)
-      .setVerbosity(3)
-      .setEnvironment(environment_);
+  auto game =
+      Game().setMaxMatches(3).setVerbosity(3).setEnvironment(environment_nv);
 
   auto result = game.run();
 
@@ -57,8 +41,7 @@ TEST_F(GameTest, Multithreaded) {
   cfg.numThreads = 2;
   cfg.maxMatches = 200;
   cfg.verbosity = 1;
-  auto game = Game(cfg)
-      .setEnvironment(environment_);
+  auto game = Game(cfg).setEnvironment(environment_nv);
   auto result = game.run();
 
   EXPECT_GE(result.matchesPlayed, 101);
@@ -68,11 +51,11 @@ TEST_F(GameTest, Multithreaded) {
 TEST_F(GameTest, CustomPlanners) {
   auto cu = PkCU();
   auto game = Game()
-      .setMaxMatches(100)
-      .setEnvironment(environment_)
-      .setVerbosity(1)
-      .setPlanner(0, PlannerRandom().setEngine(cu))
-      .setPlanner(1, PlannerRandom().setEngine(cu));
+                  .setMaxMatches(100)
+                  .setEnvironment(environment_nv)
+                  .setVerbosity(1)
+                  .setPlanner(0, PlannerRandom().setEngine(cu))
+                  .setPlanner(1, PlannerRandom().setEngine(cu));
 
   auto result = game.run();
 
@@ -82,9 +65,9 @@ TEST_F(GameTest, CustomPlanners) {
 
 TEST_F(GameTest, UninitializedCustom) {
   auto game = Game()
-      .setEnvironment(environment_)
-      .setPlanner(0, PlannerMax())
-      .setPlanner(1, PlannerMax());
+                  .setEnvironment(environment_nv)
+                  .setPlanner(0, PlannerMax())
+                  .setPlanner(1, PlannerMax());
 
   EXPECT_THROW({
     // uninitialized

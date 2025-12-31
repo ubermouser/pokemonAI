@@ -62,7 +62,7 @@ bool PokedexDynamic::inputPlugins()
     if (iPlugin->path().extension().compare(".so") != 0) { continue; }
 #endif
 
-    SPDLOG_INFO("Loading plugin at {}...", iPlugin->path().string());
+    SPDLOG_WARN("Loading plugins from {}...", iPlugin->path().string());
 
     numPluginsTotal++;
     std::unique_ptr<shared_library> cPlugin = std::make_unique<shared_library>(iPlugin->path());

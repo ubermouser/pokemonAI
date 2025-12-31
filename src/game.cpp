@@ -189,7 +189,7 @@ Game& Game::initialize() {
 
   if (cfg_.numThreads == SIZE_MAX) {
     cfg_.numThreads = omp_get_num_procs();
-    SPDLOG_INFO("Game thread parallelism set to {}!", cfg_.numThreads);
+    SPDLOG_WARN("Game thread parallelism set to {}!", cfg_.numThreads);
   }
 
   isInitialized_ = true;

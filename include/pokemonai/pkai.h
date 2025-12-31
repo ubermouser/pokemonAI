@@ -169,19 +169,6 @@ enum GameType_t
   GT_OTHER_GAUNTLET_BOTH = 16 // do not start a game, instead rank a provided team and network
 };
 
-// command-line and text output variables
-extern int verbose;
-// 0 = errors
-// 1 = warnings
-// 2 = run-time general statistics
-// 3 = run-time specific statistics
-// 4 = run-time per step statistics (normally disabled by default)
-// 5 = run-time detailed stiatistics (used for per step debugging)
-extern int warning;
-// 0 - normal operation.
-// 1 - warning
-// 2 - error
-
 class Pokedex;
 extern const Pokedex* pkdex;
 

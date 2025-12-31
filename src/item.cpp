@@ -31,7 +31,7 @@ bool Items::initialize(const std::string& path, const Types& types) {
     SPDLOG_CRITICAL("An item list has not been defined!");
     return false;
   }
-  SPDLOG_INFO("Loading Pokemon item library...");
+  SPDLOG_WARN("Loading Pokemon item library at {}...", path);
   if (!loadFromFile(path, types))
   {
     SPDLOG_CRITICAL("inputItems failed to populate a list of pokemon items.");
@@ -118,6 +118,7 @@ bool Items::loadFromFile_lines(
   reserve(_numElements);
 
   orphan::OrphanSet orphanTypes;
+  size_t num_loaded = 0;
 
   for (size_t iItem = 0; iLine < lines.size(); ++iItem, ++iLine)
   {
@@ -202,7 +203,10 @@ bool Items::loadFromFile_lines(
 
     insert({cItem.getName(), cItem});
     byIndex_.insert({cItem.index_, &at(cItem.getName())});
+    num_loaded++;
   } //end of per-item
+
+  SPDLOG_INFO("Loaded {} items!", num_loaded);
 
   printOrphans(orphanTypes, "item inputStream", "item-types", "type");
   return true;

@@ -19,7 +19,7 @@ void orphan::printOrphans(
     const std::string& type) {
   if (orphans.size() > 0)
   {
-    SPDLOG_WARN("\"{}\" - {} Orphaned {}!", source, orphans.size(), categoryName);
+    SPDLOG_ERROR("\"{}\" - {} Orphaned {}!", source, orphans.size(), categoryName);
     if (SPDLOG_ACTIVE_LEVEL <= SPDLOG_LEVEL_DEBUG)
     {
       for (auto& orphan: orphans)

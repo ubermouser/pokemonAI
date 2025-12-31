@@ -13,11 +13,13 @@
 class EngineTest : public ::testing::Test {
 protected:
   void SetUp() override {
-    verbose = 0;
-    initialize_logger(spdlog::level::trace);
+    initialize_logger(spdlog::level::warn);
+
     pokedex_ = std::make_shared<PokedexStatic>();
     engine_ = std::make_shared<PkCU>();
     engine_->setAllowInvalidMoves(true);
+
+    spdlog::set_level(spdlog::level::trace);
   }
 
   std::shared_ptr<Pokedex> pokedex_;

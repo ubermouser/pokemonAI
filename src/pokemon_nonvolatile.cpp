@@ -2,6 +2,7 @@
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
+#include <spdlog/fmt/ostr.h>
 
 #include <algorithm>
 #include <boost/property_tree/ptree.hpp>
@@ -693,9 +694,11 @@ void PokemonNonVolatile::input(const pt::ptree& ptree, Orphanage& orphanage) {
   try {
     setInitialItem(*(item==NULL?Item::no_item:item));
   } catch (const std::exception& e) {
-    std::stringstream out;
-    out << "pokemon " << *this << " cannot use item \"" << item->getName() << "\": " << e.what() << "!";
-    SPDLOG_WARN("{}", out.str());
+    SPDLOG_ERROR(
+        "pokemon \"{}\" cannot use item \"{}\": {}!",
+        fmt::streamed(*this),
+        item->getName(),
+        e.what());
   }
 
   const Ability* ability =
@@ -703,9 +706,11 @@ void PokemonNonVolatile::input(const pt::ptree& ptree, Orphanage& orphanage) {
   try {
     setAbility(*(ability==NULL?Ability::no_ability:ability));
   } catch (const std::exception& e) {
-    std::stringstream out;
-    out << "pokemon " << *this << " cannot use ability \"" << ability->getName() << "\": " << e.what() << "!";
-    SPDLOG_WARN("{}", out.str());
+    SPDLOG_ERROR(
+        "pokemon \"{}\" cannot use ability \"{}\": {}!",
+        fmt::streamed(*this),
+        ability->getName(),
+        e.what());
   }
 
   const Nature* nature =
@@ -718,10 +723,12 @@ void PokemonNonVolatile::input(const pt::ptree& ptree, Orphanage& orphanage) {
     if (move == NULL) { continue; }
     try {
       addMove(*move);
-    } catch (const std::exception& ex) {
-      std::stringstream out;
-      out << "pokemon " << *this << " cannot use move \"" << move->getName() << "\": " << ex.what() << "!";
-      SPDLOG_WARN("{}", out.str());
+    } catch (const std::exception& e) {
+      SPDLOG_ERROR(
+          "pokemon \"{}\" cannot use move \"{}\": {}!",
+          fmt::streamed(*this),
+          move->getName(),
+          e.what());
     }
   }
 

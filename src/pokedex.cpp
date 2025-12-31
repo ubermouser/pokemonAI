@@ -32,8 +32,6 @@ using namespace INI;
 using namespace orphan;
 namespace po = boost::program_options;
 
-int verbose = 0;
-int warning = 0;
 const Pokedex* pkdex = NULL;
 
 
@@ -96,7 +94,7 @@ bool PokedexStatic::initialize() {
   }
 
   // initialize scripts:
-  SPDLOG_INFO("Loading Plugins...");
+  SPDLOG_WARN("Loading Plugins from <STATIC>...");
   if (!this->inputPlugins()) {
     SPDLOG_CRITICAL(
         "inputPlugins failed to initialize an acceptable set of plugins!");

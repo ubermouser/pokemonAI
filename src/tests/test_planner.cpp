@@ -1,27 +1,25 @@
 #include <gtest/gtest.h>
 
+#include <limits>
 #include <memory>
 #include <sstream>
-#include <limits>
 
-#include "pokemonai/engine.h"
+#include "engine_test.hpp"
 #include "pokemonai/evaluator_simple.h"
-#include "pokemonai/pokedex_static.h"
-#include "pokemonai/pkCU.h"
-#include "pokemonai/planner_random.h"
+#include "pokemonai/planner_human.h"
 #include "pokemonai/planner_max.h"
 #include "pokemonai/planner_maximin.h"
 #include "pokemonai/planner_minimax.h"
-#include "pokemonai/planner_human.h"
+#include "pokemonai/planner_random.h"
 
-
-class PlannerTest : public ::testing::Test {
-protected:
+class PlannerTest : public EngineTest {
+ protected:
   void SetUp() override {
-    verbose = 1;
-    initialize_logger(spdlog::level::debug);
-    pokedex_ = std::make_shared<PokedexStatic>();
-    engine_ = std::make_shared<PkCU>();
+    EngineTest::SetUp();
+    engine_->setAllowInvalidMoves(false);
+
+    initialize_logger(spdlog::level::trace);
+
     EvaluatorSimple::Config eval_config;
     eval_config.canMoveBias = 0.0;
     eval_config.movesBias = 0.0;
@@ -52,11 +50,8 @@ protected:
   }
 
   std::shared_ptr<EnvironmentNonvolatile> environment_;
-  std::shared_ptr<Pokedex> pokedex_;
-  std::shared_ptr<PkCU> engine_;
   std::shared_ptr<Evaluator> evaluator_;
 };
-
 
 TEST_F(PlannerTest, MaxPlannerChoosesGreedyOption) {
   PlannerMax::Config cfg;

@@ -84,7 +84,7 @@ void Ranker::initialize() {
   if (initialLeague_.planners.empty()) { throw std::runtime_error("no planners defined"); }
   if (cfg_.numThreads == SIZE_MAX) {
     cfg_.numThreads = omp_get_num_procs();
-    SPDLOG_INFO("Ranker thread parallelism set to {}!", cfg_.numThreads);
+    SPDLOG_WARN("Ranker thread parallelism set to {}!", cfg_.numThreads);
   }
 
   loadTeamPopulation();

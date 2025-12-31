@@ -17,7 +17,7 @@ bool Abilities::initialize(const std::string& path) {
     SPDLOG_CRITICAL("An ability list has not been defined!");
     return false;
   }
-  SPDLOG_INFO("Loading Pokemon ability library...");
+  SPDLOG_WARN("Loading Pokemon ability library at {}...", path);
   if (!loadFromFile(path))
   {
     SPDLOG_CRITICAL(
@@ -104,6 +104,7 @@ bool Abilities::loadFromFile_lines(const std::vector<std::string>& lines, size_t
   // make sure number of lines in the file is correct for the number of moves we were given:
   if (!INI::checkRangeB(lines.size() - iLine, (size_t)_numElements, (size_t)SIZE_MAX)) { return false; }
   reserve(_numElements);
+  size_t num_loaded = 0;
 
   for (size_t iAbility = 0; iLine < lines.size(); ++iAbility, ++iLine)
   {
@@ -139,6 +140,8 @@ bool Abilities::loadFromFile_lines(const std::vector<std::string>& lines, size_t
 
     insert({cAbility.getName(), cAbility});
   } //end of per-ability
+
+  SPDLOG_INFO("Loaded {} abilities!", num_loaded);
 
   return true; // import success
 }

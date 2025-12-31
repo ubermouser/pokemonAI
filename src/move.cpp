@@ -77,7 +77,7 @@ bool Moves::initialize(const std::string& path, const Types& types) {
     SPDLOG_CRITICAL("A move list has not been defined!");
     return false;
   }
-  SPDLOG_INFO("Loading Pokemon move library...");
+  SPDLOG_WARN("Loading Pokemon move library at {}...", path);
   if (!loadFromFile(path, types))
   {
     SPDLOG_CRITICAL("inputMoves failed to populate a list of moves.");
@@ -339,6 +339,7 @@ bool Moves::loadFromFile_lines(
   reserve(_numElements);
 
   orphan::OrphanSet orphanTypes;
+  size_t num_loaded = 0;
 
   for (size_t iMove = 0; iLine != lines.size(); ++iMove, ++iLine)
   {
@@ -389,13 +390,15 @@ bool Moves::loadFromFile_lines(
         hasPlugins,
         description);
     insert({name, move});
-    SPDLOG_DEBUG("\tLoaded move {}-\"{}\"", iMove, move.getName());
+    num_loaded++;
+    SPDLOG_TRACE("\tLoaded move {}-\"{}\"", iMove, move.getName());
   } //end of per-move
+  SPDLOG_INFO("Loaded {} moves!", num_loaded);
 
   if (orphanTypes.size() != 0)
   {
-    SPDLOG_WARN("move inputStream - {} Orphaned move-types!", 
-      orphanTypes.size());
+    SPDLOG_ERROR(
+        "move inputStream - {} Orphaned move-types!", orphanTypes.size());
     for (auto orphan : orphanTypes) {
       SPDLOG_DEBUG("\tOrphaned type \"{}\"", orphan);
     }
