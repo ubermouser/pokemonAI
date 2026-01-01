@@ -1,167 +1,167 @@
 PKAIM	165							Buff, self										Debuff, Enemy									Ailment					Ailment, Volatile								
 Name	Type	PP	P.Accuracy	Power	Damage	Target	Priority	Atk	SpA	Def	SpD	Spe	Hitpoints	Evasion	Accuracy	Critical	S.Accuracy	Atk	SpA	Def	SpD	Spe	Hitpoints	Evasion	Accuracy	Critical	Burn	Freeze	Paralysis	Poison	Sleep	Confusion	Flinch	Identify	Infatuation	Lock On	Nightmare	P. Trap	Other	Description
-Absorb	Grass	25	100	20																																				User recovers half the HP inflicted on opponent.
-Acid	Poison	30	100	40																																				May lower opponent's Special Defense.
-Acid Armor	Poison	20	—	—																																				Sharply raises user's Defense.
-Agility	Psychic	30	—	—																																				Sharply raises user's Speed.
-Amnesia	Psychic	20	—	—																																				Sharply raises user's Special Defense.
-Aurora Beam	Ice	20	100	65																																				May lower opponent's Attack.
-Barrage	Normal	20	85	15																																				Hits 2-5 times in one turn.
-Barrier	Psychic	20	—	—																																				Sharply raises user's Defense.
-Bide	Normal	10	—	—																																				User takes damage for two turns then strikes back double.
-Bind	Normal	20	85	15																																				Traps opponent, damaging them for 4-5 turns.
-Bite	Dark	25	100	60																																				May cause flinching.
-Blizzard	Ice	5	70	110																																				May freeze opponent.
-Body Slam	Normal	15	100	85																																				May paralyze opponent.
-Bone Club	Ground	20	85	65																																				May cause flinching.
-Bonemerang	Ground	10	90	50																																				Hits twice in one turn.
-Bubble	Water	30	100	40																																				May lower opponent's Speed.
-Bubble Beam	Water	20	100	65																																				May lower opponent's Speed.
-Clamp	Water	15	85	35																																				Traps opponent, damaging them for 4-5 turns.
-Comet Punch	Normal	15	85	18																																				Hits 2-5 times in one turn.
-Confuse Ray	Ghost	10	100	—																																				Confuses opponent.
-Confusion	Psychic	25	100	50																																				May confuse opponent.
-Constrict	Normal	35	100	10																																				May lower opponent's Speed by one stage.
-Conversion	Normal	30	—	—																																				Changes user's type to that of its first move.
-Counter	Fighting	20	100	—																																				When hit by a Physical Attack, user strikes back with 2x power.
-Crabhammer	Water	10	90	100																																				High critical hit ratio.
-Cut	Normal	30	95	50																																				
-Defense Curl	Normal	40	—	—																																				Raises user's Defense.
-Dig	Ground	10	100	80																																				Digs underground on first turn, attacks on second. Can also escape from caves.
-Disable	Normal	20	100	—																																				Opponent can't use its last attack for a few turns.
-Dizzy Punch	Normal	10	100	70																																				May confuse opponent.
-Double Kick	Fighting	30	100	30																																				Hits twice in one turn.
-Double Slap	Normal	10	85	15																																				Hits 2-5 times in one turn.
-Double Team	Normal	15	—	—																																				Raises user's Evasiveness.
-Double-Edge	Normal	15	100	120																																				User receives recoil damage.
-Dragon Rage	Dragon	10	100	—																																				Always inflicts 40 HP.
-Dream Eater	Psychic	15	100	100																																				User recovers half the HP inflicted on a sleeping opponent.
-Drill Peck	Flying	20	100	80																																				
-Earthquake	Ground	10	100	100																																				Power is doubled if opponent is underground from using Dig.
-Egg Bomb	Normal	10	75	100																																				
-Ember	Fire	25	100	40																																				May burn opponent.
-Explosion	Normal	5	100	250																																				User faints.
-Fire Blast	Fire	5	85	110																																				May burn opponent.
-Fire Punch	Fire	15	100	75																																				May burn opponent.
-Fire Spin	Fire	15	85	35																																				Traps opponent, damaging them for 4-5 turns.
-Fissure	Ground	5	30	—																																				One-Hit-KO, if it hits.
-Flamethrower	Fire	15	100	90																																				May burn opponent.
-Flash	Normal	20	100	—																																				Lowers opponent's Accuracy.
-Fly	Flying	15	95	90																																				Flies up on first turn, attacks on second turn.
-Focus Energy	Normal	30	—	—																																				Increases critical hit ratio.
-Fury Attack	Normal	20	85	15																																				Hits 2-5 times in one turn.
-Fury Swipes	Normal	15	80	18																																				Hits 2-5 times in one turn.
-Glare	Normal	30	100	—																																				Paralyzes opponent.
-Growl	Normal	40	100	—																																				Lowers opponent's Attack.
-Growth	Normal	20	—	—																																				Raises user's Attack and Special Attack.
-Guillotine	Normal	5	30	—																																				One-Hit-KO, if it hits.
-Gust	Flying	35	100	40																																				Hits Pokémon using Fly/Bounce/Sky Drop with double power.
-Harden	Normal	30	—	—																																				Raises user's Defense.
-Haze	Ice	30	—	—																																				Resets all stat changes.
-Headbutt	Normal	15	100	70																																				May cause flinching.
-High Jump Kick	Fighting	10	90	130																																				If it misses, the user loses half their HP.
-Horn Attack	Normal	25	100	65																																				
-Horn Drill	Normal	5	30	—																																				One-Hit-KO, if it hits.
-Hydro Pump	Water	5	80	110																																				
-Hyper Beam	Normal	5	90	150																																				User must recharge next turn.
-Hyper Fang	Normal	15	90	80																																				May cause flinching.
-Hypnosis	Psychic	20	60	—																																				Puts opponent to sleep.
-Ice Beam	Ice	10	100	90																																				May freeze opponent.
-Ice Punch	Ice	15	100	75																																				May freeze opponent.
-Jump Kick	Fighting	10	95	100																																				If it misses, the user loses half their HP.
-Karate Chop	Fighting	25	100	50																																				High critical hit ratio.
-Kinesis	Psychic	15	80	—																																				Lowers opponent's Accuracy.
-Leech Life	Bug	10	100	80																																				User recovers half the HP inflicted on opponent.
-Leech Seed	Grass	10	90	—																																				Drains HP from opponent each turn.
-Leer	Normal	30	100	—																																				Lowers opponent's Defense.
-Lick	Ghost	30	100	30																																				May paralyze opponent.
-Light Screen	Psychic	30	—	—																																				Halves damage from Special attacks for 5 turns.
-Lovely Kiss	Normal	10	75	—																																				Puts opponent to sleep.
-Low Kick	Fighting	20	100	—																																				The heavier the opponent, the stronger the attack.
-Meditate	Psychic	40	—	—																																				Raises user's Attack.
-Mega Drain	Grass	15	100	40																																				User recovers half the HP inflicted on opponent.
-Mega Kick	Normal	5	75	120																																				
-Mega Punch	Normal	20	85	80																																				
-Metronome	Normal	10	—	—																																				User performs almost any move in the game at random.
-Mimic	Normal	10	—	—																																				Copies the opponent's last move.
-Minimize	Normal	10	—	—																																				Sharply raises user's Evasiveness.
-Mirror Move	Flying	20	—	—																																				User performs the opponent's last move.
-Mist	Ice	30	—	—																																				User's stats cannot be changed for a period of time.
-Night Shade	Ghost	15	100	—																																				Inflicts damage equal to user's level.
-Pay Day	Normal	20	100	40																																				Money is earned after the battle.
-Peck	Flying	35	100	35																																				
-Petal Dance	Grass	10	100	120																																				User attacks for 2-3 turns but then becomes confused.
-Pin Missile	Bug	20	95	25																																				Hits 2-5 times in one turn.
-Poison Gas	Poison	40	90	—																																				Poisons opponent.
-Poison Powder	Poison	35	75	—																																				Poisons opponent.
-Poison Sting	Poison	35	100	15																																				May poison the opponent.
-Pound	Normal	35	100	40																																				
-Psybeam	Psychic	20	100	65																																				May confuse opponent.
-Psychic	Psychic	10	100	90																																				May lower opponent's Special Defense.
-Psywave	Psychic	15	100	—																																				Inflicts damage 50-150% of user's level.
-Quick Attack	Normal	30	100	40																																				User attacks first.
-Rage	Normal	20	100	20																																				Raises user's Attack when hit.
-Razor Leaf	Grass	25	95	55																																				High critical hit ratio.
-Razor Wind	Normal	10	100	80																																				Charges on first turn, attacks on second. High critical hit ratio.
-Recover	Normal	5	—	—																																				User recovers half its max HP.
-Reflect	Psychic	20	—	—																																				Halves damage from Physical attacks for 5 turns.
-Rest	Psychic	5	—	—																																				User sleeps for 2 turns, but user is fully healed.
-Roar	Normal	20	—	—																																				In battles, the opponent switches. In the wild, the Pokémon runs.
-Rock Slide	Rock	10	90	75																																				May cause flinching.
-Rock Throw	Rock	15	90	50																																				
-Rolling Kick	Fighting	15	85	60																																				May cause flinching.
-Sand Attack	Ground	15	100	—																																				Lowers opponent's Accuracy.
-Scratch	Normal	35	100	40																																				
-Screech	Normal	40	85	—																																				Sharply lowers opponent's Defense.
-Seismic Toss	Fighting	20	100	—																																				Inflicts damage equal to user's level.
-Self-Destruct	Normal	5	100	200																																				User faints.
-Sharpen	Normal	30	—	—																																				Raises user's Attack.
-Sing	Normal	15	55	—																																				Puts opponent to sleep.
-Skull Bash	Normal	10	100	130																																				Raises Defense on first turn, attacks on second.
-Sky Attack	Flying	5	90	140																																				Charges on first turn, attacks on second. May cause flinching. High critical hit ratio.
-Slam	Normal	20	75	80																																				
-Slash	Normal	20	100	70																																				High critical hit ratio.
-Sleep Powder	Grass	15	75	—																																				Puts opponent to sleep.
-Sludge	Poison	20	100	65																																				May poison opponent.
-Smog	Poison	20	70	30																																				May poison opponent.
-Smokescreen	Normal	20	100	—																																				Lowers opponent's Accuracy.
-Soft-Boiled	Normal	5	—	—																																				User recovers half its max HP.
-Solar Beam	Grass	10	100	120																																				Charges on first turn, attacks on second.
-Sonic Boom	Normal	20	90	—																																				Always inflicts 20 HP.
-Spike Cannon	Normal	15	100	20																																				Hits 2-5 times in one turn.
-Splash	Normal	40	—	—																																				Doesn't do ANYTHING.
-Spore	Grass	15	100	—																																				Puts opponent to sleep.
-Stomp	Normal	20	100	65																																				May cause flinching.
-Strength	Normal	15	100	80																																				
-String Shot	Bug	40	95	—																																				Sharply lowers opponent's Speed.
-Struggle	Normal	—	—	50																																				Only usable when all PP are gone. Hurts the user.
-Stun Spore	Grass	30	75	—																																				Paralyzes opponent.
-Submission	Fighting	20	80	80																																				User receives recoil damage.
-Substitute	Normal	10	—	—																																				Uses HP to creates a decoy that takes hits.
-Super Fang	Normal	10	90	—																																				Always takes off half of the opponent's HP.
-Supersonic	Normal	20	55	—																																				Confuses opponent.
-Surf	Water	15	100	90																																				Hits all adjacent Pokémon.
-Swift	Normal	20	∞	60																																				Ignores Accuracy and Evasiveness.
-Swords Dance	Normal	20	—	—																																				Sharply raises user's Attack.
-Tackle	Normal	35	100	40																																				
-Tail Whip	Normal	30	100	—																																				Lowers opponent's Defense.
-Take Down	Normal	20	85	90																																				User receives recoil damage.
-Teleport	Psychic	20	—	—																																				Allows user to flee wild battles; also warps player to last PokéCenter.
-Thrash	Normal	10	100	120																																				User attacks for 2-3 turns but then becomes confused.
-Thunder	Electric	10	70	110																																				May paralyze opponent.
-Thunder Punch	Electric	15	100	75																																				May paralyze opponent.
-Thunder Shock	Electric	30	100	40																																				May paralyze opponent.
-Thunder Wave	Electric	20	90	—																																				Paralyzes opponent.
-Thunderbolt	Electric	15	100	90																																				May paralyze opponent.
-Toxic	Poison	10	90	—																																				Badly poisons opponent.
-Transform	Normal	10	—	—																																				User takes on the form and attacks of the opponent.
-Tri Attack	Normal	10	100	80																																				May paralyze, burn or freeze opponent.
-Twineedle	Bug	20	100	25																																				Hits twice in one turn. May poison opponent.
-Vine Whip	Grass	25	100	45																																				
-Vise Grip	Normal	30	100	55																																				
-Water Gun	Water	25	100	40																																				
-Waterfall	Water	15	100	80																																				May cause flinching.
-Whirlwind	Normal	20	—	—																																				In battles, the opponent switches. In the wild, the Pokémon runs.
-Wing Attack	Flying	35	100	60																																				
-Withdraw	Water	40	—	—																																				Raises user's Defense.
-Wrap	Normal	20	90	15																																				Traps opponent, damaging them for 4-5 turns.
+Absorb	Grass	25	100	20	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User recovers half the HP inflicted on opponent.
+Acid	Poison	30	100	40	1	1	0	0	0	0	0	0	0	0	0	0	33	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	May lower opponent's Special Defense.
+Acid Armor	Poison	20	—	—	0	0	0	0	0	2	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Sharply raises user's Defense.
+Agility	Psychic	30	—	—	0	0	0	0	0	0	2	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Sharply raises user's Speed.
+Amnesia	Psychic	20	—	—	0	0	0	0	0	0	0	2	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Sharply raises user's Special Defense.
+Aurora Beam	Ice	20	100	65	2	1	0	0	0	0	0	0	0	0	0	0	33	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	May lower opponent's Attack.
+Barrage	Normal	20	85	15	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Hits 2-5 times in one turn.
+Barrier	Psychic	20	—	—	0	0	0	0	0	2	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Sharply raises user's Defense.
+Bide	Normal	10	—	—	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User takes damage for two turns then strikes back double.
+Bind	Normal	20	85	15	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	SCRIPT	Traps opponent, damaging them for 4-5 turns.
+Bite	Dark	25	100	60	1	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	---	May cause flinching.
+Blizzard	Ice	5	70	110	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	---	May freeze opponent.
+Body Slam	Normal	15	100	85	1	1	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	May paralyze opponent.
+Bone Club	Ground	20	85	65	1	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	---	May cause flinching.
+Bonemerang	Ground	10	90	50	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Hits twice in one turn.
+Bubble	Water	30	100	40	2	1	0	0	0	0	0	0	0	0	0	0	33	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	May lower opponent's Speed.
+Bubble Beam	Water	20	100	65	2	1	0	0	0	0	0	0	0	0	0	0	33	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	May lower opponent's Speed.
+Clamp	Water	15	85	35	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	SCRIPT	Traps opponent, damaging them for 4-5 turns.
+Comet Punch	Normal	15	85	18	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Hits 2-5 times in one turn.
+Confuse Ray	Ghost	10	100	—	0	0	0	0	0	0	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	---	Confuses opponent.
+Confusion	Psychic	25	100	50	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	---	May confuse opponent.
+Constrict	Normal	35	100	10	1	1	0	0	0	0	0	0	0	0	0	0	33	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	May lower opponent's Speed by one stage.
+Conversion	Normal	30	—	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Changes user's type to that of its first move.
+Counter	Fighting	20	100	—	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	When hit by a Physical Attack, user strikes back with 2x power.
+Crabhammer	Water	10	90	100	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	High critical hit ratio.
+Cut	Normal	30	95	50	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Defense Curl	Normal	40	—	—	0	0	0	0	0	1	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Raises user's Defense.
+Dig	Ground	10	100	80	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Digs underground on first turn, attacks on second. Can also escape from caves.
+Disable	Normal	20	100	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Opponent can't use its last attack for a few turns.
+Dizzy Punch	Normal	10	100	70	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Double Kick	Fighting	30	100	30	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Hits twice in one turn.
+Double Slap	Normal	10	85	15	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Hits 2-5 times in one turn.
+Double Team	Normal	15	—	—	0	0	0	0	0	0	0	0	0	1	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Raises user's Evasiveness.
+Double-Edge	Normal	15	100	120	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User receives recoil damage.
+Dragon Rage	Dragon	10	100	—	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Always inflicts 40 HP.
+Dream Eater	Psychic	15	100	100	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User recovers half the HP inflicted on a sleeping opponent.
+Drill Peck	Flying	20	100	80	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Earthquake	Ground	10	100	100	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Power is doubled if opponent is underground from using Dig.
+Egg Bomb	Normal	10	75	100	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Ember	Fire	25	100	40	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	---	May burn opponent.
+Explosion	Normal	5	100	250	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User faints.
+Fire Blast	Fire	5	85	110	2	1	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	---	May burn opponent.
+Fire Punch	Fire	15	100	75	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	---	May burn opponent.
+Fire Spin	Fire	15	85	35	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	SCRIPT	Traps opponent, damaging them for 4-5 turns.
+Fissure	Ground	5	30	—	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	One-Hit-KO, if it hits.
+Flamethrower	Fire	15	100	90	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	---	May burn opponent.
+Flash	Normal	20	100	—	0	0	0	0	0	0	0	0	0	0	0	0	70	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Lowers opponent's Accuracy.
+Fly	Flying	15	95	90	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Flies up on first turn, attacks on second turn.
+Focus Energy	Normal	30	—	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Increases critical hit ratio.
+Fury Attack	Normal	20	85	15	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Hits 2-5 times in one turn.
+Fury Swipes	Normal	15	80	18	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Hits 2-5 times in one turn.
+Glare	Normal	30	100	—	0	0	0	0	0	0	0	0	0	0	0	0	75	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Paralyzes opponent.
+Growl	Normal	40	100	—	0	0	0	0	0	0	0	0	0	0	0	0	100	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Lowers opponent's Attack.
+Growth	Normal	20	—	—	0	0	0	0	1	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Raises user's Attack and Special Attack.
+Guillotine	Normal	5	30	—	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	One-Hit-KO, if it hits.
+Gust	Flying	35	100	40	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Hits Pokémon using Fly/Bounce/Sky Drop with double power.
+Harden	Normal	30	—	—	0	0	0	0	0	1	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Raises user's Defense.
+Haze	Ice	30	—	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Resets all stat changes.
+Headbutt	Normal	15	100	70	1	1	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	---	May cause flinching.
+High Jump Kick	Fighting	10	90	130	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	If it misses, the user loses half their HP.
+Horn Attack	Normal	25	100	65	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Horn Drill	Normal	5	30	—	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	One-Hit-KO, if it hits.
+Hydro Pump	Water	5	80	110	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Hyper Beam	Normal	5	90	150	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User must recharge next turn.
+Hyper Fang	Normal	15	90	80	1	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	---	May cause flinching.
+Hypnosis	Psychic	20	60	—	0	0	0	0	0	0	0	0	0	0	0	0	60	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	---	Puts opponent to sleep.
+Ice Beam	Ice	10	100	90	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	---	May freeze opponent.
+Ice Punch	Ice	15	100	75	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	---	May freeze opponent.
+Jump Kick	Fighting	10	95	100	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	If it misses, the user loses half their HP.
+Karate Chop	Fighting	25	100	50	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	High critical hit ratio.
+Kinesis	Psychic	15	80	—	0	0	0	0	0	0	0	0	0	0	0	0	80	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Lowers opponent's Accuracy.
+Leech Life	Bug	10	100	80	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User recovers half the HP inflicted on opponent.
+Leech Seed	Grass	10	90	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Drains HP from opponent each turn.
+Leer	Normal	30	100	—	0	0	0	0	0	0	0	0	0	0	0	0	100	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Lowers opponent's Defense.
+Lick	Ghost	30	100	30	1	1	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	May paralyze opponent.
+Light Screen	Psychic	30	—	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Halves damage from Special attacks for 5 turns.
+Lovely Kiss	Normal	10	75	—	0	0	0	0	0	0	0	0	0	0	0	0	75	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	---	Puts opponent to sleep.
+Low Kick	Fighting	20	100	—	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	The heavier the opponent, the stronger the attack.
+Meditate	Psychic	40	—	—	0	0	0	1	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Raises user's Attack.
+Mega Drain	Grass	15	100	40	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User recovers half the HP inflicted on opponent.
+Mega Kick	Normal	5	75	120	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Mega Punch	Normal	20	85	80	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Metronome	Normal	10	—	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User performs almost any move in the game at random.
+Mimic	Normal	10	—	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Copies the opponent's last move.
+Minimize	Normal	10	—	—	0	0	0	0	0	0	0	0	0	1	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Sharply raises user's Evasiveness.
+Mirror Move	Flying	20	—	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User performs the opponent's last move.
+Mist	Ice	30	—	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User's stats cannot be changed for a period of time.
+Night Shade	Ghost	15	100	—	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Inflicts damage equal to user's level.
+Pay Day	Normal	20	100	40	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Money is earned after the battle.
+Peck	Flying	35	100	35	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Petal Dance	Grass	10	100	120	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User attacks for 2-3 turns but then becomes confused.
+Pin Missile	Bug	20	95	25	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Hits 2-5 times in one turn.
+Poison Gas	Poison	40	90	—	0	0	0	0	0	0	0	0	0	0	0	0	55	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	---	Poisons opponent.
+Poison Powder	Poison	35	75	—	0	0	0	0	0	0	0	0	0	0	0	0	75	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	---	Poisons opponent.
+Poison Sting	Poison	35	100	15	1	1	0	0	0	0	0	0	0	0	0	0	20	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	---	May poison the opponent.
+Pound	Normal	35	100	40	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Psybeam	Psychic	20	100	65	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	---	May confuse opponent.
+Psychic	Psychic	10	100	90	2	1	0	0	0	0	0	0	0	0	0	0	33	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	May lower opponent's Special Defense.
+Psywave	Psychic	15	100	—	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Inflicts damage 50-150% of user's level.
+Quick Attack	Normal	30	100	40	1	1	1	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	User attacks first.
+Rage	Normal	20	100	20	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Raises user's Attack when hit.
+Razor Leaf	Grass	25	95	55	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	High critical hit ratio.
+Razor Wind	Normal	10	100	80	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Charges on first turn, attacks on second. High critical hit ratio.
+Recover	Normal	5	—	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User recovers half its max HP.
+Reflect	Psychic	20	—	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Halves damage from Physical attacks for 5 turns.
+Rest	Psychic	5	—	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User sleeps for 2 turns, but user is fully healed.
+Roar	Normal	20	—	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	In battles, the opponent switches. In the wild, the Pokémon runs.
+Rock Slide	Rock	10	90	75	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Rock Throw	Rock	15	90	50	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Rolling Kick	Fighting	15	85	60	1	1	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	---	May cause flinching.
+Sand Attack	Ground	15	100	—	0	0	0	0	0	0	0	0	0	0	0	0	100	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Lowers opponent's Accuracy.
+Scratch	Normal	35	100	40	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Screech	Normal	40	85	—	0	0	0	0	0	0	0	0	0	0	0	0	85	0	0	2	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Sharply lowers opponent's Defense.
+Seismic Toss	Fighting	20	100	—	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Inflicts damage equal to user's level.
+Self-Destruct	Normal	5	100	200	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User faints.
+Sharpen	Normal	30	—	—	0	0	0	1	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Raises user's Attack.
+Sing	Normal	15	55	—	0	0	0	0	0	0	0	0	0	0	0	0	55	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	---	Puts opponent to sleep.
+Skull Bash	Normal	10	100	130	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Raises Defense on first turn, attacks on second.
+Sky Attack	Flying	5	90	140	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Charges on first turn, attacks on second. May cause flinching. High critical hit ratio.
+Slam	Normal	20	75	80	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Slash	Normal	20	100	70	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	High critical hit ratio.
+Sleep Powder	Grass	15	75	—	0	0	0	0	0	0	0	0	0	0	0	0	75	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	---	Puts opponent to sleep.
+Sludge	Poison	20	100	65	1	1	0	0	0	0	0	0	0	0	0	0	40	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	---	May poison opponent.
+Smog	Poison	20	70	30	1	1	0	0	0	0	0	0	0	0	0	0	40	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	---	May poison opponent.
+Smokescreen	Normal	20	100	—	0	0	0	0	0	0	0	0	0	0	0	0	100	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Lowers opponent's Accuracy.
+Soft-Boiled	Normal	5	—	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User recovers half its max HP.
+Solar Beam	Grass	10	100	120	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Charges on first turn, attacks on second.
+Sonic Boom	Normal	20	90	—	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Always inflicts 20 HP.
+Spike Cannon	Normal	15	100	20	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Hits 2-5 times in one turn.
+Splash	Normal	40	—	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Doesn't do ANYTHING.
+Spore	Grass	15	100	—	0	0	0	0	0	0	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	---	Puts opponent to sleep.
+Stomp	Normal	20	100	65	1	1	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	---	May cause flinching.
+Strength	Normal	15	100	80	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+String Shot	Bug	40	95	—	0	0	0	0	0	0	0	0	0	0	0	0	95	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Sharply lowers opponent's Speed.
+Struggle	Normal	—	100	50	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Only usable when all PP are gone. Hurts the user.
+Stun Spore	Grass	30	75	—	0	0	0	0	0	0	0	0	0	0	0	0	75	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	Paralyzes opponent.
+Submission	Fighting	20	80	80	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User receives recoil damage.
+Substitute	Normal	10	—	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Uses HP to creates a decoy that takes hits.
+Super Fang	Normal	10	90	—	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Always takes off half of the opponent's HP.
+Supersonic	Normal	20	55	—	0	0	0	0	0	0	0	0	0	0	0	0	55	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	---	Confuses opponent.
+Surf	Water	15	100	90	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Hits all adjacent Pokémon.
+Swift	Normal	20	∞	60	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Ignores Accuracy and Evasiveness.
+Swords Dance	Normal	20	—	—	0	0	0	2	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Sharply raises user's Attack.
+Tackle	Normal	35	95	35	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Tail Whip	Normal	30	100	—	0	0	0	0	0	0	0	0	0	0	0	0	100	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Lowers opponent's Defense.
+Take Down	Normal	20	85	90	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User receives recoil damage.
+Teleport	Psychic	20	—	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Allows user to flee wild battles; also warps player to last PokéCenter.
+Thrash	Normal	10	100	120	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User attacks for 2-3 turns but then becomes confused.
+Thunder	Electric	10	70	110	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	May paralyze opponent.
+Thunder Punch	Electric	15	100	75	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	May paralyze opponent.
+Thunder Shock	Electric	30	100	40	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	May paralyze opponent.
+Thunder Wave	Electric	20	90	—	0	0	0	0	0	0	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	Paralyzes opponent.
+Thunderbolt	Electric	15	100	90	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	May paralyze opponent.
+Toxic	Poison	10	90	—	0	0	0	0	0	0	0	0	0	0	0	0	85	0	0	0	0	0	0	0	0	0	0	0	0	2	0	0	0	0	0	0	0	0	---	Badly poisons opponent.
+Transform	Normal	10	—	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User takes on the form and attacks of the opponent.
+Tri Attack	Normal	10	100	80	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	May paralyze, burn or freeze opponent.
+Twineedle	Bug	20	100	25	1	1	0	0	0	0	0	0	0	0	0	0	20	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	SCRIPT	Hits twice in one turn. May poison opponent.
+Vine Whip	Grass	25	100	45	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Vise Grip	Normal	30	100	55	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Water Gun	Water	25	100	40	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Waterfall	Water	15	100	80	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	May cause flinching.
+Whirlwind	Normal	20	—	—	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	In battles, the opponent switches. In the wild, the Pokémon runs.
+Wing Attack	Flying	35	100	60	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Withdraw	Water	40	—	—	0	0	0	0	0	1	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Raises user's Defense.
+Wrap	Normal	20	90	15	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	---	Traps opponent, damaging them for 4-5 turns.
