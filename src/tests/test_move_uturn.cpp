@@ -92,20 +92,20 @@ TEST_F(UTurnTest, NoErroneousStruggleWithChoiceItem) {
         .addMove(pokedex_->move("bullet punch"))
         .setInitialItem(pokedex_->item("choice band"))
         .setLevel(100));
-  
+
   engine_->setEnvironment(EnvironmentNonvolatile(team_cb, team_cb, true));
-  
+
   // Turn 1: Use U-turn. Since it's the last pokemon, it stays in.
   // We use moveAlly(0, 0) because U-turn requires a friendly target.
   auto turn1 = engine_->updateState(engine_->initialState(), Action::moveAlly(0, 0), Action::wait());
   auto state = turn1.at(0);
-  
+
   // Verify Choice Band lock: Bullet Punch (index 1) should be disabled
   EXPECT_FALSE(engine_->isValidAction(state, Action::move(1), TEAM_A));
-  
+
   // Verify U-turn (index 0) remains enabled (for target 0)
   EXPECT_TRUE(engine_->isValidAction(state, Action::moveAlly(0, 0), TEAM_A));
-  
+
   // Struggle should be disabled because U-turn is available.
   EXPECT_FALSE(engine_->isValidAction(state, Action::struggle(), TEAM_A));
 }

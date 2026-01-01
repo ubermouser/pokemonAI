@@ -28,20 +28,21 @@ public:
   using OrphanSet = orphan::OrphanSet;
 
   struct Config {
+    std::string prefixPath_ = "data/gen4/";
     // location of the move library
-    std::string movesPath_ = "data/gen4_moves.txt";
+    std::string movesPath_ = "moves.csv";
     // location of the pokemon library
-    std::string pokemonPath_ = "data/gen4_pokemon.txt";
+    std::string pokemonPath_ = "pokemon.csv";
     // location of the natures library
-    std::string naturesPath_ = "data/gen4_natures.txt";
+    std::string naturesPath_ = "natures.csv";
     // location of the items library
-    std::string itemsPath_ = "data/gen4_items.txt";
+    std::string itemsPath_ = "items.csv";
     // location of the abilities library
-    std::string abilitiesPath_ = "data/gen4_abilities.txt";
+    std::string abilitiesPath_ = "abilities.csv";
     // location of the type library
-    std::string typesPath_ = "data/gen4_types.txt";
+    std::string typesPath_ = "types.csv";
     // location of pokemon movelists
-    std::string movelistsPath_ = "data/gen4_movelist.txt";
+    std::string movelistsPath_ = "movelist.csv";
 
     Config(){};
 

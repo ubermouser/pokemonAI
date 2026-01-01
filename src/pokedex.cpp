@@ -59,37 +59,38 @@ bool PokedexStatic::initialize() {
 
   //load data from disk:
   //TYPE library
-  if (!types_.initialize(config_.typesPath_)) {
+  auto path_prefix = boost::filesystem::path(config_.prefixPath_);
+  if (!types_.initialize((path_prefix / config_.typesPath_).string())) {
     return false;
   }
 
   //NATURE library
-  if (!natures_.initialize(config_.naturesPath_)) {
+  if (!natures_.initialize((path_prefix / config_.naturesPath_).string())) {
     return false;
   }
 
   //MOVE library
-  if (!moves_.initialize(config_.movesPath_, types_)) {
+  if (!moves_.initialize((path_prefix / config_.movesPath_).string(), types_)) {
     return false;
   }
 
   //ABILITY library
-  if (!abilities_.initialize(config_.abilitiesPath_)) {
+  if (!abilities_.initialize((path_prefix / config_.abilitiesPath_).string())) {
     return false;
   }
 
   //ITEM library
-  if (!items_.initialize(config_.itemsPath_, types_)) {
+  if (!items_.initialize((path_prefix / config_.itemsPath_).string(), types_)) {
     return false;
   }
 
   //POKEMON library (requires abilities, moves, and types!)
   if (!pokemon_.initialize(
-      config_.pokemonPath_,
-      config_.movelistsPath_,
-      types_,
-      abilities_,
-      moves_)) {
+          (path_prefix / config_.pokemonPath_).string(),
+          (path_prefix / config_.movelistsPath_).string(),
+          types_,
+          abilities_,
+          moves_)) {
     return false;
   }
 
@@ -166,13 +167,13 @@ bool PokedexStatic::inputPlugins() {
 
 #ifdef GEN4_STATIC
   bool success = registerPlugin(
-    registerExtensions, 
-    &numExtensions, 
-    &numOverwritten, 
-    &mismatchedItems, 
-    &mismatchedAbilities, 
-    &mismatchedMoves, 
-    &mismatchedCategories);
+      registerExtensions,
+      &numExtensions,
+      &numOverwritten,
+      &mismatchedItems,
+      &mismatchedAbilities,
+      &mismatchedMoves,
+      &mismatchedCategories);
 #endif
 
   registerPlugin_orphanCount(
@@ -322,7 +323,11 @@ po::options_description PokedexStatic::Config::options(
   po::options_description desc{category};
 
   if (prefix.size() > 0) { prefix.append("-"); }
+  // clang-format off
   desc.add_options()
+      ((prefix + "prefix-path").c_str(),
+      po::value<std::string>(&prefixPath_)->default_value(defaults.prefixPath_),
+      "prefix path of all library files")
       ((prefix + "moves").c_str(),
       po::value<std::string>(&movesPath_)->default_value(defaults.movesPath_),
       "location of the move library")
@@ -344,6 +349,6 @@ po::options_description PokedexStatic::Config::options(
       ((prefix + "movelist").c_str(),
       po::value<std::string>(&movelistsPath_)->default_value(defaults.movelistsPath_),
       "location of pokemon movelists");
-
+  // clang-format on
   return desc;
 }

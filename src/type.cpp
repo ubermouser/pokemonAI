@@ -31,10 +31,10 @@ bool Types::initialize(const std::string& path) {
     SPDLOG_CRITICAL("InputTypes failed to populate an array of types.");
     return false;
   }
-  
+
   // find type special case
   Type::no_type = count("none")?&at("none"):new Type();
-  
+
   return true;
 }
 
@@ -149,7 +149,10 @@ bool Types::loadFromFile_lines(const std::vector<std::string>& lines, size_t& iL
     for (size_t indexInnerType = 0; indexInnerType < size(); indexInnerType++)
     {
       double cTypeVal;
-      if (!setArg(tokens.at(indexInnerType+1), cTypeVal)) { incorrectArgs("cTypeVal", iLine, indexInnerType+1); return false; }
+      if (!setArg(tokens.at(indexInnerType + 1), cTypeVal)) {
+        incorrectArgs("cTypeVal", iLine, indexInnerType + 1);
+        return false;
+      }
       checkRangeB(cTypeVal, 0.0, 2.0);
       cType.modTable_[typeNames[indexInnerType]] = cTypeVal * FPMULTIPLIER;
     }
