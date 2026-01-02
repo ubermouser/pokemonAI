@@ -134,7 +134,7 @@ Spore	Grass	15	100	---	0	0	0	0	0	0	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0
 Stomp	Normal	20	100	65	1	1	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	---	May cause flinching.
 Strength	Normal	15	100	80	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
 String Shot	Bug	40	95	---	0	0	0	0	0	0	0	0	0	0	0	0	95	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Sharply lowers opponent's Speed.
-Struggle	Normal	---	100	50	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Only usable when all PP are gone. Hurts the user.
+Struggle	Normal	5	100	50	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Only usable when all PP are gone. Hurts the user.
 Stun Spore	Grass	30	75	---	0	0	0	0	0	0	0	0	0	0	0	0	75	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	Paralyzes opponent.
 Submission	Fighting	20	80	80	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User receives recoil damage.
 Substitute	Normal	10	---	---	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Uses HP to creates a decoy that takes hits.
