@@ -21,19 +21,38 @@
 #include "fixedpoint/fixed_class.h"
 
 
-#define ENV_TEAM_HIT 0
-#define ENV_TEAM_CRIT 1
-#define ENV_TEAM_SECONDARY 2
-#define ENV_TEAM_BLOCKED 3
-#define ENV_TEAM_SWITCHED 4
-#define ENV_TEAM_FREE 5
-#define ENV_TEAM_WAIT 6
-#define ENV_TEAM_MOVESFIRST 7
-#define ENV_PRUNED 15
-#define ENV_MERGED 31
-#define ENV_TEAM_LAST 16
-
 typedef fixedpoint::fixed_point<30> fixType;
+
+struct TeamEnvironmentFlags {
+  uint8_t hit : 1;
+  uint8_t crit : 1;
+  uint8_t secondary : 1;
+  uint8_t blocked : 1;
+  uint8_t switched : 1;
+  uint8_t free : 1;
+  uint8_t wait : 1;
+  uint8_t movesFirst : 1;
+};
+
+union EnvironmentBitfield {
+  uint32_t raw;
+  struct {
+    TeamEnvironmentFlags team0;
+    uint8_t _pad0 : 7;
+    uint8_t pruned : 1;
+    TeamEnvironmentFlags team1;
+    uint8_t _pad1 : 7;
+    uint8_t merged : 1;
+  } bits;
+
+  const TeamEnvironmentFlags& getTeam(size_t i) const {
+    return (i == 0) ? bits.team0 : bits.team1;
+  }
+
+  TeamEnvironmentFlags& getTeam(size_t i) {
+    return (i == 0) ? bits.team0 : bits.team1;
+  }
+};
 
 struct PKAISHARED EnvironmentPossibleData {
   /*
@@ -56,26 +75,21 @@ struct PKAISHARED EnvironmentPossibleData {
    * what type of action occured to create this environment from
    * the previous environment?
    * 
-   * if bit n is set to 1:
-   * 0 - team a primary effect = hit
-   * 1 - team a critical hit = yes
-   * 2 - team a secondary effect = hit
-   * 3 - a status effect prevented team a from acting
-   * 4 - team a pokemon recently switched out
-   * 5 - team a dead pokemon recently got a free switch
+   * team 0 (bits 0-7) / team 1 (bits 16-23):
+   * hit
+   * crit
+   * secondary
+   * blocked
+   * switched
+   * free
+   * wait
+   * movesFirst
    * 
-   * 8 - team b primary effect = hit
-   * 9 - team b critical hit = yes
-   * 10 - team b secondary effect = hit
-   * 11 - a status effect prevented the team b from acting
-   * 12 - team b pokemon recently switched out
-   * 13 - team b dead pokemon recently got a free switch out
-
-   * 7 - this environmentPossible has been pruned due to duplicate status
-   * 15 - this environmentPossible has been merged with a duplicate environment
-   * 
+   * global:
+   * pruned (bit 15)
+   * merged (bit 31)
    */
-  uint32_t envBitset;
+  EnvironmentBitfield flags;
 
 
   static EnvironmentPossibleData create(const EnvironmentVolatileData& source, bool doHash = true);
@@ -91,27 +105,24 @@ struct PKAISHARED EnvironmentPossibleData {
   const fixType& getProbability() const { return probability; };
   fixType& getProbability() { return probability; };
 
-  const uint32_t& getBitmask() const { return envBitset; };
-  uint32_t& getBitmask() { return envBitset; };
-
-  void setBit(size_t iBit) { envBitset |= (0x1 << iBit); };
-  bool getBit(size_t iBit) const { return ((0x1 << iBit) & envBitset) > 0; }
+  const uint32_t& getBitmask() const { return flags.raw; };
+  uint32_t& getBitmask() { return flags.raw; };
 
   void setMerged() {
-    setBit(ENV_MERGED);
+    flags.bits.merged = 1;
   };
 
   void setPruned() {
-    setBit(ENV_PRUNED);
+    flags.bits.pruned = 1;
   };
   
 
   bool isPruned() const {
-    return getBit(ENV_PRUNED);
+    return flags.bits.pruned;
   };
 
   bool isMerged() const {
-    return getBit(ENV_MERGED);
+    return flags.bits.merged;
   }
 };
 
@@ -146,42 +157,42 @@ public:
 
   /* has iTeam hit this round? */
   bool hasHit(size_t iTeam) const {
-    return data().getBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_HIT);
+    return data().flags.getTeam(iTeam).hit;
   };
 
   /* has iTeam critical hit this round? */
   bool hasCrit(size_t iTeam) const {
-    return data().getBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_CRIT);
+    return data().flags.getTeam(iTeam).crit;
   };
 
   /* has iTeam used a secondary effect this round? */
   bool hasSecondary(size_t iTeam) const {
-    return data().getBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_SECONDARY);
+    return data().flags.getTeam(iTeam).secondary;
   };
 
   /* was iteam's action blocked this round? */
   bool wasBlocked(size_t iTeam) const {
-    return data().getBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_BLOCKED);
+    return data().flags.getTeam(iTeam).blocked;
   };
 
   /* has iTeam switched this round? */
   bool hasSwitched(size_t iTeam) const {
-    return data().getBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_SWITCHED);
+    return data().flags.getTeam(iTeam).switched;
   };
 
   /* has iTeam used a free move this round? */
   bool hasFreeMove(size_t iTeam) const {
-    return data().getBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_FREE);
+    return data().flags.getTeam(iTeam).free;
   };
 
   /* has iTeam used waited this round? */
   bool hasWaited(size_t iTeam) const {
-    return data().getBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_WAIT);
+    return data().flags.getTeam(iTeam).wait;
   };
 
   /* has iTeam moved first this round? */
   bool hasMovedFirst(size_t iTeam) const {
-    return data().getBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_MOVESFIRST);
+    return data().flags.getTeam(iTeam).movesFirst;
   };
 
   bool isMerged() const { return data().isMerged(); }
@@ -210,35 +221,35 @@ public:
   fixType& getProbability() { return data().getProbability(); };
   
   void setHit(size_t iTeam) {
-    data().setBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_HIT);
+    data().flags.getTeam(iTeam).hit = 1;
   };
 
   void setCrit(size_t iTeam) {
-    data().setBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_CRIT);
+    data().flags.getTeam(iTeam).crit = 1;
   };
 
   void setSecondary(size_t iTeam) {
-    data().setBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_SECONDARY);
+    data().flags.getTeam(iTeam).secondary = 1;
   };
 
   void setBlocked(size_t iTeam) {
-    data().setBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_BLOCKED);
+    data().flags.getTeam(iTeam).blocked = 1;
   };
 
   void setSwitched(size_t iTeam) {
-    data().setBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_SWITCHED);
+    data().flags.getTeam(iTeam).switched = 1;
   };
 
   void setFreeMove(size_t iTeam) {
-    data().setBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_FREE);
+    data().flags.getTeam(iTeam).free = 1;
   };
 
   void setWaited(size_t iTeam) {
-    data().setBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_WAIT);
+    data().flags.getTeam(iTeam).wait = 1;
   }
 
   void setMovedFirst(size_t iTeam) {
-    data().setBit(iTeam * ENV_TEAM_LAST + ENV_TEAM_MOVESFIRST);
+    data().flags.getTeam(iTeam).movesFirst = 1;
   }
 
   void setPruned() { data().setPruned(); };
