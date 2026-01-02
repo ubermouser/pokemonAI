@@ -1,11 +1,7 @@
-
-//#define PKAI_EXPORT
 #include "pokemonai/pluggable.h"
-//#undef PKAI_EXPORT
 
-//#define PKAI_STATIC
 #include "pokemonai/plugin.h"
-//#undef PKAI_STATIC
+
 
 plugin_t Pluggable::emptyPlugin = { NULL, 0, current_team };
 

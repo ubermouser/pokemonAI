@@ -1,4 +1,4 @@
-add_library(pkaiEngine STATIC
+add_library(pkaiEngine SHARED
     ../src/ability.cpp
     ../src/action.cpp
     ../src/environment_nonvolatile.cpp
@@ -59,7 +59,6 @@ add_library(pkaiEngine STATIC
 set_target_properties(pkaiEngine PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 target_compile_definitions(pkaiEngine PUBLIC
-    PKAI_STATIC
     FORCE_INLINE=
 )
 
@@ -68,4 +67,6 @@ target_link_libraries(pkaiEngine
     OpenMP::OpenMP_CXX
     fmt::fmt
     spdlog::spdlog
+    Boost::filesystem
+    Boost::program_options
 )

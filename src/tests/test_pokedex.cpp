@@ -27,11 +27,13 @@ class PokedexGen4Test : public ::testing::Test {
 
 class PokedexGen4StaticTest : public PokedexGen4Test {
  protected:
-  void SetUp() override { pokedex = std::make_shared<PokedexStatic>(); }
-
+  void SetUp() override {
 #ifndef GEN4_STATIC
-  static void SetUpTestSuite() { GTEST_SKIP() << "Generation-4 Test"; }
+    GTEST_SKIP() << "Generation-4 Test";
 #endif
+
+    pokedex = std::make_shared<PokedexStatic>();
+  }
 };
 
 
@@ -86,15 +88,15 @@ class PokedexGen1Test : public ::testing::Test {
 class PokedexGen1StaticTest : public PokedexGen1Test {
  protected:
   void SetUp() override {
+#ifndef GEN1_STATIC
+    GTEST_SKIP() << "Generation-1 Test";
+#endif
+
     PokedexStatic::Config cfg;
     cfg.prefixPath_ = "data/gen1/";
 
     pokedex = std::make_shared<PokedexStatic>(cfg);
   }
-
-#ifndef GEN1_STATIC
-  static void SetUpTestSuite() { GTEST_SKIP() << "Generation-1 Test"; }
-#endif
 };
 
 

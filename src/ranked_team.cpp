@@ -1,6 +1,4 @@
-//#define PKAI_STATIC
-#include "pokemonai/pokedex.h"
-//#undef PKAI_STATIC
+#include "pokemonai/ranked_team.h"
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -14,7 +12,7 @@
 #include "pokemonai/engine.h"
 #include "pokemonai/game.h"
 #include "pokemonai/init_toolbox.h"
-#include "pokemonai/ranked_team.h"
+#include "pokemonai/pokedex.h"
 
 const std::string RankedTeam::HEADER = "PKAIR1";
 namespace pt = boost::property_tree;
