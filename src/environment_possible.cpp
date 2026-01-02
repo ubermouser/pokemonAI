@@ -14,7 +14,7 @@ BOOST_STATIC_ASSERT(sizeof(EnvironmentPossibleData) == (sizeof(uint64_t)*19));
 
 EnvironmentPossibleData EnvironmentPossibleData::create(
     const EnvironmentVolatileData& source, bool doHash) {
-  EnvironmentPossibleData result{ source, UINT64_MAX, fixedpoint::create<30>(1.0), 0 };
+  EnvironmentPossibleData result{ source, UINT64_MAX, fixedpoint::create<30>(1.0), {0} };
   if (doHash) { result.generateHash(); }
 
   return result;
