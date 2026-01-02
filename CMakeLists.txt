@@ -25,7 +25,6 @@ add_compile_definitions(
     _CONSOLE
     _HTCOLLECTSTATISTICS
     DOUBLEPRECISION
-    GEN4_STATIC
 )
 
 # Configuration-specific settings
@@ -42,7 +41,8 @@ find_package(spdlog REQUIRED)
 
 # Add subdirectories
 add_subdirectory(pkaiEngine)
-add_subdirectory(gen4_scripts)
+add_subdirectory(scripts/gen1)
+add_subdirectory(scripts/gen4)
 add_subdirectory(ranker)
 add_subdirectory(trainer)
 add_subdirectory(battler)
@@ -54,6 +54,7 @@ add_executable(pokemonAI src/battler_main.cpp)
 # Link libraries
 target_link_libraries(pokemonAI
     pkaiEngine
+    gen1_scripts
     gen4_scripts
     Boost::program_options
     Boost::filesystem

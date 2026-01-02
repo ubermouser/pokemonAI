@@ -34,7 +34,7 @@ bool PokedexDynamic::inputPlugins()
   size_t numPluginsTotal = 0;
 
   boost::filesystem::path pluginLocation(config_.pluginsPath_);
-  
+
   // determine if folder exists:
   if (!boost::filesystem::exists(pluginLocation) || !boost::filesystem::is_directory(pluginLocation))
   {
@@ -49,6 +49,7 @@ bool PokedexDynamic::inputPlugins()
     return false;
   }
 
+  SPDLOG_INFO("Searching for plugins under \"{}\"...", pluginLocation.string());
   // iterate through all files in moves directory:
   for ( boost::filesystem::directory_iterator iPlugin(pluginLocation), endPlugin; iPlugin != endPlugin; ++iPlugin)
   {
@@ -56,11 +57,7 @@ bool PokedexDynamic::inputPlugins()
     if (boost::filesystem::is_directory(*iPlugin)) { continue; }
 
     // make sure extension is that of a plugin:
-#if defined(WIN32) || defined(_CYGWIN)
-    if (iPlugin->path().extension().compare(".dll") != 0) { continue; }
-#else // probably linux
     if (iPlugin->path().extension().compare(".so") != 0) { continue; }
-#endif
 
     SPDLOG_WARN("Loading plugins from {}...", iPlugin->path().string());
 
@@ -68,8 +65,7 @@ bool PokedexDynamic::inputPlugins()
     std::unique_ptr<shared_library> cPlugin = std::make_unique<shared_library>(iPlugin->path());
 
     // attempt to load plugin:
-    if (!cPlugin)
-    {
+    if (!cPlugin) {
       SPDLOG_ERROR("plugin \"{}\" could not be loaded!", iPlugin->path().string());
       continue;
     }
@@ -77,8 +73,7 @@ bool PokedexDynamic::inputPlugins()
     // attempt to find function which enumerates scripts within this plugin:
     //regExtension_type registerExtensions = NULL;
     regExtension_type registerExtensions(cPlugin->get<bool(const Pokedex&, std::vector<plugin>&)>("registerExtensions"));
-    if (!registerExtensions)
-    {
+    if (!registerExtensions) {
       SPDLOG_ERROR("could not find registerExtensions method in plugin \"{}\"!", iPlugin->path().string());
       // close faulty module:
       cPlugin->unload();
@@ -86,16 +81,15 @@ bool PokedexDynamic::inputPlugins()
     }
 
     bool success = registerPlugin(
-      registerExtensions, 
-      &numExtensions, 
-      &numOverwritten, 
-      &mismatchedItems, 
-      &mismatchedAbilities, 
-      &mismatchedMoves, 
-      &mismatchedCategories);
+        registerExtensions,
+        &numExtensions,
+        &numOverwritten,
+        &mismatchedItems,
+        &mismatchedAbilities,
+        &mismatchedMoves,
+        &mismatchedCategories);
 
-    if (!success)
-    {
+    if (!success) {
       cPlugin->unload();
       SPDLOG_CRITICAL("Register plugin call failed \"{}\"!", iPlugin->path().string());
       return false;
@@ -107,17 +101,17 @@ bool PokedexDynamic::inputPlugins()
   }// endof foreach plugin
 
   registerPlugin_orphanCount(
-      config_.pluginsPath_, 
-      numExtensions, 
-      numOverwritten, 
+      config_.pluginsPath_,
+      numExtensions,
+      numOverwritten,
       numPluginsLoaded,
       numPluginsTotal,
-      mismatchedItems, 
-      mismatchedAbilities, 
-      mismatchedMoves, 
+      mismatchedItems,
+      mismatchedAbilities,
+      mismatchedMoves,
       mismatchedCategories);
 
-  return true;
+  return numExtensions > 0;
 } // endOf inputScript
 
 

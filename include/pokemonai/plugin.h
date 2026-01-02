@@ -22,19 +22,6 @@ enum pluginCategory {
   engine
 };
 
-#if defined(GEN4_SCRIPTS_EXPORTS) || defined(GEN4_SCRIPTS_STATIC)
-#if (defined(WIN32) || defined(_CYGWIN))
-#define GEN4SHARED __declspec( dllexport )
-#else
-#define GEN4SHARED
-#endif
-extern "C"
-{
-  /* register all functions from this dll's extension library */
-  extern GEN4SHARED bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions);
-};
-#endif
-
 // TODO(@drendleman) - why do both plugin and plugin_t exist? One is redundant with the other?
 class PKAISHARED plugin
 {

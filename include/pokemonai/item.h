@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   item.h
  * Author: Ubermouser
  *
@@ -58,7 +58,7 @@ public:
   Item();
   Item(const Item& source) = default;
   virtual ~Item() override = default;
-  
+
   /* the type of move whose power is boosted by 20% when this object is held */
   const Type* boostedType_;
 

@@ -18,6 +18,9 @@ class PokedexGen4Test : public ::testing::Test {
     EXPECT_EQ(pkdex.getMoves().size(), 384);
     EXPECT_EQ(pkdex.getPokemon().size(), 505);
     EXPECT_EQ(pkdex.getTypes().size(), 18);
+    // TODO - count total number of ability, item, move, etc. plugins. Not just
+    //  engine plugins
+    EXPECT_GE(pkdex.getExtensions().getNumPlugins(), 10);
   }
 };
 
@@ -25,25 +28,38 @@ class PokedexGen4Test : public ::testing::Test {
 class PokedexGen4StaticTest : public PokedexGen4Test {
  protected:
   void SetUp() override { pokedex = std::make_shared<PokedexStatic>(); }
+
+#ifndef GEN4_STATIC
+  static void SetUpTestSuite() { GTEST_SKIP() << "Generation-4 Test"; }
+#endif
 };
 
 
 class PokedexGen4DynamicTest : public PokedexGen4Test {
  protected:
-  void SetUp() override { pokedex = std::make_shared<PokedexDynamic>(); }
+  void SetUp() override {
+    PokedexDynamic::Config cfg;
+    cfg.prefixPath_ = "data/gen4/";
+    cfg.pluginsPath_ = "build/scripts/gen4/";
+
+    pokedex = std::make_shared<PokedexDynamic>(cfg);
+  }
 };
 
 
 TEST_F(PokedexGen4StaticTest, LoadsItems) { validateCounts(*pokedex); }
 
 
-// TODO(@drendleman) - test fails due to not linking correctly? Why not?
-TEST_F(PokedexGen4DynamicTest, DISABLED_LoadsItems) {
-  validateCounts(*pokedex);
-}
+TEST_F(PokedexGen4DynamicTest, LoadsItems) { validateCounts(*pokedex); }
 
 
 TEST_F(PokedexGen4StaticTest, PrintsTeamWithoutCrashing) {
+  auto team = TeamNonVolatile::load("teams/hexTeamA.txt");
+  team.printSummary(std::cout);
+}
+
+
+TEST_F(PokedexGen4DynamicTest, PrintsTeamWithoutCrashing) {
   auto team = TeamNonVolatile::load("teams/hexTeamA.txt");
   team.printSummary(std::cout);
 }
@@ -75,7 +91,26 @@ class PokedexGen1StaticTest : public PokedexGen1Test {
 
     pokedex = std::make_shared<PokedexStatic>(cfg);
   }
+
+#ifndef GEN1_STATIC
+  static void SetUpTestSuite() { GTEST_SKIP() << "Generation-1 Test"; }
+#endif
 };
 
 
 TEST_F(PokedexGen1StaticTest, LoadsItems) { validateCounts(*pokedex); }
+
+
+class PokedexGen1DynamicTest : public PokedexGen1Test {
+ protected:
+  void SetUp() override {
+    PokedexDynamic::Config cfg;
+    cfg.prefixPath_ = "data/gen1/";
+    cfg.pluginsPath_ = "build/scripts/gen1/";
+
+    pokedex = std::make_shared<PokedexDynamic>(cfg);
+  }
+};
+
+
+TEST_F(PokedexGen1DynamicTest, LoadsItems) { validateCounts(*pokedex); }

@@ -172,21 +172,6 @@ enum GameType_t
 class Pokedex;
 extern const Pokedex* pkdex;
 
-#if defined(WIN32)
-#pragma warning( disable: 4251 )
-#endif
-
-
-// used to define symbols
-#undef PKAISHARED
-#if defined(PKAI_STATIC)
 #define PKAISHARED
-#elif defined(PKAI_EXPORT) && (defined(WIN32) || defined(_CYGWIN))
-#define PKAISHARED __declspec( dllexport )
-#elif defined(PKAI_IMPORT) && (defined(WIN32) || defined(_CYGWIN))
-#define PKAISHARED __declspec( dllimport )
-#else
-#define PKAISHARED
-#endif
 
 #endif	/* PKAI_H */

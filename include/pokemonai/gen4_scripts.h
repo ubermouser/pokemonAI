@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   gen4_scripts.h
  * Author: ubermouser
  *
@@ -13,7 +13,10 @@
 
 #include <vector>
 
-bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions);
+extern "C" {
+extern bool registerExtensions(
+    const Pokedex& pkAI, std::vector<plugin>& extensions);
+}
 
 #endif /* GEN4_SCRIPTS_H */
 

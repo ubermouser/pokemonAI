@@ -11,12 +11,12 @@
 #include "pokemonai/pkCU.h"
 #include "pokemonai/pkai.h"
 #include "pokemonai/planners.h"
-#include "pokemonai/pokedex_static.h"
+#include "pokemonai/pokedex_dynamic.h"
 
 namespace po = boost::program_options;
 
 struct Config {
-  PokedexStatic::Config pokedex;
+  PokedexDynamic::Config pokedex;
   Game::Config game;
   PkCU::Config engine;
   PkCU::Config agentEngine;
@@ -97,7 +97,7 @@ Config parse_command_line(int argc, char**argv) {
         po::command_line_parser(argc, argv).options(description).allow_unregistered().run(), vm);
     po::notify(vm);
   }
-  
+
   Config cfg = Config::create(protocfg);
   {
     po::variables_map vm;
@@ -110,7 +110,7 @@ Config parse_command_line(int argc, char**argv) {
       std::exit(EXIT_FAILURE);
     }
   }
-  
+
   return cfg;
 }
 
@@ -133,7 +133,7 @@ int main(int argc, char** argv) {
   spdlog::set_level(spdlog::level::level_enum(cfg.verbosity));
   srand((cfg.random_seed < 0)?time(NULL):cfg.random_seed);
 
-  auto pokedex = PokedexStatic(cfg.pokedex);
+  auto pokedex = PokedexDynamic(cfg.pokedex);
 
   auto game = Game(cfg.game)
       .setEngine(PkCU(cfg.engine))

@@ -95,7 +95,6 @@ bool PokedexStatic::initialize() {
   }
 
   // initialize scripts:
-  SPDLOG_WARN("Loading Plugins from <STATIC>...");
   if (!this->inputPlugins()) {
     SPDLOG_CRITICAL(
         "inputPlugins failed to initialize an acceptable set of plugins!");
@@ -165,7 +164,8 @@ bool PokedexStatic::inputPlugins() {
   size_t numPluginsLoaded = 0;
   size_t numPluginsTotal = 0;
 
-#ifdef GEN4_STATIC
+#if defined(GEN4_STATIC) || defined(GEN1_STATIC)
+  SPDLOG_WARN("Loading Plugins from <STATIC>...");
   bool success = registerPlugin(
       registerExtensions,
       &numExtensions,
@@ -307,8 +307,9 @@ void PokedexStatic::registerPlugin_orphanCount(
   printOrphans(mismatchedCategories, source, "plugin-categories", "category");
 
   SPDLOG_INFO(
-      "Successfully loaded {} of {} plugins, loaded {} ( {} overwritten ) "
+      "{}loaded {} of {} plugins, loaded {} ( {} overwritten ) "
       "extensions!",
+      numExtensions > 0 ? "Successfully " : "",
       numPluginsLoaded,
       numPluginsTotal,
       numExtensions,

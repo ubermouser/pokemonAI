@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   trainer_main.cpp
  * Author: drendleman
  *
@@ -17,14 +17,14 @@
 #include "pokemonai/logging.h"
 #include "pokemonai/pkCU.h"
 #include "pokemonai/planners.h"
-#include "pokemonai/pokedex_static.h"
+#include "pokemonai/pokedex_dynamic.h"
 #include "pokemonai/trainer.h"
 
 namespace po = boost::program_options;
 
 
 struct Config {
-  PokedexStatic::Config pokedex;
+  PokedexDynamic::Config pokedex;
   Trainer::Config trainer;
   Game::Config game;
   PkCU::Config engine;
@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
   spdlog::set_level(spdlog::level::level_enum(cfg.verbosity));
   srand((cfg.random_seed < 0)?time(NULL):cfg.random_seed);
 
-  auto pokedex = PokedexStatic(cfg.pokedex);
+  auto pokedex = PokedexDynamic(cfg.pokedex);
 
   Trainer trainer{cfg.trainer};
   trainer.setEngine(PkCU{cfg.engine});
@@ -142,6 +142,6 @@ int main(int argc, char** argv) {
 
   trainer.initialize();
   trainer.evolve();
-  
+
   std::exit(EXIT_SUCCESS);
 }

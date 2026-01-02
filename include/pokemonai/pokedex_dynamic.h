@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   pokedex_dynamic.h
  * Author: drendleman
  *
@@ -21,25 +21,25 @@ class PKAISHARED PokedexDynamic : public PokedexStatic {
 public:
   struct Config: public PokedexStatic::Config {
     // location of the plugin library root directory
-    std::string pluginsPath_ = "plugins";
-    
+    std::string pluginsPath_ = "plugins/gen4";
+
     Config() : PokedexStatic::Config() {};
 
     virtual boost::program_options::options_description options(
         const std::string& category="pokedex configuration",
         std::string prefix = "") override;
   };
-  
+
   PokedexDynamic(const Config& config=Config(), bool doInitialize=true);
   virtual ~PokedexDynamic() override {};
-    
+
   virtual bool inputPlugins() override; // input scripts for registered moves
-  
+
 protected:
 
   Config config_;
   // growable list of plugins (need to be closed upon exiting program)
-  std::vector<std::unique_ptr<boost::dll::shared_library> > plugins_; 
+  std::vector<std::unique_ptr<boost::dll::shared_library> > plugins_;
 };
 
 

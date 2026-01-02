@@ -13,7 +13,6 @@ add_library(pkaiEngine STATIC
     ../src/fixedpoint/fixed_func.cpp
     ../src/game.cpp
     ../src/game_factory.cpp
-    ../src/gen4_scripts.cpp
     ../src/init_toolbox.cpp
     ../src/item.cpp
     ../src/league.cpp
