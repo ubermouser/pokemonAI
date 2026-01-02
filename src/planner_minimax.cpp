@@ -49,7 +49,7 @@ ActionVector PlannerMiniMax::getValidActions(
   }
 
   // order the remaining moves as per the butterfly heuristic:
-  auto actions = cu_->getValidActions(origin, iTeam);
+  auto actions = cu_->getAllValidActions(origin, iTeam);
   orderHeuristic_.order(origin, iTeam, actions, killerMove);
 
   return actions;

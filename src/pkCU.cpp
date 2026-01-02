@@ -1338,11 +1338,11 @@ MatchState PkCU::getGameState(const ConstEnvironmentVolatile& envV) const {
 }
 
 
-ActionPairVector PkCU::getAllValidActions(
+ActionPairVector PkCU::getValidActionPairs(
     const ConstEnvironmentVolatile& envV, size_t agentTeam) const {
   auto agentActions = getValidActions(envV, agentTeam);
   auto otherActions = getValidActions(envV, (agentTeam+1) % 2);
-  ActionPairVector result; result.reserve(agentActions.size() * otherActions.size());
+  ActionPairVector result;
   for (auto agentMove: agentActions) {
     for (auto otherMove: otherActions) {
       result.push_back({agentMove, otherMove});
@@ -1353,41 +1353,126 @@ ActionPairVector PkCU::getAllValidActions(
   return result;
 }
 
+ActionVector PkCU::getAllValidActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
+  ActionVector result;
+  // TODO: reserve?
+  for (auto action: getValidActions(envV, iTeam)) {
+    result.push_back(action);
+  }
+  return result;
+}
 
-ActionVector PkCU::getValidActionsInRange(
+PkCU::ValidActionRange PkCU::getValidActionsInRange(
     const ConstEnvironmentVolatile& envV, size_t iTeam, size_t iFirst, size_t iLast) const {
-  ActionVector result; result.reserve((iLast - iFirst) + envV.getTeam(iTeam).nv().getNumTeammates());
-  ConstTeamVolatile cTV = envV.getTeam(iTeam);
-  ConstPokemonVolatile cPKV = envV.getTeam(iTeam).getPKV();
-  // foreach move type:
-  for (size_t iType = iFirst; iType < iLast; ++iType) {
-    Action action{iType};
-    bool isMoveAction = action.isMove() && (action.iMove() < cPKV.nv().getNumMoves());
-    bool isSwitchAction = action.isSwitch();
-    bool targetsFriendly =
-        (isMoveAction)?envV.getTeam(iTeam).getPKV().getMV(action).getBase().targetsAlly():false;
-    targetsFriendly |= isSwitchAction;
-    size_t iFriendlyMin = targetsFriendly?(Action::FRIENDLY_0):(Action::FRIENDLY_DEFAULT);
-    size_t iFriendlyMax = targetsFriendly?(Action::FRIENDLY_0 + cTV.nv().getNumTeammates()):(Action::FRIENDLY_DEFAULT);
-    // TODO(@drendleman) - moves that target adjacent pokemon
-    size_t iHostileMin = Action::HOSTILE_DEFAULT;
-    size_t iHostileMax = Action::HOSTILE_DEFAULT;
+  return ValidActionRange{
+      ValidActionIterator{this, &envV, iTeam, iFirst, iLast},
+      ValidActionIterator()};
+}
 
-    // foreach friendly:
-    for (size_t iFriendly = iFriendlyMin; iFriendly <= iFriendlyMax; ++iFriendly) {
-      // foreach hostile:
-      for (size_t iHostile = iHostileMin; iHostile <= iHostileMax; ++iHostile) {
-        // test if move is valid:
-        action = Action{iType, iFriendly, iHostile};
-        if (isValidAction(envV, action, iTeam)) {
-          // and if so, add it to result vector
-          result.push_back(action);
-        }
-      }
+PkCU::ValidActionIterator::ValidActionIterator()
+    : cu_(nullptr), env_(nullptr), iTeam_(0), iType_(0), iEndType_(0), iFriendly_(0), iFriendlyMax_(0), iHostile_(0), iHostileMax_(0) {}
+
+PkCU::ValidActionIterator::ValidActionIterator(const PkCU* cu, const ConstEnvironmentVolatile* env, size_t iTeam, size_t iStart, size_t iEnd)
+    : cu_(cu), env_(env), iTeam_(iTeam),
+      iType_(iStart), iEndType_(iEnd),
+      iFriendly_(0), iFriendlyMax_(0),
+      iHostile_(0), iHostileMax_(0)
+{
+  if (iType_ < iEndType_) {
+    setupLoopVariables();
+    if (!isValid()) {
+      advance();
     }
   }
+}
 
-  return result;
+void PkCU::ValidActionIterator::setupLoopVariables() {
+  Action action{iType_};
+  ConstPokemonVolatile cPKV = env_->getTeam(iTeam_).getPKV();
+  ConstTeamVolatile cTV = env_->getTeam(iTeam_);
+
+  bool isMoveAction = action.isMove() && (action.iMove() < cPKV.nv().getNumMoves());
+  bool isSwitchAction = action.isSwitch();
+  bool targetsFriendly =
+      (isMoveAction)?env_->getTeam(iTeam_).getPKV().getMV(action).getBase().targetsAlly():false;
+  targetsFriendly |= isSwitchAction;
+
+  size_t iFriendlyMin = targetsFriendly?(Action::FRIENDLY_0):(Action::FRIENDLY_DEFAULT);
+  iFriendlyMax_ = targetsFriendly?(Action::FRIENDLY_0 + cTV.nv().getNumTeammates()):(Action::FRIENDLY_DEFAULT);
+
+  size_t iHostileMin = Action::HOSTILE_DEFAULT;
+  iHostileMax_ = Action::HOSTILE_DEFAULT;
+
+  iFriendly_ = iFriendlyMin;
+  iHostile_ = iHostileMin;
+
+  currentAction_ = Action{iType_, iFriendly_, iHostile_};
+}
+
+bool PkCU::ValidActionIterator::isValid() const {
+  return (bool)cu_->isValidAction(*env_, currentAction_, iTeam_);
+}
+
+void PkCU::ValidActionIterator::advance() {
+  while (iType_ < iEndType_) {
+    // Inner loop (Hostile)
+    iHostile_++;
+    if (iHostile_ > iHostileMax_) {
+      // Reset inner, advance middle (Friendly)
+      iFriendly_++;
+      if (iFriendly_ > iFriendlyMax_) {
+        // Reset middle, advance outer (Type)
+        iType_++;
+        if (iType_ >= iEndType_) {
+          // Reached end
+          cu_ = nullptr;
+          return;
+        }
+        setupLoopVariables();
+      } else {
+         // Reset Hostile
+         iHostile_ = Action::HOSTILE_DEFAULT;
+      }
+    }
+
+    currentAction_ = Action{iType_, iFriendly_, iHostile_};
+
+    if (isValid()) {
+      return;
+    }
+  }
+}
+
+bool PkCU::ValidActionIterator::operator==(const ValidActionIterator& other) const {
+  if (cu_ == nullptr && other.cu_ == nullptr) return true;
+  if (cu_ == nullptr) return other.iType_ >= other.iEndType_;
+  if (other.cu_ == nullptr) return iType_ >= iEndType_;
+
+  return cu_ == other.cu_ && env_ == other.env_ && iTeam_ == other.iTeam_ &&
+         iType_ == other.iType_ && iFriendly_ == other.iFriendly_ && iHostile_ == other.iHostile_;
+}
+
+bool PkCU::ValidActionIterator::operator!=(const ValidActionIterator& other) const {
+  return !(*this == other);
+}
+
+const Action& PkCU::ValidActionIterator::operator*() const {
+  return currentAction_;
+}
+
+const Action* PkCU::ValidActionIterator::operator->() const {
+  return &currentAction_;
+}
+
+PkCU::ValidActionIterator& PkCU::ValidActionIterator::operator++() {
+  advance();
+  return *this;
+}
+
+PkCU::ValidActionIterator PkCU::ValidActionIterator::operator++(int) {
+  ValidActionIterator tmp = *this;
+  advance();
+  return tmp;
 }
 
 /**

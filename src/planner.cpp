@@ -168,7 +168,7 @@ PossibleEnvironments Planner::generateStates(
 ActionVector Planner::getValidActions(
     const ConstEnvironmentPossible& origin,
     size_t iTeam) const {
-  return cu_->getValidActions(origin, iTeam);
+  return cu_->getAllValidActions(origin, iTeam);
 }
 
 

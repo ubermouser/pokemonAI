@@ -37,8 +37,12 @@ PlyResult PlannerRandom::generateSolutionAtLeaf(
   // determine if we want to perform moves only:
   bool doMove = (rand() % RAND_MAX) <= (cfg_.moveChance*RAND_MAX);
   // determine the set of all valid actions:
-  auto validMoves = cu_->getValidMoveActions(origin, agentTeam_);
-  auto validActions = cu_->getValidActions(origin, agentTeam_);
+  // TODO: optimize by not converting to vector?
+  ActionVector validMoves;
+  for (const auto& a : cu_->getValidMoveActions(origin, agentTeam_)) { validMoves.push_back(a); }
+
+  ActionVector validActions = cu_->getAllValidActions(origin, agentTeam_);
+
   auto& valid = (doMove && !validMoves.empty())?validMoves:validActions;
 
   // are there ANY valid actions?

@@ -72,7 +72,10 @@ TEST_F(EngineTest, Swap) {
   EXPECT_TRUE(engine_->isValidAction(both_dead.at(0), Action::swap(0), TEAM_A));
   EXPECT_TRUE(engine_->isValidAction(both_dead.at(0), Action::swap(1), TEAM_B));
   // move counts should be accurate:
-  EXPECT_EQ(engine_->getValidActions(torkoal_dead.at(0).getEnv(), TEAM_B).size(), 1);
+  EXPECT_EQ(std::distance(
+                engine_->getValidActions(torkoal_dead.at(0).getEnv(), TEAM_B).begin(),
+                engine_->getValidActions(torkoal_dead.at(0).getEnv(), TEAM_B).end()),
+            1);
 }
 
 

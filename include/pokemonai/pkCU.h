@@ -24,6 +24,7 @@
 #include <assert.h>
 #include <bitset>
 #include <deque>
+#include <iterator>
 #include <memory>
 #include <stdint.h>
 #include <string>
@@ -332,22 +333,72 @@ public:
     return ConstEnvironmentVolatile{*nv_, initialState_};
   };
 
+  class ValidActionIterator {
+  public:
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = Action;
+    using difference_type = std::ptrdiff_t;
+    using pointer = const Action*;
+    using reference = const Action&;
+
+    ValidActionIterator();
+    ValidActionIterator(const PkCU* cu, const ConstEnvironmentVolatile* env, size_t iTeam, size_t iStart, size_t iEnd);
+
+    bool operator==(const ValidActionIterator& other) const;
+    bool operator!=(const ValidActionIterator& other) const;
+    reference operator*() const;
+    pointer operator->() const;
+    ValidActionIterator& operator++();
+    ValidActionIterator operator++(int);
+
+  private:
+    void setupLoopVariables();
+    void advance();
+    bool isValid() const;
+
+    const PkCU* cu_;
+    const ConstEnvironmentVolatile* env_;
+    size_t iTeam_;
+
+    size_t iType_;
+    size_t iEndType_;
+
+    size_t iFriendly_;
+    size_t iFriendlyMax_;
+
+    size_t iHostile_;
+    size_t iHostileMax_;
+
+    Action currentAction_;
+  };
+
+  struct ValidActionRange {
+    ValidActionIterator begin_;
+    ValidActionIterator end_;
+
+    ValidActionIterator begin() const { return begin_; }
+    ValidActionIterator end() const { return end_; }
+  };
+
   /**
-   * @brief Returns a list of all valid actions for a given team.
+   * @brief Returns a range of all valid actions for a given team.
    * @param envV The current volatile environment.
    * @param iTeam The index of the team.
-   * @return An `ActionVector` containing all valid actions.
+   * @return A `ValidActionRange` containing all valid actions.
    */
-  ActionVector getValidActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
+  ValidActionRange getValidActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
     return getValidActionsInRange(envV, iTeam, 0, Action::MOVE_LAST);
   }
-  ActionVector getValidMoveActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
+  ValidActionRange getValidMoveActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
     return getValidActionsInRange(envV, iTeam, Action::MOVE_0, Action::MOVE_WAIT + 1);
   }
-  ActionVector getValidSwapActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
+  ValidActionRange getValidSwapActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
     return getValidActionsInRange(envV, iTeam, Action::MOVE_SWITCH, Action::MOVE_SWITCH + 1);
   }
-  ActionPairVector getAllValidActions(const ConstEnvironmentVolatile& envV, size_t agentTeam=TEAM_A) const;
+
+  ActionPairVector getValidActionPairs(const ConstEnvironmentVolatile& envV, size_t agentTeam=TEAM_A) const;
+
+  ActionVector getAllValidActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const;
 
   /**
    * @brief Checks if a given action is valid for a team in the current state.
@@ -415,7 +466,7 @@ protected:
   void guardNonvolatileState(const ConstEnvironmentVolatile& cEnv) const;
 
   
-  ActionVector getValidActionsInRange(
+  ValidActionRange getValidActionsInRange(
       const ConstEnvironmentVolatile& envV, size_t iTeam, size_t iStart, size_t iEnd) const;
 
   /**
