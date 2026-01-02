@@ -78,4 +78,4 @@ class PokedexGen1StaticTest : public PokedexGen1Test {
 };
 
 
-TEST_F(PokedexGen1StaticTest, DISABLED_LoadsItems) { validateCounts(*pokedex); }
+TEST_F(PokedexGen1StaticTest, LoadsItems) { validateCounts(*pokedex); }

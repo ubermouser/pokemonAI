@@ -1,153 +1,153 @@
-PKAIS	151										
+PKAIS	151
 Name	Type	Type2	Atk	Sp Atk	Def	Sp Def	Spd	Hp	Weight (kg)	Ability 1	Ability 2
-Abra	Psychic		20	105	15	55	90	25	19.5	---	---
+Abra	Psychic	---	20	105	15	55	90	25	19.5	---	---
 Aerodactyl	Rock	Flying	105	60	65	75	130	80	59	---	---
-Alakazam	Psychic		50	135	45	95	120	55	48	---	---
-Arbok	Poison		95	65	69	79	80	60	65	---	---
-Arcanine	Fire		110	100	80	80	95	90	155	---	---
+Alakazam	Psychic	---	50	135	45	95	120	55	48	---	---
+Arbok	Poison	---	95	65	69	79	80	60	65	---	---
+Arcanine	Fire	---	110	100	80	80	95	90	155	---	---
 Articuno	Ice	Flying	85	95	100	125	85	90	55.4	---	---
 Beedrill	Bug	Poison	90	45	40	80	75	65	29.5	---	---
 Bellsprout	Grass	Poison	75	70	35	30	40	50	4	---	---
-Blastoise	Water		83	85	100	105	78	79	85.5	---	---
+Blastoise	Water	---	83	85	100	105	78	79	85.5	---	---
 Bulbasaur	Grass	Poison	49	65	49	65	45	45	6.9	---	---
 Butterfree	Bug	Flying	45	90	50	80	70	60	32	---	---
-Caterpie	Bug		30	20	35	20	45	45	2.9	---	---
-Chansey	Normal		5	35	5	105	50	250	34.6	---	---
+Caterpie	Bug	---	30	20	35	20	45	45	2.9	---	---
+Chansey	Normal	---	5	35	5	105	50	250	34.6	---	---
 Charizard	Fire	Flying	84	109	78	85	100	78	90.5	---	---
-Charmander	Fire		52	60	43	50	65	39	8.5	---	---
-Charmeleon	Fire		64	80	58	65	80	58	19	---	---
-Clefable	Fairy		70	95	73	90	60	95	40	---	---
-Clefairy	Fairy		45	60	48	65	35	70	7.5	---	---
+Charmander	Fire	---	52	60	43	50	65	39	8.5	---	---
+Charmeleon	Fire	---	64	80	58	65	80	58	19	---	---
+Clefable	Fairy	---	70	95	73	90	60	95	40	---	---
+Clefairy	Fairy	---	45	60	48	65	35	70	7.5	---	---
 Cloyster	Water	Ice	95	85	180	45	70	50	132.5	---	---
-Cubone	Ground		50	40	95	50	35	50	6.5	---	---
+Cubone	Ground	---	50	40	95	50	35	50	6.5	---	---
 Dewgong	Water	Ice	70	70	80	95	70	90	120	---	---
-Diglett	Ground		55	35	25	45	95	10	0.8	---	---
-Ditto	Normal		48	48	48	48	48	48	4	---	---
+Diglett	Ground	---	55	35	25	45	95	10	0.8	---	---
+Ditto	Normal	---	48	48	48	48	48	48	4	---	---
 Dodrio	Normal	Flying	110	60	70	60	110	60	85.2	---	---
 Doduo	Normal	Flying	85	35	45	35	75	35	39.2	---	---
-Dragonair	Dragon		84	70	65	70	70	61	16.5	---	---
+Dragonair	Dragon	---	84	70	65	70	70	61	16.5	---	---
 Dragonite	Dragon	Flying	134	100	95	100	80	91	210	---	---
-Dratini	Dragon		64	50	45	50	50	41	3.3	---	---
-Drowzee	Psychic		48	43	45	90	42	60	32.4	---	---
-Dugtrio	Ground		100	50	50	70	120	35	33.3	---	---
-Eevee	Normal		55	45	50	65	55	55	6.5	---	---
-Ekans	Poison		60	40	44	54	55	35	6.9	---	---
-Electabuzz	Electric		83	95	57	85	105	65	30	---	---
-Electrode	Electric		50	80	70	80	150	60	66.6	---	---
+Dratini	Dragon	---	64	50	45	50	50	41	3.3	---	---
+Drowzee	Psychic	---	48	43	45	90	42	60	32.4	---	---
+Dugtrio	Ground	---	100	50	50	70	120	35	33.3	---	---
+Eevee	Normal	---	55	45	50	65	55	55	6.5	---	---
+Ekans	Poison	---	60	40	44	54	55	35	6.9	---	---
+Electabuzz	Electric	---	83	95	57	85	105	65	30	---	---
+Electrode	Electric	---	50	80	70	80	150	60	66.6	---	---
 Exeggcute	Grass	Psychic	40	60	80	45	40	60	2.5	---	---
 Exeggutor	Grass	Psychic	95	125	85	75	55	95	120	---	---
 Farfetch'd	Normal	Flying	90	58	55	62	60	52	15	---	---
 Fearow	Normal	Flying	90	61	65	61	100	65	38	---	---
-Flareon	Fire		130	95	60	110	65	65	25	---	---
+Flareon	Fire	---	130	95	60	110	65	65	25	---	---
 Gastly	Ghost	Poison	35	100	30	35	80	30	0.1	---	---
 Gengar	Ghost	Poison	65	130	60	75	110	60	40.5	---	---
-Geodude	Rock 	Ground	80	30	100	30	20	40	20	---	---
+Geodude	Rock	Ground	80	30	100	30	20	40	20	---	---
 Gloom	Grass	Poison	65	85	70	75	40	60	8.6	---	---
 Golbat	Poison	Flying	80	65	70	75	90	75	55	---	---
-Goldeen	Water		67	35	60	50	63	45	15	---	---
-Golduck	Water		82	95	78	80	85	80	76.6	---	---
-Golem	Rock 	Ground	120	55	130	65	45	80	300	---	---
-Graveler	Rock 	Ground	95	45	115	45	35	55	105	---	---
-Grimer	Poison		80	40	50	50	25	80	30	---	---
-Growlithe	Fire		70	70	45	50	60	55	19	---	---
+Goldeen	Water	---	67	35	60	50	63	45	15	---	---
+Golduck	Water	---	82	95	78	80	85	80	76.6	---	---
+Golem	Rock	Ground	120	55	130	65	45	80	300	---	---
+Graveler	Rock	Ground	95	45	115	45	35	55	105	---	---
+Grimer	Poison	---	80	40	50	50	25	80	30	---	---
+Growlithe	Fire	---	70	70	45	50	60	55	19	---	---
 Gyarados	Water	Flying	125	60	79	100	81	95	235	---	---
 Haunter	Ghost	Poison	50	115	45	55	95	45	0.1	---	---
-Hitmonchan	Fighting		105	35	79	110	76	50	50.2	---	---
-Hitmonlee	Fighting		120	35	53	110	87	50	49.8	---	---
-Horsea	Water		40	70	70	25	60	30	8	---	---
-Hypno	Psychic		73	73	70	115	67	85	75.6	---	---
+Hitmonchan	Fighting	---	105	35	79	110	76	50	50.2	---	---
+Hitmonlee	Fighting	---	120	35	53	110	87	50	49.8	---	---
+Horsea	Water	---	40	70	70	25	60	30	8	---	---
+Hypno	Psychic	---	73	73	70	115	67	85	75.6	---	---
 Ivysaur	Grass	Poison	62	80	63	80	60	60	13	---	---
 Jigglypuff	Normal	Fairy	45	45	20	25	20	115	5.5	---	---
-Jolteon	Electric		65	110	60	95	130	65	24.5	---	---
+Jolteon	Electric	---	65	110	60	95	130	65	24.5	---	---
 Jynx	Ice	Psychic	50	115	35	95	95	65	40.6	---	---
 Kabuto	Rock	Water	80	55	90	45	55	30	11.5	---	---
 Kabutops	Rock	Water	115	65	105	70	80	60	40.5	---	---
-Kadabra	Psychic		35	120	30	70	105	40	56.5	---	---
+Kadabra	Psychic	---	35	120	30	70	105	40	56.5	---	---
 Kakuna	Bug	Poison	25	25	50	25	35	45	10	---	---
-Kangaskhan	Normal		95	40	80	80	90	105	80	---	---
-Kingler	Water		130	50	115	50	75	55	60	---	---
-Koffing	Poison		65	60	95	45	35	40	1	---	---
-Krabby	Water		105	25	90	25	50	30	6.5	---	---
+Kangaskhan	Normal	---	95	40	80	80	90	105	80	---	---
+Kingler	Water	---	130	50	115	50	75	55	60	---	---
+Koffing	Poison	---	65	60	95	45	35	40	1	---	---
+Krabby	Water	---	105	25	90	25	50	30	6.5	---	---
 Lapras	Water	Ice	85	85	80	95	60	130	220	---	---
-Lickitung	Normal		55	60	75	75	30	90	65.5	---	---
-Machamp	Fighting		130	65	80	85	55	90	130	---	---
-Machoke	Fighting		100	50	70	60	45	80	70.5	---	---
-Machop	Fighting		80	35	50	35	35	70	19.5	---	---
-Magikarp	Water		10	15	55	20	80	20	10	---	---
-Magmar	Fire		95	100	57	85	93	65	44.5	---	---
+Lickitung	Normal	---	55	60	75	75	30	90	65.5	---	---
+Machamp	Fighting	---	130	65	80	85	55	90	130	---	---
+Machoke	Fighting	---	100	50	70	60	45	80	70.5	---	---
+Machop	Fighting	---	80	35	50	35	35	70	19.5	---	---
+Magikarp	Water	---	10	15	55	20	80	20	10	---	---
+Magmar	Fire	---	95	100	57	85	93	65	44.5	---	---
 Magnemite	Electric	Steel	35	95	70	55	45	25	6	---	---
 Magneton	Electric	Steel	60	120	95	70	70	50	60	---	---
-Mankey	Fighting		80	35	35	45	70	40	28	---	---
-Marowak	Ground		80	50	110	80	45	60	45	---	---
-Meowth	Normal		45	40	35	40	90	40	4.2	---	---
-Metapod	Bug		20	25	55	25	30	50	9.9	---	---
-Mew	Psychic		100	100	100	100	100	100	4	---	---
-Mewtwo	Psychic		110	154	90	90	130	106	122	---	---
+Mankey	Fighting	---	80	35	35	45	70	40	28	---	---
+Marowak	Ground	---	80	50	110	80	45	60	45	---	---
+Meowth	Normal	---	45	40	35	40	90	40	4.2	---	---
+Metapod	Bug	---	20	25	55	25	30	50	9.9	---	---
+Mew	Psychic	---	100	100	100	100	100	100	4	---	---
+Mewtwo	Psychic	---	110	154	90	90	130	106	122	---	---
 Moltres	Fire	Flying	100	125	90	85	90	90	60	---	---
 Mr. Mime	Psychic	Fairy	45	100	65	120	90	40	54.5	---	---
-Muk	Poison		105	65	75	100	50	105	30	---	---
+Muk	Poison	---	105	65	75	100	50	105	30	---	---
 Nidoking	Poison	Ground	102	85	77	75	85	81	62	---	---
 Nidoqueen	Poison	Ground	92	75	87	85	76	90	60	---	---
-Nidoran-F	Poison		47	40	52	40	41	55	7	---	---
-Nidoran-M	Poison		57	40	40	40	50	46	9	---	---
-Nidorina	Poison		62	55	67	55	56	70	20	---	---
-Nidorino	Poison		72	55	57	55	65	61	19.5	---	---
-Ninetales	Fire		76	81	75	100	100	73	19.9	---	---
+Nidoran-F	Poison	---	47	40	52	40	41	55	7	---	---
+Nidoran-M	Poison	---	57	40	40	40	50	46	9	---	---
+Nidorina	Poison	---	62	55	67	55	56	70	20	---	---
+Nidorino	Poison	---	72	55	57	55	65	61	19.5	---	---
+Ninetales	Fire	---	76	81	75	100	100	73	19.9	---	---
 Oddish	Grass	Poison	50	75	55	65	30	45	5.4	---	---
 Omanyte	Rock	Water	40	90	100	55	35	35	7.5	---	---
 Omastar	Rock	Water	60	115	125	70	55	70	35	---	---
-Onix	Rock 	Ground	45	30	160	45	70	35	210	---	---
+Onix	Rock	Ground	45	30	160	45	70	35	210	---	---
 Paras	Bug	Grass	70	45	55	55	25	35	5.4	---	---
 Parasect	Bug	Grass	95	60	80	80	30	60	29.5	---	---
-Persian	Normal		70	65	60	65	115	65	32	---	---
+Persian	Normal	---	70	65	60	65	115	65	32	---	---
 Pidgeot	Normal	Flying	80	70	75	70	101	83	39.5	---	---
 Pidgeotto	Normal	Flying	60	50	55	50	71	63	30	---	---
 Pidgey	Normal	Flying	45	35	40	35	56	40	1.8	---	---
-Pikachu	Electric		55	50	40	50	90	35	6	---	---
-Pinsir	Bug		125	55	100	70	85	65	55	---	---
-Poliwag	Water		50	40	40	40	90	40	12.4	---	---
-Poliwhirl	Water		65	50	65	50	90	65	20	---	---
+Pikachu	Electric	---	55	50	40	50	90	35	6	---	---
+Pinsir	Bug	---	125	55	100	70	85	65	55	---	---
+Poliwag	Water	---	50	40	40	40	90	40	12.4	---	---
+Poliwhirl	Water	---	65	50	65	50	90	65	20	---	---
 Poliwrath	Water	Fighting	95	70	95	90	70	90	54	---	---
-Ponyta	Fire		85	65	55	65	90	50	30	---	---
-Porygon	Normal		60	85	70	75	40	65	36.5	---	---
-Primeape	Fighting		105	60	60	70	95	65	32	---	---
-Psyduck	Water		52	65	48	50	55	50	19.6	---	---
-Raichu	Electric		90	90	55	80	110	60	30	---	---
-Rapidash	Fire		100	80	70	80	105	65	95	---	---
-Raticate	Normal		81	50	60	70	97	55	18.5	---	---
-Rattata	Normal		56	25	35	35	72	30	3.5	---	---
+Ponyta	Fire	---	85	65	55	65	90	50	30	---	---
+Porygon	Normal	---	60	85	70	75	40	65	36.5	---	---
+Primeape	Fighting	---	105	60	60	70	95	65	32	---	---
+Psyduck	Water	---	52	65	48	50	55	50	19.6	---	---
+Raichu	Electric	---	90	90	55	80	110	60	30	---	---
+Rapidash	Fire	---	100	80	70	80	105	65	95	---	---
+Raticate	Normal	---	81	50	60	70	97	55	18.5	---	---
+Rattata	Normal	---	56	25	35	35	72	30	3.5	---	---
 Rhydon	Ground	Rock	130	45	120	45	40	105	120	---	---
 Rhyhorn	Ground	Rock	85	30	95	30	25	80	115	---	---
-Sandshrew	Ground		75	20	85	30	40	50	12	---	---
-Sandslash	Ground		100	45	110	55	65	75	29.5	---	---
+Sandshrew	Ground	---	75	20	85	30	40	50	12	---	---
+Sandslash	Ground	---	100	45	110	55	65	75	29.5	---	---
 Scyther	Bug	Flying	110	55	80	80	105	70	56	---	---
-Seadra	Water		65	95	95	45	85	55	25	---	---
-Seaking	Water		92	65	65	80	68	80	39	---	---
-Seel	Water		45	45	55	70	45	65	90	---	---
-Shellder	Water		65	45	100	25	40	30	4	---	---
+Seadra	Water	---	65	95	95	45	85	55	25	---	---
+Seaking	Water	---	92	65	65	80	68	80	39	---	---
+Seel	Water	---	45	45	55	70	45	65	90	---	---
+Shellder	Water	---	65	45	100	25	40	30	4	---	---
 Slowbro	Water	Psychic	75	100	110	80	30	95	78.5	---	---
 Slowpoke	Water	Psychic	65	40	65	40	15	90	36	---	---
-Snorlax	Normal		110	65	65	110	30	160	460	---	---
+Snorlax	Normal	---	110	65	65	110	30	160	460	---	---
 Spearow	Normal	Flying	60	31	30	31	70	40	2	---	---
-Squirtle	Water		48	50	65	64	43	44	9	---	---
+Squirtle	Water	---	48	50	65	64	43	44	9	---	---
 Starmie	Water	Psychic	75	100	85	85	115	60	80	---	---
-Staryu	Water		45	70	55	55	85	30	34.5	---	---
-Tangela	Grass		55	100	115	40	60	65	35	---	---
-Tauros	Normal		100	40	95	70	110	75	88.4	---	---
+Staryu	Water	---	45	70	55	55	85	30	34.5	---	---
+Tangela	Grass	---	55	100	115	40	60	65	35	---	---
+Tauros	Normal	---	100	40	95	70	110	75	88.4	---	---
 Tentacool	Water	Poison	40	50	35	100	70	40	45.5	---	---
 Tentacruel	Water	Poison	70	80	65	120	100	80	55	---	---
-Vaporeon	Water		65	110	60	95	65	130	29	---	---
+Vaporeon	Water	---	65	110	60	95	65	130	29	---	---
 Venomoth	Bug	Poison	65	90	60	75	90	70	12.5	---	---
 Venonat	Bug	Poison	55	40	50	55	45	60	30	---	---
 Venusaur	Grass	Poison	82	100	83	100	80	80	100	---	---
 Victreebel	Grass	Poison	105	100	65	70	70	80	15.5	---	---
 Vileplume	Grass	Poison	80	110	85	90	50	75	18.6	---	---
-Voltorb	Electric		30	55	50	55	100	40	10.4	---	---
-Vulpix	Fire		41	50	40	65	65	38	9.9	---	---
-Wartortle	Water		63	65	80	80	58	59	22.5	---	---
+Voltorb	Electric	---	30	55	50	55	100	40	10.4	---	---
+Vulpix	Fire	---	41	50	40	65	65	38	9.9	---	---
+Wartortle	Water	---	63	65	80	80	58	59	22.5	---	---
 Weedle	Bug	Poison	35	20	30	20	50	40	3.2	---	---
 Weepinbell	Grass	Poison	90	85	50	45	55	65	6.4	---	---
-Weezing	Poison		90	85	120	70	60	65	9.5	---	---
+Weezing	Poison	---	90	85	120	70	60	65	9.5	---	---
 Wigglytuff	Normal	Fairy	70	85	45	50	45	140	12	---	---
 Zapdos	Electric	Flying	90	125	85	90	100	90	52.6	---	---
 Zubat	Poison	Flying	45	30	35	40	55	40	7.5	---	---
