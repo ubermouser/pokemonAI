@@ -110,12 +110,9 @@ Construct new teams that play well at a range of skill levels:
 Construct teams targeting a different generation of Pokemon:
 ```bash
 ./build/trainer/trainer \
-    --planners=random max minimax minimax \
+    --planners=minimax \
     --evaluators=simple \
-    --p1-max-search-depth=0 \
-    --p2-max-search-depth=1 \
-    --p3-max-search-depth=2 \
-    --p4-max-search-depth=3 \
+    --p1-max-search-depth=3 \
     --ranker-verbosity=1 \
     --verbosity=2 \
     --prefix-path data/gen1 \
