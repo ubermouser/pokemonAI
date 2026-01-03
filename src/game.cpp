@@ -323,6 +323,12 @@ Turn Game::digestTurn(
         turn.depth0Fitness = action.atDepth.front().fitness.value();
         turn.depthMaxFitness = action.atDepth.back().fitness.value();
         turn.timeSpent = action.atDepth.back().timeSpent;
+        if (!std::isfinite(turn.depth0Fitness)) {
+          turn.depth0Fitness = turn.simpleFitness;
+        }
+        if (!std::isfinite(turn.depthMaxFitness)) {
+          turn.depthMaxFitness = turn.simpleFitness;
+        }
     } else {
       turn.depth0Fitness = turn.simpleFitness;
       turn.depthMaxFitness = turn.simpleFitness;

@@ -77,7 +77,8 @@ struct LeagueHeat : public League {
 
   struct StatEntry {
     uint64_t count = 0;
-    double contribution = 0;
+    double aggregateContribution = 0;
+    double simpleContribution = 0;
     double participation = 0;
   };
 

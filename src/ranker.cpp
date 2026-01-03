@@ -158,12 +158,15 @@ void LeagueHeat::calculateContribution() {
         const auto& pkhr = hrt.pokemon[iPkmn];
         const auto& pknv = nvTeam.teammate(iPkmn);
         auto& pkStat = counts.pokemon[pknv.getName()];
-        pkStat.contribution += pkhr.simpleContribution;
+        pkStat.aggregateContribution += pkhr.aggregateContribution;
+        pkStat.simpleContribution += pkhr.simpleContribution;
         pkStat.participation += pkhr.participation;
 
         for (size_t iMove = 0; iMove < pknv.getNumMoves(); ++iMove) {
           auto& moveStat = counts.moves[pknv.getMove_base(iMove).getName()];
-          moveStat.contribution +=
+          moveStat.aggregateContribution +=
+              pkhr.aggregateContribution * pkhr.moveUse[iMove];
+          moveStat.simpleContribution +=
               pkhr.simpleContribution * pkhr.moveUse[iMove];
           moveStat.participation += pkhr.participation * pkhr.moveUse[iMove];
         }
@@ -516,8 +519,9 @@ void Ranker::printLeagueCounts(const LeagueHeat& league) const {
               " {:02}: {:<20} count={: <4}", i + 1, key, stat.count);
           if (showPerf) {
             os << fmt::format(
-                " contrib={:6.2f} part={:6.2f}",
-                stat.contribution,
+                " aC={:6.2f} sC={:6.2f} part={:6.2f}",
+                stat.aggregateContribution,
+                stat.simpleContribution,
                 stat.participation);
           }
           os << "\n";

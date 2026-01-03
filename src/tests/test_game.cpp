@@ -1,3 +1,4 @@
+#include <cmath>
 #include <stdexcept>
 
 #include "engine_test.hpp"
@@ -26,6 +27,15 @@ class GameTest : public Gen4EngineTest {
 
     spdlog::set_level(spdlog::level::debug);
   }
+
+  void validateContribution(const HeatResult& result) {
+    for (const auto& team : result.teams) {
+      for (const auto& pk : team.pokemon) {
+        EXPECT_TRUE(std::isfinite(pk.simpleContribution));
+        EXPECT_TRUE(std::isfinite(pk.aggregateContribution));
+      }
+    }
+  }
 };
 
 TEST_F(GameTest, RolloutPokemon) {
@@ -35,6 +45,7 @@ TEST_F(GameTest, RolloutPokemon) {
   auto result = game.run();
 
   EXPECT_GE(result.matchesPlayed, 2);
+  validateContribution(result);
 }
 
 
@@ -47,6 +58,7 @@ TEST_F(GameTest, Multithreaded) {
   auto result = game.run();
 
   EXPECT_GE(result.matchesPlayed, 101);
+  validateContribution(result);
 }
 
 
@@ -62,6 +74,7 @@ TEST_F(GameTest, CustomPlanners) {
   auto result = game.run();
 
   EXPECT_GE(result.matchesPlayed, 51);
+  validateContribution(result);
 }
 
 
