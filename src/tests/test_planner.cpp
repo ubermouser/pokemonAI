@@ -12,10 +12,10 @@
 #include "pokemonai/planner_minimax.h"
 #include "pokemonai/planner_random.h"
 
-class PlannerTest : public EngineTest {
+class PlannerTest : public Gen4EngineTest {
  protected:
   void SetUp() override {
-    EngineTest::SetUp();
+    Gen4EngineTest::SetUp();
     engine_->setAllowInvalidMoves(false);
 
     initialize_logger(spdlog::level::trace);

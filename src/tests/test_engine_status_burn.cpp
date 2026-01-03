@@ -1,9 +1,9 @@
 #include "engine_test.hpp"
 
-class BurnStatusTest : public EngineTest {
-protected:
+class BurnStatusTest : public Gen4EngineTest {
+ protected:
   void SetUp() override {
-    EngineTest::SetUp();
+    Gen4EngineTest::SetUp();
 
     // Team A: Mew (Psychic)
     auto team_a = TeamNonVolatile()

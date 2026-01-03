@@ -288,7 +288,9 @@ bool PokemonNonVolatile::natureExists() const {
 
 
 PokemonNonVolatile& PokemonNonVolatile::setNature(const Nature& _chosenNature) {
-  assert(pkdex->getNatures().count(_chosenNature.getName()) > 0);
+  assert(
+      &_chosenNature == Nature::no_nature || 
+      pkdex->getNatures().count(_chosenNature.getName()) > 0);
   chosenNature_ = &_chosenNature;
   return *this;
 };

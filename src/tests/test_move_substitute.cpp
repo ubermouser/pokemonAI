@@ -1,11 +1,11 @@
 #include "engine_test.hpp"
 
-class SubstituteTest : public EngineTest {
-protected:
+class SubstituteTest : public Gen4EngineTest {
+ protected:
   PossibleEnvironments turn1_results;
 
   void SetUp() override {
-    EngineTest::SetUp();
+    Gen4EngineTest::SetUp();
     // Team A: Pokemon with Substitute
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()

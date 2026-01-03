@@ -1,10 +1,10 @@
 #include "engine_test.hpp"
 
 
-class IntimidateTest : public EngineTest {
-protected:
+class IntimidateTest : public Gen4EngineTest {
+ protected:
   void SetUp() override {
-    EngineTest::SetUp();
+    Gen4EngineTest::SetUp();
 
     // Team A: Charmander (Lead), Staraptor (Intimidate)
     auto team_a = TeamNonVolatile()

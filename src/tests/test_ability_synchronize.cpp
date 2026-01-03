@@ -1,9 +1,9 @@
 #include "engine_test.hpp"
 
-class SynchronizeTest : public EngineTest {
-public:
+class SynchronizeTest : public Gen4EngineTest {
+ public:
   void SetUp() override {
-    EngineTest::SetUp();
+    Gen4EngineTest::SetUp();
     // Team A: Mew with Synchronize
     // Using Mew because it learns Synchronize
     auto team_a = TeamNonVolatile()

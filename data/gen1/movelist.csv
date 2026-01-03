@@ -1,3 +1,5181 @@
-PKAIZ	1
+PKAIZ	5179
 name	move
-Bulbasaur	Tackle
+bulbasaur	razor wind
+bulbasaur	swords dance
+bulbasaur	cut
+bulbasaur	bind
+bulbasaur	vine whip
+bulbasaur	headbutt
+bulbasaur	tackle
+bulbasaur	body slam
+bulbasaur	take down
+bulbasaur	double-edge
+bulbasaur	growl
+bulbasaur	strength
+bulbasaur	mega drain
+bulbasaur	leech seed
+bulbasaur	growth
+bulbasaur	razor leaf
+bulbasaur	solar beam
+bulbasaur	poison powder
+bulbasaur	sleep powder
+bulbasaur	petal dance
+bulbasaur	string shot
+bulbasaur	toxic
+bulbasaur	rage
+bulbasaur	mimic
+bulbasaur	double team
+bulbasaur	defense curl
+bulbasaur	light screen
+bulbasaur	reflect
+bulbasaur	bide
+bulbasaur	sludge
+bulbasaur	skull bash
+bulbasaur	amnesia
+bulbasaur	flash
+bulbasaur	rest
+bulbasaur	substitute
+charmander	mega punch
+charmander	fire punch
+charmander	thunder punch
+charmander	scratch
+charmander	swords dance
+charmander	cut
+charmander	wing attack
+charmander	mega kick
+charmander	headbutt
+charmander	body slam
+charmander	take down
+charmander	double-edge
+charmander	leer
+charmander	bite
+charmander	growl
+charmander	roar
+charmander	ember
+charmander	flamethrower
+charmander	submission
+charmander	counter
+charmander	seismic toss
+charmander	strength
+charmander	dragon rage
+charmander	fire spin
+charmander	dig
+charmander	toxic
+charmander	rage
+charmander	mimic
+charmander	double team
+charmander	smokescreen
+charmander	defense curl
+charmander	reflect
+charmander	bide
+charmander	fire blast
+charmander	swift
+charmander	skull bash
+charmander	fury swipes
+charmander	rest
+charmander	rock slide
+charmander	slash
+charmander	substitute
+squirtle	mega punch
+squirtle	ice punch
+squirtle	mega kick
+squirtle	headbutt
+squirtle	tackle
+squirtle	body slam
+squirtle	take down
+squirtle	double-edge
+squirtle	tail whip
+squirtle	bite
+squirtle	mist
+squirtle	water gun
+squirtle	hydro pump
+squirtle	surf
+squirtle	ice beam
+squirtle	blizzard
+squirtle	bubble beam
+squirtle	submission
+squirtle	counter
+squirtle	seismic toss
+squirtle	strength
+squirtle	dig
+squirtle	toxic
+squirtle	confusion
+squirtle	rage
+squirtle	mimic
+squirtle	double team
+squirtle	withdraw
+squirtle	defense curl
+squirtle	haze
+squirtle	reflect
+squirtle	bide
+squirtle	waterfall
+squirtle	skull bash
+squirtle	bubble
+squirtle	rest
+squirtle	rock slide
+squirtle	substitute
+caterpie	tackle
+caterpie	string shot
+weedle	poison sting
+weedle	string shot
+pidgey	razor wind
+pidgey	gust
+pidgey	wing attack
+pidgey	whirlwind
+pidgey	fly
+pidgey	sand attack
+pidgey	headbutt
+pidgey	tackle
+pidgey	take down
+pidgey	double-edge
+pidgey	toxic
+pidgey	agility
+pidgey	quick attack
+pidgey	rage
+pidgey	mimic
+pidgey	double team
+pidgey	reflect
+pidgey	bide
+pidgey	mirror move
+pidgey	swift
+pidgey	sky attack
+pidgey	rest
+pidgey	substitute
+rattata	cut
+rattata	headbutt
+rattata	tackle
+rattata	body slam
+rattata	take down
+rattata	double-edge
+rattata	tail whip
+rattata	bite
+rattata	water gun
+rattata	ice beam
+rattata	blizzard
+rattata	bubble beam
+rattata	counter
+rattata	thunderbolt
+rattata	thunder wave
+rattata	thunder
+rattata	dig
+rattata	toxic
+rattata	quick attack
+rattata	rage
+rattata	mimic
+rattata	screech
+rattata	double team
+rattata	defense curl
+rattata	focus energy
+rattata	bide
+rattata	swift
+rattata	skull bash
+rattata	fury swipes
+rattata	rest
+rattata	hyper fang
+rattata	super fang
+rattata	substitute
+spearow	razor wind
+spearow	wing attack
+spearow	whirlwind
+spearow	fly
+spearow	headbutt
+spearow	fury attack
+spearow	take down
+spearow	double-edge
+spearow	leer
+spearow	growl
+spearow	peck
+spearow	drill peck
+spearow	toxic
+spearow	agility
+spearow	quick attack
+spearow	rage
+spearow	mimic
+spearow	double team
+spearow	focus energy
+spearow	bide
+spearow	mirror move
+spearow	swift
+spearow	sky attack
+spearow	rest
+spearow	tri attack
+spearow	substitute
+ekans	bind
+ekans	slam
+ekans	headbutt
+ekans	body slam
+ekans	wrap
+ekans	take down
+ekans	double-edge
+ekans	poison sting
+ekans	leer
+ekans	bite
+ekans	disable
+ekans	acid
+ekans	strength
+ekans	mega drain
+ekans	earthquake
+ekans	fissure
+ekans	dig
+ekans	toxic
+ekans	rage
+ekans	mimic
+ekans	screech
+ekans	double team
+ekans	haze
+ekans	bide
+ekans	skull bash
+ekans	glare
+ekans	leech life
+ekans	rest
+ekans	rock slide
+ekans	substitute
+sandshrew	scratch
+sandshrew	swords dance
+sandshrew	cut
+sandshrew	sand attack
+sandshrew	headbutt
+sandshrew	body slam
+sandshrew	take down
+sandshrew	double-edge
+sandshrew	poison sting
+sandshrew	submission
+sandshrew	low kick
+sandshrew	counter
+sandshrew	seismic toss
+sandshrew	strength
+sandshrew	earthquake
+sandshrew	fissure
+sandshrew	dig
+sandshrew	toxic
+sandshrew	agility
+sandshrew	rage
+sandshrew	mimic
+sandshrew	double team
+sandshrew	defense curl
+sandshrew	bide
+sandshrew	swift
+sandshrew	skull bash
+sandshrew	amnesia
+sandshrew	leech life
+sandshrew	fury swipes
+sandshrew	rest
+sandshrew	rock slide
+sandshrew	super fang
+sandshrew	slash
+sandshrew	substitute
+nidoran-f	scratch
+nidoran-f	cut
+nidoran-f	double kick
+nidoran-f	headbutt
+nidoran-f	tackle
+nidoran-f	body slam
+nidoran-f	take down
+nidoran-f	double-edge
+nidoran-f	tail whip
+nidoran-f	poison sting
+nidoran-f	bite
+nidoran-f	growl
+nidoran-f	supersonic
+nidoran-f	disable
+nidoran-f	ice beam
+nidoran-f	blizzard
+nidoran-f	counter
+nidoran-f	strength
+nidoran-f	thunderbolt
+nidoran-f	thunder
+nidoran-f	dig
+nidoran-f	toxic
+nidoran-f	rage
+nidoran-f	mimic
+nidoran-f	double team
+nidoran-f	defense curl
+nidoran-f	reflect
+nidoran-f	focus energy
+nidoran-f	bide
+nidoran-f	skull bash
+nidoran-f	fury swipes
+nidoran-f	rest
+nidoran-f	super fang
+nidoran-f	substitute
+nidoran-m	cut
+nidoran-m	double kick
+nidoran-m	headbutt
+nidoran-m	horn attack
+nidoran-m	fury attack
+nidoran-m	horn drill
+nidoran-m	tackle
+nidoran-m	body slam
+nidoran-m	take down
+nidoran-m	thrash
+nidoran-m	double-edge
+nidoran-m	poison sting
+nidoran-m	leer
+nidoran-m	supersonic
+nidoran-m	disable
+nidoran-m	ice beam
+nidoran-m	blizzard
+nidoran-m	peck
+nidoran-m	counter
+nidoran-m	strength
+nidoran-m	thunderbolt
+nidoran-m	thunder
+nidoran-m	dig
+nidoran-m	toxic
+nidoran-m	confusion
+nidoran-m	rage
+nidoran-m	mimic
+nidoran-m	double team
+nidoran-m	defense curl
+nidoran-m	reflect
+nidoran-m	focus energy
+nidoran-m	bide
+nidoran-m	skull bash
+nidoran-m	amnesia
+nidoran-m	rest
+nidoran-m	super fang
+nidoran-m	substitute
+vulpix	headbutt
+vulpix	tackle
+vulpix	body slam
+vulpix	take down
+vulpix	double-edge
+vulpix	tail whip
+vulpix	roar
+vulpix	disable
+vulpix	ember
+vulpix	flamethrower
+vulpix	fire spin
+vulpix	dig
+vulpix	toxic
+vulpix	hypnosis
+vulpix	agility
+vulpix	quick attack
+vulpix	rage
+vulpix	mimic
+vulpix	double team
+vulpix	confuse ray
+vulpix	reflect
+vulpix	bide
+vulpix	fire blast
+vulpix	swift
+vulpix	skull bash
+vulpix	rest
+vulpix	substitute
+zubat	razor wind
+zubat	gust
+zubat	wing attack
+zubat	whirlwind
+zubat	fly
+zubat	headbutt
+zubat	take down
+zubat	double-edge
+zubat	bite
+zubat	supersonic
+zubat	absorb
+zubat	mega drain
+zubat	toxic
+zubat	hypnosis
+zubat	agility
+zubat	quick attack
+zubat	rage
+zubat	mimic
+zubat	double team
+zubat	confuse ray
+zubat	haze
+zubat	bide
+zubat	swift
+zubat	leech life
+zubat	rest
+zubat	super fang
+zubat	substitute
+oddish	swords dance
+oddish	cut
+oddish	headbutt
+oddish	take down
+oddish	double-edge
+oddish	acid
+oddish	absorb
+oddish	mega drain
+oddish	leech seed
+oddish	growth
+oddish	razor leaf
+oddish	solar beam
+oddish	poison powder
+oddish	stun spore
+oddish	sleep powder
+oddish	petal dance
+oddish	toxic
+oddish	rage
+oddish	mimic
+oddish	double team
+oddish	reflect
+oddish	bide
+oddish	flash
+oddish	rest
+oddish	substitute
+paras	scratch
+paras	swords dance
+paras	cut
+paras	headbutt
+paras	body slam
+paras	take down
+paras	double-edge
+paras	psybeam
+paras	counter
+paras	absorb
+paras	mega drain
+paras	leech seed
+paras	growth
+paras	solar beam
+paras	poison powder
+paras	stun spore
+paras	sleep powder
+paras	string shot
+paras	dig
+paras	toxic
+paras	agility
+paras	rage
+paras	mimic
+paras	screech
+paras	double team
+paras	light screen
+paras	reflect
+paras	bide
+paras	skull bash
+paras	leech life
+paras	spore
+paras	flash
+paras	fury swipes
+paras	rest
+paras	slash
+paras	substitute
+venonat	headbutt
+venonat	tackle
+venonat	take down
+venonat	double-edge
+venonat	supersonic
+venonat	disable
+venonat	psybeam
+venonat	mega drain
+venonat	solar beam
+venonat	poison powder
+venonat	stun spore
+venonat	sleep powder
+venonat	string shot
+venonat	toxic
+venonat	confusion
+venonat	psychic
+venonat	agility
+venonat	rage
+venonat	night shade
+venonat	mimic
+venonat	screech
+venonat	double team
+venonat	confuse ray
+venonat	reflect
+venonat	bide
+venonat	swift
+venonat	leech life
+venonat	flash
+venonat	psywave
+venonat	rest
+venonat	substitute
+diglett	scratch
+diglett	swords dance
+diglett	cut
+diglett	sand attack
+diglett	headbutt
+diglett	body slam
+diglett	take down
+diglett	double-edge
+diglett	growl
+diglett	earthquake
+diglett	fissure
+diglett	dig
+diglett	toxic
+diglett	agility
+diglett	rage
+diglett	mimic
+diglett	screech
+diglett	double team
+diglett	bide
+diglett	fury swipes
+diglett	rest
+diglett	rock slide
+diglett	slash
+diglett	substitute
+meowth	pay day
+meowth	scratch
+meowth	cut
+meowth	headbutt
+meowth	body slam
+meowth	take down
+meowth	double-edge
+meowth	tail whip
+meowth	bite
+meowth	growl
+meowth	water gun
+meowth	bubble beam
+meowth	thunderbolt
+meowth	thunder wave
+meowth	thunder
+meowth	dig
+meowth	toxic
+meowth	hypnosis
+meowth	agility
+meowth	rage
+meowth	mimic
+meowth	screech
+meowth	double team
+meowth	defense curl
+meowth	bide
+meowth	swift
+meowth	skull bash
+meowth	amnesia
+meowth	dream eater
+meowth	flash
+meowth	fury swipes
+meowth	rest
+meowth	slash
+meowth	substitute
+psyduck	mega punch
+psyduck	pay day
+psyduck	ice punch
+psyduck	scratch
+psyduck	mega kick
+psyduck	headbutt
+psyduck	body slam
+psyduck	take down
+psyduck	double-edge
+psyduck	tail whip
+psyduck	disable
+psyduck	water gun
+psyduck	hydro pump
+psyduck	surf
+psyduck	ice beam
+psyduck	blizzard
+psyduck	psybeam
+psyduck	bubble beam
+psyduck	submission
+psyduck	low kick
+psyduck	counter
+psyduck	seismic toss
+psyduck	strength
+psyduck	dig
+psyduck	toxic
+psyduck	confusion
+psyduck	psychic
+psyduck	hypnosis
+psyduck	rage
+psyduck	mimic
+psyduck	screech
+psyduck	double team
+psyduck	confuse ray
+psyduck	light screen
+psyduck	haze
+psyduck	bide
+psyduck	metronome
+psyduck	waterfall
+psyduck	swift
+psyduck	skull bash
+psyduck	amnesia
+psyduck	bubble
+psyduck	flash
+psyduck	fury swipes
+psyduck	rest
+psyduck	substitute
+mankey	karate chop
+mankey	mega punch
+mankey	pay day
+mankey	fire punch
+mankey	ice punch
+mankey	thunder punch
+mankey	scratch
+mankey	mega kick
+mankey	headbutt
+mankey	body slam
+mankey	take down
+mankey	thrash
+mankey	double-edge
+mankey	leer
+mankey	submission
+mankey	low kick
+mankey	counter
+mankey	seismic toss
+mankey	strength
+mankey	thunderbolt
+mankey	thunder
+mankey	earthquake
+mankey	dig
+mankey	toxic
+mankey	meditate
+mankey	rage
+mankey	mimic
+mankey	screech
+mankey	double team
+mankey	defense curl
+mankey	focus energy
+mankey	bide
+mankey	metronome
+mankey	swift
+mankey	skull bash
+mankey	fury swipes
+mankey	rest
+mankey	rock slide
+mankey	substitute
+growlithe	double kick
+growlithe	headbutt
+growlithe	body slam
+growlithe	take down
+growlithe	thrash
+growlithe	double-edge
+growlithe	leer
+growlithe	bite
+growlithe	roar
+growlithe	ember
+growlithe	flamethrower
+growlithe	strength
+growlithe	dragon rage
+growlithe	fire spin
+growlithe	dig
+growlithe	toxic
+growlithe	agility
+growlithe	rage
+growlithe	mimic
+growlithe	double team
+growlithe	reflect
+growlithe	bide
+growlithe	fire blast
+growlithe	swift
+growlithe	skull bash
+growlithe	rest
+growlithe	substitute
+poliwag	pound
+poliwag	double slap
+poliwag	headbutt
+poliwag	body slam
+poliwag	take down
+poliwag	double-edge
+poliwag	mist
+poliwag	water gun
+poliwag	hydro pump
+poliwag	surf
+poliwag	ice beam
+poliwag	blizzard
+poliwag	bubble beam
+poliwag	low kick
+poliwag	dig
+poliwag	toxic
+poliwag	psychic
+poliwag	hypnosis
+poliwag	rage
+poliwag	mimic
+poliwag	double team
+poliwag	defense curl
+poliwag	haze
+poliwag	bide
+poliwag	waterfall
+poliwag	swift
+poliwag	skull bash
+poliwag	amnesia
+poliwag	bubble
+poliwag	psywave
+poliwag	splash
+poliwag	rest
+poliwag	substitute
+abra	mega punch
+abra	fire punch
+abra	ice punch
+abra	thunder punch
+abra	mega kick
+abra	headbutt
+abra	body slam
+abra	take down
+abra	double-edge
+abra	submission
+abra	counter
+abra	seismic toss
+abra	thunder wave
+abra	toxic
+abra	confusion
+abra	psychic
+abra	rage
+abra	teleport
+abra	mimic
+abra	double team
+abra	barrier
+abra	light screen
+abra	reflect
+abra	bide
+abra	metronome
+abra	swift
+abra	skull bash
+abra	dream eater
+abra	flash
+abra	psywave
+abra	rest
+abra	tri attack
+abra	substitute
+machop	karate chop
+machop	mega punch
+machop	fire punch
+machop	ice punch
+machop	thunder punch
+machop	mega kick
+machop	rolling kick
+machop	headbutt
+machop	tackle
+machop	body slam
+machop	take down
+machop	double-edge
+machop	leer
+machop	flamethrower
+machop	submission
+machop	low kick
+machop	counter
+machop	seismic toss
+machop	strength
+machop	earthquake
+machop	fissure
+machop	dig
+machop	toxic
+machop	meditate
+machop	rage
+machop	mimic
+machop	double team
+machop	light screen
+machop	focus energy
+machop	bide
+machop	metronome
+machop	fire blast
+machop	skull bash
+machop	rest
+machop	rock slide
+machop	substitute
+bellsprout	swords dance
+bellsprout	cut
+bellsprout	bind
+bellsprout	slam
+bellsprout	vine whip
+bellsprout	headbutt
+bellsprout	wrap
+bellsprout	take down
+bellsprout	double-edge
+bellsprout	acid
+bellsprout	mega drain
+bellsprout	growth
+bellsprout	razor leaf
+bellsprout	solar beam
+bellsprout	poison powder
+bellsprout	stun spore
+bellsprout	sleep powder
+bellsprout	toxic
+bellsprout	rage
+bellsprout	mimic
+bellsprout	double team
+bellsprout	reflect
+bellsprout	bide
+bellsprout	leech life
+bellsprout	flash
+bellsprout	rest
+bellsprout	substitute
+tentacool	swords dance
+tentacool	cut
+tentacool	bind
+tentacool	headbutt
+tentacool	wrap
+tentacool	take down
+tentacool	double-edge
+tentacool	poison sting
+tentacool	supersonic
+tentacool	acid
+tentacool	water gun
+tentacool	hydro pump
+tentacool	surf
+tentacool	ice beam
+tentacool	blizzard
+tentacool	bubble beam
+tentacool	aurora beam
+tentacool	mega drain
+tentacool	toxic
+tentacool	rage
+tentacool	mimic
+tentacool	screech
+tentacool	double team
+tentacool	confuse ray
+tentacool	barrier
+tentacool	haze
+tentacool	reflect
+tentacool	bide
+tentacool	waterfall
+tentacool	swift
+tentacool	skull bash
+tentacool	constrict
+tentacool	bubble
+tentacool	acid armor
+tentacool	rest
+tentacool	substitute
+geodude	mega punch
+geodude	fire punch
+geodude	thunder punch
+geodude	sand attack
+geodude	headbutt
+geodude	tackle
+geodude	body slam
+geodude	take down
+geodude	double-edge
+geodude	flamethrower
+geodude	submission
+geodude	counter
+geodude	seismic toss
+geodude	strength
+geodude	rock throw
+geodude	earthquake
+geodude	fissure
+geodude	dig
+geodude	toxic
+geodude	rage
+geodude	mimic
+geodude	double team
+geodude	harden
+geodude	defense curl
+geodude	bide
+geodude	metronome
+geodude	self-destruct
+geodude	fire blast
+geodude	explosion
+geodude	rest
+geodude	rock slide
+geodude	substitute
+venusaur	swords dance
+venusaur	cut
+venusaur	bind
+venusaur	vine whip
+venusaur	headbutt
+venusaur	tackle
+venusaur	body slam
+venusaur	take down
+venusaur	double-edge
+venusaur	growl
+venusaur	roar
+venusaur	hyper beam
+venusaur	strength
+venusaur	mega drain
+venusaur	leech seed
+venusaur	growth
+venusaur	razor leaf
+venusaur	solar beam
+venusaur	poison powder
+venusaur	sleep powder
+venusaur	petal dance
+venusaur	string shot
+venusaur	earthquake
+venusaur	toxic
+venusaur	rage
+venusaur	mimic
+venusaur	double team
+venusaur	defense curl
+venusaur	light screen
+venusaur	reflect
+venusaur	bide
+venusaur	amnesia
+venusaur	flash
+venusaur	rest
+venusaur	substitute
+charmeleon	mega punch
+charmeleon	fire punch
+charmeleon	thunder punch
+charmeleon	scratch
+charmeleon	swords dance
+charmeleon	cut
+charmeleon	mega kick
+charmeleon	headbutt
+charmeleon	body slam
+charmeleon	take down
+charmeleon	double-edge
+charmeleon	leer
+charmeleon	bite
+charmeleon	growl
+charmeleon	roar
+charmeleon	ember
+charmeleon	flamethrower
+charmeleon	submission
+charmeleon	counter
+charmeleon	seismic toss
+charmeleon	strength
+charmeleon	dragon rage
+charmeleon	fire spin
+charmeleon	dig
+charmeleon	toxic
+charmeleon	rage
+charmeleon	mimic
+charmeleon	double team
+charmeleon	smokescreen
+charmeleon	defense curl
+charmeleon	reflect
+charmeleon	bide
+charmeleon	fire blast
+charmeleon	swift
+charmeleon	skull bash
+charmeleon	fury swipes
+charmeleon	rest
+charmeleon	rock slide
+charmeleon	slash
+charmeleon	substitute
+charizard	mega punch
+charizard	fire punch
+charizard	thunder punch
+charizard	scratch
+charizard	swords dance
+charizard	cut
+charizard	wing attack
+charizard	fly
+charizard	mega kick
+charizard	headbutt
+charizard	body slam
+charizard	take down
+charizard	double-edge
+charizard	leer
+charizard	bite
+charizard	growl
+charizard	roar
+charizard	ember
+charizard	flamethrower
+charizard	hyper beam
+charizard	submission
+charizard	counter
+charizard	seismic toss
+charizard	strength
+charizard	solar beam
+charizard	dragon rage
+charizard	fire spin
+charizard	earthquake
+charizard	fissure
+charizard	dig
+charizard	toxic
+charizard	rage
+charizard	mimic
+charizard	double team
+charizard	smokescreen
+charizard	defense curl
+charizard	reflect
+charizard	bide
+charizard	fire blast
+charizard	swift
+charizard	skull bash
+charizard	fury swipes
+charizard	rest
+charizard	rock slide
+charizard	slash
+charizard	substitute
+wartortle	mega punch
+wartortle	ice punch
+wartortle	mega kick
+wartortle	headbutt
+wartortle	tackle
+wartortle	body slam
+wartortle	take down
+wartortle	double-edge
+wartortle	tail whip
+wartortle	bite
+wartortle	mist
+wartortle	water gun
+wartortle	hydro pump
+wartortle	surf
+wartortle	ice beam
+wartortle	blizzard
+wartortle	bubble beam
+wartortle	submission
+wartortle	counter
+wartortle	seismic toss
+wartortle	strength
+wartortle	dig
+wartortle	toxic
+wartortle	rage
+wartortle	mimic
+wartortle	double team
+wartortle	withdraw
+wartortle	defense curl
+wartortle	haze
+wartortle	reflect
+wartortle	bide
+wartortle	waterfall
+wartortle	skull bash
+wartortle	bubble
+wartortle	rest
+wartortle	rock slide
+wartortle	substitute
+blastoise	mega punch
+blastoise	ice punch
+blastoise	mega kick
+blastoise	headbutt
+blastoise	tackle
+blastoise	body slam
+blastoise	take down
+blastoise	double-edge
+blastoise	tail whip
+blastoise	bite
+blastoise	roar
+blastoise	mist
+blastoise	water gun
+blastoise	hydro pump
+blastoise	surf
+blastoise	ice beam
+blastoise	blizzard
+blastoise	bubble beam
+blastoise	hyper beam
+blastoise	submission
+blastoise	counter
+blastoise	seismic toss
+blastoise	strength
+blastoise	earthquake
+blastoise	fissure
+blastoise	dig
+blastoise	toxic
+blastoise	rage
+blastoise	mimic
+blastoise	double team
+blastoise	withdraw
+blastoise	defense curl
+blastoise	haze
+blastoise	reflect
+blastoise	bide
+blastoise	waterfall
+blastoise	skull bash
+blastoise	bubble
+blastoise	rest
+blastoise	rock slide
+blastoise	substitute
+metapod	string shot
+metapod	harden
+butterfree	razor wind
+butterfree	gust
+butterfree	whirlwind
+butterfree	headbutt
+butterfree	tackle
+butterfree	take down
+butterfree	double-edge
+butterfree	supersonic
+butterfree	psybeam
+butterfree	hyper beam
+butterfree	mega drain
+butterfree	solar beam
+butterfree	poison powder
+butterfree	stun spore
+butterfree	sleep powder
+butterfree	string shot
+butterfree	toxic
+butterfree	confusion
+butterfree	psychic
+butterfree	rage
+butterfree	teleport
+butterfree	mimic
+butterfree	double team
+butterfree	harden
+butterfree	reflect
+butterfree	bide
+butterfree	swift
+butterfree	dream eater
+butterfree	flash
+butterfree	psywave
+butterfree	rest
+butterfree	substitute
+kakuna	string shot
+kakuna	harden
+beedrill	swords dance
+beedrill	cut
+beedrill	headbutt
+beedrill	fury attack
+beedrill	take down
+beedrill	double-edge
+beedrill	poison sting
+beedrill	twineedle
+beedrill	pin missile
+beedrill	hyper beam
+beedrill	peck
+beedrill	mega drain
+beedrill	solar beam
+beedrill	string shot
+beedrill	toxic
+beedrill	agility
+beedrill	rage
+beedrill	mimic
+beedrill	double team
+beedrill	harden
+beedrill	reflect
+beedrill	focus energy
+beedrill	bide
+beedrill	swift
+beedrill	skull bash
+beedrill	flash
+beedrill	rest
+beedrill	substitute
+pidgeotto	razor wind
+pidgeotto	gust
+pidgeotto	wing attack
+pidgeotto	whirlwind
+pidgeotto	fly
+pidgeotto	sand attack
+pidgeotto	headbutt
+pidgeotto	tackle
+pidgeotto	take down
+pidgeotto	double-edge
+pidgeotto	toxic
+pidgeotto	agility
+pidgeotto	quick attack
+pidgeotto	rage
+pidgeotto	mimic
+pidgeotto	double team
+pidgeotto	reflect
+pidgeotto	bide
+pidgeotto	mirror move
+pidgeotto	swift
+pidgeotto	sky attack
+pidgeotto	rest
+pidgeotto	substitute
+pidgeot	razor wind
+pidgeot	gust
+pidgeot	wing attack
+pidgeot	whirlwind
+pidgeot	fly
+pidgeot	sand attack
+pidgeot	headbutt
+pidgeot	tackle
+pidgeot	take down
+pidgeot	double-edge
+pidgeot	hyper beam
+pidgeot	toxic
+pidgeot	agility
+pidgeot	quick attack
+pidgeot	rage
+pidgeot	mimic
+pidgeot	double team
+pidgeot	reflect
+pidgeot	bide
+pidgeot	mirror move
+pidgeot	swift
+pidgeot	sky attack
+pidgeot	rest
+pidgeot	substitute
+raticate	swords dance
+raticate	cut
+raticate	headbutt
+raticate	tackle
+raticate	body slam
+raticate	take down
+raticate	double-edge
+raticate	tail whip
+raticate	bite
+raticate	roar
+raticate	water gun
+raticate	ice beam
+raticate	blizzard
+raticate	bubble beam
+raticate	hyper beam
+raticate	counter
+raticate	strength
+raticate	thunderbolt
+raticate	thunder wave
+raticate	thunder
+raticate	dig
+raticate	toxic
+raticate	quick attack
+raticate	rage
+raticate	mimic
+raticate	double team
+raticate	defense curl
+raticate	focus energy
+raticate	bide
+raticate	swift
+raticate	skull bash
+raticate	fury swipes
+raticate	rest
+raticate	hyper fang
+raticate	super fang
+raticate	substitute
+fearow	razor wind
+fearow	wing attack
+fearow	whirlwind
+fearow	fly
+fearow	headbutt
+fearow	fury attack
+fearow	take down
+fearow	double-edge
+fearow	leer
+fearow	growl
+fearow	hyper beam
+fearow	peck
+fearow	drill peck
+fearow	toxic
+fearow	agility
+fearow	quick attack
+fearow	rage
+fearow	mimic
+fearow	double team
+fearow	focus energy
+fearow	bide
+fearow	mirror move
+fearow	swift
+fearow	sky attack
+fearow	rest
+fearow	tri attack
+fearow	substitute
+arbok	bind
+arbok	slam
+arbok	headbutt
+arbok	body slam
+arbok	wrap
+arbok	take down
+arbok	double-edge
+arbok	poison sting
+arbok	leer
+arbok	bite
+arbok	acid
+arbok	hyper beam
+arbok	strength
+arbok	mega drain
+arbok	earthquake
+arbok	fissure
+arbok	dig
+arbok	toxic
+arbok	rage
+arbok	mimic
+arbok	screech
+arbok	double team
+arbok	haze
+arbok	bide
+arbok	skull bash
+arbok	glare
+arbok	leech life
+arbok	rest
+arbok	rock slide
+arbok	substitute
+pikachu	mega punch
+pikachu	pay day
+pikachu	thunder punch
+pikachu	slam
+pikachu	double kick
+pikachu	mega kick
+pikachu	headbutt
+pikachu	body slam
+pikachu	take down
+pikachu	double-edge
+pikachu	tail whip
+pikachu	growl
+pikachu	surf
+pikachu	submission
+pikachu	counter
+pikachu	seismic toss
+pikachu	strength
+pikachu	thunder shock
+pikachu	thunderbolt
+pikachu	thunder wave
+pikachu	thunder
+pikachu	dig
+pikachu	toxic
+pikachu	agility
+pikachu	quick attack
+pikachu	rage
+pikachu	mimic
+pikachu	double team
+pikachu	defense curl
+pikachu	light screen
+pikachu	reflect
+pikachu	bide
+pikachu	swift
+pikachu	skull bash
+pikachu	flash
+pikachu	rest
+pikachu	substitute
+raichu	mega punch
+raichu	pay day
+raichu	thunder punch
+raichu	slam
+raichu	mega kick
+raichu	headbutt
+raichu	body slam
+raichu	take down
+raichu	double-edge
+raichu	tail whip
+raichu	growl
+raichu	surf
+raichu	hyper beam
+raichu	submission
+raichu	counter
+raichu	seismic toss
+raichu	strength
+raichu	thunder shock
+raichu	thunderbolt
+raichu	thunder wave
+raichu	thunder
+raichu	dig
+raichu	toxic
+raichu	agility
+raichu	quick attack
+raichu	rage
+raichu	mimic
+raichu	double team
+raichu	defense curl
+raichu	light screen
+raichu	reflect
+raichu	bide
+raichu	swift
+raichu	skull bash
+raichu	flash
+raichu	rest
+raichu	substitute
+sandslash	scratch
+sandslash	swords dance
+sandslash	cut
+sandslash	sand attack
+sandslash	headbutt
+sandslash	body slam
+sandslash	take down
+sandslash	double-edge
+sandslash	poison sting
+sandslash	pin missile
+sandslash	hyper beam
+sandslash	submission
+sandslash	low kick
+sandslash	counter
+sandslash	seismic toss
+sandslash	strength
+sandslash	earthquake
+sandslash	fissure
+sandslash	dig
+sandslash	toxic
+sandslash	agility
+sandslash	rage
+sandslash	mimic
+sandslash	double team
+sandslash	defense curl
+sandslash	bide
+sandslash	swift
+sandslash	skull bash
+sandslash	amnesia
+sandslash	leech life
+sandslash	fury swipes
+sandslash	rest
+sandslash	rock slide
+sandslash	super fang
+sandslash	slash
+sandslash	substitute
+nidorina	scratch
+nidorina	cut
+nidorina	double kick
+nidorina	headbutt
+nidorina	horn drill
+nidorina	tackle
+nidorina	body slam
+nidorina	take down
+nidorina	double-edge
+nidorina	tail whip
+nidorina	poison sting
+nidorina	bite
+nidorina	growl
+nidorina	water gun
+nidorina	ice beam
+nidorina	blizzard
+nidorina	bubble beam
+nidorina	counter
+nidorina	strength
+nidorina	thunderbolt
+nidorina	thunder
+nidorina	dig
+nidorina	toxic
+nidorina	rage
+nidorina	mimic
+nidorina	double team
+nidorina	defense curl
+nidorina	reflect
+nidorina	focus energy
+nidorina	bide
+nidorina	skull bash
+nidorina	fury swipes
+nidorina	rest
+nidorina	super fang
+nidorina	substitute
+nidoqueen	mega punch
+nidoqueen	pay day
+nidoqueen	fire punch
+nidoqueen	ice punch
+nidoqueen	thunder punch
+nidoqueen	scratch
+nidoqueen	cut
+nidoqueen	double kick
+nidoqueen	mega kick
+nidoqueen	headbutt
+nidoqueen	horn drill
+nidoqueen	tackle
+nidoqueen	body slam
+nidoqueen	take down
+nidoqueen	double-edge
+nidoqueen	tail whip
+nidoqueen	poison sting
+nidoqueen	bite
+nidoqueen	growl
+nidoqueen	roar
+nidoqueen	supersonic
+nidoqueen	flamethrower
+nidoqueen	water gun
+nidoqueen	surf
+nidoqueen	ice beam
+nidoqueen	blizzard
+nidoqueen	bubble beam
+nidoqueen	hyper beam
+nidoqueen	submission
+nidoqueen	counter
+nidoqueen	seismic toss
+nidoqueen	strength
+nidoqueen	thunderbolt
+nidoqueen	thunder
+nidoqueen	earthquake
+nidoqueen	fissure
+nidoqueen	dig
+nidoqueen	toxic
+nidoqueen	rage
+nidoqueen	mimic
+nidoqueen	double team
+nidoqueen	defense curl
+nidoqueen	reflect
+nidoqueen	focus energy
+nidoqueen	bide
+nidoqueen	fire blast
+nidoqueen	skull bash
+nidoqueen	fury swipes
+nidoqueen	rest
+nidoqueen	rock slide
+nidoqueen	super fang
+nidoqueen	substitute
+nidorino	cut
+nidorino	double kick
+nidorino	headbutt
+nidorino	horn attack
+nidorino	fury attack
+nidorino	horn drill
+nidorino	tackle
+nidorino	body slam
+nidorino	take down
+nidorino	double-edge
+nidorino	poison sting
+nidorino	leer
+nidorino	water gun
+nidorino	ice beam
+nidorino	blizzard
+nidorino	bubble beam
+nidorino	peck
+nidorino	counter
+nidorino	strength
+nidorino	thunderbolt
+nidorino	thunder
+nidorino	dig
+nidorino	toxic
+nidorino	rage
+nidorino	mimic
+nidorino	double team
+nidorino	defense curl
+nidorino	reflect
+nidorino	focus energy
+nidorino	bide
+nidorino	skull bash
+nidorino	amnesia
+nidorino	rest
+nidorino	super fang
+nidorino	substitute
+nidoking	mega punch
+nidoking	pay day
+nidoking	fire punch
+nidoking	ice punch
+nidoking	thunder punch
+nidoking	cut
+nidoking	double kick
+nidoking	mega kick
+nidoking	headbutt
+nidoking	horn attack
+nidoking	fury attack
+nidoking	horn drill
+nidoking	tackle
+nidoking	body slam
+nidoking	take down
+nidoking	thrash
+nidoking	double-edge
+nidoking	poison sting
+nidoking	leer
+nidoking	roar
+nidoking	supersonic
+nidoking	flamethrower
+nidoking	water gun
+nidoking	surf
+nidoking	ice beam
+nidoking	blizzard
+nidoking	bubble beam
+nidoking	hyper beam
+nidoking	peck
+nidoking	submission
+nidoking	counter
+nidoking	seismic toss
+nidoking	strength
+nidoking	thunderbolt
+nidoking	thunder
+nidoking	earthquake
+nidoking	fissure
+nidoking	dig
+nidoking	toxic
+nidoking	rage
+nidoking	mimic
+nidoking	double team
+nidoking	defense curl
+nidoking	reflect
+nidoking	focus energy
+nidoking	bide
+nidoking	fire blast
+nidoking	skull bash
+nidoking	amnesia
+nidoking	rest
+nidoking	rock slide
+nidoking	super fang
+nidoking	substitute
+clefairy	pound
+clefairy	double slap
+clefairy	mega punch
+clefairy	fire punch
+clefairy	ice punch
+clefairy	thunder punch
+clefairy	mega kick
+clefairy	headbutt
+clefairy	tackle
+clefairy	body slam
+clefairy	take down
+clefairy	double-edge
+clefairy	growl
+clefairy	sing
+clefairy	flamethrower
+clefairy	water gun
+clefairy	ice beam
+clefairy	blizzard
+clefairy	psybeam
+clefairy	bubble beam
+clefairy	submission
+clefairy	counter
+clefairy	seismic toss
+clefairy	strength
+clefairy	solar beam
+clefairy	thunderbolt
+clefairy	thunder wave
+clefairy	thunder
+clefairy	dig
+clefairy	toxic
+clefairy	psychic
+clefairy	rage
+clefairy	teleport
+clefairy	night shade
+clefairy	mimic
+clefairy	double team
+clefairy	minimize
+clefairy	defense curl
+clefairy	light screen
+clefairy	reflect
+clefairy	bide
+clefairy	metronome
+clefairy	fire blast
+clefairy	swift
+clefairy	skull bash
+clefairy	amnesia
+clefairy	soft-boiled
+clefairy	dream eater
+clefairy	flash
+clefairy	psywave
+clefairy	splash
+clefairy	rest
+clefairy	tri attack
+clefairy	substitute
+clefable	pound
+clefable	double slap
+clefable	mega punch
+clefable	fire punch
+clefable	ice punch
+clefable	thunder punch
+clefable	mega kick
+clefable	headbutt
+clefable	tackle
+clefable	body slam
+clefable	take down
+clefable	double-edge
+clefable	growl
+clefable	sing
+clefable	flamethrower
+clefable	water gun
+clefable	ice beam
+clefable	blizzard
+clefable	psybeam
+clefable	bubble beam
+clefable	hyper beam
+clefable	submission
+clefable	counter
+clefable	seismic toss
+clefable	strength
+clefable	solar beam
+clefable	thunderbolt
+clefable	thunder wave
+clefable	thunder
+clefable	dig
+clefable	toxic
+clefable	psychic
+clefable	rage
+clefable	teleport
+clefable	night shade
+clefable	mimic
+clefable	double team
+clefable	minimize
+clefable	defense curl
+clefable	light screen
+clefable	reflect
+clefable	bide
+clefable	metronome
+clefable	fire blast
+clefable	swift
+clefable	skull bash
+clefable	amnesia
+clefable	soft-boiled
+clefable	dream eater
+clefable	flash
+clefable	psywave
+clefable	splash
+clefable	rest
+clefable	tri attack
+clefable	substitute
+ninetales	headbutt
+ninetales	tackle
+ninetales	body slam
+ninetales	take down
+ninetales	double-edge
+ninetales	tail whip
+ninetales	roar
+ninetales	disable
+ninetales	ember
+ninetales	flamethrower
+ninetales	hyper beam
+ninetales	solar beam
+ninetales	fire spin
+ninetales	dig
+ninetales	toxic
+ninetales	hypnosis
+ninetales	agility
+ninetales	quick attack
+ninetales	rage
+ninetales	night shade
+ninetales	mimic
+ninetales	double team
+ninetales	confuse ray
+ninetales	reflect
+ninetales	bide
+ninetales	fire blast
+ninetales	swift
+ninetales	skull bash
+ninetales	dream eater
+ninetales	rest
+ninetales	substitute
+jigglypuff	pound
+jigglypuff	double slap
+jigglypuff	mega punch
+jigglypuff	fire punch
+jigglypuff	ice punch
+jigglypuff	thunder punch
+jigglypuff	mega kick
+jigglypuff	headbutt
+jigglypuff	body slam
+jigglypuff	take down
+jigglypuff	double-edge
+jigglypuff	sing
+jigglypuff	disable
+jigglypuff	flamethrower
+jigglypuff	water gun
+jigglypuff	ice beam
+jigglypuff	blizzard
+jigglypuff	bubble beam
+jigglypuff	submission
+jigglypuff	counter
+jigglypuff	seismic toss
+jigglypuff	strength
+jigglypuff	solar beam
+jigglypuff	thunderbolt
+jigglypuff	thunder wave
+jigglypuff	thunder
+jigglypuff	dig
+jigglypuff	toxic
+jigglypuff	psychic
+jigglypuff	rage
+jigglypuff	teleport
+jigglypuff	mimic
+jigglypuff	screech
+jigglypuff	double team
+jigglypuff	defense curl
+jigglypuff	light screen
+jigglypuff	reflect
+jigglypuff	bide
+jigglypuff	metronome
+jigglypuff	self-destruct
+jigglypuff	fire blast
+jigglypuff	swift
+jigglypuff	skull bash
+jigglypuff	amnesia
+jigglypuff	dream eater
+jigglypuff	flash
+jigglypuff	psywave
+jigglypuff	rest
+jigglypuff	tri attack
+jigglypuff	substitute
+wigglytuff	pound
+wigglytuff	double slap
+wigglytuff	mega punch
+wigglytuff	fire punch
+wigglytuff	ice punch
+wigglytuff	thunder punch
+wigglytuff	mega kick
+wigglytuff	headbutt
+wigglytuff	body slam
+wigglytuff	take down
+wigglytuff	double-edge
+wigglytuff	sing
+wigglytuff	disable
+wigglytuff	flamethrower
+wigglytuff	water gun
+wigglytuff	ice beam
+wigglytuff	blizzard
+wigglytuff	bubble beam
+wigglytuff	hyper beam
+wigglytuff	submission
+wigglytuff	counter
+wigglytuff	seismic toss
+wigglytuff	strength
+wigglytuff	solar beam
+wigglytuff	thunderbolt
+wigglytuff	thunder wave
+wigglytuff	thunder
+wigglytuff	dig
+wigglytuff	toxic
+wigglytuff	psychic
+wigglytuff	rage
+wigglytuff	teleport
+wigglytuff	mimic
+wigglytuff	screech
+wigglytuff	double team
+wigglytuff	minimize
+wigglytuff	defense curl
+wigglytuff	light screen
+wigglytuff	reflect
+wigglytuff	bide
+wigglytuff	metronome
+wigglytuff	self-destruct
+wigglytuff	fire blast
+wigglytuff	swift
+wigglytuff	skull bash
+wigglytuff	amnesia
+wigglytuff	dream eater
+wigglytuff	flash
+wigglytuff	psywave
+wigglytuff	rest
+wigglytuff	tri attack
+wigglytuff	substitute
+golbat	razor wind
+golbat	gust
+golbat	wing attack
+golbat	whirlwind
+golbat	fly
+golbat	headbutt
+golbat	take down
+golbat	double-edge
+golbat	bite
+golbat	supersonic
+golbat	hyper beam
+golbat	absorb
+golbat	mega drain
+golbat	toxic
+golbat	hypnosis
+golbat	agility
+golbat	quick attack
+golbat	rage
+golbat	mimic
+golbat	screech
+golbat	double team
+golbat	confuse ray
+golbat	haze
+golbat	bide
+golbat	swift
+golbat	leech life
+golbat	rest
+golbat	super fang
+golbat	substitute
+gloom	swords dance
+gloom	cut
+gloom	headbutt
+gloom	take down
+gloom	double-edge
+gloom	acid
+gloom	absorb
+gloom	mega drain
+gloom	leech seed
+gloom	growth
+gloom	razor leaf
+gloom	solar beam
+gloom	poison powder
+gloom	stun spore
+gloom	sleep powder
+gloom	petal dance
+gloom	toxic
+gloom	rage
+gloom	mimic
+gloom	double team
+gloom	reflect
+gloom	bide
+gloom	flash
+gloom	rest
+gloom	substitute
+vileplume	swords dance
+vileplume	cut
+vileplume	headbutt
+vileplume	body slam
+vileplume	take down
+vileplume	double-edge
+vileplume	acid
+vileplume	hyper beam
+vileplume	absorb
+vileplume	mega drain
+vileplume	leech seed
+vileplume	growth
+vileplume	razor leaf
+vileplume	solar beam
+vileplume	poison powder
+vileplume	stun spore
+vileplume	sleep powder
+vileplume	petal dance
+vileplume	toxic
+vileplume	rage
+vileplume	mimic
+vileplume	double team
+vileplume	reflect
+vileplume	bide
+vileplume	flash
+vileplume	rest
+vileplume	substitute
+parasect	scratch
+parasect	swords dance
+parasect	cut
+parasect	headbutt
+parasect	body slam
+parasect	take down
+parasect	double-edge
+parasect	hyper beam
+parasect	counter
+parasect	absorb
+parasect	mega drain
+parasect	leech seed
+parasect	growth
+parasect	solar beam
+parasect	poison powder
+parasect	stun spore
+parasect	sleep powder
+parasect	string shot
+parasect	dig
+parasect	toxic
+parasect	rage
+parasect	mimic
+parasect	screech
+parasect	double team
+parasect	light screen
+parasect	reflect
+parasect	bide
+parasect	skull bash
+parasect	leech life
+parasect	spore
+parasect	flash
+parasect	fury swipes
+parasect	rest
+parasect	slash
+parasect	substitute
+venomoth	razor wind
+venomoth	gust
+venomoth	whirlwind
+venomoth	headbutt
+venomoth	tackle
+venomoth	take down
+venomoth	double-edge
+venomoth	supersonic
+venomoth	disable
+venomoth	psybeam
+venomoth	hyper beam
+venomoth	mega drain
+venomoth	solar beam
+venomoth	poison powder
+venomoth	stun spore
+venomoth	sleep powder
+venomoth	string shot
+venomoth	toxic
+venomoth	confusion
+venomoth	psychic
+venomoth	agility
+venomoth	rage
+venomoth	teleport
+venomoth	night shade
+venomoth	mimic
+venomoth	screech
+venomoth	double team
+venomoth	confuse ray
+venomoth	reflect
+venomoth	bide
+venomoth	swift
+venomoth	dream eater
+venomoth	leech life
+venomoth	flash
+venomoth	psywave
+venomoth	rest
+venomoth	substitute
+dugtrio	scratch
+dugtrio	swords dance
+dugtrio	cut
+dugtrio	sand attack
+dugtrio	headbutt
+dugtrio	body slam
+dugtrio	take down
+dugtrio	double-edge
+dugtrio	growl
+dugtrio	hyper beam
+dugtrio	earthquake
+dugtrio	fissure
+dugtrio	dig
+dugtrio	toxic
+dugtrio	agility
+dugtrio	rage
+dugtrio	mimic
+dugtrio	screech
+dugtrio	double team
+dugtrio	bide
+dugtrio	fury swipes
+dugtrio	rest
+dugtrio	rock slide
+dugtrio	tri attack
+dugtrio	slash
+dugtrio	substitute
+persian	pay day
+persian	scratch
+persian	cut
+persian	headbutt
+persian	body slam
+persian	take down
+persian	double-edge
+persian	bite
+persian	growl
+persian	roar
+persian	water gun
+persian	bubble beam
+persian	hyper beam
+persian	thunderbolt
+persian	thunder wave
+persian	thunder
+persian	dig
+persian	toxic
+persian	hypnosis
+persian	agility
+persian	rage
+persian	mimic
+persian	screech
+persian	double team
+persian	defense curl
+persian	bide
+persian	swift
+persian	skull bash
+persian	amnesia
+persian	dream eater
+persian	flash
+persian	fury swipes
+persian	rest
+persian	slash
+persian	substitute
+golduck	mega punch
+golduck	pay day
+golduck	ice punch
+golduck	scratch
+golduck	mega kick
+golduck	headbutt
+golduck	body slam
+golduck	take down
+golduck	double-edge
+golduck	tail whip
+golduck	disable
+golduck	water gun
+golduck	hydro pump
+golduck	surf
+golduck	ice beam
+golduck	blizzard
+golduck	psybeam
+golduck	bubble beam
+golduck	hyper beam
+golduck	submission
+golduck	low kick
+golduck	counter
+golduck	seismic toss
+golduck	strength
+golduck	dig
+golduck	toxic
+golduck	confusion
+golduck	psychic
+golduck	hypnosis
+golduck	rage
+golduck	mimic
+golduck	screech
+golduck	double team
+golduck	confuse ray
+golduck	light screen
+golduck	haze
+golduck	bide
+golduck	metronome
+golduck	waterfall
+golduck	swift
+golduck	skull bash
+golduck	amnesia
+golduck	bubble
+golduck	flash
+golduck	fury swipes
+golduck	rest
+golduck	substitute
+primeape	karate chop
+primeape	mega punch
+primeape	pay day
+primeape	fire punch
+primeape	ice punch
+primeape	thunder punch
+primeape	scratch
+primeape	mega kick
+primeape	headbutt
+primeape	body slam
+primeape	take down
+primeape	thrash
+primeape	double-edge
+primeape	leer
+primeape	hyper beam
+primeape	submission
+primeape	low kick
+primeape	counter
+primeape	seismic toss
+primeape	strength
+primeape	thunderbolt
+primeape	thunder
+primeape	earthquake
+primeape	dig
+primeape	toxic
+primeape	rage
+primeape	mimic
+primeape	screech
+primeape	double team
+primeape	defense curl
+primeape	focus energy
+primeape	bide
+primeape	metronome
+primeape	swift
+primeape	skull bash
+primeape	fury swipes
+primeape	rest
+primeape	rock slide
+primeape	substitute
+arcanine	headbutt
+arcanine	body slam
+arcanine	take down
+arcanine	double-edge
+arcanine	leer
+arcanine	bite
+arcanine	roar
+arcanine	ember
+arcanine	flamethrower
+arcanine	hyper beam
+arcanine	strength
+arcanine	solar beam
+arcanine	dragon rage
+arcanine	fire spin
+arcanine	dig
+arcanine	toxic
+arcanine	agility
+arcanine	rage
+arcanine	teleport
+arcanine	mimic
+arcanine	double team
+arcanine	reflect
+arcanine	bide
+arcanine	fire blast
+arcanine	swift
+arcanine	skull bash
+arcanine	rest
+arcanine	substitute
+poliwhirl	pound
+poliwhirl	double slap
+poliwhirl	mega punch
+poliwhirl	ice punch
+poliwhirl	mega kick
+poliwhirl	headbutt
+poliwhirl	body slam
+poliwhirl	take down
+poliwhirl	double-edge
+poliwhirl	mist
+poliwhirl	water gun
+poliwhirl	hydro pump
+poliwhirl	surf
+poliwhirl	ice beam
+poliwhirl	blizzard
+poliwhirl	bubble beam
+poliwhirl	submission
+poliwhirl	low kick
+poliwhirl	counter
+poliwhirl	seismic toss
+poliwhirl	strength
+poliwhirl	earthquake
+poliwhirl	fissure
+poliwhirl	dig
+poliwhirl	toxic
+poliwhirl	psychic
+poliwhirl	hypnosis
+poliwhirl	rage
+poliwhirl	mimic
+poliwhirl	double team
+poliwhirl	defense curl
+poliwhirl	haze
+poliwhirl	bide
+poliwhirl	metronome
+poliwhirl	waterfall
+poliwhirl	swift
+poliwhirl	skull bash
+poliwhirl	amnesia
+poliwhirl	bubble
+poliwhirl	psywave
+poliwhirl	splash
+poliwhirl	rest
+poliwhirl	substitute
+poliwrath	pound
+poliwrath	double slap
+poliwrath	mega punch
+poliwrath	ice punch
+poliwrath	mega kick
+poliwrath	headbutt
+poliwrath	body slam
+poliwrath	take down
+poliwrath	double-edge
+poliwrath	mist
+poliwrath	water gun
+poliwrath	hydro pump
+poliwrath	surf
+poliwrath	ice beam
+poliwrath	blizzard
+poliwrath	bubble beam
+poliwrath	hyper beam
+poliwrath	submission
+poliwrath	low kick
+poliwrath	counter
+poliwrath	seismic toss
+poliwrath	strength
+poliwrath	earthquake
+poliwrath	fissure
+poliwrath	dig
+poliwrath	toxic
+poliwrath	psychic
+poliwrath	hypnosis
+poliwrath	rage
+poliwrath	mimic
+poliwrath	double team
+poliwrath	defense curl
+poliwrath	haze
+poliwrath	bide
+poliwrath	metronome
+poliwrath	waterfall
+poliwrath	swift
+poliwrath	skull bash
+poliwrath	amnesia
+poliwrath	bubble
+poliwrath	psywave
+poliwrath	splash
+poliwrath	rest
+poliwrath	rock slide
+poliwrath	substitute
+kadabra	mega punch
+kadabra	fire punch
+kadabra	ice punch
+kadabra	thunder punch
+kadabra	mega kick
+kadabra	headbutt
+kadabra	body slam
+kadabra	take down
+kadabra	double-edge
+kadabra	disable
+kadabra	psybeam
+kadabra	submission
+kadabra	counter
+kadabra	seismic toss
+kadabra	thunder wave
+kadabra	dig
+kadabra	toxic
+kadabra	confusion
+kadabra	psychic
+kadabra	hypnosis
+kadabra	rage
+kadabra	teleport
+kadabra	night shade
+kadabra	mimic
+kadabra	double team
+kadabra	recover
+kadabra	light screen
+kadabra	reflect
+kadabra	bide
+kadabra	metronome
+kadabra	swift
+kadabra	skull bash
+kadabra	kinesis
+kadabra	dream eater
+kadabra	flash
+kadabra	psywave
+kadabra	rest
+kadabra	tri attack
+kadabra	substitute
+alakazam	mega punch
+alakazam	fire punch
+alakazam	ice punch
+alakazam	thunder punch
+alakazam	mega kick
+alakazam	headbutt
+alakazam	body slam
+alakazam	take down
+alakazam	double-edge
+alakazam	disable
+alakazam	psybeam
+alakazam	hyper beam
+alakazam	submission
+alakazam	counter
+alakazam	seismic toss
+alakazam	thunder wave
+alakazam	dig
+alakazam	toxic
+alakazam	confusion
+alakazam	psychic
+alakazam	hypnosis
+alakazam	rage
+alakazam	teleport
+alakazam	night shade
+alakazam	mimic
+alakazam	double team
+alakazam	recover
+alakazam	barrier
+alakazam	light screen
+alakazam	reflect
+alakazam	bide
+alakazam	metronome
+alakazam	swift
+alakazam	skull bash
+alakazam	kinesis
+alakazam	dream eater
+alakazam	flash
+alakazam	psywave
+alakazam	rest
+alakazam	tri attack
+alakazam	substitute
+machoke	karate chop
+machoke	mega punch
+machoke	fire punch
+machoke	ice punch
+machoke	thunder punch
+machoke	mega kick
+machoke	headbutt
+machoke	tackle
+machoke	body slam
+machoke	take down
+machoke	double-edge
+machoke	leer
+machoke	flamethrower
+machoke	submission
+machoke	low kick
+machoke	counter
+machoke	seismic toss
+machoke	strength
+machoke	earthquake
+machoke	fissure
+machoke	dig
+machoke	toxic
+machoke	rage
+machoke	mimic
+machoke	double team
+machoke	light screen
+machoke	focus energy
+machoke	bide
+machoke	metronome
+machoke	fire blast
+machoke	skull bash
+machoke	rest
+machoke	rock slide
+machoke	substitute
+machamp	karate chop
+machamp	mega punch
+machamp	fire punch
+machamp	ice punch
+machamp	thunder punch
+machamp	mega kick
+machamp	headbutt
+machamp	tackle
+machamp	body slam
+machamp	take down
+machamp	double-edge
+machamp	leer
+machamp	flamethrower
+machamp	hyper beam
+machamp	submission
+machamp	low kick
+machamp	counter
+machamp	seismic toss
+machamp	strength
+machamp	earthquake
+machamp	fissure
+machamp	dig
+machamp	toxic
+machamp	rage
+machamp	mimic
+machamp	double team
+machamp	light screen
+machamp	focus energy
+machamp	bide
+machamp	metronome
+machamp	fire blast
+machamp	skull bash
+machamp	rest
+machamp	rock slide
+machamp	substitute
+weepinbell	swords dance
+weepinbell	cut
+weepinbell	bind
+weepinbell	slam
+weepinbell	vine whip
+weepinbell	headbutt
+weepinbell	body slam
+weepinbell	wrap
+weepinbell	take down
+weepinbell	double-edge
+weepinbell	acid
+weepinbell	mega drain
+weepinbell	growth
+weepinbell	razor leaf
+weepinbell	solar beam
+weepinbell	poison powder
+weepinbell	stun spore
+weepinbell	sleep powder
+weepinbell	toxic
+weepinbell	rage
+weepinbell	mimic
+weepinbell	double team
+weepinbell	reflect
+weepinbell	bide
+weepinbell	swift
+weepinbell	leech life
+weepinbell	flash
+weepinbell	rest
+weepinbell	substitute
+victreebel	swords dance
+victreebel	cut
+victreebel	bind
+victreebel	slam
+victreebel	vine whip
+victreebel	headbutt
+victreebel	body slam
+victreebel	wrap
+victreebel	take down
+victreebel	double-edge
+victreebel	acid
+victreebel	hyper beam
+victreebel	mega drain
+victreebel	growth
+victreebel	razor leaf
+victreebel	solar beam
+victreebel	poison powder
+victreebel	stun spore
+victreebel	sleep powder
+victreebel	toxic
+victreebel	rage
+victreebel	mimic
+victreebel	double team
+victreebel	reflect
+victreebel	bide
+victreebel	swift
+victreebel	leech life
+victreebel	flash
+victreebel	rest
+victreebel	substitute
+tentacruel	swords dance
+tentacruel	cut
+tentacruel	bind
+tentacruel	headbutt
+tentacruel	wrap
+tentacruel	take down
+tentacruel	double-edge
+tentacruel	poison sting
+tentacruel	supersonic
+tentacruel	acid
+tentacruel	water gun
+tentacruel	hydro pump
+tentacruel	surf
+tentacruel	ice beam
+tentacruel	blizzard
+tentacruel	bubble beam
+tentacruel	aurora beam
+tentacruel	hyper beam
+tentacruel	mega drain
+tentacruel	toxic
+tentacruel	rage
+tentacruel	mimic
+tentacruel	screech
+tentacruel	double team
+tentacruel	confuse ray
+tentacruel	barrier
+tentacruel	haze
+tentacruel	reflect
+tentacruel	bide
+tentacruel	waterfall
+tentacruel	swift
+tentacruel	skull bash
+tentacruel	constrict
+tentacruel	bubble
+tentacruel	acid armor
+tentacruel	rest
+tentacruel	substitute
+graveler	mega punch
+graveler	fire punch
+graveler	thunder punch
+graveler	sand attack
+graveler	headbutt
+graveler	tackle
+graveler	body slam
+graveler	take down
+graveler	double-edge
+graveler	flamethrower
+graveler	submission
+graveler	counter
+graveler	seismic toss
+graveler	strength
+graveler	rock throw
+graveler	earthquake
+graveler	fissure
+graveler	dig
+graveler	toxic
+graveler	rage
+graveler	mimic
+graveler	double team
+graveler	harden
+graveler	defense curl
+graveler	bide
+graveler	metronome
+graveler	self-destruct
+graveler	fire blast
+graveler	explosion
+graveler	rest
+graveler	rock slide
+graveler	substitute
+ponyta	stomp
+ponyta	double kick
+ponyta	headbutt
+ponyta	horn drill
+ponyta	tackle
+ponyta	body slam
+ponyta	take down
+ponyta	thrash
+ponyta	double-edge
+ponyta	tail whip
+ponyta	growl
+ponyta	ember
+ponyta	flamethrower
+ponyta	low kick
+ponyta	strength
+ponyta	solar beam
+ponyta	fire spin
+ponyta	toxic
+ponyta	hypnosis
+ponyta	agility
+ponyta	quick attack
+ponyta	rage
+ponyta	mimic
+ponyta	double team
+ponyta	reflect
+ponyta	bide
+ponyta	fire blast
+ponyta	swift
+ponyta	skull bash
+ponyta	rest
+ponyta	substitute
+slowpoke	pay day
+slowpoke	stomp
+slowpoke	headbutt
+slowpoke	tackle
+slowpoke	body slam
+slowpoke	take down
+slowpoke	double-edge
+slowpoke	growl
+slowpoke	disable
+slowpoke	flamethrower
+slowpoke	water gun
+slowpoke	hydro pump
+slowpoke	surf
+slowpoke	ice beam
+slowpoke	blizzard
+slowpoke	psybeam
+slowpoke	bubble beam
+slowpoke	strength
+slowpoke	thunder wave
+slowpoke	earthquake
+slowpoke	fissure
+slowpoke	dig
+slowpoke	toxic
+slowpoke	confusion
+slowpoke	psychic
+slowpoke	rage
+slowpoke	teleport
+slowpoke	mimic
+slowpoke	double team
+slowpoke	light screen
+slowpoke	reflect
+slowpoke	bide
+slowpoke	fire blast
+slowpoke	waterfall
+slowpoke	swift
+slowpoke	skull bash
+slowpoke	amnesia
+slowpoke	dream eater
+slowpoke	flash
+slowpoke	psywave
+slowpoke	rest
+slowpoke	tri attack
+slowpoke	substitute
+magnemite	headbutt
+magnemite	tackle
+magnemite	take down
+magnemite	double-edge
+magnemite	supersonic
+magnemite	sonic boom
+magnemite	thunder shock
+magnemite	thunderbolt
+magnemite	thunder wave
+magnemite	thunder
+magnemite	toxic
+magnemite	rage
+magnemite	teleport
+magnemite	mimic
+magnemite	screech
+magnemite	double team
+magnemite	confuse ray
+magnemite	light screen
+magnemite	reflect
+magnemite	bide
+magnemite	swift
+magnemite	flash
+magnemite	explosion
+magnemite	rest
+magnemite	substitute
+farfetch'd	razor wind
+farfetch'd	swords dance
+farfetch'd	cut
+farfetch'd	gust
+farfetch'd	whirlwind
+farfetch'd	fly
+farfetch'd	sand attack
+farfetch'd	headbutt
+farfetch'd	fury attack
+farfetch'd	body slam
+farfetch'd	take down
+farfetch'd	double-edge
+farfetch'd	leer
+farfetch'd	peck
+farfetch'd	razor leaf
+farfetch'd	toxic
+farfetch'd	agility
+farfetch'd	quick attack
+farfetch'd	rage
+farfetch'd	mimic
+farfetch'd	double team
+farfetch'd	reflect
+farfetch'd	focus energy
+farfetch'd	bide
+farfetch'd	mirror move
+farfetch'd	swift
+farfetch'd	skull bash
+farfetch'd	sky attack
+farfetch'd	rest
+farfetch'd	slash
+farfetch'd	substitute
+doduo	swords dance
+doduo	wing attack
+doduo	whirlwind
+doduo	fly
+doduo	jump kick
+doduo	headbutt
+doduo	fury attack
+doduo	body slam
+doduo	take down
+doduo	thrash
+doduo	double-edge
+doduo	leer
+doduo	growl
+doduo	supersonic
+doduo	peck
+doduo	drill peck
+doduo	low kick
+doduo	toxic
+doduo	agility
+doduo	quick attack
+doduo	rage
+doduo	mimic
+doduo	double team
+doduo	haze
+doduo	reflect
+doduo	bide
+doduo	mirror move
+doduo	swift
+doduo	skull bash
+doduo	sky attack
+doduo	rest
+doduo	tri attack
+doduo	substitute
+seel	pay day
+seel	slam
+seel	headbutt
+seel	horn drill
+seel	body slam
+seel	take down
+seel	double-edge
+seel	growl
+seel	disable
+seel	water gun
+seel	hydro pump
+seel	surf
+seel	ice beam
+seel	blizzard
+seel	bubble beam
+seel	aurora beam
+seel	peck
+seel	strength
+seel	toxic
+seel	rage
+seel	mimic
+seel	double team
+seel	haze
+seel	bide
+seel	lick
+seel	waterfall
+seel	skull bash
+seel	rest
+seel	substitute
+grimer	pound
+grimer	fire punch
+grimer	ice punch
+grimer	thunder punch
+grimer	headbutt
+grimer	body slam
+grimer	take down
+grimer	disable
+grimer	flamethrower
+grimer	strength
+grimer	mega drain
+grimer	thunderbolt
+grimer	thunder
+grimer	dig
+grimer	toxic
+grimer	rage
+grimer	mimic
+grimer	screech
+grimer	double team
+grimer	harden
+grimer	minimize
+grimer	confuse ray
+grimer	haze
+grimer	bide
+grimer	metronome
+grimer	self-destruct
+grimer	lick
+grimer	smog
+grimer	sludge
+grimer	fire blast
+grimer	poison gas
+grimer	acid armor
+grimer	explosion
+grimer	rest
+grimer	rock slide
+grimer	substitute
+shellder	headbutt
+shellder	tackle
+shellder	take down
+shellder	double-edge
+shellder	twineedle
+shellder	leer
+shellder	supersonic
+shellder	water gun
+shellder	hydro pump
+shellder	surf
+shellder	ice beam
+shellder	blizzard
+shellder	bubble beam
+shellder	aurora beam
+shellder	toxic
+shellder	rage
+shellder	teleport
+shellder	mimic
+shellder	screech
+shellder	double team
+shellder	withdraw
+shellder	barrier
+shellder	reflect
+shellder	bide
+shellder	self-destruct
+shellder	waterfall
+shellder	clamp
+shellder	swift
+shellder	explosion
+shellder	rest
+shellder	tri attack
+shellder	substitute
+gastly	fire punch
+gastly	ice punch
+gastly	thunder punch
+gastly	headbutt
+gastly	disable
+gastly	mega drain
+gastly	thunderbolt
+gastly	thunder
+gastly	toxic
+gastly	psychic
+gastly	hypnosis
+gastly	rage
+gastly	night shade
+gastly	mimic
+gastly	double team
+gastly	confuse ray
+gastly	haze
+gastly	bide
+gastly	self-destruct
+gastly	lick
+gastly	smog
+gastly	dream eater
+gastly	poison gas
+gastly	psywave
+gastly	explosion
+gastly	rest
+gastly	substitute
+onix	bind
+onix	slam
+onix	headbutt
+onix	tackle
+onix	body slam
+onix	take down
+onix	double-edge
+onix	roar
+onix	strength
+onix	rock throw
+onix	earthquake
+onix	fissure
+onix	dig
+onix	toxic
+onix	rage
+onix	mimic
+onix	screech
+onix	double team
+onix	harden
+onix	defense curl
+onix	bide
+onix	self-destruct
+onix	skull bash
+onix	explosion
+onix	rest
+onix	rock slide
+onix	substitute
+drowzee	pound
+drowzee	mega punch
+drowzee	fire punch
+drowzee	ice punch
+drowzee	thunder punch
+drowzee	mega kick
+drowzee	headbutt
+drowzee	body slam
+drowzee	take down
+drowzee	double-edge
+drowzee	disable
+drowzee	psybeam
+drowzee	submission
+drowzee	low kick
+drowzee	counter
+drowzee	seismic toss
+drowzee	thunder wave
+drowzee	toxic
+drowzee	confusion
+drowzee	psychic
+drowzee	hypnosis
+drowzee	meditate
+drowzee	rage
+drowzee	teleport
+drowzee	night shade
+drowzee	mimic
+drowzee	double team
+drowzee	barrier
+drowzee	light screen
+drowzee	haze
+drowzee	reflect
+drowzee	bide
+drowzee	metronome
+drowzee	swift
+drowzee	skull bash
+drowzee	dream eater
+drowzee	poison gas
+drowzee	flash
+drowzee	psywave
+drowzee	rest
+drowzee	tri attack
+drowzee	substitute
+krabby	vise grip
+krabby	guillotine
+krabby	swords dance
+krabby	cut
+krabby	slam
+krabby	stomp
+krabby	headbutt
+krabby	body slam
+krabby	take down
+krabby	double-edge
+krabby	leer
+krabby	water gun
+krabby	surf
+krabby	ice beam
+krabby	blizzard
+krabby	bubble beam
+krabby	strength
+krabby	dig
+krabby	toxic
+krabby	agility
+krabby	rage
+krabby	mimic
+krabby	double team
+krabby	harden
+krabby	haze
+krabby	bide
+krabby	amnesia
+krabby	bubble
+krabby	crabhammer
+krabby	rest
+krabby	rock slide
+krabby	slash
+krabby	substitute
+voltorb	headbutt
+voltorb	tackle
+voltorb	take down
+voltorb	double-edge
+voltorb	sonic boom
+voltorb	thunder shock
+voltorb	thunderbolt
+voltorb	thunder wave
+voltorb	thunder
+voltorb	toxic
+voltorb	agility
+voltorb	rage
+voltorb	teleport
+voltorb	mimic
+voltorb	screech
+voltorb	double team
+voltorb	light screen
+voltorb	reflect
+voltorb	bide
+voltorb	self-destruct
+voltorb	swift
+voltorb	flash
+voltorb	explosion
+voltorb	rest
+voltorb	substitute
+exeggcute	swords dance
+exeggcute	headbutt
+exeggcute	take down
+exeggcute	double-edge
+exeggcute	psybeam
+exeggcute	strength
+exeggcute	absorb
+exeggcute	mega drain
+exeggcute	leech seed
+exeggcute	solar beam
+exeggcute	poison powder
+exeggcute	stun spore
+exeggcute	sleep powder
+exeggcute	toxic
+exeggcute	confusion
+exeggcute	psychic
+exeggcute	hypnosis
+exeggcute	rage
+exeggcute	teleport
+exeggcute	mimic
+exeggcute	double team
+exeggcute	light screen
+exeggcute	reflect
+exeggcute	bide
+exeggcute	self-destruct
+exeggcute	egg bomb
+exeggcute	dream eater
+exeggcute	barrage
+exeggcute	flash
+exeggcute	psywave
+exeggcute	explosion
+exeggcute	rest
+exeggcute	substitute
+cubone	mega punch
+cubone	fire punch
+cubone	thunder punch
+cubone	swords dance
+cubone	double kick
+cubone	mega kick
+cubone	headbutt
+cubone	body slam
+cubone	take down
+cubone	thrash
+cubone	double-edge
+cubone	tail whip
+cubone	leer
+cubone	growl
+cubone	flamethrower
+cubone	water gun
+cubone	ice beam
+cubone	blizzard
+cubone	bubble beam
+cubone	submission
+cubone	low kick
+cubone	counter
+cubone	seismic toss
+cubone	strength
+cubone	earthquake
+cubone	fissure
+cubone	dig
+cubone	toxic
+cubone	rage
+cubone	mimic
+cubone	screech
+cubone	double team
+cubone	focus energy
+cubone	bide
+cubone	bone club
+cubone	fire blast
+cubone	swift
+cubone	skull bash
+cubone	bonemerang
+cubone	rest
+cubone	rock slide
+cubone	substitute
+lickitung	mega punch
+lickitung	fire punch
+lickitung	ice punch
+lickitung	thunder punch
+lickitung	swords dance
+lickitung	cut
+lickitung	bind
+lickitung	slam
+lickitung	stomp
+lickitung	mega kick
+lickitung	headbutt
+lickitung	tackle
+lickitung	body slam
+lickitung	wrap
+lickitung	take down
+lickitung	thrash
+lickitung	double-edge
+lickitung	supersonic
+lickitung	disable
+lickitung	acid
+lickitung	flamethrower
+lickitung	water gun
+lickitung	hydro pump
+lickitung	surf
+lickitung	ice beam
+lickitung	blizzard
+lickitung	bubble beam
+lickitung	hyper beam
+lickitung	submission
+lickitung	counter
+lickitung	seismic toss
+lickitung	strength
+lickitung	solar beam
+lickitung	thunderbolt
+lickitung	thunder
+lickitung	earthquake
+lickitung	fissure
+lickitung	dig
+lickitung	toxic
+lickitung	rage
+lickitung	mimic
+lickitung	screech
+lickitung	double team
+lickitung	defense curl
+lickitung	bide
+lickitung	lick
+lickitung	fire blast
+lickitung	skull bash
+lickitung	amnesia
+lickitung	dream eater
+lickitung	rest
+lickitung	rock slide
+lickitung	substitute
+koffing	headbutt
+koffing	tackle
+koffing	body slam
+koffing	take down
+koffing	flamethrower
+koffing	psybeam
+koffing	thunderbolt
+koffing	thunder
+koffing	toxic
+koffing	rage
+koffing	mimic
+koffing	screech
+koffing	double team
+koffing	smokescreen
+koffing	haze
+koffing	bide
+koffing	self-destruct
+koffing	smog
+koffing	sludge
+koffing	fire blast
+koffing	poison gas
+koffing	flash
+koffing	psywave
+koffing	explosion
+koffing	rest
+koffing	substitute
+rhyhorn	swords dance
+rhyhorn	stomp
+rhyhorn	sand attack
+rhyhorn	headbutt
+rhyhorn	horn attack
+rhyhorn	fury attack
+rhyhorn	horn drill
+rhyhorn	tackle
+rhyhorn	body slam
+rhyhorn	take down
+rhyhorn	thrash
+rhyhorn	double-edge
+rhyhorn	tail whip
+rhyhorn	leer
+rhyhorn	roar
+rhyhorn	flamethrower
+rhyhorn	ice beam
+rhyhorn	blizzard
+rhyhorn	counter
+rhyhorn	strength
+rhyhorn	thunderbolt
+rhyhorn	thunder
+rhyhorn	rock throw
+rhyhorn	earthquake
+rhyhorn	fissure
+rhyhorn	dig
+rhyhorn	toxic
+rhyhorn	rage
+rhyhorn	mimic
+rhyhorn	double team
+rhyhorn	bide
+rhyhorn	fire blast
+rhyhorn	skull bash
+rhyhorn	rest
+rhyhorn	rock slide
+rhyhorn	substitute
+tangela	swords dance
+tangela	cut
+tangela	bind
+tangela	slam
+tangela	vine whip
+tangela	headbutt
+tangela	body slam
+tangela	take down
+tangela	double-edge
+tangela	hyper beam
+tangela	absorb
+tangela	mega drain
+tangela	leech seed
+tangela	growth
+tangela	solar beam
+tangela	poison powder
+tangela	stun spore
+tangela	sleep powder
+tangela	toxic
+tangela	confusion
+tangela	rage
+tangela	mimic
+tangela	double team
+tangela	reflect
+tangela	bide
+tangela	skull bash
+tangela	constrict
+tangela	amnesia
+tangela	flash
+tangela	rest
+tangela	substitute
+kangaskhan	pound
+kangaskhan	comet punch
+kangaskhan	mega punch
+kangaskhan	fire punch
+kangaskhan	ice punch
+kangaskhan	thunder punch
+kangaskhan	cut
+kangaskhan	stomp
+kangaskhan	mega kick
+kangaskhan	headbutt
+kangaskhan	body slam
+kangaskhan	take down
+kangaskhan	double-edge
+kangaskhan	tail whip
+kangaskhan	leer
+kangaskhan	bite
+kangaskhan	growl
+kangaskhan	roar
+kangaskhan	disable
+kangaskhan	flamethrower
+kangaskhan	water gun
+kangaskhan	hydro pump
+kangaskhan	surf
+kangaskhan	ice beam
+kangaskhan	blizzard
+kangaskhan	bubble beam
+kangaskhan	hyper beam
+kangaskhan	submission
+kangaskhan	low kick
+kangaskhan	counter
+kangaskhan	seismic toss
+kangaskhan	strength
+kangaskhan	solar beam
+kangaskhan	thunderbolt
+kangaskhan	thunder
+kangaskhan	earthquake
+kangaskhan	fissure
+kangaskhan	dig
+kangaskhan	toxic
+kangaskhan	rage
+kangaskhan	mimic
+kangaskhan	double team
+kangaskhan	focus energy
+kangaskhan	bide
+kangaskhan	fire blast
+kangaskhan	skull bash
+kangaskhan	dizzy punch
+kangaskhan	rest
+kangaskhan	rock slide
+kangaskhan	substitute
+horsea	razor wind
+horsea	headbutt
+horsea	take down
+horsea	double-edge
+horsea	leer
+horsea	disable
+horsea	water gun
+horsea	hydro pump
+horsea	surf
+horsea	ice beam
+horsea	blizzard
+horsea	bubble beam
+horsea	aurora beam
+horsea	dragon rage
+horsea	toxic
+horsea	agility
+horsea	rage
+horsea	mimic
+horsea	double team
+horsea	smokescreen
+horsea	focus energy
+horsea	bide
+horsea	waterfall
+horsea	swift
+horsea	skull bash
+horsea	bubble
+horsea	splash
+horsea	rest
+horsea	substitute
+goldeen	swords dance
+goldeen	headbutt
+goldeen	horn attack
+goldeen	fury attack
+goldeen	horn drill
+goldeen	body slam
+goldeen	take down
+goldeen	double-edge
+goldeen	tail whip
+goldeen	supersonic
+goldeen	water gun
+goldeen	hydro pump
+goldeen	surf
+goldeen	ice beam
+goldeen	blizzard
+goldeen	psybeam
+goldeen	bubble beam
+goldeen	peck
+goldeen	toxic
+goldeen	agility
+goldeen	quick attack
+goldeen	rage
+goldeen	mimic
+goldeen	double team
+goldeen	haze
+goldeen	bide
+goldeen	waterfall
+goldeen	swift
+goldeen	skull bash
+goldeen	rest
+goldeen	substitute
+staryu	headbutt
+staryu	tackle
+staryu	take down
+staryu	double-edge
+staryu	supersonic
+staryu	water gun
+staryu	hydro pump
+staryu	surf
+staryu	ice beam
+staryu	blizzard
+staryu	psybeam
+staryu	bubble beam
+staryu	aurora beam
+staryu	thunderbolt
+staryu	thunder wave
+staryu	thunder
+staryu	toxic
+staryu	psychic
+staryu	rage
+staryu	teleport
+staryu	mimic
+staryu	double team
+staryu	recover
+staryu	harden
+staryu	minimize
+staryu	confuse ray
+staryu	barrier
+staryu	light screen
+staryu	reflect
+staryu	bide
+staryu	waterfall
+staryu	swift
+staryu	skull bash
+staryu	flash
+staryu	psywave
+staryu	rest
+staryu	tri attack
+staryu	substitute
+scyther	razor wind
+scyther	swords dance
+scyther	cut
+scyther	wing attack
+scyther	headbutt
+scyther	take down
+scyther	double-edge
+scyther	leer
+scyther	hyper beam
+scyther	counter
+scyther	toxic
+scyther	agility
+scyther	quick attack
+scyther	rage
+scyther	mimic
+scyther	double team
+scyther	light screen
+scyther	focus energy
+scyther	bide
+scyther	swift
+scyther	skull bash
+scyther	rest
+scyther	slash
+scyther	substitute
+pinsir	vise grip
+pinsir	guillotine
+pinsir	swords dance
+pinsir	cut
+pinsir	bind
+pinsir	headbutt
+pinsir	fury attack
+pinsir	body slam
+pinsir	take down
+pinsir	thrash
+pinsir	double-edge
+pinsir	hyper beam
+pinsir	submission
+pinsir	seismic toss
+pinsir	strength
+pinsir	string shot
+pinsir	earthquake
+pinsir	dig
+pinsir	toxic
+pinsir	quick attack
+pinsir	rage
+pinsir	mimic
+pinsir	double team
+pinsir	harden
+pinsir	focus energy
+pinsir	bide
+pinsir	rest
+pinsir	rock slide
+pinsir	slash
+pinsir	substitute
+tauros	stomp
+tauros	headbutt
+tauros	horn attack
+tauros	horn drill
+tauros	tackle
+tauros	body slam
+tauros	take down
+tauros	thrash
+tauros	double-edge
+tauros	tail whip
+tauros	leer
+tauros	flamethrower
+tauros	surf
+tauros	ice beam
+tauros	blizzard
+tauros	hyper beam
+tauros	strength
+tauros	solar beam
+tauros	thunderbolt
+tauros	thunder
+tauros	earthquake
+tauros	fissure
+tauros	dig
+tauros	toxic
+tauros	rage
+tauros	mimic
+tauros	double team
+tauros	focus energy
+tauros	bide
+tauros	fire blast
+tauros	skull bash
+tauros	rest
+tauros	rock slide
+tauros	substitute
+magikarp	tackle
+magikarp	hydro pump
+magikarp	splash
+lapras	headbutt
+lapras	horn drill
+lapras	body slam
+lapras	take down
+lapras	double-edge
+lapras	growl
+lapras	roar
+lapras	sing
+lapras	mist
+lapras	water gun
+lapras	hydro pump
+lapras	surf
+lapras	ice beam
+lapras	blizzard
+lapras	bubble beam
+lapras	aurora beam
+lapras	hyper beam
+lapras	strength
+lapras	solar beam
+lapras	dragon rage
+lapras	thunderbolt
+lapras	thunder
+lapras	earthquake
+lapras	fissure
+lapras	toxic
+lapras	psychic
+lapras	rage
+lapras	mimic
+lapras	double team
+lapras	confuse ray
+lapras	haze
+lapras	reflect
+lapras	bide
+lapras	waterfall
+lapras	skull bash
+lapras	dream eater
+lapras	psywave
+lapras	rest
+lapras	substitute
+ditto	transform
+eevee	pay day
+eevee	double kick
+eevee	sand attack
+eevee	headbutt
+eevee	tackle
+eevee	body slam
+eevee	take down
+eevee	double-edge
+eevee	tail whip
+eevee	bite
+eevee	growl
+eevee	roar
+eevee	dig
+eevee	toxic
+eevee	quick attack
+eevee	rage
+eevee	mimic
+eevee	double team
+eevee	reflect
+eevee	focus energy
+eevee	bide
+eevee	swift
+eevee	skull bash
+eevee	rest
+eevee	substitute
+porygon	headbutt
+porygon	tackle
+porygon	take down
+porygon	double-edge
+porygon	ice beam
+porygon	blizzard
+porygon	psybeam
+porygon	hyper beam
+porygon	solar beam
+porygon	thunder shock
+porygon	thunderbolt
+porygon	thunder wave
+porygon	thunder
+porygon	toxic
+porygon	psychic
+porygon	agility
+porygon	rage
+porygon	teleport
+porygon	mimic
+porygon	double team
+porygon	recover
+porygon	barrier
+porygon	reflect
+porygon	bide
+porygon	swift
+porygon	skull bash
+porygon	dream eater
+porygon	flash
+porygon	psywave
+porygon	rest
+porygon	sharpen
+porygon	conversion
+porygon	tri attack
+porygon	substitute
+omanyte	bind
+omanyte	slam
+omanyte	sand attack
+omanyte	headbutt
+omanyte	horn attack
+omanyte	body slam
+omanyte	take down
+omanyte	double-edge
+omanyte	leer
+omanyte	bite
+omanyte	supersonic
+omanyte	water gun
+omanyte	hydro pump
+omanyte	surf
+omanyte	ice beam
+omanyte	blizzard
+omanyte	bubble beam
+omanyte	aurora beam
+omanyte	rock throw
+omanyte	toxic
+omanyte	rage
+omanyte	mimic
+omanyte	double team
+omanyte	withdraw
+omanyte	haze
+omanyte	reflect
+omanyte	bide
+omanyte	waterfall
+omanyte	spike cannon
+omanyte	constrict
+omanyte	rest
+omanyte	rock slide
+omanyte	substitute
+kabuto	scratch
+kabuto	sand attack
+kabuto	headbutt
+kabuto	body slam
+kabuto	take down
+kabuto	double-edge
+kabuto	leer
+kabuto	water gun
+kabuto	hydro pump
+kabuto	surf
+kabuto	ice beam
+kabuto	blizzard
+kabuto	bubble beam
+kabuto	aurora beam
+kabuto	absorb
+kabuto	mega drain
+kabuto	rock throw
+kabuto	dig
+kabuto	toxic
+kabuto	rage
+kabuto	mimic
+kabuto	screech
+kabuto	double team
+kabuto	harden
+kabuto	confuse ray
+kabuto	reflect
+kabuto	bide
+kabuto	waterfall
+kabuto	leech life
+kabuto	rest
+kabuto	rock slide
+kabuto	slash
+kabuto	substitute
+aerodactyl	razor wind
+aerodactyl	wing attack
+aerodactyl	whirlwind
+aerodactyl	fly
+aerodactyl	headbutt
+aerodactyl	take down
+aerodactyl	double-edge
+aerodactyl	bite
+aerodactyl	roar
+aerodactyl	supersonic
+aerodactyl	flamethrower
+aerodactyl	hyper beam
+aerodactyl	strength
+aerodactyl	dragon rage
+aerodactyl	rock throw
+aerodactyl	earthquake
+aerodactyl	toxic
+aerodactyl	agility
+aerodactyl	rage
+aerodactyl	mimic
+aerodactyl	double team
+aerodactyl	reflect
+aerodactyl	bide
+aerodactyl	fire blast
+aerodactyl	swift
+aerodactyl	sky attack
+aerodactyl	rest
+aerodactyl	rock slide
+aerodactyl	substitute
+articuno	razor wind
+articuno	gust
+articuno	whirlwind
+articuno	fly
+articuno	headbutt
+articuno	take down
+articuno	double-edge
+articuno	leer
+articuno	roar
+articuno	mist
+articuno	water gun
+articuno	ice beam
+articuno	blizzard
+articuno	bubble beam
+articuno	hyper beam
+articuno	peck
+articuno	toxic
+articuno	agility
+articuno	rage
+articuno	mimic
+articuno	double team
+articuno	light screen
+articuno	haze
+articuno	reflect
+articuno	bide
+articuno	swift
+articuno	sky attack
+articuno	rest
+articuno	substitute
+zapdos	razor wind
+zapdos	whirlwind
+zapdos	fly
+zapdos	headbutt
+zapdos	take down
+zapdos	double-edge
+zapdos	leer
+zapdos	roar
+zapdos	hyper beam
+zapdos	peck
+zapdos	drill peck
+zapdos	thunder shock
+zapdos	thunderbolt
+zapdos	thunder wave
+zapdos	thunder
+zapdos	toxic
+zapdos	agility
+zapdos	rage
+zapdos	mimic
+zapdos	double team
+zapdos	light screen
+zapdos	reflect
+zapdos	bide
+zapdos	swift
+zapdos	sky attack
+zapdos	flash
+zapdos	rest
+zapdos	substitute
+moltres	razor wind
+moltres	gust
+moltres	wing attack
+moltres	whirlwind
+moltres	fly
+moltres	headbutt
+moltres	take down
+moltres	double-edge
+moltres	leer
+moltres	roar
+moltres	ember
+moltres	flamethrower
+moltres	hyper beam
+moltres	peck
+moltres	solar beam
+moltres	fire spin
+moltres	toxic
+moltres	agility
+moltres	rage
+moltres	mimic
+moltres	double team
+moltres	reflect
+moltres	bide
+moltres	fire blast
+moltres	swift
+moltres	sky attack
+moltres	rest
+moltres	substitute
+dratini	bind
+dratini	slam
+dratini	headbutt
+dratini	body slam
+dratini	wrap
+dratini	take down
+dratini	double-edge
+dratini	leer
+dratini	supersonic
+dratini	flamethrower
+dratini	mist
+dratini	water gun
+dratini	hydro pump
+dratini	surf
+dratini	ice beam
+dratini	blizzard
+dratini	bubble beam
+dratini	hyper beam
+dratini	dragon rage
+dratini	fire spin
+dratini	thunderbolt
+dratini	thunder wave
+dratini	thunder
+dratini	toxic
+dratini	agility
+dratini	rage
+dratini	mimic
+dratini	double team
+dratini	light screen
+dratini	haze
+dratini	reflect
+dratini	bide
+dratini	fire blast
+dratini	waterfall
+dratini	swift
+dratini	skull bash
+dratini	rest
+dratini	substitute
+mewtwo	mega punch
+mewtwo	pay day
+mewtwo	fire punch
+mewtwo	ice punch
+mewtwo	thunder punch
+mewtwo	mega kick
+mewtwo	headbutt
+mewtwo	body slam
+mewtwo	take down
+mewtwo	double-edge
+mewtwo	disable
+mewtwo	flamethrower
+mewtwo	mist
+mewtwo	water gun
+mewtwo	ice beam
+mewtwo	blizzard
+mewtwo	psybeam
+mewtwo	bubble beam
+mewtwo	hyper beam
+mewtwo	submission
+mewtwo	low kick
+mewtwo	counter
+mewtwo	seismic toss
+mewtwo	strength
+mewtwo	solar beam
+mewtwo	thunderbolt
+mewtwo	thunder wave
+mewtwo	thunder
+mewtwo	earthquake
+mewtwo	toxic
+mewtwo	confusion
+mewtwo	psychic
+mewtwo	agility
+mewtwo	rage
+mewtwo	teleport
+mewtwo	night shade
+mewtwo	mimic
+mewtwo	double team
+mewtwo	recover
+mewtwo	confuse ray
+mewtwo	barrier
+mewtwo	light screen
+mewtwo	reflect
+mewtwo	bide
+mewtwo	metronome
+mewtwo	self-destruct
+mewtwo	fire blast
+mewtwo	swift
+mewtwo	skull bash
+mewtwo	amnesia
+mewtwo	dream eater
+mewtwo	flash
+mewtwo	psywave
+mewtwo	rest
+mewtwo	rock slide
+mewtwo	tri attack
+mewtwo	substitute
+rapidash	pay day
+rapidash	swords dance
+rapidash	stomp
+rapidash	double kick
+rapidash	headbutt
+rapidash	fury attack
+rapidash	horn drill
+rapidash	tackle
+rapidash	body slam
+rapidash	take down
+rapidash	double-edge
+rapidash	tail whip
+rapidash	growl
+rapidash	ember
+rapidash	flamethrower
+rapidash	hyper beam
+rapidash	low kick
+rapidash	strength
+rapidash	solar beam
+rapidash	fire spin
+rapidash	toxic
+rapidash	hypnosis
+rapidash	agility
+rapidash	quick attack
+rapidash	rage
+rapidash	mimic
+rapidash	double team
+rapidash	reflect
+rapidash	bide
+rapidash	fire blast
+rapidash	swift
+rapidash	skull bash
+rapidash	rest
+rapidash	substitute
+slowbro	mega punch
+slowbro	pay day
+slowbro	ice punch
+slowbro	stomp
+slowbro	mega kick
+slowbro	headbutt
+slowbro	tackle
+slowbro	body slam
+slowbro	take down
+slowbro	double-edge
+slowbro	growl
+slowbro	disable
+slowbro	flamethrower
+slowbro	water gun
+slowbro	hydro pump
+slowbro	surf
+slowbro	ice beam
+slowbro	blizzard
+slowbro	psybeam
+slowbro	bubble beam
+slowbro	hyper beam
+slowbro	submission
+slowbro	counter
+slowbro	seismic toss
+slowbro	strength
+slowbro	thunder wave
+slowbro	earthquake
+slowbro	fissure
+slowbro	dig
+slowbro	toxic
+slowbro	confusion
+slowbro	psychic
+slowbro	rage
+slowbro	teleport
+slowbro	mimic
+slowbro	double team
+slowbro	withdraw
+slowbro	light screen
+slowbro	reflect
+slowbro	bide
+slowbro	metronome
+slowbro	fire blast
+slowbro	waterfall
+slowbro	swift
+slowbro	skull bash
+slowbro	amnesia
+slowbro	dream eater
+slowbro	flash
+slowbro	psywave
+slowbro	rest
+slowbro	tri attack
+slowbro	substitute
+magneton	headbutt
+magneton	tackle
+magneton	take down
+magneton	double-edge
+magneton	supersonic
+magneton	sonic boom
+magneton	hyper beam
+magneton	thunder shock
+magneton	thunderbolt
+magneton	thunder wave
+magneton	thunder
+magneton	toxic
+magneton	rage
+magneton	teleport
+magneton	mimic
+magneton	screech
+magneton	double team
+magneton	confuse ray
+magneton	light screen
+magneton	reflect
+magneton	bide
+magneton	swift
+magneton	flash
+magneton	explosion
+magneton	rest
+magneton	tri attack
+magneton	substitute
+dodrio	swords dance
+dodrio	wing attack
+dodrio	whirlwind
+dodrio	fly
+dodrio	jump kick
+dodrio	headbutt
+dodrio	fury attack
+dodrio	body slam
+dodrio	take down
+dodrio	thrash
+dodrio	double-edge
+dodrio	leer
+dodrio	growl
+dodrio	supersonic
+dodrio	hyper beam
+dodrio	peck
+dodrio	drill peck
+dodrio	low kick
+dodrio	toxic
+dodrio	agility
+dodrio	quick attack
+dodrio	rage
+dodrio	mimic
+dodrio	double team
+dodrio	reflect
+dodrio	bide
+dodrio	mirror move
+dodrio	swift
+dodrio	skull bash
+dodrio	sky attack
+dodrio	rest
+dodrio	tri attack
+dodrio	substitute
+dewgong	pay day
+dewgong	headbutt
+dewgong	horn drill
+dewgong	body slam
+dewgong	take down
+dewgong	double-edge
+dewgong	growl
+dewgong	disable
+dewgong	water gun
+dewgong	hydro pump
+dewgong	surf
+dewgong	ice beam
+dewgong	blizzard
+dewgong	bubble beam
+dewgong	aurora beam
+dewgong	hyper beam
+dewgong	strength
+dewgong	toxic
+dewgong	rage
+dewgong	mimic
+dewgong	double team
+dewgong	haze
+dewgong	bide
+dewgong	lick
+dewgong	waterfall
+dewgong	skull bash
+dewgong	rest
+dewgong	substitute
+muk	pound
+muk	fire punch
+muk	ice punch
+muk	thunder punch
+muk	headbutt
+muk	body slam
+muk	take down
+muk	disable
+muk	flamethrower
+muk	hyper beam
+muk	strength
+muk	mega drain
+muk	thunderbolt
+muk	thunder
+muk	dig
+muk	toxic
+muk	rage
+muk	mimic
+muk	screech
+muk	double team
+muk	harden
+muk	minimize
+muk	confuse ray
+muk	haze
+muk	bide
+muk	metronome
+muk	self-destruct
+muk	smog
+muk	sludge
+muk	fire blast
+muk	swift
+muk	poison gas
+muk	acid armor
+muk	explosion
+muk	rest
+muk	rock slide
+muk	substitute
+cloyster	headbutt
+cloyster	tackle
+cloyster	body slam
+cloyster	take down
+cloyster	double-edge
+cloyster	twineedle
+cloyster	pin missile
+cloyster	leer
+cloyster	supersonic
+cloyster	water gun
+cloyster	hydro pump
+cloyster	surf
+cloyster	ice beam
+cloyster	blizzard
+cloyster	bubble beam
+cloyster	aurora beam
+cloyster	hyper beam
+cloyster	toxic
+cloyster	rage
+cloyster	teleport
+cloyster	mimic
+cloyster	screech
+cloyster	double team
+cloyster	withdraw
+cloyster	barrier
+cloyster	light screen
+cloyster	reflect
+cloyster	bide
+cloyster	self-destruct
+cloyster	waterfall
+cloyster	clamp
+cloyster	swift
+cloyster	spike cannon
+cloyster	explosion
+cloyster	rest
+cloyster	tri attack
+cloyster	substitute
+haunter	fire punch
+haunter	ice punch
+haunter	thunder punch
+haunter	headbutt
+haunter	mega drain
+haunter	thunderbolt
+haunter	thunder
+haunter	toxic
+haunter	psychic
+haunter	hypnosis
+haunter	rage
+haunter	night shade
+haunter	mimic
+haunter	double team
+haunter	confuse ray
+haunter	haze
+haunter	bide
+haunter	metronome
+haunter	self-destruct
+haunter	lick
+haunter	smog
+haunter	dream eater
+haunter	poison gas
+haunter	psywave
+haunter	explosion
+haunter	rest
+haunter	substitute
+gengar	mega punch
+gengar	fire punch
+gengar	ice punch
+gengar	thunder punch
+gengar	mega kick
+gengar	headbutt
+gengar	body slam
+gengar	take down
+gengar	double-edge
+gengar	disable
+gengar	hyper beam
+gengar	submission
+gengar	counter
+gengar	seismic toss
+gengar	strength
+gengar	mega drain
+gengar	thunderbolt
+gengar	thunder wave
+gengar	thunder
+gengar	toxic
+gengar	psychic
+gengar	hypnosis
+gengar	rage
+gengar	night shade
+gengar	mimic
+gengar	double team
+gengar	confuse ray
+gengar	haze
+gengar	bide
+gengar	metronome
+gengar	self-destruct
+gengar	lick
+gengar	smog
+gengar	skull bash
+gengar	dream eater
+gengar	poison gas
+gengar	psywave
+gengar	explosion
+gengar	rest
+gengar	substitute
+hypno	pound
+hypno	mega punch
+hypno	fire punch
+hypno	ice punch
+hypno	thunder punch
+hypno	mega kick
+hypno	headbutt
+hypno	body slam
+hypno	take down
+hypno	double-edge
+hypno	disable
+hypno	psybeam
+hypno	hyper beam
+hypno	submission
+hypno	low kick
+hypno	counter
+hypno	seismic toss
+hypno	thunder wave
+hypno	toxic
+hypno	confusion
+hypno	psychic
+hypno	hypnosis
+hypno	meditate
+hypno	rage
+hypno	teleport
+hypno	night shade
+hypno	mimic
+hypno	double team
+hypno	confuse ray
+hypno	barrier
+hypno	light screen
+hypno	haze
+hypno	reflect
+hypno	bide
+hypno	metronome
+hypno	swift
+hypno	skull bash
+hypno	dream eater
+hypno	poison gas
+hypno	flash
+hypno	psywave
+hypno	rest
+hypno	tri attack
+hypno	substitute
+kingler	vise grip
+kingler	guillotine
+kingler	swords dance
+kingler	cut
+kingler	slam
+kingler	stomp
+kingler	headbutt
+kingler	body slam
+kingler	take down
+kingler	double-edge
+kingler	leer
+kingler	water gun
+kingler	hydro pump
+kingler	surf
+kingler	ice beam
+kingler	blizzard
+kingler	bubble beam
+kingler	hyper beam
+kingler	strength
+kingler	dig
+kingler	toxic
+kingler	agility
+kingler	rage
+kingler	mimic
+kingler	double team
+kingler	harden
+kingler	bide
+kingler	amnesia
+kingler	bubble
+kingler	crabhammer
+kingler	rest
+kingler	rock slide
+kingler	substitute
+electrode	headbutt
+electrode	tackle
+electrode	take down
+electrode	double-edge
+electrode	sonic boom
+electrode	hyper beam
+electrode	thunder shock
+electrode	thunderbolt
+electrode	thunder wave
+electrode	thunder
+electrode	toxic
+electrode	agility
+electrode	rage
+electrode	teleport
+electrode	mimic
+electrode	screech
+electrode	double team
+electrode	light screen
+electrode	reflect
+electrode	bide
+electrode	self-destruct
+electrode	swift
+electrode	skull bash
+electrode	flash
+electrode	explosion
+electrode	rest
+electrode	substitute
+exeggutor	swords dance
+exeggutor	stomp
+exeggutor	headbutt
+exeggutor	body slam
+exeggutor	take down
+exeggutor	double-edge
+exeggutor	psybeam
+exeggutor	hyper beam
+exeggutor	low kick
+exeggutor	strength
+exeggutor	absorb
+exeggutor	mega drain
+exeggutor	leech seed
+exeggutor	solar beam
+exeggutor	stun spore
+exeggutor	earthquake
+exeggutor	toxic
+exeggutor	confusion
+exeggutor	psychic
+exeggutor	hypnosis
+exeggutor	rage
+exeggutor	teleport
+exeggutor	mimic
+exeggutor	double team
+exeggutor	light screen
+exeggutor	reflect
+exeggutor	bide
+exeggutor	self-destruct
+exeggutor	egg bomb
+exeggutor	dream eater
+exeggutor	barrage
+exeggutor	flash
+exeggutor	psywave
+exeggutor	explosion
+exeggutor	rest
+exeggutor	substitute
+marowak	mega punch
+marowak	fire punch
+marowak	thunder punch
+marowak	swords dance
+marowak	mega kick
+marowak	headbutt
+marowak	body slam
+marowak	take down
+marowak	thrash
+marowak	double-edge
+marowak	tail whip
+marowak	leer
+marowak	growl
+marowak	flamethrower
+marowak	water gun
+marowak	ice beam
+marowak	blizzard
+marowak	bubble beam
+marowak	hyper beam
+marowak	submission
+marowak	low kick
+marowak	counter
+marowak	seismic toss
+marowak	strength
+marowak	earthquake
+marowak	fissure
+marowak	dig
+marowak	toxic
+marowak	rage
+marowak	mimic
+marowak	screech
+marowak	double team
+marowak	focus energy
+marowak	bide
+marowak	bone club
+marowak	fire blast
+marowak	swift
+marowak	skull bash
+marowak	bonemerang
+marowak	rest
+marowak	rock slide
+marowak	substitute
+hitmonlee	mega punch
+hitmonlee	swords dance
+hitmonlee	double kick
+hitmonlee	mega kick
+hitmonlee	jump kick
+hitmonlee	rolling kick
+hitmonlee	headbutt
+hitmonlee	tackle
+hitmonlee	body slam
+hitmonlee	take down
+hitmonlee	double-edge
+hitmonlee	submission
+hitmonlee	low kick
+hitmonlee	counter
+hitmonlee	seismic toss
+hitmonlee	strength
+hitmonlee	earthquake
+hitmonlee	toxic
+hitmonlee	meditate
+hitmonlee	rage
+hitmonlee	mimic
+hitmonlee	double team
+hitmonlee	focus energy
+hitmonlee	bide
+hitmonlee	metronome
+hitmonlee	swift
+hitmonlee	skull bash
+hitmonlee	high jump kick
+hitmonlee	rest
+hitmonlee	rock slide
+hitmonlee	substitute
+hitmonchan	comet punch
+hitmonchan	mega punch
+hitmonchan	fire punch
+hitmonchan	ice punch
+hitmonchan	thunder punch
+hitmonchan	swords dance
+hitmonchan	mega kick
+hitmonchan	headbutt
+hitmonchan	tackle
+hitmonchan	body slam
+hitmonchan	take down
+hitmonchan	double-edge
+hitmonchan	leer
+hitmonchan	submission
+hitmonchan	low kick
+hitmonchan	counter
+hitmonchan	seismic toss
+hitmonchan	strength
+hitmonchan	earthquake
+hitmonchan	toxic
+hitmonchan	agility
+hitmonchan	rage
+hitmonchan	mimic
+hitmonchan	double team
+hitmonchan	focus energy
+hitmonchan	bide
+hitmonchan	metronome
+hitmonchan	swift
+hitmonchan	skull bash
+hitmonchan	high jump kick
+hitmonchan	dizzy punch
+hitmonchan	rest
+hitmonchan	rock slide
+hitmonchan	substitute
+weezing	headbutt
+weezing	tackle
+weezing	body slam
+weezing	take down
+weezing	flamethrower
+weezing	psybeam
+weezing	hyper beam
+weezing	thunderbolt
+weezing	thunder
+weezing	toxic
+weezing	rage
+weezing	mimic
+weezing	screech
+weezing	double team
+weezing	smokescreen
+weezing	haze
+weezing	bide
+weezing	self-destruct
+weezing	smog
+weezing	sludge
+weezing	fire blast
+weezing	poison gas
+weezing	flash
+weezing	explosion
+weezing	rest
+weezing	substitute
+rhydon	mega punch
+rhydon	pay day
+rhydon	fire punch
+rhydon	ice punch
+rhydon	thunder punch
+rhydon	swords dance
+rhydon	cut
+rhydon	stomp
+rhydon	mega kick
+rhydon	sand attack
+rhydon	headbutt
+rhydon	horn attack
+rhydon	fury attack
+rhydon	horn drill
+rhydon	tackle
+rhydon	body slam
+rhydon	take down
+rhydon	double-edge
+rhydon	tail whip
+rhydon	leer
+rhydon	roar
+rhydon	flamethrower
+rhydon	water gun
+rhydon	hydro pump
+rhydon	surf
+rhydon	ice beam
+rhydon	blizzard
+rhydon	bubble beam
+rhydon	hyper beam
+rhydon	submission
+rhydon	counter
+rhydon	seismic toss
+rhydon	strength
+rhydon	thunderbolt
+rhydon	thunder
+rhydon	rock throw
+rhydon	earthquake
+rhydon	fissure
+rhydon	dig
+rhydon	toxic
+rhydon	rage
+rhydon	mimic
+rhydon	double team
+rhydon	bide
+rhydon	fire blast
+rhydon	skull bash
+rhydon	rest
+rhydon	rock slide
+rhydon	substitute
+chansey	pound
+chansey	double slap
+chansey	mega punch
+chansey	fire punch
+chansey	ice punch
+chansey	thunder punch
+chansey	mega kick
+chansey	headbutt
+chansey	tackle
+chansey	body slam
+chansey	take down
+chansey	double-edge
+chansey	tail whip
+chansey	growl
+chansey	sing
+chansey	flamethrower
+chansey	water gun
+chansey	ice beam
+chansey	blizzard
+chansey	bubble beam
+chansey	hyper beam
+chansey	submission
+chansey	counter
+chansey	seismic toss
+chansey	strength
+chansey	solar beam
+chansey	thunderbolt
+chansey	thunder wave
+chansey	thunder
+chansey	earthquake
+chansey	toxic
+chansey	psychic
+chansey	rage
+chansey	teleport
+chansey	mimic
+chansey	double team
+chansey	minimize
+chansey	defense curl
+chansey	light screen
+chansey	reflect
+chansey	bide
+chansey	metronome
+chansey	egg bomb
+chansey	fire blast
+chansey	swift
+chansey	skull bash
+chansey	soft-boiled
+chansey	dream eater
+chansey	flash
+chansey	psywave
+chansey	rest
+chansey	rock slide
+chansey	tri attack
+chansey	substitute
+seadra	headbutt
+seadra	take down
+seadra	double-edge
+seadra	leer
+seadra	disable
+seadra	water gun
+seadra	hydro pump
+seadra	surf
+seadra	ice beam
+seadra	blizzard
+seadra	bubble beam
+seadra	aurora beam
+seadra	hyper beam
+seadra	toxic
+seadra	agility
+seadra	rage
+seadra	mimic
+seadra	double team
+seadra	smokescreen
+seadra	focus energy
+seadra	bide
+seadra	waterfall
+seadra	swift
+seadra	skull bash
+seadra	bubble
+seadra	splash
+seadra	rest
+seadra	substitute
+seaking	swords dance
+seaking	headbutt
+seaking	horn attack
+seaking	fury attack
+seaking	horn drill
+seaking	body slam
+seaking	take down
+seaking	double-edge
+seaking	tail whip
+seaking	supersonic
+seaking	water gun
+seaking	hydro pump
+seaking	surf
+seaking	ice beam
+seaking	blizzard
+seaking	psybeam
+seaking	bubble beam
+seaking	hyper beam
+seaking	peck
+seaking	toxic
+seaking	agility
+seaking	quick attack
+seaking	rage
+seaking	mimic
+seaking	double team
+seaking	bide
+seaking	waterfall
+seaking	swift
+seaking	skull bash
+seaking	rest
+seaking	substitute
+starmie	headbutt
+starmie	tackle
+starmie	take down
+starmie	double-edge
+starmie	water gun
+starmie	hydro pump
+starmie	surf
+starmie	ice beam
+starmie	blizzard
+starmie	psybeam
+starmie	bubble beam
+starmie	hyper beam
+starmie	thunderbolt
+starmie	thunder wave
+starmie	thunder
+starmie	toxic
+starmie	psychic
+starmie	agility
+starmie	rage
+starmie	teleport
+starmie	mimic
+starmie	double team
+starmie	recover
+starmie	harden
+starmie	minimize
+starmie	confuse ray
+starmie	light screen
+starmie	reflect
+starmie	bide
+starmie	waterfall
+starmie	swift
+starmie	skull bash
+starmie	dream eater
+starmie	flash
+starmie	psywave
+starmie	rest
+starmie	tri attack
+starmie	substitute
+mr. mime	pound
+mr. mime	double slap
+mr. mime	mega punch
+mr. mime	fire punch
+mr. mime	ice punch
+mr. mime	thunder punch
+mr. mime	mega kick
+mr. mime	headbutt
+mr. mime	body slam
+mr. mime	take down
+mr. mime	double-edge
+mr. mime	psybeam
+mr. mime	hyper beam
+mr. mime	submission
+mr. mime	counter
+mr. mime	seismic toss
+mr. mime	solar beam
+mr. mime	thunderbolt
+mr. mime	thunder wave
+mr. mime	thunder
+mr. mime	toxic
+mr. mime	confusion
+mr. mime	psychic
+mr. mime	hypnosis
+mr. mime	meditate
+mr. mime	rage
+mr. mime	teleport
+mr. mime	mimic
+mr. mime	double team
+mr. mime	confuse ray
+mr. mime	barrier
+mr. mime	light screen
+mr. mime	reflect
+mr. mime	bide
+mr. mime	metronome
+mr. mime	skull bash
+mr. mime	dream eater
+mr. mime	flash
+mr. mime	psywave
+mr. mime	rest
+mr. mime	substitute
+jynx	pound
+jynx	double slap
+jynx	mega punch
+jynx	ice punch
+jynx	mega kick
+jynx	headbutt
+jynx	body slam
+jynx	take down
+jynx	thrash
+jynx	double-edge
+jynx	sing
+jynx	water gun
+jynx	ice beam
+jynx	blizzard
+jynx	bubble beam
+jynx	hyper beam
+jynx	submission
+jynx	counter
+jynx	seismic toss
+jynx	toxic
+jynx	confusion
+jynx	psychic
+jynx	rage
+jynx	teleport
+jynx	mimic
+jynx	screech
+jynx	double team
+jynx	light screen
+jynx	reflect
+jynx	bide
+jynx	metronome
+jynx	lick
+jynx	skull bash
+jynx	dream eater
+jynx	lovely kiss
+jynx	flash
+jynx	psywave
+jynx	rest
+jynx	substitute
+electabuzz	mega punch
+electabuzz	fire punch
+electabuzz	ice punch
+electabuzz	thunder punch
+electabuzz	mega kick
+electabuzz	headbutt
+electabuzz	body slam
+electabuzz	take down
+electabuzz	double-edge
+electabuzz	leer
+electabuzz	hyper beam
+electabuzz	submission
+electabuzz	low kick
+electabuzz	counter
+electabuzz	seismic toss
+electabuzz	strength
+electabuzz	thunder shock
+electabuzz	thunderbolt
+electabuzz	thunder wave
+electabuzz	thunder
+electabuzz	toxic
+electabuzz	psychic
+electabuzz	quick attack
+electabuzz	rage
+electabuzz	teleport
+electabuzz	mimic
+electabuzz	screech
+electabuzz	double team
+electabuzz	light screen
+electabuzz	reflect
+electabuzz	bide
+electabuzz	metronome
+electabuzz	swift
+electabuzz	skull bash
+electabuzz	flash
+electabuzz	psywave
+electabuzz	rest
+electabuzz	substitute
+magmar	mega punch
+magmar	fire punch
+magmar	thunder punch
+magmar	mega kick
+magmar	headbutt
+magmar	tackle
+magmar	body slam
+magmar	take down
+magmar	double-edge
+magmar	leer
+magmar	roar
+magmar	ember
+magmar	flamethrower
+magmar	hyper beam
+magmar	submission
+magmar	low kick
+magmar	counter
+magmar	seismic toss
+magmar	strength
+magmar	fire spin
+magmar	toxic
+magmar	psychic
+magmar	rage
+magmar	teleport
+magmar	mimic
+magmar	screech
+magmar	double team
+magmar	smokescreen
+magmar	confuse ray
+magmar	focus energy
+magmar	bide
+magmar	metronome
+magmar	smog
+magmar	fire blast
+magmar	skull bash
+magmar	poison gas
+magmar	psywave
+magmar	rest
+magmar	substitute
+gyarados	bind
+gyarados	headbutt
+gyarados	tackle
+gyarados	body slam
+gyarados	take down
+gyarados	thrash
+gyarados	double-edge
+gyarados	leer
+gyarados	bite
+gyarados	roar
+gyarados	flamethrower
+gyarados	water gun
+gyarados	hydro pump
+gyarados	surf
+gyarados	ice beam
+gyarados	blizzard
+gyarados	bubble beam
+gyarados	hyper beam
+gyarados	strength
+gyarados	dragon rage
+gyarados	thunderbolt
+gyarados	thunder wave
+gyarados	thunder
+gyarados	earthquake
+gyarados	toxic
+gyarados	rage
+gyarados	mimic
+gyarados	double team
+gyarados	reflect
+gyarados	focus energy
+gyarados	bide
+gyarados	fire blast
+gyarados	waterfall
+gyarados	skull bash
+gyarados	splash
+gyarados	rest
+gyarados	substitute
+vaporeon	pay day
+vaporeon	double kick
+vaporeon	sand attack
+vaporeon	headbutt
+vaporeon	tackle
+vaporeon	body slam
+vaporeon	take down
+vaporeon	double-edge
+vaporeon	tail whip
+vaporeon	bite
+vaporeon	growl
+vaporeon	roar
+vaporeon	mist
+vaporeon	water gun
+vaporeon	hydro pump
+vaporeon	surf
+vaporeon	ice beam
+vaporeon	blizzard
+vaporeon	bubble beam
+vaporeon	aurora beam
+vaporeon	hyper beam
+vaporeon	strength
+vaporeon	dig
+vaporeon	toxic
+vaporeon	quick attack
+vaporeon	rage
+vaporeon	mimic
+vaporeon	double team
+vaporeon	haze
+vaporeon	reflect
+vaporeon	focus energy
+vaporeon	bide
+vaporeon	waterfall
+vaporeon	swift
+vaporeon	skull bash
+vaporeon	bubble
+vaporeon	acid armor
+vaporeon	rest
+vaporeon	substitute
+jolteon	pay day
+jolteon	double kick
+jolteon	sand attack
+jolteon	headbutt
+jolteon	tackle
+jolteon	body slam
+jolteon	take down
+jolteon	double-edge
+jolteon	tail whip
+jolteon	pin missile
+jolteon	bite
+jolteon	growl
+jolteon	roar
+jolteon	hyper beam
+jolteon	strength
+jolteon	thunder shock
+jolteon	thunderbolt
+jolteon	thunder wave
+jolteon	thunder
+jolteon	dig
+jolteon	toxic
+jolteon	agility
+jolteon	quick attack
+jolteon	rage
+jolteon	mimic
+jolteon	double team
+jolteon	light screen
+jolteon	reflect
+jolteon	focus energy
+jolteon	bide
+jolteon	swift
+jolteon	skull bash
+jolteon	flash
+jolteon	rest
+jolteon	substitute
+flareon	pay day
+flareon	double kick
+flareon	sand attack
+flareon	headbutt
+flareon	tackle
+flareon	body slam
+flareon	take down
+flareon	double-edge
+flareon	tail whip
+flareon	leer
+flareon	bite
+flareon	growl
+flareon	roar
+flareon	ember
+flareon	flamethrower
+flareon	hyper beam
+flareon	strength
+flareon	fire spin
+flareon	dig
+flareon	toxic
+flareon	quick attack
+flareon	rage
+flareon	mimic
+flareon	double team
+flareon	reflect
+flareon	focus energy
+flareon	bide
+flareon	smog
+flareon	fire blast
+flareon	swift
+flareon	skull bash
+flareon	rest
+flareon	substitute
+omastar	bind
+omastar	sand attack
+omastar	headbutt
+omastar	horn attack
+omastar	horn drill
+omastar	body slam
+omastar	take down
+omastar	double-edge
+omastar	pin missile
+omastar	leer
+omastar	bite
+omastar	supersonic
+omastar	water gun
+omastar	hydro pump
+omastar	surf
+omastar	ice beam
+omastar	blizzard
+omastar	bubble beam
+omastar	hyper beam
+omastar	submission
+omastar	seismic toss
+omastar	rock throw
+omastar	toxic
+omastar	rage
+omastar	mimic
+omastar	double team
+omastar	withdraw
+omastar	reflect
+omastar	bide
+omastar	waterfall
+omastar	skull bash
+omastar	spike cannon
+omastar	constrict
+omastar	rest
+omastar	rock slide
+omastar	substitute
+kabutops	scratch
+kabutops	razor wind
+kabutops	swords dance
+kabutops	cut
+kabutops	mega kick
+kabutops	sand attack
+kabutops	headbutt
+kabutops	body slam
+kabutops	take down
+kabutops	double-edge
+kabutops	leer
+kabutops	water gun
+kabutops	hydro pump
+kabutops	surf
+kabutops	ice beam
+kabutops	blizzard
+kabutops	bubble beam
+kabutops	hyper beam
+kabutops	submission
+kabutops	low kick
+kabutops	seismic toss
+kabutops	absorb
+kabutops	mega drain
+kabutops	rock throw
+kabutops	dig
+kabutops	toxic
+kabutops	rage
+kabutops	mimic
+kabutops	screech
+kabutops	double team
+kabutops	harden
+kabutops	confuse ray
+kabutops	reflect
+kabutops	bide
+kabutops	waterfall
+kabutops	skull bash
+kabutops	leech life
+kabutops	rest
+kabutops	rock slide
+kabutops	slash
+kabutops	substitute
+snorlax	mega punch
+snorlax	pay day
+snorlax	fire punch
+snorlax	ice punch
+snorlax	thunder punch
+snorlax	whirlwind
+snorlax	mega kick
+snorlax	headbutt
+snorlax	tackle
+snorlax	body slam
+snorlax	take down
+snorlax	double-edge
+snorlax	bite
+snorlax	flamethrower
+snorlax	water gun
+snorlax	hydro pump
+snorlax	surf
+snorlax	ice beam
+snorlax	blizzard
+snorlax	bubble beam
+snorlax	hyper beam
+snorlax	submission
+snorlax	counter
+snorlax	seismic toss
+snorlax	strength
+snorlax	solar beam
+snorlax	thunderbolt
+snorlax	thunder
+snorlax	earthquake
+snorlax	fissure
+snorlax	dig
+snorlax	toxic
+snorlax	psychic
+snorlax	rage
+snorlax	mimic
+snorlax	screech
+snorlax	double team
+snorlax	harden
+snorlax	defense curl
+snorlax	reflect
+snorlax	bide
+snorlax	metronome
+snorlax	self-destruct
+snorlax	lick
+snorlax	fire blast
+snorlax	skull bash
+snorlax	amnesia
+snorlax	psywave
+snorlax	rest
+snorlax	rock slide
+snorlax	substitute
+dragonair	bind
+dragonair	slam
+dragonair	headbutt
+dragonair	horn drill
+dragonair	body slam
+dragonair	wrap
+dragonair	take down
+dragonair	double-edge
+dragonair	leer
+dragonair	flamethrower
+dragonair	water gun
+dragonair	hydro pump
+dragonair	surf
+dragonair	ice beam
+dragonair	blizzard
+dragonair	bubble beam
+dragonair	hyper beam
+dragonair	dragon rage
+dragonair	fire spin
+dragonair	thunderbolt
+dragonair	thunder wave
+dragonair	thunder
+dragonair	toxic
+dragonair	agility
+dragonair	rage
+dragonair	mimic
+dragonair	double team
+dragonair	light screen
+dragonair	haze
+dragonair	reflect
+dragonair	bide
+dragonair	fire blast
+dragonair	waterfall
+dragonair	swift
+dragonair	skull bash
+dragonair	rest
+dragonair	substitute
+dragonite	mega punch
+dragonite	fire punch
+dragonite	ice punch
+dragonite	thunder punch
+dragonite	razor wind
+dragonite	cut
+dragonite	wing attack
+dragonite	fly
+dragonite	bind
+dragonite	slam
+dragonite	mega kick
+dragonite	headbutt
+dragonite	horn drill
+dragonite	body slam
+dragonite	wrap
+dragonite	take down
+dragonite	double-edge
+dragonite	leer
+dragonite	roar
+dragonite	flamethrower
+dragonite	mist
+dragonite	water gun
+dragonite	hydro pump
+dragonite	surf
+dragonite	ice beam
+dragonite	blizzard
+dragonite	bubble beam
+dragonite	hyper beam
+dragonite	low kick
+dragonite	strength
+dragonite	dragon rage
+dragonite	fire spin
+dragonite	thunderbolt
+dragonite	thunder wave
+dragonite	thunder
+dragonite	earthquake
+dragonite	toxic
+dragonite	agility
+dragonite	rage
+dragonite	mimic
+dragonite	double team
+dragonite	light screen
+dragonite	haze
+dragonite	reflect
+dragonite	bide
+dragonite	metronome
+dragonite	fire blast
+dragonite	waterfall
+dragonite	swift
+dragonite	skull bash
+dragonite	rest
+dragonite	rock slide
+dragonite	substitute
+mew	pound
+mew	mega punch
+mew	pay day
+mew	fire punch
+mew	ice punch
+mew	thunder punch
+mew	razor wind
+mew	swords dance
+mew	cut
+mew	whirlwind
+mew	fly
+mew	bind
+mew	mega kick
+mew	headbutt
+mew	horn drill
+mew	body slam
+mew	take down
+mew	double-edge
+mew	pin missile
+mew	roar
+mew	flamethrower
+mew	water gun
+mew	hydro pump
+mew	surf
+mew	ice beam
+mew	blizzard
+mew	psybeam
+mew	bubble beam
+mew	hyper beam
+mew	submission
+mew	low kick
+mew	counter
+mew	seismic toss
+mew	strength
+mew	mega drain
+mew	solar beam
+mew	string shot
+mew	dragon rage
+mew	fire spin
+mew	thunderbolt
+mew	thunder wave
+mew	thunder
+mew	earthquake
+mew	fissure
+mew	dig
+mew	toxic
+mew	confusion
+mew	psychic
+mew	hypnosis
+mew	agility
+mew	rage
+mew	teleport
+mew	night shade
+mew	mimic
+mew	screech
+mew	double team
+mew	confuse ray
+mew	defense curl
+mew	barrier
+mew	light screen
+mew	haze
+mew	reflect
+mew	focus energy
+mew	bide
+mew	metronome
+mew	self-destruct
+mew	egg bomb
+mew	fire blast
+mew	waterfall
+mew	swift
+mew	skull bash
+mew	amnesia
+mew	soft-boiled
+mew	dream eater
+mew	leech life
+mew	sky attack
+mew	transform
+mew	flash
+mew	psywave
+mew	explosion
+mew	rest
+mew	rock slide
+mew	tri attack
+mew	super fang
+mew	substitute
+ivysaur	swords dance
+ivysaur	cut
+ivysaur	bind
+ivysaur	vine whip
+ivysaur	headbutt
+ivysaur	tackle
+ivysaur	body slam
+ivysaur	take down
+ivysaur	double-edge
+ivysaur	growl
+ivysaur	roar
+ivysaur	strength
+ivysaur	mega drain
+ivysaur	leech seed
+ivysaur	growth
+ivysaur	razor leaf
+ivysaur	solar beam
+ivysaur	poison powder
+ivysaur	sleep powder
+ivysaur	petal dance
+ivysaur	string shot
+ivysaur	toxic
+ivysaur	rage
+ivysaur	mimic
+ivysaur	double team
+ivysaur	defense curl
+ivysaur	light screen
+ivysaur	reflect
+ivysaur	bide
+ivysaur	amnesia
+ivysaur	flash
+ivysaur	rest
+ivysaur	substitute
+golem	mega punch
+golem	fire punch
+golem	thunder punch
+golem	mega kick
+golem	sand attack
+golem	headbutt
+golem	tackle
+golem	body slam
+golem	take down
+golem	double-edge
+golem	roar
+golem	flamethrower
+golem	hyper beam
+golem	submission
+golem	counter
+golem	seismic toss
+golem	strength
+golem	rock throw
+golem	earthquake
+golem	fissure
+golem	dig
+golem	toxic
+golem	rage
+golem	mimic
+golem	double team
+golem	harden
+golem	defense curl
+golem	bide
+golem	metronome
+golem	self-destruct
+golem	fire blast
+golem	explosion
+golem	rest
+golem	rock slide
+golem	substitute

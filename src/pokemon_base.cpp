@@ -232,7 +232,8 @@ bool Pokemons::loadFromFile_lines(
 
   //output orphans
   printOrphans(orphanedTypes, "pokemon inputStream", "pokemon-types", "type");
-  printOrphans(orphanedTypes, "pokemon inputStream", "pokemon-abilities", "ability");
+  printOrphans(
+      orphanedAbilities, "pokemon inputStream", "pokemon-abilities", "ability");
   return true; // import success
 } // endof import pokemon
 
@@ -357,6 +358,6 @@ bool Pokemons::loadMovelistFromFile_lines(
 
   //output orphans
   printOrphans(orphanedPokemon, "movelist inputStream", "movelist-pokemon", "pokemon");
-  printOrphans(orphanedPokemon, "movelist inputStream", "movelist-moves", "move");
+  printOrphans(orphanedMoves, "movelist inputStream", "movelist-moves", "move");
   return true; // import success
 }//endof import movelist

@@ -1,6 +1,6 @@
 #include "engine_test.hpp"
 
-TEST_F(EngineTest, PrimaryHitAndCrit) {
+TEST_F(Gen4EngineTest, PrimaryHitAndCrit) {
   auto team = TeamNonVolatile()
       .addPokemon(PokemonNonVolatile()
         .setBase(pokedex_->pokemon("charmander"))
@@ -20,7 +20,7 @@ TEST_F(EngineTest, PrimaryHitAndCrit) {
 }
 
 
-TEST_F(EngineTest, HighEngineAccuracy) {
+TEST_F(Gen4EngineTest, HighEngineAccuracy) {
   // moves with extremely high numbers of branches might cause stack probability that sums less than 1
   engine_->setAccuracy(16);
   auto team = TeamNonVolatile()
@@ -38,7 +38,7 @@ TEST_F(EngineTest, HighEngineAccuracy) {
 }
 
 
-TEST_F(EngineTest, Swap) {
+TEST_F(Gen4EngineTest, Swap) {
   auto team = TeamNonVolatile()
       .addPokemon(PokemonNonVolatile()
         .setBase(pokedex_->pokemon("torkoal"))
@@ -76,7 +76,7 @@ TEST_F(EngineTest, Swap) {
 }
 
 
-TEST_F(EngineTest, InvalidAction) {
+TEST_F(Gen4EngineTest, InvalidAction) {
   engine_->setAllowInvalidMoves(false);
 
   auto team = TeamNonVolatile()
@@ -119,7 +119,7 @@ TEST_F(EngineTest, InvalidAction) {
 }
 
 
-TEST_F(EngineTest, GroundConditions) {
+TEST_F(Gen4EngineTest, GroundConditions) {
   auto team = TeamNonVolatile()
       .addPokemon(PokemonNonVolatile() // has rapid spin
         .setBase(pokedex_->pokemon("forretress"))
@@ -183,7 +183,7 @@ TEST_F(EngineTest, GroundConditions) {
 }
 
 
-TEST_F(EngineTest, LifeOrb) {
+TEST_F(Gen4EngineTest, LifeOrb) {
   auto team_1 = TeamNonVolatile()
       .addPokemon(PokemonNonVolatile()
         .setBase(pokedex_->pokemon("dusknoir"))
@@ -222,7 +222,7 @@ TEST_F(EngineTest, LifeOrb) {
   }
 }
 
-TEST_F(EngineTest, Flinch) {
+TEST_F(Gen4EngineTest, Flinch) {
   auto team_a = TeamNonVolatile().addPokemon(
       PokemonNonVolatile()
           .setBase(pokedex_->pokemon("jirachi"))

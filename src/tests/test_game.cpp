@@ -5,10 +5,10 @@
 #include "pokemonai/planner_max.h"
 #include "pokemonai/planner_random.h"
 
-class GameTest : public EngineTest {
+class GameTest : public Gen4EngineTest {
  protected:
   void SetUp() override {
-    EngineTest::SetUp();
+    Gen4EngineTest::SetUp();
 
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()

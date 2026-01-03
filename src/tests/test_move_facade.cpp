@@ -1,10 +1,10 @@
 #include "engine_test.hpp"
 
 
-class FacadeTest : public EngineTest {
-protected:
+class FacadeTest : public Gen4EngineTest {
+ protected:
   void SetUp() override {
-    EngineTest::SetUp();
+    Gen4EngineTest::SetUp();
 
     // Team A: Mew with Facade
     auto team_a = TeamNonVolatile()

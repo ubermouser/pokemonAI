@@ -1,10 +1,8 @@
 #include "engine_test.hpp"
 
-class SereneGraceTest : public EngineTest {
-protected:
-  void SetUp() override {
-    EngineTest::SetUp();
-  }
+class SereneGraceTest : public Gen4EngineTest {
+ protected:
+  void SetUp() override { Gen4EngineTest::SetUp(); }
 };
 
 TEST_F(SereneGraceTest, SereneGraceDoublesSecondaryEffectChance) {

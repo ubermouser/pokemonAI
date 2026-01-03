@@ -1,7 +1,7 @@
 #include "engine_test.hpp"
 
 
-class MoveTest : public EngineTest { };
+class MoveTest : public Gen4EngineTest {};
 
 
 TEST_F(MoveTest, PainSplit) {

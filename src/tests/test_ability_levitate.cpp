@@ -1,9 +1,9 @@
 #include "engine_test.hpp"
 
-class LevitateTest : public EngineTest {
-protected:
+class LevitateTest : public Gen4EngineTest {
+ protected:
   void SetUp() override {
-    EngineTest::SetUp();
+    Gen4EngineTest::SetUp();
 
     // Team A: Sandshrew with Earthquake
     team_a = TeamNonVolatile()

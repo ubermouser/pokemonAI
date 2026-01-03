@@ -79,7 +79,7 @@ class PokedexGen1Test : public ::testing::Test {
     EXPECT_EQ(pkdex.getNatures().size(), 0);
     EXPECT_EQ(pkdex.getMoves().size(), 165);
     EXPECT_EQ(pkdex.getPokemon().size(), 151);
-    EXPECT_EQ(pkdex.getTypes().size(), 15);
+    EXPECT_EQ(pkdex.getTypes().size(), 16);
     EXPECT_GE(pkdex.getExtensions().getNumPlugins(), 10);
   }
 };

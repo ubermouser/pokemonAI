@@ -1,10 +1,10 @@
 #include "engine_test.hpp"
 
 
-class PaybackTest : public EngineTest {
-protected:
+class PaybackTest : public Gen4EngineTest {
+ protected:
   void SetUp() override {
-    EngineTest::SetUp();
+    Gen4EngineTest::SetUp();
 
     auto team = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()

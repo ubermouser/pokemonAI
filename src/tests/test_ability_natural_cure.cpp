@@ -1,9 +1,9 @@
 #include "engine_test.hpp"
 
-class NaturalCureTest : public EngineTest {
-protected:
+class NaturalCureTest : public Gen4EngineTest {
+ protected:
   void SetUp() override {
-    EngineTest::SetUp();
+    Gen4EngineTest::SetUp();
 
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()

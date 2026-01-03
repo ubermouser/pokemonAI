@@ -68,7 +68,7 @@ Battle two teams against one another using minimax search:
     --a-planner-verbosity=2 \
     --b-planner-verbosity=2 \
     --game-verbosity=3 \
-    --verbosity=5
+    --verbosity=2
 ```
 
 Play against an agent yourself:
@@ -83,7 +83,7 @@ Play against an agent yourself:
     --a-planner-verbosity=2 \
     --b-planner-verbosity=2 \
     --game-verbosity=3 \
-    --verbosity=5
+    --verbosity=2
 ```
 
 
@@ -103,7 +103,23 @@ Construct new teams that play well at a range of skill levels:
     --p3-max-search-depth=2 \
     --p4-max-search-depth=3 \
     --ranker-verbosity=1 \
-    --verbosity=10 \
+    --verbosity=2 \
+    --num-threads=32
+```
+
+Construct teams targeting a different generation of Pokemon:
+```bash
+./build/trainer/trainer \
+    --planners=random max minimax minimax \
+    --evaluators=simple \
+    --p1-max-search-depth=0 \
+    --p2-max-search-depth=1 \
+    --p3-max-search-depth=2 \
+    --p4-max-search-depth=3 \
+    --ranker-verbosity=1 \
+    --verbosity=2 \
+    --prefix-path data/gen1 \
+    --plugins plugins/gen1 \
     --num-threads=32
 ```
 
@@ -122,7 +138,7 @@ Rank all of the teams under a directory against one another:
     --evaluators=simple \
     --p1-max-search-depth=3 \
     --ranker-verbosity=1 \
-    --verbosity=5 \
+    --verbosity=2 \
     --num-threads=16
 ```
 

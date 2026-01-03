@@ -1,8 +1,8 @@
 #include "engine_test.hpp"
 
 
-class PinchBoostTest : public EngineTest {
-protected:
+class PinchBoostTest : public Gen4EngineTest {
+ protected:
 
   uint32_t getDamage(const std::string& pokemon, const std::string& ability, const std::string& move, bool lowHP) {
     auto team_a = TeamNonVolatile()

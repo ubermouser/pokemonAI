@@ -4,10 +4,10 @@
 #include "pokemonai/evaluator_random.h"
 #include "pokemonai/evaluator_simple.h"
 
-class EvaluatorTest : public EngineTest {
+class EvaluatorTest : public Gen4EngineTest {
  protected:
   void SetUp() override {
-    EngineTest::SetUp();
+    Gen4EngineTest::SetUp();
     engine_->setAllowInvalidMoves(false);
 
     auto team_a = TeamNonVolatile()

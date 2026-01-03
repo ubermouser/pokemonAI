@@ -1,10 +1,10 @@
 #include "engine_test.hpp"
 
 
-class ClearBodyTest : public EngineTest {
-protected:
+class ClearBodyTest : public Gen4EngineTest {
+ protected:
   void SetUp() override {
-    EngineTest::SetUp();
+    Gen4EngineTest::SetUp();
 
     // Setup 1: Clear Body (Metagross) vs Intimidate/Growl User (Charmander)
     auto team_a_clearbody = TeamNonVolatile()
