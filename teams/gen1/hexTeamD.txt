@@ -1,0 +1,198 @@
+{
+  "header": "PKAIE0",
+  "name": "hexTeamD",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "Starmie-Lead",
+      "species": "Starmie",
+      "level": 100,
+      "item": "---",
+      "sex": 2,
+      "ability": "---",
+      "nature": "---",
+      "moves": [
+        "Blizzard",
+        "Thunderbolt",
+        "Recover",
+        "Thunder Wave"
+      ],
+      "iv": {
+        "atk": 15,
+        "spa": 15,
+        "def": 15,
+        "spd": 15,
+        "spe": 15,
+        "hp": 15
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 0,
+        "def": 0,
+        "spd": 0,
+        "spe": 0,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Chansey",
+      "species": "Chansey",
+      "level": 100,
+      "item": "---",
+      "sex": 1,
+      "ability": "---",
+      "nature": "---",
+      "moves": [
+        "Ice Beam",
+        "Soft-Boiled",
+        "Thunder Wave",
+        "Seismic Toss"
+      ],
+      "iv": {
+        "atk": 15,
+        "spa": 15,
+        "def": 15,
+        "spd": 15,
+        "spe": 15,
+        "hp": 15
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 0,
+        "def": 0,
+        "spd": 0,
+        "spe": 0,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Slowbro",
+      "species": "Slowbro",
+      "level": 100,
+      "item": "---",
+      "sex": 2,
+      "ability": "---",
+      "nature": "---",
+      "moves": [
+        "Amnesia",
+        "Surf",
+        "Thunder Wave",
+        "Rest"
+      ],
+      "iv": {
+        "atk": 15,
+        "spa": 15,
+        "def": 15,
+        "spd": 15,
+        "spe": 15,
+        "hp": 15
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 0,
+        "def": 0,
+        "spd": 0,
+        "spe": 0,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Exeggutor",
+      "species": "Exeggutor",
+      "level": 100,
+      "item": "---",
+      "sex": 2,
+      "ability": "---",
+      "nature": "---",
+      "moves": [
+        "Psychic",
+        "Sleep Powder",
+        "Explosion",
+        "Stun Spore"
+      ],
+      "iv": {
+        "atk": 15,
+        "spa": 15,
+        "def": 15,
+        "spd": 15,
+        "spe": 15,
+        "hp": 15
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 0,
+        "def": 0,
+        "spd": 0,
+        "spe": 0,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Snorlax",
+      "species": "Snorlax",
+      "level": 100,
+      "item": "---",
+      "sex": 2,
+      "ability": "---",
+      "nature": "---",
+      "moves": [
+        "Body Slam",
+        "Hyper Beam",
+        "Self-Destruct",
+        "Earthquake"
+      ],
+      "iv": {
+        "atk": 15,
+        "spa": 15,
+        "def": 15,
+        "spd": 15,
+        "spe": 15,
+        "hp": 15
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 0,
+        "def": 0,
+        "spd": 0,
+        "spe": 0,
+        "hp": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Tauros",
+      "species": "Tauros",
+      "level": 100,
+      "item": "---",
+      "sex": 2,
+      "ability": "---",
+      "nature": "---",
+      "moves": [
+        "Body Slam",
+        "Hyper Beam",
+        "Earthquake",
+        "Blizzard"
+      ],
+      "iv": {
+        "atk": 15,
+        "spa": 15,
+        "def": 15,
+        "spd": 15,
+        "spe": 15,
+        "hp": 15
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 0,
+        "def": 0,
+        "spd": 0,
+        "spe": 0,
+        "hp": 0
+      }
+    }
+  ]
+}
