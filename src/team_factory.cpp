@@ -230,29 +230,88 @@ PokemonNonVolatile TeamFactory::createRandom_single(const TeamNonVolatile& cTeam
 } // endOf createRandom_single
 
 
+void TeamFactory::initialize(const Pokedex& pkdex) {
+  implementedSpecies_.clear();
+  implementedItems_.clear();
+  implementedNatures_.clear();
+  speciesImplementedMoves_.clear();
+  speciesImplementedAbilities_.clear();
+
+  // memoize species
+  std::vector<const PokemonBase*> pokemons = pkdex.getPokemon().toVector();
+  for (const auto* pokemon : pokemons) {
+    if (pokemon->lostChild_) { continue; }
+
+    // only include species with at least one implemented move
+    bool hasImplementedMove = false;
+    std::vector<const Move*> implementedMoves;
+    for (const auto* move : pokemon->moves_) {
+      if (move->isImplemented()) {
+        hasImplementedMove = true;
+        implementedMoves.push_back(move);
+      }
+    }
+    if (!hasImplementedMove) { continue; }
+
+    implementedSpecies_.push_back(pokemon);
+    speciesImplementedMoves_[pokemon] = std::move(implementedMoves);
+
+    // memoize abilities for this species
+    std::vector<const Ability*> implementedAbilities;
+    for (const auto* ability : pokemon->abilities_) {
+      if (ability->isImplemented()) {
+        implementedAbilities.push_back(ability);
+      }
+    }
+    speciesImplementedAbilities_[pokemon] = std::move(implementedAbilities);
+  }
+
+  // memoize items
+  std::vector<const Item*> items = pkdex.getItems().toVector();
+  for (const auto* item : items) {
+    if (item->isImplemented()) {
+      implementedItems_.push_back(item);
+    }
+  }
+
+  // memoize natures
+  std::vector<const Nature*> natures = pkdex.getNatures().toVector();
+  for (const auto* nature : natures) {
+    implementedNatures_.push_back(nature);
+  }
+
+  initialized_ = true;
+}
+
+
 void TeamFactory::randomSpecies(const TeamNonVolatile& cTeam, PokemonNonVolatile& cPokemon, size_t iReplace) const {
-  std::vector<const PokemonBase*> pokemons = pkdex->getPokemon().toVector();
+  assert(initialized_ && "TeamFactory must be initialized before use!");
+  if (implementedSpecies_.empty()) {
+    throw std::runtime_error("No implemented species available!");
+  }
+
   bool revalidate = cPokemon.pokemonExists();
   bool isSuccessful = false;
-  size_t iSpecies = (rand() % pokemons.size()) - 1;
-  // find a pokemon with an existing movelist (non orphan)
-  for (size_t iNSpecies = 0; iNSpecies != pokemons.size(); ++iNSpecies)
-  {
-    iSpecies = (iSpecies + 1) % pokemons.size();
-    const PokemonBase& candidateBase = *pokemons[iSpecies];
+  size_t iSpecies = rand() % implementedSpecies_.size();
+
+  for (size_t iNSpecies = 0; iNSpecies != implementedSpecies_.size(); ++iNSpecies) {
+    const PokemonBase& candidateBase = *implementedSpecies_[iSpecies];
 
     // don't include a species already on the team:
-    if ((iReplace == SIZE_MAX) && !cTeam.isLegalAdd(candidateBase)) { continue; }
-    else if (!cTeam.isLegalSet(iReplace, candidateBase)) { continue; }
-    // don't include any pokemon species with lost children: (no moves, no ability, no types)
-    if (candidateBase.lostChild_ == true) { continue; }
+    if ((iReplace == SIZE_MAX) && !cTeam.isLegalAdd(candidateBase)) {
+      iSpecies = (iSpecies + 1) % implementedSpecies_.size();
+      continue;
+    } else if ((iReplace != SIZE_MAX) && !cTeam.isLegalSet(iReplace, candidateBase)) {
+      iSpecies = (iSpecies + 1) % implementedSpecies_.size();
+      continue;
+    }
 
     isSuccessful = true;
     cPokemon.setBase(candidateBase);
     break;
   }
-  if (!isSuccessful)
-  {
+
+  if (!isSuccessful) {
     // something horrible happened, do not attempt to randomize the species. No need to revalidate if this occurs
     assert(false && "Failed to generate random species!");
     return;
@@ -293,65 +352,39 @@ void TeamFactory::randomSpecies(const TeamNonVolatile& cTeam, PokemonNonVolatile
 
 
 void TeamFactory::randomAbility(PokemonNonVolatile& cPokemon) const {
-  const PokemonBase& cBase = cPokemon.getBase();
- 
-  std::vector<const Ability*> abilities{begin(cBase.getAbilities()), end(cBase.getAbilities())};
-  if (abilities.empty()) {
+  assert(initialized_ && "TeamFactory must be initialized before use!");
+  const auto it = speciesImplementedAbilities_.find(&cPokemon.getBase());
+  if (it == speciesImplementedAbilities_.end() || it->second.empty()) {
     cPokemon.setNoAbility();
     return;
   }
- 
+
+  const std::vector<const Ability*>& abilities = it->second;
   size_t iAbility = rand() % abilities.size();
-  for (size_t iNAbility = 0; iNAbility != abilities.size(); ++iNAbility) {
-    if (abilities[iAbility]->isImplemented()) { break; }
-
-    iAbility = (iAbility + 1) % abilities.size();
-  }
-
-  // if the ability does not have a script implemented:
-  if (!abilities[iAbility]->isImplemented()) {
-    cPokemon.setNoAbility();
-  }
-  else {
-    cPokemon.setAbility(*abilities[iAbility]);
-  }
-} // endOf randomAbility
+  cPokemon.setAbility(*abilities[iAbility]);
+}
 
 
 void TeamFactory::randomNature(PokemonNonVolatile& cPokemon) const {
-  std::vector<const Nature*> natures = pkdex->getNatures().toVector();
-  if (natures.empty()) {
-    cPokemon.setNoNature();
+  assert(initialized_ && "TeamFactory must be initialized before use!");
+  if (implementedNatures_.empty()) {
     return;
   }
-  size_t iNature = rand() % natures.size();
-  cPokemon.setNature(*natures[iNature]);
+
+  size_t iNature = rand() % implementedNatures_.size();
+  cPokemon.setNature(*implementedNatures_[iNature]);
 }
 
 
 void TeamFactory::randomItem(PokemonNonVolatile& cPokemon) const {
-  std::vector<const Item*> items = pkdex->getItems().toVector();
-  size_t iNSize = (items.size() + 1);
-  size_t iItem = (rand() % iNSize) - 1;
-  for (size_t iNItem = 0; iNItem != iNSize; ++iNItem)
-  {
-    // in this case, we choose no item:
-    if (iItem == SIZE_MAX) { break; }
-
-    if (items[iItem]->isImplemented()) { break; }
-
-    iItem = ((iItem + 2) % iNSize) - 1;
-  }
-
-  // if the item does not have a script implemented or we explicitly chose no item:
-  if ((iItem == SIZE_MAX) || (!items[iItem]->isImplemented()))
-  {
+  assert(initialized_ && "TeamFactory must be initialized before use!");
+  if (implementedItems_.empty()) {
     cPokemon.setNoInitialItem();
+    return;
   }
-  else
-  {
-    cPokemon.setInitialItem(*items[iItem]);
-  }
+
+  size_t iItem = rand() % implementedItems_.size();
+  cPokemon.setInitialItem(*implementedItems_[iItem]);
 } // endOf randomItem
 
 
@@ -461,72 +494,43 @@ void TeamFactory::randomEV(PokemonNonVolatile& cPokemon) const {
 
 
 void TeamFactory::randomMove(PokemonNonVolatile& cPokemon, size_t numMoves) const {
-  const std::vector<const Move*>& cMovelist{
-      begin(cPokemon.getBase().moves_), end(cPokemon.getBase().moves_)};
-  std::vector<bool> isValid(cMovelist.size(), true);
-  size_t validMoves = cMovelist.size();
+  assert(initialized_ && "TeamFactory must be initialized before use!");
+  const auto it = speciesImplementedMoves_.find(&cPokemon.getBase());
+  if (it == speciesImplementedMoves_.end() || it->second.empty()) {
+    return;
+  }
 
-  // remove duplicate moves from the valid move array:
-  for (size_t iMove = 0; iMove != cPokemon.getNumMoves(); ++iMove)
-  {
-    const Move* base = &cPokemon.getMove_base(iMove);
+  const std::vector<const Move*>& implementedMoves = it->second;
+  std::vector<const Move*> availableMoves = implementedMoves;
 
-    for (size_t iValidMove = 0, iValidSize = cMovelist.size(); iValidMove != iValidSize; ++iValidMove)
-    {
-      if (base == cMovelist[iValidMove]) { isValid[iValidMove] = false; validMoves--; break; }
-    }
+  // remove moves already known by the pokemon:
+  for (size_t iMove = 0; iMove < cPokemon.getNumMoves(); ++iMove) {
+    const Move& knownMove = cPokemon.getMove(iMove).getBase();
+    availableMoves.erase(
+        std::remove(availableMoves.begin(), availableMoves.end(), &knownMove),
+        availableMoves.end());
   }
 
   // add numMoves moves to the move array:
-  for (size_t iAction = 0, iSize = std::min(numMoves, cMovelist.size()); iAction < std::min(iSize, validMoves); ++iAction)
-  {
-    // the index of the move we intend to add:
-    size_t iMove;
-    // the slot we intend to put it in:
+  for (size_t iAction = 0; iAction < numMoves && !availableMoves.empty(); ++iAction) {
+    size_t iMove = rand() % availableMoves.size();
+    const Move* selectedMove = availableMoves[iMove];
+    
+    // remove from pool:
+    availableMoves.erase(availableMoves.begin() + iMove);
+
+    MoveNonVolatile cMove(*selectedMove);
     size_t iSlot = rand() % cPokemon.getMaxNumMoves();
-    bool isSuccessful = false;
-    for (size_t numTries = 0; (numTries != MAXTRIES) && (!isSuccessful); ++numTries)
-    {
-      iMove = rand() % cMovelist.size();
 
-      const Move& possibleMove = *cMovelist.at(iMove);
-
-      // has this move been used before?
-      if (!isValid.at(iMove))
-      {
-        continue;
-      }
-
-      // is this move wholly implemented via the engine, or does it have scripts that are fully implemented?
-      if (!possibleMove.isImplemented())
-      {
-        isValid.at(iMove) = false;
-        validMoves--;
-        continue;
-      }
-
-      isSuccessful = true;
-    }
-
-    // if we were not successful in finding a move to go into this slot, just forget about it
-    if (!isSuccessful) { continue; }
-
-    isValid.at(iMove) = false;
-    validMoves--;
-    MoveNonVolatile cMove(*cMovelist.at(iMove));
-
-    if ((cPokemon.getNumMoves() < numMoves) || (iSlot >= cPokemon.getNumMoves()))
-    {
+    if ((cPokemon.getNumMoves() < numMoves) || (iSlot >= cPokemon.getNumMoves())) {
       cPokemon.addMove(cMove);
-    }
-    else
-    {
+    } else {
       cPokemon.setMove(iSlot, cMove);
     }
-  } //endOf iAction
+  }
 
   assert(cPokemon.getNumMoves() > 0);
-} // endOf randomMove
+}
 
 
 void TeamFactory::randomGender(PokemonNonVolatile& cPokemon) const {

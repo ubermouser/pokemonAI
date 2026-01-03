@@ -25,7 +25,7 @@ struct Config {
   std::array<std::shared_ptr<Evaluator::Config>, 2> agenteval = {NULL, NULL};
   std::array<std::string, 2> planner = {"Maximin", "Max"};
   std::array<std::string, 2> evaluator = {"Simple", "MonteCarlo"};
-  std::array<std::string, 2> team = {"teams/hexTeamA.txt", "teams/hexTeamD.txt"};
+  std::array<std::string, 2> team = {"teams/gen4/hexTeamA.txt", "teams/gen4/hexTeamD.txt"};
 
   int verbosity = 1;
   int random_seed = -1;

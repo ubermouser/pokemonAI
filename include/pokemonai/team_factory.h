@@ -11,6 +11,8 @@
 #include "engine.h"
 
 #include <random>
+#include <unordered_map>
+#include <vector>
 
 class TeamFactory {
 public:
@@ -21,8 +23,9 @@ public:
   };
 
   TeamNonVolatile createRandom(size_t numPokemon) const;
-
   PokemonNonVolatile createRandom_single(const TeamNonVolatile& cTeam, size_t iReplace = SIZE_MAX) const;
+
+  void initialize(const Pokedex& pkdex);
 
   /* randomize a pokemon's species */
   void randomSpecies(const TeamNonVolatile& cTeam, PokemonNonVolatile& cPokemon, size_t iReplace = SIZE_MAX) const;
@@ -63,6 +66,15 @@ protected:
   Config cfg_;
 
   mutable std::default_random_engine rand_;
+
+  // memoized game elements:
+  std::vector<const PokemonBase*> implementedSpecies_;
+  std::vector<const Item*> implementedItems_;
+  std::vector<const Nature*> implementedNatures_;
+  std::unordered_map<const PokemonBase*, std::vector<const Move*>> speciesImplementedMoves_;
+  std::unordered_map<const PokemonBase*, std::vector<const Ability*>> speciesImplementedAbilities_;
+
+  bool initialized_ = false;
 };
 
 #endif /* TEAM_FACTORY_H */

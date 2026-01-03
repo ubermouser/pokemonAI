@@ -5,12 +5,22 @@
 class Gen4TeamFactoryTest : public Gen4EngineTest {
  protected:
   TeamFactory factory_;
+
+  void SetUp() override {
+    Gen4EngineTest::SetUp();
+    factory_.initialize(*pokedex_);
+  }
 };
 
 
 class Gen1TeamFactoryTest : public Gen1EngineTest {
  protected:
   TeamFactory factory_;
+
+  void SetUp() override {
+    Gen1EngineTest::SetUp();
+    factory_.initialize(*pokedex_);
+  }
 };
 
 

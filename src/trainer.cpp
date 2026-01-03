@@ -58,6 +58,7 @@ void Trainer::initialize() {
   if (doNothingProbability_ > 1.0 || doNothingProbability_ < 0.0) { throw std::invalid_argument("doNothingProbability"); }
 
   Ranker::initialize();
+  teamFactory_.initialize(*pkdex);
 }
 
 
