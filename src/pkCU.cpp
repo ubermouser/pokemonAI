@@ -1144,7 +1144,7 @@ void PkCUEngine::evaluateMove_script() {
 
 void PkCUEngine::calculateDamage(bool hasCrit) {
   FixType partitionEnvironmentProbability =
-      (FixType(1) / FixType((int32_t)cfg_.numRandomEnvironments));
+      (FixType(1) / (int32_t)cfg_.numRandomEnvironments);
   DamageComponents_t& cDMG = getDamageComponent();
 
   uint32_t power = (hasCrit)?cDMG.damageCrit:cDMG.damage;
@@ -1183,15 +1183,14 @@ FixType PkCUEngine::getProbabilityToHit() {
 
   /* probability to hit enemy pokemon */
   // TODO - integer math
-  double probabilityToHitDouble =
+  FixType probabilityToHit =
       // lowest is 33% or 3333 / 10000
-      getPKV().getAccuracy_boosted(FV_ACCURACY).to_double() *
+      getPKV().getAccuracy_boosted(FV_ACCURACY) *
       // highest is 300% or 3
-      getTPKV().getAccuracy_boosted(FV_EVASION).to_double() *
+      getTPKV().getAccuracy_boosted(FV_EVASION) *
       // lowest is 30% or 30 / 100
-      mV.getBase().getPrimaryAccuracy().to_double();
+      mV.getBase().getPrimaryAccuracy();
 
-  FixType probabilityToHit = FixType(probabilityToHitDouble);
   return probabilityToHit;
 }
 

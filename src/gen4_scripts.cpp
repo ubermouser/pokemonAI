@@ -1225,9 +1225,7 @@ int ability_sereneGrace(
   if (!((dType == ATK_PHYSICAL) || (dType == ATK_SPECIAL))) { return 0; }
 
   // multiply secondary probability by 2
-  double probability = std::min(
-      probabilityToSecondary.to_double() * 2., 1.);  // TODO - integer math
-  probabilityToSecondary = FixType(probability);
+  probabilityToSecondary = std::min(probabilityToSecondary * 2, FixType(1));
 
   return 1;
 };
