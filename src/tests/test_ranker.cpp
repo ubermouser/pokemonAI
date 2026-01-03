@@ -31,8 +31,8 @@ protected:
     ranker_->addEvaluator(evaluators::choose("simple", *evaluators::config("simple")));
     ranker_->addEvaluator(evaluators::choose("random", *evaluators::config("random")));
 
-    ranker_->addTeam(TeamNonVolatile::load("teams/soloTeamA.txt"));
-    ranker_->addTeam(TeamNonVolatile::load("teams/soloTeamB.txt"));
+    ranker_->addTeam(TeamNonVolatile::load("teams/gen4/soloTeamA.txt"));
+    ranker_->addTeam(TeamNonVolatile::load("teams/gen4/soloTeamB.txt"));
   }
 };
 

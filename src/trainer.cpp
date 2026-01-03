@@ -57,8 +57,8 @@ void Trainer::initialize() {
   if (cfg_.seedProbability > 1.0 || cfg_.seedProbability < 0.0) { throw std::invalid_argument("seedProbability"); }
   if (doNothingProbability_ > 1.0 || doNothingProbability_ < 0.0) { throw std::invalid_argument("doNothingProbability"); }
 
-  Ranker::initialize();
   teamFactory_.initialize(*pkdex);
+  Ranker::initialize();
 }
 
 

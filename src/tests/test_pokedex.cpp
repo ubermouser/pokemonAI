@@ -56,13 +56,13 @@ TEST_F(PokedexGen4DynamicTest, LoadsItems) { validateCounts(*pokedex); }
 
 
 TEST_F(PokedexGen4StaticTest, PrintsTeamWithoutCrashing) {
-  auto team = TeamNonVolatile::load("teams/hexTeamA.txt");
+  auto team = TeamNonVolatile::load("teams/gen4/hexTeamA.txt");
   team.printSummary(std::cout);
 }
 
 
 TEST_F(PokedexGen4DynamicTest, PrintsTeamWithoutCrashing) {
-  auto team = TeamNonVolatile::load("teams/hexTeamA.txt");
+  auto team = TeamNonVolatile::load("teams/gen4/hexTeamA.txt");
   team.printSummary(std::cout);
 }
 
