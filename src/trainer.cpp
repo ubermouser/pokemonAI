@@ -17,6 +17,7 @@ po::options_description Trainer::Config::options(
   po::options_description desc = Ranker::Config::options(category, prefix);
 
   if (prefix.size() > 0) { prefix.append("-"); }
+  // clang-format off
   desc.add_options()
       ((prefix + "mutation-probability").c_str(),
       po::value<double>(&mutationProbability)->default_value(defaults.mutationProbability),
@@ -33,7 +34,7 @@ po::options_description Trainer::Config::options(
       ((prefix + "max-generations").c_str(),
       po::value<size_t>(&maxGenerations)->default_value(defaults.maxGenerations),
       "number of league generations.");
-
+  // clang-format on
 
   return desc;
 }
@@ -81,7 +82,10 @@ LeagueHeat Trainer::evolve() const {
     runLeague(league);
   }
 
-  if (cfg_.verbosity > 0) { out_.get() << "Evolution Complete!\n"; }
+  if (cfg_.verbosity > 0) {
+    out_.get() << "Evolution Complete!\n";
+    printLeagueCounts(league);
+  }
   if (cfg_.saveOnCompletion) { saveTeamPopulation(league); }
   return league;
 }

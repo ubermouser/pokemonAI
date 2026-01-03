@@ -51,6 +51,7 @@ struct Config {
     Config defaults{};
     po::options_description desc;
 
+    // clang-format off
     desc.add_options()
         ("planners",
         po::value<std::vector<std::string>>(&plannerTypes)->multitoken(),
@@ -68,6 +69,7 @@ struct Config {
         ("verbosity",
         po::value<int>(&verbosity)->default_value(defaults.verbosity),
         "static verbosity level.");
+    // clang-format on
     desc.add(pokedex.options());
     desc.add(ranker.options());
     desc.add(game.options("game configuration", "game"));

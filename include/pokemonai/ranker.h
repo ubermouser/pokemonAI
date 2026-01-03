@@ -64,7 +64,19 @@ struct LeagueHeat : public League {
     numGames = 0;
     totalPlies = 0;
     elapsedTime = 0;
+    counts = LeagueStats{};
   }
+
+  void calculateCounts();
+
+  struct LeagueStats {
+    std::unordered_map<std::string, uint64_t> pokemon;
+    std::unordered_map<std::string, uint64_t> abilities;
+    std::unordered_map<std::string, uint64_t> types;
+    std::unordered_map<std::string, uint64_t> natures;
+    std::unordered_map<std::string, uint64_t> items;
+    std::unordered_map<std::string, uint64_t> moves;
+  } counts;
 };
 
 class Ranker {
@@ -84,6 +96,9 @@ public:
 
     /* The maximum number of elements in a leaderboard to print*/
     size_t leaderboardPrintCount = 20;
+
+    /* The maximum number of elements in a popularity leaderboard to print*/
+    size_t leagueStatsPrintCount = 5;
 
     /* the minimum number of games per generation */
     size_t minGamesPerBattlegroup = 10;
@@ -193,6 +208,9 @@ protected:
 
   /* print information about the top n members of league iLeague */
   void printLeagueStatistics(LeagueHeat& league) const;
+
+  /* print popularity information about the league */
+  void printLeagueCounts(const LeagueHeat& league) const;
 
   /* print information about a single heat */
   void printHeatResult(const GameHeat& heat) const;
