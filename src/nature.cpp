@@ -7,7 +7,11 @@ using namespace INI;
 using namespace orphan;
 
 const Nature* Nature::no_nature = NULL;
-
+ 
+Nature::Nature() : Name() {
+  modTable_.fill(FPMULTIPLIER);
+}
+ 
 
 bool Natures::initialize(const std::string& path) {
   if (path.empty())

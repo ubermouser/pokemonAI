@@ -208,6 +208,7 @@ bool Pokemons::loadFromFile_lines(
 
     //first ability choice
     iToken = 10;
+    if (tokens.at(iToken) != "---")
     {
       const Ability* cAbility = orphanCheck(abilities, tokens.at(iToken), &orphanedAbilities);
       if (cAbility == NULL) { cPokemon.lostChild_ = true; } //orphan!

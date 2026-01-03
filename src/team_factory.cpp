@@ -294,23 +294,25 @@ void TeamFactory::randomSpecies(const TeamNonVolatile& cTeam, PokemonNonVolatile
 
 void TeamFactory::randomAbility(PokemonNonVolatile& cPokemon) const {
   const PokemonBase& cBase = cPokemon.getBase();
-
+ 
   std::vector<const Ability*> abilities{begin(cBase.getAbilities()), end(cBase.getAbilities())};
+  if (abilities.empty()) {
+    cPokemon.setNoAbility();
+    return;
+  }
+ 
   size_t iAbility = rand() % abilities.size();
-  for (size_t iNAbility = 0; iNAbility != abilities.size(); ++iNAbility)
-  {
+  for (size_t iNAbility = 0; iNAbility != abilities.size(); ++iNAbility) {
     if (abilities[iAbility]->isImplemented()) { break; }
 
     iAbility = (iAbility + 1) % abilities.size();
   }
 
   // if the ability does not have a script implemented:
-  if (!abilities[iAbility]->isImplemented())
-  {
+  if (!abilities[iAbility]->isImplemented()) {
     cPokemon.setNoAbility();
   }
-  else
-  {
+  else {
     cPokemon.setAbility(*abilities[iAbility]);
   }
 } // endOf randomAbility
@@ -318,6 +320,10 @@ void TeamFactory::randomAbility(PokemonNonVolatile& cPokemon) const {
 
 void TeamFactory::randomNature(PokemonNonVolatile& cPokemon) const {
   std::vector<const Nature*> natures = pkdex->getNatures().toVector();
+  if (natures.empty()) {
+    cPokemon.setNoNature();
+    return;
+  }
   size_t iNature = rand() % natures.size();
   cPokemon.setNature(*natures[iNature]);
 }
