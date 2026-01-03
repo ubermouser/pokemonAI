@@ -82,10 +82,8 @@ LeagueHeat Trainer::evolve() const {
     runLeague(league);
   }
 
-  if (cfg_.verbosity > 0) {
-    out_.get() << "Evolution Complete!\n";
-    printLeagueCounts(league);
-  }
+  if (cfg_.verbosity >= 1) { out_.get() << "Evolution Complete!\n"; }
+  if (cfg_.verbosity >= 2) { printLeagueCounts(league); }
   if (cfg_.saveOnCompletion) { saveTeamPopulation(league); }
   return league;
 }

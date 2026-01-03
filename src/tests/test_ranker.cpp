@@ -17,7 +17,7 @@ class RankerTest : public Gen4EngineTest {
   void SetUp() override {
     Gen4EngineTest::SetUp();
 
-    ranker_cfg_.verbosity = 1;
+    ranker_cfg_.verbosity = 3;
     ranker_cfg_.minGamesPerBattlegroup = 2;
     ranker_cfg_.numThreads = 2;
     ranker_ = std::make_shared<Ranker>(ranker_cfg_);
@@ -31,8 +31,8 @@ class RankerTest : public Gen4EngineTest {
     ranker_->addEvaluator(evaluators::choose("simple", *evaluators::config("simple")));
     ranker_->addEvaluator(evaluators::choose("random", *evaluators::config("random")));
 
-    ranker_->addTeam(TeamNonVolatile::load("teams/gen4/soloTeamA.txt"));
-    ranker_->addTeam(TeamNonVolatile::load("teams/gen4/soloTeamB.txt"));
+    ranker_->addTeam(TeamNonVolatile::load("teams/gen4/dualTeamA.txt"));
+    ranker_->addTeam(TeamNonVolatile::load("teams/gen4/dualTeamB.txt"));
 
     spdlog::set_level(spdlog::level::debug);
   }

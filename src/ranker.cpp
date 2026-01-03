@@ -110,7 +110,7 @@ LeagueHeat Ranker::rank() const {
   LeagueHeat league = constructLeague();
   runLeague(league);
 
-  if (cfg_.verbosity > 0) { printLeagueCounts(league); }
+  if (cfg_.verbosity >= 2) { printLeagueCounts(league); }
   if (cfg_.saveOnCompletion) { saveTeamPopulation(league); }
   return league;
 }
@@ -142,8 +142,34 @@ void Ranker::runLeague(LeagueHeat& league) const {
   }
 
   league.elapsedTime = std::chrono::duration<double>(std::chrono::steady_clock::now() - start).count();
-  league.calculateCounts();
+  league.calculateStats();
   if (cfg_.verbosity >= 1) { printLeagueStatistics(league); }
+}
+
+
+void LeagueHeat::calculateContribution() {
+  for (const auto& game : games) {
+    const auto& hr = game.heatResult;
+    for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
+      const auto& bg = (iTeam == 0) ? game.team_a : game.team_b;
+      const auto& nvTeam = bg->team().nv();
+      const auto& hrt = hr.teams[iTeam];
+      for (size_t iPkmn = 0; iPkmn < nvTeam.getNumTeammates(); ++iPkmn) {
+        const auto& pkhr = hrt.pokemon[iPkmn];
+        const auto& pknv = nvTeam.teammate(iPkmn);
+        auto& pkStat = counts.pokemon[pknv.getName()];
+        pkStat.contribution += pkhr.simpleContribution;
+        pkStat.participation += pkhr.participation;
+
+        for (size_t iMove = 0; iMove < pknv.getNumMoves(); ++iMove) {
+          auto& moveStat = counts.moves[pknv.getMove_base(iMove).getName()];
+          moveStat.contribution +=
+              pkhr.simpleContribution * pkhr.moveUse[iMove];
+          moveStat.participation += pkhr.participation * pkhr.moveUse[iMove];
+        }
+      }
+    }
+  }
 }
 
 
@@ -153,22 +179,22 @@ void LeagueHeat::calculateCounts() {
     for (size_t iTeammate = 0; iTeammate < team.getNumTeammates();
          ++iTeammate) {
       const auto& pokemon = team.teammate(iTeammate);
-      counts.pokemon[pokemon.getName()]++;
-      counts.abilities[pokemon.getAbility().getName()]++;
-      counts.natures[pokemon.getNature().getName()]++;
+      counts.pokemon[pokemon.getName()].count++;
+      counts.abilities[pokemon.getAbility().getName()].count++;
+      counts.natures[pokemon.getNature().getName()].count++;
       if (pokemon.hasInitialItem()) {
-        counts.items[pokemon.getInitialItem().getName()]++;
+        counts.items[pokemon.getInitialItem().getName()].count++;
       }
 
       const auto& base = pokemon.getBase();
       for (size_t iType = 0; iType < 2; ++iType) {
         if (base.types_[iType] != NULL) {
-          counts.types[base.getType(iType).getName()]++;
+          counts.types[base.getType(iType).getName()].count++;
         }
       }
 
       for (size_t iMove = 0; iMove < pokemon.getNumMoves(); ++iMove) {
-        counts.moves[pokemon.getMove_base(iMove).getName()]++;
+        counts.moves[pokemon.getMove_base(iMove).getName()].count++;
       }
     }
   }
@@ -464,37 +490,46 @@ void Ranker::printLeagueStatistics(LeagueHeat& league) const {
 void Ranker::printLeagueCounts(const LeagueHeat& league) const {
   std::ostringstream os;
 
-  auto printMapStats = [&](const auto& map, const std::string& name) {
-    if (map.size() <= 1) { return; }
+  auto printMapStats =
+      [&](const std::unordered_map<std::string, LeagueHeat::StatEntry>& map,
+          const std::string& name,
+          bool showPerf = false) {
+        if (map.size() <= 1) { return; }
 
-    std::vector<std::pair<std::string, uint64_t>> sorted(
-        map.begin(), map.end());
-    std::partial_sort(
-        sorted.begin(),
-        sorted.begin() + std::min(sorted.size(), cfg_.leagueStatsPrintCount),
-        sorted.end(),
-        [](const auto& a, const auto& b) { return a.second > b.second; });
+        std::vector<std::pair<std::string, LeagueHeat::StatEntry>> sorted(
+            map.begin(), map.end());
+        std::partial_sort(
+            sorted.begin(),
+            sorted.begin() +
+                std::min(sorted.size(), cfg_.leagueStatsPrintCount),
+            sorted.end(),
+            [](const auto& a, const auto& b) {
+              return a.second.count > b.second.count;
+            });
 
-    os << fmt::format(
-        "---- TOP {} {} POPULARITY ----\n",
-        std::min(sorted.size(), cfg_.leagueStatsPrintCount),
-        name);
-    for (size_t i = 0; i < std::min(sorted.size(), cfg_.leagueStatsPrintCount);
-         ++i) {
-      os << fmt::format(
-          " {:02}: {:<20} (counts={})\n",
-          i + 1,
-          sorted[i].first,
-          sorted[i].second);
-    }
-  };
+        size_t printCount = std::min(sorted.size(), cfg_.leagueStatsPrintCount);
+        os << fmt::format("---- TOP {} {} POPULARITY ----\n", printCount, name);
+        for (size_t i = 0; i < printCount; ++i) {
+          const auto& key = sorted[i].first;
+          const auto& stat = sorted[i].second;
+          os << fmt::format(
+              " {:02}: {:<20} count={: <4}", i + 1, key, stat.count);
+          if (showPerf) {
+            os << fmt::format(
+                " contrib={:6.2f} part={:6.2f}",
+                stat.contribution,
+                stat.participation);
+          }
+          os << "\n";
+        }
+      };
 
-  printMapStats(league.counts.pokemon, "POKEMON");
   printMapStats(league.counts.abilities, "ABILITY");
   printMapStats(league.counts.types, "TYPE");
   printMapStats(league.counts.natures, "NATURE");
   printMapStats(league.counts.items, "ITEM");
-  printMapStats(league.counts.moves, "MOVE");
+  printMapStats(league.counts.pokemon, "POKEMON", true);
+  printMapStats(league.counts.moves, "MOVE", true);
 
   out_.get() << os.str();
 }

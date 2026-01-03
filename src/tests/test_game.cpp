@@ -23,6 +23,8 @@ class GameTest : public Gen4EngineTest {
           .addMove(pokedex_->move("charm"))
           .setLevel(100));
     environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
+
+    spdlog::set_level(spdlog::level::debug);
   }
 };
 
