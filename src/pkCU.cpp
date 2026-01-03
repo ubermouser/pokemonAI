@@ -630,12 +630,12 @@ void PkCUEngine::evaluateMove_postMove() {
     if (!getPKV().isAlive()) { stackStage_[iBase_] = STAGE_POSTTURN; continue; }
 
     // does this move even have a secondary effect? (this check is in-loop because multiple environments could arise from previous call)
-    if (!mostlyGT(cMove.getSecondaryAccuracy(), (fpType)0.0)) { stackStage_[iBase_] = STAGE_POSTSECONDARY; continue; }
+    if (!mostlyGT(cMove.getSecondaryAccuracy(), fixedpoint::create<30>(0.0))) { stackStage_[iBase_] = STAGE_POSTSECONDARY; continue; }
 
     fpType& secondaryHitProbability = getDamageComponent().tProbability;
 
     /* probability to inflict secondary condition*/
-    secondaryHitProbability = cMove.getSecondaryAccuracy(); // lowest is 10%
+    secondaryHitProbability = cMove.getSecondaryAccuracy().to_double(); // lowest is 10%
 
     // to-hit modifying values:
     int result = 0;
@@ -941,7 +941,7 @@ void PkCUEngine::evaluateMove_damage() {
     probabilityToHit =
         cPKV.getAccuracy_boosted(FV_ACCURACY) // lowest is 33% or 1/3
         * tPKV.getAccuracy_boosted(FV_EVASION) // highest is 300% or 3
-        * mV.getBase().getPrimaryAccuracy(); // lowest is 30%
+        * mV.getBase().getPrimaryAccuracy().to_double(); // lowest is 30%
 
     // to-hit modifying values:
     int result = 0;
@@ -1055,7 +1055,7 @@ void PkCUEngine::evaluateMove_script() {
       probabilityToHit =
           getPKV().getAccuracy_boosted(FV_ACCURACY) // lowest is 33% or 3333 / 10000
           * getTPKV().getAccuracy_boosted(FV_EVASION) // highest is 300% or 3
-          * cMove.getPrimaryAccuracy(); // lowest is 30% or 30 / 100
+          * cMove.getPrimaryAccuracy().to_double(); // lowest is 30% or 30 / 100
     }
     else
     {

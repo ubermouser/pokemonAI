@@ -176,9 +176,9 @@ public:
   
   uint32_t getDamageType() const { return damageType_; };
 
-  fpType getPrimaryAccuracy() const { return (fpType)primaryAccuracy_ / 100.0; };
+  fixType getPrimaryAccuracy() const { return fixType{ (int32_t)( ((int64_t)primaryAccuracy_ << 30) / 100 ) }; };
 
-  fpType getSecondaryAccuracy() const { return (fpType)secondaryAccuracy_ / 100.0; };
+  fixType getSecondaryAccuracy() const { return fixType{ (int32_t)( ((int64_t)secondaryAccuracy_ << 30) / 100 ) }; };
 
 
   Move(
