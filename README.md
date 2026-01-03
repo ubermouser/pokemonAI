@@ -57,8 +57,8 @@ All executables must be run from the project root directory.
 Battle two teams against one another using minimax search:
 ```bash
 ./build/battler/battler \
-    --team-a ./teams/hexTeamD.txt \
-    --team-b ./teams/hexTeamA.txt \
+    --team-a ./teams/gen4/hexTeamD.txt \
+    --team-b ./teams/gen4/hexTeamA.txt \
     --planner-a minimax \
     --planner-b minimax \
     --evaluator-a simple \
@@ -74,8 +74,8 @@ Battle two teams against one another using minimax search:
 Play against an agent yourself:
 ```bash
 ./build/battler/battler \
-    --team-a ./teams/hexTeamD.txt \
-    --team-b ./teams/hexTeamA.txt \
+    --team-a ./teams/gen4/hexTeamD.txt \
+    --team-b ./teams/gen4/hexTeamA.txt \
     --planner-a minimax \
     --planner-b human \
     --evaluator-a simple \
@@ -110,6 +110,7 @@ Construct new teams that play well at a range of skill levels:
 Construct teams targeting a different generation of Pokemon:
 ```bash
 ./build/trainer/trainer \
+    --team-path ./teams/gen1/ \
     --planners=minimax \
     --evaluators=simple \
     --p1-max-search-depth=3 \
@@ -130,7 +131,7 @@ Construct teams targeting a different generation of Pokemon:
 Rank all of the teams under a directory against one another:
 ```bash
 ./build/ranker/ranker \
-    --team-path ./teams/ \
+    --team-path ./teams/gen4/ \
     --planners=minimax \
     --evaluators=simple \
     --p1-max-search-depth=3 \

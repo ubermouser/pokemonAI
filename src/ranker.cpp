@@ -157,7 +157,7 @@ void LeagueHeat::calculateContribution() {
       for (size_t iPkmn = 0; iPkmn < nvTeam.getNumTeammates(); ++iPkmn) {
         const auto& pkhr = hrt.pokemon[iPkmn];
         const auto& pknv = nvTeam.teammate(iPkmn);
-        auto& pkStat = counts.pokemon[pknv.getName()];
+        auto& pkStat = counts.pokemon[pknv.getBase().getName()];
         pkStat.aggregateContribution += pkhr.aggregateContribution;
         pkStat.simpleContribution += pkhr.simpleContribution;
         pkStat.participation += pkhr.participation;
@@ -182,16 +182,20 @@ void LeagueHeat::calculateCounts() {
     for (size_t iTeammate = 0; iTeammate < team.getNumTeammates();
          ++iTeammate) {
       const auto& pokemon = team.teammate(iTeammate);
-      counts.pokemon[pokemon.getName()].count++;
-      counts.abilities[pokemon.getAbility().getName()].count++;
-      counts.natures[pokemon.getNature().getName()].count++;
+      const auto& base = pokemon.getBase();
+      counts.pokemon[base.getName()].count++;
+      if (&pokemon.getNature() != Nature::no_nature) {
+        counts.natures[pokemon.getNature().getName()].count++;
+      }
+      if (pokemon.abilityExists()) {
+        counts.abilities[pokemon.getAbility().getName()].count++;
+      }
       if (pokemon.hasInitialItem()) {
         counts.items[pokemon.getInitialItem().getName()].count++;
       }
 
-      const auto& base = pokemon.getBase();
       for (size_t iType = 0; iType < 2; ++iType) {
-        if (base.types_[iType] != NULL) {
+        if (&base.getType(iType) != Type::no_type) {
           counts.types[base.getType(iType).getName()].count++;
         }
       }
