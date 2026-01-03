@@ -195,8 +195,10 @@ struct DamageComponents_t {
   uint32_t damage;      /**< The calculated damage of the move. */
   uint32_t damageCrit;  /**< The calculated damage if the move is a critical hit. */
   const Type* mType;    /**< The type of the move. */
-  fpType cProbability;  /**< The probability of the current environment occurring. */
-  fpType tProbability;  /**< The probability of a temporary event, like a move hitting or a secondary effect occurring. */
+  FixType cProbability; /**< The probability of the current environment
+                           occurring. */
+  FixType tProbability; /**< The probability of a temporary event, like a move
+                           hitting or a secondary effect occurring. */
 };
 
 /**
@@ -579,6 +581,12 @@ public:
   void calculateDamage(bool hasCrit);
 
   /**
+   * @brief Gets the probability of the move hitting its target.
+   * @return The probability of the move hitting its target.
+   */
+  FixType getProbabilityToHit();
+
+  /**
    * @brief A template function to duplicate the current state on the stack `numEnvironments` times.
    * @tparam numEnvironments The number of copies to create.
    * @param result An array to store the indices of the new environments.
@@ -614,6 +622,10 @@ public:
    * @param iState The index of the state to duplicate.
    */
   void duplicateState(std::array<size_t, 2>& result, fpType probability, size_t iState = SIZE_MAX);
+  void duplicateState(
+      std::array<size_t, 2>& result,
+      FixType probability,
+      size_t iState = SIZE_MAX);
 
   /**
    * @brief Duplicates the current state on the stack, creating three possible outcomes.
@@ -622,7 +634,11 @@ public:
    * @param probabilityB The probability of the third outcome.
    * @param iState The index of the state to duplicate.
    */
-  void triplicateState(std::array<size_t, 3>& result, fpType probabilityA, fpType probabilityB, size_t iState = SIZE_MAX);
+  void triplicateState(
+      std::array<size_t, 3>& result,
+      FixType probability,
+      FixType oProbability,
+      size_t iState = SIZE_MAX);
 
   /**
    * @brief Gets the current battle stage for the base environment.

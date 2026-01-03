@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+#include "pkai.h"
 #include "pokemonai/fixedpoint/fixed_class.h"
 
 #define SIZETYPE_D int64_t
@@ -13,7 +14,8 @@
 #define ABSMASK_F 0x7FFFFFFF
 #define EPSILON_D 0.0000001
 #define EPSILON_F 0.00001
-#define EPSILON_S 108 // this value is "equivalent" to the FP_EPSILON for doubles above
+#define EPSILON_S \
+  108  // this value is "equivalent" to the FP_EPSILON for doubles above
 
 inline static double fastabs(double x)
 {	
@@ -49,10 +51,7 @@ inline static float fastabs(float x)
   return (float&)y;*/
 };
 
-inline static fixType fastabs(fixType x)
-{
-  return fixedpoint::abs(x);
-};
+inline static FixType fastabs(FixType x) { return fixedpoint::abs(x); };
 
 inline static bool mostlyEQ(double lhs, double rhs)
 {
@@ -64,8 +63,7 @@ inline static bool mostlyEQ(float lhs, float rhs)
   return (fastabs(lhs - rhs) < EPSILON_F);
 };
 
-inline static bool mostlyEQ(fixType lhs, fixType rhs)
-{
+inline static bool mostlyEQ(FixType lhs, FixType rhs) {
   return (fastabs(lhs - rhs).intValue < EPSILON_S);
 };
 

@@ -21,8 +21,6 @@
 #include "fixedpoint/fixed_class.h"
 
 
-typedef fixedpoint::fixed_point<30> fixType;
-
 struct TeamEnvironmentFlags {
   uint8_t hit : 1;
   uint8_t crit : 1;
@@ -69,7 +67,7 @@ struct PKAISHARED EnvironmentPossibleData {
    * the probability of the actions that occured to create this
    * environment are 1
    */
-  fixType probability;
+  FixType probability;
 
   /*
    * what type of action occured to create this environment from
@@ -102,8 +100,8 @@ struct PKAISHARED EnvironmentPossibleData {
 
   const uint64_t& getHash() const { return hash; };
 
-  const fixType& getProbability() const { return probability; };
-  fixType& getProbability() { return probability; };
+  const FixType& getProbability() const { return probability; };
+  FixType& getProbability() { return probability; };
 
   const uint32_t& getBitmask() const { return flags.raw; };
   uint32_t& getBitmask() { return flags.raw; };
@@ -148,8 +146,8 @@ public:
 
   operator environmentvolatile_t() const { return environmentvolatile_t{nv(), data().env}; };
   environmentvolatile_t getEnv() const { return environmentvolatile_t{nv(), data().env}; };
-  
-  const fixType& getProbability() const { return data().getProbability(); };
+
+  const FixType& getProbability() const { return data().getProbability(); };
 
   const uint64_t& getHash() const { return data().getHash(); };
 
@@ -218,8 +216,8 @@ public:
 
   uint32_t& getBitmask() { return data().getBitmask(); };
 
-  fixType& getProbability() { return data().getProbability(); };
-  
+  FixType& getProbability() { return data().getProbability(); };
+
   void setHit(size_t iTeam) {
     data().flags.getTeam(iTeam).hit = 1;
   };

@@ -256,7 +256,7 @@ PkCUEngine::PkCUEngine(
   stack_.push_back(EnvironmentPossibleData::create(initial, false));
   stackStage_.push_back(STAGE_SEEDED);
   damageComponents_.push_back(DamageComponents_t());
-  damageComponents_.back().cProbability = 1.0;
+  damageComponents_.back().cProbability = FixType(1.0f);
 
   setCPluginSet();
 }
@@ -295,7 +295,7 @@ void PkCUEngine::updateState() {
   case 2: {
       // both teams are moving:
       std::array<size_t, 2> iStages;
-      duplicateState(iStages, 0.5);
+      duplicateState(iStages, FixType(0.5));
 
       // first team moves first:
       iBase_ = iStages[0];
@@ -630,17 +630,27 @@ void PkCUEngine::evaluateMove_postMove() {
     if (!getPKV().isAlive()) { stackStage_[iBase_] = STAGE_POSTTURN; continue; }
 
     // does this move even have a secondary effect? (this check is in-loop because multiple environments could arise from previous call)
-    if (!mostlyGT(cMove.getSecondaryAccuracy(), (fpType)0.0)) { stackStage_[iBase_] = STAGE_POSTSECONDARY; continue; }
+    if (!(cMove.getSecondaryAccuracy() > FixType(0))) {
+      stackStage_[iBase_] = STAGE_POSTSECONDARY;
+      continue;
+    }
 
-    fpType& secondaryHitProbability = getDamageComponent().tProbability;
+    FixType& secondaryHitProbability = getDamageComponent().tProbability;
 
     /* probability to inflict secondary condition*/
     secondaryHitProbability = cMove.getSecondaryAccuracy(); // lowest is 10%
 
     // to-hit modifying values:
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYSECONDARYPROBABILITY, onModifyPower_rawType,
-        *this, getMV(), getPKV(), getTPKV(), secondaryHitProbability);
+    CALLPLUGIN(
+        result,
+        PLUGIN_ON_MODIFYSECONDARYPROBABILITY,
+        onModifyProbability_rawType,
+        *this,
+        getMV(),
+        getPKV(),
+        getTPKV(),
+        secondaryHitProbability);
   } // endOf calculate secondary probability
 
   // split environments based on their secondary chance:
@@ -650,23 +660,23 @@ void PkCUEngine::evaluateMove_postMove() {
 
     std::array<size_t, 2> iREnv = {{ getIBase() , SIZE_MAX }};
 
-    fpType& secondaryHitProbability = getDamageComponent().tProbability;
+    FixType& secondaryHitProbability = getDamageComponent().tProbability;
 
-    secondaryHitProbability = std::max(std::min(secondaryHitProbability, (fpType)1.0), (fpType)0.0);
+    secondaryHitProbability =
+        std::max(std::min(secondaryHitProbability, FixType(1)), FixType(0));
 
     // did the ability hit its target? Is it possible for the secondary ability to miss?
-    if (getBase().hasHit(iCTeam) && (mostlyGT(secondaryHitProbability, (fpType)0.0)))
-    {
+    if (getBase().hasHit(iCTeam) && (secondaryHitProbability > FixType(0))) {
       // if there's a chance the secondary effect will not occur:
-      if (mostlyLT(secondaryHitProbability, (fpType)1.0)) {
+      if (secondaryHitProbability < FixType(1)) {
         // duplicate the environment (duplicated environment is the secondary effect missed):
-        duplicateState(iREnv, ((fpType)1.0 - secondaryHitProbability));
+        duplicateState(iREnv, (FixType(1) - secondaryHitProbability));
       }
 
       // modify bitmask as secondary effect occuring:
       getStack().at(iREnv[0]).setSecondary(iCTeam);
 
-    } else { // end of primary attack hits, and secondary attack is not assured
+    } else {  // end of primary attack hits, and secondary attack is not assured
       // pass-through: no chance to secondary
       stackStage_[iBase_] = STAGE_POSTSECONDARY;
       continue;
@@ -935,19 +945,22 @@ void PkCUEngine::evaluateMove_damage() {
     PokemonVolatile cPKV = getPKV();
     PokemonVolatile tPKV = getTPKV();
     MoveVolatile mV = getMV();
-    fpType& probabilityToHit = getDamageComponent().tProbability;
+    FixType& probabilityToHit = getDamageComponent().tProbability;
 
     /* probability to hit enemy pokemon */
-    probabilityToHit =
-        cPKV.getAccuracy_boosted(FV_ACCURACY) // lowest is 33% or 1/3
-        * tPKV.getAccuracy_boosted(FV_EVASION) // highest is 300% or 3
-        * mV.getBase().getPrimaryAccuracy(); // lowest is 30%
+    probabilityToHit = getProbabilityToHit();
 
     // to-hit modifying values:
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYHITPROBABILITY, onModifyPower_rawType,
-      *this, mV, cPKV, tPKV, probabilityToHit);
-
+    CALLPLUGIN(
+        result,
+        PLUGIN_ON_MODIFYHITPROBABILITY,
+        onModifyProbability_rawType,
+        *this,
+        mV,
+        cPKV,
+        tPKV,
+        probabilityToHit);
   }
 
   // evaluate miss(1), hit(0):
@@ -955,24 +968,25 @@ void PkCUEngine::evaluateMove_damage() {
     if (getStackStage() != STAGE_MODIFYHITCHANCE) { continue; }
     advanceStackStage();
 
-    fpType& probabilityToHit = getDamageComponent().tProbability;
+    FixType& probabilityToHit = getDamageComponent().tProbability;
 
     // bound at MIN 0.033~ ... MAX 1.0
-    probabilityToHit = std::max(std::min(probabilityToHit, (fpType)1.0), (fpType)0.0);
+    probabilityToHit =
+        std::max(std::min(probabilityToHit, FixType(1)), FixType(0));
 
     std::array<size_t, 2> iHEnv = {{ getIBase(), SIZE_MAX }};
     // did the move hit its target? Is it possible for the move to miss?
-    if (mostlyGT(probabilityToHit, (fpType)0.0)) {
+    if (probabilityToHit > FixType(0)) {
       // if there's a chance the primary effect will not occur:
-      if (mostlyLT(probabilityToHit, (fpType)1.0)) {
+      if (probabilityToHit < FixType(1)) {
         // duplicate the environment (duplicated environment is the miss environment):
-        duplicateState(iHEnv, ((fpType)1.0 - probabilityToHit));
+        duplicateState(iHEnv, (FixType(1) - probabilityToHit));
       }
 
       // modify bitmask as the hit effect occuring:
       getStack().at(iHEnv[0]).setHit(getICTeam());
 
-    } else { // end of primary attack hits, and secondary attack is not assured
+    } else {  // end of primary attack hits, and secondary attack is not assured
       // pass-through: no chance to hit or crit
       stackStage_[iBase_] = STAGE_POSTDAMAGE;
     }
@@ -987,15 +1001,22 @@ void PkCUEngine::evaluateMove_damage() {
     if (!getBase().hasHit(getICTeam())) { stackStage_[iBase_] = STAGE_POSTDAMAGE; continue; }
 
     PokemonVolatile cPKV = getPKV();
-    fpType& probabilityToCrit = getDamageComponent().tProbability;
+    FixType& probabilityToCrit = getDamageComponent().tProbability;
 
     /* Probability to critical hit, if the move has already hit */
     probabilityToCrit = cPKV.getAccuracy_boosted(FV_CRITICALHIT);
 
     // to-crit modifying values:
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYCRITPROBABILITY, onModifyPower_rawType,
-        *this, getMV(), cPKV, getTPKV(), probabilityToCrit);
+    CALLPLUGIN(
+        result,
+        PLUGIN_ON_MODIFYCRITPROBABILITY,
+        onModifyProbability_rawType,
+        *this,
+        getMV(),
+        cPKV,
+        getTPKV(),
+        probabilityToCrit);
   }
 
   // evaluate crit(2):
@@ -1003,13 +1024,13 @@ void PkCUEngine::evaluateMove_damage() {
     if (getStackStage() != STAGE_MODIFYCRITCHANCE) { continue; }
     advanceStackStage();
 
-    fpType& probabilityToCrit = getDamageComponent().tProbability;
+    FixType& probabilityToCrit = getDamageComponent().tProbability;
 
     // determine the possibility that the move crit:
     std::array<size_t, 2> iCEnv = {{ SIZE_MAX, getIBase() }};
 
-    if (mostlyGT(probabilityToCrit, (fpType)0.0) ) {
-      if (mostlyLT(probabilityToCrit, (fpType)1.0)) {
+    if (probabilityToCrit > FixType(0)) {
+      if (probabilityToCrit < FixType(1)) {
         // duplicate the environment (duplicated environment is the crit environment):
         duplicateState(iCEnv, probabilityToCrit);
       }
@@ -1047,27 +1068,30 @@ void PkCUEngine::evaluateMove_script() {
     //if (getStackStage() != STAGE_MOVEBASE) { continue; }
     stackStage_[iBase_] = STAGE_MODIFYHITCHANCE;
 
-    fpType& probabilityToHit = getDamageComponent().tProbability;
+    FixType& probabilityToHit = getDamageComponent().tProbability;
 
-    // TODO: take target into account when calculating probability to hit!
     /* probability to hit enemy pokemon */
     if (cMove.targetsEnemy()) {
-      probabilityToHit =
-          getPKV().getAccuracy_boosted(FV_ACCURACY) // lowest is 33% or 3333 / 10000
-          * getTPKV().getAccuracy_boosted(FV_EVASION) // highest is 300% or 3
-          * cMove.getPrimaryAccuracy(); // lowest is 30% or 30 / 100
+      probabilityToHit = getProbabilityToHit();
     }
     else
     {
       // TODO(@drendleman) - the probabilityToHit of a move with no accuracy is always 100%
       //probabilityToHit = cMove.getPrimaryAccuracy(); // REMOVED DUE TO ABOVE TODO
-      probabilityToHit = 1.;
+      probabilityToHit = FixType(1);
     }
 
     // to-hit modifying values:
     int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYHITPROBABILITY, onModifyPower_rawType,
-        *this, getMV(), getPKV(), getTPKV(), probabilityToHit);
+    CALLPLUGIN(
+        result,
+        PLUGIN_ON_MODIFYHITPROBABILITY,
+        onModifyProbability_rawType,
+        *this,
+        getMV(),
+        getPKV(),
+        getTPKV(),
+        probabilityToHit);
   }
 
   // evaluate miss(1), hit(0),
@@ -1075,24 +1099,25 @@ void PkCUEngine::evaluateMove_script() {
     if (getStackStage() != STAGE_MODIFYHITCHANCE) { continue; }
     stackStage_[iBase_] = STAGE_PREDAMAGE;
 
-    fpType& probabilityToHit = getDamageComponent().tProbability;
+    FixType& probabilityToHit = getDamageComponent().tProbability;
 
     // bound at MIN 0.033~ ... MAX 1.0
-    probabilityToHit = std::max(std::min(probabilityToHit, (fpType)1.0), (fpType)0.0);
+    probabilityToHit =
+        std::max(std::min(probabilityToHit, FixType(1)), FixType(0));
 
     std::array<size_t, 2> iHEnv = {{ getIBase(), SIZE_MAX }};
     // did the move hit its target? Is it possible for the move to miss?
-    if (mostlyGT(probabilityToHit, (fpType)0.0)) {
+    if (probabilityToHit > FixType(0)) {
       // if there's a chance the primary effect will not occur:
-      if (mostlyLT(probabilityToHit, (fpType)1.0)) {
+      if (probabilityToHit < FixType(1)) {
         // duplicate the environment (duplicated environment is the miss environment):
-        duplicateState(iHEnv, ((fpType)1.0 - probabilityToHit));
+        duplicateState(iHEnv, (FixType(1) - probabilityToHit));
       }
 
       // modify bitmask as the hit effect occuring:
       getStack().at(iHEnv[0]).setHit(getICTeam());
 
-    } else { // end of primary attack hits, and secondary attack is not assured
+    } else {  // end of primary attack hits, and secondary attack is not assured
       // pass-through: no chance to hit
       stackStage_[iBase_] = STAGE_POSTDAMAGE;
     }
@@ -1118,7 +1143,8 @@ void PkCUEngine::evaluateMove_script() {
 
 
 void PkCUEngine::calculateDamage(bool hasCrit) {
-  fpType partitionEnvironmentProbability = (1.0 / (fpType) cfg_.numRandomEnvironments);
+  FixType partitionEnvironmentProbability =
+      (FixType(1) / FixType((int32_t)cfg_.numRandomEnvironments));
   DamageComponents_t& cDMG = getDamageComponent();
 
   uint32_t power = (hasCrit)?cDMG.damageCrit:cDMG.damage;
@@ -1147,7 +1173,28 @@ void PkCUEngine::calculateDamage(bool hasCrit) {
     // inflict damage caused upon the targetPokemon:
     getTPKV(iREnv[1]).modHP(-1 * actualDamage);
   }
+}  // end of evaluateMove_damage
+
+
+FixType PkCUEngine::getProbabilityToHit() {
+  PokemonVolatile cPKV = getPKV();
+  PokemonVolatile tPKV = getTPKV();
+  MoveVolatile mV = getMV();
+
+  /* probability to hit enemy pokemon */
+  // TODO - integer math
+  double probabilityToHitDouble =
+      // lowest is 33% or 3333 / 10000
+      getPKV().getAccuracy_boosted(FV_ACCURACY).to_double() *
+      // highest is 300% or 3
+      getTPKV().getAccuracy_boosted(FV_EVASION).to_double() *
+      // lowest is 30% or 30 / 100
+      mV.getBase().getPrimaryAccuracy().to_double();
+
+  FixType probabilityToHit = FixType(probabilityToHitDouble);
+  return probabilityToHit;
 }
+
 
 /**
  * @brief Combines environments on the stack that are identical.
@@ -1166,7 +1213,7 @@ size_t PkCUEngine::combineSimilarEnvironments() {
 
 #ifndef NDEBUG
 #ifndef _DISABLEPROBABILITYCHECK
-  fpType probabilityAccumulator = 0.0;
+  FixType probabilityAccumulator = FixType(0);
 #endif
 #endif
 
@@ -1186,14 +1233,14 @@ size_t PkCUEngine::combineSimilarEnvironments() {
   for (size_t iOEnv = 0, iSize = stack.size(); iOEnv != iSize; iOEnv++)
   {
     EnvironmentPossible oEnv = stack.at(iOEnv);
-    fpType& oProbability = damageComponents_[iOEnv].cProbability;
+    FixType& oProbability = damageComponents_[iOEnv].cProbability;
 
     // don't attempt to merge pruned environments
     if (oEnv.isPruned()) { continue; }
 
     for (size_t iIEnv = iOEnv + 1; iIEnv != iSize; iIEnv++) {
       EnvironmentPossible iEnv = stack.at(iIEnv);
-      fpType& iProbability = damageComponents_[iIEnv].cProbability;
+      FixType& iProbability = damageComponents_[iIEnv].cProbability;
 
       // don't re-prune already pruned environments
       if (iEnv.isPruned()) { continue; }
@@ -1222,18 +1269,18 @@ size_t PkCUEngine::combineSimilarEnvironments() {
     } //endOf iInner
 
     // assign the collected probability to envP's smaller fixed point variable
-    oEnv.getProbability() = fixedpoint::create<30>(oProbability);
+    oEnv.getProbability() = oProbability;
 
 #ifndef NDEBUG
 #ifndef _DISABLEPROBABILITYCHECK
     probabilityAccumulator += oProbability;
 #endif
 #endif
-    assert(mostlyGT(oProbability, (fpType)0.0) && mostlyLTE(oProbability, (fpType)1.0));
+    assert(oProbability > FixType(0) && oProbability <= FixType(1));
   } // endOf iOuter
 
 #ifndef _DISABLEPROBABILITYCHECK
-  assert(mostlyEQ(probabilityAccumulator, (fpType)1.0));
+  assert(probabilityAccumulator == FixType(1));
 #endif
 
   return stack.getNumUnique();
@@ -1547,14 +1594,17 @@ void PkCU::guardNonvolatileState(const ConstEnvironmentVolatile& cEnv) const {
 
 
 bool saneStackProbability(std::deque<DamageComponents_t>& dComponents) {
-  fpType sum = 0.0;
+  FixType sum = FixType(0);
   for (auto begin = dComponents.begin(), end = dComponents.end(); begin != end; ++begin)
   {
     sum += begin->cProbability;
-    if (!mostlyGTE(begin->cProbability, (fpType)0.0) || !mostlyLTE(begin->cProbability, (fpType)1.0)) { return false; }
+    if (!(begin->cProbability > FixType(0)) ||
+        !(begin->cProbability <= FixType(1))) {
+      return false;
+    }
   }
 
-  return mostlyEQ(sum, (fpType)1.0);
+  return sum == FixType(1);
 }
 
 /**
@@ -1570,21 +1620,21 @@ bool saneStackProbability(std::deque<DamageComponents_t>& dComponents) {
  * @param iState The index of the environment to duplicate.
  */
 void PkCUEngine::duplicateState(
-    std::array<size_t, 2>& result,
-    fpType _probability,
-    size_t iState) {
-  assert(mostlyLTE(_probability, (fpType)1.0));
+    std::array<size_t, 2>& result, FixType _probability, size_t iState) {
+  _probability = std::max(std::min(_probability, FixType(1)), FixType(0));
 
   // duplicate state 2 times
   nPlicateState(result, iState);
 
   // modify probabilities of resulting states:
-  fpType totalProbability = damageComponents_[result[0]].cProbability;
-  damageComponents_[result[1]].cProbability *= _probability;
-  damageComponents_[result[0]].cProbability = totalProbability - damageComponents_[result[1]].cProbability;
+  FixType totalProbability = damageComponents_[result[0]].cProbability;
+  damageComponents_[result[1]].cProbability = totalProbability * _probability;
+  damageComponents_[result[0]].cProbability =
+      totalProbability - damageComponents_[result[1]].cProbability;
 
   assert(saneStackProbability(damageComponents_));
 }
+
 
 /**
  * @brief Duplicates an environment on the stack to represent three possible outcomes.
@@ -1599,19 +1649,25 @@ void PkCUEngine::duplicateState(
  */
 void PkCUEngine::triplicateState(
     std::array<size_t, 3>& result,
-    fpType _probability,
-    fpType _oProbability,
+    FixType _probability,
+    FixType _oProbability,
     size_t iState) {
-  assert(mostlyLTE(_probability + _oProbability, (fpType)1.0));
+  _probability = std::max(std::min(_probability, FixType(1)), FixType(0));
+  _oProbability = std::max(std::min(_oProbability, FixType(1)), FixType(0));
+  if (_probability + _oProbability > FixType(1)) {
+    _oProbability = FixType(1) - _probability;
+  }
 
   // duplicate state 3 times
   nPlicateState(result, iState);
 
   // modify probabilities of resulting states:
-  fpType totalProbability = damageComponents_[result[0]].cProbability;
-  damageComponents_[result[1]].cProbability *= _probability;
-  damageComponents_[result[2]].cProbability *= _oProbability;
-  damageComponents_[result[0]].cProbability = totalProbability - (damageComponents_[result[1]].cProbability + damageComponents_[result[2]].cProbability);
+  FixType totalProbability = damageComponents_[result[0]].cProbability;
+  damageComponents_[result[1]].cProbability = totalProbability * _probability;
+  damageComponents_[result[2]].cProbability = totalProbability * _oProbability;
+  damageComponents_[result[0]].cProbability =
+      totalProbability - damageComponents_[result[1]].cProbability -
+      damageComponents_[result[2]].cProbability;
 
   assert(saneStackProbability(damageComponents_));
 }
@@ -1647,12 +1703,11 @@ MoveVolatile PkCUEngine::getTMV(size_t iState) {
 }
 
 
-const PluginSet& PkCUEngine::getCPluginSet() {
-  return *cPluginSet_;
-};
+const PluginSet& PkCUEngine::getCPluginSet() { return *cPluginSet_; }
 
 
-const PluginSet& PkCU::getCPluginSet(const ConstEnvironmentVolatile& cEnv, size_t iTeam) const {
+const PluginSet& PkCU::getCPluginSet(
+    const ConstEnvironmentVolatile& cEnv, size_t iTeam) const {
   size_t iCPokemon = cEnv.getTeam(iTeam).getICPKV();
   size_t iOPokemon = cEnv.getOtherTeam(iTeam).getICPKV();
   return pluginSets_[iTeam * 6 + iCPokemon][iOPokemon];

@@ -47,28 +47,75 @@ namespace fixedpoint {
 template <int p>
 struct fixed_point {
   int32_t intValue;
-  
-  //fixed_point() {}
-  /*explicit*/ //fixed_point(int32_t i) : intValue(i << p) {}
-  /*explicit*/ //fixed_point(float f) : intValue(float2fix<p>(f)) {}
-  /*explicit*/ //fixed_point(double f) : intValue(double2fix<p>(f)) {}
+
+  fixed_point() {}
+  explicit fixed_point(int32_t i) : intValue(i << p) {}
+  explicit fixed_point(float f) : intValue(float2fix<p>(f)) {}
+  explicit fixed_point(double f) : intValue(double2fix<p>(f)) {}
 
   double to_double() const { return fix2double<p>(this->intValue); };
-  
-  fixed_point& operator += (fixed_point r) { intValue += r.intValue; return *this; }
-  fixed_point& operator -= (fixed_point r) { intValue -= r.intValue; return *this; }
-  fixed_point& operator *= (fixed_point r) { intValue = fixmul<p>(intValue, r.intValue); return *this; }
-  fixed_point& operator /= (fixed_point r) { intValue = fixdiv<p>(intValue, r.intValue); return *this; }
-  
-  //fixed_point& operator *= (int32_t r) { intValue *= r; return *this; }
-  //fixed_point& operator /= (int32_t r) { intValue /= r; return *this; }
-  
-  fixed_point operator - () const { fixed_point x; x.intValue = -intValue; return x; }
-  fixed_point operator + (fixed_point r) const { fixed_point x = *this; x += r; return x;}
-  fixed_point operator - (fixed_point r) const { fixed_point x = *this; x -= r; return x;}
-  fixed_point operator * (fixed_point r) const { fixed_point x = *this; x *= r; return x;}
-  fixed_point operator / (fixed_point r) const { fixed_point x = *this; x /= r; return x;}
-  
+
+  fixed_point& operator+=(fixed_point r) {
+    intValue += r.intValue;
+    return *this;
+  }
+  fixed_point& operator-=(fixed_point r) {
+    intValue -= r.intValue;
+    return *this;
+  }
+  fixed_point& operator*=(fixed_point r) {
+    intValue = fixmul<p>(intValue, r.intValue);
+    return *this;
+  }
+  fixed_point& operator/=(fixed_point r) {
+    intValue = fixdiv<p>(intValue, r.intValue);
+    return *this;
+  }
+
+  fixed_point& operator+=(int32_t r) {
+    intValue += r;
+    return *this;
+  }
+  fixed_point& operator-=(int32_t r) {
+    intValue -= r;
+    return *this;
+  }
+  fixed_point& operator*=(int32_t r) {
+    intValue *= r;
+    return *this;
+  }
+  fixed_point& operator/=(int32_t r) {
+    intValue /= r;
+    return *this;
+  }
+
+
+  fixed_point operator-() const {
+    fixed_point x;
+    x.intValue = -intValue;
+    return x;
+  }
+  fixed_point operator+(fixed_point r) const {
+    fixed_point x = *this;
+    x += r;
+    return x;
+  }
+  fixed_point operator-(fixed_point r) const {
+    fixed_point x = *this;
+    x -= r;
+    return x;
+  }
+  fixed_point operator*(fixed_point r) const {
+    fixed_point x = *this;
+    x *= r;
+    return x;
+  }
+  fixed_point operator/(fixed_point r) const {
+    fixed_point x = *this;
+    x /= r;
+    return x;
+  }
+
   bool operator == (fixed_point r) const { return intValue == r.intValue; }
   bool operator != (fixed_point r) const { return !(*this == r); }
   bool operator <  (fixed_point r) const { return intValue < r.intValue; }
@@ -76,15 +123,32 @@ struct fixed_point {
   bool operator <= (fixed_point r) const { return intValue <= r.intValue; }
   bool operator >= (fixed_point r) const { return intValue >= r.intValue; }
 
-  //fixed_point operator + (int32_t r) const { fixed_point x = *this; x += r; return x;}
-  //fixed_point operator - (int32_t r) const { fixed_point x = *this; x -= r; return x;}
-  //fixed_point operator * (int32_t r) const { fixed_point x = *this; x *= r; return x;}
-  //fixed_point operator / (int32_t r) const { fixed_point x = *this; x /= r; return x;}
+  fixed_point operator+(int32_t r) const {
+    fixed_point x = *this;
+    x += r;
+    return x;
+  }
+  fixed_point operator-(int32_t r) const {
+    fixed_point x = *this;
+    x -= r;
+    return x;
+  }
+  fixed_point operator*(int32_t r) const {
+    fixed_point x = *this;
+    x *= r;
+    return x;
+  }
+  fixed_point operator/(int32_t r) const {
+    fixed_point x = *this;
+    x /= r;
+    return x;
+  }
 };
 
-template<int p>
-static fixed_point<p> create(double f) 
-{ fixed_point<p> retValue = { double2fix<p>(f) }; return retValue; };
+template <int p>
+static fixed_point<p> create(double f) {
+  return fixed_point<p>(double2fix<p>(f));
+};
 
 // Specializations for use with plain integers
 template <int p>

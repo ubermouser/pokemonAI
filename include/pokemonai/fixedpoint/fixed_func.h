@@ -163,26 +163,22 @@ inline int fixinv(int32_t a)
 // Conversion from and to float
 
 template <int p>
-float fix2float(int32_t f)
-{
+float fix2float(int32_t f) {
   return (float)f / (1 << p);
 }
 
 template <int p>
-double fix2double(int32_t f)
-{
+double fix2double(int32_t f) {
   return (double)f / (1 << p);
 }
 
 template <int p>
-int32_t float2fix(float f)
-{
+int32_t float2fix(float f) {
   return (int32_t)(f * (1 << p));
 }
 
 template <int p>
-int32_t double2fix(double f)
-{
+int32_t double2fix(double f) {
   return (int32_t)(f * (1 << p));
 }
 

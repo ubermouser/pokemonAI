@@ -267,7 +267,8 @@ uint32_t POKEMON_VOLATILE_IMPL::getFV_boosted(size_t type, int32_t tempBoost) co
 
 
 POKEMON_VOLATILE_IMPL_TEMPLATE
-fpType POKEMON_VOLATILE_IMPL::getAccuracy_boosted(size_t type, int32_t tempBoost) const {
+FixType POKEMON_VOLATILE_IMPL::getAccuracy_boosted(
+    size_t type, int32_t tempBoost) const {
   int32_t cBoost = getBoost(type) + tempBoost;
   cBoost = std::min(std::max(cBoost, -6), 6);
   return PokemonNonVolatile::aFV_base[type - 6][cBoost + 6];

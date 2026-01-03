@@ -107,7 +107,7 @@ int engine_beginTurnNonvolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
   case AIL_NV_FREEZE: {
     // generate a new environment on the result array:
     std::array<size_t, 2> iREnv;
-    cu.duplicateState(iREnv, 0.8);
+    cu.duplicateState(iREnv, FixType(0.8));
 
     // 80% chance for frozen status effect to prevent user from moving:
     {
@@ -127,8 +127,8 @@ int engine_beginTurnNonvolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
   case AIL_NV_SLEEP_3T:
   case AIL_NV_SLEEP_2T:
   case AIL_NV_SLEEP_1T: {
-    static const std::array<fpType, 4> sleepStatusProb = {
-        {0.5, 1.0 / 3.0, 0.25, 0.0}};
+    static const std::array<FixType, 4> sleepStatusProb = {
+        {FixType(0.5), FixType(1.0 / 3.0), FixType(0.25), FixType(0.0)}};
     // decrement sleep counter (no effect until next turn)
     cPKV.setStatusAilment(cPKV.getStatusAilment() - 1);
 
@@ -149,7 +149,7 @@ int engine_beginTurnNonvolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
   case AIL_NV_PARALYSIS: {
     // generate a new environment on the result array:
     std::array<size_t, 2> iREnv;
-    cu.duplicateState(iREnv, 0.25);
+    cu.duplicateState(iREnv, FixType(0.25));
     // 25% chance to be paralyzed and not move
     cu.getStack().at(iREnv[1]).setBlocked(cu.getICTeam());
     break;
@@ -174,7 +174,7 @@ int engine_beginTurnVolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
     if (iConfused != AIL_V_CONFUSED_0T) {
       // 50% chance to move:
       std::array<size_t, 2> iREnv;
-      cu.duplicateState(iREnv, 0.5);
+      cu.duplicateState(iREnv, FixType(0.5));
 
       PokemonVolatile cConfusedPKV = cu.getPKV(iREnv[1]);
 
@@ -191,8 +191,8 @@ int engine_beginTurnVolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
             std::min((unsigned)4, iConfused - AIL_V_CONFUSED_0T);
         uint32_t numTerminalEnv =
             ((iConfused - AIL_V_CONFUSED_0T) >= 5) ? 0 : 1;
-        fpType terminalProbability =
-            ((fpType)numTerminalEnv) / ((fpType)numTotalEnv);
+        FixType terminalProbability =
+            FixType((float)numTerminalEnv) / FixType((float)numTotalEnv);
 
         std::array<size_t, 2> iTEnv;
 

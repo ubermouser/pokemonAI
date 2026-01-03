@@ -116,7 +116,7 @@ public:
   uint32_t getFV_boosted(size_t type, int32_t tempBoost = 0) const;
 
   /* get the boosted final value for the accuracy or evasion stat */
-  fpType getAccuracy_boosted(size_t type, int32_t tempBoost = 0) const;
+  FixType getAccuracy_boosted(size_t type, int32_t tempBoost = 0) const;
 
   uint32_t getStatusAilment() const { return data().status_nonvolatile; }
 
@@ -150,7 +150,7 @@ public:
 
   /* set target's hp to % quantity of total */
   void setPercentHP(fpType percent);
-  
+
   /* increment target's HP by percent of total. */
   void modPercentHP(fpType percent);
 

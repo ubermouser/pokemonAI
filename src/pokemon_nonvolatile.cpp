@@ -23,7 +23,7 @@
 using namespace orphan;
 namespace pt = boost::property_tree;
 
-std::array< std::array<fpType, 13>, 3> PokemonNonVolatile::aFV_base;
+std::array<std::array<FixType, 13>, 3> PokemonNonVolatile::aFV_base;
 
 PokemonNonVolatile::PokemonNonVolatile()
   : Name(),
@@ -490,14 +490,12 @@ void PokemonNonVolatile::setFV(unsigned int targetFV) {
   }
   else if (targetFV == FV_ACCURACY || targetFV == FV_EVASION)
   {
-    aFV_base[targetFV - 6][STAGE0] = 1.0; // 1.0
-  }
-  else if (targetFV == FV_CRITICALHIT)
-  {
+    aFV_base[targetFV - 6][STAGE0] = FixType(1.0f);  // 1.0
+  } else if (targetFV == FV_CRITICALHIT) {
     // critical hit stage 1 is hardcoded
-    aFV_base[targetFV - 6][STAGE0] =  0.0625; //(ACCURACY_EVASION_INTEGER * 0.0625);
-  }
-  else // for atk, spa, def, spd, spe
+    aFV_base[targetFV - 6][STAGE0] =
+        FixType(0.0625f);  //(ACCURACY_EVASION_INTEGER * 0.0625);
+  } else                   // for atk, spa, def, spd, spe
   {
     unsigned int baseStat = base_->baseStats_[targetFV];
     unsigned int iv = IV_[targetFV];
@@ -522,55 +520,54 @@ void PokemonNonVolatile::setFV(unsigned int targetFV) {
     }
     else if (targetFV == FV_ACCURACY || targetFV == FV_EVASION)
     {
-      fpType boostNumerator = 1, boostDenominator = 1;
+      double boostMultiplier;
       if (boostStage >= 1)
       {
-        boostNumerator = 3 + boostStage;
-        boostDenominator = 3;
+        boostMultiplier = (double)(3 + boostStage) / 3.0;
       }
       else // boostStage <= -1
       {
-        boostNumerator = 3;
-        boostDenominator = 3 - boostStage;
+        boostMultiplier = 3.0 / (double)(3 - boostStage);
       }
 
       if (targetFV == FV_ACCURACY)
       {
-        aFV_base[targetFV - 6][iBoost] = (aFV_base[targetFV - 6][STAGE0] * boostNumerator) / boostDenominator;
+        aFV_base[targetFV - 6][iBoost] = FixType(
+            aFV_base[targetFV - 6][STAGE0].to_double() * boostMultiplier);
       }
       else // evasion is accuracy's modification flipped
       {
-        aFV_base[targetFV - 6][iBoost] = (aFV_base[targetFV - 6][STAGE0] * boostDenominator) / boostNumerator;
+        aFV_base[targetFV - 6][iBoost] = FixType(
+            aFV_base[targetFV - 6][STAGE0].to_double() / boostMultiplier);
       }
-
     }// endOf if FV_ACCURACY or FV_EVASION
     else if (targetFV == FV_CRITICALHIT)
     {
       // values of critical hit are hardcoded, and are always 0 when less than stage 0
-      fpType boosted_FV;
+      FixType boosted_FV;
 
       // values of critical hit hardcoded
       switch(boostStage)
       {
         default:
-          boosted_FV = 0.0; // no critical hit possible
+          boosted_FV = FixType(0.0);  // no critical hit possible
           break;
         case 0:
-          boosted_FV = 0.0625; // ACCURACY_EVASION_INTEGER * .0625
+          boosted_FV = FixType(0.0625);  // ACCURACY_EVASION_INTEGER * .0625
           break;
         case 1:
-          boosted_FV = 0.125; // ACCURACY_EVASION_INTEGER * .125
+          boosted_FV = FixType(0.125);  // ACCURACY_EVASION_INTEGER * .125
           break;
         case 2:
-          boosted_FV = 0.25; // ACCURACY_EVASION_INTEGER * .25
+          boosted_FV = FixType(0.25);  // ACCURACY_EVASION_INTEGER * .25
           break;
         case 3:
-          boosted_FV = (1.0/3.0); // ACCURACY_EVASION_INTEGER * .333
+          boosted_FV = FixType(1.0 / 3.0);  // ACCURACY_EVASION_INTEGER * .333
           break;
         case 4: // maximum stage for critical hit is 4
         case 5:
         case 6:
-          boosted_FV = 0.5; // ACCURACY_EVASION_INTEGER * .5
+          boosted_FV = FixType(0.5);  // ACCURACY_EVASION_INTEGER * .5
           break;
       }
 

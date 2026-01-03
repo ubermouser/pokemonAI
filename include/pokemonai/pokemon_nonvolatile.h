@@ -110,7 +110,7 @@ public:
    */
   std::array< std::array<uint16_t, 13>, 6> FV_base_;
 
-  static std::array< std::array<fpType, 13>, 3> aFV_base;
+  static std::array<std::array<FixType, 13>, 3> aFV_base;
 
   /*
    * update the final value of a given pokemon_base, a value referenced in combat

@@ -283,7 +283,7 @@ int move_taunt_set(
 
   std::array<size_t, 3> iREnv;
   // equal probability for 3, 4, and 5 turns
-  cu.triplicateState(iREnv, 1.0 / 3.0, 1.0 / 3.0);
+  cu.triplicateState(iREnv, FixType(1.0f / 3.0f), FixType(1.0f / 3.0f));
 
   // case 1: 3 turns
   {
@@ -818,7 +818,7 @@ int move_highCrit(
     MoveVolatile mV,
     PokemonVolatile cPKV,
     PokemonVolatile tPKV,
-    fpType& probabilityToCrit) {
+    FixType& probabilityToCrit) {
   const Move* tMove = &mV.getBase();
   if ((tMove != airCutter_t) && (tMove != attackOrder_t) &&
       (tMove != blazeKick_t) && (tMove != crabHammer_t) &&
@@ -875,7 +875,7 @@ int move_alwaysHits(
     MoveVolatile mV,
     PokemonVolatile cPKV,
     PokemonVolatile tPKV,
-    fpType& probabilityToHit) {
+    FixType& probabilityToHit) {
   const Move* cMove = &mV.getBase();
   if ((cMove != auraSphere_t) && (cMove != shockWave_t) &&
       (cMove != magnetBomb_t) && (cMove != shadowPunch_t) &&
@@ -884,7 +884,7 @@ int move_alwaysHits(
     return 0;
   }
 
-  probabilityToHit = 1.0;
+  probabilityToHit = FixType(1.0f);
 
   // do not allow anything to affect hit chance other than this if the move
   // always hits:
@@ -924,14 +924,14 @@ int move_pursuit_modAccuracy(
     MoveVolatile mV,
     PokemonVolatile cPKV,
     PokemonVolatile tPKV,
-    fpType& probabilityToHit) {
+    FixType& probabilityToHit) {
   if (&mV.getBase() != pursuit_t) { return 0; }
 
   // if the enemy's move is a swap move:
   if (!cu.getOAction().isSwitch()) { return 1; }
 
   // the move never misses if the enemy move is a switch-in:
-  probabilityToHit = 1.0;
+  probabilityToHit = FixType(1.0f);
   return 2;
 }
 
@@ -963,7 +963,7 @@ int move_outrage_endLockOn(PkCUEngine& cu, PokemonVolatile cPKV) {
   // 50% chance to end at stage 1:
   if (status.cTeammate.lockIn_duration == 2) {
     std::array<size_t, 2> iREnv;
-    cu.duplicateState(iREnv, 0.5);
+    cu.duplicateState(iREnv, FixType(0.5f));
 
     PokemonVolatile rPKV = cu.getPKV(iREnv[1]);
     // state #1: pokemon snaps out of dragon dance immediatelay and becomes
@@ -1098,7 +1098,7 @@ int ability_noGuard(
     MoveVolatile mV,
     PokemonVolatile cPKV,
     PokemonVolatile tPKV,
-    fpType& probabilityToHit) {
+    FixType& probabilityToHit) {
   bool doNoGuard = false;
   if ((cPKV.nv().abilityExists() && (&(cPKV.nv().getAbility()) == noGuard_t)) ||
       (tPKV.nv().abilityExists() && (&(tPKV.nv().getAbility()) == noGuard_t))) {
@@ -1107,7 +1107,7 @@ int ability_noGuard(
 
   if (!doNoGuard) { return 0; }
 
-  probabilityToHit = 1.0;
+  probabilityToHit = FixType(1.0);
 
   // do not allow anything to affect hit chance other than this if no guard
   // occurs;
@@ -1214,7 +1214,7 @@ int ability_sereneGrace(
     MoveVolatile mV,
     PokemonVolatile cPKV,
     PokemonVolatile tPKV,
-    fpType& probabilityToSecondary) {
+    FixType& probabilityToSecondary) {
   if (!cPKV.nv().abilityExists() ||
       (&(cPKV.nv().getAbility()) != sereneGrace_t)) {
     return 0;
@@ -1225,7 +1225,9 @@ int ability_sereneGrace(
   if (!((dType == ATK_PHYSICAL) || (dType == ATK_SPECIAL))) { return 0; }
 
   // multiply secondary probability by 2
-  probabilityToSecondary *= 2.0;
+  double probability = std::min(
+      probabilityToSecondary.to_double() * 2., 1.);  // TODO - integer math
+  probabilityToSecondary = FixType(probability);
 
   return 1;
 };
@@ -1611,7 +1613,7 @@ int engine_beginTurnNonvolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
   case AIL_NV_FREEZE: {
     // generate a new environment on the result array:
     std::array<size_t, 2> iREnv;
-    cu.duplicateState(iREnv, 0.8);
+    cu.duplicateState(iREnv, FixType(0.8f));
 
     // 80% chance for frozen status effect to prevent user from moving:
     {
@@ -1631,8 +1633,8 @@ int engine_beginTurnNonvolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
   case AIL_NV_SLEEP_3T:
   case AIL_NV_SLEEP_2T:
   case AIL_NV_SLEEP_1T: {
-    static const std::array<fpType, 4> sleepStatusProb = {
-        {0.5, 1.0 / 3.0, 0.25, 0.0}};
+    static const std::array<FixType, 4> sleepStatusProb = {
+        {FixType(0.5), FixType(1.0 / 3.0), FixType(0.25), FixType(0.0)}};
     // decrement sleep counter (no effect until next turn)
     cPKV.setStatusAilment(cPKV.getStatusAilment() - 1);
 
@@ -1653,7 +1655,7 @@ int engine_beginTurnNonvolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
   case AIL_NV_PARALYSIS: {
     // generate a new environment on the result array:
     std::array<size_t, 2> iREnv;
-    cu.duplicateState(iREnv, 0.25);
+    cu.duplicateState(iREnv, FixType(0.25));
     // 25% chance to be paralyzed and not move
     cu.getStack().at(iREnv[1]).setBlocked(cu.getICTeam());
     break;
@@ -1678,7 +1680,7 @@ int engine_beginTurnVolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
     if (iConfused != AIL_V_CONFUSED_0T) {
       // 50% chance to move:
       std::array<size_t, 2> iREnv;
-      cu.duplicateState(iREnv, 0.5);
+      cu.duplicateState(iREnv, FixType(0.5));
 
       PokemonVolatile cConfusedPKV = cu.getPKV(iREnv[1]);
 
@@ -1695,8 +1697,8 @@ int engine_beginTurnVolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
             std::min((unsigned)4, iConfused - AIL_V_CONFUSED_0T);
         uint32_t numTerminalEnv =
             ((iConfused - AIL_V_CONFUSED_0T) >= 5) ? 0 : 1;
-        fpType terminalProbability =
-            ((fpType)numTerminalEnv) / ((fpType)numTotalEnv);
+        FixType terminalProbability =
+            FixType((float)numTerminalEnv) / FixType((float)numTotalEnv);
 
         std::array<size_t, 2> iTEnv;
 

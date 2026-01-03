@@ -22,8 +22,10 @@ typedef double fpType;
 typedef float fpType;
 #define FP_EPSILON 0.00001
 #endif
-typedef fixedpoint::fixed_point<30> fixType;
-#define FIX_EPSILON 108 // this value is "equivalent" to the FP_EPSILON for doubles above
+typedef fixedpoint::fixed_point<30> FixType;
+typedef FixType fixType;
+#define FIX_EPSILON \
+  108  // this value is "equivalent" to the FP_EPSILON for doubles above
 
 
 // Global constants:

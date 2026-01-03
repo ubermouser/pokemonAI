@@ -77,7 +77,7 @@ public:
   uint32_t cGetFV_boosted(size_t type, int32_t tempBoost = 0) const {
     return getPKV().getFV_boosted(type, tempBoost);
   };
-  fpType cGetAccuracy_boosted(size_t type, int32_t tempBoost = 0) const {
+  FixType cGetAccuracy_boosted(size_t type, int32_t tempBoost = 0) const {
     return getPKV().getAccuracy_boosted(type, tempBoost);
   };
 

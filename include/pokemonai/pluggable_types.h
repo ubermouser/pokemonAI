@@ -72,6 +72,9 @@ typedef int (*onModifyTypePower_rawType)
   PokemonVolatile,
   fpType&);
 
+typedef int (*onModifyProbability_rawType)(
+    PkCUEngine&, MoveVolatile, PokemonVolatile, PokemonVolatile, FixType&);
+
 typedef int (*onModifyMoveType_rawType)
   (PkCUEngine&,
   MoveVolatile,
