@@ -268,12 +268,13 @@ EvalResult Planner::recurse_gamma(
       size_t* nodesEvaluated) const {
   size_t numNodes = 0;
   // average fitness of all states combined:
-  EvalResult result{Fitness{0., 0.}, agentAction, otherAction};
+  EvalResult result{
+      Fitness{fpType(0), Fitness::prob_zero()}, agentAction, otherAction};
 
   auto rEnvP = generateStates(origin, agentAction, otherAction);
   for (const auto& cEnvP : rEnvP.getValidEnvironments(true)) {
     // the likelihood that this state occurs:
-    fpType stateProbability = cEnvP.getProbability().to_double();
+    FixType stateProbability = cEnvP.getProbability();
     // this individual state's fitness:
     EvalResult child;
 

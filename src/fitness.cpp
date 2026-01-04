@@ -22,9 +22,9 @@ std::ostream& operator <<(std::ostream& os, const Fitness& fitness) {
 
 FITNESS_TEMPLATE void FITNESS_IMPL::assertValidity() const {
   assert(value_ >= min_fitness() && value_ <= max_fitness());
-  assert(certainty_ >= zero() && certainty_ <= one());
+  assert(certainty_ >= prob_zero() && certainty_ <= prob_one());
   assert(upperBound() <= max_fitness() && lowerBound() >= min_fitness());
 }
 
 
-template class FitnessType<fpType, 0, 1, 1>;
+template class FitnessType<fpType, FixType, 0, 1, 1>;

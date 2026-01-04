@@ -27,7 +27,7 @@ struct FitnessDepth {
   static FitnessDepth worst() { return FitnessDepth{Fitness::worst(), MAXTRIES}; }
   static FitnessDepth best() { return FitnessDepth{Fitness::best(), MAXTRIES}; }
 
-  FitnessDepth expand(const Fitness::precision_t& probability) const {
+  FitnessDepth expand(const Fitness::probability_t& probability) const {
     return FitnessDepth{fitness.expand(probability), depth};
   }
 

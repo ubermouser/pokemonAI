@@ -54,6 +54,8 @@ struct fixed_point {
   explicit fixed_point(double f) : intValue(double2fix<p>(f)) {}
 
   double to_double() const { return fix2double<p>(this->intValue); };
+  explicit operator double() const { return to_double(); }
+  explicit operator float() const { return static_cast<float>(to_double()); }
 
   fixed_point& operator+=(fixed_point r) {
     intValue += r.intValue;

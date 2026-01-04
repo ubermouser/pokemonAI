@@ -16,17 +16,33 @@
 #include "fp_compare.h"
 
 
-#define FITNESS_TEMPLATE template<typename PrecisionType, int min_fitness_t, int max_fitness_t, int fitness_d>
-#define FITNESS_IMPL FitnessType<PrecisionType, min_fitness_t, max_fitness_t, fitness_d>
+#define FITNESS_TEMPLATE        \
+  template <                    \
+      typename PrecisionType,   \
+      typename ProbabilityType, \
+      int min_fitness_t,        \
+      int max_fitness_t,        \
+      int fitness_d>
+#define FITNESS_IMPL   \
+  FitnessType<         \
+      PrecisionType,   \
+      ProbabilityType, \
+      min_fitness_t,   \
+      max_fitness_t,   \
+      fitness_d>
 
 FITNESS_TEMPLATE
 class FitnessType {
 public:
   using fitness_t = FITNESS_IMPL;
   using precision_t = PrecisionType;
+  using probability_t = ProbabilityType;
 
   static constexpr PrecisionType one() { return PrecisionType(1.0); }
   static constexpr PrecisionType zero() { return PrecisionType(0.0); }
+  static constexpr ProbabilityType prob_one() { return ProbabilityType(1.0); }
+  static constexpr ProbabilityType prob_zero() { return ProbabilityType(0.0); }
+
   static constexpr PrecisionType max_fitness() {
     return PrecisionType(max_fitness_t) / PrecisionType(fitness_d);
   }
@@ -35,16 +51,18 @@ public:
   }
 
   static constexpr fitness_t worst() {
-    return fitness_t{-std::numeric_limits<PrecisionType>::infinity(), one(), false};
+    return fitness_t{
+        -std::numeric_limits<PrecisionType>::infinity(), prob_one(), false};
   }
   static constexpr fitness_t best() {
-    return fitness_t{std::numeric_limits<PrecisionType>::infinity(), one(), false};
+    return fitness_t{
+        std::numeric_limits<PrecisionType>::infinity(), prob_one(), false};
   }
 
   explicit FitnessType(
       const PrecisionType& value = min_fitness(),
-      const PrecisionType& certainty = one()) :
-      FitnessType(value, certainty, true) {}
+      const ProbabilityType& certainty = prob_one())
+      : FitnessType(value, certainty, true) {}
   ~FitnessType() {};
   FitnessType(const fitness_t& other) = default;
 
@@ -54,18 +72,19 @@ public:
   }
   fitness_t& operator +=(const fitness_t& rhs) {
     // average the two values together in accordance to their certainty:
-    value_ = (certainty() * value_) + (rhs.certainty() * rhs.value_);
+    value_ = (static_cast<PrecisionType>(certainty_) * value_) +
+             (static_cast<PrecisionType>(rhs.certainty_) * rhs.value_);
     // combine certainty:
-    certainty_ += rhs.certainty();
+    certainty_ += rhs.certainty_;
     // normalize value by certainty:
     // TODO(@drendleman) - unstable when certainty_ is small!
-    value_ /= certainty_;
+    value_ /= static_cast<PrecisionType>(certainty_);
 
     assertValidity();
     return *this;
   }
 
-  fitness_t expand(const PrecisionType& probability)const {
+  fitness_t expand(const ProbabilityType& probability) const {
     return fitness_t{value_, certainty_ * probability, false};
   }
 
@@ -77,34 +96,39 @@ public:
   bool operator !=(const fitness_t& rhs) const { return !(*this == rhs); }
 
   /* @brief when true, this fitness score includes only leaf evaluations. */
-  bool fullyEvaluated() const {
-    return mostlyEQ(certainty(), one());
-  }
+  bool fullyEvaluated() const { return mostlyEQ(certainty(), prob_one()); }
 
-  PrecisionType upperBound() const { return (value_ * certainty()) + (max_fitness() * uncertainty()); }
-  PrecisionType lowerBound() const { return (value_ * certainty()) + (min_fitness() * uncertainty()); }
+  PrecisionType upperBound() const {
+    return (value_ * static_cast<PrecisionType>(certainty_)) +
+           (max_fitness() * static_cast<PrecisionType>(uncertainty()));
+  }
+  PrecisionType lowerBound() const {
+    return (value_ * static_cast<PrecisionType>(certainty_)) +
+           (min_fitness() * static_cast<PrecisionType>(uncertainty()));
+  }
   const PrecisionType& value() const { return value_; }
-  const PrecisionType& certainty() const { return certainty_; }
-  PrecisionType uncertainty() const { return one() - certainty_; }
+  const ProbabilityType& certainty() const { return certainty_; }
+  ProbabilityType uncertainty() const { return prob_one() - certainty_; }
 
   void print() const;
   std::ostream& print(std::ostream& os) const;
 protected:
-  explicit FitnessType(
-      const PrecisionType& value,
-      const PrecisionType& certainty,
-      bool doAssertValidity) : value_(value), certainty_(certainty) {
-    if (doAssertValidity) { assertValidity(); }
-  }
+ explicit FitnessType(
+     const PrecisionType& value,
+     const ProbabilityType& certainty,
+     bool doAssertValidity)
+     : value_(value), certainty_(certainty) {
+   if (doAssertValidity) { assertValidity(); }
+ }
 
   void assertValidity() const;
 
   PrecisionType value_;
 
-  PrecisionType certainty_;
+  ProbabilityType certainty_;
 };
 
-using Fitness = FitnessType<fpType, 0, 1, 1>;
+using Fitness = FitnessType<fpType, FixType, 0, 1, 1>;
 
 
 std::ostream& operator <<(std::ostream& os, const Fitness& fitness);
