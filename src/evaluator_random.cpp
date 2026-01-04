@@ -7,9 +7,9 @@ EvalResult EvaluatorRandom::calculateFitness(
   // TODO(@drendleman) choose valid actions?
   // TODO(@drendleman) terminal fitness?
   EvalResult result = {
-    Fitness{(fpType)rand() / (fpType) RAND_MAX},
-    Action{rand() % (Action::MOVE_LAST)},
-    Action{rand() % (Action::MOVE_LAST)}
-  };
+      Fitness{std::clamp(
+          (fpType)rand() / (fpType)RAND_MAX, (fpType)0.0, (fpType)1.0)},
+      Action{rand() % (Action::MOVE_LAST)},
+      Action{rand() % (Action::MOVE_LAST)}};
   return result;
 };

@@ -2,6 +2,7 @@
 #include "pokemonai/fitness.h"
 #include "pokemonai/fp_compare.h"
 
+
 TEST(FitnessTest, Uncertainty) {
   Fitness f1(fpType(0.5), FixType(0.7));
   EXPECT_TRUE(mostlyEQ(f1.uncertainty(), FixType(0.3)));
@@ -9,6 +10,7 @@ TEST(FitnessTest, Uncertainty) {
   Fitness f2(fpType(0.5), FixType(1.0));
   EXPECT_TRUE(mostlyEQ(f2.uncertainty(), FixType(0.0)));
 }
+
 
 TEST(FitnessTest, Bounds) {
   // Fitness range is 0 to 1 for generic Fitness type.
@@ -29,6 +31,7 @@ TEST(FitnessTest, Bounds) {
   EXPECT_TRUE(mostlyEQ(f2.lowerBound(), fpType(0.7)));
 }
 
+
 TEST(FitnessTest, Expand) {
   Fitness f1(fpType(0.5), FixType(0.8));
   FixType prob(0.5);
@@ -37,6 +40,7 @@ TEST(FitnessTest, Expand) {
   EXPECT_TRUE(mostlyEQ(f2.value(), fpType(0.5)));
   EXPECT_TRUE(mostlyEQ(f2.certainty(), FixType(0.4))); // 0.8 * 0.5
 }
+
 
 TEST(FitnessTest, Comparison) {
     Fitness f1(fpType(0.5), FixType(0.8)); // Bounds [0.4, 0.6]
@@ -55,6 +59,7 @@ TEST(FitnessTest, Comparison) {
     EXPECT_FALSE(f3 < f1);
 }
 
+
 TEST(FitnessTest, Addition) {
     Fitness f1(fpType(0.4), FixType(0.5));
     Fitness f2(fpType(0.8), FixType(0.3));
@@ -68,4 +73,16 @@ TEST(FitnessTest, Addition) {
     f1 += f2;
     EXPECT_TRUE(mostlyEQ(f1.value(), fpType(0.55)));
     EXPECT_TRUE(mostlyEQ(f1.certainty(), FixType(0.8)));
+}
+
+
+TEST(FitnessTest, ReproductionRounding) {
+  Fitness f_acc(1.0f, FixType(0.9));
+  Fitness f_drift(1.0f, FixType(0.1));
+  // Adding two perfectly valid 1.0 values should not produce a 1.0000001
+  // that fails assertion, even in single precision.
+  f_acc += f_drift;
+  EXPECT_TRUE(mostlyEQ(f_acc.value(), fpType(1.0)));
+  EXPECT_TRUE(mostlyEQ(f_acc.certainty(), FixType(1.0)));
+  EXPECT_TRUE(f_acc.fullyEvaluated());
 }

@@ -59,7 +59,7 @@ void EvaluatorSimple::resetName() {
 
 fpType EvaluatorSimple::fitness_move(const ConstMoveVolatile& mV) const {
   fpType fitness = (mV.getPercentPP() * (1. - cfg_.canMoveBias)) + (mV.hasPP() * (cfg_.canMoveBias));
-  return fitness;
+  return std::clamp(fitness, (fpType)0.0, (fpType)1.0);
 }
 
 
@@ -79,7 +79,7 @@ fpType EvaluatorSimple::fitness_pokemon(const ConstPokemonVolatile& pV) const {
       (moveAccumulator * cfg_.movesBias) +
       (isAlive * cfg_.aliveBias) +
       (pV.getPercentHP() * hpBias);
-  return fitness;
+  return std::clamp(fitness, (fpType)0.0, (fpType)1.0);
 }
 
 
@@ -94,8 +94,8 @@ fpType EvaluatorSimple::fitness_team(const ConstTeamVolatile& tV) const {
   fpType fitness =
       (pokemonAccumulator * (1. - cfg_.teamAliveBias)) +
       (isAlive * cfg_.teamAliveBias);
-  
-  return fitness;
+
+  return std::clamp(fitness, (fpType)0.0, (fpType)1.0);
 };
 
 

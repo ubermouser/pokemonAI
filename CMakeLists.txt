@@ -20,7 +20,7 @@ include_directories(. include ${Boost_INCLUDE_DIRS})
 # Add preprocessor definitions
 add_compile_definitions(
     _SCL_SECURE_NO_WARNINGS
-    DOUBLEPRECISION
+    SINGLEPRECISION
 )
 
 # Configuration-specific settings

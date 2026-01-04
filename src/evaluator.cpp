@@ -85,11 +85,11 @@ Fitness Evaluator::combineTeamFitness(fpType _agentFitness, fpType _otherFitness
 
   fpType maxFitness = std::max(agentFitness, otherFitness);
   // if maxFitness is about 0, we've tied the game. Ties do not favor either team
-  if (mostlyEQ(maxFitness, 0.0)) { return Fitness{0.5}; }
+  if (mostlyEQ(maxFitness, (fpType)0.0)) { return Fitness{0.5}; }
 
   fpType fitness = (agentFitness - otherFitness) / maxFitness;
 
   // normalize fitness from 0..1 instead of -1..1
   fitness = (fitness + 1.0) / 2.0;
-  return Fitness{fitness};
+  return Fitness{std::clamp(fitness, (fpType)0.0, (fpType)1.0)};
 }

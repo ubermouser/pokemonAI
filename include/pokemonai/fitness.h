@@ -8,12 +8,12 @@
 #ifndef FITNESS_H
 #define FITNESS_H
 
-#include "pkai.h"
-
+#include <algorithm>
 #include <iosfwd>
 #include <limits>
 
 #include "fp_compare.h"
+#include "pkai.h"
 
 
 #define FITNESS_TEMPLATE        \
@@ -72,13 +72,17 @@ public:
   }
   fitness_t& operator +=(const fitness_t& rhs) {
     // average the two values together in accordance to their certainty:
-    value_ = (static_cast<PrecisionType>(certainty_) * value_) +
-             (static_cast<PrecisionType>(rhs.certainty_) * rhs.value_);
+    // using double for intermediate math prevents rounding errors from pushing
+    // the value out of bounds when PrecisionType is float.
+    double new_value =
+        (static_cast<double>(certainty_) * static_cast<double>(value_)) +
+        (static_cast<double>(rhs.certainty_) * static_cast<double>(rhs.value_));
     // combine certainty:
-    certainty_ += rhs.certainty_;
+    certainty_ = std::min(prob_one(), certainty_ + rhs.certainty_);
     // normalize value by certainty:
     // TODO(@drendleman) - unstable when certainty_ is small!
-    value_ /= static_cast<PrecisionType>(certainty_);
+    new_value /= certainty_.to_double();
+    value_ = std::clamp(PrecisionType(new_value), zero(), one());
 
     assertValidity();
     return *this;

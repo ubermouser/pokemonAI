@@ -58,7 +58,7 @@ void ENV_POSSIBLE_IMPL::printState(std::ostream& os) const {
 ENV_POSSIBLE_IMPL_TEMPLATE
 void ENV_POSSIBLE_IMPL::printEnvironment(std::ostream& os) const {
   // print state and probability:
-  os << fmt::format("p={}", getProbability().to_double());
+  os << fmt::format("p={:.4f}", getProbability().to_double());
   // print status tokens:
   for (unsigned int iTeam = 0; iTeam < 2; iTeam++) {
     std::string teamLabel = (iTeam == TEAM_A ? "A" : "B");
