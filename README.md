@@ -20,29 +20,33 @@ The project is organized into the following modules:
 
 ### Prerequisites
 
-*   CMake 3.10+
+*   CMake 3.23+
 *   A C++17 compliant compiler
-*   Boost (program_options, filesystem)
-*   OpenMP
-*   fmt 12.1+ ( [String formatting](https://fmt.dev/) )
-*   spdlog 1.16+ ( [Fast logging framework](https://github.com/gabime/spdlog) )
+*   [Conan 2.0+](https://conan.io/) package manager
+*   OpenMP (system library)
 
 ### Building
 
-1.  Create a build directory:
+1.  **Detect Conan Profile:**
+    If you haven't already, detect your system's compiler profile:
     ```bash
-    mkdir build && cd build
-    ```
-2.  Run CMake:
-    ```bash
-    cmake ..
-    ```
-3.  Compile the project:
-    ```bash
-    make
+    CC=clang CXX=clang++ conan profile detect --force --name clang
     ```
 
-This will create the executables in the `build/` directory.
+2.  **Install Dependencies:**
+    Use Conan to install the required libraries (Boost, fmt, spdlog, GTest):
+    ```bash
+    conan install . --output-folder=build --build=missing -s build_type=Release -pr:b=clang -pr:h=clang
+    ```
+
+3.  **Configure and Build:**
+    Use the Conan-generated CMake preset to configure and build the project:
+    ```bash
+    CC=clang CXX=clang++ cmake --preset conan-release
+    CC=clang CXX=clang++ cmake --build --preset conan-release -j16
+    ```
+
+This will create the executables in the `build/build/Release/` directory (or similar, depending on your environment).
 
 ### Running the applications
 

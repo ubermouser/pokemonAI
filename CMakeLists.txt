@@ -7,6 +7,7 @@ include(CTest)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+
 # Find Boost
 find_package(Boost REQUIRED COMPONENTS program_options filesystem)
 
@@ -15,7 +16,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Include directories
-include_directories(. include ${Boost_INCLUDE_DIRS})
+include_directories(. include)
 
 # Add preprocessor definitions
 add_compile_definitions(

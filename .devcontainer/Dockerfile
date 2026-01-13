@@ -25,6 +25,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   nano \
   vim
 
+# Python Dependencies
+RUN apt-get install -y \
+  python3 \
+  python3-pip \
+  python3-venv \
+  python3-ipython \
+  python3-ipdb
+
+# C++ Build tools
 RUN apt-get install -y \
   cmake \
   clang \
@@ -32,12 +41,11 @@ RUN apt-get install -y \
   lldb \
   valgrind \
   clang-format \
-  libboost-all-dev \
-  libfmt-dev \
-  libspdlog-dev \
-  libgtest-dev \
   libomp-dev \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# C++ Dependencies
+RUN pip install conan --break-system-packages
 
 # Ensure default node user has access to /usr/local/share
 RUN mkdir -p /usr/local/share/npm-global && \

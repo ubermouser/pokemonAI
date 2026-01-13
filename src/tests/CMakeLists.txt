@@ -15,8 +15,8 @@ foreach(test_file IN LISTS TEST_SOURCES)
         Boost::filesystem
         fmt::fmt
         spdlog::spdlog
-        GTest::GTest
-        GTest::Main
+        GTest::gtest
+        GTest::gtest_main
     )
 
     gtest_discover_tests(${test_name} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
