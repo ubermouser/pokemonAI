@@ -26,6 +26,7 @@ The project is organized into the following modules:
 *   OpenMP (system library)
 
 ### Building
+#### Using Conan
 
 1.  **Detect Conan Profile:**
     If you haven't already, detect your system's compiler profile:
@@ -47,6 +48,23 @@ The project is organized into the following modules:
     ```
 
 This will create the executables in the `build/build/Release/` directory (or similar, depending on your environment).
+
+#### Using System Dependencies
+
+1.  Create a build directory:
+    ```bash
+    mkdir build && cd build
+    ```
+2.  Run CMake:
+    ```bash
+    cmake -D CMAKE_BUILD_TYPE=Release ..
+    ```
+3.  Compile the project:
+    ```bash
+    make -j32
+    ```
+
+Executables will be under the `build` directory.
 
 ### Running the applications
 
