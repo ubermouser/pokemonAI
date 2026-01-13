@@ -31,20 +31,20 @@ The project is organized into the following modules:
 1.  **Detect Conan Profile:**
     If you haven't already, detect your system's compiler profile:
     ```bash
-    CC=clang CXX=clang++ conan profile detect --force --name clang
+    conan profile detect --force
     ```
 
 2.  **Install Dependencies:**
     Use Conan to install the required libraries (Boost, fmt, spdlog, GTest):
     ```bash
-    conan install . --output-folder=build --build=missing -s build_type=Release -pr:b=clang -pr:h=clang
+    conan install . --output-folder=build --build=missing -s build_type=Release
     ```
 
 3.  **Configure and Build:**
     Use the Conan-generated CMake preset to configure and build the project:
     ```bash
-    CC=clang CXX=clang++ cmake --preset conan-release
-    CC=clang CXX=clang++ cmake --build --preset conan-release -j16
+    cmake --preset conan-release
+    cmake --build --preset conan-release -j16 -t pokemonAI -t symlink_scripts
     ```
 
 This will create the executables in the `build/build/Release/` directory (or similar, depending on your environment).
@@ -73,12 +73,12 @@ All executables must be run from the project root directory.
 #### Battler
 
 ```bash
-./build/battler/battler [options]
+${BUILD_DIR}/battler/battler [options]
 ```
 
 Battle two teams against one another using minimax search:
 ```bash
-./build/battler/battler \
+${BUILD_DIR}/battler/battler \
     --team-a ./teams/gen4/hexTeamD.txt \
     --team-b ./teams/gen4/hexTeamA.txt \
     --planner-a minimax \
@@ -95,7 +95,7 @@ Battle two teams against one another using minimax search:
 
 Play against an agent yourself:
 ```bash
-./build/battler/battler \
+${BUILD_DIR}/battler/battler \
     --team-a ./teams/gen4/hexTeamD.txt \
     --team-b ./teams/gen4/hexTeamA.txt \
     --planner-a minimax \
@@ -112,12 +112,12 @@ Play against an agent yourself:
 #### Trainer
 
 ```bash
-./build/trainer/trainer [options]
+${BUILD_DIR}/trainer/trainer [options]
 ```
 
 Construct new teams that play well at a range of skill levels:
 ```bash
-./build/trainer/trainer \
+${BUILD_DIR}/trainer/trainer \
     --planners=random max minimax minimax \
     --evaluators=simple \
     --p1-max-search-depth=0 \
@@ -131,7 +131,7 @@ Construct new teams that play well at a range of skill levels:
 
 Construct teams targeting a different generation of Pokemon:
 ```bash
-./build/trainer/trainer \
+${BUILD_DIR}/trainer/trainer \
     --team-path ./teams/gen1/ \
     --planners=minimax \
     --evaluators=simple \
@@ -146,13 +146,13 @@ Construct teams targeting a different generation of Pokemon:
 #### Ranker
 
 ```bash
-./build/ranker/ranker [options]
+${BUILD_DIR}/ranker/ranker [options]
 ```
 
 
 Rank all of the teams under a directory against one another:
 ```bash
-./build/ranker/ranker \
+${BUILD_DIR}/ranker/ranker \
     --team-path ./teams/gen4/ \
     --planners=minimax \
     --evaluators=simple \
@@ -167,5 +167,5 @@ Rank all of the teams under a directory against one another:
 To run the tests, use `ctest` from the build directory:
 
 ```bash
-cd build && ctest
+cd ${BUILD_DIR} && ctest
 ```

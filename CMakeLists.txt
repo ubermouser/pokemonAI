@@ -59,3 +59,12 @@ target_link_libraries(pokemonAI
     fmt::fmt
     spdlog::spdlog
 )
+
+# Create symlink for scripts (optional target)
+add_custom_target(symlink_scripts
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
+        "${CMAKE_SOURCE_DIR}/build/build/$<CONFIG>/scripts"
+        "${CMAKE_SOURCE_DIR}/build/scripts"
+    COMMENT "Creating symlink for scripts: build/scripts -> build/build/$<CONFIG>/scripts"
+    VERBATIM
+)
