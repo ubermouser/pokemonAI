@@ -11,24 +11,6 @@
 
 class neuralNet;
 
-struct neuron // Kept for backward compatibility if needed, but mostly deprecated
-{
-public:
-  size_t iWeightBegin;
-  size_t iWeightEnd;
-  size_t iNeuronIndex;
-
-  float& getWeight(neuralNet& net, size_t iWeight) const;
-  const float& getWeight(const neuralNet& net, size_t iWeight) const;
-
-  std::vector<float>::iterator weightsBegin(neuralNet& parent) const;
-  std::vector<float>::const_iterator weightsBegin(const neuralNet& parent) const;
-
-  std::vector<float>::iterator weightsEnd(neuralNet& parent) const;
-  std::vector<float>::const_iterator weightsEnd(const neuralNet& parent) const;
-
-  neuron(neuralNet& parent, size_t numWeights);
-};
 
 class neuralNet: public Name
 {
@@ -147,15 +129,12 @@ public:
     return layerWidths[iLayer];
   };
 
-  /* output in plaintext to an ostream */
-  void output(std::ostream& oFile, bool printHeader = true) const;
+  /* output in binary to an ostream using torch::save */
+  void output(std::ostream& oFile) const;
 
-  /* input in plaintext from a string */
-  bool input(const std::vector<std::string>& lines, size_t& firstLine);
+  /* input in binary from an istream using torch::load */
+  bool input(std::istream& iFile);
   
-  friend class backpropNet;
-  friend class temporalpropNet;
-  friend struct neuron;
 }; // endOf class neuralNet
 
 #endif /* NEURALNET_H */

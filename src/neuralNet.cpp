@@ -6,14 +6,6 @@
 #include <iomanip>
 #include "pokemonai/init_toolbox.h"
 
-// neuron methods kept for compatibility but largely unused/deprecated
-float& neuron::getWeight(neuralNet& net, size_t iWeight) const { static float dummy = 0.0f; return dummy; }
-const float& neuron::getWeight(const neuralNet& net, size_t iWeight) const { static float dummy = 0.0f; return dummy; }
-std::vector<float>::iterator neuron::weightsBegin(neuralNet& parent) const { return parent.inputBegin(); }
-std::vector<float>::iterator neuron::weightsEnd(neuralNet& parent) const { return parent.inputBegin(); }
-std::vector<float>::const_iterator neuron::weightsBegin(const neuralNet& parent) const { return parent.inputBegin(); }
-std::vector<float>::const_iterator neuron::weightsEnd(const neuralNet& parent) const { return parent.inputBegin(); }
-neuron::neuron(neuralNet& parent, size_t numWeights) : iWeightBegin(0), iWeightEnd(0), iNeuronIndex(0) {}
 
 void neuralNet::feedForward() {
     if (!model) return;
@@ -56,20 +48,18 @@ void neuralNet::clear() {
     layerWidths.clear();
 }
 
-void neuralNet::output(std::ostream& oFile, bool printHeader) const {
-    // Basic output for identification, real serialization should use torch::save
-    if (printHeader) {
-        oFile << "PKNNT_TORCH\t32\t" << layerWidths.size() << "\t" << getName() << "\n";
-    }
-    for (size_t width : layerWidths) {
-        oFile << width << "\t";
-    }
-    oFile << "\n";
+void neuralNet::output(std::ostream& oFile) const {
+    if (!model) return;
+    torch::save(model, oFile);
 }
 
-bool neuralNet::input(const std::vector<std::string>& lines, size_t& iLine) {
-    // Simplified input for now, real deserialization should use torch::load
-    if (lines.size() <= iLine) return false;
-    // Just a placeholder for now to avoid breaking existing logic completely
+bool neuralNet::input(std::istream& iFile) {
+    if (!model) return false;
+    try {
+        torch::load(model, iFile);
+    } catch (const std::exception& e) {
+        SPDLOG_ERROR("Failed to load neural network: {}", e.what());
+        return false;
+    }
     return true;
 }
