@@ -44,7 +44,7 @@ The project is organized into the following modules:
     Use the Conan-generated CMake preset to configure and build the project:
     ```bash
     cmake --preset conan-release
-    cmake --build --preset conan-release -j16 -t pokemonAI -t symlink_scripts
+    cmake --build --preset conan-release -j16
     ```
 
 This will create the executables in the `build/build/Release/` directory (or similar, depending on your environment).
@@ -65,6 +65,35 @@ This will create the executables in the `build/build/Release/` directory (or sim
     ```
 
 Executables will be under the `build` directory.
+
+### Testing
+
+#### System build:
+
+To run the tests, use `ctest` from the build directory:
+
+```bash
+pushd build && ctest --output-on-failure; popd
+```
+
+Individual tests:
+```bash
+./src/tests/test_name
+```
+
+#### Conan:
+
+All tests: 
+
+```bash
+pushd build/build/Release && ctest --output-on-failure; popd
+```
+
+Individual test:
+
+```bash
+./build/build/Release/src/tests/test_name
+```
 
 ### Running the applications
 
@@ -160,12 +189,4 @@ ${BUILD_DIR}/ranker/ranker \
     --ranker-verbosity=1 \
     --verbosity=2 \
     --num-threads=16
-```
-
-#### Tests
-
-To run the tests, use `ctest` from the build directory:
-
-```bash
-cd ${BUILD_DIR} && ctest
 ```

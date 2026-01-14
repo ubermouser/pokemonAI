@@ -63,11 +63,19 @@ target_link_libraries(pokemonAI
     pkaiDecider
 )
 
-# Create symlink for scripts (optional target)
-add_custom_target(symlink_scripts
-    COMMAND ${CMAKE_COMMAND} -E create_symlink
-        "${CMAKE_SOURCE_DIR}/build/build/$<CONFIG>/scripts"
-        "${CMAKE_SOURCE_DIR}/build/scripts"
-    COMMENT "Creating symlink for scripts: build/scripts -> build/build/$<CONFIG>/scripts"
-    VERBATIM
-)
+# Detect if using Conan
+if(CMAKE_TOOLCHAIN_FILE MATCHES "conan_toolchain.cmake")
+    set(USING_CONAN ON)
+endif()
+
+# Create symlink for scripts only for Conan builds where build dir is separate
+if(USING_CONAN AND NOT "${CMAKE_BINARY_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}/build")
+    add_custom_target(symlink_scripts ALL
+        COMMAND ${CMAKE_COMMAND} -E remove -f "${CMAKE_SOURCE_DIR}/build/scripts"
+        COMMAND ${CMAKE_COMMAND} -E create_symlink
+            "${CMAKE_BINARY_DIR}/scripts"
+            "${CMAKE_SOURCE_DIR}/build/scripts"
+        COMMENT "Creating symlink for scripts: build/scripts -> ${CMAKE_BINARY_DIR}/scripts"
+        VERBATIM
+    )
+endif()
