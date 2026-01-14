@@ -5,6 +5,7 @@ find_package(OpenMP REQUIRED)
 
 target_link_libraries(trainer
   pkaiEngine
+  pkaiDecider
   Boost::program_options
   Boost::filesystem
   OpenMP::OpenMP_CXX

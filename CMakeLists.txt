@@ -35,9 +35,11 @@ add_compile_definitions(
 find_package(OpenMP REQUIRED)
 find_package(fmt REQUIRED)
 find_package(spdlog REQUIRED)
+find_package(Torch REQUIRED)
 
 # Add subdirectories
 add_subdirectory(pkaiEngine)
+add_subdirectory(pkaiDecider)
 add_subdirectory(scripts/gen1)
 add_subdirectory(scripts/gen4)
 add_subdirectory(ranker)
@@ -58,6 +60,7 @@ target_link_libraries(pokemonAI
     OpenMP::OpenMP_CXX
     fmt::fmt
     spdlog::spdlog
+    pkaiDecider
 )
 
 # Create symlink for scripts (optional target)

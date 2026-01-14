@@ -44,7 +44,7 @@ public:
   /* output feature vector defined by env starting at cInput */
   virtual void seed(float* cInput, const ConstEnvironmentVolatile& env, size_t iTeam) const = 0;
 
-  void seed(floatIterator_t cInput, const ConstEnvironmentVolatile& env, size_t iTeam) const
+  void seed(neuralNet::floatIterator_t cInput, const ConstEnvironmentVolatile& env, size_t iTeam) const
   {
     seed(&*cInput, env, iTeam);
   };

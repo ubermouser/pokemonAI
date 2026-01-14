@@ -3,6 +3,7 @@ boost/1.81.0
 fmt/10.2.1
 spdlog/1.14.1
 gtest/1.14.0
+libtorch/2.9.1
 
 [generators]
 CMakeDeps

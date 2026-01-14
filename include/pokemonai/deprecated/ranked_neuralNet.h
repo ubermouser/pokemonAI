@@ -10,35 +10,18 @@
 
 #include "pokemonai/experienceNet.h"
 #include "pokemonai/neuralNet.h"
-#ifdef _DISABLETEMPORALDIFFERENCE
 #include "pokemonai/backpropNet.h"
 typedef backpropSettings networkSettings_t;
 typedef backpropNet network_t;
-#elif _DISABLETEMPORALTRACE
-#include "pokemonai/backpropNet.h"
-typedef backpropSettings networkSettings_t;
-typedef backpropNet network_t;
-#else
-#include "pokemonai/temporalpropNet.h"
-typedef temporalpropSettings networkSettings_t;
-typedef temporalpropNet network_t;
-#endif
 
 class evaluator_featureVector;
 class EnvironmentNonvolatile;
-class RankedTeam;
-class TrueSkillTeam;
+class TrueSkill;
 class Game;
 struct Turn;
 
 class ranked_neuralNet: public Ranked
 {
-public:
-#ifdef _DISABLETEMPORALDIFFERENCE
-  static Game* rolloutGame;
-  static std::vector<float> rolloutFitnesses;
-#endif
-
 private:
   /* Is passed to planner to perform evaluation, Performs TD learning on nNet */
   network_t bNet;
@@ -54,6 +37,8 @@ private:
   fpType numUpdates;
   /* number of games played at the last jitter epoch */
   size_t lastJitterEpoch;
+  /* generation count */
+  size_t generation;
 
 public:
   static const std::string header;
@@ -68,20 +53,20 @@ public:
     const neuralNet& nNet = neuralNet(), 
     size_t generation = 0, 
     const networkSettings_t& cSettings = networkSettings_t::defaultSettings,
-    const experienceNetSettings& eSettings = experienceNetSettings::defaultSettings,
-    const trueSkillSettings& settings = trueSkillSettings::defaultSettings);
+    const experienceNetSettings& eSettings = experienceNetSettings::defaultSettings);
   
   static ranked_neuralNet generateRandom(
     const std::vector<size_t>& layerWidths, 
     const networkSettings_t& cSettings = networkSettings_t::defaultSettings,
-    const experienceNetSettings& eSettings = experienceNetSettings::defaultSettings,
-    const trueSkillSettings& settings = trueSkillSettings::defaultSettings);
+    const experienceNetSettings& eSettings = experienceNetSettings::defaultSettings);
 
-  static ranked_neuralNet jitter_create(const ranked_neuralNet& parent, const trueSkillSettings& settings = trueSkillSettings::defaultSettings);
+  static ranked_neuralNet jitter_create(const ranked_neuralNet& parent);
 
-  void jitter(const trueSkillSettings& settings = trueSkillSettings::defaultSettings);
+  void jitter();
 
   fpType getMeanSquaredError() const;
+
+  size_t getGeneration() const { return generation; }
 
   fpType getNumUpdates() const { return numUpdates; }
 
@@ -93,7 +78,7 @@ public:
 
   void resetRecord()
   {
-    Ranked::resetRecord();
+    record().resetRecord();
 
     resetMeanSquaredError();
 
@@ -102,11 +87,11 @@ public:
 
   size_t gamesSinceJitter() const
   {
-    return getNumGamesPlayed() - lastJitterEpoch;
+    return record().numGamesPlayed() - lastJitterEpoch;
   };
 
   /* update two neural network rankings with TD */
-  size_t update(const Game& cGame, const TrueSkillTeam& cTeam, size_t iTeam, bool updateWeights = true);
+  size_t update(const Game& cGame, size_t iTeam, bool updateWeights = true);
 
   /* performs monte-carlo backpropagation on bNet. Returns the error if an update was performed, or 0.0 if none */
   /* performs temporal difference learning on bNet. Returns the error if an update was performed, or 0.0 if none */

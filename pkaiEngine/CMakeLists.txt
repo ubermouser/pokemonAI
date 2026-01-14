@@ -4,11 +4,6 @@ add_library(pkaiEngine SHARED
     ../src/environment_nonvolatile.cpp
     ../src/environment_possible.cpp
     ../src/environment_volatile.cpp
-    ../src/evaluator.cpp
-    ../src/evaluator_montecarlo.cpp
-    ../src/evaluator_random.cpp
-    ../src/evaluator_simple.cpp
-    ../src/evaluators.cpp
     ../src/fitness.cpp
     ../src/fixedpoint/fixed_func.cpp
     ../src/game.cpp
@@ -25,13 +20,6 @@ add_library(pkaiEngine SHARED
     ../src/order_heuristic.cpp
     ../src/orphan.cpp
     ../src/pkCU.cpp
-    ../src/planner.cpp
-    ../src/planner_human.cpp
-    ../src/planner_max.cpp
-    ../src/planner_maximin.cpp
-    ../src/planner_minimax.cpp
-    ../src/planner_random.cpp
-    ../src/planners.cpp
     ../src/pluggable.cpp
     ../src/pokedex.cpp
     ../src/pokedex_dynamic.cpp
@@ -40,8 +28,6 @@ add_library(pkaiEngine SHARED
     ../src/pokemon_volatile.cpp
     ../src/ranked.cpp
     ../src/ranked_battlegroup.cpp
-    ../src/ranked_evaluator.cpp
-    ../src/ranked_planner.cpp
     ../src/ranked_pokemon.cpp
     ../src/ranked_team.cpp
     ../src/ranker.cpp
@@ -54,6 +40,20 @@ add_library(pkaiEngine SHARED
     ../src/transposition_table.cpp
     ../src/true_skill.cpp
     ../src/type.cpp
+    ../src/evaluator.cpp
+    ../src/evaluator_montecarlo.cpp
+    ../src/evaluator_random.cpp
+    ../src/evaluator_simple.cpp
+    ../src/evaluators.cpp
+    ../src/planner.cpp
+    ../src/planner_human.cpp
+    ../src/planner_max.cpp
+    ../src/planner_maximin.cpp
+    ../src/planner_minimax.cpp
+    ../src/planner_random.cpp
+    ../src/planners.cpp
+    ../src/ranked_evaluator.cpp
+    ../src/ranked_planner.cpp
 )
 
 set_target_properties(pkaiEngine PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON)
