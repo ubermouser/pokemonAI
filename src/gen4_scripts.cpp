@@ -226,7 +226,9 @@ int move_trick(
     PokemonVolatile tPKV) {
   if (&mV.getBase() != trick_t) { return 0; }
 
-  // TODO: Trick fails if the target is behind a substitute.
+  // Trick fails if the target is behind a substitute.
+  // This is handled by the generic move_substitute_block_status plugin (priority -10).
+
   if (tPKV.nv().abilityExists()) {
     const auto& ability = tPKV.nv().getAbility();
     if (&ability == stickyHold_t) { return 1; }
