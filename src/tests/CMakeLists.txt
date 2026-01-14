@@ -10,9 +10,8 @@ foreach(test_file IN LISTS TEST_SOURCES)
 
     target_link_libraries(${test_name}
         pkaiEngine
-        pkaiDecider
+        # pkaiDecider
         gen1_scripts
-        gen4_scripts
         Boost::program_options
         Boost::filesystem
         fmt::fmt

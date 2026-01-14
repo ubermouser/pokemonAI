@@ -35,33 +35,33 @@ add_compile_definitions(
 find_package(OpenMP REQUIRED)
 find_package(fmt REQUIRED)
 find_package(spdlog REQUIRED)
-find_package(Torch REQUIRED)
+# find_package(Torch REQUIRED)
 
 # Add subdirectories
 add_subdirectory(pkaiEngine)
-add_subdirectory(pkaiDecider)
+# add_subdirectory(pkaiDecider)
 add_subdirectory(scripts/gen1)
 add_subdirectory(scripts/gen4)
-add_subdirectory(ranker)
-add_subdirectory(trainer)
-add_subdirectory(battler)
+# add_subdirectory(ranker)
+# add_subdirectory(trainer)
+# add_subdirectory(battler)
 add_subdirectory(src/tests)
 
 # Add the executable
-add_executable(pokemonAI src/battler_main.cpp)
+# add_executable(pokemonAI src/battler_main.cpp)
 
 # Link libraries
-target_link_libraries(pokemonAI
-    pkaiEngine
-    gen1_scripts
-    gen4_scripts
-    Boost::program_options
-    Boost::filesystem
-    OpenMP::OpenMP_CXX
-    fmt::fmt
-    spdlog::spdlog
-    pkaiDecider
-)
+# target_link_libraries(pokemonAI
+#     pkaiEngine
+#     gen1_scripts
+#     gen4_scripts
+#     Boost::program_options
+#     Boost::filesystem
+#     OpenMP::OpenMP_CXX
+#     fmt::fmt
+#     spdlog::spdlog
+#     # pkaiDecider
+# )
 
 # Create symlink for scripts (optional target)
 add_custom_target(symlink_scripts
