@@ -10,6 +10,10 @@
 #include "pokemonai/evaluator_montecarlo.h"
 #include "pokemonai/evaluator_random.h"
 #include "pokemonai/evaluator_simple.h"
+#include "pokemonai/evaluator_network16.h"
+#include "pokemonai/evaluator_network32.h"
+#include "pokemonai/evaluator_network64.h"
+#include "pokemonai/evaluator_network128.h"
 
 std::shared_ptr<Evaluator::Config> evaluators::config(const std::string& _type) {
   auto type = boost::to_lower_copy(_type);
@@ -20,6 +24,8 @@ std::shared_ptr<Evaluator::Config> evaluators::config(const std::string& _type) 
     result = std::make_shared<EvaluatorRandom::Config>();
   } else if (type == "montecarlo") {
     result = std::make_shared<EvaluatorMonteCarlo::Config>();
+  } else if (type == "network16" || type == "network32" || type == "network64" || type == "network128") {
+    result = std::make_shared<EvaluatorNetwork::Config>();
   } else {
     result = std::make_shared<Evaluator::Config>();
   }
@@ -36,6 +42,14 @@ std::shared_ptr<Evaluator> evaluators::choose(const std::string& _type, const Ev
     result = std::make_shared<EvaluatorRandom>(dynamic_cast<const EvaluatorRandom::Config&>(cfg));
   } else if (type == "montecarlo") {
     result = std::make_shared<EvaluatorMonteCarlo>(dynamic_cast<const EvaluatorMonteCarlo::Config&>(cfg));
+  } else if (type == "network16") {
+    result = std::make_shared<evaluator_network16>(dynamic_cast<const EvaluatorNetwork::Config&>(cfg));
+  } else if (type == "network32") {
+    result = std::make_shared<evaluator_network32>(dynamic_cast<const EvaluatorNetwork::Config&>(cfg));
+  } else if (type == "network64") {
+    result = std::make_shared<evaluator_network64>(dynamic_cast<const EvaluatorNetwork::Config&>(cfg));
+  } else if (type == "network128") {
+    result = std::make_shared<evaluator_network128>(dynamic_cast<const EvaluatorNetwork::Config&>(cfg));
   } else {
     SPDLOG_ERROR("unknown evaluator type \"{}\"!", _type);
     throw std::invalid_argument("evaluator type");

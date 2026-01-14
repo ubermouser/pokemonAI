@@ -40,7 +40,6 @@ class NetworkEvaluatorTest : public Gen4EngineTest {
     auto eval = std::make_shared<T>(net);
     eval->setEngine(engine_);
     eval->setEnvironment(environment_);
-    eval->resetEvaluator(*environment_);
     return eval;
   }
 
@@ -69,25 +68,25 @@ void validateNetworkNonTerminalState(Evaluator& eval, const ConstEnvironmentVola
 
 TEST_F(NetworkEvaluatorTest, Network16Initialization) {
   auto eval = createEvaluator<evaluator_network16>();
-  EXPECT_TRUE(eval->isInitialized());
+  EXPECT_NO_THROW(eval->initialize());
   validateNetworkNonTerminalState(*eval, engine_->initialState());
 }
 
 TEST_F(NetworkEvaluatorTest, Network32Initialization) {
   auto eval = createEvaluator<evaluator_network32>();
-  EXPECT_TRUE(eval->isInitialized());
+  EXPECT_NO_THROW(eval->initialize());
   validateNetworkNonTerminalState(*eval, engine_->initialState());
 }
 
 TEST_F(NetworkEvaluatorTest, Network64Initialization) {
   auto eval = createEvaluator<evaluator_network64>();
-  EXPECT_TRUE(eval->isInitialized());
+  EXPECT_NO_THROW(eval->initialize());
   validateNetworkNonTerminalState(*eval, engine_->initialState());
 }
 
 TEST_F(NetworkEvaluatorTest, Network128Initialization) {
   auto eval = createEvaluator<evaluator_network128>();
-  EXPECT_TRUE(eval->isInitialized());
+  EXPECT_NO_THROW(eval->initialize());
   validateNetworkNonTerminalState(*eval, engine_->initialState());
 }
 

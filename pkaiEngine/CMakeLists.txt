@@ -44,7 +44,6 @@ add_library(pkaiEngine SHARED
     ../src/evaluator_montecarlo.cpp
     ../src/evaluator_random.cpp
     ../src/evaluator_simple.cpp
-    ../src/evaluators.cpp
     ../src/planner.cpp
     ../src/planner_human.cpp
     ../src/planner_max.cpp
