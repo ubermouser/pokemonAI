@@ -1,12 +1,12 @@
 /* 
- * File:   trainer.h
+ * File:   teambuilder.h
  * Author: drendleman
  *
  * Created on September 22, 2020, 12:54 PM
  */
 
-#ifndef TRAINER_H
-#define TRAINER_H
+#ifndef TEAMBUILDER_H
+#define TEAMBUILDER_H
 
 #include "ranker.h"
 
@@ -23,7 +23,7 @@ struct MutationStats {
   size_t numTotal() const { return numMutations + numCrossovers + numSeeds; }
 };
 
-class Trainer : public Ranker {
+class TeamBuilder : public Ranker {
 public:
   struct Config : public Ranker::Config {
     /* number of generations to complete, maximum */
@@ -45,13 +45,13 @@ public:
     size_t writeOutEvery = 0;
 
     boost::program_options::options_description options(
-        const std::string& category="trainer configuration",
+        const std::string& category="teambuilder configuration",
         std::string prefix = "");
 
     Config() : Ranker::Config() {}
   };
 
-  Trainer(const Config& cfg);
+  TeamBuilder(const Config& cfg);
 
   virtual void initialize() override;
 
@@ -81,4 +81,4 @@ protected:
   size_t shrinkPopulations(League& league, const LeagueCount& children) const;
 };
 
-#endif /* TRAINER_H */
+#endif /* TEAMBUILDER_H */

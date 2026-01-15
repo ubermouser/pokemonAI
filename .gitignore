@@ -67,6 +67,7 @@ dlldata.c
 # CMake test files
 cmake_test_discovery*
 CMakeUserPresets.json
+compile_commands.json
 
 # Chutzpah Test files
 _Chutzpah*

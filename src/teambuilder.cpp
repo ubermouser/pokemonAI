@@ -1,4 +1,4 @@
-#include "pokemonai/trainer.h"
+#include "pokemonai/teambuilder.h"
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -11,7 +11,7 @@
 namespace po = boost::program_options;
 
 
-po::options_description Trainer::Config::options(
+po::options_description TeamBuilder::Config::options(
     const std::string& category, std::string prefix) {
   Config defaults{};
   po::options_description desc = Ranker::Config::options(category, prefix);
@@ -41,7 +41,7 @@ po::options_description Trainer::Config::options(
 
 
 
-Trainer::Trainer(
+TeamBuilder::TeamBuilder(
     const Config& cfg)
   : Ranker(cfg),
     cfg_(cfg),
@@ -50,7 +50,7 @@ Trainer::Trainer(
 }
 
 
-void Trainer::initialize() {
+void TeamBuilder::initialize() {
   if (cfg_.teamPopulationSize.size() != 6) { throw std::invalid_argument("teamPopulationSize"); }
   if (*std::min_element(begin(cfg_.teamPopulationSize), end(cfg_.teamPopulationSize)) < 0) { throw std::invalid_argument("teamPopulationSize count"); }
   if (cfg_.mutationProbability > 1.0 || cfg_.mutationProbability < 0.0) { throw std::invalid_argument("mutationProbability"); }
@@ -63,7 +63,7 @@ void Trainer::initialize() {
 }
 
 
-LeagueHeat Trainer::evolve() const {
+LeagueHeat TeamBuilder::evolve() const {
   testInitialized();
 
   LeagueHeat league = constructLeague();
@@ -89,7 +89,7 @@ LeagueHeat Trainer::evolve() const {
 }
 
 
-void Trainer::resetLeague(LeagueHeat& league) const {
+void TeamBuilder::resetLeague(LeagueHeat& league) const {
   // destroy the record of the last played games:
   league.resetStats();
   // existing battlegroups should play existing games:
@@ -99,7 +99,7 @@ void Trainer::resetLeague(LeagueHeat& league) const {
 }
 
 
-void Trainer::evolveGeneration(LeagueHeat& league) const {
+void TeamBuilder::evolveGeneration(LeagueHeat& league) const {
   {
     // mutate the existing population:
     TeamLeague children = spawnTeamChildren(league);
@@ -120,7 +120,7 @@ void Trainer::evolveGeneration(LeagueHeat& league) const {
 }
 
 
-size_t Trainer::loadTeamPopulation() {
+size_t TeamBuilder::loadTeamPopulation() {
   size_t result = Ranker::loadTeamPopulation();
   result += seedRandomTeamPopulation(initialLeague_);
 
@@ -128,7 +128,7 @@ size_t Trainer::loadTeamPopulation() {
 }
 
 
-size_t Trainer::seedRandomTeamPopulation(League& league) const {
+size_t TeamBuilder::seedRandomTeamPopulation(League& league) const {
   size_t numAdded = 0;
   LeagueCount population = league.teams.countTeamLeague();
   for (size_t iLeague = 0; iLeague < 6; ++iLeague) {
@@ -146,7 +146,7 @@ size_t Trainer::seedRandomTeamPopulation(League& league) const {
 }
 
 
-TeamLeague Trainer::spawnTeamChildren(League& league) const {
+TeamLeague TeamBuilder::spawnTeamChildren(League& league) const {
   std::vector<RankedTeamPtr> teams = league.teams.getAll();
   MutationStats stats;
   TeamLeague newChildren;
@@ -208,7 +208,7 @@ TeamLeague Trainer::spawnTeamChildren(League& league) const {
 }
 
 
-size_t Trainer::shrinkPopulations(League& league, const LeagueCount& newChildren) const {
+size_t TeamBuilder::shrinkPopulations(League& league, const LeagueCount& newChildren) const {
   size_t numRemoved = 0;
   for (size_t iLeague = 0; iLeague < 6; ++iLeague) {
     std::vector<RankedTeamPtr> teams = league.teams.getLeague(iLeague + 1);
@@ -235,7 +235,7 @@ size_t Trainer::shrinkPopulations(League& league, const LeagueCount& newChildren
 }
 
 
-void Trainer::printGenerationStart(const League& league, size_t iGeneration) const {
+void TeamBuilder::printGenerationStart(const League& league, size_t iGeneration) const {
   out_.get() << fmt::format(
       "Begin generation {} of {}! {} battlegroups playing {} heats each.\n",
       iGeneration + 1,
@@ -245,7 +245,7 @@ void Trainer::printGenerationStart(const League& league, size_t iGeneration) con
 }
 
 
-void Trainer::printMutationStats(const MutationStats& stats) const {
+void TeamBuilder::printMutationStats(const MutationStats& stats) const {
   out_.get() << fmt::format(
       "Evolution step mutations={:5} crossovers={:5} seeds={:5} total={}\n",
       stats.numMutations,

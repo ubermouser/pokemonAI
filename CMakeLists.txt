@@ -43,7 +43,7 @@ add_subdirectory(pkaiDecider)
 add_subdirectory(scripts/gen1)
 add_subdirectory(scripts/gen4)
 add_subdirectory(ranker)
-add_subdirectory(trainer)
+add_subdirectory(teambuilder)
 add_subdirectory(battler)
 add_subdirectory(src/tests)
 

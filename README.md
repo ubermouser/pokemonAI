@@ -8,7 +8,7 @@ The project is organized into the following modules:
 
 *   **pkaiEngine**: The core of the project, containing the logic for the Pokémon battle simulator and the AI engine.
 *   **battler**: An executable that runs Pokémon battles between two teams, using the `pkaiEngine`.
-*   **trainer**: An executable used to build teams of pokemon using evolutionary methods.
+*   **teambuilder**: An executable used to build teams of pokemon using evolutionary methods.
 *   **ranker**: An executable for ranking Pokémon teams.
 *   **gen4_scripts**: Contains scripts and data specific to Generation 4 Pokémon games.
 *   **data**: Contains general game data used by the simulator.
@@ -31,7 +31,7 @@ The project is organized into the following modules:
 1.  **Detect Conan Profile:**
     If you haven't already, detect your system's compiler profile:
     ```bash
-    conan profile detect --force
+    conan profile detect --exist-ok
     ```
 
 2.  **Install Dependencies:**
@@ -138,15 +138,15 @@ ${BUILD_DIR}/battler/battler \
 ```
 
 
-#### Trainer
+#### TeamBuilder
 
 ```bash
-${BUILD_DIR}/trainer/trainer [options]
+${BUILD_DIR}/teambuilder/teambuilder [options]
 ```
 
 Construct new teams that play well at a range of skill levels:
 ```bash
-${BUILD_DIR}/trainer/trainer \
+${BUILD_DIR}/teambuilder/teambuilder \
     --planners=random max minimax minimax \
     --evaluators=simple \
     --p1-max-search-depth=0 \
@@ -160,7 +160,7 @@ ${BUILD_DIR}/trainer/trainer \
 
 Construct teams targeting a different generation of Pokemon:
 ```bash
-${BUILD_DIR}/trainer/trainer \
+${BUILD_DIR}/teambuilder/teambuilder \
     --team-path ./teams/gen1/ \
     --planners=minimax \
     --evaluators=simple \

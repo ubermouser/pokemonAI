@@ -1,5 +1,5 @@
 /*
- * File:   trainer_main.cpp
+ * File:   teambuilder_main.cpp
  * Author: drendleman
  *
  * Created on September 17, 2020, 11:15 AM
@@ -18,14 +18,14 @@
 #include "pokemonai/pkCU.h"
 #include "pokemonai/planners.h"
 #include "pokemonai/pokedex_dynamic.h"
-#include "pokemonai/trainer.h"
+#include "pokemonai/teambuilder.h"
 
 namespace po = boost::program_options;
 
 
 struct Config {
   PokedexDynamic::Config pokedex;
-  Trainer::Config trainer;
+  TeamBuilder::Config teambuilder;
   Game::Config game;
   PkCU::Config engine;
   std::vector<std::string> teams;
@@ -71,7 +71,7 @@ struct Config {
         "static verbosity level.");
     
     desc.add(pokedex.options());
-    desc.add(trainer.options());
+    desc.add(teambuilder.options());
     desc.add(game.options("game configuration", "game"));
     desc.add(engine.options());
     for (size_t iPlan = 0; iPlan != plannerConfigs.size(); ++iPlan) {
@@ -128,22 +128,22 @@ int main(int argc, char** argv) {
 
   auto pokedex = PokedexDynamic(cfg.pokedex);
 
-  Trainer trainer{cfg.trainer};
-  trainer.setEngine(PkCU{cfg.engine});
-  trainer.setGame(Game{cfg.game});
-  trainer.setStateEvaluator(EvaluatorSimple().setEngine(PkCU{cfg.engine}));
+  TeamBuilder teambuilder{cfg.teambuilder};
+  teambuilder.setEngine(PkCU{cfg.engine});
+  teambuilder.setGame(Game{cfg.game});
+  teambuilder.setStateEvaluator(EvaluatorSimple().setEngine(PkCU{cfg.engine}));
   for (size_t iPlan = 0; iPlan != cfg.plannerTypes.size(); ++iPlan) {
-    trainer.addPlanner(planners::choose(cfg.plannerTypes[iPlan], *cfg.plannerConfigs[iPlan]));
+    teambuilder.addPlanner(planners::choose(cfg.plannerTypes[iPlan], *cfg.plannerConfigs[iPlan]));
   }
   for (size_t iEval = 0; iEval != cfg.evalTypes.size(); ++iEval) {
-    trainer.addEvaluator(evaluators::choose(cfg.evalTypes[iEval], *cfg.evalConfigs[iEval]));
+    teambuilder.addEvaluator(evaluators::choose(cfg.evalTypes[iEval], *cfg.evalConfigs[iEval]));
   }
   for (const auto& teamPath: cfg.teams) {
-    trainer.addTeam(TeamNonVolatile::load(teamPath));
+    teambuilder.addTeam(TeamNonVolatile::load(teamPath));
   }
 
-  trainer.initialize();
-  trainer.evolve();
+  teambuilder.initialize();
+  teambuilder.evolve();
 
   std::exit(EXIT_SUCCESS);
 }

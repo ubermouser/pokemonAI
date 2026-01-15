@@ -36,7 +36,7 @@ add_library(pkaiEngine SHARED
     ../src/team_factory.cpp
     ../src/team_nonvolatile.cpp
     ../src/team_volatile.cpp
-    ../src/trainer.cpp
+    ../src/teambuilder.cpp
     ../src/transposition_table.cpp
     ../src/true_skill.cpp
     ../src/type.cpp
