@@ -14,13 +14,11 @@ public:
   evaluator_network32(const neuralNet& cNet, const Config& cfg = Config{});
   virtual ~evaluator_network32() override {};
 
-  evaluator_network32* clone() const override { return new evaluator_network32(*this); }
+  evaluator_network32* clone() const override;
 
   void seed(neuralNet::floatIterator_t cInput, const ConstEnvironmentVolatile& env, size_t iTeam) const override;
   size_t inputSize() const override { return numInputNeurons; };
   size_t outputSize() const override { return numOutputNeurons; };
-
-  void outputNames(std::ostream& oS) const override;
 };
 
 #endif /* EVALUATOR_NETWORK_32_H */

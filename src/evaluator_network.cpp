@@ -24,16 +24,6 @@ void EvaluatorNetwork::seed(
   seed(cNet.inputBegin(), env, iTeam);
 }
 
-void EvaluatorNetwork::outputNames(std::ostream& oS) const {
-  for (size_t iInput = 0, iSize = inputSize(); iInput != iSize; ++iInput) {
-    oS << "feature-" << iInput << ", ";
-  }
-  oS << "fitness-0";
-  for (size_t iOutput = 1; iOutput < outputSize(); ++iOutput) {
-    oS << ", fitness-" << iOutput;
-  }
-  oS << "\n";
-}
 
 // featureVector_impl implementations
 void featureVector_impl::generateBestMoves(const EnvironmentNonvolatile& envNV, bestMoveOrders_t& iBestMoves, bestMoveDamages_t& dBestMoves) {
@@ -147,10 +137,12 @@ EvaluatorNetwork::EvaluatorNetwork(const neuralNet& network, const Config& cfg)
       network_(std::make_shared<neuralNet>(network)) {}
 
 EvaluatorNetwork::EvaluatorNetwork(const EvaluatorNetwork& other)
-    : Evaluator(other), cfg_(other.cfg_),
-      network_(other.network_ ? std::make_shared<neuralNet>(*other.network_) : nullptr),
-      iBestMoves_(other.iBestMoves_), dBestMoves_(other.dBestMoves_), orders_(other.orders_) {
-}
+    : Evaluator(other),
+      cfg_(other.cfg_),
+      network_(other.network_),
+      iBestMoves_(other.iBestMoves_),
+      dBestMoves_(other.dBestMoves_),
+      orders_(other.orders_) {}
 
 EvaluatorNetwork::~EvaluatorNetwork() {
 }
@@ -180,9 +172,9 @@ Evaluator& EvaluatorNetwork::initialize() {
     return *this;
 }
 
-void EvaluatorNetwork::setNetwork(const neuralNet& network) {
-    network_ = std::make_shared<neuralNet>(network);
-    updateIdent();
+void EvaluatorNetwork::setNetwork(const std::shared_ptr<neuralNet>& network) {
+  network_ = network;
+  updateIdent();
 }
 
 Evaluator& EvaluatorNetwork::setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& env) {

@@ -28,6 +28,12 @@ evaluator_network64::evaluator_network64(const Config& cfg)
 evaluator_network64::evaluator_network64(const evaluator_network64& other) : EvaluatorNetwork(other) {
 }
 
+evaluator_network64* evaluator_network64::clone() const {
+  evaluator_network64* newNet = new evaluator_network64(*this);
+  if (network_) { newNet->network_ = std::make_shared<neuralNet>(*network_); }
+  return newNet;
+}
+
 evaluator_network64::evaluator_network64(const neuralNet& _cNet, const Config& cfg) : EvaluatorNetwork(_cNet, cfg) {
   updateIdent();
 }
@@ -109,16 +115,4 @@ void evaluator_network64::seed(
     cInput[1] = scale((float)((cTV.getNonVolatile().spikes>0) + (cTV.getNonVolatile().stealthRock>0)), 2.0f, 0.0f);
     cInput += NEURONSPERSTATUS;
   }
-}
-
-void evaluator_network64::outputNames(std::ostream& oS) const {
-  for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
-    for (size_t iTeammate = 0; iTeammate != 6; ++iTeammate) {
-        oS << "percentHP-" << iTeam << iTeammate << ", damagingStatus-" << iTeam << iTeammate << ", sleepStatus-" << iTeam << iTeammate << ", debilitatingStatus-" << iTeam << iTeammate << ", bestDamage-" << iTeam << iTeammate << "0, ";
-    }
-    oS << "volatileStatus-" << iTeam << ", entryHazard-" << iTeam << ", ";
-  }
-  oS << "fitness-0";
-  for (size_t iOutput = 1; iOutput < outputSize(); ++iOutput) oS << ", fitness-" << iOutput;
-  oS << "\n";
 }

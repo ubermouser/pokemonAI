@@ -24,6 +24,12 @@ evaluator_network16::evaluator_network16(const Config& cfg)
 evaluator_network16::evaluator_network16(const evaluator_network16& other) : EvaluatorNetwork(other) {
 }
 
+evaluator_network16* evaluator_network16::clone() const {
+  evaluator_network16* newNet = new evaluator_network16(*this);
+  if (network_) { newNet->network_ = std::make_shared<neuralNet>(*network_); }
+  return newNet;
+}
+
 evaluator_network16::evaluator_network16(const neuralNet& _cNet, const Config& cfg) : EvaluatorNetwork(_cNet, cfg) {
   updateIdent();
 }
@@ -78,14 +84,4 @@ void evaluator_network16::generateOrders() {
           }
       }
   }
-}
-
-void evaluator_network16::outputNames(std::ostream& oS) const {
-  for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
-    for (size_t iTeammate = 0; iTeammate != 6; ++iTeammate) oS << "percentHP-" << iTeam << iTeammate << ", ";
-    oS << "nonvolatileStatus-" << iTeam << ", volatileStatus-" << iTeam << ", ";
-  }
-  oS << "fitness-0";
-  for (size_t iOutput = 1; iOutput < outputSize(); ++iOutput) oS << ", fitness-" << iOutput;
-  oS << "\n";
 }

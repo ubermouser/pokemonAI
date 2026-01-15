@@ -46,12 +46,6 @@ class NetworkEvaluatorTest : public Gen4EngineTest {
     auto eval = std::dynamic_pointer_cast<EvaluatorNetwork>(
         evaluators::choose(type, *cfg));
 
-    // neuralNet::Config netCfg;
-    // netCfg.architecture = {16};
-    // neuralNet net(netCfg, *eval);
-    // net.randomizeWeights();
-    // eval->setNetwork(net);
-
     eval->setEngine(engine_);
     eval->setEnvironment(environment_);
     eval->getNetwork()->randomizeWeights();

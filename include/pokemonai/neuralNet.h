@@ -29,7 +29,7 @@ class neuralNet: public Name
         std::string prefix = "");
   };
 
-private:
+ protected:
   torch::nn::Sequential model;
   
   // Buffers for backward compatibility with iterators
