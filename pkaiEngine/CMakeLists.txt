@@ -11,6 +11,7 @@ add_library(pkaiEngine SHARED
     ../src/init_toolbox.cpp
     ../src/item.cpp
     ../src/league.cpp
+    ../src/league_heat.cpp
     ../src/logging.cpp
     ../src/move.cpp
     ../src/move_nonvolatile.cpp

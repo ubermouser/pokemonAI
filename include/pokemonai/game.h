@@ -78,6 +78,7 @@ struct HeatResult {
     uint64_t averageNodesEvaluated = 0;
   };
 
+  std::shared_ptr<const EnvironmentNonvolatile> nv;
   std::vector<GameResult> gameResults;
   std::array<PerTeam, 2> teams;
   std::array<uint32_t, 2> score;

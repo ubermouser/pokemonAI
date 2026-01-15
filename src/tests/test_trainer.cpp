@@ -1,58 +1,70 @@
 #include <gtest/gtest.h>
+
 #include "engine_test.hpp"
-#include "pokemonai/trainer.h"
 #include "pokemonai/evaluator_network16.h"
-#include "pokemonai/trainable_neural_net.h"
+#include "pokemonai/evaluator_simple.h"
+#include "pokemonai/evaluators.h"
 #include "pokemonai/game.h"
+#include "pokemonai/planners.h"
+#include "pokemonai/ranker.h"
+#include "pokemonai/team_nonvolatile.h"
+#include "pokemonai/trainable_neural_net.h"
+#include "pokemonai/trainer.h"
 
 class TrainerTest : public Gen4EngineTest {
  protected:
   void SetUp() override {
     Gen4EngineTest::SetUp();
 
-    auto team_a = TeamNonVolatile()
-        .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->pokemon("charmander"))
-          .addMove(pokedex_->move("cut"))
-          .addMove(pokedex_->move("swords dance"))
-          .setLevel(100));
-    auto team_b = TeamNonVolatile()
-        .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->pokemon("bulbasaur"))
-          .addMove(pokedex_->move("cut"))
-          .addMove(pokedex_->move("charm"))
-          .setLevel(100));
-    environment_nv = std::make_shared<EnvironmentNonvolatile>(team_a, team_b, true);
+    // Setup Ranker
+    Ranker::Config ranker_cfg;
+    ranker_cfg.verbosity = 0;
+    ranker_cfg.minGamesPerBattlegroup = 5;
+    ranker_cfg.numThreads = 1;
+    ranker_ = std::make_shared<Ranker>(ranker_cfg);
+    ranker_->setEngine(*engine_);
+    ranker_->setGame(Game{});
+    ranker_->setStateEvaluator(EvaluatorSimple{});
+
+    ranker_->addPlanner(
+        planners::choose("random", *planners::config("random")));
+    ranker_->addEvaluator(
+        evaluators::choose("simple", *evaluators::config("simple")));
+
+    ranker_->addTeam(TeamNonVolatile::load("teams/gen4/dualTeamA.txt"));
+    ranker_->addTeam(TeamNonVolatile::load("teams/gen4/dualTeamB.txt"));
+
+    ranker_->initialize();
 
     spdlog::set_level(spdlog::level::info);
   }
 
-  std::shared_ptr<EnvironmentNonvolatile> environment_nv;
+  std::shared_ptr<Ranker> ranker_;
 };
 
-TEST_F(TrainerTest, FitReducesLoss) {
+
+TEST_F(TrainerTest, FitOnLeagueHeatReducesLoss) {
+  // 1. Generate LeagueHeat using the fixture's ranker
+  LeagueHeat lHeat = ranker_->rank();
+
+  // 2. Setup Trainer
   auto fv = std::make_shared<evaluator_network16>();
-  fv->setEnvironment(environment_nv);
-  
-  TrainableNeuralNet::Config cfg;
-  cfg.learningRate = 0.001;
-  auto net = std::make_shared<TrainableNeuralNet>(cfg, *fv);
+
+  TrainableNeuralNet::Config netCfg;
+  netCfg.learningRate = 0.001;
+  auto net = std::make_shared<TrainableNeuralNet>(netCfg, *fv);
 
   Trainer::Config tCfg;
   tCfg.logInterval = 1;
   tCfg.batchSize = 8;
   tCfg.seed = 42;
   tCfg.numEpochs = 5;
-  
-  // Generate a real HeatResult
-  auto game = Game().setMaxMatches(5).setVerbosity(0).setEnvironment(*environment_nv);
-  HeatResult hResult = game.run();
-  Trainer trainer(fv, net, environment_nv, tCfg);
-  
-  float initialLoss = trainer.predict(hResult);
-  trainer.fit(hResult);
-  float finalLoss = trainer.predict(hResult);
 
-  ASSERT_FALSE(hResult.gameResults.empty());
+  Trainer trainer(fv, net, tCfg);
+
+  float initialLoss = trainer.predict(lHeat);
+  trainer.fit(lHeat);
+  float finalLoss = trainer.predict(lHeat);
+
   EXPECT_LT(finalLoss, initialLoss);
 }

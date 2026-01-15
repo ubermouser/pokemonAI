@@ -33,17 +33,24 @@ boost::program_options::options_description Trainer::Config::options(
 Trainer::Trainer(
     std::shared_ptr<FeatureVector> featureVector,
     std::shared_ptr<TrainableNeuralNet> neuralNet,
-    std::shared_ptr<const EnvironmentNonvolatile> envNV,
     const Config& cfg)
-    : featureVector_(featureVector), neuralNet_(neuralNet), envNV_(envNV), cfg_(cfg) {}
+    : featureVector_(featureVector), neuralNet_(neuralNet), cfg_(cfg) {}
 
 
 float Trainer::fit(const HeatResult& hResult) {
+  return fit(prepareDataset(hResult));
+}
+
+
+float Trainer::fit(const LeagueHeat& lHeat) {
+  return fit(prepareDataset(lHeat));
+}
+
+
+float Trainer::fit(std::vector<HeatDataset::Sample> samples) {
   if (cfg_.seed != 0) {
     torch::manual_seed(cfg_.seed);
   }
-
-  std::vector<HeatDataset::Sample> samples = prepareDataset(hResult);
 
   if (samples.empty()) return 0.0f;
 
@@ -90,9 +97,18 @@ float Trainer::fit(const HeatResult& hResult) {
   return finalLoss;
 }
 
-float Trainer::predict(const HeatResult& hResult) {
-  std::vector<HeatDataset::Sample> samples = prepareDataset(hResult);
 
+float Trainer::predict(const HeatResult& hResult) {
+  return predict(prepareDataset(hResult));
+}
+
+
+float Trainer::predict(const LeagueHeat& lHeat) {
+  return predict(prepareDataset(lHeat));
+}
+
+
+float Trainer::predict(std::vector<HeatDataset::Sample> samples) const {
   if (samples.empty()) return 0.0f;
 
   auto dataset = HeatDataset(std::move(samples)).map(torch::data::transforms::Stack<>());
@@ -120,11 +136,18 @@ float Trainer::predict(const HeatResult& hResult) {
 }
 
 
-std::vector<HeatDataset::Sample> Trainer::prepareDataset(const HeatResult& hResult) const {
+std::vector<HeatDataset::Sample> Trainer::prepareDataset(
+    const HeatResult& hResult) {
+  // TODO: FeatureVector needs to expose a way to set the nonvolatile
+  // environment
+  if (auto evaluator = std::dynamic_pointer_cast<Evaluator>(featureVector_)) {
+    evaluator->setEnvironment(hResult.nv);
+  }
+
   std::vector<HeatDataset::Sample> samples;
   for (const auto& gResult : hResult.gameResults) {
     for (const auto& turn : gResult.log) {
-      ConstEnvironmentVolatile cev(*envNV_, turn.env.env);
+      ConstEnvironmentVolatile cev(*hResult.nv, turn.env.env);
       for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
         std::vector<float> inputData(featureVector_->inputSize());
         featureVector_->seed(inputData.begin(), cev, iTeam);
@@ -139,4 +162,23 @@ std::vector<HeatDataset::Sample> Trainer::prepareDataset(const HeatResult& hResu
 
   SPDLOG_INFO("Prepared dataset with {} samples", samples.size());
   return samples;
+}
+
+
+std::vector<HeatDataset::Sample> Trainer::prepareDataset(
+    const LeagueHeat& lHeat) {
+  std::vector<HeatDataset::Sample> allSamples;
+  for (const auto& game : lHeat.games) {
+    auto samples = prepareDataset(game.heatResult);
+    allSamples.insert(
+        allSamples.end(),
+        std::make_move_iterator(samples.begin()),
+        std::make_move_iterator(samples.end()));
+  }
+
+  SPDLOG_INFO(
+      "Prepared aggregate dataset with {} samples from {} games",
+      allSamples.size(),
+      lHeat.games.size());
+  return allSamples;
 }

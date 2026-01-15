@@ -450,6 +450,7 @@ HeatResult Game::digestMatch(std::vector<GameResult>& gLog) const {
   // initialize heatResult:
   HeatResult hResult{};
 
+  hResult.nv = nv_;
   hResult.numPlies = 0;
   hResult.matchesTotal = cfg_.maxMatches;
   hResult.matchesPlayed = std::count_if(

@@ -1,11 +1,14 @@
 #ifndef TRAINER_H
 #define TRAINER_H
 
-#include "pokemonai/game.h"
-#include "pokemonai/feature_vector.h"
-#include "pokemonai/trainable_neural_net.h"
-#include <memory>
 #include <torch/torch.h>
+
+#include <memory>
+
+#include "pokemonai/feature_vector.h"
+#include "pokemonai/game.h"
+#include "pokemonai/league_heat.h"
+#include "pokemonai/trainable_neural_net.h"
 
 class HeatDataset : public torch::data::Dataset<HeatDataset> {
 public:
@@ -51,18 +54,21 @@ public:
   Trainer(
       std::shared_ptr<FeatureVector> featureVector,
       std::shared_ptr<TrainableNeuralNet> neuralNet,
-      std::shared_ptr<const EnvironmentNonvolatile> envNV,
       const Config& cfg = Config());
 
   float fit(const HeatResult& hResult);
+  float fit(const LeagueHeat& lHeat);
   float predict(const HeatResult& hResult);
+  float predict(const LeagueHeat& lHeat);
 
-protected:
-  std::vector<HeatDataset::Sample> prepareDataset(const HeatResult& hResult) const;
+ protected:
+  std::vector<HeatDataset::Sample> prepareDataset(const HeatResult& hResult);
+  std::vector<HeatDataset::Sample> prepareDataset(const LeagueHeat& lHeat);
+  float fit(std::vector<HeatDataset::Sample> samples);
+  float predict(std::vector<HeatDataset::Sample> samples) const;
 
   std::shared_ptr<FeatureVector> featureVector_;
   std::shared_ptr<TrainableNeuralNet> neuralNet_;
-  std::shared_ptr<const EnvironmentNonvolatile> envNV_;
   Config cfg_;
 };
 
