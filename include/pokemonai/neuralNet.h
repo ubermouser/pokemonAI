@@ -1,19 +1,34 @@
 #ifndef NEURALNET_H
 #define NEURALNET_H
 
+#include <torch/torch.h>
+
+#include <boost/program_options.hpp>
+#include <memory>
+#include <vector>
+
+#include "pokemonai/feature_vector.h"
+#include "pokemonai/name.h"
 #include "pokemonai/pkai.h"
 
-#include "pokemonai/name.h"
-
-#include <torch/torch.h>
-#include <vector>
-#include <memory>
-
-class neuralNet;
+class FeatureVector;
 
 
 class neuralNet: public Name
 {
+ public:
+  struct Config {
+    /* Architecture of the neural network (size of hidden layers) */
+    std::vector<int> architecture;
+
+    Config() {}
+    virtual ~Config() {}
+
+    virtual boost::program_options::options_description options(
+        const std::string& category = "neural network options",
+        std::string prefix = "");
+  };
+
 private:
   torch::nn::Sequential model;
   
@@ -30,46 +45,11 @@ public:
   /* generates an empty invalid neural network */
   neuralNet() : model() {};
 
-  /* creates an uninitialized neural network from an array of widths */
-  template<class InputIterator>
-  neuralNet(InputIterator current, const InputIterator last)
-  {
-    model = torch::nn::Sequential();
-    size_t lastWidth = *current;
-    layerWidths.push_back(lastWidth);
-    inputBuffer.resize(lastWidth, 0.0f);
-    
-    auto it = current;
-    ++it;
-    for (; it != last; ++it)
-    {
-      size_t currentWidth = *it;
-      layerWidths.push_back(currentWidth);
-      model->push_back(torch::nn::Linear(lastWidth, currentWidth));
-      model->push_back(torch::nn::Sigmoid()); // Maintaining sigmoid for compatibility
-      lastWidth = currentWidth;
-    }
-    outputBuffer.resize(lastWidth, 0.0f);
-  };
+  /* creates a neural network from a config */
+  neuralNet(const Config& cfg, const FeatureVector& featureVector);
 
-  /* return the result of outputneuron iOutputNode */
-  float result(size_t iOutputNode) const
-  {
-    return *(outputBegin() + iOutputNode);
-  };
-
-  template<class OutputIterator>
-  OutputIterator result_to(OutputIterator resultLoc) const
-  {
-    for (
-      constFloatIterator_t cOutput = outputBegin(), 
-      lOutput = outputEnd(); 
-      cOutput != lOutput; )
-    {
-      *resultLoc++ = *cOutput++;
-    }
-    return resultLoc;
-  };
+  /* creates a neural network from a config with explicit sizes */
+  neuralNet(const Config& cfg, size_t inputSize, size_t outputSize);
 
   /* just as it says, randomizes ALL the weights of this neural network */
   void randomizeWeights();

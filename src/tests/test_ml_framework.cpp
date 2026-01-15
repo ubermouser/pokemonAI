@@ -1,64 +1,84 @@
 #include <gtest/gtest.h>
-#include "pokemonai/neuralNet.h"
-#include <vector>
-#include <sstream>
+
 #include <iostream>
+#include <sstream>
+#include <vector>
+
+#include "pokemonai/feature_vector.h"
+#include "pokemonai/neuralNet.h"
+
+class MockFeatureVector : public FeatureVector {
+ public:
+  MockFeatureVector(size_t input, size_t output)
+      : input_(input), output_(output) {}
+  size_t inputSize() const override { return input_; }
+  size_t outputSize() const override { return output_; }
+
+ private:
+  size_t input_;
+  size_t output_;
+};
 
 TEST(MLFrameworkTest, BasicForwardPass) {
-    // Initialize a simple network with widths [2, 4, 1]
-    std::vector<size_t> widths = {2, 4, 1};
-    neuralNet net(widths.begin(), widths.end());
-    
-    EXPECT_TRUE(net.isInitialized());
-    EXPECT_EQ(net.numInputs(), 2);
-    EXPECT_EQ(net.numOutputs(), 1);
-    
-    // Set dummy input
-    std::vector<float> input = {0.5f, -0.2f};
-    net.feedForward(input.begin());
-    
-    // Check output
-    float output = net.result(0);
-    EXPECT_GE(output, 0.0f);
-    EXPECT_LE(output, 1.0f);
-    EXPECT_FALSE(std::isnan(output));
+  // Initialize a simple network with topology [2, 4, 1]
+  MockFeatureVector mfv(2, 1);
+  neuralNet::Config cfg;
+  cfg.architecture = {4};
+  neuralNet net(cfg, mfv);
+
+  EXPECT_TRUE(net.isInitialized());
+  EXPECT_EQ(net.numInputs(), 2);
+  EXPECT_EQ(net.numOutputs(), 1);
+
+  // Set dummy input
+  std::vector<float> input = {0.5f, -0.2f};
+  net.feedForward(input.begin());
+
+  // Check output
+  float output = *net.outputBegin();
+  EXPECT_GE(output, 0.0f);
+  EXPECT_LE(output, 1.0f);
+  EXPECT_FALSE(std::isnan(output));
 }
 
 TEST(MLFrameworkTest, WeightRandomization) {
-    std::vector<size_t> widths = {2, 2};
-    neuralNet net(widths.begin(), widths.end());
-    
-    net.randomizeWeights();
-    
-    std::vector<float> input = {1.0f, 1.0f};
-    net.feedForward(input.begin());
-    float output1 = net.result(0);
-    
-    net.randomizeWeights();
-    net.feedForward(input.begin());
-    float output2 = net.result(0);
-    
-    // Highly unlikely to be exactly the same after randomization
-    EXPECT_NE(output1, output2);
+  MockFeatureVector mfv(2, 2);
+  neuralNet::Config cfg;
+  neuralNet net(cfg, mfv);
+
+  net.randomizeWeights();
+
+  std::vector<float> input = {1.0f, 1.0f};
+  net.feedForward(input.begin());
+  float output1 = *net.outputBegin();
+
+  net.randomizeWeights();
+  net.feedForward(input.begin());
+  float output2 = *net.outputBegin();
+
+  // Highly unlikely to be exactly the same after randomization
+  EXPECT_NE(output1, output2);
 }
 
 TEST(MLFrameworkTest, Serialization) {
-    std::vector<size_t> widths = {2, 4, 1};
-    neuralNet net1(widths.begin(), widths.end());
-    net1.randomizeWeights();
-    
-    // Save to stream
-    std::stringstream ss;
-    net1.output(ss);
-    
-    // Load into a new network with same topology
-    neuralNet net2(widths.begin(), widths.end());
-    EXPECT_TRUE(net2.input(ss));
-    
-    // Compare outputs
-    std::vector<float> input = {0.8f, -0.5f};
-    net1.feedForward(input.begin());
-    net2.feedForward(input.begin());
-    
-    EXPECT_EQ(net1.result(0), net2.result(0));
+  MockFeatureVector mfv(2, 1);
+  neuralNet::Config cfg;
+  cfg.architecture = {4};
+  neuralNet net1(cfg, mfv);
+  net1.randomizeWeights();
+
+  // Save to stream
+  std::stringstream ss;
+  net1.output(ss);
+
+  // Load into a new network with same topology
+  neuralNet net2(cfg, mfv);
+  EXPECT_TRUE(net2.input(ss));
+
+  // Compare outputs
+  std::vector<float> input = {0.8f, -0.5f};
+  net1.feedForward(input.begin());
+  net2.feedForward(input.begin());
+
+  EXPECT_EQ(*net1.outputBegin(), *net2.outputBegin());
 }

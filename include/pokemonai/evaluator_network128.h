@@ -1,5 +1,5 @@
-#ifndef NEURAL_NETWORK_EVALUATOR_H
-#define NEURAL_NETWORK_EVALUATOR_H
+#ifndef EVALUATOR_NETWORK_128_H
+#define EVALUATOR_NETWORK_128_H
 
 #include "pokemonai/evaluator_network.h"
 
@@ -16,11 +16,11 @@ public:
 
   evaluator_network128* clone() const override { return new evaluator_network128(*this); }
 
-  void seed(float* cInput, const ConstEnvironmentVolatile& env, size_t iTeam) const override;
+  void seed(neuralNet::floatIterator_t cInput, const ConstEnvironmentVolatile& env, size_t iTeam) const override;
   size_t inputSize() const override { return numInputNeurons; };
   size_t outputSize() const override { return numOutputNeurons; };
 
   void outputNames(std::ostream& oS) const override;
 };
 
-#endif /* NEURAL_NETWORK_EVALUATOR_H */
+#endif /* EVALUATOR_NETWORK_128_H */

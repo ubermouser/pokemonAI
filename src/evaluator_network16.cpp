@@ -16,7 +16,8 @@
 const size_t evaluator_network16::numInputNeurons = (NEURONSPERTEAM*2);
 const size_t evaluator_network16::numOutputNeurons = 1U;
 
-evaluator_network16::evaluator_network16(const Config& cfg) : EvaluatorNetwork(cfg) {
+evaluator_network16::evaluator_network16(const Config& cfg)
+    : EvaluatorNetwork(cfg, numInputNeurons, numOutputNeurons) {
   updateIdent();
 }
 
@@ -27,8 +28,11 @@ evaluator_network16::evaluator_network16(const neuralNet& _cNet, const Config& c
   updateIdent();
 }
 
-void evaluator_network16::seed(float* inputBegin, const ConstEnvironmentVolatile& env, size_t _iTeam) const {
-  float* cInput;
+void evaluator_network16::seed(
+    neuralNet::floatIterator_t inputBegin,
+    const ConstEnvironmentVolatile& env,
+    size_t _iTeam) const {
+  neuralNet::floatIterator_t cInput;
   for (size_t iNTeam = 0; iNTeam < 2; ++iNTeam) {
     size_t iTeam = (_iTeam + iNTeam) & 1;
     const ConstTeamVolatile& cTV = env.getTeam(iTeam);
@@ -41,13 +45,18 @@ void evaluator_network16::seed(float* inputBegin, const ConstEnvironmentVolatile
       size_t iTeammate = iTeammates[iNTeammate];
       const ConstPokemonVolatile& cPKV = cTV.teammate(iTeammate);
       if (!cPKV.isAlive()) {
-        if (iNTeammate == 0) { memset(cInput, 0, sizeof(float)*NEURONSPERTEAMMATE); cInput+=NEURONSPERTEAMMATE; }
-        else { numTeammatesAlive--; }
+        if (iNTeammate == 0) {
+          std::fill(cInput, cInput + NEURONSPERTEAMMATE, 0.0f);
+          cInput += NEURONSPERTEAMMATE;
+        } else {
+          numTeammatesAlive--;
+        }
         continue;
       }
       *cInput++ = (float)cPKV.getPercentHP();
     }
-    memset(cInput, 0, sizeof(float) * NEURONSPERTEAMMATE * (6 - numTeammatesAlive));
+    std::fill(
+        cInput, cInput + NEURONSPERTEAMMATE * (6 - numTeammatesAlive), 0.0f);
     cInput += NEURONSPERTEAMMATE * (6 - numTeammatesAlive);
     const ConstPokemonVolatile& cPKV = cTV.getPKV();
     cInput[0] = scale((float)cPKV.getStatusAilment(), (float)AIL_NV_POISON_TOXIC, (float)AIL_NV_NONE);

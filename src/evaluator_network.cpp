@@ -18,24 +18,21 @@
 namespace po = boost::program_options;
 
 // featureVector implementations
-void featureVector::seed(neuralNet& cNet, const ConstEnvironmentVolatile& env, size_t iTeam) const {
-    assert(cNet.numInputs() >= inputSize());
-    seed(cNet.inputBegin(), env, iTeam);
+void EvaluatorNetwork::seed(
+    neuralNet& cNet, const ConstEnvironmentVolatile& env, size_t iTeam) const {
+  assert(cNet.numInputs() == inputSize() && cNet.numOutputs() == outputSize());
+  seed(cNet.inputBegin(), env, iTeam);
 }
 
-void featureVector::seed(neuralNet::floatIterator_t cInput, const ConstEnvironmentVolatile& env, size_t iTeam) const {
-    seed(&*cInput, env, iTeam);
-}
-
-void featureVector::outputNames(std::ostream& oS) const {
-    for (size_t iInput = 0, iSize = inputSize(); iInput != iSize; ++iInput) {
-        oS << "feature-" << iInput << ", ";
-    }
-    oS << "fitness-0";
-    for (size_t iOutput = 1; iOutput < outputSize(); ++iOutput) {
-        oS << ", fitness-" << iOutput;
-    }
-    oS << "\n";
+void EvaluatorNetwork::outputNames(std::ostream& oS) const {
+  for (size_t iInput = 0, iSize = inputSize(); iInput != iSize; ++iInput) {
+    oS << "feature-" << iInput << ", ";
+  }
+  oS << "fitness-0";
+  for (size_t iOutput = 1; iOutput < outputSize(); ++iOutput) {
+    oS << ", fitness-" << iOutput;
+  }
+  oS << "\n";
 }
 
 // featureVector_impl implementations
@@ -133,14 +130,21 @@ boost::program_options::options_description EvaluatorNetwork::Config::options(
     po::value<std::string>(&modelPath), 
     "Path to a pre-trained model file");
   // clang-format on
+  desc.add(netConfig.options("neural network options", prefix));
   return desc;
 }
 
-EvaluatorNetwork::EvaluatorNetwork(const Config& cfg) : Evaluator(cfg), cfg_(cfg), network_(nullptr) {
-}
+EvaluatorNetwork::EvaluatorNetwork(
+    const Config& cfg, size_t inputSize, size_t outputSize)
+    : Evaluator(cfg),
+      cfg_(cfg),
+      network_(
+          std::make_shared<neuralNet>(cfg.netConfig, inputSize, outputSize)) {}
 
-EvaluatorNetwork::EvaluatorNetwork(const neuralNet& network, const Config& cfg) : Evaluator(cfg), cfg_(cfg), network_(std::make_shared<neuralNet>(network)) {
-}
+EvaluatorNetwork::EvaluatorNetwork(const neuralNet& network, const Config& cfg)
+    : Evaluator(cfg),
+      cfg_(cfg),
+      network_(std::make_shared<neuralNet>(network)) {}
 
 EvaluatorNetwork::EvaluatorNetwork(const EvaluatorNetwork& other)
     : Evaluator(other), cfg_(other.cfg_),
@@ -195,15 +199,13 @@ EvalResult EvaluatorNetwork::calculateFitness(const ConstEnvironmentVolatile& en
 }
 
 EvalResult EvaluatorNetwork::calculateFitness(neuralNet& cNet, const ConstEnvironmentVolatile& env, size_t iTeam) const {
-    seed(&*cNet.inputBegin(), env, iTeam);
-    cNet.feedForward();
-    fpType fitness = *cNet.outputBegin();
-    fitness = std::max((fpType)0.0, std::min((fpType)1.0, scale(fitness, (fpType)0.85, (fpType)0.15)));
-    return EvalResult{ Fitness{fitness}};
-}
-
-const float* EvaluatorNetwork::getInput() const {
-    return network_ ? &*network_->inputBegin() : NULL;
+  seed(cNet.inputBegin(), env, iTeam);
+  cNet.feedForward();
+  fpType fitness = *cNet.outputBegin();
+  fitness = std::max(
+      (fpType)0.0,
+      std::min((fpType)1.0, scale(fitness, (fpType)0.85, (fpType)0.15)));
+  return EvalResult{Fitness{fitness}};
 }
 
 void EvaluatorNetwork::generateBestMoves() {

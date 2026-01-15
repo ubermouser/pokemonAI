@@ -20,7 +20,8 @@
 const size_t evaluator_network128::numInputNeurons = (NEURONSPERTEAM*2);
 const size_t evaluator_network128::numOutputNeurons = 1U;
 
-evaluator_network128::evaluator_network128(const Config& cfg) : EvaluatorNetwork(cfg) {
+evaluator_network128::evaluator_network128(const Config& cfg)
+    : EvaluatorNetwork(cfg, numInputNeurons, numOutputNeurons) {
   updateIdent();
 }
 
@@ -31,8 +32,11 @@ evaluator_network128::evaluator_network128(const neuralNet& _cNet, const Config&
   updateIdent();
 }
 
-void evaluator_network128::seed(float* inputBegin, const ConstEnvironmentVolatile& env, size_t _iTeam) const {
-  float* cInput;
+void evaluator_network128::seed(
+    neuralNet::floatIterator_t inputBegin,
+    const ConstEnvironmentVolatile& env,
+    size_t _iTeam) const {
+  neuralNet::floatIterator_t cInput;
   static const std::array<float, 13> statMultipliers = {{ 0.25f, 2.0f/7.0f, 2.0f/6.0f, 0.4f, 0.5f, 2.0f/3.0f, 1.0f, 1.5f, 2.0f, 2.5f, 3.0f, 3.5f, 4.0f }};
 
   for (size_t iNTeam = 0; iNTeam < 2; ++iNTeam) {
@@ -55,8 +59,12 @@ void evaluator_network128::seed(float* inputBegin, const ConstEnvironmentVolatil
       size_t iTeammate = iTeammates[iNTeammate];
       const ConstPokemonVolatile& cPKV = cTV.teammate(iTeammate);
       if (!cPKV.isAlive()) {
-        if (iNTeammate == 0) { memset(cInput, 0, sizeof(float)*NEURONSPERTEAMMATE); cInput+=NEURONSPERTEAMMATE; }
-        else { numTeammatesAlive--; }
+        if (iNTeammate == 0) {
+          std::fill(cInput, cInput + NEURONSPERTEAMMATE, 0.0f);
+          cInput += NEURONSPERTEAMMATE;
+        } else {
+          numTeammatesAlive--;
+        }
         continue;
       }
       const PokemonNonVolatile& cPKNV = cTNV.teammate(iTeammate);
@@ -89,10 +97,11 @@ void evaluator_network128::seed(float* inputBegin, const ConstEnvironmentVolatil
         size_t iModifier = (dType-1)*4 + (iNTeammate == 0 ? 1 : 0) + (iNOTeammate == 0 ? 2 : 0);
         *(cInput++) = std::max(0.0f, std::min(1.0f, bestDamage * modifiers[iModifier]));
       }
-      memset(cInput, 0, sizeof(float) * (6 - numOTeammatesAlive));
+      std::fill(cInput, cInput + (6 - numOTeammatesAlive), 0.0f);
       cInput += (6 - numOTeammatesAlive);
     }
-    memset(cInput, 0, sizeof(float)*NEURONSPERTEAMMATE * (6 - numTeammatesAlive));
+    std::fill(
+        cInput, cInput + NEURONSPERTEAMMATE * (6 - numTeammatesAlive), 0.0f);
     cInput += NEURONSPERTEAMMATE * (6 - numTeammatesAlive);
     cInput[0] = (float)(cTV.cGetFV_boosted(FV_SPEED) > tTV.cGetFV_boosted(FV_SPEED));
     cInput[1] = std::max(0.0f, std::min(1.0f, (float)(cTV.cGetAccuracy_boosted(FV_ACCURACY) * tTV.cGetAccuracy_boosted(FV_EVASION))));
