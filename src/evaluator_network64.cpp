@@ -39,10 +39,10 @@ evaluator_network64::evaluator_network64(const neuralNet& _cNet, const Config& c
 }
 
 void evaluator_network64::seed(
-    neuralNet::floatIterator_t inputBegin,
+    FeatureVector::floatIterator_t inputBegin,
     const ConstEnvironmentVolatile& env,
     size_t _iTeam) const {
-  neuralNet::floatIterator_t cInput;
+  FeatureVector::floatIterator_t cInput;
   static const std::array<float, 13> statMultipliers = {{ 0.25f, 2.0f/7.0f, 2.0f/6.0f, 0.4f, 0.5f, 2.0f/3.0f, 1.0f, 1.5f, 2.0f, 2.5f, 3.0f, 3.5f, 4.0f }};
 
   for (size_t iNTeam = 0; iNTeam < 2; ++iNTeam) {

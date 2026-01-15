@@ -76,9 +76,9 @@ class EvaluatorNetwork : public Evaluator, public FeatureVector {
   void updateIdent();
 
   virtual void seed(
-      neuralNet::floatIterator_t cInput,
+      floatIterator_t cInput,
       const ConstEnvironmentVolatile& env,
-      size_t iTeam) const = 0;
+      size_t iTeam) const override = 0;
 };
 
 #endif // EVALUATOR_NETWORK_H

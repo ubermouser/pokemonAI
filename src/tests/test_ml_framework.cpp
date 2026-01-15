@@ -14,6 +14,11 @@ class MockFeatureVector : public FeatureVector {
   size_t inputSize() const override { return input_; }
   size_t outputSize() const override { return output_; }
 
+  void seed(
+      floatIterator_t cInput,
+      const ConstEnvironmentVolatile& env,
+      size_t iTeam) const override {}
+
  private:
   size_t input_;
   size_t output_;

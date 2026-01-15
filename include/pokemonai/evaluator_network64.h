@@ -16,7 +16,7 @@ public:
 
   evaluator_network64* clone() const override;
 
-  void seed(neuralNet::floatIterator_t cInput, const ConstEnvironmentVolatile& env, size_t iTeam) const override;
+  void seed(FeatureVector::floatIterator_t cInput, const ConstEnvironmentVolatile& env, size_t iTeam) const override;
   size_t inputSize() const override { return numInputNeurons; };
   size_t outputSize() const override { return numOutputNeurons; };
 };

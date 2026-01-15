@@ -6,6 +6,11 @@ class MockFeatureVector : public FeatureVector {
  public:
   size_t inputSize() const override { return 10; }
   size_t outputSize() const override { return 2; }
+
+  void seed(
+      FeatureVector::floatIterator_t cInput,
+      const ConstEnvironmentVolatile& env,
+      size_t iTeam) const override {}
 };
 
 TEST(TrainableNeuralNetTest, Initialization) {

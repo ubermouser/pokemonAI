@@ -35,10 +35,10 @@ evaluator_network16::evaluator_network16(const neuralNet& _cNet, const Config& c
 }
 
 void evaluator_network16::seed(
-    neuralNet::floatIterator_t inputBegin,
+    FeatureVector::floatIterator_t inputBegin,
     const ConstEnvironmentVolatile& env,
     size_t _iTeam) const {
-  neuralNet::floatIterator_t cInput;
+  FeatureVector::floatIterator_t cInput;
   for (size_t iNTeam = 0; iNTeam < 2; ++iNTeam) {
     size_t iTeam = (_iTeam + iNTeam) & 1;
     const ConstTeamVolatile& cTV = env.getTeam(iTeam);

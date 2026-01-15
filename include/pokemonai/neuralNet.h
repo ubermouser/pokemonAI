@@ -38,10 +38,7 @@ class neuralNet: public Name
 
   std::vector<size_t> layerWidths;
 
-public:
-  typedef std::vector<float>::iterator floatIterator_t;
-  typedef std::vector<float>::const_iterator constFloatIterator_t;
-
+ public:
   /* generates an empty invalid neural network */
   neuralNet() : model() {};
 
@@ -77,17 +74,25 @@ public:
     return !model.is_empty();
   };
 
-  floatIterator_t inputBegin()			{ return inputBuffer.begin(); };
-  constFloatIterator_t inputBegin() const	{ return inputBuffer.begin(); };
+  FeatureVector::floatIterator_t inputBegin() { return inputBuffer.begin(); };
+  FeatureVector::constFloatIterator_t inputBegin() const {
+    return inputBuffer.begin();
+  };
 
-  floatIterator_t inputEnd()				{ return inputBuffer.end(); };
-  constFloatIterator_t inputEnd() const	{ return inputBuffer.end(); };
+  FeatureVector::floatIterator_t inputEnd() { return inputBuffer.end(); };
+  FeatureVector::constFloatIterator_t inputEnd() const {
+    return inputBuffer.end();
+  };
 
-  floatIterator_t outputBegin()			{ return outputBuffer.begin(); }; 
-  constFloatIterator_t outputBegin() const{ return outputBuffer.begin(); }; 
+  FeatureVector::floatIterator_t outputBegin() { return outputBuffer.begin(); };
+  FeatureVector::constFloatIterator_t outputBegin() const {
+    return outputBuffer.begin();
+  };
 
-  floatIterator_t outputEnd()				{ return outputBuffer.end(); };
-  constFloatIterator_t outputEnd() const	{ return outputBuffer.end(); };
+  FeatureVector::floatIterator_t outputEnd() { return outputBuffer.end(); };
+  FeatureVector::constFloatIterator_t outputEnd() const {
+    return outputBuffer.end();
+  };
 
   size_t numInputs() const
   {
@@ -108,6 +113,9 @@ public:
   {
     return layerWidths[iLayer];
   };
+
+  torch::nn::Sequential& getModel() { return model; }
+  const torch::nn::Sequential& getModel() const { return model; }
 
   /* output in binary to an ostream using torch::save */
   void output(std::ostream& oFile) const;
