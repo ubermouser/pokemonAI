@@ -138,11 +138,7 @@ float Trainer::predict(std::vector<HeatDataset::Sample> samples) const {
 
 std::vector<HeatDataset::Sample> Trainer::prepareDataset(
     const HeatResult& hResult) {
-  // TODO: FeatureVector needs to expose a way to set the nonvolatile
-  // environment
-  if (auto evaluator = std::dynamic_pointer_cast<Evaluator>(featureVector_)) {
-    evaluator->setEnvironment(hResult.nv);
-  }
+  featureVector_->setEnvironment(hResult.nv);
 
   std::vector<HeatDataset::Sample> samples;
   for (const auto& gResult : hResult.gameResults) {

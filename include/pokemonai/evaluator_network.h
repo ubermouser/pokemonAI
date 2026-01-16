@@ -38,7 +38,7 @@ class EvaluatorNetwork : public Evaluator, public FeatureVector {
   EvaluatorNetwork(const EvaluatorNetwork& other);
   virtual ~EvaluatorNetwork() override;
 
-  virtual Evaluator& initialize() override;
+  virtual EvaluatorNetwork& initialize() override;
 
   virtual std::shared_ptr<neuralNet>& getNetwork() { return network_; }
 
@@ -46,7 +46,7 @@ class EvaluatorNetwork : public Evaluator, public FeatureVector {
   virtual void setNetwork(const neuralNet& network) {
     setNetwork(std::make_shared<neuralNet>(network));
   }
-  virtual Evaluator& setEnvironment(
+  virtual EvaluatorNetwork& setEnvironment(
       const std::shared_ptr<const EnvironmentNonvolatile>& env) override;
 
   virtual EvalResult calculateFitness(

@@ -147,29 +147,40 @@ EvaluatorNetwork::EvaluatorNetwork(const EvaluatorNetwork& other)
 EvaluatorNetwork::~EvaluatorNetwork() {
 }
 
-Evaluator& EvaluatorNetwork::initialize() {
-    Evaluator::initialize();
-    
-    if (!network_ && !cfg_.modelPath.empty()) {
-        auto net = std::make_shared<neuralNet>();
-        std::ifstream iFile(cfg_.modelPath, std::ios::binary);
-        if (!iFile) {
-            throw std::invalid_argument(fmt::format("EvaluatorNetwork: could not open model file {}", cfg_.modelPath));
-        }
-        if (!net->input(iFile)) {
-            throw std::invalid_argument(fmt::format("EvaluatorNetwork: failed to load model from {}", cfg_.modelPath));
-        }
-        network_ = net;
-        updateIdent();
-    }
+EvaluatorNetwork& EvaluatorNetwork::initialize() {
+  Evaluator::initialize();
 
-    if (!network_) { throw std::invalid_argument("EvaluatorNetwork: network undefined"); }
-    if (!network_->isInitialized()) { throw std::invalid_argument("EvaluatorNetwork: network not initialized"); }
-    if (network_->numInputs() != inputSize() || network_->numOutputs() != outputSize()) {
-        throw std::invalid_argument(fmt::format("EvaluatorNetwork requires input-{} (has {}), output-{} (has {})!",
-                     inputSize(), network_->numInputs(), outputSize(), network_->numOutputs()));
+  if (!network_ && !cfg_.modelPath.empty()) {
+    auto net = std::make_shared<neuralNet>();
+    std::ifstream iFile(cfg_.modelPath, std::ios::binary);
+    if (!iFile) {
+      throw std::invalid_argument(fmt::format(
+          "EvaluatorNetwork: could not open model file {}", cfg_.modelPath));
     }
-    return *this;
+    if (!net->input(iFile)) {
+      throw std::invalid_argument(fmt::format(
+          "EvaluatorNetwork: failed to load model from {}", cfg_.modelPath));
+    }
+    network_ = net;
+    updateIdent();
+  }
+
+  if (!network_) {
+    throw std::invalid_argument("EvaluatorNetwork: network undefined");
+  }
+  if (!network_->isInitialized()) {
+    throw std::invalid_argument("EvaluatorNetwork: network not initialized");
+  }
+  if (network_->numInputs() != inputSize() ||
+      network_->numOutputs() != outputSize()) {
+    throw std::invalid_argument(fmt::format(
+        "EvaluatorNetwork requires input-{} (has {}), output-{} (has {})!",
+        inputSize(),
+        network_->numInputs(),
+        outputSize(),
+        network_->numOutputs()));
+  }
+  return *this;
 }
 
 void EvaluatorNetwork::setNetwork(const std::shared_ptr<neuralNet>& network) {
@@ -177,13 +188,14 @@ void EvaluatorNetwork::setNetwork(const std::shared_ptr<neuralNet>& network) {
   updateIdent();
 }
 
-Evaluator& EvaluatorNetwork::setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& env) {
-    Evaluator::setEnvironment(env);
-    // nv_ is already set by Evaluator::setEnvironment
-    generateBestMoves();
-    generateOrders();
-    if (network_) network_->clearInput();
-    return *this;
+EvaluatorNetwork& EvaluatorNetwork::setEnvironment(
+    const std::shared_ptr<const EnvironmentNonvolatile>& env) {
+  Evaluator::setEnvironment(env);
+  // nv_ is already set by Evaluator::setEnvironment
+  generateBestMoves();
+  generateOrders();
+  if (network_) network_->clearInput();
+  return *this;
 }
 
 EvalResult EvaluatorNetwork::calculateFitness(const ConstEnvironmentVolatile& env, size_t iTeam) const {

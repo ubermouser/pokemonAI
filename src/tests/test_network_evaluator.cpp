@@ -11,11 +11,6 @@
 #include "pokemonai/feature_vector.h"
 #include "pokemonai/neuralNet.h"
 
-class TestFeatureVector : public FeatureVector {
- public:
-  size_t inputSize() const override { return 16; }
-  size_t outputSize() const override { return 1; }
-};
 
 class NetworkEvaluatorTest : public Gen4EngineTest {
  protected:
@@ -55,6 +50,7 @@ class NetworkEvaluatorTest : public Gen4EngineTest {
   std::shared_ptr<EnvironmentNonvolatile> environment_;
 };
 
+
 void validateNetworkTerminalState(Evaluator& eval, const ConstEnvironmentVolatile& envp, fpType fitness=0.0) {
   EvalResult agentFitness = eval.evaluate(envp, TEAM_A);
   EvalResult otherFitness = eval.evaluate(envp, TEAM_B);
@@ -64,6 +60,7 @@ void validateNetworkTerminalState(Evaluator& eval, const ConstEnvironmentVolatil
   EXPECT_TRUE(agentFitness.fullyEvaluated());
   EXPECT_TRUE(otherFitness.fullyEvaluated());
 }
+
 
 void validateNetworkNonTerminalState(Evaluator& eval, const ConstEnvironmentVolatile& envp) {
   EvalResult agentFitness = eval.evaluate(envp, TEAM_A);
@@ -75,11 +72,13 @@ void validateNetworkNonTerminalState(Evaluator& eval, const ConstEnvironmentVola
   EXPECT_LE(otherFitness.fitness.value(), 1.0);
 }
 
+
 TEST_F(NetworkEvaluatorTest, Network16Initialization) {
   auto eval = createEvaluator("network16");
   EXPECT_NO_THROW(eval->initialize());
   validateNetworkNonTerminalState(*eval, engine_->initialState());
 }
+
 
 TEST_F(NetworkEvaluatorTest, Network32Initialization) {
   auto eval = createEvaluator("network32");
@@ -87,17 +86,20 @@ TEST_F(NetworkEvaluatorTest, Network32Initialization) {
   validateNetworkNonTerminalState(*eval, engine_->initialState());
 }
 
+
 TEST_F(NetworkEvaluatorTest, Network64Initialization) {
   auto eval = createEvaluator("network64");
   EXPECT_NO_THROW(eval->initialize());
   validateNetworkNonTerminalState(*eval, engine_->initialState());
 }
 
+
 TEST_F(NetworkEvaluatorTest, Network128Initialization) {
   auto eval = createEvaluator("network128");
   EXPECT_NO_THROW(eval->initialize());
   validateNetworkNonTerminalState(*eval, engine_->initialState());
 }
+
 
 TEST_F(NetworkEvaluatorTest, TerminalStates) {
   auto eval = createEvaluator("network16");

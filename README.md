@@ -86,7 +86,7 @@ Individual tests:
 All tests: 
 
 ```bash
-pushd build/build/Release && ctest --output-on-failure; popd
+ctest --preset conan-release --output-on-failure
 ```
 
 Individual test:

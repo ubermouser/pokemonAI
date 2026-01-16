@@ -10,5 +10,5 @@
 - To install dependencies: `conan install . --output-folder=build --build=missing -s build_type=Release`.
 - To configure: `cmake --preset conan-release`.
 - To build: `cmake --build --preset conan-release -j16`.
-- To test: `pushd build/build/Release && ctest --output-on-failure; popd`.
+- To test: `ctest --preset conan-release --output-on-failure`.
 - Individual tests may be run as follows: `./build/build/Release/src/tests/test_name`.

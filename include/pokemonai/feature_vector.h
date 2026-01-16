@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "pokemonai/environment_volatile.h"
+#include "pokemonai/evaluator.h"
 
 class FeatureVector {
  public:
@@ -17,6 +18,9 @@ class FeatureVector {
 
   virtual size_t inputSize() const = 0;
   virtual size_t outputSize() const = 0;
+
+  virtual FeatureVector& setEnvironment(
+      const std::shared_ptr<const EnvironmentNonvolatile>& env) = 0;
 
   virtual void seed(
       floatIterator_t cInput,

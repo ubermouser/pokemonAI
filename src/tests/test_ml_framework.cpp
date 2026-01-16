@@ -14,6 +14,11 @@ class MockFeatureVector : public FeatureVector {
   size_t inputSize() const override { return input_; }
   size_t outputSize() const override { return output_; }
 
+  FeatureVector& setEnvironment(
+      const std::shared_ptr<const EnvironmentNonvolatile>& env) override {
+    return *this;
+  }
+
   void seed(
       floatIterator_t cInput,
       const ConstEnvironmentVolatile& env,
