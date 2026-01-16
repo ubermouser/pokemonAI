@@ -34,7 +34,7 @@ void Trainer::initialize() {
     if (!net) { continue; }
 
     if (uniqueNetworks.find(net) == uniqueNetworks.end()) {
-      trainableNetworks_.push_back({evalPtr, net, pair.second->getName()});
+      trainableNetworks_.push_back({evalPtr, net});
       uniqueNetworks.insert(net);
     }
   }
@@ -91,7 +91,7 @@ void Trainer::printTrainingResults(const LeagueHeat& league) const {
   for (auto& tp : trainableNetworks_) {
     TrainerRegressFitness trainer(tp.evaluator, tp.network, cfg_.training);
     float loss = trainer.predict(league);
-    std::string name = tp.network->getName();
+    std::string name = tp.evaluator->getName();
     out_.get() << fmt::format(" {}: loss={:.6f}\n", name, loss);
   }
 }
