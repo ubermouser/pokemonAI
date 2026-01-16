@@ -1,4 +1,5 @@
 add_library(pkaiEngine SHARED
+    ../src/app_utils.cpp
     ../src/ability.cpp
     ../src/action.cpp
     ../src/environment_nonvolatile.cpp

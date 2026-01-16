@@ -11,6 +11,7 @@
 #include <memory>
 #include <string>
 
+#include "pokemonai/app_utils.h"
 #include "pokemonai/engine.h"
 #include "pokemonai/evaluator_simple.h"
 #include "pokemonai/evaluators.h"
@@ -119,14 +120,11 @@ Config parse_command_line(int argc, char**argv) {
   return cfg;
 }
 
+#include "pokemonai/app_utils.h"
+
 int main(int argc, char** argv) {
-  initialize_logger();
   auto cfg = parse_command_line(argc, argv);
-
-  spdlog::set_level(spdlog::level::level_enum(cfg.verbosity));
-  srand((cfg.random_seed < 0)?time(NULL):cfg.random_seed);
-
-  auto pokedex = PokedexDynamic(cfg.pokedex);
+  auto pokedex = PokemonAIAppUtils::bootstrap(cfg.verbosity, cfg.random_seed, cfg.pokedex);
 
   TeamBuilder teambuilder{cfg.teambuilder};
   teambuilder.setEngine(PkCU{cfg.engine});

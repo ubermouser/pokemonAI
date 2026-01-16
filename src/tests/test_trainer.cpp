@@ -15,7 +15,7 @@ class TrainerTest : public Gen4EngineTest {
   void SetUp() override {
     Gen4EngineTest::SetUp();
 
-    trainer_cfg_.verbosity = 1;
+    trainer_cfg_.verbosity = 2;
     trainer_cfg_.minGamesPerBattlegroup = 1;
     trainer_cfg_.maxGenerations = 1;
     trainer_cfg_.teamPopulationSize = {4, 0, 0, 0, 0, 0};

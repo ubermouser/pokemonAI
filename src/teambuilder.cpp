@@ -80,11 +80,16 @@ LeagueHeat TeamBuilder::evolve() const {
 
     // rank the league:
     runLeague(league);
+
+    postGenerationHook(league);
   }
 
   if (cfg_.verbosity >= 1) { out_.get() << "Evolution Complete!\n"; }
   if (cfg_.verbosity >= 2) { printLeagueCounts(league); }
   if (cfg_.saveOnCompletion) { saveTeamPopulation(league); }
+
+  postEvolveHook(league);
+
   return league;
 }
 

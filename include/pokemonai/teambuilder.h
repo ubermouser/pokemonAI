@@ -57,7 +57,11 @@ public:
 
   /* begin evolution process */
   LeagueHeat evolve() const;
-protected:
+
+ protected:
+  virtual void postGenerationHook(LeagueHeat& league) const {}
+  virtual void postEvolveHook(LeagueHeat& league) const {}
+
   Config cfg_;
 
   TeamFactory teamFactory_;
@@ -72,7 +76,8 @@ protected:
   void printGenerationStart(const League& league, size_t iGeneration) const;
   void printMutationStats(const MutationStats& stats) const;
 
-  /* generates a random population from previous leagues, or from random functions if at single pokemon league */
+  /* generates a random population from previous leagues, or from random
+   * functions if at single pokemon league */
   size_t seedRandomTeamPopulation(League& league) const;
 
   TeamLeague spawnTeamChildren(League& league) const;

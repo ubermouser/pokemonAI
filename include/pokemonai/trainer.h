@@ -18,13 +18,22 @@ class Trainer : public TeamBuilder {
 
  Trainer(const Config& cfg);
 
- virtual LeagueHeat evolve() const;
+ virtual void initialize() override;
 
 protected:
-  void train(LeagueHeat& league) const;
-  void saveTrainedNetworks(const LeagueHeat& league) const;
+ struct TrainablePair {
+   std::shared_ptr<class EvaluatorNetwork> evaluator;
+   std::shared_ptr<class TrainableNeuralNet> network;
+ };
+ virtual void postGenerationHook(LeagueHeat& league) const override;
+ virtual void postEvolveHook(LeagueHeat& league) const override;
 
-  Config cfg_;
+ void train(LeagueHeat& league) const;
+ void saveTrainedNetworks() const;
+ void printTrainingResults(const LeagueHeat& league) const;
+
+ Config cfg_;
+ std::vector<TrainablePair> trainableNetworks_;
 };
 
 #endif // TRAINER_H
