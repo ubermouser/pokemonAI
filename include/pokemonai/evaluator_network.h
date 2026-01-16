@@ -7,6 +7,7 @@
 #include "pokemonai/evaluator.h"
 #include "pokemonai/feature_vector.h"
 #include "pokemonai/neuralNet.h"
+#include "pokemonai/trainable_neural_net.h"
 
 
 typedef std::array< std::array< std::array< std::array<uint8_t, 4> , 6> , 6>, 2> bestMoveOrders_t;
@@ -23,7 +24,7 @@ class EvaluatorNetwork : public Evaluator, public FeatureVector {
  public:
   struct Config : public Evaluator::Config {
     std::string modelPath;
-    neuralNet::Config netConfig;
+    TrainableNeuralNet::Config netConfig;
 
     Config() : Evaluator::Config() {}
     virtual ~Config() {}
@@ -39,6 +40,8 @@ class EvaluatorNetwork : public Evaluator, public FeatureVector {
   virtual ~EvaluatorNetwork() override;
 
   virtual EvaluatorNetwork& initialize() override;
+
+  const Config& getConfig() const { return cfg_; }
 
   virtual std::shared_ptr<neuralNet>& getNetwork() { return network_; }
 

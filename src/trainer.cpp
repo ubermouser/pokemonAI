@@ -1,180 +1,109 @@
 #include "pokemonai/trainer.h"
-#include "pokemonai/environment_possible.h"
-#include <torch/torch.h>
-#include <vector>
+
 #include <spdlog/spdlog.h>
+
+#include <fstream>
+#include <unordered_set>
+
+#include "pokemonai/evaluator_network.h"
 
 namespace po = boost::program_options;
 
-
-boost::program_options::options_description Trainer::Config::options(
+po::options_description Trainer::Config::options(
     const std::string& category, std::string prefix) {
-  po::options_description desc(category);
-  if (prefix.size() > 0 && prefix.back() != '-') { prefix.append("-"); }
-  // clang-format off
-  desc.add_options()
-    ((prefix + "batch-size").c_str(), 
-    po::value<size_t>(&batchSize)->default_value(batchSize), 
-    "Size of training batches")
-    ((prefix + "log-interval").c_str(), 
-    po::value<size_t>(&logInterval)->default_value(logInterval), 
-    "Number of batches between logging loss")
-    ((prefix + "epochs").c_str(), 
-    po::value<size_t>(&numEpochs)->default_value(numEpochs), 
-    "Number of training epochs")
-    ((prefix + "seed").c_str(),
-    po::value<uint64_t>(&seed)->default_value(seed),
-    "Random seed for training. If 0, a random seed is used.");
-  // clang-format on
+  auto desc = TeamBuilder::Config::options(category, prefix);
+  desc.add(training.options(category + " [Training]", prefix + "training"));
   return desc;
 }
 
+Trainer::Trainer(const Config& cfg) : TeamBuilder(cfg), cfg_(cfg) {}
 
-Trainer::Trainer(
-    std::shared_ptr<FeatureVector> featureVector,
-    std::shared_ptr<TrainableNeuralNet> neuralNet,
-    const Config& cfg)
-    : featureVector_(featureVector), neuralNet_(neuralNet), cfg_(cfg) {}
+LeagueHeat Trainer::evolve() const {
+  testInitialized();
 
+  LeagueHeat league = constructLeague();
+  for (size_t iGeneration = 0; iGeneration < cfg_.maxGenerations;
+       ++iGeneration) {
+    if (iGeneration > 0) {
+      // perform an evolution step (if this is not the first generation):
+      evolveGeneration(league);
 
-float Trainer::fit(const HeatResult& hResult) {
-  return fit(prepareDataset(hResult));
-}
-
-
-float Trainer::fit(const LeagueHeat& lHeat) {
-  return fit(prepareDataset(lHeat));
-}
-
-
-float Trainer::fit(std::vector<HeatDataset::Sample> samples) {
-  if (cfg_.seed != 0) {
-    torch::manual_seed(cfg_.seed);
-  }
-
-  if (samples.empty()) return 0.0f;
-
-  // 2. Create DataLoader
-  auto dataset = HeatDataset(std::move(samples)).map(torch::data::transforms::Stack<>());
-  auto dataLoader = torch::data::make_data_loader<torch::data::samplers::RandomSampler>(
-      std::move(dataset),
-      torch::data::DataLoaderOptions().batch_size(cfg_.batchSize));
-
-  // 3. Training Loop
-  float totalLoss = 0;
-  size_t totalBatchCount = 0;
-  auto& model = neuralNet_->getModel();
-  auto& optimizer = neuralNet_->getOptimizer();
-
-  model->train();
-  for (size_t iEpoch = 0; iEpoch < cfg_.numEpochs; ++iEpoch) {
-    float epochLoss = 0;
-    size_t epochBatchCount = 0;
-
-    for (auto& batch : *dataLoader) {
-      optimizer.zero_grad();
-      
-      auto output = model->forward(batch.data);
-      auto loss = torch::mse_loss(output, batch.target);
-      
-      loss.backward();
-      optimizer.step();
-
-      float currentLoss = loss.item<float>();
-      epochLoss += currentLoss;
-      epochBatchCount++;
-      totalBatchCount++;
-
-      if (cfg_.logInterval > 0 && (totalBatchCount % cfg_.logInterval == 0)) {
-        SPDLOG_INFO("Epoch {}/{} Batch {}: Loss = {:.6f}", iEpoch + 1, cfg_.numEpochs, totalBatchCount, currentLoss);
-      }
+      // reset league counting:
+      resetLeague(league);
     }
-    totalLoss += epochLoss / (epochBatchCount > 0 ? epochBatchCount : 1);
+
+    if (cfg_.verbosity >= 1) { printGenerationStart(league, iGeneration); }
+
+    // rank the league:
+    runLeague(league);
+
+    // After every heat, train the networks:
+    train(league);
   }
 
-  float finalLoss = cfg_.numEpochs > 0 ? totalLoss / cfg_.numEpochs : 0.0f;
-  SPDLOG_INFO("Training completed with average loss: {:.6f}", finalLoss);
-  return finalLoss;
-}
-
-
-float Trainer::predict(const HeatResult& hResult) {
-  return predict(prepareDataset(hResult));
-}
-
-
-float Trainer::predict(const LeagueHeat& lHeat) {
-  return predict(prepareDataset(lHeat));
-}
-
-
-float Trainer::predict(std::vector<HeatDataset::Sample> samples) const {
-  if (samples.empty()) return 0.0f;
-
-  auto dataset = HeatDataset(std::move(samples)).map(torch::data::transforms::Stack<>());
-  auto dataLoader = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(
-      std::move(dataset),
-      torch::data::DataLoaderOptions().batch_size(cfg_.batchSize));
-
-  float totalLoss = 0;
-  size_t totalBatchCount = 0;
-  auto& model = neuralNet_->getModel();
-
-  torch::NoGradGuard no_grad;
-  model->eval();
-  for (auto& batch : *dataLoader) {
-    auto output = model->forward(batch.data);
-    auto loss = torch::mse_loss(output, batch.target);
-
-    totalLoss += loss.item<float>();
-    totalBatchCount++;
+  if (cfg_.verbosity >= 1) {
+    out_.get() << "Evolution and Training Complete!\n";
   }
+  if (cfg_.verbosity >= 2) { printLeagueCounts(league); }
+  if (cfg_.saveOnCompletion) { saveTeamPopulation(league); }
 
-  float finalLoss = totalBatchCount > 0 ? totalLoss / totalBatchCount : 0.0f;
-  SPDLOG_INFO("Evaluation completed with average loss: {:.6f}", finalLoss);
-  return finalLoss;
+  // Final save of trained networks
+  saveTrainedNetworks(league);
+
+  return league;
 }
 
+void Trainer::train(LeagueHeat& league) const {
+  std::unordered_set<std::shared_ptr<TrainableNeuralNet>> trainedNetworks;
 
-std::vector<HeatDataset::Sample> Trainer::prepareDataset(
-    const HeatResult& hResult) {
-  featureVector_->setEnvironment(hResult.nv);
-
-  std::vector<HeatDataset::Sample> samples;
-  for (const auto& gResult : hResult.gameResults) {
-    for (const auto& turn : gResult.log) {
-      ConstEnvironmentVolatile cev(*hResult.nv, turn.env.env);
-      for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
-        std::vector<float> inputData(featureVector_->inputSize());
-        featureVector_->seed(inputData.begin(), cev, iTeam);
-
-        auto inputTensor = torch::from_blob(inputData.data(), {(long)inputData.size()}, torch::kFloat).clone();
-        auto targetTensor = torch::tensor({(float)turn.teams[iTeam].simpleFitness}, torch::kFloat);
-
-        samples.push_back({inputTensor, targetTensor});
+  for (auto& pair : league.evaluators) {
+    auto evalPtr = pair.second->getPtr();
+    if (auto evalNet = std::dynamic_pointer_cast<EvaluatorNetwork>(evalPtr)) {
+      auto net = evalNet->getNetwork();
+      if (auto trainable = std::dynamic_pointer_cast<TrainableNeuralNet>(net)) {
+        if (trainedNetworks.find(trainable) == trainedNetworks.end()) {
+          SPDLOG_INFO("Training network: {}", trainable->getName());
+          TrainerRegressFitness trainer(evalNet, trainable, cfg_.training);
+          trainer.fit(league);
+          trainedNetworks.insert(trainable);
+        }
       }
     }
   }
-
-  SPDLOG_INFO("Prepared dataset with {} samples", samples.size());
-  return samples;
 }
 
+void Trainer::saveTrainedNetworks(const LeagueHeat& league) const {
+  std::unordered_set<std::shared_ptr<TrainableNeuralNet>> savedNetworks;
 
-std::vector<HeatDataset::Sample> Trainer::prepareDataset(
-    const LeagueHeat& lHeat) {
-  std::vector<HeatDataset::Sample> allSamples;
-  for (const auto& game : lHeat.games) {
-    auto samples = prepareDataset(game.heatResult);
-    allSamples.insert(
-        allSamples.end(),
-        std::make_move_iterator(samples.begin()),
-        std::make_move_iterator(samples.end()));
+  for (auto& pair : league.evaluators) {
+    auto evalPtr = pair.second->getPtr();
+    if (auto evalNet = std::dynamic_pointer_cast<EvaluatorNetwork>(evalPtr)) {
+      auto net = evalNet->getNetwork();
+      if (auto trainable = std::dynamic_pointer_cast<TrainableNeuralNet>(net)) {
+        if (savedNetworks.find(trainable) == savedNetworks.end()) {
+          const auto& netCfg = evalNet->getConfig().netConfig;
+          if (!netCfg.checkpointPath.empty()) {
+            SPDLOG_INFO(
+                "Saving trained network {} to {}",
+                trainable->getName(),
+                netCfg.checkpointPath);
+            std::ofstream oFile(netCfg.checkpointPath, std::ios::binary);
+            if (oFile) {
+              trainable->output(oFile);
+            } else {
+              SPDLOG_ERROR(
+                  "Failed to open checkpoint path {} for writing",
+                  netCfg.checkpointPath);
+            }
+          } else {
+            SPDLOG_WARN(
+                "Trained network {} has no checkpoint path defined, not saving "
+                "to disk",
+                trainable->getName());
+          }
+          savedNetworks.insert(trainable);
+        }
+      }
+    }
   }
-
-  SPDLOG_INFO(
-      "Prepared aggregate dataset with {} samples from {} games",
-      allSamples.size(),
-      lHeat.games.size());
-  return allSamples;
 }

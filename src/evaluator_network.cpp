@@ -1,19 +1,23 @@
 #include "pokemonai/evaluator_network.h"
-#include "pokemonai/environment_nonvolatile.h"
-#include "pokemonai/team_nonvolatile.h"
-#include "pokemonai/pokemon_nonvolatile.h"
-#include "pokemonai/environment_volatile.h"
-#include "pokemonai/team_volatile.h"
-#include "pokemonai/pokemon_volatile.h"
-#include "pokemonai/type.h"
-#include "pokemonai/move.h"
-#include "pokemonai/pokemon_base.h"
-#include "pokemonai/fp_compare.h"
-#include <sstream>
+
 #include <assert.h>
+
 #include <algorithm>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <fstream>
+#include <sstream>
+
+#include "pokemonai/environment_nonvolatile.h"
+#include "pokemonai/environment_volatile.h"
+#include "pokemonai/fp_compare.h"
+#include "pokemonai/move.h"
+#include "pokemonai/pokemon_base.h"
+#include "pokemonai/pokemon_nonvolatile.h"
+#include "pokemonai/pokemon_volatile.h"
+#include "pokemonai/team_nonvolatile.h"
+#include "pokemonai/team_volatile.h"
+#include "pokemonai/trainable_neural_net.h"
+#include "pokemonai/type.h"
 
 namespace po = boost::program_options;
 
@@ -120,7 +124,8 @@ boost::program_options::options_description EvaluatorNetwork::Config::options(
     po::value<std::string>(&modelPath), 
     "Path to a pre-trained model file");
   // clang-format on
-  desc.add(netConfig.options("neural network options", prefix));
+  desc.add(
+      netConfig.options(category + " [TrainableNeuralNet]", prefix + "net"));
   return desc;
 }
 
@@ -128,8 +133,8 @@ EvaluatorNetwork::EvaluatorNetwork(
     const Config& cfg, size_t inputSize, size_t outputSize)
     : Evaluator(cfg),
       cfg_(cfg),
-      network_(
-          std::make_shared<neuralNet>(cfg.netConfig, inputSize, outputSize)) {}
+      network_(std::make_shared<TrainableNeuralNet>(
+          cfg.netConfig, inputSize, outputSize)) {}
 
 EvaluatorNetwork::EvaluatorNetwork(const neuralNet& network, const Config& cfg)
     : Evaluator(cfg),

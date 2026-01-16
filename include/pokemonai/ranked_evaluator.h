@@ -16,8 +16,9 @@ public:
   const std::string& getName() const override { return eval_->getName(); }
 
   const Evaluator& get() const { return *eval_; };
+  const std::shared_ptr<Evaluator>& getPtr() const { return eval_; }
 
-protected:
+ protected:
   virtual Hash generateHash(bool generateSubHashes = true) override;
   virtual std::string defineName() override { return eval_->getName(); }
 

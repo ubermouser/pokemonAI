@@ -1,14 +1,13 @@
 #include <gtest/gtest.h>
 
+#include <boost/filesystem.hpp>
+
 #include "engine_test.hpp"
 #include "pokemonai/evaluator_network16.h"
 #include "pokemonai/evaluator_simple.h"
 #include "pokemonai/evaluators.h"
-#include "pokemonai/game.h"
 #include "pokemonai/planners.h"
-#include "pokemonai/ranker.h"
 #include "pokemonai/team_nonvolatile.h"
-#include "pokemonai/trainable_neural_net.h"
 #include "pokemonai/trainer.h"
 
 class TrainerTest : public Gen4EngineTest {
@@ -16,55 +15,56 @@ class TrainerTest : public Gen4EngineTest {
   void SetUp() override {
     Gen4EngineTest::SetUp();
 
-    // Setup Ranker
-    Ranker::Config ranker_cfg;
-    ranker_cfg.verbosity = 0;
-    ranker_cfg.minGamesPerBattlegroup = 5;
-    ranker_cfg.numThreads = 1;
-    ranker_ = std::make_shared<Ranker>(ranker_cfg);
-    ranker_->setEngine(*engine_);
-    ranker_->setGame(Game{});
-    ranker_->setStateEvaluator(EvaluatorSimple{});
+    trainer_cfg_.verbosity = 1;
+    trainer_cfg_.minGamesPerBattlegroup = 1;
+    trainer_cfg_.maxGenerations = 1;
+    trainer_cfg_.teamPopulationSize = {4, 0, 0, 0, 0, 0};
+    trainer_cfg_.training.numEpochs = 1;
+    trainer_cfg_.training.batchSize = 2;
 
-    ranker_->addPlanner(
+    trainer_ = std::make_shared<Trainer>(trainer_cfg_);
+    trainer_->setEngine(*engine_);
+
+    Game::Config game_cfg;
+    game_cfg.storeSubcomponents = true;
+    trainer_->setGame(Game{game_cfg});
+
+    trainer_->setStateEvaluator(EvaluatorSimple{});
+
+    trainer_->addPlanner(
         planners::choose("random", *planners::config("random")));
-    ranker_->addEvaluator(
+
+    auto eval_cfg = std::static_pointer_cast<EvaluatorNetwork::Config>(
+        evaluators::config("network16"));
+    eval_cfg->netConfig.checkpointPath = "test_trainer_model.pt";
+    eval_cfg->netConfig.architecture = {8};
+
+    trainer_->addEvaluator(evaluators::choose("network16", *eval_cfg));
+    trainer_->addEvaluator(
         evaluators::choose("simple", *evaluators::config("simple")));
 
-    ranker_->addTeam(TeamNonVolatile::load("teams/gen4/dualTeamA.txt"));
-    ranker_->addTeam(TeamNonVolatile::load("teams/gen4/dualTeamB.txt"));
-
-    ranker_->initialize();
+    trainer_->addTeam(TeamNonVolatile::load("teams/gen4/dualTeamA.txt"));
+    trainer_->addTeam(TeamNonVolatile::load("teams/gen4/dualTeamB.txt"));
 
     spdlog::set_level(spdlog::level::info);
   }
 
-  std::shared_ptr<Ranker> ranker_;
+  Trainer::Config trainer_cfg_;
+  std::shared_ptr<Trainer> trainer_;
 };
 
+TEST_F(TrainerTest, TrainerEvolvesAndTrains) {
+  trainer_->initialize();
 
-TEST_F(TrainerTest, FitOnLeagueHeatReducesLoss) {
-  // 1. Generate LeagueHeat using the fixture's ranker
-  LeagueHeat lHeat = ranker_->rank();
+  if (boost::filesystem::exists("test_trainer_model.pt")) {
+    boost::filesystem::remove("test_trainer_model.pt");
+  }
 
-  // 2. Setup Trainer
-  auto fv = std::make_shared<evaluator_network16>();
+  LeagueHeat league = trainer_->evolve();
 
-  TrainableNeuralNet::Config netCfg;
-  netCfg.learningRate = 0.001;
-  auto net = std::make_shared<TrainableNeuralNet>(netCfg, *fv);
+  EXPECT_GT(league.games.size(), 0);
 
-  Trainer::Config tCfg;
-  tCfg.logInterval = 1;
-  tCfg.batchSize = 8;
-  tCfg.seed = 42;
-  tCfg.numEpochs = 5;
-
-  Trainer trainer(fv, net, tCfg);
-
-  float initialLoss = trainer.predict(lHeat);
-  trainer.fit(lHeat);
-  float finalLoss = trainer.predict(lHeat);
-
-  EXPECT_LT(finalLoss, initialLoss);
+  // Check if checkpoint was saved
+  EXPECT_TRUE(boost::filesystem::exists("test_trainer_model.pt"));
+  boost::filesystem::remove("test_trainer_model.pt");
 }

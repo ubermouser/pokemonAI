@@ -9,6 +9,7 @@ The project is organized into the following modules:
 *   **pkaiEngine**: The core of the project, containing the logic for the Pokémon battle simulator and the AI engine.
 *   **battler**: An executable that runs Pokémon battles between two teams, using the `pkaiEngine`.
 *   **teambuilder**: An executable used to build teams of pokemon using evolutionary methods.
+*   **trainer**: An executable used to evolve teams while simultaneously training neural network evaluators.
 *   **ranker**: An executable for ranking Pokémon teams.
 *   **gen4_scripts**: Contains scripts and data specific to Generation 4 Pokémon games.
 *   **data**: Contains general game data used by the simulator.
@@ -169,6 +170,29 @@ ${BUILD_DIR}/teambuilder/teambuilder \
     --verbosity=2 \
     --prefix-path data/gen1 \
     --plugins plugins/gen1 \
+    --num-threads=32
+```
+
+#### Trainer
+
+```bash
+${BUILD_DIR}/trainer/trainer [options]
+```
+
+Construct new teams while training a `TrainableNeuralNet` evaluator using the results of evolutionary heats:
+```bash
+${BUILD_DIR}/trainer/trainer \
+    --planners=random max minimax \
+    --evaluators=network16 simple \
+    --p1-max-search-depth=0 \
+    --p2-max-search-depth=1 \
+    --p3-max-search-depth=2 \
+    --e1-net-architecture 64 \
+    --e1-net-checkpoint-path ./networks/model.pt \
+    --training-epochs 10 \
+    --max-generations 20 \
+    --ranker-verbosity=2 \
+    --verbosity=2 \
     --num-threads=32
 ```
 
