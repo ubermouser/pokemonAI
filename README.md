@@ -11,7 +11,7 @@ The project is organized into the following modules:
 *   **teambuilder**: An executable used to build teams of pokemon using evolutionary methods.
 *   **trainer**: An executable used to evolve teams while simultaneously training neural network evaluators.
 *   **ranker**: An executable for ranking Pokémon teams.
-*   **gen4_scripts**: Contains scripts and data specific to Generation 4 Pokémon games.
+*   **genX_scripts**: Contains scripts and data specific to a specific generation of Pokémon games. Currently, Generations 1 (RB) and 4 (DP) are supported.
 *   **data**: Contains general game data used by the simulator.
 *   **teams**: A directory to store Pokémon team files.
 *   **networks**: A directory for storing trained neural network models.
@@ -79,7 +79,7 @@ pushd build && ctest --output-on-failure; popd
 
 Individual tests:
 ```bash
-./src/tests/test_name
+./build/src/tests/test_name
 ```
 
 #### Conan:
