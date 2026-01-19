@@ -38,6 +38,8 @@ const Move* healOrder_t;
 const Move* hiddenPower_t;
 const Move* leafBlade_t;
 const Move* leechLife_t;
+const Move* leechSeed_t;
+const Move* lightScreen_t;
 const Move* magnetBomb_t;
 const Move* magicalLeaf_t;
 const Move* megaDrain_t;
@@ -55,7 +57,6 @@ const Move* razorLeaf_t;
 const Move* recover_t;
 const Move* reflect_t;
 const Move* roost_t;
-const Move* lightScreen_t;
 const Move* shadowClaw_t;
 const Move* shadowPunch_t;
 const Move* shockWave_t;
@@ -625,7 +626,44 @@ int move_toxicSpikes_set(
   tPKV.status().nonvolatile.toxicSpikes = std::min(2U, initial_toxic + 1U);
 
   return 1;
-};
+}
+
+int move_leechSeed_set(
+    PkCUEngine& cu,
+    MoveVolatile mV,
+    PokemonVolatile cPKV,
+    PokemonVolatile tPKV) {
+  if (&mV.getBase() != leechSeed_t) { return 0; }
+
+  // Fails against Grass types
+  if (tPKV.getBase().hasType(grass_t)) { return 0; }
+
+  // Fails if already seeded
+  if (tPKV.status().cTeammate.leechSeed) { return 0; }
+
+  tPKV.status().cTeammate.leechSeed = 1;
+
+  return 1;
+}
+
+int move_leechSeed_effect(PkCUEngine& cu, PokemonVolatile cPKV) {
+  if (!cPKV.status().cTeammate.leechSeed) { return 0; }
+
+  // Leech Seed deals 1/8 max HP damage
+  uint32_t initialHP = cPKV.getHP();
+  cPKV.modPercentHP(-0.125);
+  uint32_t finalHP = cPKV.getHP();
+  int32_t hpDrained = (int32_t)initialHP - (int32_t)finalHP;
+
+  // Heal the opponent
+  PokemonVolatile tPKV = cu.getTPKV();
+  if (tPKV.isAlive()) {
+    tPKV.modHP(hpDrained);
+  }
+
+  return (cPKV.isAlive() ? 1 : 2);
+}
+;
 
 int move_stealthRock_switch(PkCUEngine& cu, PokemonVolatile cPKV) {
   if (cPKV.status().nonvolatile.stealthRock > 0) {
@@ -1902,6 +1940,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   hiddenPower_t = orphan::orphanCheck(moves, "hidden power");
   leafBlade_t = orphan::orphanCheck(moves, "leaf blade");
   leechLife_t = orphan::orphanCheck(moves, "leech life");
+  leechSeed_t = orphan::orphanCheck(moves, "leech seed");
   magicalLeaf_t = orphan::orphanCheck(moves, "magical leaf");
   magnetBomb_t = orphan::orphanCheck(moves, "magnet bomb");
   megaDrain_t = orphan::orphanCheck(moves, "mega drain");
@@ -2015,6 +2054,8 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(move, "hidden power", PLUGIN_ON_SETMOVETYPE, move_hiddenPower_setType, 0, current_team));
   extensions.push_back(plugin(move, "leaf blade", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "leech life", PLUGIN_ON_ENDOFMOVE, move_lifeLeech50, 0, current_team));
+  extensions.push_back(plugin(move, "leech seed", PLUGIN_ON_EVALUATEMOVE, move_leechSeed_set, 0, current_team));
+  extensions.push_back(plugin(move, "leech seed", PLUGIN_ON_ENDOFROUND, move_leechSeed_effect, 0, other_team));
   extensions.push_back(plugin(move, "light screen", PLUGIN_ON_EVALUATEMOVE, move_lightScreen_set, 0, current_team));
   extensions.push_back(plugin(move, "light screen", PLUGIN_ON_BEGINNINGOFTURN, engine_lightScreen_decrement, -1, current_team));
   extensions.push_back(plugin(move, "light screen", PLUGIN_ON_MODIFYRAWDAMAGE, move_lightScreen_damage, 0, other_team));
