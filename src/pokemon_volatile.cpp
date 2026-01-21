@@ -313,7 +313,6 @@ std::ostream& operator<<(std::ostream& os, const ConstPokemonVolatile& pkmn) {
     break;
   }
 
-  // boosts:
   if (pkmn.data().active) {
     // volatile ailments:
     // target confused:
@@ -324,6 +323,8 @@ std::ostream& operator<<(std::ostream& os, const ConstPokemonVolatile& pkmn) {
     if (pkmn.status().cTeammate.infatuate > 0) {
       os << " (INFAT)";
     }
+    // target has leech seed:
+    if (pkmn.status().cTeammate.leechSeed > 0) { os << " (LEECH)"; }
     // target taunted:
     if (pkmn.status().cTeammate.taunt_duration > 0) {
       os << fmt::format(" (TAUNT-{})", pkmn.status().cTeammate.taunt_duration);
@@ -359,6 +360,7 @@ std::ostream& operator<<(std::ostream& os, const ConstPokemonVolatile& pkmn) {
       os << fmt::format(" (REFLECT-{})", pkmn.status().nonvolatile.reflect);
     }
 
+    // boosts:
     if (pkmn.getBoost(FV_ATTACK) != 0) {
       os << fmt::format(" {:+}atk", pkmn.getBoost(FV_ATTACK));
     }
