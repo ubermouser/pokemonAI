@@ -1,3 +1,5 @@
+#include <fmt/format.h>
+
 #include <memory>
 #include <type_traits>
 #include <vector>
@@ -74,67 +76,51 @@ void validateNetworkNonTerminalState(Evaluator& eval, const ConstEnvironmentVola
 }
 
 
-TEST_F(NetworkEvaluatorTest, Network16Initialization) {
-  auto eval = createEvaluator("network16");
+class NetworkEvaluatorParamTest
+    : public NetworkEvaluatorTest,
+      public ::testing::WithParamInterface<std::string> {};
+
+INSTANTIATE_TEST_SUITE_P(
+    AllNetworks,
+    NetworkEvaluatorParamTest,
+    ::testing::Values(
+        "network16", "network32", "network64", "network128", "networkLarge"));
+
+
+TEST_P(NetworkEvaluatorParamTest, Initialization) {
+  auto eval = createEvaluator(GetParam());
   EXPECT_NO_THROW(eval->initialize());
   validateNetworkNonTerminalState(*eval, engine_->initialState());
 }
 
 
-TEST_F(NetworkEvaluatorTest, Network32Initialization) {
-  auto eval = createEvaluator("network32");
-  EXPECT_NO_THROW(eval->initialize());
-  validateNetworkNonTerminalState(*eval, engine_->initialState());
-}
-
-
-TEST_F(NetworkEvaluatorTest, Network64Initialization) {
-  auto eval = createEvaluator("network64");
-  EXPECT_NO_THROW(eval->initialize());
-  validateNetworkNonTerminalState(*eval, engine_->initialState());
-}
-
-
-TEST_F(NetworkEvaluatorTest, Network128Initialization) {
-  auto eval = createEvaluator("network128");
-  EXPECT_NO_THROW(eval->initialize());
-  validateNetworkNonTerminalState(*eval, engine_->initialState());
-}
-
-TEST_F(NetworkEvaluatorTest, NetworkLargeInitialization) {
-  auto eval = createEvaluator("networkLarge");
-  EXPECT_NO_THROW(eval->initialize());
-  validateNetworkNonTerminalState(*eval, engine_->initialState());
-}
-
-
-TEST_F(NetworkEvaluatorTest, NetworkSeedValidation) {
-  auto eval = createEvaluator("networkLarge");
+TEST_P(NetworkEvaluatorParamTest, SeedValidation) {
+  auto eval = createEvaluator(GetParam());
   eval->initialize();
 
   std::vector<float> seed(eval->inputSize());
   eval->seed(seed.begin(), engine_->initialState(), TEAM_A);
 
-  std::cout << "--- Seed Vector Debug (" << seed.size() << ") ---" << std::endl;
+  fmt::print(
+      "--- Seed Vector Debug ({}, size: {}) ---\n", GetParam(), seed.size());
   size_t nonZeroCount = 0;
   for (size_t i = 0; i < seed.size(); ++i) {
-    EXPECT_TRUE(std::isfinite(seed[i])) << "Non-finite value at index " << i;
-    EXPECT_FALSE(std::isnan(seed[i])) << "NaN value at index " << i;
+    EXPECT_TRUE(std::isfinite(seed[i]))
+        << "Non-finite value at index " << i << " for " << GetParam();
+    EXPECT_FALSE(std::isnan(seed[i]))
+        << "NaN value at index " << i << " for " << GetParam();
     if (seed[i] != 0.0f) {
       nonZeroCount++;
       // Print first 50 non-zero values for brevity
-      if (nonZeroCount < 50) {
-        std::cout << "  [" << i << "] = " << seed[i] << std::endl;
-      }
+      if (nonZeroCount < 50) { fmt::print("  [{}] = {}\n", i, seed[i]); }
     }
   }
-  std::cout << "--- Total non-zero values: " << nonZeroCount << " ---"
-            << std::endl;
+  fmt::print("--- Total non-zero values: {} ---\n", nonZeroCount);
 }
 
 
-TEST_F(NetworkEvaluatorTest, TerminalStates) {
-  auto eval = createEvaluator("network16");
+TEST_P(NetworkEvaluatorParamTest, TerminalStates) {
+  auto eval = createEvaluator(GetParam());
 
   auto terminalStateData = engine_->initialState().data();
   auto terminalTieStateData = terminalStateData;
