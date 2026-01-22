@@ -59,6 +59,7 @@ TEST_F(TrainerRegressFitnessTest, FitOnLeagueHeatReducesLoss) {
   tCfg.batchSize = 8;
   tCfg.seed = 42;
   tCfg.numEpochs = 5;
+  tCfg.discountFactor = 0.9;
 
   TrainerRegressFitness trainer(fv, net, tCfg);
 

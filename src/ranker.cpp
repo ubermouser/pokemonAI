@@ -475,7 +475,7 @@ void Ranker::printLeagueCounts(const LeagueHeat& league) const {
   printMapStats(league.counts.types, "TYPE");
   printMapStats(league.counts.natures, "NATURE");
   printMapStats(league.counts.items, "ITEM");
-  printMapStats(league.counts.pokemon, "POKEMON", true);
+  printMapStats(league.counts.pokemon, "SPECIES", true);
   printMapStats(league.counts.moves, "MOVE", true);
 
   out_.get() << os.str();

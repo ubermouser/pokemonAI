@@ -44,6 +44,10 @@ public:
     /* random seed used for sampling and torch operations. If 0, a random seed is used. */
     uint64_t seed = 0;
 
+    /* temporal-difference learning discount factor. If 1.0, no discount is
+     * applied. */
+    double discountFactor = 0.96;
+
     Config() {}
 
     boost::program_options::options_description options(

@@ -24,7 +24,10 @@ boost::program_options::options_description TrainerRegressFitness::Config::optio
     "Number of training epochs")
     ((prefix + "seed").c_str(),
     po::value<uint64_t>(&seed)->default_value(seed),
-    "Random seed for training. If 0, a random seed is used.");
+    "Random seed for training. If 0, a random seed is used.")
+    ((prefix + "discount-factor").c_str(),
+    po::value<double>(&discountFactor)->default_value(discountFactor),
+    "Temporal-difference learning discount factor [0..1]");
   // clang-format on
   return desc;
 }
@@ -142,16 +145,28 @@ std::vector<HeatDataset::Sample> TrainerRegressFitness::prepareDataset(
 
   std::vector<HeatDataset::Sample> samples;
   for (const auto& gResult : hResult.gameResults) {
-    for (const auto& turn : gResult.log) {
-      ConstEnvironmentVolatile cev(*hResult.nv, turn.env.env);
-      for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
+    for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
+      float nextTarget = gResult.teams[iTeam].lastSimpleFitness;
+      for (auto it = gResult.log.rbegin(); it != gResult.log.rend(); ++it) {
+        const auto& turn = *it;
+        ConstEnvironmentVolatile cev(*hResult.nv, turn.env.env);
+
         std::vector<float> inputData(featureVector_->inputSize());
         featureVector_->seed(inputData.begin(), cev, iTeam);
 
         auto inputTensor = torch::from_blob(inputData.data(), {(long)inputData.size()}, torch::kFloat).clone();
-        auto targetTensor = torch::tensor({(float)turn.teams[iTeam].simpleFitness}, torch::kFloat);
+
+        // Compute the target using Temporal-Difference (TD) learning formula:
+        // Target_t = R_t + gamma * (Target_t+1 - R_t)
+        // This interpolates between current state fitness and bootstrapped
+        // future results.
+        float currentFitness = turn.teams[iTeam].simpleFitness;
+        float deltaNextFitness = nextTarget - currentFitness;
+        float target = currentFitness + cfg_.discountFactor * deltaNextFitness;
+        auto targetTensor = torch::tensor({target}, torch::kFloat);
 
         samples.push_back({inputTensor, targetTensor});
+        nextTarget = target;
       }
     }
   }
