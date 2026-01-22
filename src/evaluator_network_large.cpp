@@ -191,7 +191,9 @@ const size_t EvaluatorNetworkLarge::numOutputNeurons = 1U;
 
 
 EvaluatorNetworkLarge::EvaluatorNetworkLarge(const Config& cfg)
-    : EvaluatorNetwork(cfg, inputSize(), outputSize()) {}
+    : EvaluatorNetwork(cfg, inputSize(), outputSize()) {
+  updateIdent();
+}
 
 
 EvaluatorNetworkLarge::EvaluatorNetworkLarge(const EvaluatorNetworkLarge& other)
@@ -200,7 +202,9 @@ EvaluatorNetworkLarge::EvaluatorNetworkLarge(const EvaluatorNetworkLarge& other)
 
 EvaluatorNetworkLarge::EvaluatorNetworkLarge(
     const neuralNet& cNet, const Config& cfg)
-    : EvaluatorNetwork(cNet, cfg) {}
+    : EvaluatorNetwork(cNet, cfg) {
+  updateIdent();
+}
 
 
 EvaluatorNetworkLarge* EvaluatorNetworkLarge::clone() const {
