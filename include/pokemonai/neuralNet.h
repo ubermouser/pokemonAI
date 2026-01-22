@@ -69,10 +69,7 @@ class neuralNet: public Name
   /* deletes all elements within the neural network, invalidating it and freeing memory */
   void clear();
 
-  bool isInitialized() const
-  {
-    return !model.is_empty();
-  };
+  virtual neuralNet& initialize();
 
   FeatureVector::floatIterator_t inputBegin() { return inputBuffer.begin(); };
   FeatureVector::constFloatIterator_t inputBegin() const {

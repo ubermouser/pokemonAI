@@ -60,6 +60,11 @@ class EvaluatorNetwork : public Evaluator, public FeatureVector {
   void seed(
       neuralNet& cNet, const ConstEnvironmentVolatile& env, size_t iTeam) const;
 
+  virtual void seed(
+      floatIterator_t cInput,
+      const ConstEnvironmentVolatile& env,
+      size_t iTeam) const override = 0;
+
   virtual size_t inputSize() const override = 0;
   virtual size_t outputSize() const override = 0;
 
@@ -77,11 +82,6 @@ class EvaluatorNetwork : public Evaluator, public FeatureVector {
 
   virtual std::string baseName() const override { return "Network"; }
   void updateIdent();
-
-  virtual void seed(
-      floatIterator_t cInput,
-      const ConstEnvironmentVolatile& env,
-      size_t iTeam) const override = 0;
 };
 
 #endif // EVALUATOR_NETWORK_H

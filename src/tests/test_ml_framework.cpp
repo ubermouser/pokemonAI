@@ -6,6 +6,7 @@
 
 #include "pokemonai/feature_vector.h"
 #include "pokemonai/neuralNet.h"
+#include "pokemonai/trainable_neural_net.h"
 
 class MockFeatureVector : public FeatureVector {
  public:
@@ -36,7 +37,7 @@ TEST(MLFrameworkTest, BasicForwardPass) {
   cfg.architecture = {4};
   neuralNet net(cfg, mfv);
 
-  EXPECT_TRUE(net.isInitialized());
+  EXPECT_NO_THROW(net.initialize());
   EXPECT_EQ(net.numInputs(), 2);
   EXPECT_EQ(net.numOutputs(), 1);
 

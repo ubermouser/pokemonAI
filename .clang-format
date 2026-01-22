@@ -8,4 +8,5 @@ BinPackArguments: 'false'
 BinPackParameters: 'false'
 ConstructorInitializerAllOnOneLineOrOnePerLine: 'true'
 IndentCaseLabels: 'false'
+IndentWidth: 2
 MaxEmptyLinesToKeep: 2

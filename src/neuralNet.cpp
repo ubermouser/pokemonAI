@@ -93,6 +93,14 @@ void neuralNet::clear() {
 }
 
 
+neuralNet& neuralNet::initialize() {
+  if (model.is_empty()) {
+    throw std::invalid_argument("neuralNet: model not initialized");
+  }
+  return *this;
+}
+
+
 void neuralNet::output(std::ostream& oFile) const {
     if (!model) return;
     torch::save(model, oFile);

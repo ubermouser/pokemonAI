@@ -173,9 +173,7 @@ EvaluatorNetwork& EvaluatorNetwork::initialize() {
   if (!network_) {
     throw std::invalid_argument("EvaluatorNetwork: network undefined");
   }
-  if (!network_->isInitialized()) {
-    throw std::invalid_argument("EvaluatorNetwork: network not initialized");
-  }
+  network_->initialize();
   if (network_->numInputs() != inputSize() ||
       network_->numOutputs() != outputSize()) {
     throw std::invalid_argument(fmt::format(

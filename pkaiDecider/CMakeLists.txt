@@ -5,6 +5,7 @@ add_library(pkaiDecider STATIC
     ../src/evaluator_network32.cpp
     ../src/evaluator_network64.cpp
     ../src/evaluator_network128.cpp
+    ../src/evaluator_network_large.cpp
     ../src/trainable_neural_net.cpp
     ../src/trainer_regress_fitness.cpp
     ../src/trainer.cpp

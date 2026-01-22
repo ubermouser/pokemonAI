@@ -7,6 +7,7 @@
 #include "pokemonai/evaluator_network16.h"
 #include "pokemonai/evaluator_network32.h"
 #include "pokemonai/evaluator_network64.h"
+#include "pokemonai/evaluator_network_large.h"
 #include "pokemonai/evaluators.h"
 #include "pokemonai/feature_vector.h"
 #include "pokemonai/neuralNet.h"
@@ -98,6 +99,37 @@ TEST_F(NetworkEvaluatorTest, Network128Initialization) {
   auto eval = createEvaluator("network128");
   EXPECT_NO_THROW(eval->initialize());
   validateNetworkNonTerminalState(*eval, engine_->initialState());
+}
+
+TEST_F(NetworkEvaluatorTest, NetworkLargeInitialization) {
+  auto eval = createEvaluator("networkLarge");
+  EXPECT_NO_THROW(eval->initialize());
+  validateNetworkNonTerminalState(*eval, engine_->initialState());
+}
+
+
+TEST_F(NetworkEvaluatorTest, NetworkSeedValidation) {
+  auto eval = createEvaluator("networkLarge");
+  eval->initialize();
+
+  std::vector<float> seed(eval->inputSize());
+  eval->seed(seed.begin(), engine_->initialState(), TEAM_A);
+
+  std::cout << "--- Seed Vector Debug (" << seed.size() << ") ---" << std::endl;
+  size_t nonZeroCount = 0;
+  for (size_t i = 0; i < seed.size(); ++i) {
+    EXPECT_TRUE(std::isfinite(seed[i])) << "Non-finite value at index " << i;
+    EXPECT_FALSE(std::isnan(seed[i])) << "NaN value at index " << i;
+    if (seed[i] != 0.0f) {
+      nonZeroCount++;
+      // Print first 50 non-zero values for brevity
+      if (nonZeroCount < 50) {
+        std::cout << "  [" << i << "] = " << seed[i] << std::endl;
+      }
+    }
+  }
+  std::cout << "--- Total non-zero values: " << nonZeroCount << " ---"
+            << std::endl;
 }
 
 

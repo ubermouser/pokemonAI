@@ -34,6 +34,7 @@ void Trainer::initialize() {
     if (!net) { continue; }
 
     if (uniqueNetworks.find(net) == uniqueNetworks.end()) {
+      net->initialize();
       trainableNetworks_.push_back({evalPtr, net});
       uniqueNetworks.insert(net);
     }

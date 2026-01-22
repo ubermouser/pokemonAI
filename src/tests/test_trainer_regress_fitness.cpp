@@ -53,6 +53,7 @@ TEST_F(TrainerRegressFitnessTest, FitOnLeagueHeatReducesLoss) {
   TrainableNeuralNet::Config netCfg;
   netCfg.learningRate = 0.001;
   auto net = std::make_shared<TrainableNeuralNet>(netCfg, *fv);
+  net->initialize();
 
   TrainerRegressFitness::Config tCfg;
   tCfg.logInterval = 1;

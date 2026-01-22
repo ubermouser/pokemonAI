@@ -30,9 +30,12 @@ class TrainableNeuralNet : public neuralNet {
 
   virtual ~TrainableNeuralNet() override;
 
+  TrainableNeuralNet& initialize() override;
+
   torch::optim::Adam& getOptimizer() { return *optimizer_; }
 
  protected:
+  Config cfg_;
   std::unique_ptr<torch::optim::Adam> optimizer_;
   void initOptimizer(const Config& cfg);
 };
