@@ -225,11 +225,13 @@ bool Pokemons::loadFromFile_lines(
       else { cPokemon.abilities_.insert(cAbility); }
     }
 
-    insert({cPokemon.getName(), cPokemon});
+    cPokemon.index_ = iPokemon;
+    insert(cPokemon);
     num_loaded++;
+    SPDLOG_TRACE("\tLoaded species {}-\"{}\"", iPokemon, cPokemon.getName());
   } //end of per-pokemon
 
-  SPDLOG_INFO("Loaded {} pokemon!", num_loaded);
+  SPDLOG_INFO("Loaded {} pokemon species!", num_loaded);
 
   //output orphans
   printOrphans(orphanedTypes, "pokemon inputStream", "pokemon-types", "type");

@@ -201,8 +201,7 @@ bool Items::loadFromFile_lines(
       cItem.setHasNoPlugins();
     }
 
-    insert({cItem.getName(), cItem});
-    byIndex_.insert({cItem.index_, &at(cItem.getName())});
+    insert(cItem);
     num_loaded++;
   } //end of per-item
 

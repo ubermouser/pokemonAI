@@ -89,6 +89,10 @@ public:
 
   bool lostChild_;
 
+  /*
+   * index of this pokemon in the Species collection
+   */
+  size_t index_ = 0;
 
   const Type& getType(size_t iType) const { return *types_[iType]; };
 

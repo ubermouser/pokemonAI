@@ -148,6 +148,14 @@ public:
    */
   std::string description_;
 
+  /*
+   * index of this move in the Moves collection
+   */
+  size_t index_ = 0;
+
+  /*
+   * true if this move references variables or plugins that do not exist
+   */
   bool lostChild = true;
 
   static bool input(const std::vector<std::string>& lines, size_t& iLine);

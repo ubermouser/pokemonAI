@@ -86,13 +86,10 @@ class PKAISHARED Items: public Collection<Item>
 public:
   bool initialize(const std::string& path, const Types& types);
 
-  const Item* atByIndex(size_t index) const { return byIndex_.at(index); }
-
 protected:
   bool loadFromFile(const std::string& path, const Types& types);
-  bool loadFromFile_lines(const Types& types, const std::vector<std::string>& lines, size_t& iLine);
-
-  std::unordered_map<size_t, const Item*> byIndex_;
+  bool loadFromFile_lines(
+      const Types& types, const std::vector<std::string>& lines, size_t& iLine);
 };
 
 #endif	/* ITEM_H */

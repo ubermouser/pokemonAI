@@ -17,14 +17,22 @@ class Collection : public std::unordered_map<std::string, Type> {
 public:
   using base_t = std::unordered_map<std::string, Type>;
 
-  std::vector<const Type*> toVector() const {
-    std::vector<const Type*> result; result.reserve(base_t::size());
-    for (auto& pair : *this) {
-      result.push_back(&pair.second);
-    }
-
-    return result;
+  Type& insert(const Type& item) {
+    auto result = base_t::insert({item.getName(), item});
+    if (result.second) { byIndex_.push_back(&result.first->second); }
+    return result.first->second;
   }
+
+  std::vector<const Type*> toVector() const {
+    return std::vector<const Type*>(byIndex_.begin(), byIndex_.end());
+  }
+
+  const Type* atByIndex(size_t index) const { return byIndex_.at(index); }
+
+  size_t size() const { return byIndex_.size(); }
+
+ protected:
+  std::vector<Type*> byIndex_;
 };
 
 #endif /* COLLECTION_H */

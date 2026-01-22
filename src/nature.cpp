@@ -130,8 +130,10 @@ bool Natures::loadFromFile_lines(const std::vector<std::string>& lines, size_t& 
       cNature.modTable_[indexMod] = cNatureVal * FPMULTIPLIER;
     }
 
-    insert({cNature.getName(), cNature});
+    cNature.index_ = iNature;
+    insert(cNature);
     num_loaded++;
+    SPDLOG_TRACE("\tLoaded nature {}-\"{}\"", iNature, cNature.getName());
   } //end of per-nature
 
   SPDLOG_INFO("Loaded {} natures!", num_loaded);

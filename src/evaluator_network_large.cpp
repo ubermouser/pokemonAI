@@ -12,21 +12,18 @@ typedef BinaryEmbedding<7> AbilityEmbedding;
 typedef BinaryEmbedding<9> SpeciesEmbedding;
 typedef BinaryEmbedding<9> MoveEmbedding;
 typedef BinaryEmbedding<9> ItemEmbedding;
-typedef BinaryEmbedding<4> ToxicPoisonEmbedding;
 typedef BinaryEmbedding<5> TypeEmbedding;
+typedef BinaryEmbedding<4> ToxicPoisonEmbedding;
 typedef BinaryEmbedding<2> DamageTypeEmbedding;
+typedef BinaryEmbedding<4> NonvolatileStatusEmbedding;
+typedef BinaryEmbedding<3> ActivePokemonEmbedding;
 
 struct FVec_NonVolatileStatus {
-  float isSleeping;
-  float isParalyzed;
-  float isBurned;
-  float isFrozen;
-  ToxicPoisonEmbedding toxicPoison;
+  NonvolatileStatusEmbedding nonvolatileStatus;
+
 
   void seed(const PokemonVolatile& pkmn) {
-    isFrozen = pkmn.getStatusAilment() == AIL_NV_FREEZE ? 1.0 : 0.0;
-    isBurned = pkmn.getStatusAilment() == AIL_NV_BURN ? 1.0 : 0.0;
-    isParalyzed = pkmn.getStatusAilment() == AIL_NV_PARALYSIS ? 1.0 : 0.0;
+    nonvolatileStatus = NonvolatileStatusEmbedding{pkmn.getStatusAilment()};
   }
 };
 
@@ -35,12 +32,14 @@ struct FVec_VolatileStatus {
   float isTrapped;
   float isLeechSeed;
   float hasSubstitute;
+  ToxicPoisonEmbedding toxicPoison;
 
-  void seed(const VolatileStatus& status) {
-    isConfused = status.confused > 0 ? 1.0 : 0.0;
-    isTrapped = status.trap > 0 ? 1.0 : 0.0;
-    isLeechSeed = status.leechSeed > 0 ? 1.0 : 0.0;
-    hasSubstitute = status.substitute > 0 ? 1.0 : 0.0;
+  void seed(const TeamStatus& status) {
+    isConfused = status.cTeammate.confused > 0 ? 1.0 : 0.0;
+    isTrapped = status.cTeammate.trap > 0 ? 1.0 : 0.0;
+    isLeechSeed = status.cTeammate.leechSeed > 0 ? 1.0 : 0.0;
+    hasSubstitute = status.cTeammate.substitute > 0 ? 1.0 : 0.0;
+    toxicPoison = ToxicPoisonEmbedding{status.cTeammate.toxicPoison_tier};
   }
 };
 
@@ -52,6 +51,8 @@ struct FVec_MoveNonVolatile {
 
   void seed(const MoveNonVolatile& mNV) {
     damageType = DamageTypeEmbedding{mNV.getBase().getDamageType()};
+    move = MoveEmbedding{mNV.getBase().index_};
+    type = TypeEmbedding{mNV.getBase().getType().index_};
   }
 };
 
@@ -60,7 +61,7 @@ struct FVec_MoveVolatile {
   float pp;
 
   void seed(const ConstMoveVolatile& mV) {
-    pp = mV.hasPP() ? 0.1 : 0.0 + (mV.getPercentPP() * 0.9);
+    pp = (mV.hasPP() ? 0.1 : 0.0) + (mV.getPercentPP() * 0.9);
   }
 };
 
@@ -69,6 +70,7 @@ struct FVec_PokemonNonVolatile {
   AbilityEmbedding ability;
   SpeciesEmbedding species;
   std::array<FVec_MoveNonVolatile, 4> moves;
+  std::array<TypeEmbedding, 2> types;
 
 
   void seed(const PokemonNonVolatile& pkmn) {
@@ -76,9 +78,10 @@ struct FVec_PokemonNonVolatile {
       moves[iMove].seed(pkmn.getMove(iMove));
     }
 
-    // TODO - find the index of the ability, species, move, etc
-    //size_t iAbility = pkdex->getAbilities().find(pkmn.getAbility().getName()) - pkdex->getAbilities().cbegin();
-    //ability = AbilityEmbedding{iAbility};
+    ability = AbilityEmbedding{pkmn.getAbility().index_};
+    species = SpeciesEmbedding{pkmn.getBase().index_};
+    types[0] = TypeEmbedding{pkmn.getBase().getType(0).index_};
+    types[1] = TypeEmbedding{pkmn.getBase().getType(1).index_};
   }
 };
 
@@ -124,8 +127,11 @@ struct FVec_TeamNonVolatile {
 struct FVec_TeamVolatile {
   std::array<FVec_PokemonVolatile, 6> teammates;
   FVec_VolatileStatus volatileStatus;
+  ActivePokemonEmbedding activePokemon;
 
   void seed(const ConstTeamVolatile& teamV) {
+    activePokemon = ActivePokemonEmbedding{teamV.getICPKV()};
+    volatileStatus.seed(teamV.status());
     for (size_t iTeammate = 0; iTeammate != teamV.nv().getNumTeammates();
          ++iTeammate) {
       teammates[iTeammate].seed(teamV.teammate(iTeammate));
@@ -170,7 +176,7 @@ void EvaluatorNetworkLarge::seed(
     FeatureVector::floatIterator_t inputBegin,
     const ConstEnvironmentVolatile& env,
     size_t _iTeam) const {
-  FeatureVectorLargeUnion fVec = {};
+  FeatureVectorLargeUnion fVec{};
   // TODO - precompute the NonVolatile portion and just copy
   fVec.fVec.envNV.seed(env.nv(), _iTeam);
   fVec.fVec.envV.seed(env, _iTeam);

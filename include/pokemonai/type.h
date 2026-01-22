@@ -43,13 +43,9 @@ class PKAISHARED Types: public Collection<Type>
 public:
   bool initialize(const std::string& path);
 
-  const Type* atByIndex(size_t index) const { return byIndex_.at(index); }
-
 protected:
   bool loadFromFile(const std::string& path);
   bool loadFromFile_lines(const std::vector<std::string>& lines, size_t& iLine);
-
-  std::unordered_map<size_t, const Type*> byIndex_;
 };
 
 #endif	/* TYPE_H */

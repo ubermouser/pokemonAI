@@ -389,7 +389,8 @@ bool Moves::loadFromFile_lines(
         targetVolatileAilment,
         hasPlugins,
         description);
-    insert({name, move});
+    move.index_ = iMove;
+    insert(move);
     num_loaded++;
     SPDLOG_TRACE("\tLoaded move {}-\"{}\"", iMove, move.getName());
   } //end of per-move

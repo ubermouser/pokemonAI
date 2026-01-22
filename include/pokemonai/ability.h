@@ -27,6 +27,11 @@ public:
   virtual ~Ability() override = default;
 
   std::string script_;
+
+  /*
+   * index of this ability in the Abilities collection
+   */
+  size_t index_ = 0;
 };
 
 

@@ -32,6 +32,12 @@ public:
    * other FV values are not allocated
    */
   std::array<uint8_t, 5> modTable_;
+
+  /*
+   * index of this nature in the Natures collection
+   */
+  size_t index_ = 0;
+
   Nature();
 };
 

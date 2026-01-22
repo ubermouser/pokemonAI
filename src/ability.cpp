@@ -138,7 +138,9 @@ bool Abilities::loadFromFile_lines(const std::vector<std::string>& lines, size_t
       cAbility.script_ = std::string(tokens.at(1).substr(offset, tokenLength - offset));
     }
 
-    insert({cAbility.getName(), cAbility});
+    cAbility.index_ = iAbility;
+    insert(cAbility);
+    num_loaded++;
   } //end of per-ability
 
   SPDLOG_INFO("Loaded {} abilities!", num_loaded);

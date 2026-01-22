@@ -121,8 +121,8 @@ bool Types::loadFromFile_lines(const std::vector<std::string>& lines, size_t& iL
     //type name
     cType.setName(lowerCase(tokens.at(0)));
 
-    insert({cType.getName(), cType});
-    typeNames.push_back(&at(cType.getName()));
+    Type& ref = insert(cType);
+    typeNames.push_back(&ref);
   }
 
   // insert modtable types after we have a fully allocated type map:
@@ -140,7 +140,7 @@ bool Types::loadFromFile_lines(const std::vector<std::string>& lines, size_t& iL
     }
 
     cType.index_ = iType;
-    byIndex_.insert({cType.index_, &cType});
+    insert(cType);
 
     //allocate dynamic modtable
     cType.modTable_.reserve(size());
@@ -157,6 +157,7 @@ bool Types::loadFromFile_lines(const std::vector<std::string>& lines, size_t& iL
       cType.modTable_[typeNames[indexInnerType]] = cTypeVal * FPMULTIPLIER;
     }
     num_loaded++;
+    SPDLOG_TRACE("\tLoaded type {}-\"{}\"", iType, cType.getName());
   } //end of per-type
 
   SPDLOG_INFO("Loaded {} types!", num_loaded);
