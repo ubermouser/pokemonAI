@@ -27,7 +27,10 @@ boost::program_options::options_description TrainerRegressFitness::Config::optio
     "Random seed for training. If 0, a random seed is used.")
     ((prefix + "discount-factor").c_str(),
     po::value<double>(&discountFactor)->default_value(discountFactor),
-    "Temporal-difference learning discount factor [0..1]");
+    "Temporal-difference learning discount factor [0..1]")
+    ((prefix + "dataset-size").c_str(),
+    po::value<size_t>(&datasetSize)->default_value(datasetSize),
+    "Maximum number of training examples to keep in the buffer");
   // clang-format on
   return desc;
 }
@@ -41,27 +44,34 @@ TrainerRegressFitness::TrainerRegressFitness(
 
 
 float TrainerRegressFitness::fit(const HeatResult& hResult) {
-  return fit(prepareDataset(hResult));
+  addTrainingData(hResult);
+  return fit();
 }
 
 
 float TrainerRegressFitness::fit(const LeagueHeat& lHeat) {
-  return fit(prepareDataset(lHeat));
+  addTrainingData(lHeat);
+  return fit();
 }
 
 
-float TrainerRegressFitness::fit(std::vector<HeatDataset::Sample> samples) {
+float TrainerRegressFitness::fit() {
   if (cfg_.seed != 0) {
     torch::manual_seed(cfg_.seed);
   }
 
-  if (samples.empty()) return 0.0f;
+  if (buffer_.empty()) return 0.0f;
 
-  // 2. Create DataLoader
-  auto dataset = HeatDataset(std::move(samples)).map(torch::data::transforms::Stack<>());
+  // 3. Create DataLoader using the buffer
+  auto dataset = HeatDataset(buffer_).map(torch::data::transforms::Stack<>());
   auto dataLoader = torch::data::make_data_loader<torch::data::samplers::RandomSampler>(
       std::move(dataset),
       torch::data::DataLoaderOptions().batch_size(cfg_.batchSize));
+
+  SPDLOG_INFO(
+      "Training model {} on dataset of size={}",
+      neuralNet_->getName(),
+      buffer_.size());
 
   // 3. Training Loop
   float totalLoss = 0;
@@ -96,7 +106,10 @@ float TrainerRegressFitness::fit(std::vector<HeatDataset::Sample> samples) {
   }
 
   float finalLoss = cfg_.numEpochs > 0 ? totalLoss / cfg_.numEpochs : 0.0f;
-  SPDLOG_INFO("Training completed with average loss: {:.6f}", finalLoss);
+  SPDLOG_INFO(
+      "Training completed on {} with average loss: {:.6f}",
+      neuralNet_->getName(),
+      finalLoss);
   return finalLoss;
 }
 
@@ -134,8 +147,41 @@ float TrainerRegressFitness::predict(std::vector<HeatDataset::Sample> samples) c
   }
 
   float finalLoss = totalBatchCount > 0 ? totalLoss / totalBatchCount : 0.0f;
-  SPDLOG_INFO("Evaluation completed with average loss: {:.6f}", finalLoss);
+  SPDLOG_INFO(
+      "Evaluation completed on {} with average loss: {:.6f}",
+      neuralNet_->getName(),
+      finalLoss);
   return finalLoss;
+}
+
+
+size_t TrainerRegressFitness::addTrainingData(
+    std::vector<HeatDataset::Sample> samples) {
+  if (samples.empty()) return buffer_.size();
+
+  // 1. Truncate buffer if it exceeds datasetSize
+  size_t totalSize = buffer_.size() + samples.size();
+  if (cfg_.datasetSize > 0 && totalSize > cfg_.datasetSize) {
+    size_t numToDrop = totalSize - cfg_.datasetSize;
+    buffer_.erase(buffer_.begin(), buffer_.begin() + numToDrop);
+  }
+
+  // 2. Accumulate samples in buffer
+  buffer_.insert(
+      buffer_.end(),
+      std::make_move_iterator(samples.begin()),
+      std::make_move_iterator(samples.end()));
+  return buffer_.size();
+}
+
+
+size_t TrainerRegressFitness::addTrainingData(const HeatResult& hResult) {
+  return addTrainingData(prepareDataset(hResult));
+}
+
+
+size_t TrainerRegressFitness::addTrainingData(const LeagueHeat& lHeat) {
+  return addTrainingData(prepareDataset(lHeat));
 }
 
 
@@ -187,9 +233,5 @@ std::vector<HeatDataset::Sample> TrainerRegressFitness::prepareDataset(
         std::make_move_iterator(samples.end()));
   }
 
-  SPDLOG_INFO(
-      "Prepared dataset with {} samples from {} games",
-      allSamples.size(),
-      lHeat.games.size());
   return allSamples;
 }
