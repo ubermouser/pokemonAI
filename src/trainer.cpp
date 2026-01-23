@@ -35,7 +35,9 @@ void Trainer::initialize() {
 
     if (uniqueNetworks.find(net) == uniqueNetworks.end()) {
       net->initialize();
-      trainableNetworks_.push_back({evalPtr, net});
+      auto trainer = std::make_shared<TrainerRegressFitness>(
+          evalPtr, net, cfg_.training);
+      trainableNetworks_.push_back({evalPtr, net, trainer});
       uniqueNetworks.insert(net);
     }
   }
@@ -56,8 +58,7 @@ void Trainer::postEvolveHook(LeagueHeat& league) const {
 void Trainer::train(LeagueHeat& league) const {
   for (auto& tp : trainableNetworks_) {
     SPDLOG_INFO("Training network: {}", tp.network->getName());
-    TrainerRegressFitness trainer(tp.evaluator, tp.network, cfg_.training);
-    trainer.fit(league);
+    tp.trainer->fit(league);
   }
 }
 
@@ -89,8 +90,7 @@ void Trainer::printTrainingResults(const LeagueHeat& league) const {
   out_.get() << "---- TRAINING RESULTS (Final Loss on Last Heat) ----\n";
 
   for (auto& tp : trainableNetworks_) {
-    TrainerRegressFitness trainer(tp.evaluator, tp.network, cfg_.training);
-    float loss = trainer.predict(league);
+    float loss = tp.trainer->predict(league);
     std::string name = tp.evaluator->getName();
     out_.get() << fmt::format(" {}: loss={:.6f}\n", name, loss);
   }
