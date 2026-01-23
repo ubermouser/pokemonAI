@@ -6,11 +6,12 @@ This project is a C++-based Pokémon battle engine and AI. It allows users to si
 
 The project is organized into the following modules:
 
-*   **pkaiEngine**: The core of the project, containing the logic for the Pokémon battle simulator and the AI engine.
-*   **battler**: An executable that runs Pokémon battles between two teams, using the `pkaiEngine`.
+*   **pkaiEngine**: The core of the project, containing the logic for the Pokémon battle simulator.
+*   **pkaiDecider**: A library containing the logic for the AI engine, all planners, evaluators, and trainers.
+*   **battler**: An executable that runs Pokémon battles between two teams, using `pkaiEngine`.
 *   **teambuilder**: An executable used to build teams of pokemon using evolutionary methods.
-*   **trainer**: An executable used to evolve teams while simultaneously training neural network evaluators.
-*   **ranker**: An executable for ranking Pokémon teams.
+*   **trainer**: An executable used to training machine-learning based planners and evaluators.
+*   **ranker**: An executable for ranking Pokémon planners, evaluators, and teams.
 *   **genX_scripts**: Contains scripts and data specific to a specific generation of Pokémon games. Currently, Generations 1 (RB) and 4 (DP) are supported.
 *   **data**: Contains general game data used by the simulator.
 *   **teams**: A directory to store Pokémon team files.
@@ -179,21 +180,26 @@ ${BUILD_DIR}/teambuilder/teambuilder \
 ${BUILD_DIR}/trainer/trainer [options]
 ```
 
-Construct new teams while training a `TrainableNeuralNet` evaluator using the results of evolutionary heats:
+Train two `TrainableNeuralNet` evaluators through self-play with a set of 
+randomly generated teams:
 ```bash
 ${BUILD_DIR}/trainer/trainer \
-    --planners=random max minimax \
-    --evaluators=network16 simple \
-    --p1-max-search-depth=0 \
+    --planners=softmax softmax \
+    --evaluators=network16 network64 simple random \
+    --p1-max-search-depth=1 \
     --p2-max-search-depth=1 \
-    --p3-max-search-depth=2 \
+    --p2-temperature=0.25 \
     --e1-net-architecture 64 \
-    --e1-net-checkpoint-path ./networks/model.pt \
-    --training-epochs 10 \
-    --max-generations 20 \
+    --e1-net-model-path ./networks/net16-64.model \
+    --e2-net-architecture 128 \
+    --e2-net-model-path ./networks/net64-128.model \
+    --save-on-completion=1 \
+    --allow-same-planner=1 \
+    --training-epochs=25 \
+    --max-generations=50 \
     --ranker-verbosity=2 \
     --verbosity=2 \
-    --num-threads=32
+    --num-threads=16
 ```
 
 #### Ranker
