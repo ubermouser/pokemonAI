@@ -39,7 +39,7 @@ po::options_description Ranker::Config::options(const std::string& category, std
       po::value<bool>(&allowSameTeam)->default_value(defaults.allowSameTeam),
       "when true, a given team may fight itself.")
       ((prefix + "enforce-same-league").c_str(),
-      po::value<bool>(&allowSameTeam)->default_value(defaults.allowSameTeam),
+      po::value<bool>(&enforceSameLeague)->default_value(defaults.enforceSameLeague),
       "when true, teams will only fight teams with the same number of pokemon.")
       ((prefix + "print-battlegroup-leaderboard").c_str(),
       po::value<bool>(&printBattlegroupLeaderboard)->default_value(defaults.printBattlegroupLeaderboard),
