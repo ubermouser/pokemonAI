@@ -14,7 +14,6 @@ class TrainableNeuralNet : public neuralNet {
     double adamBeta2 = 0.999;
     double adamEpsilon = 1e-8;
     double weightDecay = 0;
-    std::string checkpointPath;
 
     Config() : neuralNet::Config() {}
     virtual ~Config() override {}

@@ -1,9 +1,15 @@
 #include "pokemonai/neuralNet.h"
+
+#include <fmt/format.h>
 #include <torch/torch.h>
+
 #include <algorithm>
+#include <boost/filesystem.hpp>
 #include <cstring>
-#include <sstream>
+#include <fstream>
 #include <iomanip>
+#include <sstream>
+
 #include "pokemonai/init_toolbox.h"
 
 namespace po = boost::program_options;
@@ -17,7 +23,10 @@ boost::program_options::options_description neuralNet::Config::options(
   desc.add_options()
     ((prefix + "architecture").c_str(),
     po::value<std::vector<int>>(&architecture)->multitoken(),
-    "Architecture of the neural network (size of hidden layers)");
+    "Architecture of the neural network (size of hidden layers)")
+    ((prefix + "model-path").c_str(),
+    po::value<std::string>(&modelPath),
+    "Path to a pre-trained model file");
   // clang-format on
   return desc;
 }
@@ -26,7 +35,8 @@ boost::program_options::options_description neuralNet::Config::options(
 neuralNet::neuralNet(const Config& cfg, const FeatureVector& featureVector)
     : neuralNet(cfg, featureVector.inputSize(), featureVector.outputSize()) {}
 
-neuralNet::neuralNet(const Config& cfg, size_t inputSize, size_t outputSize) {
+neuralNet::neuralNet(const Config& cfg, size_t inputSize, size_t outputSize)
+    : cfg_(cfg) {
   std::vector<size_t> layer_sizes = {inputSize};
   layer_sizes.insert(
       layer_sizes.end(), cfg.architecture.begin(), cfg.architecture.end());
@@ -43,6 +53,25 @@ neuralNet::neuralNet(const Config& cfg, size_t inputSize, size_t outputSize) {
 
   for (size_t i = 0; i < layer_sizes.size() - 1; ++i) {
     add_layer(layer_sizes[i], layer_sizes[i + 1]);
+  }
+
+  layerWidths = std::move(layer_sizes);
+  updateIdent();
+}
+
+
+void neuralNet::updateIdent() {
+  // Set name based on modelPath or architecture hash
+  if (!cfg_.modelPath.empty()) {
+    setName(boost::filesystem::path(cfg_.modelPath).stem().string());
+  } else if (!layerWidths.empty()) {
+    size_t hash = 0;
+    for (size_t val : layerWidths) {
+      hash ^= std::hash<size_t>{}(val) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+    }
+    std::stringstream ss;
+    ss << std::hex << std::setw(8) << std::setfill('0') << (hash & 0xFFFFFFFF);
+    setName(ss.str());
   }
 }
 
@@ -94,6 +123,18 @@ void neuralNet::clear() {
 
 
 neuralNet& neuralNet::initialize() {
+  if (model.is_empty() && !cfg_.modelPath.empty()) {
+    std::ifstream iFile(cfg_.modelPath, std::ios::binary);
+    if (!iFile) {
+      throw std::invalid_argument(fmt::format(
+          "neuralNet: could not open model file {}", cfg_.modelPath));
+    }
+    if (!input(iFile)) {
+      throw std::invalid_argument(fmt::format(
+          "neuralNet: failed to load model from {}", cfg_.modelPath));
+    }
+  }
+
   if (model.is_empty()) {
     throw std::invalid_argument("neuralNet: model not initialized");
   }

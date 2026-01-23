@@ -50,7 +50,7 @@ void Trainer::postEvolveHook(LeagueHeat& league) const {
   if (cfg_.verbosity >= 1) { out_.get() << "Training Complete!\n"; }
   if (cfg_.verbosity >= 2) { printTrainingResults(league); }
   // Final save of trained networks
-  saveTrainedNetworks();
+  if (cfg_.saveOnCompletion) { saveTrainedNetworks(); }
 }
 
 void Trainer::train(LeagueHeat& league) const {
@@ -64,22 +64,21 @@ void Trainer::train(LeagueHeat& league) const {
 void Trainer::saveTrainedNetworks() const {
   for (auto& tp : trainableNetworks_) {
     const auto& netCfg = tp.evaluator->getConfig().netConfig;
-    if (!netCfg.checkpointPath.empty()) {
+    if (!netCfg.modelPath.empty()) {
       SPDLOG_INFO(
           "Saving trained network {} to {}",
           tp.network->getName(),
-          netCfg.checkpointPath);
-      std::ofstream oFile(netCfg.checkpointPath, std::ios::binary);
+          netCfg.modelPath);
+      std::ofstream oFile(netCfg.modelPath, std::ios::binary);
       if (oFile) {
         tp.network->output(oFile);
       } else {
         SPDLOG_ERROR(
-            "Failed to open checkpoint path {} for writing",
-            netCfg.checkpointPath);
+            "Failed to open model path {} for writing", netCfg.modelPath);
       }
     } else {
       SPDLOG_WARN(
-          "Trained network {} has no checkpoint path defined, not saving "
+          "Trained network {} has no model path defined, not saving "
           "to disk",
           tp.network->getName());
     }

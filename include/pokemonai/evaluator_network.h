@@ -23,7 +23,6 @@ namespace featureVector_impl
 class EvaluatorNetwork : public Evaluator, public FeatureVector {
  public:
   struct Config : public Evaluator::Config {
-    std::string modelPath;
     TrainableNeuralNet::Config netConfig;
 
     Config() : Evaluator::Config() {}

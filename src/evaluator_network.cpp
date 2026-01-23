@@ -118,12 +118,6 @@ boost::program_options::options_description EvaluatorNetwork::Config::options(
   auto desc = Evaluator::Config::options(category, prefix);
 
   if (prefix.size() > 0) { prefix.append("-"); }
-  // clang-format off
-  desc.add_options()
-    ((prefix + "model").c_str(), 
-    po::value<std::string>(&modelPath), 
-    "Path to a pre-trained model file");
-  // clang-format on
   desc.add(
       netConfig.options(category + " [TrainableNeuralNet]", prefix + "net"));
   return desc;
@@ -149,26 +143,10 @@ EvaluatorNetwork::EvaluatorNetwork(const EvaluatorNetwork& other)
       dBestMoves_(other.dBestMoves_),
       orders_(other.orders_) {}
 
-EvaluatorNetwork::~EvaluatorNetwork() {
-}
+EvaluatorNetwork::~EvaluatorNetwork() {}
 
 EvaluatorNetwork& EvaluatorNetwork::initialize() {
   Evaluator::initialize();
-
-  if (!network_ && !cfg_.modelPath.empty()) {
-    auto net = std::make_shared<neuralNet>();
-    std::ifstream iFile(cfg_.modelPath, std::ios::binary);
-    if (!iFile) {
-      throw std::invalid_argument(fmt::format(
-          "EvaluatorNetwork: could not open model file {}", cfg_.modelPath));
-    }
-    if (!net->input(iFile)) {
-      throw std::invalid_argument(fmt::format(
-          "EvaluatorNetwork: failed to load model from {}", cfg_.modelPath));
-    }
-    network_ = net;
-    updateIdent();
-  }
 
   if (!network_) {
     throw std::invalid_argument("EvaluatorNetwork: network undefined");

@@ -52,7 +52,7 @@ public:
      * Maximum number of training examples to keep in the buffer.
      * Earliest examples are truncated when the buffer exceeds this size.
      */
-    size_t datasetSize = 0;
+    size_t datasetSize = 1000000;
 
     /**
      * If true, addTrainingData(const LeagueHeat&) will only add samples where

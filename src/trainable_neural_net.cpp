@@ -25,10 +25,7 @@ boost::program_options::options_description TrainableNeuralNet::Config::options(
      "Epsilon hyperparameter for the Adam optimizer")
     ((prefix + "weight-decay").c_str(),
      po::value<double>(&weightDecay)->default_value(weightDecay),
-     "Weight decay for the Adam optimizer")
-    ((prefix + "checkpoint-path").c_str(),
-     po::value<std::string>(&checkpointPath),
-     "Path to save/load checkpoints");
+     "Weight decay for the Adam optimizer");
   // clang-format on
   return desc;
 }

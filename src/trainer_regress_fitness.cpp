@@ -245,12 +245,14 @@ std::vector<HeatDataset::Sample> TrainerRegressFitness::prepareDataset(
 std::vector<HeatDataset::Sample> TrainerRegressFitness::prepareDataset(
     const LeagueHeat& lHeat) {
   std::vector<HeatDataset::Sample> allSamples;
+  size_t numGames = 0;
   for (const auto& game : lHeat.games) {
     if (cfg_.trainOnOwnData && !isInvolved(game.team_a) &&
         !isInvolved(game.team_b)) {
       continue;
     }
 
+    numGames++;
     auto samples = prepareDataset(game.heatResult);
     allSamples.insert(
         allSamples.end(),
@@ -258,5 +260,7 @@ std::vector<HeatDataset::Sample> TrainerRegressFitness::prepareDataset(
         std::make_move_iterator(samples.end()));
   }
 
+  SPDLOG_INFO(
+      "Extracted {} samples from {} games", allSamples.size(), numGames);
   return allSamples;
 }

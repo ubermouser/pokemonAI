@@ -21,6 +21,9 @@ class neuralNet: public Name
     /* Architecture of the neural network (size of hidden layers) */
     std::vector<int> architecture;
 
+    /* Path to a pre-trained model file */
+    std::string modelPath;
+
     Config() {}
     virtual ~Config() {}
 
@@ -33,10 +36,13 @@ class neuralNet: public Name
   torch::nn::Sequential model;
   
   // Buffers for backward compatibility with iterators
-  mutable std::vector<float> inputBuffer;
+  std::vector<float> inputBuffer;
   mutable std::vector<float> outputBuffer;
 
   std::vector<size_t> layerWidths;
+  void updateIdent();
+
+  Config cfg_;
 
  public:
   /* generates an empty invalid neural network */

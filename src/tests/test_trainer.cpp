@@ -18,6 +18,7 @@ class TrainerTest : public Gen4EngineTest {
     trainer_cfg_.verbosity = 2;
     trainer_cfg_.minGamesPerBattlegroup = 1;
     trainer_cfg_.maxGenerations = 1;
+    trainer_cfg_.saveOnCompletion = true;
     trainer_cfg_.teamPopulationSize = {4, 0, 0, 0, 0, 0};
     trainer_cfg_.training.numEpochs = 1;
     trainer_cfg_.training.batchSize = 2;
@@ -36,7 +37,7 @@ class TrainerTest : public Gen4EngineTest {
 
     auto eval_cfg = std::static_pointer_cast<EvaluatorNetwork::Config>(
         evaluators::config("network16"));
-    eval_cfg->netConfig.checkpointPath = "test_trainer_model.pt";
+    eval_cfg->netConfig.modelPath = "test_trainer_model.pt";
     eval_cfg->netConfig.architecture = {8};
 
     trainer_->addEvaluator(evaluators::choose("network16", *eval_cfg));
@@ -64,7 +65,7 @@ TEST_F(TrainerTest, TrainerEvolvesAndTrains) {
 
   EXPECT_GT(league.games.size(), 0);
 
-  // Check if checkpoint was saved
+  // Check if model was saved
   EXPECT_TRUE(boost::filesystem::exists("test_trainer_model.pt"));
   boost::filesystem::remove("test_trainer_model.pt");
 }
