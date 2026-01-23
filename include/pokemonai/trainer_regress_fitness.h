@@ -54,6 +54,12 @@ public:
      */
     size_t datasetSize = 0;
 
+    /**
+     * If true, addTrainingData(const LeagueHeat&) will only add samples where
+     * the current neural network was involved in the match.
+     */
+    bool trainOnOwnData = true;
+
     Config() {}
 
     boost::program_options::options_description options(
@@ -109,6 +115,7 @@ public:
  protected:
   std::vector<HeatDataset::Sample> prepareDataset(const HeatResult& hResult);
   std::vector<HeatDataset::Sample> prepareDataset(const LeagueHeat& lHeat);
+  bool isInvolved(const BattlegroupPtr& bg) const;
 
   /**
    * Trains the model on the current contents of the buffer.

@@ -61,6 +61,7 @@ TEST_F(TrainerRegressFitnessTest, FitOnLeagueHeatReducesLoss) {
   tCfg.seed = 42;
   tCfg.numEpochs = 5;
   tCfg.discountFactor = 0.9;
+  tCfg.trainOnOwnData = false;  // Test users simple/random planners
 
   TrainerRegressFitness trainer(fv, net, tCfg);
 

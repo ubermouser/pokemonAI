@@ -1,8 +1,12 @@
 #include "pokemonai/trainer_regress_fitness.h"
-#include "pokemonai/environment_possible.h"
-#include <torch/torch.h>
-#include <vector>
+
 #include <spdlog/spdlog.h>
+#include <torch/torch.h>
+
+#include <vector>
+
+#include "pokemonai/environment_possible.h"
+#include "pokemonai/evaluator_network.h"
 
 namespace po = boost::program_options;
 
@@ -30,7 +34,10 @@ boost::program_options::options_description TrainerRegressFitness::Config::optio
     "Temporal-difference learning discount factor [0..1]")
     ((prefix + "dataset-size").c_str(),
     po::value<size_t>(&datasetSize)->default_value(datasetSize),
-    "Maximum number of training examples to keep in the buffer");
+    "Maximum number of training examples to keep in the buffer")
+    ((prefix + "train-on-own-data").c_str(),
+    po::value<bool>(&trainOnOwnData)->default_value(trainOnOwnData),
+    "Include only training data where this neural network was involved");
   // clang-format on
   return desc;
 }
@@ -185,6 +192,19 @@ size_t TrainerRegressFitness::addTrainingData(const LeagueHeat& lHeat) {
 }
 
 
+bool TrainerRegressFitness::isInvolved(const BattlegroupPtr& bg) const {
+  if (!bg) return false;
+  auto rankedEval = bg->evaluator().getPtr();
+  if (!rankedEval) return false;
+
+  // Try to cast to EvaluatorNetwork to get access to the network
+  auto evalNet = std::dynamic_pointer_cast<EvaluatorNetwork>(rankedEval);
+  if (!evalNet) return false;
+
+  return evalNet->getNetwork() == neuralNet_;
+}
+
+
 std::vector<HeatDataset::Sample> TrainerRegressFitness::prepareDataset(
     const HeatResult& hResult) {
   featureVector_->setEnvironment(hResult.nv);
@@ -226,6 +246,11 @@ std::vector<HeatDataset::Sample> TrainerRegressFitness::prepareDataset(
     const LeagueHeat& lHeat) {
   std::vector<HeatDataset::Sample> allSamples;
   for (const auto& game : lHeat.games) {
+    if (cfg_.trainOnOwnData && !isInvolved(game.team_a) &&
+        !isInvolved(game.team_b)) {
+      continue;
+    }
+
     auto samples = prepareDataset(game.heatResult);
     allSamples.insert(
         allSamples.end(),

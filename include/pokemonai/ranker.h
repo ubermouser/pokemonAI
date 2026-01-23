@@ -123,7 +123,7 @@ public:
   }
 
   Ranker& addTeam(const TeamNonVolatile& cTeam);
-  
+
 protected:
   Config cfg_;
 
