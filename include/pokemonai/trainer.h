@@ -24,6 +24,7 @@ protected:
  struct TrainablePair {
    std::shared_ptr<class EvaluatorNetwork> evaluator;
    std::shared_ptr<class TrainableNeuralNet> network;
+   std::shared_ptr<class TrainerRegressFitness> trainer;
  };
  virtual void postGenerationHook(LeagueHeat& league) const override;
  virtual void postEvolveHook(LeagueHeat& league) const override;
