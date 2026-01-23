@@ -161,6 +161,24 @@ protected:
       const FitnessDepth& highCutoff = FitnessDepth::best(),
       size_t* nodesEvaluated=NULL) const;
 
+  /* Recurse through other actions, pruning nodes above high and below low.
+   *
+   * @param origin - the state to be recursed upon
+   * @param agentAction - action performed by the agent
+   * @param searchDepth - maximum depth to recurse
+   * @param lowCutoff - the fitness and solution depth of the best current agent
+   * move
+   * @param highCutoff - the fitness and solution depth of the best current
+   * other move
+   *  */
+  virtual EvalResult recurse_beta(
+      const ConstEnvironmentPossible& origin,
+      const Action& agentAction,
+      size_t searchDepth,
+      const FitnessDepth& lowCutoff = FitnessDepth::worst(),
+      const FitnessDepth& highCutoff = FitnessDepth::best(),
+      size_t* nodesEvaluated = NULL) const;
+
   /* Recurse through chance nodes, pruning nodes above high and below low.
 
    * @param origin - the state to be recursed upon

@@ -227,34 +227,62 @@ EvalResult Planner::recurse_alphabeta(
   // the best agent move fitness:
   EvalResult bestOfWorst{Fitness::worst()};
 
-  // for every possible move by both agent team and other team:
+  // for every possible move by the agent team:
   for (const auto& agentAction: getValidActions(origin, agentTeam_)) {
     const FitnessDepth& lowCutoff = std::max((const FitnessDepth&)bestOfWorst, _lowCutoff); // low cutoff (cannot do worse)
-    EvalResult worst{Fitness::best()};
 
-    // the worst possible other team choice is the one which causes the agent to decide to use it:
-    for (const auto& otherAction: getValidActions(origin, otherTeam_)) {
-      const FitnessDepth& highCutoff = std::min((const FitnessDepth&)worst, _highCutoff); // high cutoff (cannot do better)
+    // find the worst possible outcome for this agent action by looking at all
+    // other team responses:
+    EvalResult worst = recurse_beta(
+        origin,
+        agentAction,
+        searchDepth,
+        lowCutoff,
+        _highCutoff,
+        nodesEvaluated);
 
-      // evaluate what probabilistically will occur if agent and other teams perform action at state:
-      EvalResult child = recurse_gamma(
-          origin,
-          agentAction,
-          otherAction,
-          searchDepth - 1,
-          lowCutoff, // low cutoff (cannot do worse)
-          highCutoff, // high cutoff (cannot do better)
-          nodesEvaluated);
-
-      // has the other agent improved upon its best score by reducing our score more?
-      testOtherSelection(worst, child, highCutoff, origin);
-    } // endOf foreach other move
-
-    // is the min of all other agent moves better than the best of our current moves?
+    // is the min of all other agent moves better than the best of our current
+    // moves?
     testAgentSelection(bestOfWorst, worst, lowCutoff, origin);
-  } // endOf foreach agent move
+  }  // endOf foreach agent move
 
   return bestOfWorst;
+}
+
+
+EvalResult Planner::recurse_beta(
+    const ConstEnvironmentPossible& origin,
+    const Action& agentAction,
+    size_t searchDepth,
+    const FitnessDepth& lowCutoff,
+    const FitnessDepth& _highCutoff,
+    size_t* nodesEvaluated) const {
+  EvalResult worst{Fitness::best()};
+
+  // the worst possible other team choice is the one which causes the agent to
+  // decide to use it:
+  for (const auto& otherAction : getValidActions(origin, otherTeam_)) {
+    const FitnessDepth& highCutoff = std::min(
+        (const FitnessDepth&)worst,
+        _highCutoff);  // high cutoff (cannot do better)
+
+    // evaluate what probabilistically will occur if agent and other teams
+    // perform action at state:
+    EvalResult child = recurse_gamma(
+        origin,
+        agentAction,
+        otherAction,
+        searchDepth - 1,
+        lowCutoff,   // low cutoff (cannot do worse)
+        highCutoff,  // high cutoff (cannot do better)
+        nodesEvaluated);
+
+    // has the other agent improved upon its best score by reducing our score
+    // more?
+    testOtherSelection(worst, child, highCutoff, origin);
+  }  // endOf foreach other move
+
+  return worst;
 }
 
 

@@ -30,9 +30,9 @@ struct Config {
   Game::Config game;
   PkCU::Config engine;
   std::vector<std::string> teams;
-  std::vector<std::string> evalTypes = {"network16", "simple"};
+  std::vector<std::string> evalTypes = {"network16", "simple", "random"};
   std::vector<std::shared_ptr<Evaluator::Config> > evalConfigs;
-  std::vector<std::string> plannerTypes = {"max", "maximin"};
+  std::vector<std::string> plannerTypes = {"softmax"};
   std::vector<std::shared_ptr<Planner::Config> > plannerConfigs;
 
   int verbosity = spdlog::level::info;

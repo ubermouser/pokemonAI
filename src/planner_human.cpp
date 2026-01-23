@@ -38,11 +38,7 @@ void PlannerHuman::printActions(const ConstEnvironmentPossible& env) const {
   auto getFitnessDelta = [&](const Action& agentAction) {
     if (!shouldEval()) return 0.0;
 
-    EvalResult worst{Fitness::best()};
-    for (const auto& otherAction : cu_->getValidActions(env, otherTeam_)) {
-      EvalResult child = recurse_gamma(env, agentAction, otherAction, 0);
-      if (child < worst) { worst = child; }
-    }
+    EvalResult worst = recurse_beta(env, agentAction, cfg_.maxDepth);
     return worst.fitness.lowerBound() - currentFitness;
   };
 

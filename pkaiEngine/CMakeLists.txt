@@ -51,6 +51,7 @@ add_library(pkaiEngine SHARED
     ../src/planner_max.cpp
     ../src/planner_maximin.cpp
     ../src/planner_minimax.cpp
+    ../src/planner_softmax.cpp
     ../src/planner_random.cpp
     ../src/planners.cpp
     ../src/ranked_evaluator.cpp

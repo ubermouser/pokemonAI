@@ -3,6 +3,7 @@
 #include <limits>
 #include <memory>
 #include <sstream>
+#include <unordered_set>
 
 #include "engine_test.hpp"
 #include "pokemonai/evaluator_simple.h"
@@ -11,6 +12,7 @@
 #include "pokemonai/planner_maximin.h"
 #include "pokemonai/planner_minimax.h"
 #include "pokemonai/planner_random.h"
+#include "pokemonai/planner_softmax.h"
 
 class PlannerTest : public Gen4EngineTest {
  protected:
@@ -250,4 +252,71 @@ TEST_F(PlannerTest, HumanPlannerActionReader) {
     input >> result;
     EXPECT_FALSE(input);
   }
+}
+
+
+class PlannerSoftmaxTest : public PlannerTest {
+ protected:
+  void SetUp() override {
+    PlannerTest::SetUp();
+
+    PlannerSoftmax::Config softmax_cfg;
+    softmax_cfg.temperature = 0.0;
+    softmax_cfg.maxDepth = 1;
+    softmax_planner_ = std::make_unique<PlannerSoftmax>(softmax_cfg);
+    softmax_planner_->setEvaluator(evaluator_)
+        .setTeam(TEAM_A)
+        .setEngine(engine_)
+        .setEnvironment(environment_)
+        .initialize();
+
+    PlannerMaxiMin::Config maximin_cfg;
+    maximin_cfg.maxDepth = 1;
+    maximin_planner_ = std::make_unique<PlannerMaxiMin>(maximin_cfg);
+    maximin_planner_->setEvaluator(evaluator_)
+        .setTeam(TEAM_A)
+        .setEngine(engine_)
+        .setEnvironment(environment_)
+        .initialize();
+
+    PlannerSoftmax::Config softmax_cfg_high_temp;
+    softmax_cfg_high_temp.temperature = 10.0;
+    softmax_cfg_high_temp.maxDepth = 1;
+    softmax_planner_high_temp_ =
+        std::make_unique<PlannerSoftmax>(softmax_cfg_high_temp);
+    softmax_planner_high_temp_->setEvaluator(evaluator_)
+        .setTeam(TEAM_A)
+        .setEngine(engine_)
+        .setEnvironment(environment_)
+        .initialize();
+  }
+
+  std::unique_ptr<PlannerSoftmax> softmax_planner_;
+  std::unique_ptr<PlannerSoftmax> softmax_planner_high_temp_;
+  std::unique_ptr<PlannerMaxiMin> maximin_planner_;
+};
+
+
+TEST_F(PlannerSoftmaxTest, TemperatureZeroFallbacksToMaxiMin) {
+  auto softmax_result =
+      softmax_planner_->generateSolution(engine_->initialState());
+  auto maximin_result =
+      maximin_planner_->generateSolution(engine_->initialState());
+
+  EXPECT_EQ(softmax_result.bestAgentAction(), maximin_result.bestAgentAction());
+}
+
+
+TEST_F(PlannerSoftmaxTest, HighTemperatureDiversifiesActions) {
+  srand(42);
+
+  std::unordered_set<Action> chosen_actions;
+  for (int i = 0; i < 50; ++i) {
+    auto result =
+        softmax_planner_high_temp_->generateSolution(engine_->initialState());
+    chosen_actions.insert(result.bestAgentAction());
+  }
+
+  // We should see both moves being picked at least once
+  EXPECT_GT(chosen_actions.size(), 1);
 }
