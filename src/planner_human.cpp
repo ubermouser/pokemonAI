@@ -24,29 +24,58 @@ PlyResult PlannerHuman::generateSolutionAtLeaf(
   return result;
 }
 
-void PlannerHuman::printActions(const ConstEnvironmentVolatile& env) const {
-  const ConstTeamVolatile cTeam = env.getTeam(agentTeam_);
+void PlannerHuman::printActions(const ConstEnvironmentPossible& env) const {
+  const ConstTeamVolatile cTeam = env.getEnv().getTeam(agentTeam_);
   const ConstPokemonVolatile cPokemon = cTeam.getPKV();
+
+  double currentFitness = 0.0;
+  if (shouldEval()) {
+    currentFitness = eval_->evaluate(env, agentTeam_).fitness.lowerBound();
+
+    fmt::print("Current Evaluator Fitness: {:.4f}\n", currentFitness);
+  }
+
+  auto getFitnessDelta = [&](const Action& agentAction) {
+    if (!shouldEval()) return 0.0;
+
+    EvalResult worst{Fitness::best()};
+    for (const auto& otherAction : cu_->getValidActions(env, otherTeam_)) {
+      EvalResult child = recurse_gamma(env, agentAction, otherAction, 0);
+      if (child < worst) { worst = child; }
+    }
+    return worst.fitness.lowerBound() - currentFitness;
+  };
+
   fmt::print("Active pokemon: \n");
 
   // if this is false, then the only move this pokemon may use is "thrash"
   for (const auto& action : cu_->getValidMoveActions(env, agentTeam_)) {
+    double delta = getFitnessDelta(action);
+    std::string deltaStr =
+        (shouldEval()) ? fmt::format("\t({:+.2f})", delta) : "";
+
     if (action.isStruggle()) {
-      fmt::print("\t{} \"Struggle\" -/-\n", fmt::streamed(action));
+      fmt::print("\t{} \"Struggle\" -/-{}\n", fmt::streamed(action), deltaStr);
     } else if (action.isWait()) {
-      fmt::print("\t{} \"Nothing\" -/-\n", fmt::streamed(action));
+      fmt::print("\t{} \"Nothing\" -/-{}\n", fmt::streamed(action), deltaStr);
     } else {
       const ConstMoveVolatile cMove = cPokemon.getMV(action);
-      fmt::print("\t{} {}\n", fmt::streamed(action), fmt::streamed(cMove));
+      fmt::print(
+          "\t{} {}{}\n", fmt::streamed(action), fmt::streamed(cMove), deltaStr);
     }
   }
   if (cTeam.nv().getNumTeammates() > 1) {
     fmt::print("Or switch to a sidelined pokemon: \n");
     for (const auto& action : cu_->getValidSwapActions(env, agentTeam_)) {
+      double delta = getFitnessDelta(action);
+      std::string deltaStr =
+          (shouldEval()) ? fmt::format("\t({:+.2f})", delta) : "";
+
       fmt::print(
-          "\t{} {}\n",
+          "\t{} {}{}\n",
           fmt::streamed(action),
-          fmt::streamed(cTeam.teammate(action)));
+          fmt::streamed(cTeam.teammate(action)),
+          deltaStr);
     }
   }
 }

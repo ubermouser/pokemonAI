@@ -24,6 +24,8 @@ public:
 protected:
   std::reference_wrapper<std::istream> in_;
 
+  bool shouldEval() const { return eval_ != nullptr; }
+
   /* Returns a valid action as per the user's choice
    * AT_MOVE_0-3: pokemon's move
    * AT_MOVE_STRUGGLE  : struggle
@@ -36,7 +38,7 @@ protected:
   /*
    * Prints all possible actions a given pokemon may take to stdout
    */
-  void printActions(const ConstEnvironmentVolatile& env) const;
+  void printActions(const ConstEnvironmentPossible& env) const;
 
   virtual std::string baseName() const override { return "Human"; }
 
