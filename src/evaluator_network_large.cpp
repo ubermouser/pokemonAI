@@ -1,5 +1,7 @@
 #include "pokemonai/evaluator_network_large.h"
 
+#include <algorithm>
+
 #include "pokemonai/binary_embedding.h"
 #include "pokemonai/evaluator_network.h"
 #include "pokemonai/move_nonvolatile.h"
@@ -166,22 +168,23 @@ struct FeatureVectorLarge {
 };
 
 
-union FeatureVectorLargeUnion {
-  FeatureVectorLarge fVec;
-  std::array<float, sizeof(FeatureVectorLarge) / sizeof(float)> fVecAsFloat;
-};
-
-
 void EvaluatorNetworkLarge::seed(
     FeatureVector::floatIterator_t inputBegin,
     const ConstEnvironmentVolatile& env,
     size_t _iTeam) const {
-  FeatureVectorLargeUnion fVec{};
-  // TODO - precompute the NonVolatile portion and just copy
-  fVec.fVec.envNV.seed(env.nv(), _iTeam);
-  fVec.fVec.envV.seed(env, _iTeam);
+  assert(!precomputedNV_[_iTeam].empty());
+  const size_t envNVSize = sizeof(FVec_EnvironmentNonVolatile) / sizeof(float);
 
-  std::copy(fVec.fVecAsFloat.begin(), fVec.fVecAsFloat.end(), inputBegin);
+  // 1. Copy precomputed NonVolatile portion
+  std::copy(
+      precomputedNV_[_iTeam].begin(), precomputedNV_[_iTeam].end(), inputBegin);
+
+  // 2. Zero-initialize and seed Volatile portion directly into the output
+  // buffer
+  std::fill(inputBegin + envNVSize, inputBegin + numInputNeurons, 0.0f);
+  FVec_EnvironmentVolatile* fVecV =
+      reinterpret_cast<FVec_EnvironmentVolatile*>(&(*(inputBegin + envNVSize)));
+  fVecV->seed(env, _iTeam);
 }
 
 
@@ -209,4 +212,24 @@ EvaluatorNetworkLarge::EvaluatorNetworkLarge(
 
 EvaluatorNetworkLarge* EvaluatorNetworkLarge::clone() const {
   return new EvaluatorNetworkLarge(*this);
+}
+
+
+EvaluatorNetworkLarge& EvaluatorNetworkLarge::setEnvironment(
+    const std::shared_ptr<const EnvironmentNonvolatile>& env) {
+  EvaluatorNetwork::setEnvironment(env);
+
+  const size_t envNVSize = sizeof(FVec_EnvironmentNonVolatile) / sizeof(float);
+
+  for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
+    precomputedNV_[iTeam].resize(envNVSize);
+    FVec_EnvironmentNonVolatile envNV{};
+    envNV.seed(*env, iTeam);
+    std::copy(
+        reinterpret_cast<const float*>(&envNV),
+        reinterpret_cast<const float*>(&envNV) + envNVSize,
+        precomputedNV_[iTeam].begin());
+  }
+
+  return *this;
 }

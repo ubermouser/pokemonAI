@@ -18,11 +18,15 @@ class EvaluatorNetworkLarge : public EvaluatorNetwork {
   virtual ~EvaluatorNetworkLarge() override{};
 
   EvaluatorNetworkLarge* clone() const override;
+  EvaluatorNetworkLarge& setEnvironment(
+      const std::shared_ptr<const EnvironmentNonvolatile>& env) override;
 
   void seed(FeatureVector::floatIterator_t cInput, const ConstEnvironmentVolatile& env, size_t iTeam) const override;
   size_t inputSize() const override { return numInputNeurons; };
   size_t outputSize() const override { return numOutputNeurons; };
-protected:
+
+ protected:
+  std::array<std::vector<float>, 2> precomputedNV_;
 };
 
 #endif /* EVALUATOR_NETWORK_LARGE_H */
