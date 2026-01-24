@@ -33,9 +33,9 @@ class MockFeatureVector : public FeatureVector {
 TEST(MLFrameworkTest, BasicForwardPass) {
   // Initialize a simple network with topology [2, 4, 1]
   MockFeatureVector mfv(2, 1);
-  neuralNet::Config cfg;
+  TrainableNeuralNet::Config cfg;
   cfg.architecture = {4};
-  neuralNet net(cfg, mfv);
+  TrainableNeuralNet net(cfg, mfv);
 
   EXPECT_NO_THROW(net.initialize());
   EXPECT_EQ(net.numInputs(), 2);
@@ -84,7 +84,7 @@ TEST(MLFrameworkTest, Serialization) {
 
   // Load into a new network with same topology
   neuralNet net2(cfg, mfv);
-  EXPECT_TRUE(net2.input(ss));
+  EXPECT_NO_THROW(net2.input(ss));
 
   // Compare outputs
   std::vector<float> input = {0.8f, -0.5f};

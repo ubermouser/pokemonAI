@@ -77,6 +77,10 @@ class neuralNet: public Name
 
   virtual neuralNet& initialize();
 
+  virtual std::shared_ptr<neuralNet> clone() const {
+    return std::make_shared<neuralNet>(*this);
+  }
+
   FeatureVector::floatIterator_t inputBegin() { return inputBuffer.begin(); };
   FeatureVector::constFloatIterator_t inputBegin() const {
     return inputBuffer.begin();
@@ -124,8 +128,11 @@ class neuralNet: public Name
   void output(std::ostream& oFile) const;
 
   /* input in binary from an istream using torch::load */
-  bool input(std::istream& iFile);
-  
+  void input(std::istream& iFile);
+
+  /* loads the model from the configured modelPath */
+  void loadModel();
+
 }; // endOf class neuralNet
 
 #endif /* NEURALNET_H */

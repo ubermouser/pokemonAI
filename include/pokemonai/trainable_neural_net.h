@@ -14,6 +14,7 @@ class TrainableNeuralNet : public neuralNet {
     double adamBeta2 = 0.999;
     double adamEpsilon = 1e-8;
     double weightDecay = 0;
+    bool randomWeights = false;
 
     Config() : neuralNet::Config() {}
     virtual ~Config() override {}
@@ -26,10 +27,15 @@ class TrainableNeuralNet : public neuralNet {
   TrainableNeuralNet();
   TrainableNeuralNet(const Config& cfg, const FeatureVector& featureVector);
   TrainableNeuralNet(const Config& cfg, size_t inputSize, size_t outputSize);
+  TrainableNeuralNet(const TrainableNeuralNet& other);
 
   virtual ~TrainableNeuralNet() override;
 
   TrainableNeuralNet& initialize() override;
+
+  virtual std::shared_ptr<neuralNet> clone() const override {
+    return std::make_shared<TrainableNeuralNet>(*this);
+  }
 
   torch::optim::Adam& getOptimizer() { return *optimizer_; }
 

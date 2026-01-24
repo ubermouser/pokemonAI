@@ -29,9 +29,7 @@ evaluator_network128::evaluator_network128(const evaluator_network128& other) : 
 }
 
 evaluator_network128* evaluator_network128::clone() const {
-  evaluator_network128* newNet = new evaluator_network128(*this);
-  if (network_) { newNet->network_ = std::make_shared<neuralNet>(*network_); }
-  return newNet;
+  return new evaluator_network128(*this);
 }
 
 evaluator_network128::evaluator_network128(const neuralNet& _cNet, const Config& cfg) : EvaluatorNetwork(_cNet, cfg) {

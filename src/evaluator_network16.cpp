@@ -25,9 +25,7 @@ evaluator_network16::evaluator_network16(const evaluator_network16& other) : Eva
 }
 
 evaluator_network16* evaluator_network16::clone() const {
-  evaluator_network16* newNet = new evaluator_network16(*this);
-  if (network_) { newNet->network_ = std::make_shared<neuralNet>(*network_); }
-  return newNet;
+  return new evaluator_network16(*this);
 }
 
 evaluator_network16::evaluator_network16(const neuralNet& _cNet, const Config& cfg) : EvaluatorNetwork(_cNet, cfg) {

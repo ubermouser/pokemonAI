@@ -131,14 +131,13 @@ EvaluatorNetwork::EvaluatorNetwork(
           cfg.netConfig, inputSize, outputSize)) {}
 
 EvaluatorNetwork::EvaluatorNetwork(const neuralNet& network, const Config& cfg)
-    : Evaluator(cfg),
-      cfg_(cfg),
-      network_(std::make_shared<neuralNet>(network)) {}
+    : Evaluator(cfg), cfg_(cfg), network_(network.clone()) {}
 
 EvaluatorNetwork::EvaluatorNetwork(const EvaluatorNetwork& other)
     : Evaluator(other),
+      FeatureVector(other),
       cfg_(other.cfg_),
-      network_(other.network_),
+      network_(other.network_ ? other.network_->clone() : nullptr),
       iBestMoves_(other.iBestMoves_),
       dBestMoves_(other.dBestMoves_),
       orders_(other.orders_) {}

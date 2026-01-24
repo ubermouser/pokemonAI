@@ -39,6 +39,7 @@ class TrainerTest : public Gen4EngineTest {
         evaluators::config("network16"));
     eval_cfg->netConfig.modelPath = "test_trainer_model.pt";
     eval_cfg->netConfig.architecture = {8};
+    eval_cfg->netConfig.randomWeights = true;
 
     trainer_->addEvaluator(evaluators::choose("network16", *eval_cfg));
     trainer_->addEvaluator(

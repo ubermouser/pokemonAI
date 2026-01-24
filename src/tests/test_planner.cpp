@@ -227,7 +227,9 @@ TEST_F(PlannerTest, HumanPlannerActionReader) {
   Action result;
   {
     std::istringstream input("m2");
-    PlannerHuman planner(PlannerHuman::Config(), input);
+    PlannerHuman::Config cfg;
+    cfg.maxDepth = 0;
+    PlannerHuman planner(cfg, input);
     planner.setTeam(TEAM_A).setEngine(engine_).setEnvironment(environment_).initialize();
     result = planner.generateSolution(engine_->initialState()).bestAgentAction();
     EXPECT_EQ(result, Action::move(1));

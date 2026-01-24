@@ -89,6 +89,8 @@ void neuralNet::feedForward() {
 
 void neuralNet::randomizeWeights() {
     if (!model) return;
+
+    SPDLOG_WARN("Randomizing weights of neuralNet {}...", getName());
     torch::NoGradGuard no_grad;
     for (auto& param : model->parameters()) {
         if (param.dim() >= 2) {
@@ -123,22 +125,30 @@ void neuralNet::clear() {
 
 
 neuralNet& neuralNet::initialize() {
-  if (model.is_empty() && !cfg_.modelPath.empty()) {
-    std::ifstream iFile(cfg_.modelPath, std::ios::binary);
-    if (!iFile) {
-      throw std::invalid_argument(fmt::format(
-          "neuralNet: could not open model file {}", cfg_.modelPath));
-    }
-    if (!input(iFile)) {
-      throw std::invalid_argument(fmt::format(
-          "neuralNet: failed to load model from {}", cfg_.modelPath));
-    }
+  if (cfg_.modelPath.empty()) {
+    throw std::invalid_argument(
+        "neuralNet: modelPath is required for initialization");
   }
 
-  if (model.is_empty()) {
-    throw std::invalid_argument("neuralNet: model not initialized");
-  }
+  loadModel();
+
   return *this;
+}
+
+
+void neuralNet::loadModel() {
+  SPDLOG_WARN("Loading neural network from {}...", cfg_.modelPath);
+  std::ifstream iFile(cfg_.modelPath, std::ios::binary);
+  if (!iFile) {
+    throw std::invalid_argument(fmt::format(
+        "neuralNet: could not open model file {}!", cfg_.modelPath));
+  }
+  input(iFile);
+
+  if (model.is_empty()) {
+    throw std::invalid_argument(
+        "neuralNet: model not initialized after loading!");
+  }
 }
 
 
@@ -148,13 +158,14 @@ void neuralNet::output(std::ostream& oFile) const {
 }
 
 
-bool neuralNet::input(std::istream& iFile) {
-    if (!model) return false;
-    try {
-        torch::load(model, iFile);
-    } catch (const std::exception& e) {
-        SPDLOG_ERROR("Failed to load neural network: {}", e.what());
-        return false;
-    }
-    return true;
+void neuralNet::input(std::istream& iFile) {
+  if (!model) {
+    throw std::invalid_argument("neuralNet: model not initialized");
+  }
+  try {
+    torch::load(model, iFile);
+  } catch (const std::exception& e) {
+    SPDLOG_CRITICAL("Failed to load neural network: {}", e.what());
+    throw;
+  }
 }

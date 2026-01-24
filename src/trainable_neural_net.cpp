@@ -25,7 +25,10 @@ boost::program_options::options_description TrainableNeuralNet::Config::options(
      "Epsilon hyperparameter for the Adam optimizer")
     ((prefix + "weight-decay").c_str(),
      po::value<double>(&weightDecay)->default_value(weightDecay),
-     "Weight decay for the Adam optimizer");
+     "Weight decay for the Adam optimizer")
+    ((prefix + "random-weights").c_str(),
+     po::bool_switch(&randomWeights),
+     "Initialize with random weights (even if model-path is set)");
   // clang-format on
   return desc;
 }
@@ -44,12 +47,14 @@ TrainableNeuralNet::TrainableNeuralNet(
     : neuralNet(cfg, inputSize, outputSize), cfg_(cfg) {}
 
 
+TrainableNeuralNet::TrainableNeuralNet(const TrainableNeuralNet& other)
+    : neuralNet(other), cfg_(other.cfg_), optimizer_(nullptr) {}
+
+
 TrainableNeuralNet::~TrainableNeuralNet() {}
 
 
 TrainableNeuralNet& TrainableNeuralNet::initialize() {
-  neuralNet::initialize();
-
   if (cfg_.learningRate <= 0) {
     throw std::invalid_argument("TrainableNeuralNet: learningRate must be > 0");
   }
@@ -68,6 +73,12 @@ TrainableNeuralNet& TrainableNeuralNet::initialize() {
     throw std::invalid_argument("TrainableNeuralNet: weightDecay must be >= 0");
   }
 
+  if (cfg_.randomWeights || cfg_.modelPath.empty()) {
+    randomizeWeights();
+  } else {
+    neuralNet::initialize();
+  }
+
   initOptimizer(cfg_);
 
   return *this;
@@ -76,6 +87,7 @@ TrainableNeuralNet& TrainableNeuralNet::initialize() {
 
 void TrainableNeuralNet::initOptimizer(const Config& cfg) {
   if (!model.is_empty() and optimizer_ == nullptr) {
+    SPDLOG_WARN("Initializing optimizer for neuralNet {}...", getName());
     auto options = torch::optim::AdamOptions(cfg.learningRate)
                        .betas({cfg.adamBeta1, cfg.adamBeta2})
                        .eps(cfg.adamEpsilon)
