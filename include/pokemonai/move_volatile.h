@@ -24,20 +24,25 @@ struct PKAISHARED MoveVolatileData
   bool operator!=(const MoveVolatileData& other) const;
 };
 
-#define MOVE_VOLATILE_IMPL_TEMPLATE template <typename VolatileType>
-#define MOVE_VOLATILE_IMPL MoveVolatileImpl<VolatileType>
+#define MOVE_VOLATILE_IMPL_TEMPLATE template <typename MOVE_VOLATILE_DATA_TYPE>
+#define MOVE_VOLATILE_IMPL MoveVolatileImpl<MOVE_VOLATILE_DATA_TYPE>
 
 
 MOVE_VOLATILE_IMPL_TEMPLATE
-class MoveVolatileImpl: public NonvolatileVolatilePair<const MoveNonVolatile, VolatileType> {
-public:
-  using base_t = NonvolatileVolatilePair<const MoveNonVolatile, VolatileType>;
+class MoveVolatileImpl : public NonvolatileVolatilePair<
+                             const MoveNonVolatile,
+                             MOVE_VOLATILE_DATA_TYPE> {
+ public:
+  using base_t =
+      NonvolatileVolatilePair<const MoveNonVolatile, MOVE_VOLATILE_DATA_TYPE>;
   using base_t::base_t;
   using base_t::data;
   using base_t::nv;
 
   /* returns percentage of move's PP remaining. */
-  fpType getPercentPP() const { return fpType(data().PPcurrent) / fpType(nv().getPPMax()); };
+  fpType getPercentPP() const {
+    return fpType(data().PPcurrent) / fpType(nv().getPPMax());
+  };
 
   /* returns count of this move's PP */
   uint32_t getPP() const { return data().PPcurrent; };

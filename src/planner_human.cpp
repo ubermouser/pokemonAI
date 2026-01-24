@@ -69,11 +69,9 @@ void PlannerHuman::printActions(const ConstEnvironmentPossible& env) const {
       std::string deltaStr =
           (shouldEval()) ? fmt::format("\t({:+.2f})", delta) : "";
 
-      fmt::print(
-          "\t{} {}{}\n",
-          fmt::streamed(action),
-          fmt::streamed(cTeam.teammate(action)),
-          deltaStr);
+      const ConstPokemonVolatile cTeammate = cTeam.teammate(action);
+      cTeammate.prettyPrint(
+          fmt::format("\t{} ", fmt::streamed(action)), deltaStr);
     }
   }
 }

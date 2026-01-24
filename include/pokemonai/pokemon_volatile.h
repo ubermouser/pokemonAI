@@ -59,15 +59,22 @@ struct PKAISHARED PokemonVolatileData {
   bool operator!=(const PokemonVolatileData& other) const;
 };
 
-#define POKEMON_VOLATILE_IMPL_TEMPLATE \
-template<typename MoveVolatileType, typename VolatileType, typename StatusType>
+#define POKEMON_VOLATILE_IMPL_TEMPLATE     \
+  template <                               \
+      typename MoveVolatileType,           \
+      typename POKEMON_VOLATILE_DATA_TYPE, \
+      typename StatusType>
 #define POKEMON_VOLATILE_IMPL \
-PokemonVolatileImpl<MoveVolatileType, VolatileType, StatusType>
+  PokemonVolatileImpl<MoveVolatileType, POKEMON_VOLATILE_DATA_TYPE, StatusType>
 
 POKEMON_VOLATILE_IMPL_TEMPLATE
-class PokemonVolatileImpl: public NonvolatileVolatilePair<const PokemonNonVolatile, VolatileType> {
-public:
-  using base_t = NonvolatileVolatilePair<const PokemonNonVolatile, VolatileType>;
+class PokemonVolatileImpl : public NonvolatileVolatilePair<
+                                const PokemonNonVolatile,
+                                POKEMON_VOLATILE_DATA_TYPE> {
+ public:
+  using base_t = NonvolatileVolatilePair<
+      const PokemonNonVolatile,
+      POKEMON_VOLATILE_DATA_TYPE>;
   using impl_t = POKEMON_VOLATILE_IMPL;
   using status_t = StatusType;
   using movevolatile_t = MoveVolatileType;
@@ -78,23 +85,26 @@ public:
   StatusType* status_;
 
   PokemonVolatileImpl(
-      typename base_t::nonvolatile_t& nv, typename base_t::volatile_t& data) = delete;
+      typename base_t::nonvolatile_t& nv,
+      typename base_t::volatile_t& data) = delete;
   PokemonVolatileImpl(
-      typename base_t::nonvolatile_t& nv, 
+      typename base_t::nonvolatile_t& nv,
       typename base_t::volatile_t& data,
-      typename impl_t::status_t& status
-  ): base_t(nv, data), status_(&status) {};
+      typename impl_t::status_t& status)
+      : base_t(nv, data), status_(&status){};
 
-  StatusType& status() const { return *status_; }
-  operator StatusType&() const { return *status_; }
+ StatusType& status() const { return *status_; }
+ operator StatusType&() const { return *status_; }
 
-  /* retrieve the base species of the current volatile pokemon */
-  const PokemonBase& getBase() const { return nv().getBase(); };
+ /* retrieve the base species of the current volatile pokemon */
+ const PokemonBase& getBase() const { return nv().getBase(); };
 
-  /* returns TRUE if the pokemon has more than 0 hitpoints */
-  bool isAlive() const;
+ /* returns TRUE if the pokemon has more than 0 hitpoints */
+ bool isAlive() const;
 
-  movevolatile_t getMV(const Action& action) const { return getMV(action.iMove()); }
+ movevolatile_t getMV(const Action& action) const {
+   return getMV(action.iMove());
+  }
   movevolatile_t getMV(size_t index) const;
 
   /* True if the pokemon has at least one move they can perform */
@@ -121,6 +131,10 @@ public:
   uint32_t getStatusAilment() const { return data().status_nonvolatile; }
 
   bool hasItem() const;
+
+  /* pretty prints the pokemon */
+  void prettyPrint(
+      const std::string& prefix = "", const std::string& suffix = "") const;
 
   const Item& getItem() const;
 };
@@ -182,4 +196,3 @@ public:
 PKAISHARED std::ostream& operator <<(std::ostream& os, const ConstPokemonVolatile& pokemon);
 
 #endif	/* POKEMON_VOLATILE_H */
-

@@ -1,5 +1,6 @@
 #include "pokemonai/pokemon_volatile.h"
 
+#include <fmt/color.h>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
@@ -14,6 +15,7 @@
 #include "pokemonai/pokedex.h"
 #include "pokemonai/pokemon_base.h"
 #include "pokemonai/pokemon_nonvolatile.h"
+#include "pokemonai/type.h"
 
 BOOST_STATIC_ASSERT(sizeof(PokemonVolatileData) == sizeof(uint64_t));
 
@@ -183,6 +185,102 @@ void PokemonVolatile::setItem(const Item& newItem, bool resetVolatile) {
 POKEMON_VOLATILE_IMPL_TEMPLATE
 bool POKEMON_VOLATILE_IMPL::hasItem() const {
   return data().iHeldItem != Item::no_item->index_;
+}
+
+
+POKEMON_VOLATILE_IMPL_TEMPLATE
+void POKEMON_VOLATILE_IMPL::prettyPrint(
+    const std::string& prefix, const std::string& suffix) const {
+  const PokemonBase& base = getBase();
+  const PokemonNonVolatile& nonVol = nv();
+
+  // Line 1: Name (Species) | HP: 100/100 | Type1/Type2 | Status | Suffix
+  fmt::print("{}", prefix);
+  fmt::print(
+      fmt::emphasis::bold | fg(fmt::color::cyan), "\"{}\"", nonVol.getName());
+  fmt::print(" ({}) | ", base.getName());
+
+  // HP
+  uint32_t hp = getHP();
+  uint32_t maxHp = nv().getMaxHP();
+  float hpPercent = (maxHp > 0) ? (float)hp / maxHp : 0.0f;
+  fmt::color hpColor = fmt::color::green;
+  if (hpPercent < 0.2f)
+    hpColor = fmt::color::red;
+  else if (hpPercent < 0.5f)
+    hpColor = fmt::color::gold;
+  fmt::print("HP: ");
+  fmt::print(fg(hpColor), "{}/{}", hp, maxHp);
+  fmt::print(" | ");
+
+  // Types
+  fmt::print(fg(fmt::color::yellow), "{}", base.getType(0).getName());
+  if (base.types_[1] != Type::no_type) {
+    fmt::print("/{}", base.getType(1).getName());
+  }
+  fmt::print(" | ");
+
+  // Status
+  std::string statusStr = "Normal";
+  fmt::color statusColor = fmt::color::white;
+  switch (getStatusAilment()) {
+  case AIL_NV_BURN:
+    statusStr = "BRN";
+    statusColor = fmt::color::orange_red;
+    break;
+  case AIL_NV_FREEZE:
+    statusStr = "FRZ";
+    statusColor = fmt::color::light_sky_blue;
+    break;
+  case AIL_NV_PARALYSIS:
+    statusStr = "PAR";
+    statusColor = fmt::color::yellow;
+    break;
+  case AIL_NV_POISON_TOXIC:
+    statusStr = "TOX";
+    statusColor = fmt::color::purple;
+    break;
+  case AIL_NV_POISON:
+    statusStr = "PSN";
+    statusColor = fmt::color::orchid;
+    break;
+  case AIL_NV_REST_1T:
+  case AIL_NV_REST_2T:
+  case AIL_NV_REST_3T:
+  case AIL_NV_SLEEP_4T:
+  case AIL_NV_SLEEP_3T:
+  case AIL_NV_SLEEP_2T:
+  case AIL_NV_SLEEP_1T:
+    statusStr = "SLP";
+    statusColor = fmt::color::light_gray;
+    break;
+  default:
+    break;
+  }
+  if (statusStr != "Normal") {
+    fmt::print(fmt::emphasis::bold | fg(statusColor), "{}", statusStr);
+  } else {
+    fmt::print("{}", statusStr);
+  }
+  fmt::print("{}\n", suffix);
+
+  // Line 2: I: ItemName | A: AbilityName | M: M1, M2, M3, M4
+  fmt::print("{}", prefix);
+  fmt::print("   I: ");
+  if (hasItem()) {
+    fmt::print(fg(fmt::color::orange), "{}", getItem().getName());
+  } else {
+    fmt::print("None");
+  }
+  fmt::print(" | A: ");
+  fmt::print(fg(fmt::color::light_green), "{}", nonVol.getAbility().getName());
+  fmt::print(" | M: ");
+
+  for (size_t i = 0, size = nonVol.getNumMoves(); i < size; ++i) {
+    fmt::print("{}", nonVol.getMove_base(i).getName());
+    if (i < size - 1) fmt::print(", ");
+  }
+  fmt::print("\n");
 }
 
 
