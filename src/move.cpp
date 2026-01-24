@@ -71,6 +71,28 @@ const Type& Move::getType() const
 }
 
 
+const std::string& Move::getDamageTypeName() const {
+  static const std::string status = "Status";
+  static const std::string physical = "Physical";
+  static const std::string special = "Special";
+  static const std::string fixed = "Fixed";
+  static const std::string unknown = "Unknown";
+
+  switch (damageType_) {
+  case 0:
+    return status;
+  case 1:
+    return physical;
+  case 2:
+    return special;
+  case 3:
+    return fixed;
+  default:
+    return unknown;
+  }
+}
+
+
 bool Moves::initialize(const std::string& path, const Types& types) {
   if (path.empty())
   {
@@ -248,12 +270,13 @@ bool volatileAilmentFromToken(
 
   // volatileAilment,target,identify
   iToken = iStartToken + 2;
-  if (setArg(tokens.at(iToken), ailment))
-  {
+  if (setArg(tokens.at(iToken), ailment)) {
     checkRangeB(ailment, (uint32_t)0, (uint32_t)1);
     if (ailment == 1) { result = 110; goto endVolatile; }
+  } else {
+    incorrectArgs("AIL_V_IDENTIFY", iLine, iToken);
+    return false;
   }
-  else { incorrectArgs("AIL_V_IDENTIFY", iLine, iToken); return false; }
 
   // volatileAilment,target,infatuation
   iToken = iStartToken + 3;

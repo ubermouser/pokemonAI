@@ -24,8 +24,11 @@ struct PKAISHARED MoveVolatileData
   bool operator!=(const MoveVolatileData& other) const;
 };
 
+#define MOVE_VOLATILE_IMPL_TEMPLATE template <typename VolatileType>
+#define MOVE_VOLATILE_IMPL MoveVolatileImpl<VolatileType>
 
-template<typename VolatileType>
+
+MOVE_VOLATILE_IMPL_TEMPLATE
 class MoveVolatileImpl: public NonvolatileVolatilePair<const MoveNonVolatile, VolatileType> {
 public:
   using base_t = NonvolatileVolatilePair<const MoveNonVolatile, VolatileType>;
@@ -44,6 +47,10 @@ public:
 
   /* retrieve the base move of the current volatile move */
   const Move& getBase() const { return nv().getBase(); };
+
+  /* pretty prints the move */
+  void prettyPrint(
+      const std::string& prefix = "", const std::string& suffix = "") const;
 };
 
 

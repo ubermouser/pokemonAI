@@ -1,11 +1,15 @@
 #include "pokemonai/move_volatile.h"
 
+#include <fmt/color.h>
+#include <fmt/format.h>
+
 #include <boost/static_assert.hpp>
 #include <cstring>
 #include <ostream>
 
-#include "pokemonai/move_nonvolatile.h"
 #include "pokemonai/move.h"
+#include "pokemonai/move_nonvolatile.h"
+#include "pokemonai/type.h"
 
 BOOST_STATIC_ASSERT(sizeof(MoveVolatileData) == sizeof(uint8_t));
 
@@ -47,9 +51,67 @@ bool MoveVolatile::setPP(uint32_t value) {
 }
 
 
+MOVE_VOLATILE_IMPL_TEMPLATE
+void MOVE_VOLATILE_IMPL::prettyPrint(
+    const std::string& prefix, const std::string& suffix) const {
+  const Move& base = getBase();
+  fmt::print("{}", prefix);
+  fmt::print(
+      fmt::emphasis::bold | fg(fmt::color::cyan), "\"{}\"", base.getName());
+  fmt::print(" [");
+  fmt::print(
+      fmt::emphasis::bold | fg(fmt::color::yellow),
+      "{}",
+      base.getType().getName());
+  fmt::print("] ");
+
+  fmt::color catColor;
+  switch (base.getDamageType()) {
+  case 0:
+    catColor = fmt::color::white;
+    break;
+  case 1:
+    catColor = fmt::color::crimson;
+    break;
+  case 2:
+    catColor = fmt::color::cornflower_blue;
+    break;
+  case 3:
+    catColor = fmt::color::gray;
+    break;
+  default:
+    catColor = fmt::color::white;
+    break;
+  }
+  fmt::print(
+      fmt::emphasis::bold | fg(catColor), "{}", base.getDamageTypeName());
+
+  fmt::print(" Pow: ");
+  fmt::print(fmt::emphasis::bold | fg(fmt::color::red), "{}", base.getPower());
+  fmt::print(" PP: {}/{}{}\n", (unsigned int)getPP(), nv().getPPMax(), suffix);
+
+  if (!base.getDescription().empty()) {
+    fmt::print("\t   \033[3m{}\033[0m\n", base.getDescription());
+  }
+}
+
+
 std::ostream& operator <<(std::ostream& os, const ConstMoveVolatile& cMV)
 {
-  os << "\"" << cMV.getBase().getName() << "\" " << (unsigned int)cMV.getPP() << "/" << cMV.nv().getPPMax();
+  const Move& base = cMV.getBase();
+
+  os << fmt::format(
+      "\"{}\" [{}] {} Pwr: {} PP: {}/{}",
+      base.getName(),
+      base.getType().getName(),
+      base.getDamageTypeName(),
+      base.getPower(),
+      (unsigned int)cMV.getPP(),
+      cMV.nv().getPPMax());
 
   return os;
 }
+
+
+template class MoveVolatileImpl<const MoveVolatileData>;
+template class MoveVolatileImpl<MoveVolatileData>;

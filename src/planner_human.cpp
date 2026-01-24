@@ -1,6 +1,7 @@
 //#define PKAI_IMPORT
 #include "pokemonai/planner_human.h"
 
+#include <fmt/color.h>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
@@ -57,10 +58,10 @@ void PlannerHuman::printActions(const ConstEnvironmentPossible& env) const {
       fmt::print("\t{} \"Nothing\" -/-{}\n", fmt::streamed(action), deltaStr);
     } else {
       const ConstMoveVolatile cMove = cPokemon.getMV(action);
-      fmt::print(
-          "\t{} {}{}\n", fmt::streamed(action), fmt::streamed(cMove), deltaStr);
+      cMove.prettyPrint(fmt::format("\t{} ", fmt::streamed(action)), deltaStr);
     }
   }
+
   if (cTeam.nv().getNumTeammates() > 1) {
     fmt::print("Or switch to a sidelined pokemon: \n");
     for (const auto& action : cu_->getValidSwapActions(env, agentTeam_)) {

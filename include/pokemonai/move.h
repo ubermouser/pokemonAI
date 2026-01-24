@@ -184,6 +184,10 @@ public:
   
   uint32_t getDamageType() const { return damageType_; };
 
+  const std::string& getDamageTypeName() const;
+
+  const std::string& getDescription() const { return description_; };
+
   FixType getPrimaryAccuracy() const {
     return FixType((double)primaryAccuracy_ / 100.0);
   };
@@ -227,4 +231,3 @@ protected:
 };
 
 #endif	/* MOVE_H */
-
