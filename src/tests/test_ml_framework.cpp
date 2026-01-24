@@ -54,8 +54,8 @@ TEST(MLFrameworkTest, BasicForwardPass) {
 
 TEST(MLFrameworkTest, WeightRandomization) {
   MockFeatureVector mfv(2, 2);
-  neuralNet::Config cfg;
-  neuralNet net(cfg, mfv);
+  TrainableNeuralNet::Config cfg;
+  TrainableNeuralNet net(cfg, mfv);
 
   net.randomizeWeights();
 
@@ -73,9 +73,9 @@ TEST(MLFrameworkTest, WeightRandomization) {
 
 TEST(MLFrameworkTest, Serialization) {
   MockFeatureVector mfv(2, 1);
-  neuralNet::Config cfg;
+  TrainableNeuralNet::Config cfg;
   cfg.architecture = {4};
-  neuralNet net1(cfg, mfv);
+  TrainableNeuralNet net1(cfg, mfv);
   net1.randomizeWeights();
 
   // Save to stream

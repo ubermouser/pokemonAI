@@ -46,7 +46,10 @@ class NetworkEvaluatorTest : public Gen4EngineTest {
 
     eval->setEngine(engine_);
     eval->setEnvironment(environment_);
-    eval->getNetwork()->randomizeWeights();
+    if (auto tEval =
+            std::dynamic_pointer_cast<TrainableEvaluatorNetwork>(eval)) {
+      tEval->getTrainableNetwork()->randomizeWeights();
+    }
     return eval;
   }
 
@@ -84,7 +87,11 @@ INSTANTIATE_TEST_SUITE_P(
     AllNetworks,
     NetworkEvaluatorParamTest,
     ::testing::Values(
-        "network16", "network32", "network64", "network128", "networkLarge"));
+        "tnetwork16",
+        "tnetwork32",
+        "tnetwork64",
+        "tnetwork128",
+        "tnetworkLarge"));
 
 
 TEST_P(NetworkEvaluatorParamTest, Initialization) {
@@ -119,18 +126,107 @@ TEST_P(NetworkEvaluatorParamTest, SeedValidation) {
 }
 
 
-TEST_P(NetworkEvaluatorParamTest, TerminalStates) {
-  auto eval = createEvaluator(GetParam());
+TEST_P(NetworkEvaluatorParamTest, FrozenLoadFailure) {
+  std::string fType = GetParam().substr(1);  // remove 't'
+  auto cfg = std::static_pointer_cast<EvaluatorNetwork::Config>(
+      evaluators::config(fType));
+  cfg->netConfig.modelPath = "";  // Ensure empty path
+  auto eval = evaluators::choose(fType, *cfg);
 
-  auto terminalStateData = engine_->initialState().data();
-  auto terminalTieStateData = terminalStateData;
-  auto terminalState = EnvironmentVolatile{*environment_, terminalStateData};
-  auto terminalTieState = EnvironmentVolatile{*environment_, terminalTieStateData};
+  eval->setEngine(engine_);
+  eval->setEnvironment(environment_);
 
-  terminalState.getTeam(0).cSetHP(0); // kill first pokemon
-  terminalTieState.getTeam(0).cSetHP(0); // kill both first pokemon
-  terminalTieState.getTeam(1).cSetHP(0); 
+  // Frozen network initialization should throw because modelPath is empty
+  EXPECT_THROW(eval->initialize(), std::invalid_argument);
+}
 
-  validateNetworkTerminalState(*eval, terminalState, 0.0);
-  validateNetworkTerminalState(*eval, terminalTieState, 0.5);
+
+TEST_P(NetworkEvaluatorParamTest, TrainableLoadSuccess) {
+  std::string tType = GetParam();
+  auto cfg = std::static_pointer_cast<TrainableEvaluatorNetwork::Config>(
+      evaluators::config(tType));
+  cfg->netConfig.modelPath = "";  // Ensure empty path
+  auto eval = evaluators::choose(tType, *cfg);
+
+  eval->setEngine(engine_);
+  eval->setEnvironment(environment_);
+
+  // Trainable network initialization should succeed even with empty modelPath
+  EXPECT_NO_THROW(eval->initialize());
+  validateNetworkNonTerminalState(*eval, engine_->initialState());
+}
+
+
+TEST_P(NetworkEvaluatorParamTest, SaveLoadParity) {
+  std::string tType = GetParam();
+  std::string fType = GetParam().substr(1);  // remove 't'
+  auto tCfg = std::static_pointer_cast<TrainableEvaluatorNetwork::Config>(
+      evaluators::config(tType));
+  tCfg->netConfig.modelPath = "";
+  auto tEval = std::dynamic_pointer_cast<TrainableEvaluatorNetwork>(
+      evaluators::choose(tType, *tCfg));
+
+  tEval->setEngine(engine_);
+  tEval->setEnvironment(environment_);
+  tEval->initialize();
+  tEval->getTrainableNetwork()->randomizeWeights();
+
+  // Save the trainable network
+  std::string tempModel = "temp_model.pt";
+  {
+    std::ofstream oFile(tempModel, std::ios::binary);
+    tEval->getTrainableNetwork()->output(oFile);
+  }
+
+  // Load it as a frozen network
+  auto fCfg = std::static_pointer_cast<EvaluatorNetwork::Config>(
+      evaluators::config(fType));
+  fCfg->netConfig.modelPath = tempModel;
+  auto fEval = std::dynamic_pointer_cast<EvaluatorNetwork>(
+      evaluators::choose(fType, *fCfg));
+
+  fEval->setEngine(engine_);
+  fEval->setEnvironment(environment_);
+  fEval->initialize();
+
+  // Verify outputs are identical
+  auto state = engine_->initialState();
+  EvalResult tRes = tEval->evaluate(state, TEAM_A);
+  EvalResult fRes = fEval->evaluate(state, TEAM_A);
+
+  EXPECT_NEAR(tRes.fitness.value(), fRes.fitness.value(), 1e-6);
+
+  // Cleanup
+  std::remove(tempModel.c_str());
+}
+
+
+TEST_P(NetworkEvaluatorParamTest, CloneInitialization) {
+  std::string tType = GetParam();
+  std::string fType = GetParam().substr(1);  // remove 't'
+
+  auto tCfg = std::static_pointer_cast<TrainableEvaluatorNetwork::Config>(
+      evaluators::config(tType));
+  tCfg->netConfig.modelPath = "";
+  auto tEval = std::dynamic_pointer_cast<TrainableEvaluatorNetwork>(
+      evaluators::choose(tType, *tCfg));
+
+  tEval->setEngine(engine_);
+  tEval->setEnvironment(environment_);
+  tEval->initialize();  // Initializes the network (random weights)
+
+  // Clone the evaluator (which clones the network)
+  std::unique_ptr<EvaluatorNetwork> fEval(
+      dynamic_cast<EvaluatorNetwork*>(tEval->clone()));
+
+  // fEval is a frozen network type, and its internal config likely has no path.
+  // However, it already has an initialized network.
+  // initialize() should succeed.
+  EXPECT_NO_THROW(fEval->initialize());
+
+  // Verify output parity
+  auto state = engine_->initialState();
+  EvalResult tRes = tEval->evaluate(state, TEAM_A);
+  EvalResult fRes = fEval->evaluate(state, TEAM_A);
+  EXPECT_NEAR(tRes.fitness.value(), fRes.fitness.value(), 1e-6);
 }

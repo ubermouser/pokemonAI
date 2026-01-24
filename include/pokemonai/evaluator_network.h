@@ -23,7 +23,7 @@ namespace featureVector_impl
 class EvaluatorNetwork : public Evaluator, public FeatureVector {
  public:
   struct Config : public Evaluator::Config {
-    TrainableNeuralNet::Config netConfig;
+    neuralNet::Config netConfig;
 
     Config() : Evaluator::Config() {}
     virtual ~Config() {}
@@ -43,6 +43,9 @@ class EvaluatorNetwork : public Evaluator, public FeatureVector {
   const Config& getConfig() const { return cfg_; }
 
   virtual std::shared_ptr<neuralNet>& getNetwork() { return network_; }
+  virtual const std::shared_ptr<neuralNet>& getNetwork() const {
+    return network_;
+  }
 
   virtual void setNetwork(const std::shared_ptr<neuralNet>& network);
   virtual void setNetwork(const neuralNet& network) {
@@ -67,7 +70,6 @@ class EvaluatorNetwork : public Evaluator, public FeatureVector {
   virtual size_t inputSize() const override = 0;
   virtual size_t outputSize() const override = 0;
 
-
  protected:
   Config cfg_;
   std::shared_ptr<neuralNet> network_;
@@ -81,6 +83,44 @@ class EvaluatorNetwork : public Evaluator, public FeatureVector {
 
   virtual std::string baseName() const override { return "Network"; }
   void updateIdent();
+  void initNetwork();
+};
+
+
+class TrainableEvaluatorNetwork : public EvaluatorNetwork {
+ public:
+  struct Config : public EvaluatorNetwork::Config {
+    TrainableNeuralNet::Config netConfig;
+
+    Config() : EvaluatorNetwork::Config() {}
+    virtual ~Config() {}
+
+    virtual boost::program_options::options_description options(
+        const std::string& category = "trainable evaluator options",
+        std::string prefix = "") override;
+  };
+
+  TrainableEvaluatorNetwork(
+      const Config& cfg, size_t inputSize, size_t outputSize);
+  TrainableEvaluatorNetwork(const neuralNet& network, const Config& cfg);
+  TrainableEvaluatorNetwork(const TrainableEvaluatorNetwork& other);
+  virtual ~TrainableEvaluatorNetwork() override;
+
+  virtual TrainableEvaluatorNetwork& initialize() override;
+
+  const Config& getConfig() const { return cfg_; }
+
+  virtual std::shared_ptr<TrainableNeuralNet> getTrainableNetwork() {
+    return std::dynamic_pointer_cast<TrainableNeuralNet>(network_);
+  }
+  virtual std::shared_ptr<const TrainableNeuralNet> getTrainableNetwork()
+      const {
+    return std::dynamic_pointer_cast<const TrainableNeuralNet>(network_);
+  }
+
+ protected:
+  Config cfg_;
+  virtual std::string baseName() const override { return "TrainableNetwork"; }
 };
 
 #endif // EVALUATOR_NETWORK_H

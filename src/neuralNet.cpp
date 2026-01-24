@@ -87,30 +87,6 @@ void neuralNet::feedForward() {
 }
 
 
-void neuralNet::randomizeWeights() {
-    if (!model) return;
-
-    SPDLOG_WARN("Randomizing weights of neuralNet {}...", getName());
-    torch::NoGradGuard no_grad;
-    for (auto& param : model->parameters()) {
-        if (param.dim() >= 2) {
-            torch::nn::init::xavier_uniform_(param);
-        } else {
-            torch::nn::init::zeros_(param);
-        }
-    }
-}
-
-
-void neuralNet::jitterWeights(float jitterMax) {
-    if (!model) return;
-    torch::NoGradGuard no_grad;
-    for (auto& param : model->parameters()) {
-        param.add_(torch::randn(param.sizes()) * jitterMax);
-    }
-}
-
-
 void neuralNet::clearInput() {
     std::fill(inputBuffer.begin(), inputBuffer.end(), 0.0f);
 }
@@ -125,12 +101,15 @@ void neuralNet::clear() {
 
 
 neuralNet& neuralNet::initialize() {
+  if (initialized_) { return *this; }
+
   if (cfg_.modelPath.empty()) {
     throw std::invalid_argument(
         "neuralNet: modelPath is required for initialization");
   }
 
   loadModel();
+  initialized_ = true;
 
   return *this;
 }

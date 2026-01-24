@@ -33,15 +33,15 @@ class TrainerTest : public Gen4EngineTest {
     trainer_->setStateEvaluator(EvaluatorSimple{});
 
     trainer_->addPlanner(
-        planners::choose("random", *planners::config("random")));
+        planners::choose("softmax", *planners::config("softmax")));
 
-    auto eval_cfg = std::static_pointer_cast<EvaluatorNetwork::Config>(
-        evaluators::config("network16"));
+    auto eval_cfg = std::static_pointer_cast<TrainableEvaluatorNetwork::Config>(
+        evaluators::config("tnetwork16"));
     eval_cfg->netConfig.modelPath = "test_trainer_model.pt";
     eval_cfg->netConfig.architecture = {8};
     eval_cfg->netConfig.randomWeights = true;
 
-    trainer_->addEvaluator(evaluators::choose("network16", *eval_cfg));
+    trainer_->addEvaluator(evaluators::choose("tnetwork16", *eval_cfg));
     trainer_->addEvaluator(
         evaluators::choose("simple", *evaluators::config("simple")));
 

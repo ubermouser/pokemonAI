@@ -43,6 +43,7 @@ class neuralNet: public Name
   void updateIdent();
 
   Config cfg_;
+  bool initialized_ = false;
 
  public:
   /* generates an empty invalid neural network */
@@ -53,12 +54,6 @@ class neuralNet: public Name
 
   /* creates a neural network from a config with explicit sizes */
   neuralNet(const Config& cfg, size_t inputSize, size_t outputSize);
-
-  /* just as it says, randomizes ALL the weights of this neural network */
-  void randomizeWeights();
-
-  /* jitters the network's weight */
-  void jitterWeights(float jitterMax);
 
   /* perform regression on an input set */
   template<class InputIterator>

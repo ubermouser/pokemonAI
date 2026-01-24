@@ -3,22 +3,24 @@
 
 #include "pokemonai/evaluator_network.h"
 
-class EvaluatorNetworkLarge : public EvaluatorNetwork {
+template <class Base>
+class EvaluatorNetworkLarge_impl : public Base {
  public:
-  struct Config : public EvaluatorNetwork::Config {
-
-  };
+  struct Config : public Base::Config {};
 
   static const size_t numInputNeurons;
   static const size_t numOutputNeurons;
 
-  EvaluatorNetworkLarge(const Config& cfg = Config{});
-  EvaluatorNetworkLarge(const EvaluatorNetworkLarge& other);
-  EvaluatorNetworkLarge(const neuralNet& cNet, const Config& cfg = Config{});
-  virtual ~EvaluatorNetworkLarge() override{};
+  EvaluatorNetworkLarge_impl(const Config& cfg = Config{});
+  EvaluatorNetworkLarge_impl(const EvaluatorNetworkLarge_impl& other);
+  EvaluatorNetworkLarge_impl(
+      const neuralNet& cNet, const Config& cfg = Config{});
+  virtual ~EvaluatorNetworkLarge_impl() override{};
 
-  EvaluatorNetworkLarge* clone() const override;
-  EvaluatorNetworkLarge& setEnvironment(
+  EvaluatorNetworkLarge_impl* clone() const override {
+    return new EvaluatorNetworkLarge_impl(*this);
+  }
+  EvaluatorNetworkLarge_impl& setEnvironment(
       const std::shared_ptr<const EnvironmentNonvolatile>& env) override;
 
   void seed(FeatureVector::floatIterator_t cInput, const ConstEnvironmentVolatile& env, size_t iTeam) const override;
@@ -28,5 +30,9 @@ class EvaluatorNetworkLarge : public EvaluatorNetwork {
  protected:
   std::array<std::vector<float>, 2> precomputedNV_;
 };
+
+typedef EvaluatorNetworkLarge_impl<EvaluatorNetwork> EvaluatorNetworkLarge;
+typedef EvaluatorNetworkLarge_impl<TrainableEvaluatorNetwork>
+    TrainableEvaluatorNetworkLarge;
 
 #endif /* EVALUATOR_NETWORK_LARGE_H */

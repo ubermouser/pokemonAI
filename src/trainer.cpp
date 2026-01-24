@@ -25,12 +25,11 @@ void Trainer::initialize() {
   trainableNetworks_.clear();
 
   for (auto& pair : initialLeague_.evaluators) {
-    auto evalPtr =
-        std::dynamic_pointer_cast<EvaluatorNetwork>(pair.second->getPtr());
+    auto evalPtr = std::dynamic_pointer_cast<TrainableEvaluatorNetwork>(
+        pair.second->getPtr());
     if (!evalPtr) { continue; }
 
-    auto net =
-        std::dynamic_pointer_cast<TrainableNeuralNet>(evalPtr->getNetwork());
+    auto net = evalPtr->getTrainableNetwork();
     if (!net) { continue; }
 
     if (uniqueNetworks.find(net) == uniqueNetworks.end()) {

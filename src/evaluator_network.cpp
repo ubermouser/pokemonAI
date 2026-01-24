@@ -118,8 +118,7 @@ boost::program_options::options_description EvaluatorNetwork::Config::options(
   auto desc = Evaluator::Config::options(category, prefix);
 
   if (prefix.size() > 0) { prefix.append("-"); }
-  desc.add(
-      netConfig.options(category + " [TrainableNeuralNet]", prefix + "net"));
+  desc.add(netConfig.options(category + " [NeuralNet]", prefix + "net"));
   return desc;
 }
 
@@ -127,8 +126,8 @@ EvaluatorNetwork::EvaluatorNetwork(
     const Config& cfg, size_t inputSize, size_t outputSize)
     : Evaluator(cfg),
       cfg_(cfg),
-      network_(std::make_shared<TrainableNeuralNet>(
-          cfg.netConfig, inputSize, outputSize)) {}
+      network_(
+          std::make_shared<neuralNet>(cfg.netConfig, inputSize, outputSize)) {}
 
 EvaluatorNetwork::EvaluatorNetwork(const neuralNet& network, const Config& cfg)
     : Evaluator(cfg), cfg_(cfg), network_(network.clone()) {}
@@ -146,20 +145,65 @@ EvaluatorNetwork::~EvaluatorNetwork() {}
 
 EvaluatorNetwork& EvaluatorNetwork::initialize() {
   Evaluator::initialize();
+  initNetwork();
+  return *this;
+}
 
+void EvaluatorNetwork::initNetwork() {
   if (!network_) {
-    throw std::invalid_argument("EvaluatorNetwork: network undefined");
+    throw std::invalid_argument(
+        fmt::format("{}: network undefined", baseName()));
   }
+
   network_->initialize();
   if (network_->numInputs() != inputSize() ||
       network_->numOutputs() != outputSize()) {
     throw std::invalid_argument(fmt::format(
-        "EvaluatorNetwork requires input-{} (has {}), output-{} (has {})!",
+        "{} requires input-{} (has {}), output-{} (has {})!",
+        baseName(),
         inputSize(),
         network_->numInputs(),
         outputSize(),
         network_->numOutputs()));
   }
+}
+
+// TrainableEvaluatorNetwork implementation
+boost::program_options::options_description
+TrainableEvaluatorNetwork::Config::options(
+    const std::string& category, std::string prefix) {
+  auto desc = Evaluator::Config::options(category, prefix);
+
+  if (prefix.size() > 0) { prefix.append("-"); }
+  desc.add(
+      netConfig.options(category + " [TrainableNeuralNet]", prefix + "net"));
+  return desc;
+}
+
+TrainableEvaluatorNetwork::TrainableEvaluatorNetwork(
+    const Config& cfg, size_t inputSize, size_t outputSize)
+    : EvaluatorNetwork(
+          static_cast<const EvaluatorNetwork::Config&>(cfg),
+          inputSize,
+          outputSize),
+      cfg_(cfg) {
+  network_ = std::make_shared<TrainableNeuralNet>(
+      cfg.netConfig, inputSize, outputSize);
+}
+
+TrainableEvaluatorNetwork::TrainableEvaluatorNetwork(
+    const neuralNet& network, const Config& cfg)
+    : EvaluatorNetwork(network, cfg), cfg_(cfg) {}
+
+TrainableEvaluatorNetwork::TrainableEvaluatorNetwork(
+    const TrainableEvaluatorNetwork& other)
+    : EvaluatorNetwork(other), cfg_(other.cfg_) {}
+
+TrainableEvaluatorNetwork::~TrainableEvaluatorNetwork() {}
+
+TrainableEvaluatorNetwork& TrainableEvaluatorNetwork::initialize() {
+  Evaluator::initialize();
+  initNetwork();
   return *this;
 }
 

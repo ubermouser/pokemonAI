@@ -17,26 +17,34 @@
 #define NEURONSPERSTATUS 4
 #define NEURONSPERTEAM (NEURONSPERTEAMMATE * 6 + NEURONSPERSTATUS)
 
-const size_t evaluator_network128::numInputNeurons = (NEURONSPERTEAM*2);
-const size_t evaluator_network128::numOutputNeurons = 1U;
+template <class Base>
+const size_t evaluator_network128_impl<Base>::numInputNeurons =
+    (NEURONSPERTEAM * 2);
 
-evaluator_network128::evaluator_network128(const Config& cfg)
-    : EvaluatorNetwork(cfg, numInputNeurons, numOutputNeurons) {
-  updateIdent();
+template <class Base>
+const size_t evaluator_network128_impl<Base>::numOutputNeurons = 1U;
+
+template <class Base>
+evaluator_network128_impl<Base>::evaluator_network128_impl(
+    const typename Base::Config& cfg)
+    : Base(cfg, numInputNeurons, numOutputNeurons) {
+  this->updateIdent();
 }
 
-evaluator_network128::evaluator_network128(const evaluator_network128& other) : EvaluatorNetwork(other) {
+template <class Base>
+evaluator_network128_impl<Base>::evaluator_network128_impl(
+    const evaluator_network128_impl& other)
+    : Base(other) {}
+
+template <class Base>
+evaluator_network128_impl<Base>::evaluator_network128_impl(
+    const neuralNet& _cNet, const typename Base::Config& cfg)
+    : Base(_cNet, cfg) {
+  this->updateIdent();
 }
 
-evaluator_network128* evaluator_network128::clone() const {
-  return new evaluator_network128(*this);
-}
-
-evaluator_network128::evaluator_network128(const neuralNet& _cNet, const Config& cfg) : EvaluatorNetwork(_cNet, cfg) {
-  updateIdent();
-}
-
-void evaluator_network128::seed(
+template <class Base>
+void evaluator_network128_impl<Base>::seed(
     FeatureVector::floatIterator_t inputBegin,
     const ConstEnvironmentVolatile& env,
     size_t _iTeam) const {
@@ -47,13 +55,15 @@ void evaluator_network128::seed(
     size_t iTeam = (_iTeam + iNTeam) & 1;
     size_t iOTeam = (iTeam + 1) & 1;
     const ConstTeamVolatile& cTV = env.getTeam(iTeam);
-    assert(nv_ != nullptr);
-    const TeamNonVolatile& cTNV = nv_->getTeam(iTeam);
+    assert(this->nv_ != nullptr);
+    const TeamNonVolatile& cTNV = this->nv_->getTeam(iTeam);
     const ConstTeamVolatile& tTV = env.getTeam(iOTeam);
-    const TeamNonVolatile& tTNV = nv_->getOtherTeam(iTeam);
+    const TeamNonVolatile& tTNV = this->nv_->getOtherTeam(iTeam);
 
-    const std::array<uint8_t, 6>& iTeammates = orders_[iTeam][cTV.getICPKV()];
-    const std::array<uint8_t, 6>& iOTeammates = orders_[iOTeam][tTV.getICPKV()];
+    const std::array<uint8_t, 6>& iTeammates =
+        this->orders_[iTeam][cTV.getICPKV()];
+    const std::array<uint8_t, 6>& iOTeammates =
+        this->orders_[iOTeam][tTV.getICPKV()];
 
     std::array<float, 8> modifiers = {{ 1.0f, statMultipliers[cTV.cGetBoost(FV_ATTACK)+6], statMultipliers[6-tTV.cGetBoost(FV_DEFENSE)], statMultipliers[cTV.cGetBoost(FV_ATTACK)+6]*statMultipliers[6-tTV.cGetBoost(FV_DEFENSE)], 1.0f, statMultipliers[cTV.cGetBoost(FV_SPATTACK)+6], statMultipliers[6-tTV.cGetBoost(FV_SPDEFENSE)], statMultipliers[cTV.cGetBoost(FV_SPATTACK)+6]*statMultipliers[6-tTV.cGetBoost(FV_SPDEFENSE)] }};
 
@@ -88,11 +98,12 @@ void evaluator_network128::seed(
         const ConstPokemonVolatile& tPKV = tTV.teammate(iOTeammate);
         if (!tPKV.isAlive()) { if (iNOTeammate == 0) { *(cInput++) = 0.0f; } else { numOTeammatesAlive--; } continue; }
         float bestDamage = 0.0f; uint8_t dType = ATK_NODMG;
-        const std::array<uint8_t, 4>& cBestMoves = iBestMoves_[iTeam][iTeammate][iOTeammate];
+        const std::array<uint8_t, 4>& cBestMoves =
+            this->iBestMoves_[iTeam][iTeammate][iOTeammate];
         for (size_t iNMove = 0, iMoveSize = cPKNV.getNumMoves(); iNMove != iMoveSize; ++iNMove) {
           size_t iMove = cBestMoves[iNMove];
           if (!cPKV.getMV(iMove).hasPP()) continue;
-          bestDamage = dBestMoves_[iTeam][iTeammate][iOTeammate][iNMove];
+          bestDamage = this->dBestMoves_[iTeam][iTeammate][iOTeammate][iNMove];
           dType = cPKNV.getMove_base(iMove).getDamageType() % ATK_FIXED;
           break;
         }
@@ -114,3 +125,7 @@ void evaluator_network128::seed(
     cInput += NEURONSPERSTATUS;
   }
 }
+
+// Explicit instantiations
+template class evaluator_network128_impl<EvaluatorNetwork>;
+template class evaluator_network128_impl<TrainableEvaluatorNetwork>;

@@ -85,6 +85,31 @@ TrainableNeuralNet& TrainableNeuralNet::initialize() {
 }
 
 
+void TrainableNeuralNet::randomizeWeights() {
+  if (!model) return;
+
+  SPDLOG_WARN("Randomizing weights of neuralNet {}...", getName());
+  torch::NoGradGuard no_grad;
+  for (auto& param : model->parameters()) {
+    if (param.dim() >= 2) {
+      torch::nn::init::xavier_uniform_(param);
+    } else {
+      torch::nn::init::zeros_(param);
+    }
+  }
+  initialized_ = true;
+}
+
+
+void TrainableNeuralNet::jitterWeights(float jitterMax) {
+  if (!model) return;
+  torch::NoGradGuard no_grad;
+  for (auto& param : model->parameters()) {
+    param.add_(torch::randn(param.sizes()) * jitterMax);
+  }
+}
+
+
 void TrainableNeuralNet::initOptimizer(const Config& cfg) {
   if (!model.is_empty() and optimizer_ == nullptr) {
     SPDLOG_WARN("Initializing optimizer for neuralNet {}...", getName());

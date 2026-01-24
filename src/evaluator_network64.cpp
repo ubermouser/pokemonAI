@@ -17,26 +17,34 @@
 #define NEURONSPERSTATUS 2
 #define NEURONSPERTEAM (NEURONSPERTEAMMATE * 6 + NEURONSPERSTATUS)
 
-const size_t evaluator_network64::numInputNeurons = (NEURONSPERTEAM*2);
-const size_t evaluator_network64::numOutputNeurons = 1U;
+template <class Base>
+const size_t evaluator_network64_impl<Base>::numInputNeurons =
+    (NEURONSPERTEAM * 2);
 
-evaluator_network64::evaluator_network64(const Config& cfg)
-    : EvaluatorNetwork(cfg, numInputNeurons, numOutputNeurons) {
-  updateIdent();
+template <class Base>
+const size_t evaluator_network64_impl<Base>::numOutputNeurons = 1U;
+
+template <class Base>
+evaluator_network64_impl<Base>::evaluator_network64_impl(
+    const typename Base::Config& cfg)
+    : Base(cfg, numInputNeurons, numOutputNeurons) {
+  this->updateIdent();
 }
 
-evaluator_network64::evaluator_network64(const evaluator_network64& other) : EvaluatorNetwork(other) {
+template <class Base>
+evaluator_network64_impl<Base>::evaluator_network64_impl(
+    const evaluator_network64_impl& other)
+    : Base(other) {}
+
+template <class Base>
+evaluator_network64_impl<Base>::evaluator_network64_impl(
+    const neuralNet& _cNet, const typename Base::Config& cfg)
+    : Base(_cNet, cfg) {
+  this->updateIdent();
 }
 
-evaluator_network64* evaluator_network64::clone() const {
-  return new evaluator_network64(*this);
-}
-
-evaluator_network64::evaluator_network64(const neuralNet& _cNet, const Config& cfg) : EvaluatorNetwork(_cNet, cfg) {
-  updateIdent();
-}
-
-void evaluator_network64::seed(
+template <class Base>
+void evaluator_network64_impl<Base>::seed(
     FeatureVector::floatIterator_t inputBegin,
     const ConstEnvironmentVolatile& env,
     size_t _iTeam) const {
@@ -47,12 +55,14 @@ void evaluator_network64::seed(
     size_t iTeam = (_iTeam + iNTeam) & 1;
     size_t iOTeam = (iTeam + 1) & 1;
     const ConstTeamVolatile& cTV = env.getTeam(iTeam);
-    assert(nv_ != nullptr);
-    const TeamNonVolatile& cTNV = nv_->getTeam(iTeam);
+    assert(this->nv_ != nullptr);
+    const TeamNonVolatile& cTNV = this->nv_->getTeam(iTeam);
     const ConstTeamVolatile& tTV = env.getTeam(iOTeam);
 
-    const std::array<uint8_t, 6>& iTeammates = orders_[iTeam][cTV.getICPKV()];
-    const std::array<uint8_t, 6>& iOTeammates = orders_[iOTeam][tTV.getICPKV()];
+    const std::array<uint8_t, 6>& iTeammates =
+        this->orders_[iTeam][cTV.getICPKV()];
+    const std::array<uint8_t, 6>& iOTeammates =
+        this->orders_[iOTeam][tTV.getICPKV()];
     const ConstPokemonVolatile& tPKV = tTV.teammate(iOTeammates[0]);
 
     std::array<float, 4> modifiers = {{
@@ -89,11 +99,12 @@ void evaluator_network64::seed(
       if (!tPKV.isAlive()) { cInput[4] = 0.0f; }
       else {
         float bestDamage = 0.0f; uint8_t dType = ATK_NODMG;
-        const std::array<uint8_t, 4>& cBestMoves = iBestMoves_[iTeam][iTeammate][iOTeammates[0]];
+        const std::array<uint8_t, 4>& cBestMoves =
+            this->iBestMoves_[iTeam][iTeammate][iOTeammates[0]];
         for (size_t iNMove = 0, iMoveSize = cPKNV.getNumMoves(); iNMove != iMoveSize; ++iNMove) {
           size_t iMove = cBestMoves[iNMove];
           if (!cPKV.getMV(iMove).hasPP()) continue;
-          bestDamage = dBestMoves_[iTeam][iTeammate][0][iNMove];
+          bestDamage = this->dBestMoves_[iTeam][iTeammate][0][iNMove];
           dType = cPKNV.getMove_base(iMove).getDamageType() % ATK_FIXED;
           break;
         }
@@ -114,3 +125,7 @@ void evaluator_network64::seed(
     cInput += NEURONSPERSTATUS;
   }
 }
+
+// Explicit instantiations
+template class evaluator_network64_impl<EvaluatorNetwork>;
+template class evaluator_network64_impl<TrainableEvaluatorNetwork>;

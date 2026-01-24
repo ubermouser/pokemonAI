@@ -168,7 +168,8 @@ struct FeatureVectorLarge {
 };
 
 
-void EvaluatorNetworkLarge::seed(
+template <class Base>
+void EvaluatorNetworkLarge_impl<Base>::seed(
     FeatureVector::floatIterator_t inputBegin,
     const ConstEnvironmentVolatile& env,
     size_t _iTeam) const {
@@ -188,36 +189,40 @@ void EvaluatorNetworkLarge::seed(
 }
 
 
-const size_t EvaluatorNetworkLarge::numInputNeurons =
+template <class Base>
+const size_t EvaluatorNetworkLarge_impl<Base>::numInputNeurons =
     sizeof(FeatureVectorLarge) / sizeof(float);
-const size_t EvaluatorNetworkLarge::numOutputNeurons = 1U;
+
+template <class Base>
+const size_t EvaluatorNetworkLarge_impl<Base>::numOutputNeurons = 1U;
 
 
-EvaluatorNetworkLarge::EvaluatorNetworkLarge(const Config& cfg)
-    : EvaluatorNetwork(cfg, inputSize(), outputSize()) {
-  updateIdent();
+template <class Base>
+EvaluatorNetworkLarge_impl<Base>::EvaluatorNetworkLarge_impl(const Config& cfg)
+    : Base(cfg, inputSize(), outputSize()) {
+  this->updateIdent();
 }
 
 
-EvaluatorNetworkLarge::EvaluatorNetworkLarge(const EvaluatorNetworkLarge& other)
-    : EvaluatorNetwork(other) {}
+template <class Base>
+EvaluatorNetworkLarge_impl<Base>::EvaluatorNetworkLarge_impl(
+    const EvaluatorNetworkLarge_impl& other)
+    : Base(other), precomputedNV_(other.precomputedNV_) {}
 
 
-EvaluatorNetworkLarge::EvaluatorNetworkLarge(
+template <class Base>
+EvaluatorNetworkLarge_impl<Base>::EvaluatorNetworkLarge_impl(
     const neuralNet& cNet, const Config& cfg)
-    : EvaluatorNetwork(cNet, cfg) {
-  updateIdent();
+    : Base(cNet, cfg) {
+  this->updateIdent();
 }
 
 
-EvaluatorNetworkLarge* EvaluatorNetworkLarge::clone() const {
-  return new EvaluatorNetworkLarge(*this);
-}
-
-
-EvaluatorNetworkLarge& EvaluatorNetworkLarge::setEnvironment(
+template <class Base>
+EvaluatorNetworkLarge_impl<Base>&
+EvaluatorNetworkLarge_impl<Base>::setEnvironment(
     const std::shared_ptr<const EnvironmentNonvolatile>& env) {
-  EvaluatorNetwork::setEnvironment(env);
+  Base::setEnvironment(env);
 
   const size_t envNVSize = sizeof(FVec_EnvironmentNonVolatile) / sizeof(float);
 
@@ -233,3 +238,7 @@ EvaluatorNetworkLarge& EvaluatorNetworkLarge::setEnvironment(
 
   return *this;
 }
+
+// Explicit instantiations
+template class EvaluatorNetworkLarge_impl<EvaluatorNetwork>;
+template class EvaluatorNetworkLarge_impl<TrainableEvaluatorNetwork>;

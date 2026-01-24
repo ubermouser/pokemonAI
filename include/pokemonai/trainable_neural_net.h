@@ -37,6 +37,12 @@ class TrainableNeuralNet : public neuralNet {
     return std::make_shared<TrainableNeuralNet>(*this);
   }
 
+  /* just as it says, randomizes ALL the weights of this neural network */
+  void randomizeWeights();
+
+  /* jitters the network's weight */
+  void jitterWeights(float jitterMax);
+
   torch::optim::Adam& getOptimizer() { return *optimizer_; }
 
  protected:

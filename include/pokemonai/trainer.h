@@ -22,7 +22,7 @@ class Trainer : public TeamBuilder {
 
 protected:
  struct TrainablePair {
-   std::shared_ptr<class EvaluatorNetwork> evaluator;
+   std::shared_ptr<class TrainableEvaluatorNetwork> evaluator;
    std::shared_ptr<class TrainableNeuralNet> network;
    std::shared_ptr<class TrainerRegressFitness> trainer;
  };
