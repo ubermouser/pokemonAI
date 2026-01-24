@@ -1,10 +1,14 @@
 #include <gtest/gtest.h>
+
 #include <sstream>
+
 #include "engine_test.hpp"
-#include "pokemonai/move_volatile.h"
-#include "pokemonai/pokemon_volatile.h"
-#include "pokemonai/planner_human.h"
 #include "pokemonai/item.h"
+#include "pokemonai/move_volatile.h"
+#include "pokemonai/planner_human.h"
+#include "pokemonai/pokemon_volatile.h"
+#include "pokemonai/state_transition_printer.h"
+
 
 class PlannerHumanTest : public Gen4EngineTest {
  protected:
@@ -53,6 +57,7 @@ class PlannerHumanTest : public Gen4EngineTest {
   std::shared_ptr<EnvironmentNonvolatile> environment_;
 };
 
+
 TEST_F(PlannerHumanTest, MoveVolatileOperatorOutput) {
   const auto& moves = pokedex_->getMoves();
   ASSERT_TRUE(moves.count("tackle"));
@@ -78,6 +83,7 @@ TEST_F(PlannerHumanTest, MoveVolatileOperatorOutput) {
   EXPECT_TRUE(output.find("Pwr: 35") != std::string::npos);
   EXPECT_TRUE(output.find("PP: 35") != std::string::npos);
 }
+
 
 TEST_F(PlannerHumanTest, HumanPlannerActionReader) {
   Action result;
@@ -112,6 +118,7 @@ TEST_F(PlannerHumanTest, HumanPlannerActionReader) {
   }
 }
 
+
 TEST_F(PlannerHumanTest, PokemonVolatilePrettyPrint) {
   const TeamNonVolatile& teamA = environment_->getTeam(TEAM_A);
   const PokemonNonVolatile& gengarNV = teamA.teammate(0);
@@ -143,6 +150,8 @@ TEST_F(PlannerHumanTest, PokemonVolatilePrettyPrint) {
   EXPECT_TRUE(output.find("focus blast") != std::string::npos);
 }
 
+
+// TODO: move these to individual move/ability/item tests
 TEST_F(PlannerHumanTest, PokemonVolatilePrettyPrintWithStatusAndItem) {
   const TeamNonVolatile& teamA = environment_->getTeam(TEAM_A);
   const PokemonNonVolatile& gengarNV = teamA.teammate(0);
@@ -173,6 +182,7 @@ TEST_F(PlannerHumanTest, PokemonVolatilePrettyPrintWithStatusAndItem) {
   EXPECT_TRUE(output.find("life orb") != std::string::npos);
 }
 
+
 TEST_F(PlannerHumanTest, PokemonVolatileOperatorOutput) {
   const TeamNonVolatile& teamA = environment_->getTeam(TEAM_A);
   const PokemonNonVolatile& gengarNV = teamA.teammate(0);
@@ -197,4 +207,92 @@ TEST_F(PlannerHumanTest, PokemonVolatileOperatorOutput) {
   EXPECT_TRUE(output.find("230/230") != std::string::npos);
   EXPECT_TRUE(output.find("PAR") != std::string::npos);
   EXPECT_TRUE(output.find("+2spa") != std::string::npos);
+}
+
+
+TEST_F(PlannerHumanTest, StateTransitionPrinterDamage) {
+  EnvironmentVolatileData oldState =
+      EnvironmentVolatileData::create(*environment_);
+  EnvironmentPossibleData newState = EnvironmentPossibleData::create(oldState);
+
+  // Apply damage to gengar on team A
+  newState.env.teams[TEAM_A].teammates[0].HPcurrent = 200;  // was 230
+  newState.flags.bits.team1.hit = 1;                        // Team B hit
+  newState.flags.bits.team1.movesFirst = 1;
+
+  std::array<Action, 2> actions = {Action::move(0), Action::move(1)};
+
+  testing::internal::CaptureStdout();
+  StateTransitionPrinter::print(
+      std::cout,
+      ConstEnvironmentPossible{
+          *environment_, EnvironmentPossibleData::create(oldState, false)},
+      ConstEnvironmentPossible{*environment_, newState},
+      actions);
+  std::string output = testing::internal::GetCapturedStdout();
+
+  SCOPED_TRACE(output);
+  EXPECT_TRUE(output.find("gengar") != std::string::npos);
+  EXPECT_TRUE(output.find("lost 30 HP") != std::string::npos);
+}
+
+
+TEST_F(PlannerHumanTest, StateTransitionPrinterCritAndStatus) {
+  EnvironmentVolatileData oldState =
+      EnvironmentVolatileData::create(*environment_);
+  EnvironmentPossibleData newState = EnvironmentPossibleData::create(oldState);
+
+  // Team A moves first, crits
+  newState.flags.bits.team0.movesFirst = 1;
+  newState.flags.bits.team0.hit = 1;
+  newState.flags.bits.team0.crit = 1;
+
+  // Team B active pokemon (alakazam) gets burned
+  newState.env.teams[TEAM_B].teammates[0].status_nonvolatile = AIL_NV_BURN;
+
+  std::array<Action, 2> actions = {Action::move(0), Action::move(1)};
+
+  testing::internal::CaptureStdout();
+  StateTransitionPrinter::print(
+      std::cout,
+      ConstEnvironmentPossible{
+          *environment_, EnvironmentPossibleData::create(oldState, false)},
+      ConstEnvironmentPossible{*environment_, newState},
+      actions);
+  std::string output = testing::internal::GetCapturedStdout();
+
+  SCOPED_TRACE(output);
+  EXPECT_TRUE(output.find("critical hit") != std::string::npos);
+  EXPECT_TRUE(output.find("alakazam") != std::string::npos);
+  EXPECT_TRUE(output.find("burned") != std::string::npos);
+}
+
+
+TEST_F(PlannerHumanTest, StateTransitionPrinterFaintAndSwitch) {
+  EnvironmentVolatileData oldState =
+      EnvironmentVolatileData::create(*environment_);
+  EnvironmentPossibleData newState = EnvironmentPossibleData::create(oldState);
+
+  // Gengar faints
+  newState.env.teams[TEAM_A].teammates[0].HPcurrent = 0;
+
+  // Team A switches to metagross
+  newState.flags.bits.team0.switched = 1;
+  newState.env.teams[TEAM_A].status.nonvolatile.iCPokemon = 1;
+
+  std::array<Action, 2> actions = {Action::move(0), Action::move(1)};
+
+  testing::internal::CaptureStdout();
+  StateTransitionPrinter::print(
+      std::cout,
+      ConstEnvironmentPossible{
+          *environment_, EnvironmentPossibleData::create(oldState, false)},
+      ConstEnvironmentPossible{*environment_, newState},
+      actions);
+  std::string output = testing::internal::GetCapturedStdout();
+
+  SCOPED_TRACE(output);
+  EXPECT_TRUE(output.find("gengar") != std::string::npos);
+  EXPECT_TRUE(output.find("fainted") != std::string::npos);
+  EXPECT_TRUE(output.find("metagross") != std::string::npos);
 }

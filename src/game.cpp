@@ -1,5 +1,6 @@
 #include "pokemonai/game.h"
 
+#include <fmt/color.h>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <omp.h>
@@ -19,6 +20,7 @@
 #include "pokemonai/pkCU.h"
 #include "pokemonai/planner.h"
 #include "pokemonai/planner_max.h"
+#include "pokemonai/state_transition_printer.h"
 
 namespace po = boost::program_options;
 
@@ -289,7 +291,7 @@ GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_
 
       // print the state that occurs:
       if (cfg_.verbosity >= 3) {
-        printStateTransition(turnLog.back(), iPly);
+        printStateTransition(stateData.env, turnLog.back(), iPly);
       }
 
       // perform the state transition:
@@ -614,12 +616,21 @@ void Game::printAction(
 }
 
 
-void Game::printStateTransition(const Turn& cTurn, size_t iPly) const {
-  std::ostringstream out;
-  out << fmt::format("ply {}, s={}, ", iPly, cTurn.stateSelected);
+void Game::printStateTransition(
+    const EnvironmentVolatileData& oldState,
+    const Turn& cTurn,
+    size_t iPly) const {
+  if (iPly != SIZE_MAX) {
+    fmt::print(fmt::emphasis::bold, "--- Turn {} ---\n", iPly + 1);
+  }
 
-  ConstEnvironmentPossible{*nv_, cTurn.env}.printState(out);
-  fmt::print("{}\n", out.str());
+  std::array<Action, 2> actions = {
+      cTurn.teams[0].action, cTurn.teams[1].action};
+  StateTransitionPrinter::print(
+      std::cout,
+      ConstEnvironmentVolatile{*nv_, oldState},
+      ConstEnvironmentPossible{*nv_, cTurn.env},
+      actions);
 }
 
 

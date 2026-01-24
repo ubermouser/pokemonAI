@@ -157,6 +157,7 @@ TEST_P(NetworkEvaluatorParamTest, TrainableLoadSuccess) {
 }
 
 
+// TODO - flaky test
 TEST_P(NetworkEvaluatorParamTest, SaveLoadParity) {
   std::string tType = GetParam();
   std::string fType = GetParam().substr(1);  // remove 't'

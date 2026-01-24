@@ -224,7 +224,10 @@ protected:
   void printAction(
       const ConstTeamVolatile& currentTeam, const Action& indexAction, unsigned int iTeam) const;
 
-  void printStateTransition(const Turn& cTurn, size_t iPly=SIZE_MAX) const;
+  void printStateTransition(
+      const EnvironmentVolatileData& oldState,
+      const Turn& cTurn,
+      size_t iPly = SIZE_MAX) const;
 
   /* prints interesting facts about the game */
   void printGameStart(size_t iMatch=SIZE_MAX) const;
