@@ -38,7 +38,8 @@ void PlannerHuman::printActions(const ConstEnvironmentPossible& env) const {
   auto getFitnessDelta = [&](const Action& agentAction) {
     if (!shouldEval()) return 0.0;
 
-    EvalResult worst = recurse_beta(env, agentAction, cfg_.maxDepth);
+    // TODO: generateSolutionAtDepth must be implemented if maxDepth > 0!
+    EvalResult worst = recurse_beta(env, agentAction, 1);
     return worst.fitness.lowerBound() - currentFitness;
   };
 
@@ -79,7 +80,7 @@ void PlannerHuman::printActions(const ConstEnvironmentPossible& env) const {
 Action PlannerHuman::actionSelect(const ConstEnvironmentVolatile& env) const {
   std::string input;
   Action action;
-  
+
   do {
     fmt::print(
         "Please select the index of your desired action for Team {}:\n",
