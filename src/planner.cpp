@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <boost/program_options.hpp>
+#include <cassert>
 #include <chrono>
 #include <iomanip>
 #include <iostream>
@@ -294,6 +295,7 @@ EvalResult Planner::recurse_gamma(
       const FitnessDepth& lowCutoff,
       const FitnessDepth& highCutoff,
       size_t* nodesEvaluated) const {
+  assert(searchDepth <= MAXTRIES && searchDepth >= 0);
   size_t numNodes = 0;
   // average fitness of all states combined:
   EvalResult result{

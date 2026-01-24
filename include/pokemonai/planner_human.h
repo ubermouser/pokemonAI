@@ -42,7 +42,7 @@ protected:
 
   virtual std::string baseName() const override { return "Human"; }
 
-  virtual size_t maxImplDepth() const override { return 0; }
+  virtual size_t maxImplDepth() const override { return MAXTRIES; }
   virtual bool isEvaluatorRequired() const override { return false; }
 
   virtual PlyResult generateSolutionAtLeaf(
