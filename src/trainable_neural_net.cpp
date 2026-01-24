@@ -48,13 +48,15 @@ TrainableNeuralNet::TrainableNeuralNet(
 
 
 TrainableNeuralNet::TrainableNeuralNet(const TrainableNeuralNet& other)
-    : neuralNet(other), cfg_(other.cfg_), optimizer_(nullptr) {}
+    : neuralNet(other), cfg_(other.cfg_), optimizer_(other.optimizer_) {}
 
 
 TrainableNeuralNet::~TrainableNeuralNet() {}
 
 
 TrainableNeuralNet& TrainableNeuralNet::initialize() {
+  if (initialized_) { return *this; }
+
   if (cfg_.learningRate <= 0) {
     throw std::invalid_argument("TrainableNeuralNet: learningRate must be > 0");
   }

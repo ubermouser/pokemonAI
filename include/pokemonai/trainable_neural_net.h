@@ -34,6 +34,9 @@ class TrainableNeuralNet : public neuralNet {
   TrainableNeuralNet& initialize() override;
 
   virtual std::shared_ptr<neuralNet> clone() const override {
+    // TODO: clone should construct a copy of the optimizer. When cloning
+    // evaluators during multithreaded evaluation, a non-trainable neuralnet
+    // with no optimizer should be cloned.
     return std::make_shared<TrainableNeuralNet>(*this);
   }
 
@@ -47,7 +50,7 @@ class TrainableNeuralNet : public neuralNet {
 
  protected:
   Config cfg_;
-  std::unique_ptr<torch::optim::Adam> optimizer_;
+  std::shared_ptr<torch::optim::Adam> optimizer_;
   void initOptimizer(const Config& cfg);
 };
 
