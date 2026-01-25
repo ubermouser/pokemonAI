@@ -65,3 +65,16 @@ TEST_F(FocusSashTest, FocusSashDoesNotWorkIfNotFullHP) {
   // Garchomp uses Earthquake (index 0) on damaged Magikarp
   ASSERT_FALSE(target_dead.at(0).getEnv().getTeam(1).getPKV().isAlive());
 }
+
+
+TEST_F(FocusSashTest, FocusSashReported) {
+  // Garchomp uses Earthquake (index 0) on full HP Magikarp
+  // We use target_bigdamage from SetUp which already has this transition.
+  auto output = StateTransitionPrinter::printString(
+      engine_->initialState(), target_bigdamage.at(0));
+
+  SCOPED_TRACE(output);
+  EXPECT_TRUE(output.find("magikarp") != std::string::npos);
+  // We expect it to report that it used the item.
+  EXPECT_TRUE(output.find("used its focus sash") != std::string::npos);
+}

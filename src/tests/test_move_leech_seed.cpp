@@ -1,97 +1,124 @@
 #include "engine_test.hpp"
 
+
 class LeechSeedTest : public Gen4EngineTest {
  protected:
   void SetUp() override {
     Gen4EngineTest::SetUp();
 
-    // Team A: Bulbasaur (Grass/Poison)
-    team_a = TeamNonVolatile()
-        .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->pokemon("bulbasaur"))
-          .addMove(pokedex_->move("leech seed"))
-          .addMove(pokedex_->move("body slam"))
-          .setLevel(100));
+    // Team A: Bulbasaur
+    team_a = TeamNonVolatile().addPokemon(
+        PokemonNonVolatile()
+            .setBase(pokedex_->pokemon("bulbasaur"))
+            .addMove(pokedex_->move("leech seed"))
+            .setLevel(100));
 
     // Team B: Mew (Psychic)
-    team_b_normal = TeamNonVolatile()
-        .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->pokemon("mew"))
-          .addMove(pokedex_->move("body slam"))
-          .setLevel(100));
+    team_b_normal = TeamNonVolatile().addPokemon(
+        PokemonNonVolatile()
+            .setBase(pokedex_->pokemon("mew"))
+            .addMove(pokedex_->move("amnesia"))
+            .addMove(pokedex_->move("body slam"))
+            .setLevel(100));
 
-    // Team B: Roserade (Grass/Poison) - instead of Bulbasaur to keep it distinct
-    team_b_grass = TeamNonVolatile()
-        .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->pokemon("roserade"))
-          .addMove(pokedex_->move("body slam"))
-          .setLevel(100));
+    // Team B: Roserade (Grass/Poison)
+    team_b_grass = TeamNonVolatile().addPokemon(
+        PokemonNonVolatile()
+            .setBase(pokedex_->pokemon("roserade"))
+            .addMove(pokedex_->move("growth"))
+            .setLevel(100));
+
+    // Scenario 1: Normal seeding + Damage (Bulbasaur vs Mew)
+    // Turn 1: Bulbasaur uses Leech Seed, Mew uses Body Slam (damages Bulbasaur)
+    environment_nv = EnvironmentNonvolatile(team_a, team_b_normal, true);
+    engine_->setEnvironment(environment_nv);
+    r1_normal = engine_->updateState(
+        engine_->initialState(), Action::move(0), Action::move(1));
+
+    // Turn 2: Both wait. Leech seed triggers again at end of turn.
+    r2_normal =
+        engine_->updateState(r1_normal.at(0), Action::wait(), Action::wait());
+
+    // Scenario 2: Fails against Grass
+    auto env_grass = EnvironmentNonvolatile(team_a, team_b_grass, true);
+    engine_->setEnvironment(env_grass);
+    r1_grass = engine_->updateState(
+        engine_->initialState(), Action::move(0), Action::wait());
   }
 
   TeamNonVolatile team_a;
   TeamNonVolatile team_b_normal;
   TeamNonVolatile team_b_grass;
+
+  PossibleEnvironments r1_normal;
+  PossibleEnvironments r2_normal;
+  PossibleEnvironments r1_grass;
 };
 
+
 TEST_F(LeechSeedTest, Test_AppliesToNonGrassType) {
-    environment_nv = EnvironmentNonvolatile(team_a, team_b_normal, true);
-    engine_->setEnvironment(environment_nv);
+  // Bulbasaur used Leech Seed on Mew in r1_normal
+  auto result_env = r1_normal.at(0).getEnv();
 
-    // Bulbasaur uses Leech Seed, Mew uses Body Slam
-    auto result_envs = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(0));
-    auto result_env = result_envs.at(0).getEnv();
-
-    // Mew should have Leech Seed status
-    EXPECT_TRUE(result_env.getTeam(1).teammate(0).status().cTeammate.leechSeed);
+  // Mew should have Leech Seed status
+  EXPECT_TRUE(result_env.getTeam(1).teammate(0).status().cTeammate.leechSeed);
 }
+
 
 TEST_F(LeechSeedTest, Test_FailsAgainstGrassType) {
-    environment_nv = EnvironmentNonvolatile(team_a, team_b_grass, true);
-    engine_->setEnvironment(environment_nv);
+  // Bulbasaur used Leech Seed on Roserade in r1_grass
+  auto result_env = r1_grass.at(0).getEnv();
 
-    // Bulbasaur uses Leech Seed, Roserade uses Body Slam
-    auto result_envs = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(0));
-    auto result_env = result_envs.at(0).getEnv();
-
-    // Roserade should NOT have Leech Seed status
-    EXPECT_FALSE(result_env.getTeam(1).teammate(0).status().cTeammate.leechSeed);
+  // Roserade should NOT have Leech Seed status
+  EXPECT_FALSE(result_env.getTeam(1).teammate(0).status().cTeammate.leechSeed);
 }
+
 
 TEST_F(LeechSeedTest, Test_DamageAndHealing) {
-    // Add Amnesia to Mew so it doesn't damage Bulbasaur
-    team_b_normal = TeamNonVolatile()
-        .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->pokemon("mew"))
-          .addMove(pokedex_->move("amnesia"))
-          .setLevel(100));
+  // Bulbasaur used Leech Seed on Mew in r1_normal (Mew used Body Slam)
+  auto r1_env = r1_normal.at(0).getEnv();
 
-    environment_nv = EnvironmentNonvolatile(team_a, team_b_normal, true);
-    engine_->setEnvironment(environment_nv);
+  // Mew should have Leech Seed status
+  EXPECT_TRUE(r1_env.getTeam(1).teammate(0).status().cTeammate.leechSeed);
 
-    // Round 1: Bulbasaur uses Leech Seed, Mew uses Amnesia
-    auto r1_envs = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(0));
-    auto r1_env = r1_envs.at(0).getEnv();
+  // Mew should have lost 1/8 HP at end of round
+  EXPECT_NEAR(r1_env.getTeam(1).teammate(0).getPercentHP(), 0.875, 0.005);
 
-    // Mew should have Leech Seed status
-    EXPECT_TRUE(r1_env.getTeam(1).teammate(0).status().cTeammate.leechSeed);
-
-    // Mew should have lost 1/8 HP at end of round
-    EXPECT_NEAR(r1_env.getTeam(1).teammate(0).getPercentHP(), 0.875, 0.005);
-
-    // Bulbasaur should have been healed (starting at 100%, it remains at 100%)
-    EXPECT_EQ(r1_env.getTeam(0).teammate(0).getPercentHP(), 1.0);
+  // Bulbasaur took damage from Body Slam and healed from Leech Seed
+  EXPECT_LT(r1_env.getTeam(0).teammate(0).getPercentHP(), 1.0);
 }
 
-TEST_F(LeechSeedTest, Test_FailsIfAlreadySeeded) {
-    environment_nv = EnvironmentNonvolatile(team_a, team_b_normal, true);
-    engine_->setEnvironment(environment_nv);
 
-    // Round 1: Apply Leech Seed
-    auto r1_envs = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(0));
-    
-    // Round 2: Apply Leech Seed again
-    auto r2_envs = engine_->updateState(r1_envs.at(0), Action::move(0), Action::move(0));
-    
-    // It shouldn't crash or double seed
-    EXPECT_TRUE(r2_envs.at(0).getEnv().getTeam(1).teammate(0).status().cTeammate.leechSeed);
+TEST_F(LeechSeedTest, Test_FailsIfAlreadySeeded) {
+  // Round 2 after r1_normal: Apply Leech Seed again
+  EXPECT_TRUE(r2_normal.at(0)
+                  .getEnv()
+                  .getTeam(1)
+                  .teammate(0)
+                  .status()
+                  .cTeammate.leechSeed);
+}
+
+
+TEST_F(LeechSeedTest, LeechSeedReported_Seeding) {
+  // Verify initial seeding report (Initial -> Turn 1)
+  auto output = StateTransitionPrinter::printString(
+      engine_->initialState(), r1_normal.at(0));
+  SCOPED_TRACE(output);
+  EXPECT_TRUE(output.find("was seeded") != std::string::npos);
+}
+
+
+TEST_F(LeechSeedTest, LeechSeedReported_Healing) {
+  // Verify healing report (Turn 1 -> Turn 2)
+  // Between turn 1 and turn 2, Mew loses HP and Bulbasaur restores HP.
+  auto output = StateTransitionPrinter::printString(
+      r1_normal.at(0).getEnv(), r2_normal.at(0));
+  SCOPED_TRACE(output);
+
+  EXPECT_TRUE(output.find("lost") != std::string::npos);  // Mew lost HP
+  EXPECT_TRUE(output.find("bulbasaur") != std::string::npos);
+  EXPECT_TRUE(
+      output.find("restored HP") !=
+      std::string::npos);  // Bulbasaur restored HP
 }

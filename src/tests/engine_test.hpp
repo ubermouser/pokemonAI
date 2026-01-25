@@ -8,6 +8,7 @@
 #include "pokemonai/pkai.h"
 #include "pokemonai/pokedex_dynamic.h"
 #include "pokemonai/pokemon_volatile.h"
+#include "pokemonai/state_transition_printer.h"
 #include "pokemonai/team_volatile.h"
 
 class Gen4EngineTest : public ::testing::Test {

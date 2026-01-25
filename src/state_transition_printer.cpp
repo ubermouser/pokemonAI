@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "pokemonai/item.h"
 #include "pokemonai/team_status.h"
 #include "pokemonai/type.h"
 
@@ -52,6 +53,7 @@ void StateTransitionPrinter::print(
 
     if (teamOld.getICPKV() == teamNew.getICPKV()) {
       reportDamage(os, teamOld, teamNew);
+      reportItemUsage(os, pkOld, pkNew);
       reportStatusChange(os, pkOld, pkNew);
       reportTeamVolatileStatusChange(os, teamOld, teamNew);
       reportVolatileStatusChange(os, teamOld, teamNew);
@@ -277,4 +279,15 @@ void StateTransitionPrinter::reportTeamVolatileStatusChange(
 std::string StateTransitionPrinter::pokemonName(
     const ConstPokemonVolatile& pk) {
   return fmt::format(fmt::fg(fmt::color::cyan), "{}", pk.nv().getName());
+}
+
+
+void StateTransitionPrinter::reportItemUsage(
+    std::ostream& os,
+    const ConstPokemonVolatile& pkOld,
+    const ConstPokemonVolatile& pkNew) {
+  if (pkOld.hasItem() && !pkNew.hasItem()) {
+    fmt::print(
+        os, "{} used its {}!\n", pokemonName(pkNew), pkOld.getItem().getName());
+  }
 }

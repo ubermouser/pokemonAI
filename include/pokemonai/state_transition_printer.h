@@ -51,6 +51,10 @@ class StateTransitionPrinter {
       std::ostream& os,
       const ConstPokemonVolatile& pkOld,
       const ConstPokemonVolatile& pkNew);
+  static void reportItemUsage(
+      std::ostream& os,
+      const ConstPokemonVolatile& pkOld,
+      const ConstPokemonVolatile& pkNew);
   static void reportVolatileStatusChange(
       std::ostream& os,
       const ConstTeamVolatile& teamOld,

@@ -1,7 +1,4 @@
-#include <sstream>
-
 #include "engine_test.hpp"
-#include "pokemonai/state_transition_printer.h"
 
 
 class TauntTest : public Gen4EngineTest {
