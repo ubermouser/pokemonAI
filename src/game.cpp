@@ -624,13 +624,10 @@ void Game::printStateTransition(
     fmt::print(fmt::emphasis::bold, "--- Turn {} ---\n", iPly + 1);
   }
 
-  std::array<Action, 2> actions = {
-      cTurn.teams[0].action, cTurn.teams[1].action};
   StateTransitionPrinter::print(
       std::cout,
       ConstEnvironmentVolatile{*nv_, oldState},
-      ConstEnvironmentPossible{*nv_, cTurn.env},
-      actions);
+      ConstEnvironmentPossible{*nv_, cTurn.env});
 }
 
 

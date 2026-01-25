@@ -220,15 +220,12 @@ TEST_F(PlannerHumanTest, StateTransitionPrinterDamage) {
   newState.flags.bits.team1.hit = 1;                        // Team B hit
   newState.flags.bits.team1.movesFirst = 1;
 
-  std::array<Action, 2> actions = {Action::move(0), Action::move(1)};
-
   testing::internal::CaptureStdout();
   StateTransitionPrinter::print(
       std::cout,
       ConstEnvironmentPossible{
           *environment_, EnvironmentPossibleData::create(oldState, false)},
-      ConstEnvironmentPossible{*environment_, newState},
-      actions);
+      ConstEnvironmentPossible{*environment_, newState});
   std::string output = testing::internal::GetCapturedStdout();
 
   SCOPED_TRACE(output);
@@ -250,15 +247,12 @@ TEST_F(PlannerHumanTest, StateTransitionPrinterCritAndStatus) {
   // Team B active pokemon (alakazam) gets burned
   newState.env.teams[TEAM_B].teammates[0].status_nonvolatile = AIL_NV_BURN;
 
-  std::array<Action, 2> actions = {Action::move(0), Action::move(1)};
-
   testing::internal::CaptureStdout();
   StateTransitionPrinter::print(
       std::cout,
       ConstEnvironmentPossible{
           *environment_, EnvironmentPossibleData::create(oldState, false)},
-      ConstEnvironmentPossible{*environment_, newState},
-      actions);
+      ConstEnvironmentPossible{*environment_, newState});
   std::string output = testing::internal::GetCapturedStdout();
 
   SCOPED_TRACE(output);
@@ -280,15 +274,12 @@ TEST_F(PlannerHumanTest, StateTransitionPrinterFaintAndSwitch) {
   newState.flags.bits.team0.switched = 1;
   newState.env.teams[TEAM_A].status.nonvolatile.iCPokemon = 1;
 
-  std::array<Action, 2> actions = {Action::move(0), Action::move(1)};
-
   testing::internal::CaptureStdout();
   StateTransitionPrinter::print(
       std::cout,
       ConstEnvironmentPossible{
           *environment_, EnvironmentPossibleData::create(oldState, false)},
-      ConstEnvironmentPossible{*environment_, newState},
-      actions);
+      ConstEnvironmentPossible{*environment_, newState});
   std::string output = testing::internal::GetCapturedStdout();
 
   SCOPED_TRACE(output);

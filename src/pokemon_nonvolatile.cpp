@@ -234,6 +234,14 @@ bool PokemonNonVolatile::abilityExists() const {
 };
 
 
+const std::string& PokemonNonVolatile::getName() const {
+  if (Name::getName().empty() && pokemonExists()) {
+    return getBase().getName();
+  }
+  return Name::getName();
+}
+
+
 PokemonNonVolatile& PokemonNonVolatile::setAbility(const Ability& _chosenAbility) {
   if (&_chosenAbility == Ability::no_ability) { return setNoAbility(); }
 

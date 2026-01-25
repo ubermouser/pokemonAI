@@ -10,8 +10,7 @@
 void StateTransitionPrinter::print(
     std::ostream& os,
     const ConstEnvironmentVolatile& osP,
-    const ConstEnvironmentPossible& nsP,
-    const std::array<Action, 2>& actions) {
+    const ConstEnvironmentPossible& nsP) {
   // Determine order of actions based on movesFirst bit
   std::array<size_t, 2> order = {0, 1};
   if (nsP.hasMovedFirst(1)) {
@@ -21,6 +20,14 @@ void StateTransitionPrinter::print(
   for (size_t iTeam : order) {
     reportSwitch(os, nsP, iTeam);
     reportHitResult(os, nsP, iTeam);
+
+    if (nsP.hasSwitched(iTeam)) {
+      size_t activeOld = osP.getTeam(iTeam).getICPKV();
+      const auto& pkOld = osP.getTeam(iTeam).teammate(activeOld);
+      const auto& pkNew = nsP.getEnv().getTeam(iTeam).teammate(activeOld);
+
+      reportStatusChange(os, pkOld, pkNew);
+    }
   }
 
   // General HP and Status changes comparison between oldState and newState

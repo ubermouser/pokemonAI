@@ -23,13 +23,11 @@ class StateTransitionPrinter {
    * @param oldState The state before the transition occurs.
    * @param newState The state after the transition occurs, containing turn
    * flags.
-   * @param actions The actions performed by both teams during this turn.
    */
   static void print(
       std::ostream& os,
       const ConstEnvironmentVolatile& oldState,
-      const ConstEnvironmentPossible& newState,
-      const std::array<Action, 2>& actions);
+      const ConstEnvironmentPossible& newState);
 
  protected:
   static void reportSwitch(

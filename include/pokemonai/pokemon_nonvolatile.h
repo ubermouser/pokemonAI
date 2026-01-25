@@ -147,6 +147,8 @@ public:
     return *base_;
   };
 
+  const std::string& getName() const override;
+
   PokemonNonVolatile& setNoBase();
   PokemonNonVolatile& setBase(const PokemonBase& _base);
 
