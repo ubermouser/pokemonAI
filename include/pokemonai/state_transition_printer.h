@@ -29,6 +29,10 @@ class StateTransitionPrinter {
       const ConstEnvironmentVolatile& oldState,
       const ConstEnvironmentPossible& newState);
 
+  static std::string printString(
+      const ConstEnvironmentVolatile& oldState,
+      const ConstEnvironmentPossible& newState);
+
  protected:
   static void reportSwitch(
       std::ostream& os, const ConstEnvironmentPossible& nsP, size_t iTeam);

@@ -57,13 +57,9 @@ TEST_F(NaturalCureTest, NaturalCureHealsOnSwitch) {
 
 TEST_F(NaturalCureTest, NaturalCureReportedOnSwitch) {
   // Turn 2: Starmie switches out
-  const auto& newState = turn2_swap.at(0);
-  const auto& oldState = turn1_twave.at(0);  // Before Turn 2
+  auto output = StateTransitionPrinter::printString(
+      turn1_twave.at(0).getEnv(), turn2_swap.at(0));
 
-  std::stringstream ss;
-  StateTransitionPrinter::print(ss, oldState.getEnv(), newState);
-
-  std::string output = ss.str();
   SCOPED_TRACE(output);
   EXPECT_TRUE(output.find("starmie") != std::string::npos);
   EXPECT_TRUE(output.find("cured") != std::string::npos);

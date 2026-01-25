@@ -1,11 +1,22 @@
 #include "pokemonai/state_transition_printer.h"
+
 #include <fmt/color.h>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
-#include <iostream>
-#include "pokemonai/type.h"
-#include "pokemonai/team_status.h"
 
+#include <iostream>
+#include <sstream>
+
+#include "pokemonai/team_status.h"
+#include "pokemonai/type.h"
+
+
+std::string StateTransitionPrinter::printString(
+    const ConstEnvironmentVolatile& osP, const ConstEnvironmentPossible& nsP) {
+  std::stringstream ss;
+  print(ss, osP, nsP);
+  return ss.str();
+}
 
 void StateTransitionPrinter::print(
     std::ostream& os,

@@ -1,4 +1,7 @@
+#include <sstream>
+
 #include "engine_test.hpp"
+#include "pokemonai/state_transition_printer.h"
 
 
 class TauntTest : public Gen4EngineTest {
@@ -23,13 +26,17 @@ class TauntTest : public Gen4EngineTest {
 
     environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
     engine_->setEnvironment(environment_nv);
+
+    turn1_taunt = engine_->updateState(
+        engine_->initialState(), Action::move(0), Action::wait());
   }
+
+  PossibleEnvironments turn1_taunt;
 };
 
 TEST_F(TauntTest, AppliesEffect) {
   // Steelix uses Taunt on Shuckle
-  auto taunt_result = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
-  auto env = taunt_result.at(0).getEnv();
+  auto env = turn1_taunt.at(0).getEnv();
 
   // Shuckle should have taunt duration
   EXPECT_GT(env.getTeam(1).teammate(0).status().cTeammate.taunt_duration, 0);
@@ -39,20 +46,21 @@ TEST_F(TauntTest, AppliesEffect) {
 
 TEST_F(TauntTest, PreventsStatusMoves) {
   // Steelix uses Taunt on Shuckle
-  auto taunt_result = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
-  auto env = taunt_result.at(0).getEnv();
+  auto env = turn1_taunt.at(0).getEnv();
 
   // Shuckle tries to use Toxic (Move 0, Status) - Should be invalid
-  EXPECT_FALSE(engine_->isValidAction(taunt_result.at(0), Action::move(0), TEAM_B));
+  EXPECT_FALSE(
+      engine_->isValidAction(turn1_taunt.at(0), Action::move(0), TEAM_B));
 
   // Shuckle tries to use Constrict (Move 1, Physical) - Should be valid
-  EXPECT_TRUE(engine_->isValidAction(taunt_result.at(0), Action::move(1), TEAM_B));
+  EXPECT_TRUE(
+      engine_->isValidAction(turn1_taunt.at(0), Action::move(1), TEAM_B));
 }
 
 TEST_F(TauntTest, WearsOff) {
   // Turn 1: Steelix uses Taunt. Shuckle is taunted (duration 3-5).
   // Note: PkCU branches state. We pick the first environment and follow it.
-  auto turn1 = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
+  auto turn1 = turn1_taunt;
   turn1.printStates();
   // Verify we have multiple outcomes (3, 4, 5 turns)
   // We expect at least 3 states due to triplicateState, possibly more if other RNG happened (but unlikely here)
@@ -102,4 +110,15 @@ TEST_F(TauntTest, PreemptsStatusMoveSameTurn) {
 
   // 2. Steelix should NOT be poisoned (Toxic should have failed)
   EXPECT_EQ(final_env.getTeam(0).teammate(0).getStatusAilment(), AIL_NV_NONE);
+}
+
+
+TEST_F(TauntTest, TauntReported) {
+  // Steelix uses Taunt on Shuckle
+  auto output = StateTransitionPrinter::printString(
+      engine_->initialState(), turn1_taunt.at(0));
+
+  SCOPED_TRACE(output);
+  EXPECT_TRUE(output.find("shuckle") != std::string::npos);
+  EXPECT_TRUE(output.find("taunted") != std::string::npos);
 }

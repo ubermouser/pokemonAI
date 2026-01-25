@@ -1,4 +1,8 @@
+#include <sstream>
+
 #include "engine_test.hpp"
+#include "pokemonai/state_transition_printer.h"
+
 
 class SubstituteTest : public Gen4EngineTest {
  protected:
@@ -159,4 +163,14 @@ TEST_F(SubstituteTest, DoesNotBlockSelfTargetingMoves) {
 
   // Blissey should have healed
   EXPECT_GT(blissey2.getHP(), hpAfterSub - 20);
+}
+
+TEST_F(SubstituteTest, SubstituteReported) {
+  // Blissey uses Substitute in SetUp
+  auto output = StateTransitionPrinter::printString(
+      engine_->initialState(), turn1_results.at(0));
+
+  SCOPED_TRACE(output);
+  EXPECT_TRUE(output.find("blissey") != std::string::npos);
+  EXPECT_TRUE(output.find("substitute") != std::string::npos);
 }

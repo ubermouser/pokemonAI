@@ -1,4 +1,8 @@
+#include <sstream>
+
 #include "engine_test.hpp"
+#include "pokemonai/state_transition_printer.h"
+
 
 class SynchronizeTest : public Gen4EngineTest {
  public:
@@ -25,7 +29,19 @@ class SynchronizeTest : public Gen4EngineTest {
 
     environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
     engine_->setEnvironment(environment_nv);
+
+    const auto initialState = engine_->initialState();
+    results_burn =
+        engine_->updateState(initialState, Action::wait(), Action::move(0));
+    results_paralysis =
+        engine_->updateState(initialState, Action::wait(), Action::move(1));
+    results_poison =
+        engine_->updateState(initialState, Action::wait(), Action::move(2));
   }
+
+  PossibleEnvironments results_burn;
+  PossibleEnvironments results_paralysis;
+  PossibleEnvironments results_poison;
 };
 
 TEST_F(SynchronizeTest, SynchronizeBurn) {
@@ -33,7 +49,7 @@ TEST_F(SynchronizeTest, SynchronizeBurn) {
   // User has Synchronize
 
   // Team 0 (User) waits, Team 1 (Opponent) uses Will-O-Wisp (Move 0)
-  auto result_states = engine_->updateState(engine_->initialState(), Action::wait(), Action::move(0));
+  auto& result_states = results_burn;
 
   // Check if User is burned
   bool user_burned = false;
@@ -62,7 +78,7 @@ TEST_F(SynchronizeTest, SynchronizeBurn) {
 
 TEST_F(SynchronizeTest, SynchronizeParalysis) {
   // Opponent (Team B) uses Thunder Wave on User (Team A)
-  auto result_states = engine_->updateState(engine_->initialState(), Action::wait(), Action::move(1));
+  auto& result_states = results_paralysis;
 
   bool user_paralyzed = false;
   bool opponent_paralyzed = false;
@@ -86,7 +102,7 @@ TEST_F(SynchronizeTest, SynchronizeParalysis) {
 
 TEST_F(SynchronizeTest, SynchronizePoison) {
   // Opponent (Team B) uses Toxic on User (Team A)
-  auto result_states = engine_->updateState(engine_->initialState(), Action::wait(), Action::move(2));
+  auto& result_states = results_poison;
 
   bool user_poisoned = false;
   bool opponent_poisoned = false;
@@ -114,4 +130,19 @@ TEST_F(SynchronizeTest, SynchronizePoison) {
 
   EXPECT_TRUE(user_poisoned) << "User should be poisoned by Toxic";
   EXPECT_TRUE(opponent_poisoned) << "Opponent should be poisoned by Synchronize";
+}
+
+
+TEST_F(SynchronizeTest, SynchronizeReported) {
+  // Opponent (Team B) uses Thunder Wave on User (Team A)
+  auto output = StateTransitionPrinter::printString(
+      engine_->initialState(), results_paralysis.at(0));
+
+  SCOPED_TRACE(output);
+  // Verify Umbreon (Synchronize user) is mentioned as being status'd
+  EXPECT_TRUE(output.find("umbreon") != std::string::npos);
+  // Verify Mewtwo (Caster) is also mentioned (due to Synchronize)
+  EXPECT_TRUE(output.find("mewtwo") != std::string::npos);
+  // Verify the status itself is mentioned
+  EXPECT_TRUE(output.find("paralyzed") != std::string::npos);
 }
