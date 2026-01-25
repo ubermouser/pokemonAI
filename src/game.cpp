@@ -628,6 +628,8 @@ void Game::printStateTransition(
       std::cout,
       ConstEnvironmentVolatile{*nv_, oldState},
       ConstEnvironmentPossible{*nv_, cTurn.env});
+
+  ConstEnvironmentPossible{*nv_, cTurn.env}.printState(std::cout);
 }
 
 
