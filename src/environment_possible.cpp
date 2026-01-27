@@ -194,5 +194,66 @@ std::vector<ConstEnvironmentPossible> PossibleEnvironments::getValidEnvironments
 }
 
 
+std::vector<ConstEnvironmentPossible> PossibleEnvironments::where(
+    EnvironmentBitfield target) const {
+  std::vector<ConstEnvironmentPossible> results;
+  for (size_t i = 0; i < size(); ++i) {
+    auto state = at(i);
+    if (state.isPruned()) continue;
+    if ((state.data().flags.raw & target.raw) == target.raw) {
+      results.push_back(state);
+    }
+  }
+  return results;
+}
+
+
+std::vector<ConstEnvironmentPossible> PossibleEnvironments::whereHit(
+    size_t iTeam) const {
+  return where(EnvironmentBitfield().team(iTeam).hasHit());
+}
+
+std::vector<ConstEnvironmentPossible> PossibleEnvironments::whereCrit(
+    size_t iTeam) const {
+  return where(EnvironmentBitfield().team(iTeam).hasCrit());
+}
+
+std::vector<ConstEnvironmentPossible> PossibleEnvironments::whereStatus(
+    size_t iTeam) const {
+  return where(EnvironmentBitfield().team(iTeam).hasSecondary());
+}
+
+ConstEnvironmentPossible PossibleEnvironments::where1(
+    EnvironmentBitfield target) const {
+  std::vector<ConstEnvironmentPossible> results = where(target);
+  if (results.empty()) {
+    throw std::runtime_error(
+        "PossibleEnvironments::where1: No matching state found");
+  }
+
+  auto best = std::max_element(
+      results.begin(),
+      results.end(),
+      [](const ConstEnvironmentPossible& a, const ConstEnvironmentPossible& b) {
+        return a.getProbability() < b.getProbability();
+      });
+
+  return *best;
+}
+
+ConstEnvironmentPossible PossibleEnvironments::where1Hit(size_t iTeam) const {
+  return where1(EnvironmentBitfield().team(iTeam).hasHit());
+}
+
+ConstEnvironmentPossible PossibleEnvironments::where1Crit(size_t iTeam) const {
+  return where1(EnvironmentBitfield().team(iTeam).hasCrit());
+}
+
+ConstEnvironmentPossible PossibleEnvironments::where1Status(
+    size_t iTeam) const {
+  return where1(EnvironmentBitfield().team(iTeam).hasSecondary());
+}
+
+
 template class EnvironmentPossibleImpl<ConstEnvironmentVolatile, const EnvironmentPossibleData>;
 template class EnvironmentPossibleImpl<EnvironmentVolatile, EnvironmentPossibleData>;

@@ -32,6 +32,29 @@ struct TeamEnvironmentFlags {
   uint8_t movesFirst : 1;
 };
 
+union EnvironmentBitfield;
+
+struct TeamProxy {
+  EnvironmentBitfield& b;
+  size_t i;
+
+  TeamProxy& hasHit();
+  TeamProxy& hasCrit();
+  TeamProxy& hasSecondary();
+  TeamProxy& wasBlocked();
+  TeamProxy& hasSwitched();
+  TeamProxy& hasFree();
+  TeamProxy& hasWait();
+  TeamProxy& hasMovedFirst();
+
+  TeamProxy team(size_t nextI) { return {b, nextI}; }
+
+  TeamProxy& isPruned();
+  TeamProxy& isMerged();
+
+  operator EnvironmentBitfield() const;
+};
+
 union EnvironmentBitfield {
   uint32_t raw;
   struct {
@@ -43,6 +66,9 @@ union EnvironmentBitfield {
     uint8_t merged : 1;
   } bits;
 
+  EnvironmentBitfield() : raw(0) {}
+  EnvironmentBitfield(uint32_t raw) : raw(raw) {}
+
   const TeamEnvironmentFlags& getTeam(size_t i) const {
     return (i == 0) ? bits.team0 : bits.team1;
   }
@@ -50,7 +76,62 @@ union EnvironmentBitfield {
   TeamEnvironmentFlags& getTeam(size_t i) {
     return (i == 0) ? bits.team0 : bits.team1;
   }
+
+  TeamProxy team(size_t i) { return {*this, i}; }
+
+  EnvironmentBitfield& isPruned() {
+    bits.pruned = 1;
+    return *this;
+  }
+
+  EnvironmentBitfield& isMerged() {
+    bits.merged = 1;
+    return *this;
+  }
 };
+
+inline TeamProxy& TeamProxy::hasHit() {
+  b.getTeam(i).hit = 1;
+  return *this;
+}
+inline TeamProxy& TeamProxy::hasCrit() {
+  b.getTeam(i).crit = 1;
+  return *this;
+}
+inline TeamProxy& TeamProxy::hasSecondary() {
+  b.getTeam(i).secondary = 1;
+  return *this;
+}
+inline TeamProxy& TeamProxy::wasBlocked() {
+  b.getTeam(i).blocked = 1;
+  return *this;
+}
+inline TeamProxy& TeamProxy::hasSwitched() {
+  b.getTeam(i).switched = 1;
+  return *this;
+}
+inline TeamProxy& TeamProxy::hasFree() {
+  b.getTeam(i).free = 1;
+  return *this;
+}
+inline TeamProxy& TeamProxy::hasWait() {
+  b.getTeam(i).wait = 1;
+  return *this;
+}
+inline TeamProxy& TeamProxy::hasMovedFirst() {
+  b.getTeam(i).movesFirst = 1;
+  return *this;
+}
+inline TeamProxy& TeamProxy::isPruned() {
+  b.bits.pruned = 1;
+  return *this;
+}
+inline TeamProxy& TeamProxy::isMerged() {
+  b.bits.merged = 1;
+  return *this;
+}
+inline TeamProxy::operator EnvironmentBitfield() const { return b; }
+
 
 struct PKAISHARED EnvironmentPossibleData {
   /*
@@ -285,7 +366,27 @@ public:
   ConstEnvironmentPossible at(size_t index) const {
     return ConstEnvironmentPossible{*nv_, base_t::at(index)};
   };
-  
+
+  /**
+   * Returns all states where the environment's bitfield is a superset of the
+   * provided EnvironmentBitfield.
+   */
+  std::vector<ConstEnvironmentPossible> where(EnvironmentBitfield target) const;
+
+  std::vector<ConstEnvironmentPossible> whereHit(size_t iTeam) const;
+  std::vector<ConstEnvironmentPossible> whereCrit(size_t iTeam) const;
+  std::vector<ConstEnvironmentPossible> whereStatus(size_t iTeam) const;
+
+  /**
+   * Returns the single most probable state matching the criteria.
+   * Throws std::runtime_error if no state matches.
+   */
+  ConstEnvironmentPossible where1(EnvironmentBitfield target) const;
+
+  ConstEnvironmentPossible where1Hit(size_t iTeam) const;
+  ConstEnvironmentPossible where1Crit(size_t iTeam) const;
+  ConstEnvironmentPossible where1Status(size_t iTeam) const;
+
   size_t getNumUnique() const { return size() - numMerged_; };
   void decrementUnique() { numMerged_++; }
 
