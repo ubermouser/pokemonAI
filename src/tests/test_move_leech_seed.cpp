@@ -36,8 +36,8 @@ class LeechSeedTest : public Gen4EngineTest {
         engine_->initialState(), Action::move(0), Action::move(1));
 
     // Turn 2: Both wait. Leech seed triggers again at end of turn.
-    r2_normal =
-        engine_->updateState(r1_normal.at(0), Action::wait(), Action::wait());
+    r2_normal = engine_->updateState(
+        r1_normal.where1(), Action::wait(), Action::wait());
 
     // Scenario 2: Fails against Grass
     auto env_grass = EnvironmentNonvolatile(team_a, team_b_grass, true);
@@ -58,7 +58,7 @@ class LeechSeedTest : public Gen4EngineTest {
 
 TEST_F(LeechSeedTest, Test_AppliesToNonGrassType) {
   // Bulbasaur used Leech Seed on Mew in r1_normal
-  auto result_env = r1_normal.at(0).getEnv();
+  auto result_env = r1_normal.where1().getEnv();
 
   // Mew should have Leech Seed status
   EXPECT_TRUE(result_env.getTeam(1).teammate(0).status().cTeammate.leechSeed);
@@ -67,7 +67,7 @@ TEST_F(LeechSeedTest, Test_AppliesToNonGrassType) {
 
 TEST_F(LeechSeedTest, Test_FailsAgainstGrassType) {
   // Bulbasaur used Leech Seed on Roserade in r1_grass
-  auto result_env = r1_grass.at(0).getEnv();
+  auto result_env = r1_grass.where1().getEnv();
 
   // Roserade should NOT have Leech Seed status
   EXPECT_FALSE(result_env.getTeam(1).teammate(0).status().cTeammate.leechSeed);
@@ -76,7 +76,7 @@ TEST_F(LeechSeedTest, Test_FailsAgainstGrassType) {
 
 TEST_F(LeechSeedTest, Test_DamageAndHealing) {
   // Bulbasaur used Leech Seed on Mew in r1_normal (Mew used Body Slam)
-  auto r1_env = r1_normal.at(0).getEnv();
+  auto r1_env = r1_normal.where1().getEnv();
 
   // Mew should have Leech Seed status
   EXPECT_TRUE(r1_env.getTeam(1).teammate(0).status().cTeammate.leechSeed);
@@ -91,7 +91,7 @@ TEST_F(LeechSeedTest, Test_DamageAndHealing) {
 
 TEST_F(LeechSeedTest, Test_FailsIfAlreadySeeded) {
   // Round 2 after r1_normal: Apply Leech Seed again
-  EXPECT_TRUE(r2_normal.at(0)
+  EXPECT_TRUE(r2_normal.where1()
                   .getEnv()
                   .getTeam(1)
                   .teammate(0)
@@ -103,7 +103,7 @@ TEST_F(LeechSeedTest, Test_FailsIfAlreadySeeded) {
 TEST_F(LeechSeedTest, LeechSeedReported_Seeding) {
   // Verify initial seeding report (Initial -> Turn 1)
   auto output = StateTransitionPrinter::printString(
-      engine_->initialState(), r1_normal.at(0), false);
+      engine_->initialState(), r1_normal.where1(), false);
   SCOPED_TRACE(output);
   EXPECT_TRUE(output.find("mew was seeded") != std::string::npos);
 }
@@ -113,7 +113,7 @@ TEST_F(LeechSeedTest, LeechSeedReported_Healing) {
   // Verify healing report (Turn 1 -> Turn 2)
   // Between turn 1 and turn 2, Mew loses HP and Bulbasaur restores HP.
   auto output = StateTransitionPrinter::printString(
-      r1_normal.at(0).getEnv(), r2_normal.at(0), false);
+      r1_normal.where1().getEnv(), r2_normal.where1(), false);
   SCOPED_TRACE(output);
 
   EXPECT_TRUE(output.find("mew lost") != std::string::npos);

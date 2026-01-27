@@ -38,8 +38,9 @@ class IntimidateTest : public Gen4EngineTest {
     setup_vs_normal = engine_->updateState(engine_->initialState(), Action::wait(), Action::wait());
 
     // State 2: A:Charmander vs B:Metagross
-    // Uses setup_vs_normal.at(0)
-    setup_vs_clearbody = engine_->updateState(setup_vs_normal.at(0), Action::wait(), Action::swap(1));
+    // Uses setup_vs_normal.where1()
+    setup_vs_clearbody = engine_->updateState(
+        setup_vs_normal.where1(), Action::wait(), Action::swap(1));
   }
 
   PossibleEnvironments setup_vs_normal;
@@ -52,10 +53,10 @@ TEST_F(IntimidateTest, IntimidateVsNormal) {
 
   // A switches to Staraptor (index 1)
   auto turn1 = engine_->updateState(
-    setup_vs_normal.at(0), Action::swap(1), Action::wait());
+      setup_vs_normal.where1(), Action::swap(1), Action::wait());
 
   // Verify Charmander (Team B) Attack is -1
-  auto charmander_opp = turn1.at(0).getEnv().getTeam(TEAM_B).getPKV();
+  auto charmander_opp = turn1.where1().getEnv().getTeam(TEAM_B).getPKV();
   EXPECT_EQ(charmander_opp.getBoost(FV_ATTACK), -1);
 }
 
@@ -65,10 +66,10 @@ TEST_F(IntimidateTest, IntimidateVsClearBody) {
 
   // A switches to Staraptor (index 1)
   auto turn1 = engine_->updateState(
-    setup_vs_clearbody.at(0), Action::swap(1), Action::wait());
+      setup_vs_clearbody.where1(), Action::swap(1), Action::wait());
 
   // Verify Metagross (Team B) Attack is 0 (immune)
-  auto metagross_opp = turn1.at(0).getEnv().getTeam(TEAM_B).getPKV();
+  auto metagross_opp = turn1.where1().getEnv().getTeam(TEAM_B).getPKV();
   EXPECT_EQ(metagross_opp.getBoost(FV_ATTACK), 0);
 }
 

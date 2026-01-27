@@ -34,12 +34,16 @@ class ChoiceItemsTest : public Gen4EngineTest {
     swift_cb = engine_->updateState(engine_->initialState(), Action::move(1), Action::move(1));
 
     azelf_pair = engine_->updateState(engine_->initialState(), Action::swap(1), Action::swap(1));
-    swift_cs = engine_->updateState(azelf_pair.at(0), Action::move(0), Action::move(0));
-    firepunch_cs = engine_->updateState(azelf_pair.at(0), Action::move(1), Action::move(1));
+    swift_cs = engine_->updateState(
+        azelf_pair.where1(), Action::move(0), Action::move(0));
+    firepunch_cs = engine_->updateState(
+        azelf_pair.where1(), Action::move(1), Action::move(1));
 
     flygon_pair = engine_->updateState(engine_->initialState(), Action::swap(2), Action::swap(2));
-    dracometeor_cs = engine_->updateState(flygon_pair.at(0), Action::move(0), Action::move(0));
-    dracometeor_none = engine_->updateState(flygon_pair.at(0), Action::wait(), Action::move(0));
+    dracometeor_cs = engine_->updateState(
+        flygon_pair.where1(), Action::move(0), Action::move(0));
+    dracometeor_none = engine_->updateState(
+        flygon_pair.where1(), Action::wait(), Action::move(0));
   }
 
   PossibleEnvironments bulletpunch_cb;
@@ -54,13 +58,15 @@ class ChoiceItemsTest : public Gen4EngineTest {
 
 TEST_F(ChoiceItemsTest, LockedIntoMove) {
   // other moves are locked out after using a choice move:
-  EXPECT_TRUE(engine_->isValidAction(bulletpunch_cb.at(0), Action::move(0), TEAM_A));
-  EXPECT_FALSE(engine_->isValidAction(bulletpunch_cb.at(0), Action::move(1), TEAM_A));
+  EXPECT_TRUE(
+      engine_->isValidAction(bulletpunch_cb.where1(), Action::move(0), TEAM_A));
+  EXPECT_FALSE(
+      engine_->isValidAction(bulletpunch_cb.where1(), Action::move(1), TEAM_A));
 }
 
 TEST_F(ChoiceItemsTest, StruggleWhenNoPP) {
   // when all PP have been used, only struggle is available:
-  auto noPPState = bulletpunch_cb.at(1);
+  auto noPPState = bulletpunch_cb.where1Hit(0);
   noPPState.getEnv().getTeam(0).getPKV().getMV(0).setPP(0);
   EXPECT_FALSE(engine_->isValidAction(noPPState, Action::move(0), TEAM_A)); // locked due to PP
   EXPECT_FALSE(engine_->isValidAction(noPPState, Action::move(1), TEAM_A)); // locked due to Choice
@@ -69,20 +75,23 @@ TEST_F(ChoiceItemsTest, StruggleWhenNoPP) {
 
 TEST_F(ChoiceItemsTest, ChoiceBandBonus) {
   // physical attack with choice band deals additional damage:
-  EXPECT_GT(bulletpunch_cb.at(0).getEnv().getTeam(0).teammate(0).getHP(),
-            bulletpunch_cb.at(0).getEnv().getTeam(1).teammate(0).getHP());
+  EXPECT_GT(
+      bulletpunch_cb.where1().getEnv().getTeam(0).teammate(0).getHP(),
+      bulletpunch_cb.where1().getEnv().getTeam(1).teammate(0).getHP());
 }
 
 TEST_F(ChoiceItemsTest, ChoiceBandNoSpecialBonus) {
   // special attack with choice band does no additional damage:
-  EXPECT_EQ(swift_cb.at(0).getEnv().getTeam(0).teammate(0).getHP(),
-            swift_cb.at(0).getEnv().getTeam(1).teammate(0).getHP());
+  EXPECT_EQ(
+      swift_cb.where1().getEnv().getTeam(0).teammate(0).getHP(),
+      swift_cb.where1().getEnv().getTeam(1).teammate(0).getHP());
 }
 
 TEST_F(ChoiceItemsTest, ChoiceSpecsBonus) {
   // special attack with choice specs deals additional damage:
-  EXPECT_GT(swift_cs.at(0).getEnv().getTeam(0).teammate(1).getHP(),
-            swift_cs.at(0).getEnv().getTeam(1).teammate(1).getHP());
+  EXPECT_GT(
+      swift_cs.where1().getEnv().getTeam(0).teammate(1).getHP(),
+      swift_cs.where1().getEnv().getTeam(1).teammate(1).getHP());
 }
 
 TEST_F(ChoiceItemsTest, ChoiceSpecsNoPhysicalBonus) {
@@ -97,8 +106,13 @@ TEST_F(ChoiceItemsTest, ChoiceSpecsNoPhysicalBonus) {
 
 TEST_F(ChoiceItemsTest, ChoiceScarfSpeed) {
   // speed boost with 1-hit KO moves before enemy can deal damage with choice scarf:
-  EXPECT_EQ(dracometeor_cs.at(0).getEnv().getTeam(0).teammate(2).getPercentHP(), 1.);
-  EXPECT_GE(dracometeor_cs.at(0).getProbability().to_double(), 0.89); // enemy never moves
-  EXPECT_EQ(dracometeor_cs.at(0).getEnv().getTeam(1).teammate(2).getHP(), 0);
-  EXPECT_EQ(dracometeor_none.at(0).getEnv().getTeam(0).teammate(2).getHP(), 0);
+  EXPECT_EQ(
+      dracometeor_cs.where1().getEnv().getTeam(0).teammate(2).getPercentHP(),
+      1.);
+  EXPECT_GE(
+      dracometeor_cs.where1().getProbability().to_double(),
+      0.89);  // enemy never moves
+  EXPECT_EQ(dracometeor_cs.where1().getEnv().getTeam(1).teammate(2).getHP(), 0);
+  EXPECT_EQ(
+      dracometeor_none.where1().getEnv().getTeam(0).teammate(2).getHP(), 0);
 }

@@ -26,7 +26,7 @@ class SuicideMoveTest : public Gen4EngineTest {
 TEST_F(SuicideMoveTest, Explosion) {
   auto possible_envs = engine_->updateState(
     engine_->initialState(), Action::move(0), Action::wait());
-  auto final_env_v = possible_envs.at(0).getEnv();
+  auto final_env_v = possible_envs.where1().getEnv();
 
   EXPECT_EQ(final_env_v.getTeam(0).getPKV().getHP(), 0);
   EXPECT_LT(final_env_v.getTeam(1).getPKV().getPercentHP(), 0.5);
@@ -36,7 +36,7 @@ TEST_F(SuicideMoveTest, Explosion) {
 TEST_F(SuicideMoveTest, SelfDestruct) {
   auto possible_envs = engine_->updateState(
     engine_->initialState(), Action::move(1), Action::wait());
-  auto final_env_v = possible_envs.at(0).getEnv();
+  auto final_env_v = possible_envs.where1().getEnv();
 
   EXPECT_EQ(final_env_v.getTeam(0).getPKV().getHP(), 0);
   EXPECT_LT(final_env_v.getTeam(1).getPKV().getPercentHP(), 0.5);

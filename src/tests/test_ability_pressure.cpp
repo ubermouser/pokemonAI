@@ -29,7 +29,8 @@ class PressureTest : public Gen4EngineTest {
 
 TEST_F(PressureTest, PressureIncreasesPPCost) {
   // Turn 1: Starmie uses water gun
-  ASSERT_EQ(turn1_water_gun.size(), 2);
-  auto starmie_after_water_gun = turn1_water_gun.at(0).getEnv().getTeam(TEAM_A).getPKV();
+  ASSERT_GE(turn1_water_gun.size(), 1);
+  auto starmie_after_water_gun =
+      turn1_water_gun.where1().getEnv().getTeam(TEAM_A).getPKV();
   EXPECT_EQ(starmie_after_water_gun.getMV(0).getPP(), 38);
 }

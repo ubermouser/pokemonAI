@@ -33,7 +33,7 @@ class TauntTest : public Gen4EngineTest {
 
 TEST_F(TauntTest, AppliesEffect) {
   // Steelix uses Taunt on Shuckle
-  auto env = turn1_taunt.at(0).getEnv();
+  auto env = turn1_taunt.where1().getEnv();
 
   // Shuckle should have taunt duration
   EXPECT_GT(env.getTeam(1).teammate(0).status().cTeammate.taunt_duration, 0);
@@ -43,15 +43,15 @@ TEST_F(TauntTest, AppliesEffect) {
 
 TEST_F(TauntTest, PreventsStatusMoves) {
   // Steelix uses Taunt on Shuckle
-  auto env = turn1_taunt.at(0).getEnv();
+  auto env = turn1_taunt.where1().getEnv();
 
   // Shuckle tries to use Toxic (Move 0, Status) - Should be invalid
   EXPECT_FALSE(
-      engine_->isValidAction(turn1_taunt.at(0), Action::move(0), TEAM_B));
+      engine_->isValidAction(turn1_taunt.where1(), Action::move(0), TEAM_B));
 
   // Shuckle tries to use Constrict (Move 1, Physical) - Should be valid
   EXPECT_TRUE(
-      engine_->isValidAction(turn1_taunt.at(0), Action::move(1), TEAM_B));
+      engine_->isValidAction(turn1_taunt.where1(), Action::move(1), TEAM_B));
 }
 
 TEST_F(TauntTest, WearsOff) {
@@ -64,18 +64,18 @@ TEST_F(TauntTest, WearsOff) {
   EXPECT_GE(turn1.size(), 3);
 
   // Pick one state to follow.
-  auto initial_env = turn1.at(0);
+  auto initial_env = turn1.where1();
   auto initial_duration = initial_env.getEnv().getTeam(1).teammate(0).status().cTeammate.taunt_duration;
 
   EXPECT_GE(initial_duration, 3);
   EXPECT_LE(initial_duration, 5);
 
   auto next_turn = turn1;
-  auto current_state = turn1.at(0);
+  auto current_state = turn1.where1();
   for (uint32_t i = 0; i < initial_duration; ++i) {
       // Duration should decrement each turn
       next_turn = engine_->updateState(current_state, Action::move(1), Action::move(1));
-      current_state = next_turn.at(0);
+      current_state = next_turn.where1();
       next_turn.printStates();
 
       auto current_duration = current_state.getEnv().getTeam(1).teammate(0).status().cTeammate.taunt_duration;
@@ -100,7 +100,7 @@ TEST_F(TauntTest, PreemptsStatusMoveSameTurn) {
   // Action: P0 uses Taunt (Move 0), P1 uses Toxic (Move 0)
   auto result = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(0));
 
-  auto final_env = result.at(0).getEnv();
+  auto final_env = result.where1().getEnv();
 
   // 1. Shuckle should be taunted
   EXPECT_GT(final_env.getTeam(1).teammate(0).status().cTeammate.taunt_duration, 0);
@@ -113,7 +113,7 @@ TEST_F(TauntTest, PreemptsStatusMoveSameTurn) {
 TEST_F(TauntTest, TauntReported) {
   // Steelix uses Taunt on Shuckle
   auto output = StateTransitionPrinter::printString(
-      engine_->initialState(), turn1_taunt.at(0), false);
+      engine_->initialState(), turn1_taunt.where1(), false);
 
   SCOPED_TRACE(output);
   EXPECT_TRUE(output.find("shuckle was taunted") != std::string::npos);

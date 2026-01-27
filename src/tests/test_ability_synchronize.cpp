@@ -133,7 +133,7 @@ TEST_F(SynchronizeTest, SynchronizePoison) {
 TEST_F(SynchronizeTest, SynchronizeReported) {
   // Opponent (Team B) uses Thunder Wave on User (Team A)
   auto output = StateTransitionPrinter::printString(
-      engine_->initialState(), results_paralysis.at(0), false);
+      engine_->initialState(), results_paralysis.where1(), false);
 
   SCOPED_TRACE(output);
   // Verify Umbreon (Synchronize user) is mentioned as being status'd

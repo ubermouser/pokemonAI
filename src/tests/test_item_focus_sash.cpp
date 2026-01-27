@@ -31,7 +31,7 @@ class FocusSashTest : public Gen4EngineTest {
     auto swap_state = engine_->updateState(
         target_untouched, Action::swap(1), Action::move(0));
     target_damaged = engine_->updateState(
-        swap_state.at(0), Action::move(0),Action::move(0));
+        swap_state.where1(), Action::move(0), Action::move(0));
 
     // Garchomp uses earthquake, magikarp only just survives.
     target_bigdamage = engine_->updateState(
@@ -39,8 +39,9 @@ class FocusSashTest : public Gen4EngineTest {
 
     // Garchump uses earthquake after bulbasaur uses tackle, magikarp dies.
     auto swap_back_to_garchomp = engine_->updateState(
-      target_damaged.at(0), Action::swap(0), Action::wait());
-    target_dead = engine_->updateState(swap_back_to_garchomp.at(0), Action::move(0), Action::move(0));
+        target_damaged.where1(), Action::swap(0), Action::wait());
+    target_dead = engine_->updateState(
+        swap_back_to_garchomp.where1(), Action::move(0), Action::move(0));
   }
 
   PossibleEnvironments target_damaged;
@@ -51,27 +52,28 @@ class FocusSashTest : public Gen4EngineTest {
 
 TEST_F(FocusSashTest, FocusSashPreventsOHKO) {
   // Garchomp uses Earthquake (index 0) on full HP Magikarp
-  ASSERT_EQ(target_bigdamage.at(0).getEnv().getTeam(1).getPKV().getHP(), 1);
+  ASSERT_EQ(target_bigdamage.where1().getEnv().getTeam(1).getPKV().getHP(), 1);
 }
 
 
 TEST_F(FocusSashTest, FocusSashConsumedAfterUse) {
   // Garchomp uses Earthquake (index 0) on full HP Magikarp
-  ASSERT_FALSE(target_bigdamage.at(0).getEnv().getTeam(1).getPKV().hasItem());
+  ASSERT_FALSE(
+      target_bigdamage.where1().getEnv().getTeam(1).getPKV().hasItem());
 }
 
 
 TEST_F(FocusSashTest, FocusSashDoesNotWorkIfNotFullHP) {
   // Garchomp uses Earthquake (index 0) on damaged Magikarp
-  ASSERT_FALSE(target_dead.at(0).getEnv().getTeam(1).getPKV().isAlive());
+  ASSERT_FALSE(target_dead.where1().getEnv().getTeam(1).getPKV().isAlive());
 }
 
 
 TEST_F(FocusSashTest, FocusSashReported) {
   // Garchomp uses Earthquake (index 0) on full HP Magikarp
-  // We use target_bigdamage from SetUp which already has this transition.
+  // We expect it to report that it used the item.
   auto output = StateTransitionPrinter::printString(
-      engine_->initialState(), target_bigdamage.at(0), false);
+      engine_->initialState(), target_bigdamage.where1(), false);
 
   SCOPED_TRACE(output);
   // We expect it to report that it used the item.

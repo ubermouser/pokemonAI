@@ -50,29 +50,39 @@ TEST_F(Gen4EngineTest, Swap) {
   engine_->setEnvironment(environment);
 
   auto swap_squirtle = engine_->updateState(engine_->initialState(), Action::swap(1), Action::wait());
-  auto torkoal_dead = engine_->updateState(swap_squirtle.at(0), Action::move(0), Action::wait());
-  auto both_dead = engine_->updateState(swap_squirtle.at(0), Action::wait(), Action::move(0));
+  auto torkoal_dead = engine_->updateState(
+      swap_squirtle.where1(), Action::move(0), Action::wait());
+  auto both_dead = engine_->updateState(
+      swap_squirtle.where1(), Action::wait(), Action::move(0));
 
   // active pokemon has changed:
   EXPECT_EQ(engine_->initialState().getTeam(0).getICPKV(), 0);
-  EXPECT_EQ(swap_squirtle.at(0).getEnv().getTeam(0).getICPKV(), 1);
+  EXPECT_EQ(swap_squirtle.where1().getEnv().getTeam(0).getICPKV(), 1);
 
   // pokemon may not swap to themselves:
   EXPECT_FALSE(engine_->isValidAction(engine_->initialState(), Action::swap(0), TEAM_A));
-  EXPECT_FALSE(engine_->isValidAction(swap_squirtle.at(0), Action::swap(1), TEAM_A));
+  EXPECT_FALSE(
+      engine_->isValidAction(swap_squirtle.where1(), Action::swap(1), TEAM_A));
   // pokemon may swap when alive:
   EXPECT_TRUE(engine_->isValidAction(engine_->initialState(), Action::swap(1), TEAM_A));
   EXPECT_TRUE(engine_->isValidAction(engine_->initialState(), Action::swap(1), TEAM_B));
   // dead pokemon may swap:
-  EXPECT_TRUE(engine_->isValidAction(torkoal_dead.at(0), Action::swap(1), TEAM_B));
+  EXPECT_TRUE(
+      engine_->isValidAction(torkoal_dead.where1(), Action::swap(1), TEAM_B));
   // living pokemon may NOT swap when the enemy is dead:
-  EXPECT_FALSE(engine_->isValidAction(torkoal_dead.at(0), Action::swap(0), TEAM_A));
-  EXPECT_TRUE(engine_->isValidAction(torkoal_dead.at(0), Action::wait(), TEAM_A));
+  EXPECT_FALSE(
+      engine_->isValidAction(torkoal_dead.where1(), Action::swap(0), TEAM_A));
+  EXPECT_TRUE(
+      engine_->isValidAction(torkoal_dead.where1(), Action::wait(), TEAM_A));
   // if BOTH pokemon are dead, both pokemon may swap:
-  EXPECT_TRUE(engine_->isValidAction(both_dead.at(0), Action::swap(0), TEAM_A));
-  EXPECT_TRUE(engine_->isValidAction(both_dead.at(0), Action::swap(1), TEAM_B));
+  EXPECT_TRUE(
+      engine_->isValidAction(both_dead.where1(), Action::swap(0), TEAM_A));
+  EXPECT_TRUE(
+      engine_->isValidAction(both_dead.where1(), Action::swap(1), TEAM_B));
   // move counts should be accurate:
-  EXPECT_EQ(engine_->getValidActions(torkoal_dead.at(0).getEnv(), TEAM_B).size(), 1);
+  EXPECT_EQ(
+      engine_->getValidActions(torkoal_dead.where1().getEnv(), TEAM_B).size(),
+      1);
 }
 
 
@@ -147,38 +157,73 @@ TEST_F(Gen4EngineTest, GroundConditions) {
   auto toxic_spikes = engine_->updateState(engine_->initialState(), Action::move(2), Action::wait());
 
   { // test rapid-spin removal:
-    auto spikes_removed = engine_->updateState(spikes.at(0), Action::wait(), Action::move(3));
-    auto removed_vs_spikes = engine_->updateState(spikes_removed.at(0), Action::wait(), Action::swap(1));
-    EXPECT_EQ(removed_vs_spikes.at(0).getEnv().getTeam(1).getPKV().getPercentHP(), 1.); // 100%
+    auto spikes_removed =
+        engine_->updateState(spikes.where1(), Action::wait(), Action::move(3));
+    auto removed_vs_spikes = engine_->updateState(
+        spikes_removed.where1(), Action::wait(), Action::swap(1));
+    EXPECT_EQ(
+        removed_vs_spikes.where1().getEnv().getTeam(1).getPKV().getPercentHP(),
+        1.);  // 100%
   }
   { // test normal harmed vs spikes:
-    auto normal_vs_spikes = engine_->updateState(spikes.at(0), Action::wait(), Action::swap(1));
-    EXPECT_NEAR(normal_vs_spikes.at(0).getEnv().getTeam(1).getPKV().getPercentHP(), 0.875, 0.005); // 87.5%
+    auto normal_vs_spikes =
+        engine_->updateState(spikes.where1(), Action::wait(), Action::swap(1));
+    EXPECT_NEAR(
+        normal_vs_spikes.where1().getEnv().getTeam(1).getPKV().getPercentHP(),
+        0.875,
+        0.005);  // 87.5%
   }
   { // test normal harmed vs toxic spikes:
-    auto normal_vs_toxic = engine_->updateState(toxic_spikes.at(0), Action::wait(), Action::swap(1));
-    EXPECT_NEAR(normal_vs_toxic.at(0).getEnv().getTeam(1).getPKV().getPercentHP(), 0.875, 0.005); // 87.5%
-    EXPECT_EQ(normal_vs_toxic.at(0).getEnv().getTeam(1).getPKV().getStatusAilment(), AIL_NV_POISON); // 87.5%
+    auto normal_vs_toxic = engine_->updateState(
+        toxic_spikes.where1(), Action::wait(), Action::swap(1));
+    EXPECT_NEAR(
+        normal_vs_toxic.where1().getEnv().getTeam(1).getPKV().getPercentHP(),
+        0.875,
+        0.005);  // 87.5%
+    EXPECT_EQ(
+        normal_vs_toxic.where1()
+            .getEnv()
+            .getTeam(1)
+            .getPKV()
+            .getStatusAilment(),
+        AIL_NV_POISON);  // 87.5%
   }
   { // test levitate unharmed vs spikes:
-    auto lev_vs_spikes = engine_->updateState(spikes.at(0), Action::wait(), Action::swap(2));
-    EXPECT_EQ(lev_vs_spikes.at(0).getEnv().getTeam(1).getPKV().getPercentHP(), 1.); // 100%
+    auto lev_vs_spikes =
+        engine_->updateState(spikes.where1(), Action::wait(), Action::swap(2));
+    EXPECT_EQ(
+        lev_vs_spikes.where1().getEnv().getTeam(1).getPKV().getPercentHP(),
+        1.);  // 100%
   }
   { // test levitate unharmed vs toxic spikes:
-    auto lev_vs_toxic = engine_->updateState(toxic_spikes.at(0), Action::wait(), Action::swap(2));
-    EXPECT_EQ(lev_vs_toxic.at(0).getEnv().getTeam(1).getPKV().getPercentHP(), 1.); // 100%
+    auto lev_vs_toxic = engine_->updateState(
+        toxic_spikes.where1(), Action::wait(), Action::swap(2));
+    EXPECT_EQ(
+        lev_vs_toxic.where1().getEnv().getTeam(1).getPKV().getPercentHP(),
+        1.);  // 100%
   }
   { // test levitate harmed vs stealth rock:
-    auto lev_vs_sr = engine_->updateState(stealth_rock.at(0), Action::wait(), Action::swap(2));
-    EXPECT_NEAR(lev_vs_sr.at(0).getEnv().getTeam(1).getPKV().getPercentHP(), 0.875, 0.005); // 87.5%
+    auto lev_vs_sr = engine_->updateState(
+        stealth_rock.where1(), Action::wait(), Action::swap(2));
+    EXPECT_NEAR(
+        lev_vs_sr.where1().getEnv().getTeam(1).getPKV().getPercentHP(),
+        0.875,
+        0.005);  // 87.5%
   }
   { // test flying unharmed vs spikes:
-    auto flying_vs_spikes = engine_->updateState(spikes.at(0), Action::wait(), Action::swap(3));
-    EXPECT_EQ(flying_vs_spikes.at(0).getEnv().getTeam(1).getPKV().getPercentHP(), 1.); // 100%
+    auto flying_vs_spikes =
+        engine_->updateState(spikes.where1(), Action::wait(), Action::swap(3));
+    EXPECT_EQ(
+        flying_vs_spikes.where1().getEnv().getTeam(1).getPKV().getPercentHP(),
+        1.);  // 100%
   }
   { // test flying harmed vs stealth rock:
-    auto flying_vs_sr = engine_->updateState(stealth_rock.at(0), Action::wait(), Action::swap(3));
-    EXPECT_NEAR(flying_vs_sr.at(0).getEnv().getTeam(1).getPKV().getPercentHP(), 0.75, 0.005); // 75%
+    auto flying_vs_sr = engine_->updateState(
+        stealth_rock.where1(), Action::wait(), Action::swap(3));
+    EXPECT_NEAR(
+        flying_vs_sr.where1().getEnv().getTeam(1).getPKV().getPercentHP(),
+        0.75,
+        0.005);  // 75%
   }
 }
 
@@ -201,24 +246,34 @@ TEST_F(Gen4EngineTest, LifeOrb) {
   auto sp_lifeorb = engine_->updateState(engine_->initialState(), Action::move(1), Action::wait());
   auto sp_noitem = engine_->updateState(engine_->initialState(), Action::wait(), Action::move(1));
   auto will_o_wisp = engine_->updateState(engine_->initialState(), Action::move(2), Action::wait());
-  auto split_pain = engine_->updateState(sp_lifeorb.at(0), Action::move(0), Action::wait());
+  auto split_pain = engine_->updateState(
+      sp_lifeorb.where1(), Action::move(0), Action::wait());
   auto calm_mind = engine_->updateState(engine_->initialState(), Action::move(3), Action::wait());
 
   { // attacking move: life orb subtracts 10%, damage is increased by 30%
-    EXPECT_EQ(sp_lifeorb.at(0).getEnv().getTeam(0).teammate(0).getHP(), 180); // 90%
-    EXPECT_EQ(sp_lifeorb.at(0).getEnv().getTeam(1).teammate(0).getHP(), 62); // 31%
-    EXPECT_LT(sp_lifeorb.at(0).getEnv().getTeam(1).teammate(0).getHP(),
-              sp_noitem.at(0).getEnv().getTeam(0).teammate(0).getHP());
+    EXPECT_EQ(
+        sp_lifeorb.where1().getEnv().getTeam(0).teammate(0).getHP(),
+        180);  // 90%
+    EXPECT_EQ(
+        sp_lifeorb.where1().getEnv().getTeam(1).teammate(0).getHP(),
+        62);  // 31%
+    EXPECT_LT(
+        sp_lifeorb.where1().getEnv().getTeam(1).teammate(0).getHP(),
+        sp_noitem.where1().getEnv().getTeam(0).teammate(0).getHP());
   }
   { // special move targeting other team: no effect
-    EXPECT_EQ(split_pain.at(0).getEnv().getTeam(0).teammate(0).getHP(),
-              split_pain.at(0).getEnv().getTeam(1).teammate(0).getHP());
+    EXPECT_EQ(
+        split_pain.where1().getEnv().getTeam(0).teammate(0).getHP(),
+        split_pain.where1().getEnv().getTeam(1).teammate(0).getHP());
   }
   { // status move targeting other team: no effect
-    EXPECT_EQ(will_o_wisp.at(0).getEnv().getTeam(0).teammate(0).getPercentHP(), 1.);
+    EXPECT_EQ(
+        will_o_wisp.where1().getEnv().getTeam(0).teammate(0).getPercentHP(),
+        1.);
   }
   { // move targeting friendly team: no effect
-    EXPECT_EQ(calm_mind.at(0).getEnv().getTeam(0).teammate(0).getPercentHP(), 1.);
+    EXPECT_EQ(
+        calm_mind.where1().getEnv().getTeam(0).teammate(0).getPercentHP(), 1.);
   }
 }
 
@@ -245,6 +300,9 @@ TEST_F(Gen4EngineTest, Flinch) {
   result.printStates();
 
   // Jirachi's health should be full if Charmander flinches
-  EXPECT_EQ(result.at(0).getEnv().getTeam(0).teammate(0).getMissingHP(), 0);
-  EXPECT_GE(result.at(0).getEnv().getTeam(1).teammate(0).getMissingHP(), 100);
+  EXPECT_EQ(
+      result.where1Status(0).getEnv().getTeam(0).teammate(0).getMissingHP(), 0);
+  EXPECT_GE(
+      result.where1Status(0).getEnv().getTeam(1).teammate(0).getMissingHP(),
+      100);
 }

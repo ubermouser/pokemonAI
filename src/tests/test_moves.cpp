@@ -16,7 +16,7 @@ TEST_F(MoveTest, PainSplit) {
 
   auto split_pain = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(1));
 
-  auto result = split_pain.at(0).getEnv();
+  auto result = split_pain.where1().getEnv();
   EXPECT_EQ(result.getTeam(0).teammate(0).getHP(), result.getTeam(1).teammate(0).getHP());
   EXPECT_EQ(result.getTeam(0).teammate(0).getMV(0).getPP(), 31);
 }
@@ -39,16 +39,35 @@ TEST_F(MoveTest, Aromatherapy) {
   engine_->setEnvironment(environment);
 
   auto pikachu_poisoned = engine_->updateState(engine_->initialState(), Action::wait(), Action::move(0));
-  auto blissey_poisoned = engine_->updateState(pikachu_poisoned.at(0), Action::swap(1), Action::move(0));
-  auto all_cured = engine_->updateState(blissey_poisoned.at(0), Action::move(0), Action::wait());
+  auto blissey_poisoned = engine_->updateState(
+      pikachu_poisoned.where1(), Action::swap(1), Action::move(0));
+  auto all_cured = engine_->updateState(
+      blissey_poisoned.where1(), Action::move(0), Action::wait());
 
-  EXPECT_EQ(pikachu_poisoned.at(0).getEnv().getTeam(0).teammate(0).getStatusAilment(), AIL_NV_POISON_TOXIC);
-  EXPECT_EQ(blissey_poisoned.at(0).getEnv().getTeam(0).teammate(1).getStatusAilment(), AIL_NV_POISON_TOXIC);
+  EXPECT_EQ(
+      pikachu_poisoned.where1()
+          .getEnv()
+          .getTeam(0)
+          .teammate(0)
+          .getStatusAilment(),
+      AIL_NV_POISON_TOXIC);
+  EXPECT_EQ(
+      blissey_poisoned.where1()
+          .getEnv()
+          .getTeam(0)
+          .teammate(1)
+          .getStatusAilment(),
+      AIL_NV_POISON_TOXIC);
   // aromatherapy used once:
-  EXPECT_EQ(all_cured.at(0).getEnv().getTeam(0).teammate(1).getMV(0).getPP(), 7);
+  EXPECT_EQ(
+      all_cured.where1().getEnv().getTeam(0).teammate(1).getMV(0).getPP(), 7);
   // both pikachu and blissey cured:
-  EXPECT_EQ(all_cured.at(0).getEnv().getTeam(0).teammate(0).getStatusAilment(), AIL_NV_NONE);
-  EXPECT_EQ(all_cured.at(0).getEnv().getTeam(0).teammate(1).getStatusAilment(), AIL_NV_NONE);
+  EXPECT_EQ(
+      all_cured.where1().getEnv().getTeam(0).teammate(0).getStatusAilment(),
+      AIL_NV_NONE);
+  EXPECT_EQ(
+      all_cured.where1().getEnv().getTeam(0).teammate(1).getStatusAilment(),
+      AIL_NV_NONE);
 }
 
 
@@ -95,7 +114,7 @@ TEST_F(MoveTest, HiddenPower) {
   auto hidden_power = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
 
   // rock_t with 30 power
-  EXPECT_EQ(hidden_power.at(0).getEnv().getTeam(1).getPKV().getHP(), 233);
+  EXPECT_EQ(hidden_power.where1().getEnv().getTeam(1).getPKV().getHP(), 233);
 }
 
 
@@ -114,10 +133,17 @@ TEST_F(MoveTest, Pursuit) {
   auto pursuit_noswitch = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
 
   // the pokemon switching out receives 2x the damage as a pokemon that doesn't:
-  EXPECT_LT(pursuit_switch.at(0).getEnv().getTeam(1).teammate(0).getHP(),
-            pursuit_noswitch.at(0).getEnv().getTeam(1).teammate(0).getHP());
+  EXPECT_LT(
+      pursuit_switch.where1Hit(0).getEnv().getTeam(1).teammate(0).getHP(),
+      pursuit_noswitch.where1Hit(0).getEnv().getTeam(1).teammate(0).getHP());
   // no damage to the pokemon who switched in:
-  EXPECT_EQ(pursuit_switch.at(0).getEnv().getTeam(1).teammate(1).getPercentHP(), 1.);
+  EXPECT_EQ(
+      pursuit_switch.where1Hit(0)
+          .getEnv()
+          .getTeam(1)
+          .teammate(1)
+          .getPercentHP(),
+      1.);
 }
 
 
@@ -138,21 +164,35 @@ TEST_F(MoveTest, Outrage) {
   engine_->setEnvironment(environment);
 
   auto outrage_0 = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
-  auto outrage_1 = engine_->updateState(outrage_0.at(0), Action::move(0), Action::wait());
-  auto outrage_2 = engine_->updateState(outrage_1.at(0), Action::move(0), Action::wait());
+  auto outrage_1 =
+      engine_->updateState(outrage_0.where1(), Action::move(0), Action::wait());
+  auto outrage_2 =
+      engine_->updateState(outrage_1.where1(), Action::move(0), Action::wait());
 
   // the pokemon cannot switch out or perform other moves when outraging:
-  EXPECT_TRUE(engine_->isValidAction(outrage_0.at(0), Action::move(0), TEAM_A));
-  EXPECT_FALSE(engine_->isValidAction(outrage_0.at(0), Action::move(1), TEAM_A));
-  EXPECT_FALSE(engine_->isValidAction(outrage_0.at(0), Action::swap(1), TEAM_A));
+  EXPECT_TRUE(
+      engine_->isValidAction(outrage_0.where1(), Action::move(0), TEAM_A));
+  EXPECT_FALSE(
+      engine_->isValidAction(outrage_0.where1(), Action::move(1), TEAM_A));
+  EXPECT_FALSE(
+      engine_->isValidAction(outrage_0.where1(), Action::swap(1), TEAM_A));
 
   // the pokemon is confused after outraging:
   EXPECT_EQ(
-      outrage_2.at(0).getEnv().getTeam(0).teammate(0).status().cTeammate.confused, AIL_V_CONFUSED_5T);
+      outrage_2.where1()
+          .getEnv()
+          .getTeam(0)
+          .teammate(0)
+          .status()
+          .cTeammate.confused,
+      AIL_V_CONFUSED_5T);
   // the pokemon may switch out or perform other moves:
-  EXPECT_TRUE(engine_->isValidAction(outrage_2.at(0), Action::move(0), TEAM_A));
-  EXPECT_TRUE(engine_->isValidAction(outrage_2.at(0), Action::move(1), TEAM_A));
-  EXPECT_TRUE(engine_->isValidAction(outrage_2.at(0), Action::swap(1), TEAM_A));
+  EXPECT_TRUE(
+      engine_->isValidAction(outrage_2.where1(), Action::move(0), TEAM_A));
+  EXPECT_TRUE(
+      engine_->isValidAction(outrage_2.where1(), Action::move(1), TEAM_A));
+  EXPECT_TRUE(
+      engine_->isValidAction(outrage_2.where1(), Action::swap(1), TEAM_A));
 
   // TODO(@drendleman) the pokemon's outrage counter doesn't decrease when the enemy is dead:
 }

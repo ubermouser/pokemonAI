@@ -37,9 +37,15 @@ class PaybackTest : public Gen4EngineTest {
 
 TEST_F(PaybackTest, normal_power_when_moving_first) {
   auto payback_normal_power = engine_->updateState(
-    setup_payback.at(0), Action::move(0), Action::move(0));
+      setup_payback.where1(), Action::move(0), Action::move(0));
 
-  EXPECT_EQ(payback_normal_power.at(0).getEnv().getTeam(1).getPKV().getMissingHP(), 31);
+  EXPECT_EQ(
+      payback_normal_power.where1Hit(0)
+          .getEnv()
+          .getTeam(1)
+          .getPKV()
+          .getMissingHP(),
+      31);
 }
 
 
@@ -47,16 +53,28 @@ TEST_F(PaybackTest, normal_power_when_enemy_switching) {
   // NOTE: normal damage on switching is technically gen-V+ behavior, but
   // we test it here as smogon uses this behavior for Gen-IV
   auto payback_normal_power = engine_->updateState(
-    setup_payback.at(0), Action::move(0), Action::swap(0));
+      setup_payback.where1(), Action::move(0), Action::swap(0));
 
-  EXPECT_EQ(payback_normal_power.at(0).getEnv().getTeam(1).getPKV().getMissingHP(), 31);
+  EXPECT_EQ(
+      payback_normal_power.where1Hit(0)
+          .getEnv()
+          .getTeam(1)
+          .getPKV()
+          .getMissingHP(),
+      31);
 }
 
 
 TEST_F(PaybackTest, double_power_when_moving_second) {
   // machoke uses a priority move, machamp will move second
   auto payback_doubled_power = engine_->updateState(
-    setup_payback.at(0), Action::move(0), Action::move(1));
+      setup_payback.where1(), Action::move(0), Action::move(1));
 
-  EXPECT_EQ(payback_doubled_power.at(0).getEnv().getTeam(1).getPKV().getMissingHP(), 63);
+  EXPECT_EQ(
+      payback_doubled_power.where1Hit(0)
+          .getEnv()
+          .getTeam(1)
+          .getPKV()
+          .getMissingHP(),
+      63);
 }

@@ -296,7 +296,7 @@ TEST_F(PlannerHumanTest, StateTransitionPrinterDamageOnSwitch) {
 
   std::string output = StateTransitionPrinter::printString(
       engine_->initialState(),
-      ConstEnvironmentPossible{*environment_, switch_and_attack.at(0)},
+      ConstEnvironmentPossible{*environment_, switch_and_attack.where1()},
       /*withStyle=*/false);
 
   SCOPED_TRACE(output);

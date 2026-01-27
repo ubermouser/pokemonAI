@@ -276,6 +276,8 @@ public:
 
   bool isMerged() const { return data().isMerged(); }
   bool isPruned() const { return data().isPruned(); }
+
+  bool isEmpty() const;
 };
 
 
@@ -285,7 +287,6 @@ public:
 
   // TODO(@drendleman) a workaround for stateSelect having to return a NULL State
   explicit ConstEnvironmentPossible(nonvolatile_t& nv);
-  bool isEmpty() const;
 };
 
 
@@ -298,6 +299,7 @@ public:
   uint32_t& getBitmask() { return data().getBitmask(); };
 
   FixType& getProbability() { return data().getProbability(); };
+  const FixType& getProbability() const { return data().getProbability(); };
 
   void setHit(size_t iTeam) {
     data().flags.getTeam(iTeam).hit = 1;
@@ -373,6 +375,8 @@ public:
    */
   std::vector<ConstEnvironmentPossible> where(
       EnvironmentBitfield mask, EnvironmentBitfield expected) const;
+  std::vector<EnvironmentPossible> where(
+      EnvironmentBitfield mask, EnvironmentBitfield expected);
 
   /**
    * Returns all states where the provided predicate returns true.
@@ -380,6 +384,9 @@ public:
   std::vector<ConstEnvironmentPossible> where(
       const std::function<bool(const ConstEnvironmentPossible&)>& predicate)
       const;
+  std::vector<EnvironmentPossible> where(
+      const std::function<bool(const ConstEnvironmentPossible&)>& predicate);
+
 
   /**
    * Returns all states where the environment's bitfield is a superset of the
@@ -389,6 +396,10 @@ public:
       EnvironmentBitfield target) const {
     return where(target, target);
   }
+  std::vector<EnvironmentPossible> where(EnvironmentBitfield target) {
+    return where(target, target);
+  }
+
 
   std::vector<ConstEnvironmentPossible> whereHit(size_t iTeam) const;
   std::vector<ConstEnvironmentPossible> whereCrit(size_t iTeam) const;
@@ -398,12 +409,23 @@ public:
   std::vector<ConstEnvironmentPossible> whereHitNoCrit(size_t iTeam) const;
   std::vector<ConstEnvironmentPossible> whereHitNoStatus(size_t iTeam) const;
 
+  std::vector<EnvironmentPossible> whereHit(size_t iTeam);
+  std::vector<EnvironmentPossible> whereCrit(size_t iTeam);
+  std::vector<EnvironmentPossible> whereStatus(size_t iTeam);
+  std::vector<EnvironmentPossible> whereMiss(size_t iTeam);
+  std::vector<EnvironmentPossible> whereSwitch(size_t iTeam);
+  std::vector<EnvironmentPossible> whereHitNoCrit(size_t iTeam);
+  std::vector<EnvironmentPossible> whereHitNoStatus(size_t iTeam);
+
   /**
    * Returns the single most probable state matching the criteria.
    * Throws std::runtime_error if no state matches.
    */
   ConstEnvironmentPossible where1(
       EnvironmentBitfield mask, EnvironmentBitfield expected) const;
+  EnvironmentPossible where1(
+      EnvironmentBitfield mask, EnvironmentBitfield expected);
+
 
   /**
    * Returns the single most probable state matching the predicate.
@@ -412,13 +434,20 @@ public:
   ConstEnvironmentPossible where1(
       const std::function<bool(const ConstEnvironmentPossible&)>& predicate)
       const;
+  EnvironmentPossible where1(
+      const std::function<bool(const ConstEnvironmentPossible&)>& predicate);
 
   /**
    * Returns the single most probable state matching the criteria.
+   * If no criteria are provided, returns the single most probable state.
    * Throws std::runtime_error if no state matches.
    */
   ConstEnvironmentPossible where1(
       EnvironmentBitfield target = EnvironmentBitfield()) const {
+    return where1(target, target);
+  }
+  EnvironmentPossible where1(
+      EnvironmentBitfield target = EnvironmentBitfield()) {
     return where1(target, target);
   }
 
@@ -429,6 +458,14 @@ public:
   ConstEnvironmentPossible where1Switch(size_t iTeam) const;
   ConstEnvironmentPossible where1HitNoCrit(size_t iTeam) const;
   ConstEnvironmentPossible where1HitNoStatus(size_t iTeam) const;
+
+  EnvironmentPossible where1Hit(size_t iTeam);
+  EnvironmentPossible where1Crit(size_t iTeam);
+  EnvironmentPossible where1Status(size_t iTeam);
+  EnvironmentPossible where1Miss(size_t iTeam);
+  EnvironmentPossible where1Switch(size_t iTeam);
+  EnvironmentPossible where1HitNoCrit(size_t iTeam);
+  EnvironmentPossible where1HitNoStatus(size_t iTeam);
 
   size_t getNumUnique() const { return size() - numMerged_; };
   void decrementUnique() { numMerged_++; }

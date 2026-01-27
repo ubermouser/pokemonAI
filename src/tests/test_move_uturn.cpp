@@ -20,15 +20,16 @@ class UTurnTest : public Gen4EngineTest {
     engine_->setEnvironment(environment_nv);
 
     setup_swap = engine_->updateState(engine_->initialState(), Action::wait(), Action::swap(1));
-    setup_sr = engine_->updateState(setup_swap.at(0), Action::wait(), Action::move(0));
+    setup_sr = engine_->updateState(
+        setup_swap.where1(), Action::wait(), Action::move(0));
     uturn_to_ally = engine_->updateState(
-      setup_swap.at(0), Action::moveAlly(0, 1), Action::wait());
+        setup_swap.where1(), Action::moveAlly(0, 1), Action::wait());
     uturn_to_ally_with_sr = engine_->updateState(
-      setup_sr.at(0), Action::moveAlly(0, 1), Action::wait());
+        setup_sr.where1(), Action::moveAlly(0, 1), Action::wait());
     swap_to_scyzor = engine_->updateState(
-      uturn_to_ally.at(0), Action::wait(), Action::swap(0));
+        uturn_to_ally.where1(), Action::wait(), Action::swap(0));
     uturn_no_ally = engine_->updateState(
-      swap_to_scyzor.at(0), Action::wait(), Action::moveAlly(0, 0));
+        swap_to_scyzor.where1(), Action::wait(), Action::moveAlly(0, 0));
   }
 
   PossibleEnvironments setup_swap;
@@ -41,45 +42,86 @@ class UTurnTest : public Gen4EngineTest {
 
 
 TEST_F(UTurnTest, requires_pokemon_to_swap_if_ally_exists) {
-  EXPECT_FALSE(engine_->isValidAction(setup_sr.at(0), Action::move(0), TEAM_A));
-  EXPECT_TRUE(engine_->isValidAction(setup_sr.at(0), Action::moveAlly(0, 1), TEAM_A));
-  EXPECT_FALSE(engine_->isValidAction(setup_sr.at(0), Action::moveAlly(0, 0), TEAM_A));
+  EXPECT_FALSE(
+      engine_->isValidAction(setup_sr.where1(), Action::move(0), TEAM_A));
+  EXPECT_TRUE(engine_->isValidAction(
+      setup_sr.where1(), Action::moveAlly(0, 1), TEAM_A));
+  EXPECT_FALSE(engine_->isValidAction(
+      setup_sr.where1(), Action::moveAlly(0, 0), TEAM_A));
 }
 
 
 TEST_F(UTurnTest, can_still_be_used_without_swap_if_no_allies_exist) {
-  EXPECT_FALSE(engine_->isValidAction(swap_to_scyzor.at(0), Action::move(0), TEAM_B));
-  EXPECT_TRUE(engine_->isValidAction(swap_to_scyzor.at(0), Action::moveAlly(0, 0), TEAM_B));
-  EXPECT_FALSE(engine_->isValidAction(swap_to_scyzor.at(0), Action::moveAlly(0, 1), TEAM_B));
+  EXPECT_FALSE(
+      engine_->isValidAction(swap_to_scyzor.where1(), Action::move(0), TEAM_B));
+  EXPECT_TRUE(engine_->isValidAction(
+      swap_to_scyzor.where1(), Action::moveAlly(0, 0), TEAM_B));
+  EXPECT_FALSE(engine_->isValidAction(
+      swap_to_scyzor.where1(), Action::moveAlly(0, 1), TEAM_B));
 }
 
 
 TEST_F(UTurnTest, damages_enemy_and_swaps_to_ally) {
   // pp decremented
-  EXPECT_EQ(uturn_to_ally.at(0).getEnv().getTeam(0).teammate(0).getMV(0).getPP(), 31);
+  EXPECT_EQ(
+      uturn_to_ally.where1Hit(0)
+          .getEnv()
+          .getTeam(0)
+          .teammate(0)
+          .getMV(0)
+          .getPP(),
+      31);
   // item effect (life orb) applies
-  EXPECT_NEAR(uturn_to_ally.at(0).getEnv().getTeam(0).teammate(0).getPercentHP(), 0.9, 0.005);
+  EXPECT_NEAR(
+      uturn_to_ally.where1Hit(0).getEnv().getTeam(0).teammate(0).getPercentHP(),
+      0.9,
+      0.005);
   // ally has swapped out
-  EXPECT_EQ(uturn_to_ally.at(0).getEnv().getTeam(0).getICPKV(), 1);
-  EXPECT_EQ(uturn_to_ally.at(0).getEnv().getTeam(1).teammate(1).getPercentHP(), 0.); // enemy weakling deleted
+  EXPECT_EQ(uturn_to_ally.where1Hit(0).getEnv().getTeam(0).getICPKV(), 1);
+  EXPECT_EQ(
+      uturn_to_ally.where1Hit(0).getEnv().getTeam(1).teammate(1).getPercentHP(),
+      0.);  // enemy weakling deleted
 }
 
 
 TEST_F(UTurnTest, damages_enemy_and_swaps_to_ally_with_stealth_rock) {
   // life orb applies to attacking teammate
-  EXPECT_NEAR(uturn_to_ally_with_sr.at(0).getEnv().getTeam(0).teammate(0).getPercentHP(), 0.9, 0.005);
+  EXPECT_NEAR(
+      uturn_to_ally_with_sr.where1Hit(0)
+          .getEnv()
+          .getTeam(0)
+          .teammate(0)
+          .getPercentHP(),
+      0.9,
+      0.005);
   // stealth-rock applies to entering teammate
-  EXPECT_NEAR(uturn_to_ally_with_sr.at(0).getEnv().getTeam(0).teammate(1).getPercentHP(), 0.9375, 0.005);
+  EXPECT_NEAR(
+      uturn_to_ally_with_sr.where1Hit(0)
+          .getEnv()
+          .getTeam(0)
+          .teammate(1)
+          .getPercentHP(),
+      0.9375,
+      0.005);
 }
 
 
 TEST_F(UTurnTest, damages_enemy_but_doesnt_swap_if_no_allies_exist) {
   // pp decremented
-  EXPECT_EQ(uturn_no_ally.at(0).getEnv().getTeam(1).teammate(0).getMV(0).getPP(), 31);
+  EXPECT_EQ(
+      uturn_no_ally.where1Hit(1)
+          .getEnv()
+          .getTeam(1)
+          .teammate(0)
+          .getMV(0)
+          .getPP(),
+      31);
   // item effect (life orb) applies
-  EXPECT_FLOAT_EQ(uturn_no_ally.at(0).getEnv().getTeam(1).teammate(0).getPercentHP(), 0.9);
+  EXPECT_FLOAT_EQ(
+      uturn_no_ally.where1Hit(1).getEnv().getTeam(1).teammate(0).getPercentHP(),
+      0.9);
   // ally NOT swapped out
-  EXPECT_EQ(uturn_no_ally.at(0).getEnv().getTeam(1).getICPKV(), 0);
+  EXPECT_EQ(uturn_no_ally.where1Hit(1).getEnv().getTeam(1).getICPKV(), 0);
 }
 
 
@@ -98,7 +140,7 @@ TEST_F(UTurnTest, NoErroneousStruggleWithChoiceItem) {
   // Turn 1: Use U-turn. Since it's the last pokemon, it stays in.
   // We use moveAlly(0, 0) because U-turn requires a friendly target.
   auto turn1 = engine_->updateState(engine_->initialState(), Action::moveAlly(0, 0), Action::wait());
-  auto state = turn1.at(0);
+  auto state = turn1.where1Hit(0);
 
   // Verify Choice Band lock: Bullet Punch (index 1) should be disabled
   EXPECT_FALSE(engine_->isValidAction(state, Action::move(1), TEAM_A));
@@ -114,7 +156,7 @@ TEST_F(UTurnTest, NoErroneousStruggleWithChoiceItem) {
 TEST_F(UTurnTest, UTurnReported) {
   // Turn 1: Scizor uses U-turn on enemy Torterra and swaps to friendly Torterra
   auto output = StateTransitionPrinter::printString(
-      setup_swap.at(0).getEnv(), uturn_to_ally.at(0), false);
+      setup_swap.where1().getEnv(), uturn_to_ally.where1Hit(0), false);
 
   SCOPED_TRACE(output);
   // Verify swap action is reported

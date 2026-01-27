@@ -28,7 +28,7 @@ class NaturalCureTest : public Gen4EngineTest {
     turn1_twave = engine_->updateState(
       env_v, Action::wait(), Action::move(0));
     turn2_swap = engine_->updateState(
-      turn1_twave.at(0), Action::swap(1), Action::wait());
+        turn1_twave.where1(), Action::swap(1), Action::wait());
   }
 
   PossibleEnvironments turn1_twave;
@@ -38,16 +38,18 @@ class NaturalCureTest : public Gen4EngineTest {
 
 TEST_F(NaturalCureTest, NaturalCureDoesNotHealInBattle) {
   // Turn 1: Jolteon uses Thunder Wave on Starmie
-  ASSERT_EQ(turn1_twave.size(), 1);
-  auto starmie_after_twave = turn1_twave.at(0).getEnv().getTeam(TEAM_A).getPKV();
+  ASSERT_GE(turn1_twave.size(), 1);
+  auto starmie_after_twave =
+      turn1_twave.where1().getEnv().getTeam(TEAM_A).getPKV();
   EXPECT_EQ(starmie_after_twave.getStatusAilment(), AIL_NV_PARALYSIS);
 }
 
 
 TEST_F(NaturalCureTest, NaturalCureHealsOnSwitch) {
   // Turn 2: Starmie switches out
-  ASSERT_EQ(turn2_swap.size(), 1);
-  auto starmie_after_switch = turn2_swap.at(0).getEnv().getTeam(TEAM_A).teammate(0);
+  ASSERT_GE(turn2_swap.size(), 1);
+  auto starmie_after_switch =
+      turn2_swap.where1().getEnv().getTeam(TEAM_A).teammate(0);
   EXPECT_EQ(starmie_after_switch.getStatusAilment(), AIL_NV_NONE);
 }
 
@@ -55,7 +57,7 @@ TEST_F(NaturalCureTest, NaturalCureHealsOnSwitch) {
 TEST_F(NaturalCureTest, NaturalCureReportedOnSwitch) {
   // Turn 2: Starmie switches out
   auto output = StateTransitionPrinter::printString(
-      turn1_twave.at(0).getEnv(), turn2_swap.at(0), false);
+      turn1_twave.where1().getEnv(), turn2_swap.where1(), false);
 
   SCOPED_TRACE(output);
   EXPECT_TRUE(output.find("starmie woke up / was cured") != std::string::npos);

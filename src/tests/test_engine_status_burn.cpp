@@ -26,8 +26,10 @@ class BurnStatusTest : public Gen4EngineTest {
 
     // Initialize states
     burn_state = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(0));
-    baseline_physical_state = engine_->updateState(engine_->initialState(), Action::wait(), Action::move(0));
-    baseline_special_state = engine_->updateState(engine_->initialState(), Action::wait(), Action::move(1));
+    baseline_special_state = engine_->updateState(
+        engine_->initialState(), Action::wait(), Action::move(1));
+    baseline_physical_state = engine_->updateState(
+        engine_->initialState(), Action::wait(), Action::move(0));
     // Use where1Status to find the state where burn was applied (secondary
     // effect)
     auto burned_state = burn_state.where1Status(0);

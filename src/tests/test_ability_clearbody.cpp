@@ -35,16 +35,18 @@ class ClearBodyTest : public Gen4EngineTest {
 
 
 TEST_F(ClearBodyTest, PreventsStatDrop) {
-  auto env = setup_clearbody.at(0).getEnv();
+  auto env = setup_clearbody.where1().getEnv();
   // Verify Metagross starts with 0 boost
   EXPECT_EQ(env.getTeam(0).getPKV().getBoost(FV_ATTACK), 0);
 
-  auto metagross_after_growl = setup_clearbody.at(0).getEnv().getTeam(0).getPKV();
+  auto metagross_after_growl =
+      setup_clearbody.where1().getEnv().getTeam(0).getPKV();
   EXPECT_EQ(metagross_after_growl.getBoost(FV_ATTACK), 0); // Should be unchanged
 }
 
 
 TEST_F(ClearBodyTest, StatDropOccursWithoutAbility) {
-  auto charmander_after_growl = setup_control.at(0).getEnv().getTeam(0).getPKV();
+  auto charmander_after_growl =
+      setup_control.where1().getEnv().getTeam(0).getPKV();
   EXPECT_EQ(charmander_after_growl.getBoost(FV_ATTACK), -1); // Should be lowered
 }

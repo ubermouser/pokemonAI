@@ -38,7 +38,7 @@ TEST_F(TrickTest, item_for_item) {
   auto trick_item = engine_->updateState(
     engine_->initialState(), Action::move(0), Action::wait());
 
-  auto final_env_v = trick_item.at(0).getEnv();
+  auto final_env_v = trick_item.where1().getEnv();
   EXPECT_EQ(final_env_v.getTeam(0).getPKV().getItem().getName(), "leftovers");
   EXPECT_EQ(final_env_v.getTeam(1).getPKV().getItem().getName(), "choice specs");
 }
@@ -48,7 +48,7 @@ TEST_F(TrickTest, item_behavior_propagates) {
   auto trick_item = engine_->updateState(
     engine_->initialState(), Action::move(0), Action::move(0));
 
-  auto final_env_v = trick_item.at(0).getEnv();
+  auto final_env_v = trick_item.where1().getEnv();
   EXPECT_FALSE(engine_->isValidAction(final_env_v, Action::move(1), 1));
 }
 
@@ -57,9 +57,9 @@ TEST_F(TrickTest, no_item_for_item) {
   auto trick_no_item = engine_->updateState(
     engine_->initialState(), Action::swap(1), Action::wait());
   auto final_trick = engine_->updateState(
-    trick_no_item.at(0), Action::move(0), Action::wait());
+      trick_no_item.where1(), Action::move(0), Action::wait());
 
-  auto final_env_v = final_trick.at(0).getEnv();
+  auto final_env_v = final_trick.where1().getEnv();
   EXPECT_EQ(final_env_v.getTeam(0).getPKV().getItem().getName(), "leftovers");
   EXPECT_FALSE(final_env_v.getTeam(1).getPKV().hasItem());
 }
@@ -76,7 +76,7 @@ TEST_F(TrickTest, item_for_no_item) {
   auto trick_item = engine_->updateState(
     engine_->initialState(), Action::move(0), Action::wait());
 
-  auto final_env_v = trick_item.at(0).getEnv();
+  auto final_env_v = trick_item.where1().getEnv();
   EXPECT_FALSE(final_env_v.getTeam(0).getPKV().hasItem());
   EXPECT_EQ(final_env_v.getTeam(1).getPKV().getItem().getName(), "choice specs");
 }
@@ -86,7 +86,7 @@ TEST_F(TrickTest, sticky_hold_fails) {
   auto trick_item = engine_->updateState(
     engine_->initialState(), Action::move(0), Action::swap(1));
 
-  auto final_env_v = trick_item.at(0).getEnv();
+  auto final_env_v = trick_item.where1().getEnv();
   EXPECT_EQ(final_env_v.getTeam(0).getPKV().getItem().getName(), "choice specs");
   EXPECT_EQ(final_env_v.getTeam(1).getPKV().getItem().getName(), "choice band");
 }

@@ -36,7 +36,7 @@ class SubstituteTest : public Gen4EngineTest {
 
 TEST_F(SubstituteTest, CreatesSubstitute) {
   // Blissey uses Substitute (already done in SetUp)
-  auto env = turn1_results.at(0).getEnv();
+  auto env = turn1_results.where1().getEnv();
   auto blissey = env.getTeam(0).teammate(0);
 
   uint32_t maxHP = blissey.nv().getMaxHP();
@@ -54,7 +54,7 @@ TEST_F(SubstituteTest, FailsWithLowHP) {
 
   // Try to use Substitute
   auto result = engine_->updateState(state, Action::move(0), Action::wait());
-  auto env = result.at(0).getEnv();
+  auto env = result.where1().getEnv();
   auto blissey = env.getTeam(0).teammate(0);
 
   // HP should not change, substitute should not be created
@@ -64,14 +64,14 @@ TEST_F(SubstituteTest, FailsWithLowHP) {
 
 TEST_F(SubstituteTest, AbsorbsDamage) {
   // Blissey uses Substitute in SetUp
-  auto state1 = turn1_results.at(0);
+  auto state1 = turn1_results.where1();
 
   uint32_t initialHP = state1.getEnv().getTeam(0).teammate(0).getHP();
   uint32_t initialSubHP = state1.getEnv().getTeam(0).teammate(0).status().cTeammate.substitute;
 
   // Turn 2: Gengar uses Sludge Bomb (Move index 3 - hits Blissey)
   auto turn2 = engine_->updateState(state1, Action::wait(), Action::move(3));
-  auto env2 = turn2.at(0).getEnv();
+  auto env2 = turn2.where1().getEnv();
   auto blissey2 = env2.getTeam(0).teammate(0);
 
   // Blissey's HP should not have decreased
@@ -82,7 +82,7 @@ TEST_F(SubstituteTest, AbsorbsDamage) {
 
 TEST_F(SubstituteTest, DISABLED_BreaksSubstitute) {
   // Blissey uses Substitute in SetUp
-  auto state1 = turn1_results.at(0);
+  auto state1 = turn1_results.where1();
 
   // Force break substitute by creating a mutable state
   EnvironmentVolatileData stateData = state1.getEnv().data();
@@ -91,7 +91,7 @@ TEST_F(SubstituteTest, DISABLED_BreaksSubstitute) {
 
   // Turn 2: Gengar uses Sludge Bomb (Move index 3)
   auto turn2 = engine_->updateState(mutableState, Action::wait(), Action::move(3));
-  auto env2 = turn2.at(0).getEnv();
+  auto env2 = turn2.where1().getEnv();
   auto blissey2 = env2.getTeam(0).teammate(0);
 
   // Substitute should be gone
@@ -102,11 +102,11 @@ TEST_F(SubstituteTest, DISABLED_BreaksSubstitute) {
 
 TEST_F(SubstituteTest, BlocksStatusMove) {
   // Blissey uses Substitute in SetUp
-  auto state1 = turn1_results.at(0);
+  auto state1 = turn1_results.where1();
 
   // Turn 2: Gengar uses Toxic
   auto turn2 = engine_->updateState(state1, Action::wait(), Action::move(0));
-  auto env2 = turn2.at(0).getEnv();
+  auto env2 = turn2.where1().getEnv();
   auto blissey2 = env2.getTeam(0).teammate(0);
 
   // Blissey should NOT be poisoned
@@ -115,11 +115,11 @@ TEST_F(SubstituteTest, BlocksStatusMove) {
 
 TEST_F(SubstituteTest, BypassedByTaunt) {
   // Blissey uses Substitute in SetUp
-  auto state1 = turn1_results.at(0);
+  auto state1 = turn1_results.where1();
 
   // Turn 2: Gengar uses Taunt
   auto turn2 = engine_->updateState(state1, Action::wait(), Action::move(2));
-  auto env2 = turn2.at(0).getEnv();
+  auto env2 = turn2.where1().getEnv();
   auto blissey2 = env2.getTeam(0).teammate(0);
 
   // Blissey should be taunted
@@ -128,7 +128,7 @@ TEST_F(SubstituteTest, BypassedByTaunt) {
 
 TEST_F(SubstituteTest, DISABLED_BlocksSecondaryEffect) {
   // Blissey uses Substitute in SetUp
-  auto state1 = turn1_results.at(0);
+  auto state1 = turn1_results.where1();
 
   // Turn 2: Gengar uses Sludge Bomb (30% chance to poison) (Move index 3)
   // We want to verify that even if it hits, the poison effect is blocked.
@@ -145,7 +145,7 @@ TEST_F(SubstituteTest, DISABLED_BlocksSecondaryEffect) {
 
 TEST_F(SubstituteTest, DoesNotBlockSelfTargetingMoves) {
   // Blissey uses Substitute in SetUp
-  auto state1 = turn1_results.at(0);
+  auto state1 = turn1_results.where1();
 
   // Set Blissey's HP lower to see healing effect
   EnvironmentVolatileData stateData = state1.getEnv().data();
@@ -155,7 +155,7 @@ TEST_F(SubstituteTest, DoesNotBlockSelfTargetingMoves) {
 
   // Turn 2: Blissey uses Soft-Boiled (Move index 1)
   auto turn2 = engine_->updateState(mutableState, Action::move(1), Action::wait());
-  auto env2 = turn2.at(0).getEnv();
+  auto env2 = turn2.where1().getEnv();
   auto blissey2 = env2.getTeam(0).teammate(0);
 
   // Blissey should have healed
@@ -165,7 +165,7 @@ TEST_F(SubstituteTest, DoesNotBlockSelfTargetingMoves) {
 TEST_F(SubstituteTest, SubstituteReported) {
   // Blissey uses Substitute in SetUp
   auto output = StateTransitionPrinter::printString(
-      engine_->initialState(), turn1_results.at(0), false);
+      engine_->initialState(), turn1_results.where1(), false);
 
   SCOPED_TRACE(output);
   EXPECT_TRUE(output.find("blissey put up a substitute") != std::string::npos);
