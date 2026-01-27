@@ -114,14 +114,13 @@ TEST_F(UTurnTest, NoErroneousStruggleWithChoiceItem) {
 TEST_F(UTurnTest, UTurnReported) {
   // Turn 1: Scizor uses U-turn on enemy Torterra and swaps to friendly Torterra
   auto output = StateTransitionPrinter::printString(
-      setup_swap.at(0).getEnv(), uturn_to_ally.at(0));
+      setup_swap.at(0).getEnv(), uturn_to_ally.at(0), false);
 
   SCOPED_TRACE(output);
   // Verify swap action is reported
-  EXPECT_TRUE(output.find("sent out") != std::string::npos);
-  EXPECT_TRUE(output.find("torterra") != std::string::npos);
+  EXPECT_TRUE(output.find("Team A sent out torterra!") != std::string::npos);
 
   // Verify damage to target is reported
-  EXPECT_TRUE(output.find("lost") != std::string::npos);
+  EXPECT_TRUE(output.find("torterra lost") != std::string::npos);
   EXPECT_TRUE(output.find("HP") != std::string::npos);
 }

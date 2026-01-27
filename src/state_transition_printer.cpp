@@ -5,6 +5,7 @@
 #include <fmt/ostream.h>
 
 #include <iostream>
+#include <regex>
 #include <sstream>
 
 #include "pokemonai/item.h"
@@ -13,10 +14,21 @@
 
 
 std::string StateTransitionPrinter::printString(
-    const ConstEnvironmentVolatile& osP, const ConstEnvironmentPossible& nsP) {
+    const ConstEnvironmentVolatile& osP,
+    const ConstEnvironmentPossible& nsP,
+    bool withStyle) {
   std::stringstream ss;
   print(ss, osP, nsP);
-  return ss.str();
+  std::string result = ss.str();
+  if (!withStyle) { return stripControlCharacters(result); }
+  return result;
+}
+
+
+std::string StateTransitionPrinter::stripControlCharacters(
+    const std::string& input) {
+  static const std::regex ansi_regex("\x1b\\[[0-9;]*[mK]");
+  return std::regex_replace(input, ansi_regex, "");
 }
 
 void StateTransitionPrinter::print(

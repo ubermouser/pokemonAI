@@ -71,10 +71,9 @@ TEST_F(FocusSashTest, FocusSashReported) {
   // Garchomp uses Earthquake (index 0) on full HP Magikarp
   // We use target_bigdamage from SetUp which already has this transition.
   auto output = StateTransitionPrinter::printString(
-      engine_->initialState(), target_bigdamage.at(0));
+      engine_->initialState(), target_bigdamage.at(0), false);
 
   SCOPED_TRACE(output);
-  EXPECT_TRUE(output.find("magikarp") != std::string::npos);
   // We expect it to report that it used the item.
-  EXPECT_TRUE(output.find("used its focus sash") != std::string::npos);
+  EXPECT_TRUE(output.find("magikarp used its focus sash") != std::string::npos);
 }

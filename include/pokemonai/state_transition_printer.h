@@ -29,9 +29,12 @@ class StateTransitionPrinter {
       const ConstEnvironmentVolatile& oldState,
       const ConstEnvironmentPossible& newState);
 
+  static std::string stripControlCharacters(const std::string& input);
+
   static std::string printString(
       const ConstEnvironmentVolatile& oldState,
-      const ConstEnvironmentPossible& newState);
+      const ConstEnvironmentPossible& newState,
+      bool withStyle = true);
 
  protected:
   static void reportSwitch(

@@ -133,13 +133,11 @@ TEST_F(SynchronizeTest, SynchronizePoison) {
 TEST_F(SynchronizeTest, SynchronizeReported) {
   // Opponent (Team B) uses Thunder Wave on User (Team A)
   auto output = StateTransitionPrinter::printString(
-      engine_->initialState(), results_paralysis.at(0));
+      engine_->initialState(), results_paralysis.at(0), false);
 
   SCOPED_TRACE(output);
   // Verify Umbreon (Synchronize user) is mentioned as being status'd
-  EXPECT_TRUE(output.find("umbreon") != std::string::npos);
+  EXPECT_TRUE(output.find("umbreon is paralyzed") != std::string::npos);
   // Verify Mewtwo (Caster) is also mentioned (due to Synchronize)
-  EXPECT_TRUE(output.find("mewtwo") != std::string::npos);
-  // Verify the status itself is mentioned
-  EXPECT_TRUE(output.find("paralyzed") != std::string::npos);
+  EXPECT_TRUE(output.find("mewtwo is paralyzed") != std::string::npos);
 }

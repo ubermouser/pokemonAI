@@ -103,9 +103,9 @@ TEST_F(LeechSeedTest, Test_FailsIfAlreadySeeded) {
 TEST_F(LeechSeedTest, LeechSeedReported_Seeding) {
   // Verify initial seeding report (Initial -> Turn 1)
   auto output = StateTransitionPrinter::printString(
-      engine_->initialState(), r1_normal.at(0));
+      engine_->initialState(), r1_normal.at(0), false);
   SCOPED_TRACE(output);
-  EXPECT_TRUE(output.find("was seeded") != std::string::npos);
+  EXPECT_TRUE(output.find("mew was seeded") != std::string::npos);
 }
 
 
@@ -113,12 +113,9 @@ TEST_F(LeechSeedTest, LeechSeedReported_Healing) {
   // Verify healing report (Turn 1 -> Turn 2)
   // Between turn 1 and turn 2, Mew loses HP and Bulbasaur restores HP.
   auto output = StateTransitionPrinter::printString(
-      r1_normal.at(0).getEnv(), r2_normal.at(0));
+      r1_normal.at(0).getEnv(), r2_normal.at(0), false);
   SCOPED_TRACE(output);
 
-  EXPECT_TRUE(output.find("lost") != std::string::npos);  // Mew lost HP
-  EXPECT_TRUE(output.find("bulbasaur") != std::string::npos);
-  EXPECT_TRUE(
-      output.find("restored HP") !=
-      std::string::npos);  // Bulbasaur restored HP
+  EXPECT_TRUE(output.find("mew lost") != std::string::npos);
+  EXPECT_TRUE(output.find("bulbasaur restored HP") != std::string::npos);
 }

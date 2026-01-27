@@ -113,9 +113,8 @@ TEST_F(TauntTest, PreemptsStatusMoveSameTurn) {
 TEST_F(TauntTest, TauntReported) {
   // Steelix uses Taunt on Shuckle
   auto output = StateTransitionPrinter::printString(
-      engine_->initialState(), turn1_taunt.at(0));
+      engine_->initialState(), turn1_taunt.at(0), false);
 
   SCOPED_TRACE(output);
-  EXPECT_TRUE(output.find("shuckle") != std::string::npos);
-  EXPECT_TRUE(output.find("taunted") != std::string::npos);
+  EXPECT_TRUE(output.find("shuckle was taunted") != std::string::npos);
 }

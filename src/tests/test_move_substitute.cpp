@@ -165,9 +165,8 @@ TEST_F(SubstituteTest, DoesNotBlockSelfTargetingMoves) {
 TEST_F(SubstituteTest, SubstituteReported) {
   // Blissey uses Substitute in SetUp
   auto output = StateTransitionPrinter::printString(
-      engine_->initialState(), turn1_results.at(0));
+      engine_->initialState(), turn1_results.at(0), false);
 
   SCOPED_TRACE(output);
-  EXPECT_TRUE(output.find("blissey") != std::string::npos);
-  EXPECT_TRUE(output.find("substitute") != std::string::npos);
+  EXPECT_TRUE(output.find("blissey put up a substitute") != std::string::npos);
 }
