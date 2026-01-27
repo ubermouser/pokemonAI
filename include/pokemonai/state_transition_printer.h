@@ -48,8 +48,8 @@ class StateTransitionPrinter {
       size_t iTeam);
   static void reportDamage(
       std::ostream& os,
-      const ConstTeamVolatile& teamOld,
-      const ConstTeamVolatile& teamNew);
+      const ConstPokemonVolatile& pkOld,
+      const ConstPokemonVolatile& pkNew);
   static void reportStatusChange(
       std::ostream& os,
       const ConstPokemonVolatile& pkOld,

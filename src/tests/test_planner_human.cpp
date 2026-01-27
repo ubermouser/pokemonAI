@@ -287,3 +287,19 @@ TEST_F(PlannerHumanTest, StateTransitionPrinterFaintAndSwitch) {
   EXPECT_TRUE(output.find("fainted") != std::string::npos);
   EXPECT_TRUE(output.find("metagross") != std::string::npos);
 }
+
+
+TEST_F(PlannerHumanTest, StateTransitionPrinterDamageOnSwitch) {
+  // Team A switches from gengar to metagross while Team B attacks with psychic
+  auto switch_and_attack = engine_->updateState(
+      engine_->initialState(), Action::swap(1), Action::move(1));
+
+  std::string output = StateTransitionPrinter::printString(
+      engine_->initialState(),
+      ConstEnvironmentPossible{*environment_, switch_and_attack.at(0)},
+      /*withStyle=*/false);
+
+  SCOPED_TRACE(output);
+  EXPECT_TRUE(output.find("metagross lost") != std::string::npos)
+      << "Expected to find 'metagross lost ... HP' in output";
+}

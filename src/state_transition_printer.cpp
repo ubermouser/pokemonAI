@@ -64,12 +64,19 @@ void StateTransitionPrinter::print(
     reportFainting(os, osP, nsP, iTeam);
 
     if (teamOld.getICPKV() == teamNew.getICPKV()) {
-      reportDamage(os, teamOld, teamNew);
+      reportDamage(os, pkOld, pkNew);
       reportItemUsage(os, pkOld, pkNew);
       reportStatusChange(os, pkOld, pkNew);
       reportTeamVolatileStatusChange(os, teamOld, teamNew);
       reportVolatileStatusChange(os, teamOld, teamNew);
       reportStatBoosts(os, teamOld, teamNew);
+    } else {
+      // A switch occurred - check for damage to the newly switched-in Pokemon
+      // This can happen from entry hazards or the opponent attacking
+      size_t newActive = teamNew.getICPKV();
+      const auto& pkOldNewActive = teamOld.teammate(newActive);
+      const auto& pkNewNewActive = teamNew.teammate(newActive);
+      reportDamage(os, pkOldNewActive, pkNewNewActive);
     }
   }
 }
@@ -137,11 +144,8 @@ void StateTransitionPrinter::reportFainting(
 
 void StateTransitionPrinter::reportDamage(
     std::ostream& os,
-    const ConstTeamVolatile& teamOld,
-    const ConstTeamVolatile& teamNew) {
-  const auto& pkOld = teamOld.getPKV();
-  const auto& pkNew = teamNew.getPKV();
-
+    const ConstPokemonVolatile& pkOld,
+    const ConstPokemonVolatile& pkNew) {
   if (pkNew.getHP() < pkOld.getHP()) {
     uint32_t damage = pkOld.getHP() - pkNew.getHP();
     float percent = (float)damage * 100.0f / pkNew.nv().getMaxHP();
