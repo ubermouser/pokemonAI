@@ -63,11 +63,22 @@ TEST_F(MoveTest, Heal50) {
   engine_->setEnvironment(environment);
 
   auto pidgey_tackled = engine_->updateState(engine_->initialState(), Action::wait(), Action::move(0));
-  auto pidgey_roosted = engine_->updateState(pidgey_tackled.at(1), Action::move(1), Action::wait());
+  // Select state where enemy critically hit for significant damage
+  auto pidgey_crit = pidgey_tackled.where1Crit(1);
+  auto pidgey_roosted =
+      engine_->updateState(pidgey_crit, Action::move(1), Action::wait());
 
-  EXPECT_EQ(pidgey_tackled.at(1).getEnv().getTeam(0).teammate(0).getHP(), 30);
-  EXPECT_EQ(pidgey_roosted.at(0).getEnv().getTeam(0).teammate(0).getHP(), 125);
-  EXPECT_EQ(pidgey_roosted.at(0).getEnv().getTeam(0).teammate(0).getMV(1).getPP(), 15);
+  EXPECT_EQ(pidgey_crit.getEnv().getTeam(0).teammate(0).getHP(), 30);
+  EXPECT_EQ(
+      pidgey_roosted.where1Hit(0).getEnv().getTeam(0).teammate(0).getHP(), 125);
+  EXPECT_EQ(
+      pidgey_roosted.where1Hit(0)
+          .getEnv()
+          .getTeam(0)
+          .teammate(0)
+          .getMV(1)
+          .getPP(),
+      15);
 }
 
 

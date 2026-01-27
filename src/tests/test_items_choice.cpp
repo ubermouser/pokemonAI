@@ -86,10 +86,13 @@ TEST_F(ChoiceItemsTest, ChoiceSpecsBonus) {
 }
 
 TEST_F(ChoiceItemsTest, ChoiceSpecsNoPhysicalBonus) {
-  // physical attack with choice specs does no additional damage:
-  // state 12 avoids BURN condition
-  EXPECT_EQ(firepunch_cs.at(12).getEnv().getTeam(0).teammate(1).getHP(),
-            firepunch_cs.at(12).getEnv().getTeam(1).teammate(1).getHP());
+  // physical attack with choice specs does no additional damage
+  // Find a state where both teams hit without secondary effects (e.g., burn)
+  auto noStatusState = firepunch_cs.where1HitNoStatus(0);
+
+  EXPECT_EQ(
+      noStatusState.getEnv().getTeam(0).teammate(1).getHP(),
+      noStatusState.getEnv().getTeam(1).teammate(1).getHP());
 }
 
 TEST_F(ChoiceItemsTest, ChoiceScarfSpeed) {

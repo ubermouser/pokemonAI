@@ -12,6 +12,7 @@
 
 BOOST_STATIC_ASSERT(sizeof(EnvironmentPossibleData) == (sizeof(uint64_t)*19));
 
+
 EnvironmentPossibleData EnvironmentPossibleData::create(
     const EnvironmentVolatileData& source, bool doHash) {
   EnvironmentPossibleData result{source, UINT64_MAX, FixType(1.0f), {0}};
@@ -46,6 +47,7 @@ ENV_POSSIBLE_IMPL_TEMPLATE
 void ENV_POSSIBLE_IMPL::printState() const {
   printState(std::cout);
 }
+
 
 ENV_POSSIBLE_IMPL_TEMPLATE
 void ENV_POSSIBLE_IMPL::printState(std::ostream& os) const {
@@ -158,7 +160,9 @@ ConstEnvironmentPossible PossibleEnvironments::stateSelect_index(size_t& indexRe
   return at(indexState);
 } // endOf stateSelect_index
 
+
 void PossibleEnvironments::printStates() const { printStates(std::cout, ""); }
+
 
 void PossibleEnvironments::printStates(std::ostream& os, const std::string& linePrefix) const {
   os << fmt::format("{}({}) possible states!\n", getNumUnique(), size());
@@ -195,16 +199,23 @@ std::vector<ConstEnvironmentPossible> PossibleEnvironments::getValidEnvironments
 
 
 std::vector<ConstEnvironmentPossible> PossibleEnvironments::where(
-    EnvironmentBitfield target) const {
+    const std::function<bool(const ConstEnvironmentPossible&)>& predicate)
+    const {
   std::vector<ConstEnvironmentPossible> results;
   for (size_t i = 0; i < size(); ++i) {
     auto state = at(i);
     if (state.isPruned()) continue;
-    if ((state.data().flags.raw & target.raw) == target.raw) {
-      results.push_back(state);
-    }
+    if (predicate(state)) { results.push_back(state); }
   }
   return results;
+}
+
+
+std::vector<ConstEnvironmentPossible> PossibleEnvironments::where(
+    EnvironmentBitfield mask, EnvironmentBitfield expected) const {
+  return where([mask, expected](const ConstEnvironmentPossible& state) {
+    return (state.data().flags.raw & mask.raw) == expected.raw;
+  });
 }
 
 
@@ -213,19 +224,53 @@ std::vector<ConstEnvironmentPossible> PossibleEnvironments::whereHit(
   return where(EnvironmentBitfield().team(iTeam).hasHit());
 }
 
+
 std::vector<ConstEnvironmentPossible> PossibleEnvironments::whereCrit(
     size_t iTeam) const {
   return where(EnvironmentBitfield().team(iTeam).hasCrit());
 }
+
 
 std::vector<ConstEnvironmentPossible> PossibleEnvironments::whereStatus(
     size_t iTeam) const {
   return where(EnvironmentBitfield().team(iTeam).hasSecondary());
 }
 
+
+std::vector<ConstEnvironmentPossible> PossibleEnvironments::whereMiss(
+    size_t iTeam) const {
+  return where(
+      EnvironmentBitfield().team(iTeam).hasHit().hasSwitched().hasWait(),
+      EnvironmentBitfield());
+}
+
+
+std::vector<ConstEnvironmentPossible> PossibleEnvironments::whereSwitch(
+    size_t iTeam) const {
+  return where(EnvironmentBitfield().team(iTeam).hasSwitched());
+}
+
+
+std::vector<ConstEnvironmentPossible> PossibleEnvironments::whereHitNoCrit(
+    size_t iTeam) const {
+  return where(
+      EnvironmentBitfield().team(iTeam).hasHit().hasCrit(),
+      EnvironmentBitfield().team(iTeam).hasHit());
+}
+
+
+std::vector<ConstEnvironmentPossible> PossibleEnvironments::whereHitNoStatus(
+    size_t iTeam) const {
+  return where(
+      EnvironmentBitfield().team(iTeam).hasHit().hasSecondary(),
+      EnvironmentBitfield().team(iTeam).hasHit());
+}
+
+
 ConstEnvironmentPossible PossibleEnvironments::where1(
-    EnvironmentBitfield target) const {
-  std::vector<ConstEnvironmentPossible> results = where(target);
+    const std::function<bool(const ConstEnvironmentPossible&)>& predicate)
+    const {
+  std::vector<ConstEnvironmentPossible> results = where(predicate);
   if (results.empty()) {
     throw std::runtime_error(
         "PossibleEnvironments::where1: No matching state found");
@@ -241,17 +286,57 @@ ConstEnvironmentPossible PossibleEnvironments::where1(
   return *best;
 }
 
+
+ConstEnvironmentPossible PossibleEnvironments::where1(
+    EnvironmentBitfield mask, EnvironmentBitfield expected) const {
+  return where1([mask, expected](const ConstEnvironmentPossible& state) {
+    return (state.data().flags.raw & mask.raw) == expected.raw;
+  });
+}
+
+
 ConstEnvironmentPossible PossibleEnvironments::where1Hit(size_t iTeam) const {
   return where1(EnvironmentBitfield().team(iTeam).hasHit());
 }
+
 
 ConstEnvironmentPossible PossibleEnvironments::where1Crit(size_t iTeam) const {
   return where1(EnvironmentBitfield().team(iTeam).hasCrit());
 }
 
+
 ConstEnvironmentPossible PossibleEnvironments::where1Status(
     size_t iTeam) const {
   return where1(EnvironmentBitfield().team(iTeam).hasSecondary());
+}
+
+
+ConstEnvironmentPossible PossibleEnvironments::where1Miss(size_t iTeam) const {
+  return where1(
+      EnvironmentBitfield().team(iTeam).hasHit().hasSwitched().hasWait(),
+      EnvironmentBitfield());
+}
+
+
+ConstEnvironmentPossible PossibleEnvironments::where1Switch(
+    size_t iTeam) const {
+  return where1(EnvironmentBitfield().team(iTeam).hasSwitched());
+}
+
+
+ConstEnvironmentPossible PossibleEnvironments::where1HitNoCrit(
+    size_t iTeam) const {
+  return where1(
+      EnvironmentBitfield().team(iTeam).hasHit().hasCrit(),
+      EnvironmentBitfield().team(iTeam).hasHit());
+}
+
+
+ConstEnvironmentPossible PossibleEnvironments::where1HitNoStatus(
+    size_t iTeam) const {
+  return where1(
+      EnvironmentBitfield().team(iTeam).hasHit().hasSecondary(),
+      EnvironmentBitfield().team(iTeam).hasHit());
 }
 
 

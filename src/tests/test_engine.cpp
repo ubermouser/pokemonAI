@@ -14,9 +14,9 @@ TEST_F(Gen4EngineTest, PrimaryHitAndCrit) {
   // pokemon may move freely when both are alive:
   EXPECT_TRUE(engine_->isValidAction(engine_->initialState(), Action::move(0), TEAM_A));
   EXPECT_EQ(result.size(), 3);
-  EXPECT_EQ(result.at(0).hasHit(0), true);
-  EXPECT_EQ(result.at(1).hasHit(0), false);
-  EXPECT_EQ(result.at(2).hasCrit(0), true);
+  EXPECT_EQ(result.where1Hit(0).hasHit(0), true);
+  EXPECT_EQ(result.where1Miss(0).hasHit(0), false);
+  EXPECT_EQ(result.where1Crit(0).hasCrit(0), true);
 }
 
 

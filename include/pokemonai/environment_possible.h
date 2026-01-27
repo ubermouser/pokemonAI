@@ -368,24 +368,67 @@ public:
   };
 
   /**
+   * Returns all states where the environment's bitfield matches the expected
+   * values for the given mask.
+   */
+  std::vector<ConstEnvironmentPossible> where(
+      EnvironmentBitfield mask, EnvironmentBitfield expected) const;
+
+  /**
+   * Returns all states where the provided predicate returns true.
+   */
+  std::vector<ConstEnvironmentPossible> where(
+      const std::function<bool(const ConstEnvironmentPossible&)>& predicate)
+      const;
+
+  /**
    * Returns all states where the environment's bitfield is a superset of the
    * provided EnvironmentBitfield.
    */
-  std::vector<ConstEnvironmentPossible> where(EnvironmentBitfield target) const;
+  std::vector<ConstEnvironmentPossible> where(
+      EnvironmentBitfield target) const {
+    return where(target, target);
+  }
 
   std::vector<ConstEnvironmentPossible> whereHit(size_t iTeam) const;
   std::vector<ConstEnvironmentPossible> whereCrit(size_t iTeam) const;
   std::vector<ConstEnvironmentPossible> whereStatus(size_t iTeam) const;
+  std::vector<ConstEnvironmentPossible> whereMiss(size_t iTeam) const;
+  std::vector<ConstEnvironmentPossible> whereSwitch(size_t iTeam) const;
+  std::vector<ConstEnvironmentPossible> whereHitNoCrit(size_t iTeam) const;
+  std::vector<ConstEnvironmentPossible> whereHitNoStatus(size_t iTeam) const;
 
   /**
    * Returns the single most probable state matching the criteria.
    * Throws std::runtime_error if no state matches.
    */
-  ConstEnvironmentPossible where1(EnvironmentBitfield target) const;
+  ConstEnvironmentPossible where1(
+      EnvironmentBitfield mask, EnvironmentBitfield expected) const;
+
+  /**
+   * Returns the single most probable state matching the predicate.
+   * Throws std::runtime_error if no state matches.
+   */
+  ConstEnvironmentPossible where1(
+      const std::function<bool(const ConstEnvironmentPossible&)>& predicate)
+      const;
+
+  /**
+   * Returns the single most probable state matching the criteria.
+   * Throws std::runtime_error if no state matches.
+   */
+  ConstEnvironmentPossible where1(
+      EnvironmentBitfield target = EnvironmentBitfield()) const {
+    return where1(target, target);
+  }
 
   ConstEnvironmentPossible where1Hit(size_t iTeam) const;
   ConstEnvironmentPossible where1Crit(size_t iTeam) const;
   ConstEnvironmentPossible where1Status(size_t iTeam) const;
+  ConstEnvironmentPossible where1Miss(size_t iTeam) const;
+  ConstEnvironmentPossible where1Switch(size_t iTeam) const;
+  ConstEnvironmentPossible where1HitNoCrit(size_t iTeam) const;
+  ConstEnvironmentPossible where1HitNoStatus(size_t iTeam) const;
 
   size_t getNumUnique() const { return size() - numMerged_; };
   void decrementUnique() { numMerged_++; }

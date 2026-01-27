@@ -134,3 +134,45 @@ TEST_F(EnvironmentPossibleSearchTest, WhereExcludesPruned) {
   auto newCount = result.where(target).size();
   EXPECT_EQ(newCount, initialCount - 1);
 }
+
+
+TEST_F(EnvironmentPossibleSearchTest, SearchWithNegativeMask) {
+  // Find states where team 0 hit but did NOT crit:
+  auto mask = EnvironmentBitfield().team(0).hasHit().hasCrit();
+  auto expected = EnvironmentBitfield().team(0).hasHit();  // crit = 0
+
+  auto states = result.where(mask, expected);
+
+  EXPECT_GT(states.size(), 0);
+  for (const auto& state : states) {
+    EXPECT_TRUE(state.hasHit(0));
+    EXPECT_FALSE(state.hasCrit(0));
+  }
+}
+
+
+TEST_F(EnvironmentPossibleSearchTest, SearchWithPredicate) {
+  // Find states where team 1's active pokemon has full HP (unrealistic in this
+  // test context but tests the mechanic) Or more simply, find states where team
+  // 0 moved first:
+  auto states = result.where([](const ConstEnvironmentPossible& state) {
+    return state.hasMovedFirst(0);
+  });
+
+  EXPECT_GT(states.size(), 0);
+  for (const auto& state : states) { EXPECT_TRUE(state.hasMovedFirst(0)); }
+}
+
+
+TEST_F(EnvironmentPossibleSearchTest, Where1NoArg) {
+  // Find the single most probable state:
+  auto expectedBest = *std::max_element(
+      result.begin(), result.end(), [](const auto& a, const auto& b) {
+        if (a.isPruned()) return true;
+        if (b.isPruned()) return false;
+        return a.probability < b.probability;
+      });
+
+  auto best = result.where1();
+  EXPECT_EQ(best.getProbability(), expectedBest.probability);
+}
