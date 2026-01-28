@@ -31,7 +31,7 @@ class EnvironmentPossibleSearchTest : public Gen4EngineTest {
 
 TEST_F(EnvironmentPossibleSearchTest, SearchWithWhere) {
   // Find states where BOTH hit and crit occurred for team 0:
-  auto target = EnvironmentBitfield().team(0).hasHit().hasCrit();
+  EnvironmentBitfield target = EnvironmentBitfield().team(0).hasHit().hasCrit();
   auto states = result.where(target);
 
   EXPECT_GT(states.size(), 0);
@@ -93,7 +93,7 @@ TEST_F(EnvironmentPossibleSearchTest, Where1Status) {
 
 TEST_F(EnvironmentPossibleSearchTest, Where1Probabilistic) {
   // Verify where1 actually finds the most probable state
-  auto target = EnvironmentBitfield().team(0).hasHit();
+  EnvironmentBitfield target = EnvironmentBitfield().team(0).hasHit();
   auto allHits = result.where(target);
   auto expectedBest = *std::max_element(allHits.begin(), allHits.end(), [](const auto& a, const auto& b){
     return a.getProbability() < b.getProbability();
@@ -138,8 +138,9 @@ TEST_F(EnvironmentPossibleSearchTest, WhereExcludesPruned) {
 
 TEST_F(EnvironmentPossibleSearchTest, SearchWithNegativeMask) {
   // Find states where team 0 hit but did NOT crit:
-  auto mask = EnvironmentBitfield().team(0).hasHit().hasCrit();
-  auto expected = EnvironmentBitfield().team(0).hasHit();  // crit = 0
+  EnvironmentBitfield mask = EnvironmentBitfield().team(0).hasHit().hasCrit();
+  EnvironmentBitfield expected =
+      EnvironmentBitfield().team(0).hasHit();  // crit = 0
 
   auto states = result.where(mask, expected);
 

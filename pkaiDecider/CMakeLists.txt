@@ -39,7 +39,6 @@ add_library(pkaiDecider STATIC
     ../src/planners.cpp
     ../src/ranked_evaluator.cpp
     ../src/ranked_planner.cpp
-    ../src/state_transition_printer.cpp
 )
 
 target_include_directories(pkaiDecider PUBLIC ../include)

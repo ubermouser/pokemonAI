@@ -27,6 +27,7 @@ add_library(pkaiEngine SHARED
     ../src/team_nonvolatile.cpp
     ../src/team_volatile.cpp
     ../src/type.cpp
+    ../src/state_transition_printer.cpp
 )
 
 set_target_properties(pkaiEngine PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON)
