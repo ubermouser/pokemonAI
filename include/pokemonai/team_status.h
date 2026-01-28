@@ -8,6 +8,8 @@
 #ifndef TEAM_STATUS_H
 #define TEAM_STATUS_H
 
+#include <cstdint>
+
 struct VolatileStatus
 {
   // boost array

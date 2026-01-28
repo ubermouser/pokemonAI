@@ -35,6 +35,7 @@
 
 class PkCUEngine;
 
+// clang-format off
 /**
  * @name Battle Stages
  * @brief Defines the different stages of the battle engine's state machine.
@@ -55,33 +56,35 @@ class PkCUEngine;
 #define STAGE_STATUS 5              /**< Before a move is executed, for status effects like paralysis. */
 // move damage evaluation:
 #define STAGE_MOVEBASE 6            /**< Base move evaluation. */
-#define STAGE_SETBASEPOWER 7        /**< Set the base power of the move. */
-#define STAGE_SETMOVETYPE 8         /**< Set the type of the move. */
-#define STAGE_MODIFYBASEPOWER 9     /**< Modify the base power of the move. */
-#define STAGE_MODIFYATTACKPOWER 10  /**< Modify the attack power of the user. */
-#define STAGE_MODIFYCRITICALPOWER 11 /**< Modify the power of a critical hit. */
-#define STAGE_MODIFYRAWDAMAGE 12    /**< Modify the raw damage calculated. */
-#define STAGE_MODIFYSTAB 13         /**< Modify the Same-Type Attack Bonus (STAB). */
-#define STAGE_MODIFYTYPERESISTANCE 14 /**< Modify the type resistance of the target. */
-#define STAGE_MODIFYITEMPOWER 15    /**< Modify the power based on items. */
-#define STAGE_MODIFYHITCHANCE 16    /**< Modify the chance of the move hitting. */
-#define STAGE_EVALUATEHITCHANCE 17  /**< Evaluate if the move hits. */
-#define STAGE_MODIFYCRITCHANCE 18   /**< Modify the chance of a critical hit. */
-#define STAGE_PREDAMAGE 19          /**< Before damage is applied. */
-#define STAGE_POSTDAMAGE 20         /**< After damage is applied. */
+#define STAGE_MODIFYHITCHANCE 7     /**< Modify the chance of the move hitting. */
+#define STAGE_EVALUATEHITCHANCE 8   /**< Evaluate if the move hits. */
+#define STAGE_MODIFYCRITCHANCE 9    /**< Modify the chance of a critical hit. */
+#define STAGE_EVALUATECRITCHANCE 10 /**< Evaluate if the move crits. */
+#define STAGE_SETBASEPOWER 11       /**< Set the base power of the move. */
+#define STAGE_SETMOVETYPE 12        /**< Set the type of the move. */
+#define STAGE_MODIFYBASEPOWER 13    /**< Modify the base power of the move. */
+#define STAGE_MODIFYATTACKPOWER 14  /**< Modify the attack power of the user. */
+#define STAGE_MODIFYCRITICALPOWER 15 /**< Modify the power of a critical hit. */
+#define STAGE_MODIFYRAWDAMAGE 16    /**< Modify the raw damage calculated. */
+#define STAGE_MODIFYSTAB 17         /**< Modify the Same-Type Attack Bonus (STAB). */
+#define STAGE_MODIFYTYPERESISTANCE 18 /**< Modify the type resistance of the target. */
+#define STAGE_MODIFYITEMPOWER 19    /**< Modify the power based on items. */
+#define STAGE_PREDAMAGE 20          /**< Before damage is applied. */
+#define STAGE_POSTDAMAGE 21         /**< After damage is applied. */
 // post move evaluation:
-#define STAGE_POSTMOVE 21           /**< After a move has been executed. */
-#define STAGE_PRESECONDARY 22       /**< Before secondary effects are calculated. */
-#define STAGE_MODIFYSECONDARYHITCHANCE 23 /**< Modify the hit chance of secondary effects. */
-#define STAGE_SECONDARY 24          /**< Secondary effects are being applied. */
-#define STAGE_POSTSECONDARY 25      /**< After secondary effects have been applied. */
+#define STAGE_POSTMOVE 22           /**< After a move has been executed. */
+#define STAGE_PRESECONDARY 23       /**< Before secondary effects are calculated. */
+#define STAGE_MODIFYSECONDARYHITCHANCE 24 /**< Modify the hit chance of secondary effects. */
+#define STAGE_SECONDARY 25          /**< Secondary effects are being applied. */
+#define STAGE_POSTSECONDARY 26      /**< After secondary effects have been applied. */
 // post turn status
-#define STAGE_POSTTURN 26           /**< After a Pokemon has completed its turn. */
+#define STAGE_POSTTURN 27           /**< After a Pokemon has completed its turn. */
 // post round status
-#define STAGE_POSTROUND 27          /**< After both Pokemon have completed their turns. */
-#define STAGE_FINAL 28              /**< The final stage of the round. */
-#define STAGE_HASH 29               /**< The resulting environment is being hashed. */
+#define STAGE_POSTROUND 28          /**< After both Pokemon have completed their turns. */
+#define STAGE_FINAL 29              /**< The final stage of the round. */
+#define STAGE_HASH 30               /**< The resulting environment is being hashed. */
 /** @} */
+// clang-format on
 
 /**
  * @name Action Validity Checks
@@ -193,7 +196,6 @@ static const char* invalidActionReasonToString(IsValidResult result) {
  */
 struct DamageComponents_t {
   uint32_t damage;      /**< The calculated damage of the move. */
-  uint32_t damageCrit;  /**< The calculated damage if the move is a critical hit. */
   const Type* mType;    /**< The type of the move. */
   FixType cProbability; /**< The probability of the current environment
                            occurring. */
@@ -475,7 +477,7 @@ protected:
   /**
    * @brief A deque that stores the damage components for each environment on the stack.
    */
-  std::deque<DamageComponents_t> damageComponents_;
+  std::deque<std::array<DamageComponents_t, 2>> damageComponents_;
 
   /**
    * @brief An array that stores the team indices. `iTeams_[0]` is the current team.
@@ -575,10 +577,10 @@ public:
   void evaluateMove();
 
   /**
-   * @brief Calculates the final damage of a move, including the random damage roll.
-   * @param hasCrit `true` if the move is a critical hit, `false` otherwise.
+   * @brief Calculates the final damage of a move, including the random damage
+   * roll.
    */
-  void calculateDamage(bool hasCrit);
+  void calculateDamage();
 
   /**
    * @brief Gets the probability of the move hitting its target.
@@ -602,7 +604,7 @@ public:
 
     result[0] = iState;
     uint32_t baseStage = stackStage_[iState];
-    const DamageComponents_t& baseComponent = damageComponents_[iState];
+    const auto& baseComponent = damageComponents_[iState];
     for (size_t iEnvironment = 1; iEnvironment < numEnvironments; ++iEnvironment)
     {
       size_t cSize = stack.size();
@@ -677,9 +679,22 @@ public:
   MoveVolatile getTMV() { return getTMV(iBase_); }
   MoveVolatile getMV(size_t iState);
   MoveVolatile getTMV(size_t iState);
-  DamageComponents_t& getDamageComponent(size_t iStack) { return damageComponents_[iStack]; };
-  DamageComponents_t& getDamageComponent() { return damageComponents_[iBase_]; };
-  const DamageComponents_t& getDamageComponent() const { return damageComponents_[iBase_]; };
+  DamageComponents_t& getDamageComponent(size_t iStack) {
+    return damageComponents_[iStack][getICTeam()];
+  };
+  DamageComponents_t& getDamageComponent(size_t iStack, size_t iTeam) {
+    return damageComponents_[iStack][iTeam];
+  };
+  DamageComponents_t& getDamageComponent() {
+    return damageComponents_[iBase_][getICTeam()];
+  };
+  const DamageComponents_t& getDamageComponent() const {
+    return damageComponents_[iBase_][getICTeam()];
+  };
+  EnvironmentPossible getBase(size_t iStack) { return getStack().at(iStack); };
+  ConstEnvironmentPossible getBase(size_t iStack) const {
+    return getStack().at(iStack);
+  };
   EnvironmentPossible getBase() { return getStack().at(iBase_); };
   ConstEnvironmentPossible getBase() const { return getStack().at(iBase_); };
   size_t getICTeam() const { return iTeams_[0]; };

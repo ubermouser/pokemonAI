@@ -255,8 +255,9 @@ PkCUEngine::PkCUEngine(
   // push-back first stack stage:
   stack_.push_back(EnvironmentPossibleData::create(initial, false));
   stackStage_.push_back(STAGE_SEEDED);
-  damageComponents_.push_back(DamageComponents_t());
-  damageComponents_.back().cProbability = FixType(1.0f);
+  damageComponents_.push_back({DamageComponents_t{}, DamageComponents_t{}});
+  damageComponents_.back()[0].cProbability = FixType(1.0f);
+  damageComponents_.back()[1].cProbability = FixType(1.0f);
 
   setCPluginSet();
 }
@@ -737,209 +738,14 @@ void PkCUEngine::evaluateMove_damage() {
 
   const Move& cMove = getMV().getBase();
 
+  stackStage_[iBase_] = STAGE_MODIFYHITCHANCE;
+
   //Source: http://www.smogon.com/dp/articles/damage_formula
 
-  /*BasePower = HH × BP × IT × CHG × (MS × WS) × UA × FA*/
-  // set basePower:
-  //for (/*iBase = baseFloor, baseCeil = getStack().size()*/; iBase != baseCeil; ++iBase)
-  {
-    //if (getStackStage() != STAGE_MOVEBASE) { continue; }
-    advanceStackStage();
-
-    uint32_t& basePower = getDamageComponent().damage;
-    basePower = cMove.getPower();
-
-    int result = (basePower != UINT8_MAX)?1:0;
-    CALLPLUGIN(result, PLUGIN_ON_SETBASEPOWER, onSetPower_rawType,
-        *this, getMV(), getPKV(), getTPKV(), basePower);
-
-    assert(result > 0 && basePower > 0);
-  }
-
-  // calculate this move's type:
-  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
-    if (getStackStage() != STAGE_SETBASEPOWER) { continue; }
-    advanceStackStage();
-
-    const Type*& cType = getDamageComponent().mType;
-    cType = &cMove.getType();
-
-    int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_SETMOVETYPE, onModifyMoveType_rawType,
-        *this, getMV(), getPKV(), getTPKV(), cType);
-  }
-
-  // modify basePower:
-  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
-    if (getStackStage() != STAGE_SETMOVETYPE) { continue; }
-    advanceStackStage();
-
-    uint32_t& basePower = getDamageComponent().damage;
-    fpType baseModifier = 1.0;
-
-    int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYBASEPOWER, onModifyPower_rawType,
-        *this, getMV(), getPKV(), getTPKV(), baseModifier);
-
-    basePower = (uint32_t)(basePower * baseModifier);
-  }
-
-  // calculate attack and damage modifiers:
-  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
-    if (getStackStage() != STAGE_MODIFYBASEPOWER) { continue; }
-    advanceStackStage();
-
-    PokemonVolatile cPKV = getPKV();
-    PokemonVolatile tPKV = getTPKV();
-    DamageComponents_t& cDamage = getDamageComponent();
-
-    size_t attackType;
-    size_t defenseType;
-    if (cMove.getDamageType() == ATK_PHYSICAL) {
-      attackType = FV_ATTACK; defenseType = FV_DEFENSE;
-    } else {
-      attackType = FV_SPATTACK; defenseType = FV_SPDEFENSE;
-    }
-
-    uint32_t attackPower = cPKV.getFV_boosted(attackType);
-    uint32_t attackPowerCrit = std::max(cPKV.nv().getFV_base(attackType), attackPower);
-
-    uint32_t defensePower = tPKV.getFV_boosted(defenseType);
-    uint32_t defensePowerCrit = std::min(tPKV.nv().getFV_base(defenseType), defensePower);
-
-    uint32_t levelModifier = ((cPKV.nv().getLevel() * 2) / 5) + 2;
-
-    // calculate crit first:
-    cDamage.damageCrit = ((levelModifier * cDamage.damage * attackPowerCrit) / 50) / defensePowerCrit;
-    // and regular damage:
-    cDamage.damage = ((levelModifier * cDamage.damage * attackPower) / 50) / defensePower;
-
-
-    /* Mod1 = BRN × RL × TVT × SR × FF */
-    // modifier1:
-    fpType attackPowerModifier = 1.0;
-
-    int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYATTACKPOWER, onModifyPower_rawType,
-        *this, getMV(), cPKV, tPKV, attackPowerModifier);
-
-    // incorporate attack power modifier:
-    cDamage.damage = (uint32_t)(cDamage.damage * attackPowerModifier) + 2;
-    cDamage.damageCrit = (uint32_t)(cDamage.damageCrit * attackPowerModifier) + 2;
-  }
-
-  // calculate critical hit modifiers:
-  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
-    if (getStackStage() != STAGE_MODIFYATTACKPOWER) { continue; }
-    advanceStackStage();
-
-    DamageComponents_t& cDamage = getDamageComponent();
-
-    /* CH - Critical Hit modifier
-      3 if has sniper ability AND critical hit (mult 1.5)
-      2 if critical hit (mult 1.0)
-      1 else
-     */
-    fpType criticalHitModifier = 2.0;
-    int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYCRITICALPOWER, onModifyPower_rawType,
-        *this, getMV(), getPKV(), getTPKV(), criticalHitModifier);
-
-    // incorporate critical power modifier:
-    cDamage.damageCrit = (uint32_t)(cDamage.damageCrit * criticalHitModifier);
-  }
-
-  // calculate raw damage modifiers:
-  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
-    if (getStackStage() != STAGE_MODIFYCRITICALPOWER) { continue; }
-    advanceStackStage();
-
-    DamageComponents_t& cDamage = getDamageComponent();
-
-    /* Mod2 = Other modifier
-      1.3 if item = life orb
-      1+.1*n if item = metronome and used the same move n previous times, to a max of n=10
-      1.5 if attacking with Me First and attacks first (NOTE: SPECIAL BEHAVIOR with life orb / metronome!)
-      1 else
-     */
-    fpType rawDamageMultiplier = 1.0;
-    int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYRAWDAMAGE, onModifyPower_rawType,
-      *this, getMV(), getPKV(), getTPKV(), rawDamageMultiplier);
-
-    // incorporate critical power modifier:
-    cDamage.damage = (uint32_t)(cDamage.damage * rawDamageMultiplier);
-    cDamage.damageCrit = (uint32_t)(cDamage.damageCrit * rawDamageMultiplier);
-  }
-
-  // calculate this move's STAB:
-  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
-    if (getStackStage() != STAGE_MODIFYRAWDAMAGE) { continue; }
-    advanceStackStage();
-
-    PokemonVolatile cPKV = getPKV();
-    DamageComponents_t& cDamage = getDamageComponent();
-
-    bool hasStab = (
-        (&cPKV.getBase().getType(0) == cDamage.mType) ||
-        (&cPKV.getBase().getType(1) == cDamage.mType));
-    fpType STABMultiplier = hasStab?1.5:1.0;
-    int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYSTAB, onModifyPower_rawType,
-        *this, getMV(), cPKV, getTPKV(), STABMultiplier);
-
-    // incorporate STAB modifier:
-    cDamage.damage = (uint32_t)(cDamage.damage * STABMultiplier);
-    cDamage.damageCrit = (uint32_t)(cDamage.damageCrit * STABMultiplier);
-  }
-
-  // calculate the enemy pokemon's type resistance:
-  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
-    if (getStackStage() != STAGE_MODIFYSTAB) { continue; }
-    advanceStackStage();
-
-    PokemonVolatile tPKV = getTPKV();
-    DamageComponents_t& cDamage = getDamageComponent();
-
-    fpType typeModifier = 1.0;
-    {
-      // type1:
-      typeModifier *= cDamage.mType->getModifier(tPKV.getBase().getType(0));
-      // type 2:
-      typeModifier *= cDamage.mType->getModifier(tPKV.getBase().getType(1));
-    }
-    int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_SETDEFENSETYPE, onModifyTypePower_rawType,
-        *this, *cDamage.mType, getMV(), getPKV(), getTPKV(), typeModifier);
-
-    // incorporate type modifier:
-    cDamage.damage = (uint32_t)(cDamage.damage * typeModifier);
-    cDamage.damageCrit = (uint32_t)(cDamage.damageCrit * typeModifier);
-  }
-
-  // calculate item resistance modifiers:
-  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
-    if (getStackStage() != STAGE_MODIFYTYPERESISTANCE) { continue; }
-    advanceStackStage();
-
-    DamageComponents_t& cDamage = getDamageComponent();
-
-    /* Mod3 = SRF × EB × TL × TRB */
-    fpType itemModifier = 1.0;
-    int result = 0;
-    CALLPLUGIN(result, PLUGIN_ON_MODIFYITEMPOWER, onModifyPower_rawType,
-      *this, getMV(), getPKV(), getTPKV(), itemModifier);
-
-    // incorporate type modifier:
-    cDamage.damage = (uint32_t)(cDamage.damage * itemModifier);
-    cDamage.damageCrit = (uint32_t)(cDamage.damageCrit * itemModifier);
-  }
-
-  /* Damage Formula = (((((((Level × 2 ÷ 5) + 2) × BasePower × [Sp]Atk ÷ 50) ÷ [Sp]Def) × Mod1) + 2) × CH × Mod2 × R ÷ 100) × STAB × Type1 × Type2 × Mod3 */
-
   // calculate probability to hit, miss:
-  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
-    if (getStackStage() != STAGE_MODIFYITEMPOWER) { continue; }
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil;
+       ++iBase_) {
+    if (getStackStage() != STAGE_MODIFYHITCHANCE) { continue; }
     advanceStackStage();
 
     PokemonVolatile cPKV = getPKV();
@@ -964,8 +770,9 @@ void PkCUEngine::evaluateMove_damage() {
   }
 
   // evaluate miss(1), hit(0):
-  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
-    if (getStackStage() != STAGE_MODIFYHITCHANCE) { continue; }
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil;
+       ++iBase_) {
+    if (getStackStage() != STAGE_EVALUATEHITCHANCE) { continue; }
     advanceStackStage();
 
     FixType& probabilityToHit = getDamageComponent().tProbability;
@@ -974,12 +781,13 @@ void PkCUEngine::evaluateMove_damage() {
     probabilityToHit =
         std::max(std::min(probabilityToHit, FixType(1)), FixType(0));
 
-    std::array<size_t, 2> iHEnv = {{ getIBase(), SIZE_MAX }};
+    std::array<size_t, 2> iHEnv = {{getIBase(), SIZE_MAX}};
     // did the move hit its target? Is it possible for the move to miss?
     if (probabilityToHit > FixType(0)) {
       // if there's a chance the primary effect will not occur:
       if (probabilityToHit < FixType(1)) {
-        // duplicate the environment (duplicated environment is the miss environment):
+        // duplicate the environment (duplicated environment is the miss
+        // environment):
         duplicateState(iHEnv, (FixType(1) - probabilityToHit));
       }
 
@@ -993,12 +801,16 @@ void PkCUEngine::evaluateMove_damage() {
   }
 
   // calculate probability to crit:
-  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
-    if (getStackStage() != STAGE_EVALUATEHITCHANCE) { continue; }
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil;
+       ++iBase_) {
+    if (getStackStage() != STAGE_MODIFYCRITCHANCE) { continue; }
     advanceStackStage();
 
-    // don't continue to evaluate a stage that has not hit the enemy team:
-    if (!getBase().hasHit(getICTeam())) { stackStage_[iBase_] = STAGE_POSTDAMAGE; continue; }
+    // don't continue to evaluate a stage that will not hit the enemy team:
+    if (!getBase().hasHit(getICTeam())) {
+      stackStage_[iBase_] = STAGE_POSTDAMAGE;
+      continue;
+    }
 
     PokemonVolatile cPKV = getPKV();
     FixType& probabilityToCrit = getDamageComponent().tProbability;
@@ -1020,18 +832,20 @@ void PkCUEngine::evaluateMove_damage() {
   }
 
   // evaluate crit(2):
-  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
-    if (getStackStage() != STAGE_MODIFYCRITCHANCE) { continue; }
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil;
+       ++iBase_) {
+    if (getStackStage() != STAGE_EVALUATECRITCHANCE) { continue; }
     advanceStackStage();
 
     FixType& probabilityToCrit = getDamageComponent().tProbability;
 
     // determine the possibility that the move crit:
-    std::array<size_t, 2> iCEnv = {{ SIZE_MAX, getIBase() }};
+    std::array<size_t, 2> iCEnv = {{SIZE_MAX, getIBase()}};
 
     if (probabilityToCrit > FixType(0)) {
       if (probabilityToCrit < FixType(1)) {
-        // duplicate the environment (duplicated environment is the crit environment):
+        // duplicate the environment (duplicated environment is the crit
+        // environment):
         duplicateState(iCEnv, probabilityToCrit);
       }
 
@@ -1041,6 +855,209 @@ void PkCUEngine::evaluateMove_damage() {
     // even with no chance to crit there's still the possibility of damage
   }
 
+  /*BasePower = HH × BP × IT × CHG × (MS × WS) × UA × FA*/
+  // set basePower:
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil;
+       ++iBase_) {
+    if (getStackStage() != STAGE_SETBASEPOWER) { continue; }
+    advanceStackStage();
+
+    uint32_t& basePower = getDamageComponent().damage;
+    basePower = cMove.getPower();
+
+    int result = (basePower != UINT8_MAX)?1:0;
+    CALLPLUGIN(result, PLUGIN_ON_SETBASEPOWER, onSetPower_rawType,
+        *this, getMV(), getPKV(), getTPKV(), basePower);
+
+    assert(result > 0 && basePower > 0);
+  }
+
+  // calculate this move's type:
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
+    if (getStackStage() != STAGE_SETMOVETYPE) { continue; }
+    advanceStackStage();
+
+    const Type*& cType = getDamageComponent().mType;
+    cType = &cMove.getType();
+
+    int result = 0;
+    CALLPLUGIN(result, PLUGIN_ON_SETMOVETYPE, onModifyMoveType_rawType,
+        *this, getMV(), getPKV(), getTPKV(), cType);
+  }
+
+  // modify basePower:
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
+    if (getStackStage() != STAGE_MODIFYBASEPOWER) { continue; }
+    advanceStackStage();
+
+    uint32_t& basePower = getDamageComponent().damage;
+    fpType baseModifier = 1.0;
+
+    int result = 0;
+    CALLPLUGIN(result, PLUGIN_ON_MODIFYBASEPOWER, onModifyPower_rawType,
+        *this, getMV(), getPKV(), getTPKV(), baseModifier);
+
+    basePower = (uint32_t)(basePower * baseModifier);
+  }
+
+  // calculate attack and damage modifiers:
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
+    if (getStackStage() != STAGE_MODIFYATTACKPOWER) { continue; }
+    advanceStackStage();
+
+    PokemonVolatile cPKV = getPKV();
+    PokemonVolatile tPKV = getTPKV();
+    DamageComponents_t& cDamage = getDamageComponent();
+
+    size_t attackType;
+    size_t defenseType;
+    if (cMove.getDamageType() == ATK_PHYSICAL) {
+      attackType = FV_ATTACK; defenseType = FV_DEFENSE;
+    } else {
+      attackType = FV_SPATTACK; defenseType = FV_SPDEFENSE;
+    }
+
+    /* Mod1 = BRN × RL × TVT × SR × FF */
+    // modifier1:
+    fpType attackPowerModifier = 1.0;
+
+    int result = 0;
+    CALLPLUGIN(
+        result,
+        PLUGIN_ON_MODIFYATTACKPOWER,
+        onModifyPower_rawType,
+        *this,
+        getMV(),
+        cPKV,
+        tPKV,
+        attackPowerModifier);
+
+    // regular damage:
+    uint32_t attackPower = cPKV.getFV_boosted(attackType);
+    uint32_t defensePower = tPKV.getFV_boosted(defenseType);
+    uint32_t levelModifier = ((cPKV.nv().getLevel() * 2) / 5) + 2;
+
+    // has the pokemon crit?
+    if (getBase().hasCrit(getICTeam())) {
+      attackPower = std::max(cPKV.nv().getFV_base(attackType), attackPower);
+      defensePower = std::min(tPKV.nv().getFV_base(defenseType), defensePower);
+    }
+
+    // incorporate attack power modifier:
+    cDamage.damage =
+        ((levelModifier * cDamage.damage * attackPower) / 50) / defensePower;
+    cDamage.damage = (uint32_t)(cDamage.damage * attackPowerModifier) + 2;
+  }
+
+  // calculate critical hit modifiers:
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
+    if (getStackStage() != STAGE_MODIFYCRITICALPOWER) { continue; }
+    advanceStackStage();
+
+    // do nothing if the move didn't crit:
+    if (!getBase().hasCrit(getICTeam())) { continue; }
+
+    DamageComponents_t& cDamage = getDamageComponent();
+
+    /* CH - Critical Hit modifier
+      3 if has sniper ability AND critical hit (mult 1.5)
+      2 if critical hit (mult 1.0)
+      1 else
+     */
+    fpType criticalHitModifier = 2.0;
+    int result = 0;
+    CALLPLUGIN(result, PLUGIN_ON_MODIFYCRITICALPOWER, onModifyPower_rawType,
+        *this, getMV(), getPKV(), getTPKV(), criticalHitModifier);
+
+    // incorporate critical power modifier:
+    cDamage.damage = (uint32_t)(cDamage.damage * criticalHitModifier);
+  }
+
+  // calculate raw damage modifiers:
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
+    if (getStackStage() != STAGE_MODIFYRAWDAMAGE) { continue; }
+    advanceStackStage();
+
+    DamageComponents_t& cDamage = getDamageComponent();
+
+    /* Mod2 = Other modifier
+      1.3 if item = life orb
+      1+.1*n if item = metronome and used the same move n previous times, to a max of n=10
+      1.5 if attacking with Me First and attacks first (NOTE: SPECIAL BEHAVIOR with life orb / metronome!)
+      1 else
+     */
+    fpType rawDamageMultiplier = 1.0;
+    int result = 0;
+    CALLPLUGIN(result, PLUGIN_ON_MODIFYRAWDAMAGE, onModifyPower_rawType,
+      *this, getMV(), getPKV(), getTPKV(), rawDamageMultiplier);
+
+    // incorporate raw damage modifier:
+    cDamage.damage = (uint32_t)(cDamage.damage * rawDamageMultiplier);
+  }
+
+  // calculate this move's STAB:
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
+    if (getStackStage() != STAGE_MODIFYSTAB) { continue; }
+    advanceStackStage();
+
+    PokemonVolatile cPKV = getPKV();
+    DamageComponents_t& cDamage = getDamageComponent();
+
+    bool hasStab = (
+        (&cPKV.getBase().getType(0) == cDamage.mType) ||
+        (&cPKV.getBase().getType(1) == cDamage.mType));
+    fpType STABMultiplier = hasStab?1.5:1.0;
+    int result = 0;
+    CALLPLUGIN(result, PLUGIN_ON_MODIFYSTAB, onModifyPower_rawType,
+        *this, getMV(), cPKV, getTPKV(), STABMultiplier);
+
+    // incorporate STAB modifier:
+    cDamage.damage = (uint32_t)(cDamage.damage * STABMultiplier);
+  }
+
+  // calculate the enemy pokemon's type resistance:
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
+    if (getStackStage() != STAGE_MODIFYTYPERESISTANCE) { continue; }
+    advanceStackStage();
+
+    PokemonVolatile tPKV = getTPKV();
+    DamageComponents_t& cDamage = getDamageComponent();
+
+    fpType typeModifier = 1.0;
+    {
+      // type1:
+      typeModifier *= cDamage.mType->getModifier(tPKV.getBase().getType(0));
+      // type 2:
+      typeModifier *= cDamage.mType->getModifier(tPKV.getBase().getType(1));
+    }
+    int result = 0;
+    CALLPLUGIN(result, PLUGIN_ON_SETDEFENSETYPE, onModifyTypePower_rawType,
+        *this, *cDamage.mType, getMV(), getPKV(), getTPKV(), typeModifier);
+
+    // incorporate type modifier:
+    cDamage.damage = (uint32_t)(cDamage.damage * typeModifier);
+  }
+
+  // calculate item resistance modifiers:
+  for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
+    if (getStackStage() != STAGE_MODIFYITEMPOWER) { continue; }
+    advanceStackStage();
+
+    DamageComponents_t& cDamage = getDamageComponent();
+
+    /* Mod3 = SRF × EB × TL × TRB */
+    fpType itemModifier = 1.0;
+    int result = 0;
+    CALLPLUGIN(result, PLUGIN_ON_MODIFYITEMPOWER, onModifyPower_rawType,
+      *this, getMV(), getPKV(), getTPKV(), itemModifier);
+
+    // incorporate item modifier:
+    cDamage.damage = (uint32_t)(cDamage.damage * itemModifier);
+  }
+
+  /* Damage Formula = (((((((Level × 2 ÷ 5) + 2) × BasePower × [Sp]Atk ÷ 50) ÷
+   * [Sp]Def) × Mod1) + 2) × CH × Mod2 × R ÷ 100) × STAB × Type1 × Type2 × Mod3
+   */
   // perform actual damage calculation
   for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
     if (getStackStage() != STAGE_PREDAMAGE) { continue; }
@@ -1048,7 +1065,7 @@ void PkCUEngine::evaluateMove_damage() {
 
     if (!getBase().hasHit(getICTeam())) { continue; }
 
-    calculateDamage(getBase().hasCrit(getICTeam()));
+    calculateDamage();
   }
 } // end of evaluateMove_damage
 
@@ -1142,12 +1159,12 @@ void PkCUEngine::evaluateMove_script() {
 }
 
 
-void PkCUEngine::calculateDamage(bool hasCrit) {
+void PkCUEngine::calculateDamage() {
   FixType partitionEnvironmentProbability =
       (FixType(1) / (int32_t)cfg_.numRandomEnvironments);
   DamageComponents_t& cDMG = getDamageComponent();
 
-  uint32_t power = (hasCrit)?cDMG.damageCrit:cDMG.damage;
+  uint32_t power = cDMG.damage;
 
   std::array<size_t, 2> iREnv = {{ SIZE_MAX, getIBase() }};
   for (size_t iEnv = 0; iEnv != cfg_.numRandomEnvironments; ++iEnv ) {
@@ -1163,7 +1180,7 @@ void PkCUEngine::calculateDamage(bool hasCrit) {
     // scale our random value modifier to 0.85..1.0
     randomValue = deScale(randomValue, (fpType)1.0, (fpType)0.85);
 
-    uint32_t& actualDamage = getDamageComponent(iREnv[1]).damage;
+    uint32_t& actualDamage = getDamageComponent(iREnv[1], getICTeam()).damage;
     actualDamage = (uint32_t)((fpType)power * randomValue);
 
     int result = 0;
@@ -1210,11 +1227,7 @@ FixType PkCUEngine::getProbabilityToHit() {
 size_t PkCUEngine::combineSimilarEnvironments() {
   PossibleEnvironments& stack = getStack();
 
-#ifndef NDEBUG
-#ifndef _DISABLEPROBABILITYCHECK
   FixType probabilityAccumulator = FixType(0);
-#endif
-#endif
 
   // hash environments (and summate probabilities for check):
   for (iBase_ = 0; iBase_ != stack.size(); ++iBase_) {
@@ -1232,14 +1245,14 @@ size_t PkCUEngine::combineSimilarEnvironments() {
   for (size_t iOEnv = 0, iSize = stack.size(); iOEnv != iSize; iOEnv++)
   {
     EnvironmentPossible oEnv = stack.at(iOEnv);
-    FixType& oProbability = damageComponents_[iOEnv].cProbability;
+    FixType& oProbability = oEnv.getProbability();
 
     // don't attempt to merge pruned environments
     if (oEnv.isPruned()) { continue; }
 
     for (size_t iIEnv = iOEnv + 1; iIEnv != iSize; iIEnv++) {
       EnvironmentPossible iEnv = stack.at(iIEnv);
-      FixType& iProbability = damageComponents_[iIEnv].cProbability;
+      FixType& iProbability = iEnv.getProbability();
 
       // don't re-prune already pruned environments
       if (iEnv.isPruned()) { continue; }
@@ -1267,21 +1280,11 @@ size_t PkCUEngine::combineSimilarEnvironments() {
 
     } //endOf iInner
 
-    // assign the collected probability to envP's smaller fixed point variable
-    oEnv.getProbability() = oProbability;
-
-#ifndef NDEBUG
-#ifndef _DISABLEPROBABILITYCHECK
     probabilityAccumulator += oProbability;
-#endif
-#endif
     assert(oProbability > FixType(0) && oProbability <= FixType(1));
   } // endOf iOuter
 
-#ifndef _DISABLEPROBABILITYCHECK
   assert(probabilityAccumulator == FixType(1));
-#endif
-
   return stack.getNumUnique();
 } //endOf combineSimilarEnvironments
 
@@ -1592,13 +1595,12 @@ void PkCU::guardNonvolatileState(const ConstEnvironmentVolatile& cEnv) const {
 }
 
 
-bool saneStackProbability(std::deque<DamageComponents_t>& dComponents) {
+bool saneStackProbability(PossibleEnvironments& envs) {
   FixType sum = FixType(0);
-  for (auto begin = dComponents.begin(), end = dComponents.end(); begin != end; ++begin)
-  {
-    sum += begin->cProbability;
-    if (!(begin->cProbability > FixType(0)) ||
-        !(begin->cProbability <= FixType(1))) {
+  for (auto begin = envs.begin(), end = envs.end(); begin != end; ++begin) {
+    sum += begin->getProbability();
+    if (!(begin->getProbability() > FixType(0)) ||
+        !(begin->getProbability() <= FixType(1))) {
       return false;
     }
   }
@@ -1626,12 +1628,12 @@ void PkCUEngine::duplicateState(
   nPlicateState(result, iState);
 
   // modify probabilities of resulting states:
-  FixType totalProbability = damageComponents_[result[0]].cProbability;
-  damageComponents_[result[1]].cProbability = totalProbability * _probability;
-  damageComponents_[result[0]].cProbability =
-      totalProbability - damageComponents_[result[1]].cProbability;
+  FixType totalProbability = getBase(result[0]).getProbability();
+  getBase(result[1]).getProbability() = totalProbability * _probability;
+  getBase(result[0]).getProbability() =
+      totalProbability - getBase(result[1]).getProbability();
 
-  assert(saneStackProbability(damageComponents_));
+  assert(saneStackProbability(getStack()));
 }
 
 
@@ -1661,14 +1663,14 @@ void PkCUEngine::triplicateState(
   nPlicateState(result, iState);
 
   // modify probabilities of resulting states:
-  FixType totalProbability = damageComponents_[result[0]].cProbability;
-  damageComponents_[result[1]].cProbability = totalProbability * _probability;
-  damageComponents_[result[2]].cProbability = totalProbability * _oProbability;
-  damageComponents_[result[0]].cProbability =
-      totalProbability - damageComponents_[result[1]].cProbability -
-      damageComponents_[result[2]].cProbability;
+  FixType totalProbability = getBase(result[0]).getProbability();
+  getBase(result[1]).getProbability() = totalProbability * _probability;
+  getBase(result[2]).getProbability() = totalProbability * _oProbability;
+  getBase(result[0]).getProbability() =
+      totalProbability - getBase(result[1]).getProbability() -
+      getBase(result[2]).getProbability();
 
-  assert(saneStackProbability(damageComponents_));
+  assert(saneStackProbability(getStack()));
 }
 
 

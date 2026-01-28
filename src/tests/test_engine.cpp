@@ -34,6 +34,7 @@ TEST_F(Gen4EngineTest, HighEngineAccuracy) {
       engine_->initialState(), Action::move(0), Action::move(0));
 
   EXPECT_EQ(result.size(), 8450);
+  EXPECT_EQ(result.getNumUnique(), 49);
   result.printStates();
 }
 
