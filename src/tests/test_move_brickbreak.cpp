@@ -47,8 +47,7 @@ class BrickBreakTest : public Gen4EngineTest {
 TEST_F(BrickBreakTest, RemovesReflect) {
   auto setup_env = setup_reflect.where1().getEnv();
 
-  EXPECT_EQ(
-      setup_reflect.where1().getEnv().getTeam(1).getNonVolatile().reflect, 5);
+  EXPECT_EQ(setup_reflect.where1().getTeam(1).getNonVolatile().reflect, 5);
 
   // Test: Team A uses Brick Break
   auto result = engine_->updateState(setup_env, Action::move(0), Action::wait());

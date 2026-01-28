@@ -219,6 +219,8 @@ public:
   using base_t::base_t;
   using base_t::data;
   using base_t::nv;
+  using team_t = typename environmentvolatile_t::teamvolatile_t;
+  using pokemon_t = typename team_t::pokemonvolatile_t;
 
   /* print details of a single state */
   void printState() const;
@@ -278,6 +280,12 @@ public:
   bool isPruned() const { return data().isPruned(); }
 
   bool isEmpty() const;
+
+  team_t getTeam(size_t iTeam) const { return getEnv().getTeam(iTeam); }
+
+  pokemon_t teammate(size_t iTeam, size_t iTeammate) const {
+    return getEnv().teammate(iTeam, iTeammate);
+  }
 };
 
 

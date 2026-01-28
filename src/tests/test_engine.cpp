@@ -57,7 +57,7 @@ TEST_F(Gen4EngineTest, Swap) {
 
   // active pokemon has changed:
   EXPECT_EQ(engine_->initialState().getTeam(0).getICPKV(), 0);
-  EXPECT_EQ(swap_squirtle.where1().getEnv().getTeam(0).getICPKV(), 1);
+  EXPECT_EQ(swap_squirtle.where1().getTeam(0).getICPKV(), 1);
 
   // pokemon may not swap to themselves:
   EXPECT_FALSE(engine_->isValidAction(engine_->initialState(), Action::swap(0), TEAM_A));
@@ -162,14 +162,14 @@ TEST_F(Gen4EngineTest, GroundConditions) {
     auto removed_vs_spikes = engine_->updateState(
         spikes_removed.where1(), Action::wait(), Action::swap(1));
     EXPECT_EQ(
-        removed_vs_spikes.where1().getEnv().getTeam(1).getPKV().getPercentHP(),
+        removed_vs_spikes.where1().getTeam(1).getPKV().getPercentHP(),
         1.);  // 100%
   }
   { // test normal harmed vs spikes:
     auto normal_vs_spikes =
         engine_->updateState(spikes.where1(), Action::wait(), Action::swap(1));
     EXPECT_NEAR(
-        normal_vs_spikes.where1().getEnv().getTeam(1).getPKV().getPercentHP(),
+        normal_vs_spikes.where1().getTeam(1).getPKV().getPercentHP(),
         0.875,
         0.005);  // 87.5%
   }
@@ -177,12 +177,11 @@ TEST_F(Gen4EngineTest, GroundConditions) {
     auto normal_vs_toxic = engine_->updateState(
         toxic_spikes.where1(), Action::wait(), Action::swap(1));
     EXPECT_NEAR(
-        normal_vs_toxic.where1().getEnv().getTeam(1).getPKV().getPercentHP(),
+        normal_vs_toxic.where1().getTeam(1).getPKV().getPercentHP(),
         0.875,
         0.005);  // 87.5%
     EXPECT_EQ(
         normal_vs_toxic.where1()
-            .getEnv()
             .getTeam(1)
             .getPKV()
             .getStatusAilment(),
@@ -192,21 +191,21 @@ TEST_F(Gen4EngineTest, GroundConditions) {
     auto lev_vs_spikes =
         engine_->updateState(spikes.where1(), Action::wait(), Action::swap(2));
     EXPECT_EQ(
-        lev_vs_spikes.where1().getEnv().getTeam(1).getPKV().getPercentHP(),
+        lev_vs_spikes.where1().getTeam(1).getPKV().getPercentHP(),
         1.);  // 100%
   }
   { // test levitate unharmed vs toxic spikes:
     auto lev_vs_toxic = engine_->updateState(
         toxic_spikes.where1(), Action::wait(), Action::swap(2));
     EXPECT_EQ(
-        lev_vs_toxic.where1().getEnv().getTeam(1).getPKV().getPercentHP(),
+        lev_vs_toxic.where1().getTeam(1).getPKV().getPercentHP(),
         1.);  // 100%
   }
   { // test levitate harmed vs stealth rock:
     auto lev_vs_sr = engine_->updateState(
         stealth_rock.where1(), Action::wait(), Action::swap(2));
     EXPECT_NEAR(
-        lev_vs_sr.where1().getEnv().getTeam(1).getPKV().getPercentHP(),
+        lev_vs_sr.where1().getTeam(1).getPKV().getPercentHP(),
         0.875,
         0.005);  // 87.5%
   }
@@ -214,14 +213,14 @@ TEST_F(Gen4EngineTest, GroundConditions) {
     auto flying_vs_spikes =
         engine_->updateState(spikes.where1(), Action::wait(), Action::swap(3));
     EXPECT_EQ(
-        flying_vs_spikes.where1().getEnv().getTeam(1).getPKV().getPercentHP(),
+        flying_vs_spikes.where1().getTeam(1).getPKV().getPercentHP(),
         1.);  // 100%
   }
   { // test flying harmed vs stealth rock:
     auto flying_vs_sr = engine_->updateState(
         stealth_rock.where1(), Action::wait(), Action::swap(3));
     EXPECT_NEAR(
-        flying_vs_sr.where1().getEnv().getTeam(1).getPKV().getPercentHP(),
+        flying_vs_sr.where1().getTeam(1).getPKV().getPercentHP(),
         0.75,
         0.005);  // 75%
   }
@@ -251,29 +250,24 @@ TEST_F(Gen4EngineTest, LifeOrb) {
   auto calm_mind = engine_->updateState(engine_->initialState(), Action::move(3), Action::wait());
 
   { // attacking move: life orb subtracts 10%, damage is increased by 30%
-    EXPECT_EQ(
-        sp_lifeorb.where1().getEnv().getTeam(0).teammate(0).getHP(),
-        180);  // 90%
-    EXPECT_EQ(
-        sp_lifeorb.where1().getEnv().getTeam(1).teammate(0).getHP(),
-        62);  // 31%
+    EXPECT_EQ(sp_lifeorb.where1().teammate(0, 0).getHP(),
+              180);  // 90%
+    EXPECT_EQ(sp_lifeorb.where1().teammate(1, 0).getHP(),
+              62);  // 31%
     EXPECT_LT(
-        sp_lifeorb.where1().getEnv().getTeam(1).teammate(0).getHP(),
-        sp_noitem.where1().getEnv().getTeam(0).teammate(0).getHP());
+        sp_lifeorb.where1().teammate(1, 0).getHP(),
+        sp_noitem.where1().teammate(0, 0).getHP());
   }
   { // special move targeting other team: no effect
     EXPECT_EQ(
-        split_pain.where1().getEnv().getTeam(0).teammate(0).getHP(),
-        split_pain.where1().getEnv().getTeam(1).teammate(0).getHP());
+        split_pain.where1().teammate(0, 0).getHP(),
+        split_pain.where1().teammate(1, 0).getHP());
   }
   { // status move targeting other team: no effect
-    EXPECT_EQ(
-        will_o_wisp.where1().getEnv().getTeam(0).teammate(0).getPercentHP(),
-        1.);
+    EXPECT_EQ(will_o_wisp.where1().teammate(0, 0).getPercentHP(), 1.);
   }
   { // move targeting friendly team: no effect
-    EXPECT_EQ(
-        calm_mind.where1().getEnv().getTeam(0).teammate(0).getPercentHP(), 1.);
+    EXPECT_EQ(calm_mind.where1().teammate(0, 0).getPercentHP(), 1.);
   }
 }
 
@@ -300,9 +294,6 @@ TEST_F(Gen4EngineTest, Flinch) {
   result.printStates();
 
   // Jirachi's health should be full if Charmander flinches
-  EXPECT_EQ(
-      result.where1Status(0).getEnv().getTeam(0).teammate(0).getMissingHP(), 0);
-  EXPECT_GE(
-      result.where1Status(0).getEnv().getTeam(1).teammate(0).getMissingHP(),
-      100);
+  EXPECT_EQ(result.where1Status(0).teammate(0, 0).getMissingHP(), 0);
+  EXPECT_GE(result.where1Status(0).teammate(1, 0).getMissingHP(), 100);
 }

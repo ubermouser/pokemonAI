@@ -27,8 +27,8 @@ class PaybackTest : public Gen4EngineTest {
     // we need this to be true so the moving first and enemy switching tests
     // return the same damage taken
     EXPECT_EQ(
-      environment_nv.getTeam(0).teammate(0).getFV_base(FV_DEFENSE),
-      environment_nv.getTeam(0).teammate(1).getFV_base(FV_DEFENSE));
+        environment_nv.teammate(0, 0).getFV_base(FV_DEFENSE),
+        environment_nv.teammate(0, 1).getFV_base(FV_DEFENSE));
   }
 
   PossibleEnvironments setup_payback;

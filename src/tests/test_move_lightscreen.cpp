@@ -47,34 +47,22 @@ class ScreenTest : public Gen4EngineTest {
 
 
 TEST_F(ScreenTest, ReflectReducesPhysicalDamage) {
-  auto damage_baseline =
-      mew_physdmg.where1().getEnv().getTeam(0).teammate(0).getMissingHP();
+  auto damage_baseline = mew_physdmg.where1().teammate(0, 0).getMissingHP();
   auto damage_reflect =
-      mew_reflect_physdmg.where1()
-          .getEnv()
-          .getTeam(0)
-          .teammate(0)
-          .getMissingHP();
+      mew_reflect_physdmg.where1().teammate(0, 0).getMissingHP();
 
-  EXPECT_EQ(
-      mew_reflect.where1().getEnv().getTeam(0).getNonVolatile().reflect, 5);
+  EXPECT_EQ(mew_reflect.where1().getTeam(0).getNonVolatile().reflect, 5);
   EXPECT_LE(damage_reflect, damage_baseline * 0.5);
 }
 
 
 TEST_F(ScreenTest, LightScreenReducesSpecialDamage) {
-  auto damage_baseline =
-      mew_specdmg.where1().getEnv().getTeam(0).teammate(0).getMissingHP();
+  auto damage_baseline = mew_specdmg.where1().teammate(0, 0).getMissingHP();
   auto damage_screen =
-      mew_lightscreen_specdmg.where1()
-          .getEnv()
-          .getTeam(0)
-          .teammate(0)
-          .getMissingHP();
+      mew_lightscreen_specdmg.where1().teammate(0, 0).getMissingHP();
 
   EXPECT_EQ(
-      mew_lightscreen.where1().getEnv().getTeam(0).getNonVolatile().lightScreen,
-      5);
+      mew_lightscreen.where1().getTeam(0).getNonVolatile().lightScreen, 5);
   EXPECT_LE(damage_screen, damage_baseline * 0.5);
 }
 
@@ -83,7 +71,7 @@ TEST_F(ScreenTest, ReflectDurationDecrements) {
   // Turn 1: Mew uses Reflect
   auto result = mew_reflect;
   auto current_state = result.where1();
-  EXPECT_EQ(current_state.getEnv().getTeam(0).getNonVolatile().reflect, 5);
+  EXPECT_EQ(current_state.getTeam(0).getNonVolatile().reflect, 5);
 
   // Turns 2-5: Reflect is active and decrements
   for (int i = 0; i < 4; ++i) {
@@ -91,14 +79,16 @@ TEST_F(ScreenTest, ReflectDurationDecrements) {
       result = engine_->updateState(current_state, Action::move(2), Action::move(0));
       current_state = result.where1();
       int expected_duration = 4 - i;
-      EXPECT_EQ(current_state.getEnv().getTeam(0).getNonVolatile().reflect, expected_duration) << "Turn " << (i+2);
+      EXPECT_EQ(
+          current_state.getTeam(0).getNonVolatile().reflect, expected_duration)
+          << "Turn " << (i + 2);
   }
 
-  EXPECT_EQ(current_state.getEnv().getTeam(0).getNonVolatile().reflect, 1);
+  EXPECT_EQ(current_state.getTeam(0).getNonVolatile().reflect, 1);
 
   // Turn 6: Decrement to 0.
   auto turn6 = engine_->updateState(current_state, Action::move(2), Action::move(0));
-  EXPECT_EQ(turn6.where1().getEnv().getTeam(0).getNonVolatile().reflect, 0);
+  EXPECT_EQ(turn6.where1().getTeam(0).getNonVolatile().reflect, 0);
 }
 
 
@@ -106,32 +96,32 @@ TEST_F(ScreenTest, LightScreenDurationDecrements) {
   // Turn 1: Mew uses Light Screen
   auto result = mew_lightscreen;
   auto current_state = result.where1();
-  EXPECT_EQ(current_state.getEnv().getTeam(0).getNonVolatile().lightScreen, 5);
+  EXPECT_EQ(current_state.getTeam(0).getNonVolatile().lightScreen, 5);
 
   for (int i = 0; i < 4; ++i) {
       result = engine_->updateState(current_state, Action::move(2), Action::move(0));
       current_state = result.where1();
   }
 
-  EXPECT_EQ(current_state.getEnv().getTeam(0).getNonVolatile().lightScreen, 1);
+  EXPECT_EQ(current_state.getTeam(0).getNonVolatile().lightScreen, 1);
 
   auto turn6 = engine_->updateState(current_state, Action::move(2), Action::move(0));
   current_state = result.where1();
-  EXPECT_EQ(turn6.where1().getEnv().getTeam(0).getNonVolatile().lightScreen, 0);
+  EXPECT_EQ(turn6.where1().getTeam(0).getNonVolatile().lightScreen, 0);
 }
 
 
 TEST_F(ScreenTest, FailsIfAlreadyActive) {
   // Turn 1: Mew uses Reflect
   auto turn1 = mew_reflect;
-  EXPECT_EQ(turn1.where1().getEnv().getTeam(0).getNonVolatile().reflect, 5);
+  EXPECT_EQ(turn1.where1().getTeam(0).getNonVolatile().reflect, 5);
 
   // Turn 2: Mew tries to use Reflect again.
   // Should decrement to 4, then fail to reset to 5.
 
   auto turn2 =
       engine_->updateState(turn1.where1(), Action::move(0), Action::wait());
-  EXPECT_EQ(turn2.where1().getEnv().getTeam(0).getNonVolatile().reflect, 4);
+  EXPECT_EQ(turn2.where1().getTeam(0).getNonVolatile().reflect, 4);
 }
 
 

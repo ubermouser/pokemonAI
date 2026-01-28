@@ -47,8 +47,8 @@ void StateTransitionPrinter::print(
 
     if (nsP.hasSwitched(iTeam)) {
       size_t activeOld = osP.getTeam(iTeam).getICPKV();
-      const auto& pkOld = osP.getTeam(iTeam).teammate(activeOld);
-      const auto& pkNew = nsP.getEnv().getTeam(iTeam).teammate(activeOld);
+      const auto& pkOld = osP.teammate(iTeam, activeOld);
+      const auto& pkNew = nsP.teammate(iTeam, activeOld);
 
       reportStatusChange(os, pkOld, pkNew);
     }
@@ -57,7 +57,7 @@ void StateTransitionPrinter::print(
   // General HP and Status changes comparison between oldState and newState
   for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
     const auto& teamOld = osP.getTeam(iTeam);
-    const auto& teamNew = nsP.getEnv().getTeam(iTeam);
+    const auto& teamNew = nsP.getTeam(iTeam);
     const auto& pkOld = teamOld.getPKV();
     const auto& pkNew = teamNew.getPKV();
 
@@ -89,14 +89,14 @@ void StateTransitionPrinter::reportSwitch(
         os,
         "Team {} sent out {}!\n",
         (iTeam == 0 ? "A" : "B"),
-        pokemonName(nsP.getEnv().getTeam(iTeam).getPKV()));
+        pokemonName(nsP.getTeam(iTeam).getPKV()));
   }
 }
 
 
 void StateTransitionPrinter::reportHitResult(
     std::ostream& os, const ConstEnvironmentPossible& nsP, size_t iTeam) {
-  auto pkName = pokemonName(nsP.getEnv().getTeam(iTeam).getPKV());
+  auto pkName = pokemonName(nsP.getTeam(iTeam).getPKV());
 
   if (nsP.hasWaited(iTeam)) {
     // Waiting, nothing to report here usually
@@ -127,7 +127,7 @@ void StateTransitionPrinter::reportFainting(
     const ConstEnvironmentPossible& nsP,
     size_t iTeam) {
   const auto& teamOld = osP.getTeam(iTeam);
-  const auto& teamNew = nsP.getEnv().getTeam(iTeam);
+  const auto& teamNew = nsP.getTeam(iTeam);
   size_t activeOld = teamOld.getICPKV();
 
   const auto& pkOldActive = teamOld.getPKV();

@@ -58,8 +58,8 @@ TEST_F(SynchronizeTest, SynchronizeBurn) {
       // Assuming single battle, index 0 is active pokemon
       // state is EnvironmentPossibleData
       EnvironmentPossible env(environment_nv, const_cast<EnvironmentPossibleData&>(state));
-      auto user_pkv = env.getEnv().getTeam(0).getPKV();
-      auto opponent_pkv = env.getEnv().getTeam(1).getPKV();
+      auto user_pkv = env.getTeam(0).getPKV();
+      auto opponent_pkv = env.getTeam(1).getPKV();
 
       if (user_pkv.getStatusAilment() == AIL_NV_BURN) {
           user_burned = true;
@@ -82,8 +82,8 @@ TEST_F(SynchronizeTest, SynchronizeParalysis) {
 
   for (const auto& state : result_states) {
       EnvironmentPossible env(environment_nv, const_cast<EnvironmentPossibleData&>(state));
-      auto user_pkv = env.getEnv().getTeam(0).getPKV();
-      auto opponent_pkv = env.getEnv().getTeam(1).getPKV();
+      auto user_pkv = env.getTeam(0).getPKV();
+      auto opponent_pkv = env.getTeam(1).getPKV();
 
       if (user_pkv.getStatusAilment() == AIL_NV_PARALYSIS) {
           user_paralyzed = true;
@@ -106,8 +106,8 @@ TEST_F(SynchronizeTest, SynchronizePoison) {
 
   for (const auto& state : result_states) {
       EnvironmentPossible env(environment_nv, const_cast<EnvironmentPossibleData&>(state));
-      auto user_pkv = env.getEnv().getTeam(0).getPKV();
-      auto opponent_pkv = env.getEnv().getTeam(1).getPKV();
+      auto user_pkv = env.getTeam(0).getPKV();
+      auto opponent_pkv = env.getTeam(1).getPKV();
 
       // Toxic causes Bad Poison
       if (user_pkv.getStatusAilment() == AIL_NV_POISON_TOXIC) {

@@ -31,6 +31,6 @@ TEST_F(PressureTest, PressureIncreasesPPCost) {
   // Turn 1: Starmie uses water gun
   ASSERT_GE(turn1_water_gun.size(), 1);
   auto starmie_after_water_gun =
-      turn1_water_gun.where1().getEnv().getTeam(TEAM_A).getPKV();
+      turn1_water_gun.where1().getTeam(TEAM_A).getPKV();
   EXPECT_EQ(starmie_after_water_gun.getMV(0).getPP(), 38);
 }

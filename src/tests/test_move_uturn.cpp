@@ -63,23 +63,14 @@ TEST_F(UTurnTest, can_still_be_used_without_swap_if_no_allies_exist) {
 
 TEST_F(UTurnTest, damages_enemy_and_swaps_to_ally) {
   // pp decremented
-  EXPECT_EQ(
-      uturn_to_ally.where1Hit(0)
-          .getEnv()
-          .getTeam(0)
-          .teammate(0)
-          .getMV(0)
-          .getPP(),
-      31);
+  EXPECT_EQ(uturn_to_ally.where1Hit(0).teammate(0, 0).getMV(0).getPP(), 31);
   // item effect (life orb) applies
   EXPECT_NEAR(
-      uturn_to_ally.where1Hit(0).getEnv().getTeam(0).teammate(0).getPercentHP(),
-      0.9,
-      0.005);
+      uturn_to_ally.where1Hit(0).teammate(0, 0).getPercentHP(), 0.9, 0.005);
   // ally has swapped out
-  EXPECT_EQ(uturn_to_ally.where1Hit(0).getEnv().getTeam(0).getICPKV(), 1);
+  EXPECT_EQ(uturn_to_ally.where1Hit(0).getTeam(0).getICPKV(), 1);
   EXPECT_EQ(
-      uturn_to_ally.where1Hit(0).getEnv().getTeam(1).teammate(1).getPercentHP(),
+      uturn_to_ally.where1Hit(0).teammate(1, 1).getPercentHP(),
       0.);  // enemy weakling deleted
 }
 
@@ -87,20 +78,12 @@ TEST_F(UTurnTest, damages_enemy_and_swaps_to_ally) {
 TEST_F(UTurnTest, damages_enemy_and_swaps_to_ally_with_stealth_rock) {
   // life orb applies to attacking teammate
   EXPECT_NEAR(
-      uturn_to_ally_with_sr.where1Hit(0)
-          .getEnv()
-          .getTeam(0)
-          .teammate(0)
-          .getPercentHP(),
+      uturn_to_ally_with_sr.where1Hit(0).teammate(0, 0).getPercentHP(),
       0.9,
       0.005);
   // stealth-rock applies to entering teammate
   EXPECT_NEAR(
-      uturn_to_ally_with_sr.where1Hit(0)
-          .getEnv()
-          .getTeam(0)
-          .teammate(1)
-          .getPercentHP(),
+      uturn_to_ally_with_sr.where1Hit(0).teammate(0, 1).getPercentHP(),
       0.9375,
       0.005);
 }
@@ -108,20 +91,15 @@ TEST_F(UTurnTest, damages_enemy_and_swaps_to_ally_with_stealth_rock) {
 
 TEST_F(UTurnTest, damages_enemy_but_doesnt_swap_if_no_allies_exist) {
   // pp decremented
-  EXPECT_EQ(
-      uturn_no_ally.where1Hit(1)
-          .getEnv()
-          .getTeam(1)
-          .teammate(0)
-          .getMV(0)
-          .getPP(),
-      31);
+  EXPECT_EQ(uturn_no_ally.where1Hit(1).teammate(1, 0).getMV(0).getPP(), 31);
   // item effect (life orb) applies
   EXPECT_FLOAT_EQ(
-      uturn_no_ally.where1Hit(1).getEnv().getTeam(1).teammate(0).getPercentHP(),
-      0.9);
+      uturn_no_ally.where1Hit(1).teammate(1, 0).getPercentHP(), 0.9);
+  // item effect (life orb) applies
+  EXPECT_FLOAT_EQ(
+      uturn_no_ally.where1Hit(1).teammate(1, 0).getPercentHP(), 0.9);
   // ally NOT swapped out
-  EXPECT_EQ(uturn_no_ally.where1Hit(1).getEnv().getTeam(1).getICPKV(), 0);
+  EXPECT_EQ(uturn_no_ally.where1Hit(1).getTeam(1).getICPKV(), 0);
 }
 
 

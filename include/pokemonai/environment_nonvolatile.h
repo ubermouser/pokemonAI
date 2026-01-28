@@ -32,22 +32,28 @@ public:
   TeamNonVolatile& getTeam(size_t movesFirst) {
     return teams[movesFirst];
   };
-
-  TeamNonVolatile& getOtherTeam(size_t movesFirst) {
-    return teams[(movesFirst+1)&1];
-  };
-
-  EnvironmentNonvolatile& initialize();
-
-  void uninitialize();
-
   const TeamNonVolatile& getTeam(size_t movesFirst) const {
     return teams[movesFirst];
   };
 
-  const TeamNonVolatile& getOtherTeam(size_t movesFirst) const {
-    return teams[(movesFirst+1)&1];
+  TeamNonVolatile& getOtherTeam(size_t movesFirst) {
+    return teams[(movesFirst + 1) & 1];
   };
+  const TeamNonVolatile& getOtherTeam(size_t movesFirst) const {
+    return teams[(movesFirst + 1) & 1];
+  };
+
+  const PokemonNonVolatile& teammate(
+      size_t movesFirst, size_t iTeammate) const {
+    return getTeam(movesFirst).teammate(iTeammate);
+  }
+  PokemonNonVolatile& teammate(size_t movesFirst, size_t iTeammate) {
+    return getTeam(movesFirst).teammate(iTeammate);
+  }
+
+  EnvironmentNonvolatile& initialize();
+
+  void uninitialize();
 
   size_t getNumPokemon() const {
     return getTeam(0).getNumTeammates() + getTeam(1).getNumTeammates();

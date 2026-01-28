@@ -23,58 +23,21 @@ class SuckerPunchTest : public Gen4EngineTest {
 TEST_F(SuckerPunchTest, no_damage_against_status_effect_move) {
   auto suckerpunch_status = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(1));
 
-  EXPECT_EQ(
-      suckerpunch_status.where1()
-          .getEnv()
-          .getTeam(1)
-          .teammate(0)
-          .getPercentHP(),
-      1.);
-  EXPECT_EQ(
-      suckerpunch_status.where1()
-          .getEnv()
-          .getTeam(0)
-          .teammate(0)
-          .getMV(0)
-          .getPP(),
-      7);
+  EXPECT_EQ(suckerpunch_status.where1().teammate(1, 0).getPercentHP(), 1.);
+  EXPECT_EQ(suckerpunch_status.where1().teammate(0, 0).getMV(0).getPP(), 7);
 }
 
 TEST_F(SuckerPunchTest, no_damage_against_swapping_pokemon) {
   auto suckerpunch_move = engine_->updateState(engine_->initialState(), Action::move(0), Action::swap(1));
 
-  EXPECT_EQ(
-      suckerpunch_move.where1().getEnv().getTeam(1).teammate(0).getPercentHP(),
-      1.);
-  EXPECT_EQ(
-      suckerpunch_move.where1().getEnv().getTeam(1).teammate(1).getPercentHP(),
-      1.);
-  EXPECT_EQ(
-      suckerpunch_move.where1()
-          .getEnv()
-          .getTeam(0)
-          .teammate(0)
-          .getMV(0)
-          .getPP(),
-      7);
+  EXPECT_EQ(suckerpunch_move.where1().teammate(1, 0).getPercentHP(), 1.);
+  EXPECT_EQ(suckerpunch_move.where1().teammate(1, 1).getPercentHP(), 1.);
+  EXPECT_EQ(suckerpunch_move.where1().teammate(0, 0).getMV(0).getPP(), 7);
 }
 
 TEST_F(SuckerPunchTest, full_damage_against_attacking_pokemon) {
   auto suckerpunch_dmg = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(2));
 
-  EXPECT_LT(
-      suckerpunch_dmg.where1Hit(0)
-          .getEnv()
-          .getTeam(1)
-          .teammate(0)
-          .getPercentHP(),
-      0.75);
-  EXPECT_EQ(
-      suckerpunch_dmg.where1Hit(0)
-          .getEnv()
-          .getTeam(0)
-          .teammate(0)
-          .getMV(0)
-          .getPP(),
-      7);
+  EXPECT_LT(suckerpunch_dmg.where1Hit(0).teammate(1, 0).getPercentHP(), 0.75);
+  EXPECT_EQ(suckerpunch_dmg.where1Hit(0).teammate(0, 0).getMV(0).getPP(), 7);
 }

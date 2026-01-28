@@ -26,7 +26,7 @@ PlyResult PlannerHuman::generateSolutionAtLeaf(
 }
 
 void PlannerHuman::printActions(const ConstEnvironmentPossible& env) const {
-  const ConstTeamVolatile cTeam = env.getEnv().getTeam(agentTeam_);
+  const ConstTeamVolatile cTeam = env.getTeam(agentTeam_);
   const ConstPokemonVolatile cPokemon = cTeam.getPKV();
 
   double currentFitness = 0.0;

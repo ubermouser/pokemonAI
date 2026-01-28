@@ -1683,12 +1683,12 @@ PokemonVolatile PkCUEngine::getTPKV(size_t iState) {
 
 
 TeamVolatile PkCUEngine::getTV(size_t iState) {
-  return getStack().at(iState).getEnv().getTeam(getICTeam());
+  return getStack().at(iState).getTeam(getICTeam());
 }
 
 
 TeamVolatile PkCUEngine::getTTV(size_t iState) {
-  return getStack().at(iState).getEnv().getTeam(getIOTeam());
+  return getStack().at(iState).getTeam(getIOTeam());
 }
 
 
@@ -1714,7 +1714,7 @@ const PluginSet& PkCU::getCPluginSet(
 
 
 void PkCUEngine::setCPluginSet() {
-  size_t iCPokemon = getBase().getEnv().getTeam(getICTeam()).getICPKV();
-  size_t iOPokemon = getBase().getEnv().getTeam(getIOTeam()).getICPKV();
+  size_t iCPokemon = getBase().getTeam(getICTeam()).getICPKV();
+  size_t iOPokemon = getBase().getTeam(getIOTeam()).getICPKV();
   cPluginSet_ = &pluginSets_[getICTeam() * 6 + iCPokemon][iOPokemon];
 }

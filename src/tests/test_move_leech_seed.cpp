@@ -61,7 +61,7 @@ TEST_F(LeechSeedTest, Test_AppliesToNonGrassType) {
   auto result_env = r1_normal.where1().getEnv();
 
   // Mew should have Leech Seed status
-  EXPECT_TRUE(result_env.getTeam(1).teammate(0).status().cTeammate.leechSeed);
+  EXPECT_TRUE(result_env.teammate(1, 0).status().cTeammate.leechSeed);
 }
 
 
@@ -70,7 +70,7 @@ TEST_F(LeechSeedTest, Test_FailsAgainstGrassType) {
   auto result_env = r1_grass.where1().getEnv();
 
   // Roserade should NOT have Leech Seed status
-  EXPECT_FALSE(result_env.getTeam(1).teammate(0).status().cTeammate.leechSeed);
+  EXPECT_FALSE(result_env.teammate(1, 0).status().cTeammate.leechSeed);
 }
 
 
@@ -79,24 +79,19 @@ TEST_F(LeechSeedTest, Test_DamageAndHealing) {
   auto r1_env = r1_normal.where1().getEnv();
 
   // Mew should have Leech Seed status
-  EXPECT_TRUE(r1_env.getTeam(1).teammate(0).status().cTeammate.leechSeed);
+  EXPECT_TRUE(r1_env.teammate(1, 0).status().cTeammate.leechSeed);
 
   // Mew should have lost 1/8 HP at end of round
-  EXPECT_NEAR(r1_env.getTeam(1).teammate(0).getPercentHP(), 0.875, 0.005);
+  EXPECT_NEAR(r1_env.teammate(1, 0).getPercentHP(), 0.875, 0.005);
 
   // Bulbasaur took damage from Body Slam and healed from Leech Seed
-  EXPECT_LT(r1_env.getTeam(0).teammate(0).getPercentHP(), 1.0);
+  EXPECT_LT(r1_env.teammate(0, 0).getPercentHP(), 1.0);
 }
 
 
 TEST_F(LeechSeedTest, Test_FailsIfAlreadySeeded) {
   // Round 2 after r1_normal: Apply Leech Seed again
-  EXPECT_TRUE(r2_normal.where1()
-                  .getEnv()
-                  .getTeam(1)
-                  .teammate(0)
-                  .status()
-                  .cTeammate.leechSeed);
+  EXPECT_TRUE(r2_normal.where1().teammate(1, 0).status().cTeammate.leechSeed);
 }
 
 

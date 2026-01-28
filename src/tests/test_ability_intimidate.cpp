@@ -56,7 +56,7 @@ TEST_F(IntimidateTest, IntimidateVsNormal) {
       setup_vs_normal.where1(), Action::swap(1), Action::wait());
 
   // Verify Charmander (Team B) Attack is -1
-  auto charmander_opp = turn1.where1().getEnv().getTeam(TEAM_B).getPKV();
+  auto charmander_opp = turn1.where1().getTeam(TEAM_B).getPKV();
   EXPECT_EQ(charmander_opp.getBoost(FV_ATTACK), -1);
 }
 
@@ -69,7 +69,7 @@ TEST_F(IntimidateTest, IntimidateVsClearBody) {
       setup_vs_clearbody.where1(), Action::swap(1), Action::wait());
 
   // Verify Metagross (Team B) Attack is 0 (immune)
-  auto metagross_opp = turn1.where1().getEnv().getTeam(TEAM_B).getPKV();
+  auto metagross_opp = turn1.where1().getTeam(TEAM_B).getPKV();
   EXPECT_EQ(metagross_opp.getBoost(FV_ATTACK), 0);
 }
 

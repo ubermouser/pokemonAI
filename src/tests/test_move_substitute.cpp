@@ -36,8 +36,7 @@ class SubstituteTest : public Gen4EngineTest {
 
 TEST_F(SubstituteTest, CreatesSubstitute) {
   // Blissey uses Substitute (already done in SetUp)
-  auto env = turn1_results.where1().getEnv();
-  auto blissey = env.getTeam(0).teammate(0);
+  auto blissey = turn1_results.where1().teammate(0, 0);
 
   uint32_t maxHP = blissey.nv().getMaxHP();
   uint32_t expectedHP = maxHP - (maxHP / 4);
@@ -54,8 +53,7 @@ TEST_F(SubstituteTest, FailsWithLowHP) {
 
   // Try to use Substitute
   auto result = engine_->updateState(state, Action::move(0), Action::wait());
-  auto env = result.where1().getEnv();
-  auto blissey = env.getTeam(0).teammate(0);
+  auto blissey = result.where1().teammate(0, 0);
 
   // HP should not change, substitute should not be created
   EXPECT_EQ(blissey.getHP(), 10U);
@@ -66,13 +64,12 @@ TEST_F(SubstituteTest, AbsorbsDamage) {
   // Blissey uses Substitute in SetUp
   auto state1 = turn1_results.where1();
 
-  uint32_t initialHP = state1.getEnv().getTeam(0).teammate(0).getHP();
-  uint32_t initialSubHP = state1.getEnv().getTeam(0).teammate(0).status().cTeammate.substitute;
+  uint32_t initialHP = state1.teammate(0, 0).getHP();
+  uint32_t initialSubHP = state1.teammate(0, 0).status().cTeammate.substitute;
 
   // Turn 2: Gengar uses Sludge Bomb (Move index 3 - hits Blissey)
   auto turn2 = engine_->updateState(state1, Action::wait(), Action::move(3));
-  auto env2 = turn2.where1().getEnv();
-  auto blissey2 = env2.getTeam(0).teammate(0);
+  auto blissey2 = turn2.where1().teammate(0, 0);
 
   // Blissey's HP should not have decreased
   EXPECT_EQ(blissey2.getHP(), initialHP);
@@ -91,13 +88,12 @@ TEST_F(SubstituteTest, DISABLED_BreaksSubstitute) {
 
   // Turn 2: Gengar uses Sludge Bomb (Move index 3)
   auto turn2 = engine_->updateState(mutableState, Action::wait(), Action::move(3));
-  auto env2 = turn2.where1().getEnv();
-  auto blissey2 = env2.getTeam(0).teammate(0);
+  auto blissey2 = turn2.where1().teammate(0, 0);
 
   // Substitute should be gone
   EXPECT_EQ(blissey2.status().cTeammate.substitute, 0U);
   // Blissey's HP should still be same as start of Turn 2
-  EXPECT_EQ(blissey2.getHP(), state1.getEnv().getTeam(0).teammate(0).getHP());
+  EXPECT_EQ(blissey2.getHP(), state1.teammate(0, 0).getHP());
 }
 
 TEST_F(SubstituteTest, BlocksStatusMove) {
@@ -106,8 +102,7 @@ TEST_F(SubstituteTest, BlocksStatusMove) {
 
   // Turn 2: Gengar uses Toxic
   auto turn2 = engine_->updateState(state1, Action::wait(), Action::move(0));
-  auto env2 = turn2.where1().getEnv();
-  auto blissey2 = env2.getTeam(0).teammate(0);
+  auto blissey2 = turn2.where1().teammate(0, 0);
 
   // Blissey should NOT be poisoned
   EXPECT_EQ(blissey2.getStatusAilment(), AIL_NV_NONE);
@@ -119,8 +114,7 @@ TEST_F(SubstituteTest, BypassedByTaunt) {
 
   // Turn 2: Gengar uses Taunt
   auto turn2 = engine_->updateState(state1, Action::wait(), Action::move(2));
-  auto env2 = turn2.where1().getEnv();
-  auto blissey2 = env2.getTeam(0).teammate(0);
+  auto blissey2 = turn2.where1().teammate(0, 0);
 
   // Blissey should be taunted
   EXPECT_GT(blissey2.status().cTeammate.taunt_duration, 0U);
@@ -137,9 +131,8 @@ TEST_F(SubstituteTest, DISABLED_BlocksSecondaryEffect) {
   auto turn2 = engine_->updateState(state1, Action::wait(), Action::move(3));
 
   for (size_t i = 0; i < turn2.size(); ++i) {
-      auto env = turn2.at(i).getEnv();
-      auto blissey = env.getTeam(0).teammate(0);
-      EXPECT_EQ(blissey.getStatusAilment(), AIL_NV_NONE);
+    auto blissey = turn2.at(i).teammate(0, 0);
+    EXPECT_EQ(blissey.getStatusAilment(), AIL_NV_NONE);
   }
 }
 
@@ -155,8 +148,7 @@ TEST_F(SubstituteTest, DoesNotBlockSelfTargetingMoves) {
 
   // Turn 2: Blissey uses Soft-Boiled (Move index 1)
   auto turn2 = engine_->updateState(mutableState, Action::move(1), Action::wait());
-  auto env2 = turn2.where1().getEnv();
-  auto blissey2 = env2.getTeam(0).teammate(0);
+  auto blissey2 = turn2.where1().teammate(0, 0);
 
   // Blissey should have healed
   EXPECT_GT(blissey2.getHP(), hpAfterSub - 20);

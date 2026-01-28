@@ -36,9 +36,9 @@ TEST_F(TauntTest, AppliesEffect) {
   auto env = turn1_taunt.where1().getEnv();
 
   // Shuckle should have taunt duration
-  EXPECT_GT(env.getTeam(1).teammate(0).status().cTeammate.taunt_duration, 0);
+  EXPECT_GT(env.teammate(1, 0).status().cTeammate.taunt_duration, 0);
   // Steelix should not
-  EXPECT_EQ(env.getTeam(0).teammate(0).status().cTeammate.taunt_duration, 0);
+  EXPECT_EQ(env.teammate(0, 0).status().cTeammate.taunt_duration, 0);
 }
 
 TEST_F(TauntTest, PreventsStatusMoves) {
@@ -65,7 +65,8 @@ TEST_F(TauntTest, WearsOff) {
 
   // Pick one state to follow.
   auto initial_env = turn1.where1();
-  auto initial_duration = initial_env.getEnv().getTeam(1).teammate(0).status().cTeammate.taunt_duration;
+  auto initial_duration =
+      initial_env.teammate(1, 0).status().cTeammate.taunt_duration;
 
   EXPECT_GE(initial_duration, 3);
   EXPECT_LE(initial_duration, 5);
@@ -78,12 +79,13 @@ TEST_F(TauntTest, WearsOff) {
       current_state = next_turn.where1();
       next_turn.printStates();
 
-      auto current_duration = current_state.getEnv().getTeam(1).teammate(0).status().cTeammate.taunt_duration;
+      auto current_duration =
+          current_state.teammate(1, 0).status().cTeammate.taunt_duration;
       EXPECT_EQ(current_duration, initial_duration - 1 - i);
   }
 
   // After duration expires, duration should be 0
-  EXPECT_EQ(current_state.getEnv().getTeam(1).teammate(0).status().cTeammate.taunt_duration, 0);
+  EXPECT_EQ(current_state.teammate(1, 0).status().cTeammate.taunt_duration, 0);
 
   // Now Shuckle can use Toxic again.
   EXPECT_TRUE(engine_->isValidAction(current_state, Action::move(0), TEAM_B));
@@ -103,10 +105,10 @@ TEST_F(TauntTest, PreemptsStatusMoveSameTurn) {
   auto final_env = result.where1().getEnv();
 
   // 1. Shuckle should be taunted
-  EXPECT_GT(final_env.getTeam(1).teammate(0).status().cTeammate.taunt_duration, 0);
+  EXPECT_GT(final_env.teammate(1, 0).status().cTeammate.taunt_duration, 0);
 
   // 2. Steelix should NOT be poisoned (Toxic should have failed)
-  EXPECT_EQ(final_env.getTeam(0).teammate(0).getStatusAilment(), AIL_NV_NONE);
+  EXPECT_EQ(final_env.teammate(0, 0).getStatusAilment(), AIL_NV_NONE);
 }
 
 

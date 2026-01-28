@@ -255,7 +255,8 @@ GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_
     // print out the agent's moves:
     if (cfg_.verbosity >= 3) {
       for (size_t iTeam = 0; iTeam != 2; ++iTeam) {
-        printAction(envP.getEnv().getTeam(iTeam), actions[iTeam].bestAgentAction(), iTeam);
+        printAction(
+            envP.getTeam(iTeam), actions[iTeam].bestAgentAction(), iTeam);
       }
     }
 
@@ -341,7 +342,7 @@ Turn Game::digestTurn(
       return a + b.numNodes;
     });
     // active pokemon at the END of the turn:
-    turn.activePokemon = envP.getEnv().getTeam(iTeam).getICPKV();
+    turn.activePokemon = envP.getTeam(iTeam).getICPKV();
     // action taken by each team to transition the previous turn to the current turn:
     turn.action = actions[iTeam].bestAgentAction();
   } // endOf foreach team

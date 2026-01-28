@@ -29,7 +29,7 @@ class FacadeTest : public Gen4EngineTest {
     // Calculate base damage for reuse (no status)
     auto normal_damage_env = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
     normal_damage =
-        normal_damage_env.where1().getEnv().getTeam(1).getPKV().getMissingHP();
+        normal_damage_env.where1().getTeam(1).getPKV().getMissingHP();
   }
 
   // Helper to run a turn where opponent uses a status move, then user uses Facade
@@ -40,7 +40,7 @@ class FacadeTest : public Gen4EngineTest {
     // Turn 2: User uses Facade (Move 0), Opponent waits
     auto result_t2 = engine_->updateState(
         result_t1.where1(), Action::move(0), Action::wait());
-    return result_t2.where1().getEnv().getTeam(1).getPKV().getMissingHP();
+    return result_t2.where1().getTeam(1).getPKV().getMissingHP();
   }
 
   uint32_t normal_damage;

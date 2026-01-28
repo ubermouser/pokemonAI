@@ -38,10 +38,8 @@ class BurnStatusTest : public Gen4EngineTest {
     burned_special_state =
         engine_->updateState(burned_state, Action::move(0), Action::move(1));
 
-    burn_state_missing_hp =
-        burned_state.getEnv().getTeam(1).teammate(0).getMissingHP();
-    damage_on_mew_setup =
-        burned_state.getEnv().getTeam(0).teammate(0).getMissingHP();
+    burn_state_missing_hp = burned_state.teammate(1, 0).getMissingHP();
+    damage_on_mew_setup = burned_state.teammate(0, 0).getMissingHP();
   }
 
   PossibleEnvironments burn_state;
@@ -59,32 +57,24 @@ TEST_F(BurnStatusTest, Test_AppliesBurn) {
     auto result_env = burn_state.where1Status(0).getEnv();
 
     // Snorlax should be burned
-    EXPECT_EQ(result_env.getTeam(1).teammate(0).getStatusAilment(), AIL_NV_BURN);
+    EXPECT_EQ(result_env.teammate(1, 0).getStatusAilment(), AIL_NV_BURN);
 }
 
 TEST_F(BurnStatusTest, Test_BurnDamage) {
   auto burned_env = burn_state.where1Status(0).getEnv();
 
   // Verify initial full HP for Snorlax before burn damage trigger
-  EXPECT_NEAR(burned_env.getTeam(1).teammate(0).getPercentHP(), 0.875, 0.005);
+  EXPECT_NEAR(burned_env.teammate(1, 0).getPercentHP(), 0.875, 0.005);
 }
 
 TEST_F(BurnStatusTest, Test_BurnReducesPhysicalDamage) {
     // Baseline: Snorlax uses Tackle on Mew (Clean state)
     uint32_t damage_baseline =
-        baseline_physical_state.where1Hit(1)
-            .getEnv()
-            .getTeam(0)
-            .teammate(0)
-            .getMissingHP();
+        baseline_physical_state.where1Hit(1).teammate(0, 0).getMissingHP();
 
     // Burned: Mew uses Will-o-wisp, Snorlax uses Tackle
     uint32_t damage_burned_total =
-        burned_physical_state.where1Hit(1)
-            .getEnv()
-            .getTeam(0)
-            .teammate(0)
-            .getMissingHP();
+        burned_physical_state.where1Hit(1).teammate(0, 0).getMissingHP();
     uint32_t damage_burned = damage_burned_total - damage_on_mew_setup;
 
     // Burn reduces physical damage by 50%
@@ -95,19 +85,11 @@ TEST_F(BurnStatusTest, Test_BurnReducesPhysicalDamage) {
 TEST_F(BurnStatusTest, Test_BurnDoesNotReduceSpecialDamage) {
     // Baseline: Snorlax uses Psychic on Mew (Clean state)
     uint32_t damage_baseline =
-        baseline_special_state.where1Hit(1)
-            .getEnv()
-            .getTeam(0)
-            .teammate(0)
-            .getMissingHP();
+        baseline_special_state.where1Hit(1).teammate(0, 0).getMissingHP();
 
     // Burned: Mew uses Will-o-wisp, Snorlax uses Psychic
     uint32_t damage_burned_total =
-        burned_special_state.where1Hit(1)
-            .getEnv()
-            .getTeam(0)
-            .teammate(0)
-            .getMissingHP();
+        burned_special_state.where1Hit(1).teammate(0, 0).getMissingHP();
     uint32_t damage_burned = damage_burned_total - damage_on_mew_setup;
 
     // Burn does NOT reduce special damage

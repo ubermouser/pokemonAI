@@ -56,6 +56,11 @@ public:
     return getTeam((movesFirst + 1) & 1);
   }
 
+  typename teamvolatile_t::pokemonvolatile_t teammate(
+      size_t iTeam, size_t iTeammate) const {
+    return getTeam(iTeam).teammate(iTeammate);
+  }
+
   void printActivePokemon(std::ostream& os, size_t firstTeam=0) const;
 };
 

@@ -40,7 +40,7 @@ TEST_F(LevitateTest, ImmunityToGroundMoves) {
   // Sandshrew uses Earthquake on Gastly
   auto turn1 = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
 
-  auto gastly = turn1.where1().getEnv().getTeam(TEAM_B).getPKV();
+  auto gastly = turn1.where1().getTeam(TEAM_B).getPKV();
 
   // Should take no damage (HP equal to Max HP)
   EXPECT_EQ(gastly.getHP(), gastly.nv().getMaxHP());
@@ -52,7 +52,7 @@ TEST_F(LevitateTest, VulnerabilityWithoutLevitate) {
   // Sandshrew uses Earthquake on Grimer
   auto turn1 = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
 
-  auto grimer = turn1.where1().getEnv().getTeam(TEAM_B).getPKV();
+  auto grimer = turn1.where1().getTeam(TEAM_B).getPKV();
 
   // Should take damage
   EXPECT_LT(grimer.getHP(), grimer.nv().getMaxHP());

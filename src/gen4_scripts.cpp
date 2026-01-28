@@ -1855,7 +1855,7 @@ int engine_decrementPP(
   //if (cu.getICTeam() != TEAM_B) { return 0; } // no effect for first team
   // nonvolatile:
   nonvolatileStatus& cNV =
-cu.getBase().getEnv().getTeam(TEAM_A).getNonVolatile(); uint32_t
+cu.getBase().getTeam(TEAM_A).getNonVolatile(); uint32_t
 weatherCondition = cNV.weather_type; if (weatherCondition == WEATHER_NORMAL) {
 return 0; } // end early if no weather effect exists uint32_t weatherDuration =
 cTMV.getNonVolatile().weather_duration;
@@ -1878,7 +1878,7 @@ int engine_endRoundWeatherDamageEffect(
 {
   // nonvolatile:
   nonvolatileStatus& cNV =
-cu.getBase().getEnv().getTeam(TEAM_A).getNonVolatile(); uint32_t
+cu.getBase().getTeam(TEAM_A).getNonVolatile(); uint32_t
 weatherCondition = cNV.weather_type;
 
   // nasty hack: if second team, perform end of round decrement effects
