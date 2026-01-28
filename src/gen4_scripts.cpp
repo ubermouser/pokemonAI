@@ -1540,16 +1540,17 @@ int item_choiceItem_testLockedMove(
 
 int engine_typeResistingBerry(
     PkCUEngine& cu,
-    const Type& cType,
     MoveVolatile mV,
     PokemonVolatile cPKV,
     PokemonVolatile tPKV,
     fpType& typeModifier) {
   if (!tPKV.hasItem()) { return 0; }
+
+  const Type* cType = &mV.getBase().getType();
   const Type* resistedType = &tPKV.getItem().getResistedType();
 
   // no effect if attack type isn't of the resisted type
-  if (&cType != resistedType) { return 0; }
+  if (cType != resistedType) { return 0; }
 
   // berry reduces the damage of the attack by 50%
   typeModifier *= 0.5;
