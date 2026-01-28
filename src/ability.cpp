@@ -26,8 +26,10 @@ bool Abilities::initialize(const std::string& path) {
   }
 
   // find special case no ability:
-  Ability::no_ability = count("none")?&at("none"):new Ability();
-  
+  if (Ability::no_ability == nullptr) {
+    Ability::no_ability = count("none") ? &at("none") : new Ability();
+  }
+
   return true;
 }
 

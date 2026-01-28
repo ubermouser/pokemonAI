@@ -7,6 +7,13 @@ include(CTest)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Enable LLVM Sanitizers in Debug mode
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(STATUS "Enabling LLVM Sanitizers: address, undefined, leak")
+    add_compile_options(-fsanitize=address,undefined,leak -fno-omit-frame-pointer)
+    add_link_options(-fsanitize=address,undefined,leak)
+endif()
+
 
 # Find Boost
 find_package(Boost REQUIRED COMPONENTS program_options filesystem)

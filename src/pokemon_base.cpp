@@ -49,7 +49,9 @@ bool Pokemons::initialize(
 
   {
     // find special case no base:
-    PokemonBase::no_base = count("none")?&at("none"):new PokemonBase();
+    if (PokemonBase::no_base == nullptr) {
+      PokemonBase::no_base = count("none") ? &at("none") : new PokemonBase();
+    }
   }
 
   //MOVELIST library

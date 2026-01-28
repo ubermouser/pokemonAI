@@ -40,7 +40,9 @@ bool Items::initialize(const std::string& path, const Types& types) {
 
   {
     // find special case no item:
-    Item::no_item = count("none")?&at("none"):new Item();
+    if (Item::no_item == nullptr) {
+      Item::no_item = count("none") ? &at("none") : new Item();
+    }
   }
   
   return true;

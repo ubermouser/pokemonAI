@@ -30,6 +30,7 @@ The project is organized into the following modules:
 ### Building
 #### Using Conan
 
+##### Release
 1.  **Detect Conan Profile:**
     If you haven't already, detect your system's compiler profile:
     ```bash
@@ -46,10 +47,25 @@ The project is organized into the following modules:
     Use the Conan-generated CMake preset to configure and build the project:
     ```bash
     cmake --preset conan-release
-    cmake --build --preset conan-release -j16
+    cmake --build --preset conan-release
     ```
 
-This will create the executables in the `build/build/Release/` directory (or similar, depending on your environment).
+##### Debug (with Sanitizers)
+Debug mode enables LLVM sanitizers (Address, Undefined, and Leak) and is recommended for development.
+
+1.  **Install Dependencies:**
+    We build the transitive dependencies in Release mode to avoid build failures in `openblas`.
+    ```bash
+    conan install . --output-folder=build --build=missing -s build_type=Release -s "&:build_type=Debug"
+    ```
+
+2.  **Configure and Build:**
+    ```bash
+    cmake --preset conan-debug
+    cmake --build --preset conan-debug
+    ```
+
+This will create the executables in the `build/build/Release/` or `build/build/Debug/` directory.
 
 #### Using System Dependencies
 
@@ -89,12 +105,16 @@ All tests:
 
 ```bash
 ctest --preset conan-release --output-on-failure
+# or
+ctest --preset conan-debug --output-on-failure
 ```
 
 Individual test:
 
 ```bash
 ./build/build/Release/src/tests/test_name
+# or
+./build/build/Debug/src/tests/test_name
 ```
 
 ### Running the applications
