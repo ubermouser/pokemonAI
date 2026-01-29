@@ -11,4 +11,10 @@
 - To configure: `cmake --preset conan-debug`.
 - To build: `cmake --build --preset conan-debug`.
 - To test: `ctest --preset conan-debug`.
-- Individual tests: `./build/build/Release/src/tests/test_name`.
+- Individual tests: `./build/build/Debug/src/tests/test_name`.
+
+### Development Patterns and Quirks
+- **Test State**: When developing GenXEngineTests, try not to modify the state directly. To setup the test:
+    - Extend `Gen4EngineTest` (or your generation's test fixture).
+    - Use multi-turn engine transitions (`engine_->updateState`) to set up the state. Transitions should be generated in the test fixture rather than the test itself.
+    - If necessary, reconstruct an `EnvironmentVolatile` from `initialState().nv()` and `initialState().data()`.

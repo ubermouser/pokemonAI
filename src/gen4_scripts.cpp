@@ -23,6 +23,7 @@ const Move* auraSphere_t;
 const Move* blazeKick_t;
 const Move* braveBird_t;
 const Move* brickBreak_t;
+const Move* counter_t;
 const Move* crabHammer_t;
 const Move* crossChop_t;
 const Move* crossPoison_t;
@@ -45,6 +46,7 @@ const Move* magicalLeaf_t;
 const Move* megaDrain_t;
 const Move* memento_t;
 const Move* milkDrink_t;
+const Move* mirrorCoat_t;
 const Move* nightShade_t;
 const Move* nightSlash_t;
 const Move* outrage_t;
@@ -763,6 +765,51 @@ int move_cureNonVolatile_team(
 
   // clear volatile confusion:
   cTMV.status().cTeammate.confused = 0;
+
+  return 1;
+};
+
+int move_counterMirrorCoat(
+    PkCUEngine& cu,
+    MoveVolatile mV,
+    PokemonVolatile cPKV,
+    PokemonVolatile tPKV) {
+  const Move* cMove = &mV.getBase();
+  if (cMove != counter_t && cMove != mirrorCoat_t) { return 0; }
+
+  // Must move second
+  if (cu.getBase().hasMovedFirst(cu.getICTeam())) { return 1; }
+
+  // Opponent must have hit with a move
+  if (!cu.getBase().hasHit(cu.getIOTeam())) { return 1; }
+
+  const DamageComponents_t& oDamage =
+      cu.getDamageComponent(cu.getIBase(), cu.getIOTeam());
+
+  // Get the move the opponent used
+  const Action& oAction = cu.getOAction();
+  if (!oAction.isMove()) { return 1; }
+  MoveVolatile oMV = tPKV.getMV(oAction);
+  uint32_t oCategory = oMV.getBase().getDamageType();
+
+  if (cMove == counter_t) {
+    if (oCategory != ATK_PHYSICAL) { return 1; }
+    // Ghost type immunity
+    if (tPKV.getBase().hasType(ghost_t)) { return 1; }
+  } else {
+    assert(cMove == mirrorCoat_t);
+    if (oCategory != ATK_SPECIAL) { return 1; }
+    // Dark type immunity
+    if (tPKV.getBase().hasType(dark_t)) { return 1; }
+  }
+
+  uint32_t damageTaken = oDamage.damage;
+  if (damageTaken == 0) { return 1; }
+
+  uint32_t damageToDeal = damageTaken * 2;
+
+  // Apply damage
+  tPKV.modHP(-(int32_t)damageToDeal);
 
   return 1;
 };
@@ -1926,6 +1973,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   blazeKick_t = orphan::orphanCheck(moves, "blaze kick");
   braveBird_t = orphan::orphanCheck(moves, "brave bird");
   brickBreak_t = orphan::orphanCheck(moves, "brick break");
+  counter_t = orphan::orphanCheck(moves, "counter");
   crabHammer_t = orphan::orphanCheck(moves, "crabhammer");
   crossChop_t = orphan::orphanCheck(moves, "cross chop");
   crossPoison_t = orphan::orphanCheck(moves, "cross poison");
@@ -1947,6 +1995,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   megaDrain_t = orphan::orphanCheck(moves, "mega drain");
   memento_t = orphan::orphanCheck(moves, "memento");
   milkDrink_t = orphan::orphanCheck(moves, "milk drink");
+  mirrorCoat_t = orphan::orphanCheck(moves, "mirror coat");
   nightShade_t = orphan::orphanCheck(moves, "night shade");
   nightSlash_t = orphan::orphanCheck(moves, "night slash");
   outrage_t = orphan::orphanCheck(moves, "outrage");
@@ -2037,6 +2086,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(move, "blaze kick", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "brave bird", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, current_team));
   extensions.push_back(plugin(move, "brick break", PLUGIN_ON_MODIFYRAWDAMAGE, move_brickBreak_removeScreens, -1, current_team));
+  extensions.push_back(plugin(move, "counter", PLUGIN_ON_EVALUATEMOVE, move_counterMirrorCoat, 0, current_team));
   extensions.push_back(plugin(move, "crabhammer", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "cross chop", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "cross poison", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
@@ -2065,6 +2115,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(move, "mega drain", PLUGIN_ON_ENDOFMOVE, move_lifeLeech50, 0, current_team));
   extensions.push_back(plugin(move, "memento", PLUGIN_ON_ENDOFMOVE, move_suicide_modLife, 0, current_team));
   extensions.push_back(plugin(move, "milk drink", PLUGIN_ON_EVALUATEMOVE, move_heal50, 0, current_team));
+  extensions.push_back(plugin(move, "mirror coat", PLUGIN_ON_EVALUATEMOVE, move_counterMirrorCoat, 0, current_team));
   extensions.push_back(plugin(move, "night shade", PLUGIN_ON_EVALUATEMOVE, move_leveledDamage, 0, current_team));
   extensions.push_back(plugin(move, "night slash", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "outrage", PLUGIN_ON_ENDOFTURN, move_outrage_endLockOn, 0, current_team));

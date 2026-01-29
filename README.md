@@ -18,6 +18,14 @@ The project is organized into the following modules:
 *   **networks**: A directory for storing trained neural network models.
 *   **src/tests**: Contains the unit tests for the project.
 
+## Extending the Engine
+
+To implement new moves or abilities for a specific generation:
+1.  **Register Script Pointer**: Abilities / Moves / Pokemon / Items / etc must have an equivalent name in the corresponding data file, e.g. inside `data/genX/moves.csv`.
+2.  **Implement Plugin**: Add the implementation to the corresponding `src/genX_scripts.cpp`. Use the appropriate plugin hook for custom logic (e.g. `PLUGIN_ON_EVALUATEMOVE` for Counter/Mirror Coat).
+3.  **Maintain Order**: Keep move pointers and registrations in `genX_scripts.cpp` alphabetical.
+4.  **Verification**: Add a test in `src/tests/` using `GenXEngineTest` (or equivalent) to verify the new logic.
+
 ## Building and Running
 
 ### Prerequisites
