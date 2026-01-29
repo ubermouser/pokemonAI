@@ -10,7 +10,7 @@
 class plugin;
 typedef void (*voidFunction_rawType)(void*);
 
-#define PLUGIN_MAXSIZE 28
+#define PLUGIN_MAXSIZE 29
 
 enum pluginTarget {
   current_team = 0,
@@ -18,8 +18,7 @@ enum pluginTarget {
   all_teams = 2
 };
 
-enum pluginType
-{
+enum pluginType {
   PLUGIN_ON_INIT = 0,
   PLUGIN_ON_RESET = 1,
   PLUGIN_ON_SETSPEEDBRACKET = 2,
@@ -47,7 +46,8 @@ enum pluginType
   PLUGIN_ON_SWITCHIN = 24,
   PLUGIN_ON_TESTMOVE = 25,
   PLUGIN_ON_TESTSWITCH = 26,
-  PLUGIN_ON_UNINIT = 27
+  PLUGIN_ON_MODIFYACTION = 27,
+  PLUGIN_ON_UNINIT = 28
 };
 
 

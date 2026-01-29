@@ -349,6 +349,9 @@ int move_encore_set(
   uint32_t iLastAction = tPKV.status().cTeammate.iLastAction;
   if (iLastAction == 0) { return 1; }
 
+  // Fails if the target is already under the effects of Encore.
+  if (tPKV.status().cTeammate.encore_duration > 0) { return 1; }
+
   // iMove is 0-indexed index of the move in the pokemon's movelist
   const Move& oMove = tPKV.getMV(iLastAction - 1).getBase();
 
@@ -417,6 +420,22 @@ int move_encore_update(PkCUEngine& cu, PokemonVolatile cPKV) {
   }
 
   return 1;
+}
+
+int move_encore_preempt(PkCUEngine& cu, Action& action) {
+  PokemonVolatile cPKV = cu.getPKV();
+  auto& teamStatus = cPKV.status().cTeammate;
+  if (teamStatus.encore_duration == 0) { return 0; }
+
+  uint32_t encAction = teamStatus.encore_action;
+
+  // If the action is a move and it's not the encored move, CHANGE it.
+  if (action.isMove() && action.iMove() != encAction) {
+    action = Action::move(encAction);
+    return 1;
+  }
+
+  return 0;
 }
 
 int move_substitute(
@@ -2182,6 +2201,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(move, "double-edge", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, current_team));
   extensions.push_back(plugin(move, "encore", PLUGIN_ON_EVALUATEMOVE, move_encore_set, 0, current_team));
   extensions.push_back(plugin(move, "encore", PLUGIN_ON_TESTMOVE, move_encore_test, 0, other_team));
+  extensions.push_back(plugin(move, "encore", PLUGIN_ON_MODIFYACTION, move_encore_preempt, 0, other_team));
   extensions.push_back(plugin(move, "encore", PLUGIN_ON_ENDOFTURN, move_encore_update, 0, other_team));
   extensions.push_back(plugin(move, "explosion", PLUGIN_ON_MODIFYATTACKPOWER, move_suicide_modPower, 0, current_team));
   extensions.push_back(plugin(move, "explosion", PLUGIN_ON_ENDOFMOVE, move_suicide_modLife, 0, current_team));

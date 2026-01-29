@@ -104,6 +104,8 @@ typedef int (*onTestSwitch_rawType)
   const Action&,
   ValidSwapSet&);
 
+typedef int (*onModifyAction_rawType)(PkCUEngine&, Action&);
+
 //typedef bool (*regExtension_rawType)(const pokedex&, std::vector<plugin>&);
 
 #endif /* PLUGGABLE_TYPES_H */

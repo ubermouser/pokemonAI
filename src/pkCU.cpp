@@ -242,13 +242,14 @@ PkCUEngine::PkCUEngine(
     PossibleEnvironments& stack,
     const EnvironmentVolatileData& initial,
     const Action& actionA,
-    const Action& actionB) :
-    cfg_(cu.cfg_),
-    stack_(stack),
-    pluginSets_(cu.pluginSets_),
-    iTeams_({TEAM_A, TEAM_B}),
-    actions_({actionA, actionB}),
-    iBase_(0) {
+    const Action& actionB)
+    : cu_(cu),
+      cfg_(cu.cfg_),
+      stack_(stack),
+      pluginSets_(cu.pluginSets_),
+      iTeams_({TEAM_A, TEAM_B}),
+      actions_({actionA, actionB}),
+      iBase_(0) {
   stack_.clear();
   stack_.setNonvolatileEnvironment(cu.nv_);
 
@@ -474,6 +475,25 @@ void PkCUEngine::evaluateMove() {
   // if either pokemon is dead at this point, the only valid moves are switching and waiting
   if ( (!getPKV().isAlive() || !getTPKV().isAlive()) && cAction.isMove() ) {
     cAction = Action::wait();
+  }
+
+  // Pre-move script: modify action?
+  if (cAction.isMove()) {
+    int result = 0;
+    CALLPLUGIN(
+        result, PLUGIN_ON_MODIFYACTION, onModifyAction_rawType, *this, cAction);
+
+    // If the plugin changed the action, we must validate it.
+    if (cAction != getCAction()) {
+      auto validation = cu_.isValidAction(getBase().getEnv(), cAction, iCTeam);
+      if (!validation) { cAction = Action::struggle(); }
+      // Update the action in the engine's internal state
+      actions_[0] = cAction;
+
+      // Set blocked if we want the environment to reflect that the original
+      // choice was preempted
+      getBase().setBlocked(iCTeam);
+    }
   }
 
 

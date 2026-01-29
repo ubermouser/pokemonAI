@@ -432,6 +432,11 @@ std::ostream& operator<<(std::ostream& os, const ConstPokemonVolatile& pkmn) {
       os << fmt::format(
           " (LOCKIN-{})", pkmn.status().cTeammate.lockIn_duration);
     }
+    // target is encored
+    if (pkmn.status().cTeammate.encore_duration > 0) {
+      os << fmt::format(
+          " (ENCORE-{})", pkmn.status().cTeammate.encore_duration);
+    }
     // target has a substitute:
     if (pkmn.status().cTeammate.substitute > 0) {
       os << fmt::format(" (SUB-{})", pkmn.status().cTeammate.substitute);

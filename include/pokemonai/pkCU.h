@@ -453,7 +453,8 @@ protected:
  * mechanics.
  */
 class PkCUEngine {
-protected:
+ protected:
+  const PkCU& cu_;
   const PkCU::Config& cfg_;
 
   /**
@@ -463,34 +464,40 @@ protected:
 
   const PluginSets& pluginSets_;
 
-  // TODO(@drendleman) - cPluginSet may differ per StackFrame! This cannot be constant!
+  // TODO(@drendleman) - cPluginSet may differ per StackFrame! This cannot be
+  // constant!
   /**
    * @brief The current set of plugins for the active matchup.
    */
   const PluginSet* cPluginSet_;
 
   /**
-   * @brief A deque that tracks the current battle stage for each environment on the stack.
+   * @brief A deque that tracks the current battle stage for each environment on
+   * the stack.
    */
   std::deque<uint32_t> stackStage_;
 
   /**
-   * @brief A deque that stores the damage components for each environment on the stack.
+   * @brief A deque that stores the damage components for each environment on
+   * the stack.
    */
   std::deque<std::array<DamageComponents_t, 2>> damageComponents_;
 
   /**
-   * @brief An array that stores the team indices. `iTeams_[0]` is the current team.
+   *  @brief An array that stores the team indices. `iTeams_[0]` is the current
+   * team.
    */
   std::array<size_t, 2> iTeams_;
 
   /**
-   * @brief An array that stores the actions of each team. `actions_[0]` is the current team's action.
+   * @brief An array that stores the actions of each team. `actions_[0]` is the
+   * current team's action.
    */
   std::array<Action, 2> actions_;
 
   /**
-   * @brief The index of the base environment on the stack that is currently being processed.
+   * @brief The index of the base environment on the stack that is currently
+   * being processed.
    */
   size_t iBase_;
 

@@ -36,10 +36,57 @@ TEST_F(EncoreTest, FailsIfNoMoveUsed) {
   EXPECT_EQ(env.teammate(1, 0).status().cTeammate.encore_action, 0);
 }
 
-TEST_F(EncoreTest, DISABLED_PreemptsChoiceIfMoveIsForbidden) {
+TEST_F(EncoreTest, PreemptsChoiceIfMoveIsForbidden) {
   // If Blissey is encored in the same turn as another move is selected, the
   // move should be preempted.
-  EXPECT_TRUE(false);
+
+  // Turn 1: Blissey uses Soft-Boiled (Move 1). Alakazam uses Psychic (faster).
+  auto turn1 = engine_->updateState(
+      engine_->initialState(), Action::move(1), Action::move(1));
+  auto state1 = turn1.where1();
+
+  // Turn 2: Blissey selects Seismic Toss (Move 0). Alakazam uses Encore
+  // (faster).
+  auto turn2 = engine_->updateState(state1, Action::move(0), Action::move(0));
+  auto state2 = turn2.where1();
+
+  // Verify that Blissey's action was preempted and it used Soft-Boiled (Move 1)
+  // instead of Seismic Toss (Move 0).
+  EXPECT_TRUE(state2.wasBlocked(
+      TEAM_B));  // It was "blocked" and switched to encored move
+
+  // Check that Blissey is now encored into Soft-Boiled (Move 1)
+  auto teamStatus = state2.teammate(1, 0).status();
+  EXPECT_GT(teamStatus.cTeammate.encore_duration, 0);
+  EXPECT_EQ(teamStatus.cTeammate.encore_action, 1);
+}
+
+TEST_F(EncoreTest, FailsIfAlreadyEncored) {
+  // If Blissey is already encored, using Encore again should fail and not
+  // reset the duration.
+
+  // Turn 1: Blissey uses Soft-Boiled (Move 1). Alakazam uses Psychic (faster).
+  auto turn1 = engine_->updateState(
+      engine_->initialState(), Action::move(1), Action::move(1));
+  auto state1 = turn1.where1();
+
+  // Turn 2: Blissey selects Seismic Toss (Move 0). Alakazam uses Encore
+  // (faster).
+  auto turn2 = engine_->updateState(state1, Action::move(0), Action::move(0));
+  auto state2 = turn2.where1();
+  auto durationAfterTurn2 =
+      state2.teammate(1, 0).status().cTeammate.encore_duration;
+  EXPECT_GT(durationAfterTurn2, 0);
+
+  // Turn 3: Blissey encored into Soft-Boiled. Alakazam uses Encore again.
+  // The duration should decrement due to the turn end, but NOT be reset by the
+  // second Encore attempt.
+  auto turn3 = engine_->updateState(state2, Action::move(1), Action::move(0));
+  auto state3 = turn3.where1();
+
+  auto teamStatus = state3.teammate(1, 0).status();
+  // Duration should be durationAfterTurn2 - 1
+  EXPECT_EQ(teamStatus.cTeammate.encore_duration, durationAfterTurn2 - 1);
 }
 
 TEST_F(EncoreTest, AppliesEffect) {
