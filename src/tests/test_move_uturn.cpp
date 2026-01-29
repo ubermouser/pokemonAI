@@ -144,3 +144,29 @@ TEST_F(UTurnTest, UTurnReported) {
   EXPECT_TRUE(output.find("torterra lost") != std::string::npos);
   EXPECT_TRUE(output.find("HP") != std::string::npos);
 }
+
+
+TEST_F(UTurnTest, SwappedInPokemonShouldNotBeEncored) {
+  // Re-setup with Team B having a slower Encore user (Shuckle)
+  auto team_b = TeamNonVolatile().addPokemon(
+      PokemonNonVolatile()
+          .setBase(pokedex_->pokemon("shuckle"))
+          .addMove(pokedex_->move("encore"))
+          .setLevel(100));
+
+  engine_->setEnvironment(
+      EnvironmentNonvolatile(environment_nv.getTeam(0), team_b, true));
+
+  // Turn 1: Scizor uses U-turn (moveAlly 0, 1), Shuckle uses Encore (move 0)
+  auto turn1 = engine_->updateState(
+      engine_->initialState(), Action::moveAlly(0, 1), Action::move(0));
+
+  auto state = turn1.where1Hit(0);
+
+  // Torterra (Team A, index 1) is now active.
+  EXPECT_EQ(state.getTeam(0).getICPKV(), 1);
+
+  // Verify Torterra is NOT encored.
+  EXPECT_EQ(state.teammate(0, 1).status().cTeammate.encore_duration, 0)
+      << "Torterra should not be encored as it has not used a move yet.";
+}

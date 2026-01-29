@@ -354,7 +354,8 @@ int move_encore_set(
 
   // The last move used by the opponent
   uint32_t iLastAction = tPKV.status().cTeammate.iLastAction;
-  if (iLastAction == 0) { return 1; }
+  bool switched = cu.getBase().hasSwitched(cu.getIOTeam());
+  if (iLastAction == 0 || switched) { return 1; }
 
   // Fails if the target is already under the effects of Encore.
   if (tPKV.status().cTeammate.encore_duration > 0) { return 1; }
@@ -1765,7 +1766,8 @@ int engine_updateLastAction(PkCUEngine& cu, PokemonVolatile cPKV) {
   if (!cPKV.isAlive()) { return 0; }
 
   const auto& lastAction = cu.getCAction();
-  if (lastAction.isMove()) {
+  bool switched = cu.getBase().hasSwitched(cu.getICTeam());
+  if (lastAction.isMove() && !switched) {
     cPKV.status().cTeammate.iLastAction = lastAction.iMove() + 1;
     return 1;
   } else {
