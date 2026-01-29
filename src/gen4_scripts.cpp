@@ -13,6 +13,8 @@
 #include "pokemonai/pluggable_types.h"
 #include "pokemonai/plugin.h"
 
+static const uint32_t BROKEN_SUB_FLAG = 255;
+
 const Pokedex* dex;
 
 const Move* airCutter_t;
@@ -452,6 +454,8 @@ int move_substitute(
   // Fails if HP is not enough to create a substitute
   if (cPKV.getHP() <= cost) { return 1; }
 
+  if (cost >= 255) { cost = 254; }
+
   cPKV.modHP(-(int32_t)cost);
   cPKV.status().cTeammate.substitute = cost;
 
@@ -469,12 +473,14 @@ int move_substitute_damage(
       mV.getBase().getName(),
       raw_damage,
       (uint32_t)tPKV.status().cTeammate.substitute);
-  if (tPKV.status().cTeammate.substitute == 0) { return 0; }
+
+  // Check for flag or 0
+  if (tPKV.status().cTeammate.substitute == 0 || tPKV.status().cTeammate.substitute == BROKEN_SUB_FLAG) { return 0; }
 
   uint32_t subHP = tPKV.status().cTeammate.substitute;
   if (raw_damage >= subHP) {
     SPDLOG_TRACE("move_substitute_damage: Substitute BROKE");
-    tPKV.status().cTeammate.substitute = 0;
+    tPKV.status().cTeammate.substitute = BROKEN_SUB_FLAG;
   } else {
     SPDLOG_TRACE(
         "move_substitute_damage: Substitute absorbed {} damage", raw_damage);
@@ -496,6 +502,8 @@ int move_substitute_block_secondary(
       (void*)&cPKV.nv(),
       (void*)&tPKV.nv(),
       (uint32_t)tPKV.status().cTeammate.substitute);
+
+  // substitute > 0 includes BROKEN_SUB_FLAG (255)
   if (tPKV.status().cTeammate.substitute > 0) {
     // Does not block self-targeting secondary effects
     if (&cPKV.nv() == &tPKV.nv()) {
@@ -1773,6 +1781,29 @@ int engine_onModifySpeed_paralyze(
   return 1;
 };
 
+int move_substitute_cleanup_preturn(PkCUEngine& cu, Action& action) {
+  PokemonVolatile cPKV = cu.getPKV();
+  if (cPKV.status().cTeammate.substitute == BROKEN_SUB_FLAG) {
+    cPKV.status().cTeammate.substitute = 0;
+  }
+  return 1;
+}
+
+int move_substitute_cleanup_end(PkCUEngine& cu, PokemonVolatile cPKV) {
+  // cPKV is the attacker.
+  // We want to clean up the defender (tPKV) if they have a broken substitute.
+  // Also checking cPKV just in case.
+  if (cPKV.isAlive() && (cPKV.status().cTeammate.substitute == BROKEN_SUB_FLAG)) {
+    cPKV.status().cTeammate.substitute = 0;
+  }
+
+  PokemonVolatile tPKV = cu.getTPKV();
+  if (tPKV.isAlive() && (tPKV.status().cTeammate.substitute == BROKEN_SUB_FLAG)) {
+    tPKV.status().cTeammate.substitute = 0;
+  }
+  return 1;
+}
+
 int engine_endRoundDamageEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
   // nonvolatile:
   uint32_t condition = cPKV.getStatusAilment();
@@ -2263,6 +2294,8 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(move, "substitute", PLUGIN_ON_EVALUATEMOVE, move_substitute, 0, current_team));
   extensions.push_back(plugin(move, "substitute", PLUGIN_ON_CALCULATEDAMAGE, move_substitute_damage, 0, all_teams));
   extensions.push_back(plugin(move, "substitute", PLUGIN_ON_SECONDARYEFFECT, move_substitute_block_secondary, -10, all_teams));
+  extensions.push_back(plugin(move, "substitute", PLUGIN_ON_MODIFYACTION, move_substitute_cleanup_preturn, 0, current_team));
+  extensions.push_back(plugin(move, "substitute", PLUGIN_ON_ENDOFTURN, move_substitute_cleanup_end, 0, all_teams));
   extensions.push_back(plugin(engine, "substitute_block_status", PLUGIN_ON_EVALUATEMOVE, move_substitute_block_status, -10, all_teams));   // TODO - conflicts with move_substitute!
   extensions.push_back(plugin(move, "sucker punch", PLUGIN_ON_CALCULATEDAMAGE, move_suckerPunch_noDamageOnCondition, 0, current_team));
   extensions.push_back(plugin(move, "swift", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
