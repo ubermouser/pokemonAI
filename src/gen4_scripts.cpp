@@ -87,6 +87,7 @@ const Move* taunt_t;
 const Move* uTurn_t;
 const Move* voltTackle_t;
 const Move* woodHammer_t;
+const Move* destinyBond_t;
 
 const Item* choiceBand_t;
 const Item* choiceScarf_t;
@@ -552,6 +553,49 @@ int move_hiddenPower_setPower(
 
   basePower = mV.nv().getScriptVal_b();
   return 1;
+}
+
+
+int move_destinyBond(
+    PkCUEngine& cu,
+    MoveVolatile mV,
+    PokemonVolatile cPKV,
+    PokemonVolatile tPKV) {
+  if (&mV.getBase() != destinyBond_t) { return 0; }
+
+  // Fails if used consecutively in Gen 4
+  uint32_t iLastAction = cPKV.status().cTeammate.iLastAction;
+  if (iLastAction > 0) {
+    const Move& lastMove = cPKV.getMV(iLastAction - 1).getBase();
+    if (&lastMove == destinyBond_t) { return 1; }
+  }
+
+  cPKV.status().cTeammate.destinyBond = 1;
+
+  return 1;
+}
+
+int move_destinyBond_clear(PkCUEngine& cu, PokemonVolatile cPKV) {
+  cPKV.status().cTeammate.destinyBond = 0;
+  return 0;  // Does not consume action
+}
+
+int move_destinyBond_trigger(
+    PkCUEngine& cu,
+    MoveVolatile mV,
+    PokemonVolatile cPKV,
+    PokemonVolatile tPKV,
+    uint32_t& damage) {
+  // If the target has Destiny Bond active
+  if (tPKV.status().cTeammate.destinyBond) {
+    // If the damage will kill the target
+    if (damage >= tPKV.getHP()) {
+      // The attacker faints too
+      cPKV.setHP(0);
+      return 1;
+    }
+  }
+  return 0;
 }
 
 int move_painSplit(
@@ -1284,6 +1328,23 @@ int move_suckerPunch_noDamageOnCondition(
   return 1;
 }
 
+int move_trap_set(
+    PkCUEngine& cu,
+    MoveVolatile mV,
+    PokemonVolatile cPKV,
+    PokemonVolatile tPKV) {
+  const Move& cMove = mV.getBase();
+  if ((&cMove != block_t) && (&cMove != meanLook_t) &&
+      (&cMove != spiderWeb_t)) {
+    return 0;
+  }
+
+  // Set fully trapped status
+  tPKV.status().cTeammate.trap = 7;
+
+  return 1;
+}
+
 int ability_noGuard(
     PkCUEngine& cu,
     MoveVolatile mV,
@@ -1776,23 +1837,6 @@ int engine_updateLastAction(PkCUEngine& cu, PokemonVolatile cPKV) {
   }
 };
 
-int move_trap_set(
-    PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
-  const Move& cMove = mV.getBase();
-  if ((&cMove != block_t) && (&cMove != meanLook_t) &&
-      (&cMove != spiderWeb_t)) {
-    return 0;
-  }
-
-  // Set fully trapped status
-  tPKV.status().cTeammate.trap = 7;
-
-  return 1;
-}
-
 int engine_checkTrapped(
     ConstPokemonVolatile cPKV,
     ConstPokemonVolatile fPKV,
@@ -2199,6 +2243,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   crabHammer_t = orphan::orphanCheck(moves, "crabhammer");
   crossChop_t = orphan::orphanCheck(moves, "cross chop");
   crossPoison_t = orphan::orphanCheck(moves, "cross poison");
+  destinyBond_t = orphan::orphanCheck(moves, "destiny bond");
   doubleEdge_t = orphan::orphanCheck(moves, "double-edge");
   drainPunch_t = orphan::orphanCheck(moves, "drain punch");
   encore_t = orphan::orphanCheck(moves, "encore");
@@ -2318,8 +2363,11 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(move, "crabhammer", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "cross chop", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "cross poison", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
-  extensions.push_back(plugin(move, "drain punch", PLUGIN_ON_ENDOFMOVE, move_lifeLeech50, 0, current_team));
+  extensions.push_back(plugin(move, "destiny bond", PLUGIN_ON_EVALUATEMOVE, move_destinyBond, 0, current_team));
+  extensions.push_back(plugin(move, "destiny bond", PLUGIN_ON_BEGINNINGOFTURN, move_destinyBond_clear, 0, current_team));
+  extensions.push_back(plugin(move, "destiny bond", PLUGIN_ON_CALCULATEDAMAGE, move_destinyBond_trigger, 0, all_teams));
   extensions.push_back(plugin(move, "double-edge", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, current_team));
+  extensions.push_back(plugin(move, "drain punch", PLUGIN_ON_ENDOFMOVE, move_lifeLeech50, 0, current_team));
   extensions.push_back(plugin(move, "encore", PLUGIN_ON_EVALUATEMOVE, move_encore_set, 0, current_team));
   extensions.push_back(plugin(move, "encore", PLUGIN_ON_TESTMOVE, move_encore_test, 0, other_team));
   extensions.push_back(plugin(move, "encore", PLUGIN_ON_MODIFYACTION, move_encore_preempt, 0, other_team));

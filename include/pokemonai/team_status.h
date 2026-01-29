@@ -59,6 +59,7 @@ struct VolatileStatus
   uint32_t imprison : 1;
   uint32_t infatuate : 1;
   uint32_t taunt_duration : 3;
+  uint32_t destinyBond : 1;
   // END OF THIRD WORD
 
   void reset();
