@@ -77,7 +77,7 @@ TEST_F(SubstituteTest, AbsorbsDamage) {
   EXPECT_LT(blissey2.status().cTeammate.substitute, initialSubHP);
 }
 
-TEST_F(SubstituteTest, DISABLED_BreaksSubstitute) {
+TEST_F(SubstituteTest, BreaksSubstitute) {
   // Blissey uses Substitute in SetUp
   auto state1 = turn1_results.where1();
 
@@ -120,7 +120,7 @@ TEST_F(SubstituteTest, BypassedByTaunt) {
   EXPECT_GT(blissey2.status().cTeammate.taunt_duration, 0U);
 }
 
-TEST_F(SubstituteTest, DISABLED_BlocksSecondaryEffect) {
+TEST_F(SubstituteTest, BlocksSecondaryEffect) {
   // Blissey uses Substitute in SetUp
   auto state1 = turn1_results.where1();
 
