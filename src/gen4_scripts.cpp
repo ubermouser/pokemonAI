@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #include <algorithm>
+#include <iostream>
 #include <vector>
 
 #include "pokemonai/engine.h"
@@ -29,6 +30,7 @@ const Move* crossChop_t;
 const Move* crossPoison_t;
 const Move* doubleEdge_t;
 const Move* drainPunch_t;
+const Move* encore_t;
 const Move* explosion_t;
 const Move* facade_t;
 const Move* faintAttack_t;
@@ -331,6 +333,87 @@ int move_taunt_preempt(PkCUEngine& cu, PokemonVolatile cPKV) {
     }
 
     cPKV.status().cTeammate.taunt_duration--;
+  }
+
+  return 1;
+}
+
+int move_encore_set(
+    PkCUEngine& cu,
+    MoveVolatile mV,
+    PokemonVolatile cPKV,
+    PokemonVolatile tPKV) {
+  if (&mV.getBase() != encore_t) { return 0; }
+
+  // The last move used by the opponent
+  uint32_t iLastAction = tPKV.status().cTeammate.iLastAction;
+  if (iLastAction == 0) { return 1; }
+
+  // iMove is 0-indexed index of the move in the pokemon's movelist
+  const Move& oMove = tPKV.getMV(iLastAction - 1).getBase();
+
+  // Illegal moves for Encore in Gen 4:
+  // Encore, Mirror Move, Sketch, Mimic, Transform, Struggle.
+  if (&oMove == encore_t || &oMove == struggle_t) { return 1; }
+
+  tPKV.status().cTeammate.encore_action = iLastAction - 1;
+  tPKV.status().cTeammate.encore_duration = 7;
+
+  return 1;
+}
+
+int move_encore_test(
+    ConstTeamVolatile cTV,
+    ConstPokemonVolatile cPKV,
+    ConstMoveVolatile mV,
+    const Action& action,
+    ValidMoveSet& moveAllowed) {
+  if (cPKV.status().cTeammate.encore_duration == 0) { return 0; }
+
+  // no effect if not a move:
+  if (!action.isMove()) { return 0; }
+
+  // only the encored move is allowed:
+  uint32_t encAction = cPKV.status().cTeammate.encore_action;
+  if (action.iMove() != encAction) { moveAllowed[VALID_MOVE_SCRIPT] = false; }
+
+  return 1;
+}
+
+int move_encore_update(PkCUEngine& cu, PokemonVolatile cPKV) {
+  auto& teamStatus = cPKV.status().cTeammate;
+  if (teamStatus.encore_duration == 0) { return 0; }
+
+  uint32_t duration = teamStatus.encore_duration;
+  uint32_t encAction = teamStatus.encore_action;
+
+  // Check if the encored move has PP
+  if (!cPKV.getMV(Action::move(encAction)).hasPP()) {
+    teamStatus.encore_duration = 0;
+    teamStatus.encore_action = 0;
+    return 1;
+  }
+
+  if (duration > 4) {
+    teamStatus.encore_duration = duration - 1;
+  } else {
+    std::array<size_t, 2> iREnv;
+    // Probability to end: 1/duration
+    cu.duplicateState(iREnv, FixType(1.0f / duration));
+
+    // Case 1: Encore ends
+    {
+      auto& newStatus = cu.getPKV(iREnv[0]).status().cTeammate;
+      newStatus.encore_duration = 0;
+      newStatus.encore_action = 0;
+    }
+    // Case 2: Encore continues
+    {
+      auto& newStatus = cu.getPKV(iREnv[1]).status().cTeammate;
+      uint32_t new_duration = std::max((int32_t)duration - 1, 0);
+      newStatus.encore_duration = new_duration;
+      newStatus.encore_action = new_duration == 0 ? 0 : encAction;
+    }
   }
 
   return 1;
@@ -1627,6 +1710,18 @@ int engine_typeBoostingItem(
   return 1;
 };
 
+
+int engine_updateLastAction(PkCUEngine& cu, PokemonVolatile cPKV) {
+  const auto& lastAction = cu.getCAction();
+  if (lastAction.isMove()) {
+    cPKV.status().cTeammate.iLastAction = lastAction.iMove() + 1;
+    return 1;
+  } else {
+    cPKV.status().cTeammate.iLastAction = 0;
+    return 0;
+  }
+};
+
 int engine_move_struggle(
     PkCUEngine& cu,
     MoveVolatile mV,
@@ -1979,6 +2074,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   crossPoison_t = orphan::orphanCheck(moves, "cross poison");
   doubleEdge_t = orphan::orphanCheck(moves, "double-edge");
   drainPunch_t = orphan::orphanCheck(moves, "drain punch");
+  encore_t = orphan::orphanCheck(moves, "encore");
   explosion_t = orphan::orphanCheck(moves, "explosion");
   facade_t = orphan::orphanCheck(moves, "facade");
   faintAttack_t = orphan::orphanCheck(moves, "faint attack");
@@ -2092,6 +2188,9 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(move, "cross poison", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "drain punch", PLUGIN_ON_ENDOFMOVE, move_lifeLeech50, 0, current_team));
   extensions.push_back(plugin(move, "double-edge", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, current_team));
+  extensions.push_back(plugin(move, "encore", PLUGIN_ON_EVALUATEMOVE, move_encore_set, 0, current_team));
+  extensions.push_back(plugin(move, "encore", PLUGIN_ON_TESTMOVE, move_encore_test, 0, other_team));
+  extensions.push_back(plugin(move, "encore", PLUGIN_ON_ENDOFTURN, move_encore_update, 0, other_team));
   extensions.push_back(plugin(move, "explosion", PLUGIN_ON_MODIFYATTACKPOWER, move_suicide_modPower, 0, current_team));
   extensions.push_back(plugin(move, "explosion", PLUGIN_ON_ENDOFMOVE, move_suicide_modLife, 0, current_team));
   extensions.push_back(plugin(move, "facade", PLUGIN_ON_MODIFYBASEPOWER, move_facade_modPower, 0, current_team));
@@ -2199,6 +2298,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(ability, "torrent", PLUGIN_ON_MODIFYBASEPOWER, ability_pinch_type_boost, -1, current_team));
 
   // engine effects:
+  extensions.push_back(plugin(engine, "engine update last action", PLUGIN_ON_ENDOFTURN, engine_updateLastAction, 1, all_teams));
   extensions.push_back(plugin(engine, "pp decrement", PLUGIN_ON_ENDOFMOVE, engine_decrementPP, 0, all_teams));
   extensions.push_back(plugin(engine, "type boosting item effect", PLUGIN_ON_MODIFYBASEPOWER, engine_typeBoostingItem, 0, all_teams));
   extensions.push_back(plugin(engine, "type resisting berry effect", PLUGIN_ON_MODIFYITEMPOWER, engine_typeResistingBerry, 0, all_teams));
