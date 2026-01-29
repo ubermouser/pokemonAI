@@ -5,6 +5,8 @@ if(NOT TORCH_LIBRARIES)
     set(TORCH_LIBRARIES libtorch::libtorch)
 endif()
 
+find_package(OpenBLAS REQUIRED)
+
 file(GLOB_RECURSE TEST_SOURCES "*.cpp")
 
 set(DECIDER_TESTS
@@ -19,6 +21,8 @@ set(DECIDER_TESTS
     test_fitness
     test_ranker
     test_ml_framework
+    test_torch_minimal
+    test_blas_minimal
 )
 
 foreach(test_file IN LISTS TEST_SOURCES)
@@ -39,7 +43,8 @@ foreach(test_file IN LISTS TEST_SOURCES)
     if(test_name IN_LIST DECIDER_TESTS)
         list(APPEND TEST_LIBS 
             pkaiDecider
-            "${TORCH_LIBRARIES}")
+            "${TORCH_LIBRARIES}"
+            OpenBLAS::OpenBLAS)
     endif()
 
     target_link_libraries(${test_name} ${TEST_LIBS})

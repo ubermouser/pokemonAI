@@ -11,3 +11,6 @@ CMakeToolchain
 
 [layout]
 cmake_layout
+
+[options]
+openblas/*:dynamic_arch=True
