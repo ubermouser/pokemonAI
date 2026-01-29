@@ -418,7 +418,14 @@ protected:
    */
   void guardNonvolatileState(const ConstEnvironmentVolatile& cEnv) const;
 
-  
+  /**
+   * @brief Checks if the sum of the probabilities in the stack is sane.
+   * @param envs The stack of possible environments.
+   * @return `true` if the sum is sane, `false` otherwise.
+   */
+  static bool saneStackProbability(PossibleEnvironments& envs);
+
+
   ActionVector getValidActionsInRange(
       const ConstEnvironmentVolatile& envV, size_t iTeam, size_t iStart, size_t iEnd) const;
 

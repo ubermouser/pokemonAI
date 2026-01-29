@@ -1248,8 +1248,6 @@ FixType PkCUEngine::getProbabilityToHit() {
 size_t PkCUEngine::combineSimilarEnvironments() {
   PossibleEnvironments& stack = getStack();
 
-  FixType probabilityAccumulator = FixType(0);
-
   // hash environments (and summate probabilities for check):
   for (iBase_ = 0; iBase_ != stack.size(); ++iBase_) {
     EnvironmentPossible cEnvironment = getBase();
@@ -1262,8 +1260,9 @@ size_t PkCUEngine::combineSimilarEnvironments() {
     cEnvironment.data().generateHash();
   }
 
-  std::unordered_map<uint64_t, size_t> envMap;
   size_t iSize = stack.size();
+  std::unordered_map<uint64_t, size_t> envMap;
+  envMap.reserve(iSize);
 
   // compare environment hashes:
   for (size_t iEnv = 0; iEnv != iSize; iEnv++)
@@ -1283,9 +1282,7 @@ size_t PkCUEngine::combineSimilarEnvironments() {
 
 #ifdef _PKCUCHECKSIGNATURE
       // Assert that same hash implies same environment data
-      // Note: this assertion was in the original code, adapted for map lookup
-      assert(cEnv.getHash() == existEnv.getHash());
-      // Checking actual environment equality would require operator== or memcmp
+      assert((oEnv.hash == iEnv.hash) == (oEnv.env == iEnv.env));
 #endif
 
       // combine the two environments by adding their probabilities
@@ -1309,14 +1306,7 @@ size_t PkCUEngine::combineSimilarEnvironments() {
   }
 
   // Calculate accumulated probability for verification
-  for (const auto& pair : envMap) {
-    EnvironmentPossible env = stack.at(pair.second);
-    FixType prob = env.getProbability();
-    probabilityAccumulator += prob;
-    assert(prob > FixType(0) && prob <= FixType(1));
-  }
-
-  assert(probabilityAccumulator == FixType(1));
+  assert(PkCU::saneStackProbability(stack));
   return stack.getNumUnique();
 } //endOf combineSimilarEnvironments
 
@@ -1627,12 +1617,14 @@ void PkCU::guardNonvolatileState(const ConstEnvironmentVolatile& cEnv) const {
 }
 
 
-bool saneStackProbability(PossibleEnvironments& envs) {
+bool PkCU::saneStackProbability(PossibleEnvironments& envs) {
   FixType sum = FixType(0);
   for (auto begin = envs.begin(), end = envs.end(); begin != end; ++begin) {
-    sum += begin->getProbability();
-    if (!(begin->getProbability() > FixType(0)) ||
-        !(begin->getProbability() <= FixType(1))) {
+    auto probability = begin->getProbability();
+    if (begin->isPruned()) { continue; }
+
+    sum += probability;
+    if (!(probability > FixType(0)) || !(probability <= FixType(1))) {
       return false;
     }
   }
@@ -1665,7 +1657,7 @@ void PkCUEngine::duplicateState(
   getBase(result[0]).getProbability() =
       totalProbability - getBase(result[1]).getProbability();
 
-  assert(saneStackProbability(getStack()));
+  assert(PkCU::saneStackProbability(getStack()));
 }
 
 
@@ -1702,7 +1694,7 @@ void PkCUEngine::triplicateState(
       totalProbability - getBase(result[1]).getProbability() -
       getBase(result[2]).getProbability();
 
-  assert(saneStackProbability(getStack()));
+  assert(PkCU::saneStackProbability(getStack()));
 }
 
 
