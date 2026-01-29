@@ -47,8 +47,8 @@ PlyResult PlannerSoftmax::generateSolutionAtDepth(
   actionValues.reserve(agentActions.size());
 
   size_t totalNodes = 0;
-  
-  // For each agent action, find the worst-case (minimax) outcome
+
+  // For each agent action, find the worst-case (negamax) outcome
   for (const auto& agentAction : agentActions) {
     size_t nodesEvaluated = 0;
     EvalResult worst = recurse_beta(

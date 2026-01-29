@@ -495,24 +495,14 @@ int move_substitute_block_status(
     MoveVolatile mV,
     PokemonVolatile cPKV,
     PokemonVolatile tPKV) {
-  SPDLOG_TRACE(
-      "move_substitute_block_status: move={} cPKV_nv={} tPKV_nv={} sub={}",
-      mV.getBase().getName(),
-      (void*)&cPKV.nv(),
-      (void*)&tPKV.nv(),
-      (uint32_t)tPKV.status().cTeammate.substitute);
   if (tPKV.status().cTeammate.substitute > 0) {
     if (mV.getBase().getDamageType() == ATK_NODMG) {
       // Gen 4 exceptions: Taunt bypasses Substitute
       if (&mV.getBase() == taunt_t) { return 0; }
 
       // Does not block self-targeting moves
-      if (&cPKV.nv() == &tPKV.nv()) {
-        SPDLOG_TRACE("move_substitute_block_status: Bypassing self-target");
-        return 0;
-      }
+      if (&cPKV.nv() == &tPKV.nv()) { return 0; }
 
-      SPDLOG_TRACE("move_substitute_block_status: BLOCKING status move");
       return 2;  // Consume evaluation, effective failure
     }
   }
@@ -1712,6 +1702,8 @@ int engine_typeBoostingItem(
 
 
 int engine_updateLastAction(PkCUEngine& cu, PokemonVolatile cPKV) {
+  if (!cPKV.isAlive()) { return 0; }
+
   const auto& lastAction = cu.getCAction();
   if (lastAction.isMove()) {
     cPKV.status().cTeammate.iLastAction = lastAction.iMove() + 1;
@@ -2298,7 +2290,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(ability, "torrent", PLUGIN_ON_MODIFYBASEPOWER, ability_pinch_type_boost, -1, current_team));
 
   // engine effects:
-  extensions.push_back(plugin(engine, "engine update last action", PLUGIN_ON_ENDOFTURN, engine_updateLastAction, 1, all_teams));
+  extensions.push_back(plugin(engine, "engine record last action", PLUGIN_ON_ENDOFTURN, engine_updateLastAction, 1, all_teams));
   extensions.push_back(plugin(engine, "pp decrement", PLUGIN_ON_ENDOFMOVE, engine_decrementPP, 0, all_teams));
   extensions.push_back(plugin(engine, "type boosting item effect", PLUGIN_ON_MODIFYBASEPOWER, engine_typeBoostingItem, 0, all_teams));
   extensions.push_back(plugin(engine, "type resisting berry effect", PLUGIN_ON_MODIFYITEMPOWER, engine_typeResistingBerry, 0, all_teams));

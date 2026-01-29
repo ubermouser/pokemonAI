@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-PlyResult PlannerMaxiMin::generateSolutionAtDepth(
+PlyResult PlannerMaximin::generateSolutionAtDepth(
     const ConstEnvironmentPossible& origin, size_t maxPly) const {
   // a count of the number of nodes evaluated:
   size_t numNodesEvaluated = 0;

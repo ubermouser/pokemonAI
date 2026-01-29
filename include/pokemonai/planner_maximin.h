@@ -12,22 +12,24 @@
 #include "planner.h"
 
 /**
- * @class PlannerMaxiMin
+ * @class PlannerMaximin
  * @brief A planner implementing depth-first-search over leaf evaluation.
  *
- * No search optimization is implemented at all for this planner, offering a stable
- * baseline of performance versus more efficient pruning methods.
+ * No search optimization is implemented at all for this planner, offering a
+ * stable baseline of performance versus more efficient pruning methods.
  */
-class PlannerMaxiMin : public Planner {
-public:
-  PlannerMaxiMin(const Config& cfg = Config()) : Planner(cfg) { resetName(); };
-  PlannerMaxiMin(const PlannerMaxiMin& other) = default;
+class PlannerMaximin : public Planner {
+ public:
+ PlannerMaximin(const Config& cfg = Config()) : Planner(cfg) { resetName(); };
+ PlannerMaximin(const PlannerMaximin& other) = default;
 
-  virtual ~PlannerMaxiMin() {};
+ virtual ~PlannerMaximin(){};
 
-  virtual std::string baseName() const override { return "MaxiMin"; }
+ virtual std::string baseName() const override { return "Maximin"; }
 
-  virtual PlannerMaxiMin* clone() const override { return new PlannerMaxiMin(*this); }
+ virtual PlannerMaximin* clone() const override {
+   return new PlannerMaximin(*this);
+ }
 
   virtual size_t maxImplDepth() const override { return MAXTRIES; }
 

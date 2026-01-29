@@ -31,19 +31,21 @@ struct FitnessDepth {
     return FitnessDepth{fitness.expand(probability), depth};
   }
 
-  bool operator < (const FitnessDepth& other) const {
+  bool operator<(const FitnessDepth& other) const {
     // bias towards shallower depth
     if (fitness == other.fitness) {
       return depth < other.depth;
     }
     return fitness < other.fitness;
   }
-  bool operator > (const FitnessDepth& other) const {
+  bool operator>(const FitnessDepth& other) const {
     if (fitness == other.fitness) {
       return depth < other.depth;
     }
     return fitness > other.fitness;
   }
+  bool operator<=(const FitnessDepth& other) const { return !(*this > other); }
+  bool operator>=(const FitnessDepth& other) const { return !(*this < other); }
 };
 
 

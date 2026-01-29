@@ -84,13 +84,13 @@ modules:
 					EvaluatorPerceptron:  - uses a perceptron to compute fitness
 					EvaluatorMonteCarlo:  - evaluates a state given successive rollouts.
 		extends:
-			PlannerNegamax:  evaluates moves in order of nested probability (best-first traversal)
-			PlannerMinimax:  - uses expectiminimax to determine optimal move
+			PlannerNegamax:  - uses negamax to determine optimal move. evaluates moves in order of nested probability (best-first traversal)
 				submodules:
 					KillerHeuristic:  The first move attempted is the one that produced the strongest cutoff in the transposition table
 					OrderHeuristic:  For a given pair of agent/other pokemon, visit actions in the order most likely to produce a cutoff.
 					TranspositionTable:  recalls evaluated performance of a given state. May recall full and partial evaluations.
 					ply:  an agent move, other move, all possible random outcomes of those moves:
+			PlannerMinimax:  implements alpha-beta-gamma pruning ontop of PlannerMaximin.
 			PlannerMaximin:  testing module. Simplest minimax algorithm capable of evaluating N-depth.
 			PlannerMax:  testing module. Determines the locally optimal move, not taking into account the other agent's choice.
 			PlannerStochastic:  performs a move in accordance to a probability distribution

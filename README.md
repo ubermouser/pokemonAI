@@ -135,13 +135,13 @@ All executables must be run from the project root directory.
 ${BUILD_DIR}/battler/battler [options]
 ```
 
-Battle two teams against one another using minimax search:
+Battle two teams against one another using negamax search:
 ```bash
 ${BUILD_DIR}/battler/battler \
     --team-a ./teams/gen4/hexTeamD.txt \
     --team-b ./teams/gen4/hexTeamA.txt \
-    --planner-a minimax \
-    --planner-b minimax \
+    --planner-a negamax \
+    --planner-b negamax \
     --evaluator-a simple \
     --evaluator-b simple \
     --b-max-search-depth=4 \
@@ -157,7 +157,7 @@ Play against an agent yourself:
 ${BUILD_DIR}/battler/battler \
     --team-a ./teams/gen4/hexTeamD.txt \
     --team-b ./teams/gen4/hexTeamA.txt \
-    --planner-a minimax \
+    --planner-a negamax \
     --planner-b human \
     --evaluator-a simple \
     --b-max-search-depth=4 \
@@ -177,7 +177,7 @@ ${BUILD_DIR}/teambuilder/teambuilder [options]
 Construct new teams that play well at a range of skill levels:
 ```bash
 ${BUILD_DIR}/teambuilder/teambuilder \
-    --planners=random max minimax minimax \
+    --planners=random max negamax negamax \
     --evaluators=simple \
     --p1-max-search-depth=0 \
     --p2-max-search-depth=1 \
@@ -192,7 +192,7 @@ Construct teams targeting a different generation of Pokemon:
 ```bash
 ${BUILD_DIR}/teambuilder/teambuilder \
     --team-path ./teams/gen1/ \
-    --planners=minimax \
+    --planners=negamax \
     --evaluators=simple \
     --p1-max-search-depth=3 \
     --ranker-verbosity=1 \

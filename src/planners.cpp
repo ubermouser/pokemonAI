@@ -11,6 +11,7 @@
 #include "pokemonai/planner_max.h"
 #include "pokemonai/planner_maximin.h"
 #include "pokemonai/planner_minimax.h"
+#include "pokemonai/planner_negamax.h"
 #include "pokemonai/planner_random.h"
 #include "pokemonai/planner_softmax.h"
 
@@ -18,9 +19,11 @@ std::shared_ptr<Planner::Config> planners::config(const std::string& _type) {
   auto type = boost::to_lower_copy(_type);
   std::shared_ptr<Planner::Config> result;
   if (type == "maximin") {
-    result = std::make_shared<PlannerMaxiMin::Config>();
+    result = std::make_shared<PlannerMaximin::Config>();
   } else if (type == "minimax") {
-    result = std::make_shared<PlannerMiniMax::Config>();
+    result = std::make_shared<PlannerMinimax::Config>();
+  } else if (type == "negamax") {
+    result = std::make_shared<PlannerNegamax::Config>();
   } else if (type == "random") {
     result = std::make_shared<PlannerRandom::Config>();
   } else if (type == "max") {
@@ -40,11 +43,14 @@ std::shared_ptr<Planner> planners::choose(const std::string& _type, const Planne
   auto type = boost::to_lower_copy(_type);
   std::shared_ptr<Planner> result;
   if (type == "maximin") {
-    result = std::make_shared<PlannerMaxiMin>(
-        dynamic_cast<const PlannerMaxiMin::Config&>(cfg));
+    result = std::make_shared<PlannerMaximin>(
+        dynamic_cast<const PlannerMaximin::Config&>(cfg));
   } else if (type == "minimax") {
-    result = std::make_shared<PlannerMiniMax>(
-        dynamic_cast<const PlannerMiniMax::Config&>(cfg));
+    result = std::make_shared<PlannerMinimax>(
+        dynamic_cast<const PlannerMinimax::Config&>(cfg));
+  } else if (type == "negamax") {
+    result = std::make_shared<PlannerNegamax>(
+        dynamic_cast<const PlannerNegamax::Config&>(cfg));
   } else if (type == "random") {
     result = std::make_shared<PlannerRandom>(
         dynamic_cast<const PlannerRandom::Config&>(cfg));

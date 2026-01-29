@@ -173,52 +173,6 @@ ActionVector Planner::getValidActions(
 }
 
 
-bool Planner::testAgentSelection(
-    EvalResult& bestOfWorst,
-    const EvalResult& worst,
-    const FitnessDepth& lowCutoff,
-    const ConstEnvironmentPossible& origin) const {
-  if (worst > bestOfWorst) {
-    bestOfWorst = worst;
-    return true;
-  }
-  return false;
-}
-
-
-bool Planner::testOtherSelection(
-    EvalResult& worst,
-    const EvalResult& current,
-    const FitnessDepth& highCutoff,
-    const ConstEnvironmentPossible& origin) const {
-  if (current < worst) {
-    worst = current;
-    return true;
-  }
-  return false;
-}
-
-
-bool Planner::testGammaCutoff(
-    const EvalResult& child,
-    const FitnessDepth& lowCutoff,
-    const FitnessDepth& highCutoff) const {
-  // TODO(@drendleman) cutoff when solution has been found at a shallower depth
-  if (child < lowCutoff) {
-    // if there's no possibility this action is the best for the agent, do not continue:
-    return true;
-  } else if (child > highCutoff) {
-    // if the other team would never choose this move against the agent, do not continue:
-    return true;
-  } else if (highCutoff < lowCutoff) {
-    // if there exists no solution that can satisfy both the agent and the other, do not continue:
-    return true;
-  }
-  // continue evaluation at this depth.
-  return false;
-}
-
-
 EvalResult Planner::recurse_alphabeta(
       const ConstEnvironmentPossible& origin,
       size_t searchDepth,
@@ -244,7 +198,13 @@ EvalResult Planner::recurse_alphabeta(
 
     // is the min of all other agent moves better than the best of our current
     // moves?
-    testAgentSelection(bestOfWorst, worst, lowCutoff, origin);
+    if (testAgentSelection(bestOfWorst, worst, _highCutoff, origin)) {
+      SPDLOG_TRACE(
+          "Agent selection cutoff! c={} high={}",
+          fmt::streamed(bestOfWorst.fitness),
+          fmt::streamed(_highCutoff.fitness));
+      break;
+    };
   }  // endOf foreach agent move
 
   return bestOfWorst;
@@ -280,7 +240,13 @@ EvalResult Planner::recurse_beta(
 
     // has the other agent improved upon its best score by reducing our score
     // more?
-    testOtherSelection(worst, child, highCutoff, origin);
+    if (testOtherSelection(worst, child, lowCutoff, origin)) {
+      SPDLOG_TRACE(
+          "Other selection cutoff! c={} low={}",
+          fmt::streamed(worst.fitness),
+          fmt::streamed(lowCutoff.fitness));
+      break;
+    }
   }  // endOf foreach other move
 
   return worst;
@@ -331,10 +297,19 @@ EvalResult Planner::recurse_gamma(
     result.depth = std::max(result.depth, child.depth);
 
     // if this action will never be chosen by either agent or other, do not continue:
-    if (testGammaCutoff(result, lowCutoff, highCutoff)) { break; }
+    if (testGammaCutoff(result, lowCutoff, highCutoff)) {
+      SPDLOG_TRACE(
+          "Gamma cutoff! c={} low={} high={} ",
+          fmt::streamed(result.fitness),
+          fmt::streamed(lowCutoff.fitness),
+          fmt::streamed(highCutoff.fitness));
+      break;
+    }
   } // endOf foreach environment
 
-  if (cfg_.verbosity >= 4) { printStateEvaluation(origin, searchDepth, result); }
+  if (cfg_.verbosity >= 4) {
+    printStateEvaluation(origin, searchDepth, result, numNodes);
+  }
   if (nodesEvaluated != NULL) { *nodesEvaluated += numNodes; }
   return EvalResult{result.fitness, agentAction, otherAction, result.depth + 1};
 }
@@ -343,10 +318,11 @@ EvalResult Planner::recurse_gamma(
 void Planner::printStateEvaluation(
     const ConstEnvironmentPossible& origin,
     size_t searchDepth,
-    const EvalResult& evalResult) const {
+    const EvalResult& evalResult,
+    size_t numNodes) const {
   std::string padding(searchDepth, ' ');
   fmt::print(
-      "{}T{}: s=x{:06x} i={:2} a={:4} o={:4} d={:2} {}\n",
+      "{}T{}: s=x{:06x} i={:2} a={:4} o={:4} d={:2} n={} {}\n",
       padding,
       (agentTeam_ == TEAM_A ? "A" : "B"),
       (origin.getHash() & 0xffffff),
@@ -354,6 +330,7 @@ void Planner::printStateEvaluation(
       fmt::streamed(evalResult.agentAction),
       fmt::streamed(evalResult.otherAction),
       evalResult.depth,
+      numNodes,
       fmt::streamed(evalResult.fitness));
 }
 

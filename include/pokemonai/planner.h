@@ -209,27 +209,39 @@ protected:
   virtual bool testGammaCutoff(
       const EvalResult& child,
       const FitnessDepth& lowCutoff,
-      const FitnessDepth& highCutoff) const;
+      const FitnessDepth& highCutoff) const {
+    // disable all pruning:
+    return false;
+  }
 
   /* test if the current agent action is better than the best seen agent action */
   virtual bool testAgentSelection(
-      EvalResult& bestOfWorst, 
+      EvalResult& bestOfWorst,
       const EvalResult& worst,
-      const FitnessDepth& lowCutoff,
-      const ConstEnvironmentPossible& origin) const;
+      const FitnessDepth& highCutoff,
+      const ConstEnvironmentPossible& origin) const {
+    if (worst > bestOfWorst) { bestOfWorst = worst; }
+    // disable all pruning:
+    return false;
+  }
 
   /* test if the current other action is worse than the worst seen other action */
   virtual bool testOtherSelection(
-      EvalResult& worst, 
+      EvalResult& worst,
       const EvalResult& current,
-      const FitnessDepth& highCutoff,
-      const ConstEnvironmentPossible& origin) const;
+      const FitnessDepth& lowCutoff,
+      const ConstEnvironmentPossible& origin) const {
+    if (current < worst) { worst = current; }
+    // disable all pruning:
+    return false;
+  }
 
   virtual void printSolution(const PlannerResult& result, bool isLast) const;
   virtual void printStateEvaluation(
       const ConstEnvironmentPossible& origin,
       size_t iDepth,
-      const EvalResult& evalResult) const;
+      const EvalResult& evalResult,
+      size_t numNodes) const;
 };
 
 #endif /* PLANNER_H */

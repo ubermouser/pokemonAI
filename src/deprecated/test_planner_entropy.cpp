@@ -1,39 +1,34 @@
 //#define PKAI_IMPORT
-#include "pokemonai/pkai.h"
-
-#include <fstream>
-#include <iostream>
 #include <assert.h>
 #include <time.h>
-#include <boost/scoped_ptr.hpp>
+
 #include <boost/foreach.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <fstream>
+#include <iostream>
 
-#include "pokemonai/team_nonvolatile.h"
 #include "pokemonai/environment_nonvolatile.h"
-#include "pokemonai/environment_volatile.h"
 #include "pokemonai/environment_possible.h"
-
-#include "pokemonai/pokedex.h"
-#include "pokemonai/plugin.h"
-#include "pokemonai/pkCU.h"
-
-#include "pokemonai/ranked_team.h"
-
-#include "pokemonai/planner_max.h"
-#include "pokemonai/planner_stochastic.h"
-#include "pokemonai/planner_directed.h"
-#include "pokemonai/planner_minimax.h"
-#include "pokemonai/planner_human.h"
-#include "pokemonai/planner_random.h"
-#include "pokemonai/evaluator_simple.h"
+#include "pokemonai/environment_volatile.h"
 #include "pokemonai/evaluator_featureVector.h"
+#include "pokemonai/evaluator_simple.h"
 #include "pokemonai/experienceNet.h"
-
+#include "pokemonai/game.h"
 #include "pokemonai/init_toolbox.h"
 #include "pokemonai/orphan.h"
+#include "pokemonai/pkCU.h"
+#include "pokemonai/pkai.h"
+#include "pokemonai/planner_directed.h"
+#include "pokemonai/planner_human.h"
+#include "pokemonai/planner_max.h"
+#include "pokemonai/planner_negamax.h"
+#include "pokemonai/planner_random.h"
+#include "pokemonai/planner_stochastic.h"
+#include "pokemonai/plugin.h"
+#include "pokemonai/pokedex.h"
+#include "pokemonai/ranked_team.h"
 #include "pokemonai/roulette.h"
-
-#include "pokemonai/game.h"
+#include "pokemonai/team_nonvolatile.h"
 
 class tinyAI : public pokedex
 {

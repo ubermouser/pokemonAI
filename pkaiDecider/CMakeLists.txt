@@ -34,6 +34,7 @@ add_library(pkaiDecider STATIC
     ../src/planner_max.cpp
     ../src/planner_maximin.cpp
     ../src/planner_minimax.cpp
+    ../src/planner_negamax.cpp
     ../src/planner_softmax.cpp
     ../src/planner_random.cpp
     ../src/planners.cpp

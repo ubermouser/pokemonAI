@@ -10,7 +10,7 @@
 #include "pokemonai/planner_human.h"
 #include "pokemonai/planner_max.h"
 #include "pokemonai/planner_maximin.h"
-#include "pokemonai/planner_minimax.h"
+#include "pokemonai/planner_negamax.h"
 #include "pokemonai/planner_random.h"
 #include "pokemonai/planner_softmax.h"
 
@@ -85,11 +85,12 @@ TEST_F(PlannerTest, MaxPlannerChoosesGreedyOption) {
 
 
 TEST_F(PlannerTest, MaximinPlannerChooses1PlyOption) {
-  PlannerMaxiMin::Config cfg;
+  PlannerMaximin::Config cfg;
   cfg.maxDepth = 1;
   cfg.verbosity = 4;
   cfg.maxTime = std::numeric_limits<double>::infinity();
-  std::array<PlannerMaxiMin, 2> planners {PlannerMaxiMin(cfg), PlannerMaxiMin(cfg)};
+  std::array<PlannerMaximin, 2> planners{
+      PlannerMaximin(cfg), PlannerMaximin(cfg)};
   for (auto& planner: planners) {
     planner
         .setEvaluator(evaluator_)
@@ -111,11 +112,12 @@ TEST_F(PlannerTest, MaximinPlannerChooses1PlyOption) {
 
 
 TEST_F(PlannerTest, MaximinPlannerChooses2PlyOption) {
-  PlannerMaxiMin::Config cfg;
+  PlannerMaximin::Config cfg;
   cfg.maxDepth = 2;
   cfg.verbosity = 4;
   cfg.maxTime = std::numeric_limits<double>::infinity();
-  std::array<PlannerMaxiMin, 2> planners {PlannerMaxiMin(cfg), PlannerMaxiMin(cfg)};
+  std::array<PlannerMaximin, 2> planners{
+      PlannerMaximin(cfg), PlannerMaximin(cfg)};
   for (auto& planner: planners) {
     planner
         .setEvaluator(evaluator_)
@@ -164,36 +166,13 @@ class PlannerMaximinTest : public PlannerNPlyTest {
 protected:
   void SetUp() override {
     PlannerNPlyTest::SetUp();
-    PlannerMaxiMin::Config cfg;
+    PlannerMaximin::Config cfg;
     cfg.minDepth = 4;
-    cfg.maxDepth = 4; // success is possible in 2 turns
+    cfg.maxDepth = 4;  // success is possible in 2 turns
     cfg.verbosity = 4;
     cfg.maxTime = std::numeric_limits<double>::infinity();
 
-    planner_ = std::make_shared<PlannerMaxiMin>(cfg);
-    planner_->setEvaluator(evaluator_)
-        .setTeam(TEAM_A)
-        .setEngine(engine_)
-        .setEnvironment(environment_)
-        .initialize();
-  }
-
-  std::shared_ptr<Planner> planner_;
-};
-
-
-class PlannerMinimaxTest : public PlannerNPlyTest {
-protected:
-  void SetUp() override {
-    PlannerNPlyTest::SetUp();
-    PlannerMiniMax::Config cfg;
-    cfg.minDepth = 4;
-    cfg.maxDepth = 4; // success is possible in 2 turns
-    cfg.verbosity = 4;
-    cfg.transposition_table_size = 256;
-    cfg.maxTime = std::numeric_limits<double>::infinity();
-
-    planner_ = std::make_shared<PlannerMiniMax>(cfg);
+    planner_ = std::make_shared<PlannerMaximin>(cfg);
     planner_->setEvaluator(evaluator_)
         .setTeam(TEAM_A)
         .setEngine(engine_)
@@ -209,16 +188,71 @@ TEST_F(PlannerMaximinTest, planner_chooses_n_ply_option) {
   auto agent_result = planner_->generateSolution(engine_->initialState());
 
   EXPECT_EQ(agent_result.bestAgentAction(), Action::move(1));
+  // TODO: not enough opportunities to cutoff moves in the contrived example
   EXPECT_EQ(agent_result.best().numNodes, 114);
   EXPECT_FLOAT_EQ(agent_result.bestFitness(), 1.0);
 }
+
+
+class PlannerMinimaxTest : public PlannerNPlyTest {
+ protected:
+  void SetUp() override {
+    PlannerNPlyTest::SetUp();
+    PlannerMinimax::Config cfg;
+    cfg.minDepth = 4;
+    cfg.maxDepth = 4; // success is possible in 2 turns
+    cfg.verbosity = 4;
+    cfg.maxTime = std::numeric_limits<double>::infinity();
+
+    planner_ = std::make_shared<PlannerMinimax>(cfg);
+    planner_->setEvaluator(evaluator_)
+        .setTeam(TEAM_A)
+        .setEngine(engine_)
+        .setEnvironment(environment_)
+        .initialize();
+  }
+
+  std::shared_ptr<Planner> planner_;
+};
 
 
 TEST_F(PlannerMinimaxTest, planner_chooses_n_ply_option) {
   auto agent_result = planner_->generateSolution(engine_->initialState());
 
   EXPECT_EQ(agent_result.bestAgentAction(), Action::move(1));
-  EXPECT_LE(agent_result.best().numNodes, 45);
+  EXPECT_EQ(agent_result.best().numNodes, 114);
+  EXPECT_FLOAT_EQ(agent_result.bestFitness(), 1.0);
+}
+
+
+class PlannerNegamaxTest : public PlannerNPlyTest {
+ protected:
+  void SetUp() override {
+    PlannerNPlyTest::SetUp();
+    PlannerNegamax::Config cfg;
+    cfg.minDepth = 4;
+    cfg.maxDepth = 4;  // success is possible in 2 turns
+    cfg.verbosity = 4;
+    cfg.transposition_table_size = 256;
+    cfg.maxTime = std::numeric_limits<double>::infinity();
+
+    planner_ = std::make_shared<PlannerNegamax>(cfg);
+    planner_->setEvaluator(evaluator_)
+        .setTeam(TEAM_A)
+        .setEngine(engine_)
+        .setEnvironment(environment_)
+        .initialize();
+  }
+
+  std::shared_ptr<Planner> planner_;
+};
+
+
+TEST_F(PlannerNegamaxTest, planner_chooses_n_ply_option) {
+  auto agent_result = planner_->generateSolution(engine_->initialState());
+
+  EXPECT_EQ(agent_result.bestAgentAction(), Action::move(1));
+  EXPECT_EQ(agent_result.best().numNodes, 57);
   EXPECT_FLOAT_EQ(agent_result.bestFitness(), 1.0);
 }
 
@@ -238,15 +272,6 @@ class PlannerSoftmaxTest : public PlannerTest {
         .setEnvironment(environment_)
         .initialize();
 
-    PlannerMaxiMin::Config maximin_cfg;
-    maximin_cfg.maxDepth = 1;
-    maximin_planner_ = std::make_unique<PlannerMaxiMin>(maximin_cfg);
-    maximin_planner_->setEvaluator(evaluator_)
-        .setTeam(TEAM_A)
-        .setEngine(engine_)
-        .setEnvironment(environment_)
-        .initialize();
-
     PlannerSoftmax::Config softmax_cfg_high_temp;
     softmax_cfg_high_temp.temperature = 10.0;
     softmax_cfg_high_temp.maxDepth = 1;
@@ -257,15 +282,24 @@ class PlannerSoftmaxTest : public PlannerTest {
         .setEngine(engine_)
         .setEnvironment(environment_)
         .initialize();
+
+    PlannerMaximin::Config maximin_cfg;
+    maximin_cfg.maxDepth = 1;
+    maximin_planner_ = std::make_unique<PlannerMaximin>(maximin_cfg);
+    maximin_planner_->setEvaluator(evaluator_)
+        .setTeam(TEAM_A)
+        .setEngine(engine_)
+        .setEnvironment(environment_)
+        .initialize();
   }
 
   std::unique_ptr<PlannerSoftmax> softmax_planner_;
   std::unique_ptr<PlannerSoftmax> softmax_planner_high_temp_;
-  std::unique_ptr<PlannerMaxiMin> maximin_planner_;
+  std::unique_ptr<PlannerMaximin> maximin_planner_;
 };
 
 
-TEST_F(PlannerSoftmaxTest, TemperatureZeroFallbacksToMaxiMin) {
+TEST_F(PlannerSoftmaxTest, TemperatureZeroFallbacksToMaximin) {
   auto softmax_result =
       softmax_planner_->generateSolution(engine_->initialState());
   auto maximin_result =

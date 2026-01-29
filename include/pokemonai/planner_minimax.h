@@ -1,75 +1,45 @@
-/*
- * File:   planner_minimax.h
- * Author: drendleman
- *
- * Created on September 16, 2020, 1:57 PM
- */
-
 #ifndef PLANNER_MINIMAX_H
 #define PLANNER_MINIMAX_H
 
-#include <boost/program_options.hpp>
-#include <string>
-
-#include "order_heuristic.h"
 #include "planner_maximin.h"
-#include "transposition_table.h"
 
 /**
- * @class PlannerMaxiMin
+ * @class PlannerMinimax
  * @brief A planner implementing expectiminimax search over leaf evaluation.
  *
  * Includes alpha-beta-gamma pruning.
  */
-class PlannerMiniMax : public PlannerMaxiMin {
+class PlannerMinimax : public PlannerMaximin {
 public:
-  using base_t = PlannerMaxiMin;
+  PlannerMinimax(const Config& cfg = Config()) : PlannerMaximin(cfg) { resetName(); };
+  PlannerMinimax(const PlannerMinimax& other) = default;
 
-  struct Config: public base_t::Config {
-    size_t transposition_table_size = 1024 * 1024 * 10;
+  virtual ~PlannerMinimax() {};
 
-    Config() : base_t::Config() {};
+  virtual std::string baseName() const override { return "Minimax"; }
 
-    virtual boost::program_options::options_description options(
-        const std::string& category="planner options", std::string prefix="") override;
-  };
+  virtual PlannerMinimax* clone() const override { return new PlannerMinimax(*this); }
 
-  PlannerMiniMax(const Config& cfg = Config());
-
-  virtual PlannerMiniMax& initialize() override;
-
-  virtual std::string baseName() const override { return "MiniMax"; }
-
-  virtual PlannerMiniMax* clone() const override { return new PlannerMiniMax(*this); }
 protected:
-  virtual ActionVector getValidActions(
-      const ConstEnvironmentPossible& origin, size_t iTeam) const override;
+  /* test if another previously seen action always better than the current */
+  virtual bool testGammaCutoff(
+      const EvalResult& child,
+      const FitnessDepth& lowCutoff,
+      const FitnessDepth& highCutoff) const override;
 
-  virtual EvalResult recurse_alphabeta(
-      const ConstEnvironmentPossible& origin,
-      size_t iDepth,
-      const FitnessDepth& lowCutoff = FitnessDepth::worst(),
-      const FitnessDepth& highCutoff = FitnessDepth::best(),
-      size_t* nodesEvaluated=NULL) const override;
-
+  /* test if the current agent action is better than the best seen agent action */
   virtual bool testAgentSelection(
-      EvalResult& bestOfWorst,
+      EvalResult& bestOfWorst, 
       const EvalResult& worst,
       const FitnessDepth& lowCutoff,
       const ConstEnvironmentPossible& origin) const override;
+
+  /* test if the current other action is worse than the worst seen other action */
   virtual bool testOtherSelection(
-      EvalResult& worst,
+      EvalResult& worst, 
       const EvalResult& current,
       const FitnessDepth& highCutoff,
       const ConstEnvironmentPossible& origin) const override;
-
-  Config cfg_;
-
-  // TODO(@drendleman) neither of these are thread safe!
-  mutable TranspositionTable transpositionTable_;
-
-  mutable OrderHeuristic orderHeuristic_;
 };
 
 #endif /* PLANNER_MINIMAX_H */
-

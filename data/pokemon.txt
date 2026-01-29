@@ -141,7 +141,7 @@ Current bugs, features to implement:
 		above is called STAR algorithm - Ballard
 	max_planner:
 		
-	minimax_planner:
+	negamax_planner:
 		don't allow agent to switch or use the same move x times in a row unless they absolutely have to
 		detect if move returned from search is invalid, and if so, delete transposition table and redo the search. No code in release builds exists to determine if a potential ttable max exhibits type 1 key collisions
 		Can the fitness function provide a guess as to the best move? -- this would only serve to increase the power of move-ordering. Make it so! -- and decrease raw performance for dubious gain
