@@ -1388,6 +1388,9 @@ int ability_shadowTag(
     return 0;
   }
 
+  // Shadow Tag does not affect fainted pokemon
+  if (!cPKV.isAlive()) { return 0; }
+
   switchAllowed[VALID_SWAP_SCRIPT] = false;
   return 1;
 };

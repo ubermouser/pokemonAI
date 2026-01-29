@@ -92,3 +92,18 @@ TEST_F(ShadowTagTest, Normal) {
   // Team A tries to switch - Should be valid
   EXPECT_TRUE(engine_->isValidAction(state, Action::swap(1), TEAM_A));
 }
+
+TEST_F(ShadowTagTest, FaintedPokemonCanSwitch) {
+  // Team A: Squirtle (Torrent) vs Team B: Wobbuffet (Shadow Tag)
+  setupState("torrent", "shadow tag");
+
+  // Faint Team A's Squirtle
+  auto state = engine_->initialState();
+  EnvironmentVolatileData envData = state.data();
+  EnvironmentVolatile envV(state.nv(), envData);
+  envV.getTeam(TEAM_A).getPKV().setHP(0);
+
+  // Team A should be able to switch because Squirtle is fainted, even though
+  // Wobbuffet has Shadow Tag
+  EXPECT_TRUE(engine_->isValidAction(envV, Action::swap(1), TEAM_A));
+}
