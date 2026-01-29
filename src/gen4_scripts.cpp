@@ -90,6 +90,7 @@ const Item* focusSash_t;
 const Item* leftovers_t;
 const Item* lifeOrb_t;
 const Item* lumBerry_t;
+const Item* shedShell_t;
 
 const Ability* blaze_t;
 const Ability* clearBody_t;
@@ -102,6 +103,7 @@ const Ability* overgrow_t;
 const Ability* pressure_t;
 const Ability* sereneGrace_t;
 const Ability* stickyHold_t;
+const Ability* shadowTag_t;
 const Ability* swarm_t;
 const Ability* synchronize_t;
 const Ability* technician_t;
@@ -1366,6 +1368,31 @@ int ability_pinch_type_boost(
   return 0;
 }
 
+int ability_shadowTag(
+    ConstPokemonVolatile cPKV,
+    ConstPokemonVolatile fPKV,
+    const Action& action,
+    ValidSwapSet& switchAllowed) {
+  if (cPKV.nv().abilityExists() && (&cPKV.nv().getAbility() == shadowTag_t)) {
+    return 0;
+  }
+
+  switchAllowed[VALID_SWAP_SCRIPT] = false;
+  return 1;
+};
+
+int item_shedShell_allowSwitch(
+    ConstPokemonVolatile cPKV,
+    ConstPokemonVolatile fPKV,
+    const Action& action,
+    ValidSwapSet& switchAllowed) {
+  if (cPKV.hasItem() && (&cPKV.getItem() == shedShell_t)) {
+    return 2;
+  }
+
+  return 0;
+}
+
 int ability_technician(
     PkCUEngine& cu,
     MoveVolatile mV,
@@ -2145,6 +2172,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   leftovers_t = orphan::orphanCheck(items, "leftovers");
   lifeOrb_t = orphan::orphanCheck(items, "life orb");
   lumBerry_t = orphan::orphanCheck(items, "lum berry");
+  shedShell_t = orphan::orphanCheck(items, "shed shell");
   // abilities:
   const Abilities& abilities = dex->getAbilities();
   blaze_t = orphan::orphanCheck(abilities, "blaze");
@@ -2157,6 +2185,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   overgrow_t = orphan::orphanCheck(abilities, "overgrow");
   pressure_t = orphan::orphanCheck(abilities, "pressure");
   sereneGrace_t = orphan::orphanCheck(abilities, "serene grace");
+  shadowTag_t = orphan::orphanCheck(abilities, "shadow tag");
   stickyHold_t = orphan::orphanCheck(abilities, "sticky hold");
   swarm_t = orphan::orphanCheck(abilities, "swarm");
   synchronize_t = orphan::orphanCheck(abilities, "synchronize");
@@ -2291,6 +2320,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(item, "life orb", PLUGIN_ON_MODIFYRAWDAMAGE, item_lifeOrb_modPower, 0, all_teams));
   extensions.push_back(plugin(item, "life orb", PLUGIN_ON_ENDOFMOVE, item_lifeOrb_modLife, 0, all_teams));
   extensions.push_back(plugin(item, "lum berry", PLUGIN_ON_ENDOFTURN, item_lumBerry, 0, all_teams));
+  extensions.push_back(plugin(item, "shed shell", PLUGIN_ON_TESTSWITCH, item_shedShell_allowSwitch, -100, current_team));
   // ability effects:
   extensions.push_back(plugin(ability, "blaze", PLUGIN_ON_MODIFYBASEPOWER, ability_pinch_type_boost, -1, current_team));
   extensions.push_back(plugin(ability, "clear body", PLUGIN_ON_SECONDARYEFFECT, ability_restoreStats, 0, other_team));
@@ -2303,6 +2333,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(ability, "overgrow", PLUGIN_ON_MODIFYBASEPOWER, ability_pinch_type_boost, -1, current_team));
   extensions.push_back(plugin(ability, "pressure", PLUGIN_ON_ENDOFMOVE, ability_pressure, 0, other_team));
   extensions.push_back(plugin(ability, "serene grace", PLUGIN_ON_MODIFYSECONDARYPROBABILITY, ability_sereneGrace, -1, current_team));
+  extensions.push_back(plugin(ability, "shadow tag", PLUGIN_ON_TESTSWITCH, ability_shadowTag, 0, other_team));
   extensions.push_back(plugin(ability, "sticky hold", PLUGIN_ON_SWITCHOUT, ability_doNothing, 99, current_team));
   extensions.push_back(plugin(ability, "swarm", PLUGIN_ON_MODIFYBASEPOWER, ability_pinch_type_boost, -1, current_team));
   extensions.push_back(plugin(ability, "synchronize", PLUGIN_ON_SECONDARYEFFECT, ability_synchronize, -1, other_team));
