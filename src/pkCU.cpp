@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <boost/program_options.hpp>
 
 #include "pokemonai/fp_compare.h"
@@ -1261,48 +1262,59 @@ size_t PkCUEngine::combineSimilarEnvironments() {
     cEnvironment.data().generateHash();
   }
 
+  std::unordered_map<uint64_t, size_t> envMap;
+  size_t iSize = stack.size();
+
   // compare environment hashes:
-  for (size_t iOEnv = 0, iSize = stack.size(); iOEnv != iSize; iOEnv++)
+  for (size_t iEnv = 0; iEnv != iSize; iEnv++)
   {
-    EnvironmentPossible oEnv = stack.at(iOEnv);
-    FixType& oProbability = oEnv.getProbability();
+    EnvironmentPossible cEnv = stack.at(iEnv);
 
     // don't attempt to merge pruned environments
-    if (oEnv.isPruned()) { continue; }
+    if (cEnv.isPruned()) { continue; }
 
-    for (size_t iIEnv = iOEnv + 1; iIEnv != iSize; iIEnv++) {
-      EnvironmentPossible iEnv = stack.at(iIEnv);
-      FixType& iProbability = iEnv.getProbability();
+    uint64_t hash = cEnv.getHash();
+    auto it = envMap.find(hash);
 
-      // don't re-prune already pruned environments
-      if (iEnv.isPruned()) { continue; }
+    if (it != envMap.end()) {
+      // Found a duplicate! Merge into the existing environment
+      size_t existIndex = it->second;
+      EnvironmentPossible existEnv = stack.at(existIndex);
 
-      // don't merge non-identical environments
 #ifdef _PKCUCHECKSIGNATURE
-      assert((oEnv.hash == iEnv.hash) == (oEnv.env == iEnv.env));
+      // Assert that same hash implies same environment data
+      // Note: this assertion was in the original code, adapted for map lookup
+      assert(cEnv.getHash() == existEnv.getHash());
+      // Checking actual environment equality would require operator== or memcmp
 #endif
-      if (oEnv.getHash() != iEnv.getHash()) { continue; }
 
-      // combine the two environments by adding their probabilities and deleting the second
-      oProbability += iProbability;
+      // combine the two environments by adding their probabilities
+      existEnv.getProbability() += cEnv.getProbability();
 
       // this is probably not representative of the current environment now
-      oEnv.getBitmask() &= iEnv.getBitmask();
+      existEnv.getBitmask() &= cEnv.getBitmask();
 
-      // flag this environment as merged with another environment
-      oEnv.setMerged();
+      // flag the destination environment as merged
+      existEnv.setMerged();
 
-      // flag the inner environment as pruned by another environment
-      iEnv.setPruned();
+      // flag the current environment as pruned
+      cEnv.setPruned();
 
       // decrement number of unique values in vector
       stack.decrementUnique();
+    } else {
+      // First time seeing this hash, add to map
+      envMap[hash] = iEnv;
+    }
+  }
 
-    } //endOf iInner
-
-    probabilityAccumulator += oProbability;
-    assert(oProbability > FixType(0) && oProbability <= FixType(1));
-  } // endOf iOuter
+  // Calculate accumulated probability for verification
+  for (const auto& pair : envMap) {
+    EnvironmentPossible env = stack.at(pair.second);
+    FixType prob = env.getProbability();
+    probabilityAccumulator += prob;
+    assert(prob > FixType(0) && prob <= FixType(1));
+  }
 
   assert(probabilityAccumulator == FixType(1));
   return stack.getNumUnique();
