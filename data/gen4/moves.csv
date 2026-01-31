@@ -28,6 +28,7 @@ bite	Dark	25	100	60	1	1	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0
 blast burn	Fire	5	90	150	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SetStatus(self,flinch,1)	The foe is razed by a fiery explosion. The user must rest on the next turn, however.
 blaze kick	Fire	10	90	85	1	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	High-Crit	The user launches a kick with a high critical-hit ratio. It may also leave the target with a burn.
 blizzard	Ice	5	70	120	2	5	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	---	A howling blizzard is summoned to strike the foe. It may also freeze the target solid.
+block	Normal	5	100	---	0	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user blocks the foe's way with arms spread wide to prevent escape.
 body slam	Normal	15	100	85	1	1	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	The user drops onto the foe with its full body weight. It may leave the foe paralyzed.
 bone club	Ground	20	85	65	1	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	---	The user clubs the foe with a bone. It may also make the target flinch.
 bone rush	Ground	10	80	25	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	MultiAtck(2-3,75%)|MultiAtck(4-5,25%)	The user strikes at the foe with a hard bone two to five times in a row.
@@ -194,7 +195,7 @@ magical leaf	Grass	20	100	60	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0
 magnet bomb	Steel	20	100	60	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	Always-Hits	The user launches a steel bomb that sticks to the target. This attack will not miss.
 magnet rise	Electric	10	---	---	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SetStatus(self,levitate,5)	The user levitates using electrically generated magnetism for five turns.
 me first	Normal	20	---	---	0	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	FailIf(!self.InjuredThisTurn);useMove(lastmove);SetDMG(always,1.5*dmg)	The user tries to cut ahead of the foe to steal and use the foe's intended move with greater power.
-mean look	Normal	5	100	---	0	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	taunt(target)	The user affixes the foe with a dark, arresting look. The target becomes unable to flee.
+mean look	Normal	5	100	---	0	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user affixes the foe with a dark, arresting look. The target becomes unable to flee.
 mega drain	Grass	15	100	40	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	ModHP(self,.5*dmgInflicted)	A nutrient-draining attack. The user's HP is restored by half the damage taken by the target.
 mega kick	Normal	5	75	120	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The foe is attacked by a kick launched with muscle-packed power.
 mega punch	Normal	20	85	80	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The foe is slugged by a punch thrown with muscle-packed power.
@@ -307,7 +308,7 @@ softboiled	Normal	10	---	---	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0
 solarbeam	Grass	10	100	120	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	delay(self,!environment(sun),noImmortal,1);SetDMG(self,environment(hail)|environment(rain)|environment(sandstorm),0.5*dmg)	A two-turn attack. The user gathers light, then blasts a bundled beam on the second turn.
 sonicboom	Normal	20	90	Var	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SetDMG(self,always,20)	The foe is hit with a destructive shock wave that always inflicts 20 HP damage.
 spark	Electric	20	100	65	1	1	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	The user throws an electrically charged tackle at the foe. It may also leave the target paralyzed.
-spider web	Bug	10	100	---	0	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	taunt(target)	The user ensnares the foe with a thin, gooey silk so it can't flee from battle.
+spider web	Bug	10	100	---	0	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user ensnares the foe with a thin, gooey silk so it can't flee from battle.
 spikes	Ground	20	100	---	0	3	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!SPIKES	The user lays a trap of spikes at the foe's feet. The trap hurts foes that switch into battle.
 spit up	Normal	10	100	Var	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!SPITUP	The power stored using the move Stockpile is released at once in an attack.
 spite	Ghost	10	100	---	0	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!SPITE	The user looses its grudge on the move last used by the foe by cutting 4 PP from it.

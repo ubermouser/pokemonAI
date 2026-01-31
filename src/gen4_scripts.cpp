@@ -24,6 +24,7 @@ const Move* attackOrder_t;
 const Move* aromatherapy_t;
 const Move* auraSphere_t;
 const Move* blazeKick_t;
+const Move* block_t;
 const Move* braveBird_t;
 const Move* brickBreak_t;
 const Move* counter_t;
@@ -47,6 +48,7 @@ const Move* leechSeed_t;
 const Move* lightScreen_t;
 const Move* magnetBomb_t;
 const Move* magicalLeaf_t;
+const Move* meanLook_t;
 const Move* megaDrain_t;
 const Move* memento_t;
 const Move* milkDrink_t;
@@ -72,6 +74,7 @@ const Move* softBoiled_t;
 const Move* slackOff_t;
 const Move* slash_t;
 const Move* spikes_t;
+const Move* spiderWeb_t;
 const Move* stealthRock_t;
 const Move* stoneEdge_t;
 const Move* struggle_t;
@@ -1768,6 +1771,55 @@ int engine_updateLastAction(PkCUEngine& cu, PokemonVolatile cPKV) {
   }
 };
 
+int move_trap_set(
+    PkCUEngine& cu,
+    MoveVolatile mV,
+    PokemonVolatile cPKV,
+    PokemonVolatile tPKV) {
+  const Move& cMove = mV.getBase();
+  if ((&cMove != block_t) && (&cMove != meanLook_t) &&
+      (&cMove != spiderWeb_t)) {
+    return 0;
+  }
+
+  // Set fully trapped status
+  tPKV.status().cTeammate.trap = 7;
+
+  return 1;
+}
+
+int engine_checkTrapped(
+    ConstPokemonVolatile cPKV,
+    ConstPokemonVolatile fPKV,
+    const Action& action,
+    ValidSwapSet& switchAllowed) {
+  // If fully trapped (trap == 7), prevent switching
+  if (cPKV.status().cTeammate.trap == 7) {
+    switchAllowed[VALID_SWAP_SCRIPT] = false;
+    return 1;
+  }
+  return 0;
+}
+
+int engine_clearTrap(PkCUEngine& cu, PokemonVolatile cPKV) {
+  // cPKV is the pokemon switching in (or just switched in).
+
+  // 1. Clear trap on self to ensure new arrivals aren't trapped
+  if (cPKV.status().cTeammate.trap == 7) {
+    cPKV.status().cTeammate.trap = 0;
+  }
+
+  // 2. Clear trap on opponent because the trapper (previous pokemon) has left.
+  // Note: We assume that if the opponent is fully trapped (7), it was by us.
+  PokemonVolatile tPKV = cu.getTPKV();
+
+  if (tPKV.isAlive() && tPKV.status().cTeammate.trap == 7) {
+    tPKV.status().cTeammate.trap = 0;
+  }
+
+  return 1;
+}
+
 int engine_move_struggle(
     PkCUEngine& cu,
     MoveVolatile mV,
@@ -2135,6 +2187,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   attackOrder_t = orphan::orphanCheck(moves, "attack order");
   auraSphere_t = orphan::orphanCheck(moves, "aura sphere");
   blazeKick_t = orphan::orphanCheck(moves, "blaze kick");
+  block_t = orphan::orphanCheck(moves, "block");
   braveBird_t = orphan::orphanCheck(moves, "brave bird");
   brickBreak_t = orphan::orphanCheck(moves, "brick break");
   counter_t = orphan::orphanCheck(moves, "counter");
@@ -2157,6 +2210,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   leechSeed_t = orphan::orphanCheck(moves, "leech seed");
   magicalLeaf_t = orphan::orphanCheck(moves, "magical leaf");
   magnetBomb_t = orphan::orphanCheck(moves, "magnet bomb");
+  meanLook_t = orphan::orphanCheck(moves, "mean look");
   megaDrain_t = orphan::orphanCheck(moves, "mega drain");
   memento_t = orphan::orphanCheck(moves, "memento");
   milkDrink_t = orphan::orphanCheck(moves, "milk drink");
@@ -2181,6 +2235,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   slackOff_t = orphan::orphanCheck(moves, "slack off");
   slash_t = orphan::orphanCheck(moves, "slash");
   spikes_t = orphan::orphanCheck(moves, "spikes");
+  spiderWeb_t = orphan::orphanCheck(moves, "spider web");
   softBoiled_t = orphan::orphanCheck(moves, "softboiled");
   stealthRock_t = orphan::orphanCheck(moves, "stealth rock");
   stoneEdge_t = orphan::orphanCheck(moves, "stone edge");
@@ -2251,6 +2306,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(move, "attack order", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "aura sphere", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
   extensions.push_back(plugin(move, "blaze kick", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
+  extensions.push_back(plugin(move, "block", PLUGIN_ON_EVALUATEMOVE, move_trap_set, 0, current_team));
   extensions.push_back(plugin(move, "brave bird", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, current_team));
   extensions.push_back(plugin(move, "brick break", PLUGIN_ON_MODIFYRAWDAMAGE, move_brickBreak_removeScreens, -1, current_team));
   extensions.push_back(plugin(move, "counter", PLUGIN_ON_EVALUATEMOVE, move_counterMirrorCoat, 0, current_team));
@@ -2283,6 +2339,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(move, "light screen", PLUGIN_ON_MODIFYRAWDAMAGE, move_lightScreen_damage, 0, other_team));
   extensions.push_back(plugin(move, "magical leaf", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
   extensions.push_back(plugin(move, "magnet bomb", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
+  extensions.push_back(plugin(move, "mean look", PLUGIN_ON_EVALUATEMOVE, move_trap_set, 0, current_team));
   extensions.push_back(plugin(move, "mega drain", PLUGIN_ON_ENDOFMOVE, move_lifeLeech50, 0, current_team));
   extensions.push_back(plugin(move, "memento", PLUGIN_ON_ENDOFMOVE, move_suicide_modLife, 0, current_team));
   extensions.push_back(plugin(move, "milk drink", PLUGIN_ON_EVALUATEMOVE, move_heal50, 0, current_team));
@@ -2317,6 +2374,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(move, "softboiled", PLUGIN_ON_EVALUATEMOVE, move_heal50, 0, current_team));
   extensions.push_back(plugin(move, "spikes", PLUGIN_ON_SWITCHIN, move_spikes_switch, 2, all_teams));
   extensions.push_back(plugin(move, "spikes", PLUGIN_ON_EVALUATEMOVE, move_spikes_set, 0, current_team));
+  extensions.push_back(plugin(move, "spider web", PLUGIN_ON_EVALUATEMOVE, move_trap_set, 0, current_team));
   extensions.push_back(plugin(move, "stealth rock", PLUGIN_ON_SWITCHIN, move_stealthRock_switch, 0, all_teams));
   extensions.push_back(plugin(move, "stealth rock", PLUGIN_ON_EVALUATEMOVE, move_stealthRock_set, 0, current_team));
   extensions.push_back(plugin(move, "stone edge", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
@@ -2388,6 +2446,8 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(engine, "secondary effect volatile", PLUGIN_ON_SECONDARYEFFECT, engine_secondaryVolatileEffect, -1, all_teams));
   extensions.push_back(plugin(engine, "nonvolatile end-of-round damage", PLUGIN_ON_ENDOFROUND, engine_endRoundDamageEffect, -1, all_teams));
   extensions.push_back(plugin(engine, "damage mod burn", PLUGIN_ON_MODIFYATTACKPOWER, engine_modifyAttackPower_burn, 0, all_teams));
+  extensions.push_back(plugin(engine, "trapped check", PLUGIN_ON_TESTSWITCH, engine_checkTrapped, 0, current_team));
+  extensions.push_back(plugin(engine, "clear trap on switch", PLUGIN_ON_SWITCHIN, engine_clearTrap, 0, all_teams));
   // clang-format on
 
   return true;
