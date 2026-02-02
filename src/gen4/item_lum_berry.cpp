@@ -1,8 +1,4 @@
-#ifndef ITEM_LUM_BERRY_CPP
-#define ITEM_LUM_BERRY_CPP
-
 #include "gen4_scripts_internal.h"
-#include "pokemonai/pkCU.h"
 
 namespace gen4 {
 
@@ -43,5 +39,3 @@ void register_item_lum_berry(const Pokedex& pkAI, std::vector<plugin>& extension
 }
 
 } // namespace gen4
-
-#endif

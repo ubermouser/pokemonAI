@@ -1,6 +1,6 @@
-#include "gen1_scripts_internal.h"
+#include "gen4_scripts_internal.h"
 
-namespace gen1 {
+namespace gen4 {
 
 int move_struggle_recoil25(
     PkCUEngine& cu,
@@ -28,4 +28,4 @@ void register_move_struggle(const Pokedex& pkAI, std::vector<plugin>& extensions
   // clang-format on
 }
 
-} // namespace gen1
+} // namespace gen4

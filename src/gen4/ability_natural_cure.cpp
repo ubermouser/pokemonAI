@@ -1,5 +1,4 @@
 #include "gen4_scripts_internal.h"
-#include "pokemonai/pkCU.h"
 
 namespace gen4 {
 

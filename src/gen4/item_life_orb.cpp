@@ -1,8 +1,4 @@
-#ifndef ITEM_LIFE_ORB_CPP
-#define ITEM_LIFE_ORB_CPP
-
 #include "gen4_scripts_internal.h"
-#include "pokemonai/pkCU.h"
 
 namespace gen4 {
 
@@ -46,5 +42,3 @@ void register_item_life_orb(const Pokedex& pkAI, std::vector<plugin>& extensions
 }
 
 } // namespace gen4
-
-#endif

@@ -1,5 +1,4 @@
 #include "gen4_scripts_internal.h"
-#include "pokemonai/pkCU.h"
 
 namespace gen4 {
 
@@ -24,7 +23,9 @@ int move_facade_modPower(
 };
 
 void register_move_facade(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "facade", PLUGIN_ON_MODIFYRAWDAMAGE, move_facade_modPower, 0, current_team));
+  // clang-format off
+  extensions.push_back(plugin(move, "facade", PLUGIN_ON_MODIFYBASEPOWER, move_facade_modPower, 0, current_team));
+  // clang-format on
 }
 
 } // namespace gen4

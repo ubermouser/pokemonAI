@@ -1,8 +1,4 @@
-#ifndef ITEM_SHED_SHELL_CPP
-#define ITEM_SHED_SHELL_CPP
-
 #include "gen4_scripts_internal.h"
-#include "pokemonai/pkCU.h"
 
 namespace gen4 {
 
@@ -24,5 +20,3 @@ void register_item_shed_shell(const Pokedex& pkAI, std::vector<plugin>& extensio
 }
 
 } // namespace gen4
-
-#endif

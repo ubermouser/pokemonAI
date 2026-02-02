@@ -1,8 +1,4 @@
-#ifndef ITEM_FOCUS_SASH_CPP
-#define ITEM_FOCUS_SASH_CPP
-
 #include "gen4_scripts_internal.h"
-#include "pokemonai/pkCU.h"
 
 namespace gen4 {
 
@@ -33,5 +29,3 @@ void register_item_focus_sash(const Pokedex& pkAI, std::vector<plugin>& extensio
 }
 
 } // namespace gen4
-
-#endif

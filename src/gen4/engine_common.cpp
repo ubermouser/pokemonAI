@@ -251,7 +251,23 @@ int engine_decrementPP(
   return 1;
 };
 
+int engine_updateLastAction(PkCUEngine& cu, PokemonVolatile cPKV) {
+  if (!cPKV.isAlive()) { return 0; }
+
+  const auto& lastAction = cu.getCAction();
+  bool switched = cu.getBase().hasSwitched(cu.getICTeam());
+  if (lastAction.isMove() && !switched) {
+    cPKV.status().cTeammate.iLastAction = lastAction.iMove() + 1;
+    return 1;
+  } else {
+    cPKV.status().cTeammate.iLastAction = 0;
+    return 0;
+  }
+};
+
 void register_engine_common(const Pokedex& pkAI, std::vector<plugin>& extensions) {
+  // clang-format off
+  extensions.push_back(plugin(engine, "engine record last action", PLUGIN_ON_ENDOFTURN, engine_updateLastAction, 1, all_teams));
   extensions.push_back(plugin(engine, "pp decrement", PLUGIN_ON_ENDOFMOVE, engine_decrementPP, 0, all_teams));
   extensions.push_back(plugin(engine, "nonvolatile speed change", PLUGIN_ON_MODIFYSPEED, engine_onModifySpeed_paralyze, -1, all_teams));
   extensions.push_back(plugin(engine, "nonvolatile beginning-of-round damage", PLUGIN_ON_BEGINNINGOFTURN, engine_beginTurnNonvolatileEffect, -2, all_teams));
@@ -261,6 +277,7 @@ void register_engine_common(const Pokedex& pkAI, std::vector<plugin>& extensions
   extensions.push_back(plugin(engine, "secondary effect volatile", PLUGIN_ON_SECONDARYEFFECT, engine_secondaryVolatileEffect, -1, all_teams));
   extensions.push_back(plugin(engine, "nonvolatile end-of-round damage", PLUGIN_ON_ENDOFROUND, engine_endRoundDamageEffect, -1, all_teams));
   extensions.push_back(plugin(engine, "damage mod burn", PLUGIN_ON_MODIFYATTACKPOWER, engine_modifyAttackPower_burn, 0, all_teams));
+  // clang-format on
 }
 
 } // namespace gen4

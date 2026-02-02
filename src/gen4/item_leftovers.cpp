@@ -1,8 +1,4 @@
-#ifndef ITEM_LEFTOVERS_CPP
-#define ITEM_LEFTOVERS_CPP
-
 #include "gen4_scripts_internal.h"
-#include "pokemonai/pkCU.h"
 
 namespace gen4 {
 
@@ -20,5 +16,3 @@ void register_item_leftovers(const Pokedex& pkAI, std::vector<plugin>& extension
 }
 
 } // namespace gen4
-
-#endif

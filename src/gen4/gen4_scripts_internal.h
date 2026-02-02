@@ -168,22 +168,25 @@ void register_move_screens(const Pokedex& pkAI, std::vector<plugin>& extensions)
 void register_move_substitute(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_sucker_punch(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_suicide(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_move_struggle(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_taunt(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_trap(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_trick(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_u_turn(const Pokedex& pkAI, std::vector<plugin>& extensions);
 
+void register_ability_clear_body(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_ability_inner_focus(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_intimidate(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_levitate(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_natural_cure(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_ability_no_guard(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_ability_pinch_boost(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_pressure(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_serene_grace(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_shadow_tag(const Pokedex& pkAI, std::vector<plugin>& extensions);
-void register_ability_technician(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_ability_sticky_hold(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_synchronize(const Pokedex& pkAI, std::vector<plugin>& extensions);
-void register_ability_pinch_boost(const Pokedex& pkAI, std::vector<plugin>& extensions);
-void register_ability_inner_focus(const Pokedex& pkAI, std::vector<plugin>& extensions);
-void register_ability_no_guard(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_ability_technician(const Pokedex& pkAI, std::vector<plugin>& extensions);
 
 void register_item_choice(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_item_focus_sash(const Pokedex& pkAI, std::vector<plugin>& extensions);
@@ -191,6 +194,7 @@ void register_item_leftovers(const Pokedex& pkAI, std::vector<plugin>& extension
 void register_item_life_orb(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_item_lum_berry(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_item_shed_shell(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_item_type_resisting_berry(const Pokedex& pkAI, std::vector<plugin>& extensions);
 
 void register_engine_common(const Pokedex& pkAI, std::vector<plugin>& extensions);
 

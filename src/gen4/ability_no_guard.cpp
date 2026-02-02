@@ -1,8 +1,4 @@
-#ifndef NO_GUARD_CPP
-#define NO_GUARD_CPP
-
 #include "gen4_scripts_internal.h"
-#include "pokemonai/pkCU.h"
 
 namespace gen4 {
 
@@ -32,5 +28,3 @@ void register_ability_no_guard(const Pokedex& pkAI, std::vector<plugin>& extensi
 }
 
 } // namespace gen4
-
-#endif

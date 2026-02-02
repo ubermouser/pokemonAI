@@ -1,8 +1,4 @@
-#ifndef ITEM_CHOICE_CPP
-#define ITEM_CHOICE_CPP
-
 #include "gen4_scripts_internal.h"
-#include "pokemonai/pkCU.h"
 
 namespace gen4 {
 
@@ -92,5 +88,3 @@ void register_item_choice(const Pokedex& pkAI, std::vector<plugin>& extensions) 
 }
 
 } // namespace gen4
-
-#endif
