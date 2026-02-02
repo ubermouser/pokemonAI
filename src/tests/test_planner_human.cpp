@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-#include "engine_test.hpp"
+#include "gen4/engine_test.hpp"
 #include "pokemonai/item.h"
 #include "pokemonai/move_volatile.h"
 #include "pokemonai/planner_human.h"

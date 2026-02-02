@@ -6,7 +6,7 @@
 #include <type_traits>
 #include <vector>
 
-#include "engine_test.hpp"
+#include "gen4/engine_test.hpp"
 #include "pokemonai/evaluator_network128.h"
 #include "pokemonai/evaluator_network16.h"
 #include "pokemonai/evaluator_network32.h"

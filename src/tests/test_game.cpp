@@ -1,7 +1,7 @@
 #include <cmath>
 #include <stdexcept>
 
-#include "engine_test.hpp"
+#include "gen4/engine_test.hpp"
 #include "pokemonai/game.h"
 #include "pokemonai/planner_max.h"
 #include "pokemonai/planner_random.h"

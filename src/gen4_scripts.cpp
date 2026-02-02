@@ -476,22 +476,13 @@ int move_substitute_damage(
     PokemonVolatile cPKV,
     PokemonVolatile tPKV,
     uint32_t& raw_damage) {
-  SPDLOG_TRACE(
-      "move_substitute_damage: move={} damage={} sub={}",
-      mV.getBase().getName(),
-      raw_damage,
-      (uint32_t)tPKV.status().cTeammate.substitute);
-
   // Check for flag or 0
   if (tPKV.status().cTeammate.substitute == 0 || tPKV.status().cTeammate.substitute == BROKEN_SUB_FLAG) { return 0; }
 
   uint32_t subHP = tPKV.status().cTeammate.substitute;
   if (raw_damage >= subHP) {
-    SPDLOG_TRACE("move_substitute_damage: Substitute BROKE");
     tPKV.status().cTeammate.substitute = BROKEN_SUB_FLAG;
   } else {
-    SPDLOG_TRACE(
-        "move_substitute_damage: Substitute absorbed {} damage", raw_damage);
     tPKV.status().cTeammate.substitute -= raw_damage;
   }
 
@@ -504,22 +495,11 @@ int move_substitute_block_secondary(
     MoveVolatile mV,
     PokemonVolatile cPKV,
     PokemonVolatile tPKV) {
-  SPDLOG_TRACE(
-      "move_substitute_block_secondary: move={} cPKV_nv={} tPKV_nv={} sub={}",
-      mV.getBase().getName(),
-      (void*)&cPKV.nv(),
-      (void*)&tPKV.nv(),
-      (uint32_t)tPKV.status().cTeammate.substitute);
-
   // substitute > 0 includes BROKEN_SUB_FLAG (255)
   if (tPKV.status().cTeammate.substitute > 0) {
     // Does not block self-targeting secondary effects
-    if (&cPKV.nv() == &tPKV.nv()) {
-      SPDLOG_TRACE("move_substitute_block_secondary: Bypassing self-target");
-      return 0;
-    }
+    if (&cPKV.nv() == &tPKV.nv()) { return 0; }
 
-    SPDLOG_TRACE("move_substitute_block_secondary: BLOCKING secondary effect");
     return 2;
   }
   return 0;

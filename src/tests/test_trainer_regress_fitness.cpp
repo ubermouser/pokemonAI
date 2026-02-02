@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "engine_test.hpp"
+#include "gen4/engine_test.hpp"
 #include "pokemonai/evaluator_network16.h"
 #include "pokemonai/evaluator_simple.h"
 #include "pokemonai/evaluators.h"

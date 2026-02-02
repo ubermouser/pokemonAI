@@ -1,4 +1,5 @@
-#include "engine_test.hpp"
+#include "gen1/engine_test.hpp"
+#include "gen4/engine_test.hpp"
 #include "pokemonai/team_factory.h"
 
 

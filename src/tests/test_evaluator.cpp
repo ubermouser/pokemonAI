@@ -1,4 +1,4 @@
-#include "engine_test.hpp"
+#include "gen4/engine_test.hpp"
 #include "pokemonai/evaluator.h"
 #include "pokemonai/evaluator_montecarlo.h"
 #include "pokemonai/evaluator_random.h"

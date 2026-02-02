@@ -5,7 +5,7 @@
 #include <sstream>
 #include <unordered_set>
 
-#include "engine_test.hpp"
+#include "gen4/engine_test.hpp"
 #include "pokemonai/evaluator_simple.h"
 #include "pokemonai/planner_human.h"
 #include "pokemonai/planner_max.h"
