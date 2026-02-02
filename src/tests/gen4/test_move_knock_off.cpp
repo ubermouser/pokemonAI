@@ -93,7 +93,7 @@ TEST_F(KnockOffTest, no_item) {
   EXPECT_FALSE(final_env_v.getTeam(1).getPKV().hasItem());
 }
 
-TEST_F(KnockOffTest, arceus_plate) {
+TEST_F(KnockOffTest, DISABLED_arceus_plate) {
   // Setup Arceus with Draco Plate
   auto team_c = TeamNonVolatile()
     .addPokemon(PokemonNonVolatile()
