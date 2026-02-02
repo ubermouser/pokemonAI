@@ -1,59 +1,7 @@
-#include "pokemonai/pkai.h"
-
-#include <stdint.h>
-
-#include <algorithm>
-#include <vector>
-
-#include "pokemonai/gen4_scripts.h"
-
-#include "pokemonai/engine.h"
-#include "pokemonai/orphan.h"
+#include "gen1_scripts_internal.h"
 #include "pokemonai/pkCU.h"
 
-#include "pokemonai/pluggable_types.h"
-#include "pokemonai/plugin.h"
-
-const Pokedex* dex;
-
-const Move* struggle_t;
-
-const Type* normal_t;
-const Type* fighting_t;
-const Type* flying_t;
-const Type* poison_t;
-const Type* ground_t;
-const Type* rock_t;
-const Type* bug_t;
-const Type* ghost_t;
-const Type* steel_t;
-const Type* fire_t;
-const Type* water_t;
-const Type* grass_t;
-const Type* electric_t;
-const Type* psychic_t;
-const Type* ice_t;
-const Type* dragon_t;
-const Type* dark_t;
-
-
-int engine_move_struggle(
-    PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
-  // this plugin_t only triggered if primary has hit
-  if (!cu.getBase().hasHit(cu.getICTeam())) { return 0; }
-
-  const Move* cMove = &mV.getBase();
-
-  if (cMove != struggle_t) { return 0; }
-
-  // subtract hitpoints:
-  cPKV.modPercentHP(-0.25);
-
-  return cPKV.isAlive() ? 1 : 2;
-};
+namespace gen1 {
 
 int engine_modifyAttackPower_burn(
     PkCUEngine& cu,
@@ -304,38 +252,8 @@ int engine_decrementPP(
   return 1;
 };
 
-
-bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  // register needed types:
-  dex = &pkAI;
-  // moves:
-  const Moves& moves = dex->getMoves();
-  struggle_t = orphan::orphanCheck(moves, "struggle");
-  // types:
-  const Types& types = dex->getTypes();
-  normal_t = orphan::orphanCheck(types, "normal");
-  fighting_t = orphan::orphanCheck(types, "fighting");
-  flying_t = orphan::orphanCheck(types, "flying");
-  poison_t = orphan::orphanCheck(types, "poison");
-  ground_t = orphan::orphanCheck(types, "ground");
-  rock_t = orphan::orphanCheck(types, "rock");
-  bug_t = orphan::orphanCheck(types, "bug");
-  ghost_t = orphan::orphanCheck(types, "ghost");
-  steel_t = orphan::orphanCheck(types, "steel");
-  fire_t = orphan::orphanCheck(types, "fire");
-  water_t = orphan::orphanCheck(types, "water");
-  grass_t = orphan::orphanCheck(types, "grass");
-  electric_t = orphan::orphanCheck(types, "electric");
-  psychic_t = orphan::orphanCheck(types, "psychic");
-  ice_t = orphan::orphanCheck(types, "ice");
-  dragon_t = orphan::orphanCheck(types, "dragon");
-
-
-  // clang-format off
-
-  // engine effects:
+void register_engine_common(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(engine, "pp decrement", PLUGIN_ON_ENDOFMOVE, engine_decrementPP, 0, all_teams));
-  extensions.push_back(plugin(engine, "struggle damage effect", PLUGIN_ON_ENDOFMOVE, engine_move_struggle, 0, all_teams));
   extensions.push_back(plugin(engine, "nonvolatile speed change", PLUGIN_ON_MODIFYSPEED, engine_onModifySpeed_paralyze, -1, all_teams));
   extensions.push_back(plugin(engine, "nonvolatile beginning-of-round damage", PLUGIN_ON_BEGINNINGOFTURN, engine_beginTurnNonvolatileEffect, -2, all_teams));
   extensions.push_back(plugin(engine, "volatile beginning-of-round damage", PLUGIN_ON_BEGINNINGOFTURN, engine_beginTurnVolatileEffect, -1, all_teams));
@@ -344,7 +262,6 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(engine, "secondary effect volatile", PLUGIN_ON_SECONDARYEFFECT, engine_secondaryVolatileEffect, -1, all_teams));
   extensions.push_back(plugin(engine, "nonvolatile end-of-round damage", PLUGIN_ON_ENDOFROUND, engine_endRoundDamageEffect, -1, all_teams));
   extensions.push_back(plugin(engine, "damage mod burn", PLUGIN_ON_MODIFYATTACKPOWER, engine_modifyAttackPower_burn, 0, all_teams));
-  // clang-format on
-
-  return true;
 }
+
+} // namespace gen1

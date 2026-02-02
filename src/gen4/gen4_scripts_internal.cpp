@@ -1,0 +1,257 @@
+#include "gen4_scripts_internal.h"
+
+#include "pokemonai/gen4_scripts.h"
+
+namespace gen4 {
+
+const Pokedex* dex;
+
+const Move* airCutter_t;
+const Move* absorb_t;
+const Move* aerialAce_t;
+const Move* attackOrder_t;
+const Move* aromatherapy_t;
+const Move* auraSphere_t;
+const Move* batonPass_t;
+const Move* blazeKick_t;
+const Move* block_t;
+const Move* braveBird_t;
+const Move* brickBreak_t;
+const Move* counter_t;
+const Move* crabHammer_t;
+const Move* crossChop_t;
+const Move* crossPoison_t;
+const Move* doubleEdge_t;
+const Move* drainPunch_t;
+const Move* encore_t;
+const Move* explosion_t;
+const Move* facade_t;
+const Move* faintAttack_t;
+const Move* flareBlitz_t;
+const Move* gigaDrain_t;
+const Move* healBell_t;
+const Move* healOrder_t;
+const Move* hiddenPower_t;
+const Move* leafBlade_t;
+const Move* leechLife_t;
+const Move* leechSeed_t;
+const Move* lightScreen_t;
+const Move* magnetBomb_t;
+const Move* magicalLeaf_t;
+const Move* meanLook_t;
+const Move* megaDrain_t;
+const Move* memento_t;
+const Move* milkDrink_t;
+const Move* mirrorCoat_t;
+const Move* nightShade_t;
+const Move* nightSlash_t;
+const Move* outrage_t;
+const Move* painSplit_t;
+const Move* payback_t;
+const Move* pursuit_t;
+const Move* psychoCut_t;
+const Move* rapidSpin_t;
+const Move* razorLeaf_t;
+const Move* recover_t;
+const Move* reflect_t;
+const Move* roost_t;
+const Move* shadowClaw_t;
+const Move* shadowPunch_t;
+const Move* shockWave_t;
+const Move* seismicToss_t;
+const Move* selfDestruct_t;
+const Move* softBoiled_t;
+const Move* slackOff_t;
+const Move* slash_t;
+const Move* spikes_t;
+const Move* spiderWeb_t;
+const Move* stealthRock_t;
+const Move* stoneEdge_t;
+const Move* struggle_t;
+const Move* substitute_t;
+const Move* suckerPunch_t;
+const Move* swift_t;
+const Move* toxicSpikes_t;
+const Move* trick_t;
+const Move* taunt_t;
+const Move* uTurn_t;
+const Move* voltTackle_t;
+const Move* woodHammer_t;
+const Move* destinyBond_t;
+
+const Item* choiceBand_t;
+const Item* choiceScarf_t;
+const Item* choiceSpecs_t;
+const Item* focusSash_t;
+const Item* leftovers_t;
+const Item* lifeOrb_t;
+const Item* lumBerry_t;
+const Item* shedShell_t;
+
+const Ability* blaze_t;
+const Ability* clearBody_t;
+const Ability* innerFocus_t;
+const Ability* intimidate_t;
+const Ability* levitate_t;
+const Ability* naturalCure_t;
+const Ability* noGuard_t;
+const Ability* overgrow_t;
+const Ability* pressure_t;
+const Ability* sereneGrace_t;
+const Ability* stickyHold_t;
+const Ability* shadowTag_t;
+const Ability* swarm_t;
+const Ability* synchronize_t;
+const Ability* technician_t;
+const Ability* torrent_t;
+
+const Type* normal_t;
+const Type* fighting_t;
+const Type* flying_t;
+const Type* poison_t;
+const Type* ground_t;
+const Type* rock_t;
+const Type* bug_t;
+const Type* ghost_t;
+const Type* steel_t;
+const Type* fire_t;
+const Type* water_t;
+const Type* grass_t;
+const Type* electric_t;
+const Type* psychic_t;
+const Type* ice_t;
+const Type* dragon_t;
+const Type* dark_t;
+
+void initializePointers(const Pokedex& pkAI) {
+  // register needed types:
+  dex = &pkAI;
+  // moves:
+  const Moves& moves = dex->getMoves();
+  absorb_t = orphan::orphanCheck(moves, "absorb");
+  aerialAce_t = orphan::orphanCheck(moves, "aerial ace");
+  airCutter_t = orphan::orphanCheck(moves, "air cutter");
+  aromatherapy_t = orphan::orphanCheck(moves, "aromatherapy");
+  attackOrder_t = orphan::orphanCheck(moves, "attack order");
+  auraSphere_t = orphan::orphanCheck(moves, "aura sphere");
+  batonPass_t = orphan::orphanCheck(moves, "baton pass");
+  blazeKick_t = orphan::orphanCheck(moves, "blaze kick");
+  block_t = orphan::orphanCheck(moves, "block");
+  braveBird_t = orphan::orphanCheck(moves, "brave bird");
+  brickBreak_t = orphan::orphanCheck(moves, "brick break");
+  counter_t = orphan::orphanCheck(moves, "counter");
+  crabHammer_t = orphan::orphanCheck(moves, "crabhammer");
+  crossChop_t = orphan::orphanCheck(moves, "cross chop");
+  crossPoison_t = orphan::orphanCheck(moves, "cross poison");
+  destinyBond_t = orphan::orphanCheck(moves, "destiny bond");
+  doubleEdge_t = orphan::orphanCheck(moves, "double-edge");
+  drainPunch_t = orphan::orphanCheck(moves, "drain punch");
+  encore_t = orphan::orphanCheck(moves, "encore");
+  explosion_t = orphan::orphanCheck(moves, "explosion");
+  facade_t = orphan::orphanCheck(moves, "facade");
+  faintAttack_t = orphan::orphanCheck(moves, "faint attack");
+  flareBlitz_t = orphan::orphanCheck(moves, "flare blitz");
+  gigaDrain_t = orphan::orphanCheck(moves, "giga drain");
+  healBell_t = orphan::orphanCheck(moves, "heal bell");
+  healOrder_t = orphan::orphanCheck(moves, "heal order");
+  hiddenPower_t = orphan::orphanCheck(moves, "hidden power");
+  leafBlade_t = orphan::orphanCheck(moves, "leaf blade");
+  leechLife_t = orphan::orphanCheck(moves, "leech life");
+  leechSeed_t = orphan::orphanCheck(moves, "leech seed");
+  magicalLeaf_t = orphan::orphanCheck(moves, "magical leaf");
+  magnetBomb_t = orphan::orphanCheck(moves, "magnet bomb");
+  meanLook_t = orphan::orphanCheck(moves, "mean look");
+  megaDrain_t = orphan::orphanCheck(moves, "mega drain");
+  memento_t = orphan::orphanCheck(moves, "memento");
+  milkDrink_t = orphan::orphanCheck(moves, "milk drink");
+  mirrorCoat_t = orphan::orphanCheck(moves, "mirror coat");
+  nightShade_t = orphan::orphanCheck(moves, "night shade");
+  nightSlash_t = orphan::orphanCheck(moves, "night slash");
+  outrage_t = orphan::orphanCheck(moves, "outrage");
+  painSplit_t = orphan::orphanCheck(moves, "pain split");
+  payback_t = orphan::orphanCheck(moves, "payback");
+  pursuit_t = orphan::orphanCheck(moves, "pursuit");
+  psychoCut_t = orphan::orphanCheck(moves, "psycho cut");
+  rapidSpin_t = orphan::orphanCheck(moves, "rapid spin");
+  razorLeaf_t = orphan::orphanCheck(moves, "razor leaf");
+  reflect_t = orphan::orphanCheck(moves, "reflect");
+  lightScreen_t = orphan::orphanCheck(moves, "light screen");
+  roost_t = orphan::orphanCheck(moves, "roost");
+  seismicToss_t = orphan::orphanCheck(moves, "seismic toss");
+  selfDestruct_t = orphan::orphanCheck(moves, "selfdestruct");
+  shadowClaw_t = orphan::orphanCheck(moves, "shadow claw");
+  shadowPunch_t = orphan::orphanCheck(moves, "shadow punch");
+  shockWave_t = orphan::orphanCheck(moves, "shock wave");
+  slackOff_t = orphan::orphanCheck(moves, "slack off");
+  slash_t = orphan::orphanCheck(moves, "slash");
+  softBoiled_t = orphan::orphanCheck(moves, "softboiled");
+  spikes_t = orphan::orphanCheck(moves, "spikes");
+  spiderWeb_t = orphan::orphanCheck(moves, "spider web");
+  stealthRock_t = orphan::orphanCheck(moves, "stealth rock");
+  stoneEdge_t = orphan::orphanCheck(moves, "stone edge");
+  struggle_t = orphan::orphanCheck(moves, "struggle");
+  substitute_t = orphan::orphanCheck(moves, "substitute");
+  suckerPunch_t = orphan::orphanCheck(moves, "sucker punch");
+  swift_t = orphan::orphanCheck(moves, "swift");
+  toxicSpikes_t = orphan::orphanCheck(moves, "toxic spikes");
+  taunt_t = orphan::orphanCheck(moves, "taunt");
+  trick_t = orphan::orphanCheck(moves, "trick");
+  uTurn_t = orphan::orphanCheck(moves, "u-turn");
+  voltTackle_t = orphan::orphanCheck(moves, "volt tackle");
+  woodHammer_t = orphan::orphanCheck(moves, "wood hammer");
+  // items:
+  const Items& items = dex->getItems();
+  choiceBand_t = orphan::orphanCheck(items, "choice band");
+  choiceScarf_t = orphan::orphanCheck(items, "choice scarf");
+  choiceSpecs_t = orphan::orphanCheck(items, "choice specs");
+  focusSash_t = orphan::orphanCheck(items, "focus sash");
+  leftovers_t = orphan::orphanCheck(items, "leftovers");
+  lifeOrb_t = orphan::orphanCheck(items, "life orb");
+  lumBerry_t = orphan::orphanCheck(items, "lum berry");
+  shedShell_t = orphan::orphanCheck(items, "shed shell");
+  // abilities:
+  const Abilities& abilities = dex->getAbilities();
+  blaze_t = orphan::orphanCheck(abilities, "blaze");
+  clearBody_t = orphan::orphanCheck(abilities, "clear body");
+  innerFocus_t = orphan::orphanCheck(abilities, "inner focus");
+  intimidate_t = orphan::orphanCheck(abilities, "intimidate");
+  levitate_t = orphan::orphanCheck(abilities, "levitate");
+  naturalCure_t = orphan::orphanCheck(abilities, "natural cure");
+  noGuard_t = orphan::orphanCheck(abilities, "no guard");
+  overgrow_t = orphan::orphanCheck(abilities, "overgrow");
+  pressure_t = orphan::orphanCheck(abilities, "pressure");
+  sereneGrace_t = orphan::orphanCheck(abilities, "serene grace");
+  shadowTag_t = orphan::orphanCheck(abilities, "shadow tag");
+  stickyHold_t = orphan::orphanCheck(abilities, "sticky hold");
+  swarm_t = orphan::orphanCheck(abilities, "swarm");
+  synchronize_t = orphan::orphanCheck(abilities, "synchronize");
+  technician_t = orphan::orphanCheck(abilities, "technician");
+  torrent_t = orphan::orphanCheck(abilities, "torrent");
+  // types:
+  const Types& types = dex->getTypes();
+  normal_t = orphan::orphanCheck(types, "normal");
+  fighting_t = orphan::orphanCheck(types, "fighting");
+  flying_t = orphan::orphanCheck(types, "flying");
+  poison_t = orphan::orphanCheck(types, "poison");
+  ground_t = orphan::orphanCheck(types, "ground");
+  rock_t = orphan::orphanCheck(types, "rock");
+  bug_t = orphan::orphanCheck(types, "bug");
+  ghost_t = orphan::orphanCheck(types, "ghost");
+  steel_t = orphan::orphanCheck(types, "steel");
+  fire_t = orphan::orphanCheck(types, "fire");
+  water_t = orphan::orphanCheck(types, "water");
+  grass_t = orphan::orphanCheck(types, "grass");
+  electric_t = orphan::orphanCheck(types, "electric");
+  psychic_t = orphan::orphanCheck(types, "psychic");
+  ice_t = orphan::orphanCheck(types, "ice");
+  dragon_t = orphan::orphanCheck(types, "dragon");
+  dark_t = orphan::orphanCheck(types, "dark");
+}
+
+} // namespace gen4
+
+extern "C" bool registerExtensions(
+    const Pokedex& pkAI, std::vector<plugin>& extensions) {
+  gen4::registerGen4Extensions(pkAI, extensions);
+  return true;
+}
