@@ -114,6 +114,8 @@ bool Moves::initialize(const std::string& path, const Types& types) {
     Move::move_struggle = &at("struggle");
     if (MoveNonVolatile::mNV_struggle == nullptr) {
       MoveNonVolatile::mNV_struggle = new MoveNonVolatile(*Move::move_struggle);
+    } else {
+      MoveNonVolatile::mNV_struggle->setBase(*Move::move_struggle);
     }
   }
   
