@@ -23,6 +23,7 @@ const Move* aerialAce_t;
 const Move* attackOrder_t;
 const Move* aromatherapy_t;
 const Move* auraSphere_t;
+const Move* batonPass_t;
 const Move* blazeKick_t;
 const Move* block_t;
 const Move* braveBird_t;
@@ -1170,6 +1171,79 @@ int move_pursuit_modAccuracy(
   return 2;
 }
 
+int move_batonPass(
+    PkCUEngine& cu,
+    MoveVolatile mV,
+    PokemonVolatile cPKV,
+    PokemonVolatile tPKV) {
+  if (&mV.getBase() != batonPass_t) { return 0; }
+
+  auto action = cu.getCAction();
+  TeamVolatile tV = cu.getTV();
+  size_t currentPokemon = tV.getICPKV();
+  size_t targetPokemon = action.iFriendly();
+
+  if (targetPokemon >= 6 || targetPokemon == currentPokemon) { return 1; }
+
+  // Save Volatile Status
+  VolatileStatus savedStatus = tV.getVolatile();
+
+  // Perform Swap (reseting volatile)
+  if (!tV.swapPokemon(targetPokemon, false)) {
+    return 0; // Failed to swap
+  }
+
+  // Mark as switched
+  cu.getBase().setSwitched(cu.getICTeam());
+
+  // Restore transferrable volatile status
+  VolatileStatus& newStatus = tV.getVolatile();
+
+  // Boosts
+  newStatus.boosts = savedStatus.boosts;
+
+  // Other transferrables
+  newStatus.substitute = savedStatus.substitute;
+  newStatus.leechSeed = savedStatus.leechSeed;
+  newStatus.perishSong = savedStatus.perishSong;
+  newStatus.curse = savedStatus.curse;
+  newStatus.lockOn = savedStatus.lockOn;
+  newStatus.identify = savedStatus.identify;
+  newStatus.focusEnergy = savedStatus.focusEnergy;
+  // Ensure toxicPoison_tier is reset (already 0 from swapPokemon)
+
+  // Trigger OnSwitchIn plugins
+  cu.setCPluginSet();
+  int result = 0;
+  const std::vector<plugin_t>& cPlugins =
+      cu.getCPluginSet()[(size_t)PLUGIN_ON_SWITCHIN];
+  for (auto iPlugin = cPlugins.cbegin(), iPSize = cPlugins.cend();
+       iPlugin != iPSize;
+       ++iPlugin) {
+    onSwitch_rawType cPlugin = (onSwitch_rawType)iPlugin->pFunction;
+    result = result | cPlugin(cu, cu.getPKV());
+    if (result > 1) { break; }
+  }
+
+  return 2;
+}
+
+int move_batonPass_testMoveSwap(
+    ConstTeamVolatile cTV,
+    ConstPokemonVolatile cPKV,
+    ConstMoveVolatile mV,
+    const Action& action,
+    ValidMoveSet& moveAllowed) {
+  if (&mV.getBase() != batonPass_t) { return 0; }
+
+  // Allow friendly targeting for swap
+  if (cTV.numTeammatesAlive() > 1) {
+    moveAllowed[VALID_MOVE_FRIENDLY_IS_OTHER] = true;
+  }
+
+  return 1;
+}
+
 int move_outrage_lockMove(PkCUEngine& cu, PokemonVolatile cPKV) {
   // action is guaranteed to be a move action:
   MoveVolatile mV = cPKV.getMV(cu.getCAction());
@@ -2235,6 +2309,7 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   aromatherapy_t = orphan::orphanCheck(moves, "aromatherapy");
   attackOrder_t = orphan::orphanCheck(moves, "attack order");
   auraSphere_t = orphan::orphanCheck(moves, "aura sphere");
+  batonPass_t = orphan::orphanCheck(moves, "baton pass");
   blazeKick_t = orphan::orphanCheck(moves, "blaze kick");
   block_t = orphan::orphanCheck(moves, "block");
   braveBird_t = orphan::orphanCheck(moves, "brave bird");
@@ -2355,6 +2430,8 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(move, "aromatherapy", PLUGIN_ON_EVALUATEMOVE, move_cureNonVolatile_team, 0, current_team));
   extensions.push_back(plugin(move, "attack order", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "aura sphere", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
+  extensions.push_back(plugin(move, "baton pass", PLUGIN_ON_ENDOFMOVE, move_batonPass, 1, current_team));
+  extensions.push_back(plugin(move, "baton pass", PLUGIN_ON_TESTMOVE, move_batonPass_testMoveSwap, 1, current_team));
   extensions.push_back(plugin(move, "blaze kick", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "block", PLUGIN_ON_EVALUATEMOVE, move_trap_set, 0, current_team));
   extensions.push_back(plugin(move, "brave bird", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, current_team));
