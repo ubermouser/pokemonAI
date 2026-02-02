@@ -73,6 +73,7 @@ const Move* suckerPunch_t;
 const Move* swift_t;
 const Move* toxicSpikes_t;
 const Move* trick_t;
+const Move* knockOff_t;
 const Move* taunt_t;
 const Move* uTurn_t;
 const Move* voltTackle_t;
@@ -196,6 +197,7 @@ void initializePointers(const Pokedex& pkAI) {
   toxicSpikes_t = orphan::orphanCheck(moves, "toxic spikes");
   taunt_t = orphan::orphanCheck(moves, "taunt");
   trick_t = orphan::orphanCheck(moves, "trick");
+  knockOff_t = orphan::orphanCheck(moves, "knock off");
   uTurn_t = orphan::orphanCheck(moves, "u-turn");
   voltTackle_t = orphan::orphanCheck(moves, "volt tackle");
   woodHammer_t = orphan::orphanCheck(moves, "wood hammer");

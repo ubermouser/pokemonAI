@@ -90,6 +90,7 @@ extern const Move* suckerPunch_t;
 extern const Move* swift_t;
 extern const Move* toxicSpikes_t;
 extern const Move* trick_t;
+extern const Move* knockOff_t;
 extern const Move* taunt_t;
 extern const Move* uTurn_t;
 extern const Move* voltTackle_t;
@@ -172,6 +173,7 @@ void register_move_struggle(const Pokedex& pkAI, std::vector<plugin>& extensions
 void register_move_taunt(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_trap(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_trick(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_move_knock_off(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_u_turn(const Pokedex& pkAI, std::vector<plugin>& extensions);
 
 void register_ability_clear_body(const Pokedex& pkAI, std::vector<plugin>& extensions);
