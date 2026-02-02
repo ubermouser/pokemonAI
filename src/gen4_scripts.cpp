@@ -1228,22 +1228,6 @@ int move_batonPass(
   return 2;
 }
 
-int move_batonPass_testMoveSwap(
-    ConstTeamVolatile cTV,
-    ConstPokemonVolatile cPKV,
-    ConstMoveVolatile mV,
-    const Action& action,
-    ValidMoveSet& moveAllowed) {
-  if (&mV.getBase() != batonPass_t) { return 0; }
-
-  // Allow friendly targeting for swap
-  if (cTV.numTeammatesAlive() > 1) {
-    moveAllowed[VALID_MOVE_FRIENDLY_IS_OTHER] = true;
-  }
-
-  return 1;
-}
-
 int move_outrage_lockMove(PkCUEngine& cu, PokemonVolatile cPKV) {
   // action is guaranteed to be a move action:
   MoveVolatile mV = cPKV.getMV(cu.getCAction());
@@ -2431,7 +2415,6 @@ bool registerExtensions(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(move, "attack order", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "aura sphere", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
   extensions.push_back(plugin(move, "baton pass", PLUGIN_ON_ENDOFMOVE, move_batonPass, 1, current_team));
-  extensions.push_back(plugin(move, "baton pass", PLUGIN_ON_TESTMOVE, move_batonPass_testMoveSwap, 1, current_team));
   extensions.push_back(plugin(move, "blaze kick", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
   extensions.push_back(plugin(move, "block", PLUGIN_ON_EVALUATEMOVE, move_trap_set, 0, current_team));
   extensions.push_back(plugin(move, "brave bird", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, current_team));

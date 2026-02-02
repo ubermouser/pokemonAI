@@ -21,7 +21,7 @@ attract	Normal	15	100	---	0	1	0	0	0	0	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0	0	
 aura sphere	Fighting	20	100	90	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	Always-Hits	The user looses a blast of aura power from deep within its body. This move is certain to hit.
 avalanche	Ice	10	100	60	1	1	-4	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SetDMG(self.InjuredThisTurn,200%*self.dmg)	An attack move that inflicts double the damage if the user has been hurt by the foe in the same turn.
 barrier	Psychic	30	---	---	0	0	0	0	0	2	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user throws up a sturdy wall that sharply raises its Defense stat.
-baton pass	Normal	40	---	---	0	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!BATON-PASS	The user switches places with a party Pokémon in waiting, passing along any stat changes.
+baton pass	Normal	40	---	---	0	8	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!BATON-PASS	The user switches places with a party Pokémon in waiting, passing along any stat changes.
 beat up	Dark	10	100	10	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	MultiAtck(numAlliesAlive,100%)	The user gets all the party Pokémon to attack the foe. The more party Pokémon, the more damage.
 belly drum	Normal	10	---	---	0	0	0	12	0	0	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	FailIf(self.%HP < 51);SetHP(self,-.5*self.MAXHP)	The user maximizes its Attack stat in exchange for HP equal to half its max HP.
 bite	Dark	25	100	60	1	1	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	---	The foe is bitten with viciously sharp fangs. It may make the target flinch.

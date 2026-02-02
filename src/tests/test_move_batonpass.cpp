@@ -91,19 +91,14 @@ TEST_F(BatonPassTest, DoesNotPassConfusion) {
   auto turn2 = engine_->updateState(
       turn1.where1(), Action::moveAlly(0, 1), Action::wait());
 
-  // Check if there is a state where switch happened
-  bool switch_happened = false;
-  for (size_t i = 0; i < turn2.size(); ++i) {
-      if (turn2.at(i).getTeam(0).getICPKV() == 1) {
-          switch_happened = true;
-          auto torterra = turn2.at(i).teammate(0, 1);
-          // Verify Confusion NOT passed
-          EXPECT_EQ(torterra.status().cTeammate.confused, 0);
-      }
-  }
+  auto switched_states = turn2.whereSwitch(0);
+  ASSERT_FALSE(switched_states.empty())
+      << "Scizor never managed to Baton Pass (confusion blocked all?)";
 
-  if (!switch_happened) {
-      FAIL() << "Scizor never managed to Baton Pass (confusion blocked all?)";
+  for (const auto& state : switched_states) {
+    auto torterra = state.teammate(0, 1);
+    // Verify Confusion NOT passed
+    EXPECT_EQ(torterra.status().cTeammate.confused, 0);
   }
 }
 

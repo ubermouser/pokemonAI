@@ -1,0 +1,70 @@
+{
+  "header": "PKAIE0",
+  "name": "x2_maddog_batonpass",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "bpAbsol",
+      "species": "Absol",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 0,
+      "ability": "Super Luck",
+      "nature": "Jolly",
+      "moves": [
+        "Swords Dance",
+        "Mean Look",
+        "Baton Pass",
+        "Sucker Punch"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 0,
+        "spd": 0,
+        "spe": 252,
+        "hp": 4
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "receiveMetagross",
+      "species": "Metagross",
+      "level": 100,
+      "item": "Lum Berry",
+      "sex": 0,
+      "ability": "Clear body",
+      "nature": "Adamant",
+      "moves": [
+        "Meteor Mash",
+        "Thunder Punch",
+        "Ice Punch",
+        "Earthquake"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 252,
+        "spa": 0,
+        "def": 0,
+        "spd": 0,
+        "spe": 252,
+        "hp": 4
+      }
+    }
+  ]
+}
