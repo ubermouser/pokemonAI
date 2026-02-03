@@ -14,6 +14,7 @@ void registerGen4Extensions(const Pokedex& pkAI, std::vector<plugin>& extensions
   register_move_encore(pkAI, extensions);
   register_move_facade(pkAI, extensions);
   register_move_hazards(pkAI, extensions);
+  register_move_haze(pkAI, extensions);
   register_move_heal50(pkAI, extensions);
   register_move_hidden_power(pkAI, extensions);
   register_move_highCrit(pkAI, extensions);

@@ -30,6 +30,7 @@ const Move* facade_t;
 const Move* faintAttack_t;
 const Move* flareBlitz_t;
 const Move* gigaDrain_t;
+const Move* haze_t;
 const Move* healBell_t;
 const Move* healOrder_t;
 const Move* hiddenPower_t;
@@ -156,6 +157,7 @@ void initializePointers(const Pokedex& pkAI) {
   faintAttack_t = orphan::orphanCheck(moves, "faint attack");
   flareBlitz_t = orphan::orphanCheck(moves, "flare blitz");
   gigaDrain_t = orphan::orphanCheck(moves, "giga drain");
+  haze_t = orphan::orphanCheck(moves, "haze");
   healBell_t = orphan::orphanCheck(moves, "heal bell");
   healOrder_t = orphan::orphanCheck(moves, "heal order");
   hiddenPower_t = orphan::orphanCheck(moves, "hidden power");

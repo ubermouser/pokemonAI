@@ -47,6 +47,7 @@ extern const Move* facade_t;
 extern const Move* faintAttack_t;
 extern const Move* flareBlitz_t;
 extern const Move* gigaDrain_t;
+extern const Move* haze_t;
 extern const Move* healBell_t;
 extern const Move* healOrder_t;
 extern const Move* hiddenPower_t;
@@ -156,6 +157,7 @@ void register_move_destiny_bond(const Pokedex& pkAI, std::vector<plugin>& extens
 void register_move_encore(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_facade(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_hazards(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_move_haze(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_heal50(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_hidden_power(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_highCrit(const Pokedex& pkAI, std::vector<plugin>& extensions);
