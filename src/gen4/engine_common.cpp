@@ -27,15 +27,6 @@ int engine_onModifySpeed_paralyze(
 int engine_endRoundDamageEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
   // nonvolatile:
   uint32_t condition = cPKV.getStatusAilment();
-
-  // Poison Heal:
-  if (cPKV.nv().abilityExists() && (&cPKV.nv().getAbility() == poisonHeal_t)) {
-    if (condition == AIL_NV_POISON || condition == AIL_NV_POISON_TOXIC) {
-      cPKV.modPercentHP(0.125);
-      condition = AIL_NV_NONE;
-    }
-  }
-
   if (condition == AIL_NV_POISON || condition == AIL_NV_BURN) {
     // reduce HP of pokemon by (1/8) or .125
     cPKV.modPercentHP(-0.125);
@@ -296,7 +287,7 @@ void register_engine_common(const Pokedex& pkAI, std::vector<plugin>& extensions
   extensions.push_back(plugin(engine, "secondary effect boosts", PLUGIN_ON_SECONDARYEFFECT, engine_secondaryBoostEffect, -3, all_teams));
   extensions.push_back(plugin(engine, "secondary effect nonvolatile", PLUGIN_ON_SECONDARYEFFECT, engine_secondaryNonvolatileEffect, -2, all_teams));
   extensions.push_back(plugin(engine, "secondary effect volatile", PLUGIN_ON_SECONDARYEFFECT, engine_secondaryVolatileEffect, -1, all_teams));
-  extensions.push_back(plugin(engine, "nonvolatile end-of-round damage", PLUGIN_ON_ENDOFROUND, engine_endRoundDamageEffect, -1, all_teams));
+  extensions.push_back(plugin(engine, "nonvolatile end-of-round damage", PLUGIN_ON_ENDOFROUND, engine_endRoundDamageEffect, 0, all_teams));
   extensions.push_back(plugin(engine, "damage mod burn", PLUGIN_ON_MODIFYATTACKPOWER, engine_modifyAttackPower_burn, 0, all_teams));
   // clang-format on
 }
