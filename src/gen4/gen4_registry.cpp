@@ -36,6 +36,7 @@ void registerGen4Extensions(const Pokedex& pkAI, std::vector<plugin>& extensions
   register_move_trick(pkAI, extensions);
   register_move_knock_off(pkAI, extensions);
   register_move_u_turn(pkAI, extensions);
+  register_move_roar(pkAI, extensions);
 
   register_ability_clear_body(pkAI, extensions);
   register_ability_inner_focus(pkAI, extensions);

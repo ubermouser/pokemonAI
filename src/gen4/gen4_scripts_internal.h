@@ -96,6 +96,8 @@ extern const Move* uTurn_t;
 extern const Move* voltTackle_t;
 extern const Move* woodHammer_t;
 extern const Move* destinyBond_t;
+extern const Move* roar_t;
+extern const Move* whirlwind_t;
 
 extern const Item* choiceBand_t;
 extern const Item* choiceScarf_t;
@@ -175,6 +177,7 @@ void register_move_trap(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_trick(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_knock_off(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_u_turn(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_move_roar(const Pokedex& pkAI, std::vector<plugin>& extensions);
 
 void register_ability_clear_body(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_inner_focus(const Pokedex& pkAI, std::vector<plugin>& extensions);

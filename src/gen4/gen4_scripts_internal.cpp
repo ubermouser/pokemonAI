@@ -79,6 +79,8 @@ const Move* uTurn_t;
 const Move* voltTackle_t;
 const Move* woodHammer_t;
 const Move* destinyBond_t;
+const Move* roar_t;
+const Move* whirlwind_t;
 
 const Item* choiceBand_t;
 const Item* choiceScarf_t;
@@ -201,6 +203,8 @@ void initializePointers(const Pokedex& pkAI) {
   uTurn_t = orphan::orphanCheck(moves, "u-turn");
   voltTackle_t = orphan::orphanCheck(moves, "volt tackle");
   woodHammer_t = orphan::orphanCheck(moves, "wood hammer");
+  roar_t = orphan::orphanCheck(moves, "roar");
+  whirlwind_t = orphan::orphanCheck(moves, "whirlwind");
   // items:
   const Items& items = dex->getItems();
   choiceBand_t = orphan::orphanCheck(items, "choice band");
