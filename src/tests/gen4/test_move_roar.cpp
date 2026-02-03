@@ -105,14 +105,15 @@ TEST_F(RoarTest, ForcesSwitch) {
   // Verify charmander (idx 0) is swapped out for squirtle (idx 1)
   EXPECT_EQ(state.getTeam(1).getICPKV(), 1);
 
-  // Verify Aerodactyl took no damage (proving swift was preempted)
-  EXPECT_EQ(
+  // Verify Aerodactyl took damage (proving swift was NOT preempted due to
+  // Roar's low priority)
+  EXPECT_LT(
       state.getTeam(0).getPKV().getHP(),
       state.getTeam(0).getPKV().nv().getMaxHP());
 
-  // Verification of preemption symbols
+  // Verification of hit symbols
   EXPECT_TRUE(state.hasHit(0));
-  EXPECT_FALSE(state.hasHit(1));
+  EXPECT_TRUE(state.hasHit(1));
 }
 
 TEST_F(RoarTest, FailsIfNoSwitch) {

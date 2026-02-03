@@ -478,6 +478,15 @@ void PkCUEngine::evaluateMove() {
     cAction = Action::wait();
   }
 
+  // if the current pokemon has been switched out, its move should be canceled
+  // We skip evaluation entirely to avoid illegal move access and incorrect wait
+  // flags.
+  if (getBase().hasSwitched(iCTeam) && cAction.isMove()) {
+    stackStage_[iBase_] = STAGE_POSTTURN;
+    evaluateMove_postTurn();
+    return;
+  }
+
   // Pre-move script: modify action?
   if (cAction.isMove()) {
     int result = 0;

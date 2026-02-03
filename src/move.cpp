@@ -54,7 +54,7 @@ Move::Move(
   checkRangeB(PP, 5, 40);
   checkRangeB(damageType, 0, 3);
   checkRangeB(target, -1, 8);
-  checkRangeB(priority, -5, 5);
+  checkRangeB(priority, -7, 7);
   checkRangeB(*std::max_element(begin(selfBuff), end(selfBuff)), -12, 12);
   checkRangeB(*std::min_element(begin(selfBuff), end(selfBuff)), -12, 12);
   checkRangeB(*std::max_element(begin(targetDebuff), end(targetDebuff)), -12, 12);
