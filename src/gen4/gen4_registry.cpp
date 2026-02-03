@@ -46,6 +46,7 @@ void registerGen4Extensions(const Pokedex& pkAI, std::vector<plugin>& extensions
   register_ability_levitate(pkAI, extensions);
   register_ability_natural_cure(pkAI, extensions);
   register_ability_no_guard(pkAI, extensions);
+  register_ability_poison_heal(pkAI, extensions);
   register_ability_pinch_boost(pkAI, extensions);
   register_ability_pressure(pkAI, extensions);
   register_ability_serene_grace(pkAI, extensions);

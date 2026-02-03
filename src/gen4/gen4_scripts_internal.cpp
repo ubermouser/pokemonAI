@@ -109,6 +109,7 @@ const Ability* swarm_t;
 const Ability* synchronize_t;
 const Ability* technician_t;
 const Ability* torrent_t;
+const Ability* poisonHeal_t;
 
 const Type* normal_t;
 const Type* fighting_t;
@@ -237,6 +238,7 @@ void initializePointers(const Pokedex& pkAI) {
   synchronize_t = orphan::orphanCheck(abilities, "synchronize");
   technician_t = orphan::orphanCheck(abilities, "technician");
   torrent_t = orphan::orphanCheck(abilities, "torrent");
+  poisonHeal_t = orphan::orphanCheck(abilities, "poison heal");
   // types:
   const Types& types = dex->getTypes();
   normal_t = orphan::orphanCheck(types, "normal");
