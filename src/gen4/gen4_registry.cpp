@@ -59,6 +59,7 @@ void registerGen4Extensions(const Pokedex& pkAI, std::vector<plugin>& extensions
   register_item_life_orb(pkAI, extensions);
   register_item_lum_berry(pkAI, extensions);
   register_item_shed_shell(pkAI, extensions);
+  register_item_toxic_orb(pkAI, extensions);
   register_item_type_resisting_berry(pkAI, extensions);
 
   register_engine_common(pkAI, extensions);

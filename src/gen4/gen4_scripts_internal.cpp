@@ -91,6 +91,7 @@ const Item* leftovers_t;
 const Item* lifeOrb_t;
 const Item* lumBerry_t;
 const Item* shedShell_t;
+const Item* toxicOrb_t;
 
 const Ability* blaze_t;
 const Ability* clearBody_t;
@@ -217,6 +218,7 @@ void initializePointers(const Pokedex& pkAI) {
   lifeOrb_t = orphan::orphanCheck(items, "life orb");
   lumBerry_t = orphan::orphanCheck(items, "lum berry");
   shedShell_t = orphan::orphanCheck(items, "shed shell");
+  toxicOrb_t = orphan::orphanCheck(items, "toxic orb");
   // abilities:
   const Abilities& abilities = dex->getAbilities();
   blaze_t = orphan::orphanCheck(abilities, "blaze");
