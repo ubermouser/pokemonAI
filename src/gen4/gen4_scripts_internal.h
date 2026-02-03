@@ -125,6 +125,7 @@ extern const Ability* swarm_t;
 extern const Ability* synchronize_t;
 extern const Ability* technician_t;
 extern const Ability* torrent_t;
+extern const Ability* poisonHeal_t;
 
 extern const Type* normal_t;
 extern const Type* fighting_t;
@@ -187,6 +188,7 @@ void register_ability_intimidate(const Pokedex& pkAI, std::vector<plugin>& exten
 void register_ability_levitate(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_natural_cure(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_no_guard(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_ability_poison_heal(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_pinch_boost(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_pressure(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_serene_grace(const Pokedex& pkAI, std::vector<plugin>& extensions);

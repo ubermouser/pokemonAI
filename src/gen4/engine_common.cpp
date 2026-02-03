@@ -27,6 +27,15 @@ int engine_onModifySpeed_paralyze(
 int engine_endRoundDamageEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
   // nonvolatile:
   uint32_t condition = cPKV.getStatusAilment();
+
+  // Poison Heal:
+  if (cPKV.nv().abilityExists() && (&cPKV.nv().getAbility() == poisonHeal_t)) {
+    if (condition == AIL_NV_POISON || condition == AIL_NV_POISON_TOXIC) {
+      cPKV.modPercentHP(0.125);
+      condition = AIL_NV_NONE;
+    }
+  }
+
   if (condition == AIL_NV_POISON || condition == AIL_NV_BURN) {
     // reduce HP of pokemon by (1/8) or .125
     cPKV.modPercentHP(-0.125);
