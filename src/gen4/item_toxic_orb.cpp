@@ -6,10 +6,8 @@ int item_toxic_orb(PkCUEngine& cu, PokemonVolatile cPKV) {
   if (cPKV.hasItem() && (&cPKV.getItem() == toxicOrb_t)) {
     if (cPKV.getStatusAilment() == AIL_NV_NONE) {
         // Toxic Orb does not affect Poison or Steel types
-        const Type* type1 = &cPKV.getBase().getType(0);
-        const Type* type2 = &cPKV.getBase().getType(1);
-
-        if (type1 == poison_t || type2 == poison_t || type1 == steel_t || type2 == steel_t) {
+        const PokemonBase& base = cPKV.getBase();
+        if (base.hasType(poison_t) || base.hasType(steel_t)) {
             return 0;
         }
 
@@ -22,7 +20,7 @@ int item_toxic_orb(PkCUEngine& cu, PokemonVolatile cPKV) {
 };
 
 void register_item_toxic_orb(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(item, "toxic orb", PLUGIN_ON_ENDOFROUND, item_toxic_orb, 0, all_teams));
+  extensions.push_back(plugin(item, "toxic orb", PLUGIN_ON_ENDOFROUND, item_toxic_orb, 0, current_team));
 }
 
 } // namespace gen4
