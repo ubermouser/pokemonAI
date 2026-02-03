@@ -13,7 +13,6 @@ int move_knockOff(
 
   // Check if move hit
   // If damage is 0 (miss, immunity, etc.), Knock Off fails to remove item.
-  // Using hasHit() flag as requested in PR review.
   if (!cu.getBase().hasHit(cu.getICTeam())) { return 1; }
 
   // If the target has a substitute, the item is not knocked off.
