@@ -116,7 +116,7 @@ typedef FixType fixType;
 #define AIL_NV_SLEEP_3T 3
 #define AIL_NV_SLEEP_4T 4
 #define AIL_NV_SLEEP 4
-#define AIL_NV_REST_0T 4
+#define AIL_NV_REST_0T 0
 #define AIL_NV_REST_1T 5
 #define AIL_NV_REST_2T 6
 #define AIL_NV_REST_3T 7

@@ -73,6 +73,7 @@ extern const Move* rapidSpin_t;
 extern const Move* razorLeaf_t;
 extern const Move* recover_t;
 extern const Move* reflect_t;
+extern const Move* rest_t;
 extern const Move* roar_t;
 extern const Move* roost_t;
 extern const Move* shadowClaw_t;
@@ -158,7 +159,7 @@ void register_move_hazards(const Pokedex& pkAI, std::vector<plugin>& extensions)
 void register_move_heal50(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_hidden_power(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_highCrit(const Pokedex& pkAI, std::vector<plugin>& extensions);
-void register_move_recoil33(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_move_knock_off(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_leech_seed(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_leveled_damage(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_lifeLeech50(const Pokedex& pkAI, std::vector<plugin>& extensions);
@@ -167,6 +168,9 @@ void register_move_pain_split(const Pokedex& pkAI, std::vector<plugin>& extensio
 void register_move_payback(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_pursuit(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_rapid_spin(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_move_recoil33(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_move_rest(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_move_roar(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_screens(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_substitute(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_sucker_punch(const Pokedex& pkAI, std::vector<plugin>& extensions);
@@ -175,9 +179,7 @@ void register_move_struggle(const Pokedex& pkAI, std::vector<plugin>& extensions
 void register_move_taunt(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_trap(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_trick(const Pokedex& pkAI, std::vector<plugin>& extensions);
-void register_move_knock_off(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_u_turn(const Pokedex& pkAI, std::vector<plugin>& extensions);
-void register_move_roar(const Pokedex& pkAI, std::vector<plugin>& extensions);
 
 void register_ability_clear_body(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_inner_focus(const Pokedex& pkAI, std::vector<plugin>& extensions);

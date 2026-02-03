@@ -93,6 +93,18 @@ int engine_beginTurnNonvolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
     cu.getStack().at(iREnv[0]).setBlocked(cu.getICTeam());
     break;
   }
+  case AIL_NV_REST_3T:
+  case AIL_NV_REST_2T: {
+    // pokemon is sleeping for a fixed number of turns
+    cPKV.setStatusAilment(cStatus - 1);
+    cu.getBase().setBlocked(cu.getICTeam());
+    break;
+  }
+  case AIL_NV_REST_1T: {
+    // pokemon wakes up from rest
+    cPKV.clearStatusAilment();
+    break;
+  }
   case AIL_NV_PARALYSIS: {
     // generate a new environment on the result array:
     std::array<size_t, 2> iREnv;

@@ -17,7 +17,7 @@ void registerGen4Extensions(const Pokedex& pkAI, std::vector<plugin>& extensions
   register_move_heal50(pkAI, extensions);
   register_move_hidden_power(pkAI, extensions);
   register_move_highCrit(pkAI, extensions);
-  register_move_recoil33(pkAI, extensions);
+  register_move_knock_off(pkAI, extensions);
   register_move_leech_seed(pkAI, extensions);
   register_move_leveled_damage(pkAI, extensions);
   register_move_lifeLeech50(pkAI, extensions);
@@ -26,6 +26,9 @@ void registerGen4Extensions(const Pokedex& pkAI, std::vector<plugin>& extensions
   register_move_payback(pkAI, extensions);
   register_move_pursuit(pkAI, extensions);
   register_move_rapid_spin(pkAI, extensions);
+  register_move_recoil33(pkAI, extensions);
+  register_move_rest(pkAI, extensions);
+  register_move_roar(pkAI, extensions);
   register_move_screens(pkAI, extensions);
   register_move_substitute(pkAI, extensions);
   register_move_sucker_punch(pkAI, extensions);
@@ -34,9 +37,7 @@ void registerGen4Extensions(const Pokedex& pkAI, std::vector<plugin>& extensions
   register_move_taunt(pkAI, extensions);
   register_move_trap(pkAI, extensions);
   register_move_trick(pkAI, extensions);
-  register_move_knock_off(pkAI, extensions);
   register_move_u_turn(pkAI, extensions);
-  register_move_roar(pkAI, extensions);
 
   register_ability_clear_body(pkAI, extensions);
   register_ability_inner_focus(pkAI, extensions);
