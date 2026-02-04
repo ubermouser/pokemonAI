@@ -25,6 +25,7 @@ void registerGen4Extensions(const Pokedex& pkAI, std::vector<plugin>& extensions
   register_move_outrage(pkAI, extensions);
   register_move_pain_split(pkAI, extensions);
   register_move_payback(pkAI, extensions);
+  register_move_perish_song(pkAI, extensions);
   register_move_pursuit(pkAI, extensions);
   register_move_rapid_spin(pkAI, extensions);
   register_move_recoil33(pkAI, extensions);

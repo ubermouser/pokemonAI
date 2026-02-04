@@ -51,6 +51,7 @@ const Move* nightSlash_t;
 const Move* outrage_t;
 const Move* painSplit_t;
 const Move* payback_t;
+const Move* perishSong_t;
 const Move* pursuit_t;
 const Move* psychoCut_t;
 const Move* rapidSpin_t;
@@ -179,6 +180,7 @@ void initializePointers(const Pokedex& pkAI) {
   outrage_t = orphan::orphanCheck(moves, "outrage");
   painSplit_t = orphan::orphanCheck(moves, "pain split");
   payback_t = orphan::orphanCheck(moves, "payback");
+  perishSong_t = orphan::orphanCheck(moves, "perish song");
   pursuit_t = orphan::orphanCheck(moves, "pursuit");
   psychoCut_t = orphan::orphanCheck(moves, "psycho cut");
   rapidSpin_t = orphan::orphanCheck(moves, "rapid spin");
