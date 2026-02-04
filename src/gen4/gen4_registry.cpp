@@ -28,6 +28,7 @@ void registerGen4Extensions(const Pokedex& pkAI, std::vector<plugin>& extensions
   register_move_perish_song(pkAI, extensions);
   register_move_pursuit(pkAI, extensions);
   register_move_rapid_spin(pkAI, extensions);
+  register_move_ohko(pkAI, extensions);
   register_move_recoil33(pkAI, extensions);
   register_move_rest(pkAI, extensions);
   register_move_roar(pkAI, extensions);
@@ -53,6 +54,7 @@ void registerGen4Extensions(const Pokedex& pkAI, std::vector<plugin>& extensions
   register_ability_serene_grace(pkAI, extensions);
   register_ability_shadow_tag(pkAI, extensions);
   register_ability_sticky_hold(pkAI, extensions);
+  register_ability_sturdy(pkAI, extensions);
   register_ability_technician(pkAI, extensions);
   register_ability_synchronize(pkAI, extensions);
 

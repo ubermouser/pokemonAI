@@ -1,4 +1,4 @@
-PKAIM	383							Buff, self										Debuff, Enemy									Ailment					Ailment, Volatile								
+PKAIM	385							Buff, self										Debuff, Enemy									Ailment					Ailment, Volatile
 Name	Type	PP	P.Accuracy	Power	Damage	Target	Priority	Atk	SpA	Def	SpD	Spe	Hitpoints	Evasion	Accuracy	Critical	S.Accuracy	Atk	SpA	Def	SpD	Spe	Hitpoints	Evasion	Accuracy	Critical	Burn	Freeze	Paralysis	Poison	Sleep	Confusion	Flinch	Identify	Infatuation	Lock On	Nightmare	P. Trap	Other	Description
 absorb	Grass	25	100	20	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	ModHP(self,.50*dmgInflicted)	A nutrient-draining attack. The user's HP is restored by half the damage taken by the target.
 acid armor	Poison	40	---	---	0	0	0	0	0	2	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user alters its cellular structure to liquefy itself, sharply raising its Defense stat.
@@ -385,3 +385,5 @@ x-scissor	Bug	15	100	80	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	
 yawn	Normal	10	100	---	0	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	delay(noImmortal,1);failIf(switchesOut(target));SetStatus(target,always,sleep)	The user lets loose a huge yawn that lulls the foe into falling asleep on the next turn.
 zap cannon	Electric	5	50	120	2	1	0	0	0	0	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	The user fires an electric blast like a cannon to inflict damage and cause paralysis.
 zen headbutt	Psychic	15	90	80	1	1	0	0	0	0	0	0	0	0	0	0	20	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	---	The user focuses its willpower to its head and rams the foe. It may also make the target flinch.
+guillotine	Normal	5	30	Var	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	ModHP(target,((self.level-target.level)+30)/100,-1*target.HP)	A pincer attack that hits the foe. The foe instantly faints if it hits.
+horn drill	Normal	5	30	Var	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	ModHP(target,((self.level-target.level)+30)/100,-1*target.HP)	The user stabs the foe with a horn that rotates like a drill. The foe instantly faints if it hits.
