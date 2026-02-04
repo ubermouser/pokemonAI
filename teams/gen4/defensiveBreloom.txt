@@ -1,0 +1,38 @@
+{
+  "header": "PKAIE0",
+  "name": "x1_johnnyg2_DefensiveBreloom",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "DefensiveBreloom",
+      "species": "Breloom",
+      "level": 100,
+      "item": "Toxic Orb",
+      "sex": 0,
+      "ability": "Poison Heal",
+      "nature": "Impish",
+      "moves": [
+        "Leech Seed",
+        "Force Palm",
+        "Protect",
+        "Spore"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 0,
+        "spa": 0,
+        "def": 252,
+        "spd": 4,
+        "spe": 0,
+        "hp": 252
+      }
+    }
+  ]
+}

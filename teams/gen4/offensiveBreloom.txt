@@ -1,0 +1,38 @@
+{
+  "header": "PKAIE0",
+  "name": "x1_johnnyg2_OffensiveBreloom",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "OffensiveBreloom",
+      "species": "Breloom",
+      "level": 100,
+      "item": "Toxic Orb",
+      "sex": 0,
+      "ability": "Poison Heal",
+      "nature": "Adamant",
+      "moves": [
+        "Spore",
+        "Superpower",
+        "Seed Bomb",
+        "Mach Punch"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 248,
+        "spa": 0,
+        "def": 0,
+        "spd": 0,
+        "spe": 184,
+        "hp": 76
+      }
+    }
+  ]
+}

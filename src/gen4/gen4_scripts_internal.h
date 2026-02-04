@@ -120,6 +120,7 @@ extern const Ability* levitate_t;
 extern const Ability* naturalCure_t;
 extern const Ability* noGuard_t;
 extern const Ability* overgrow_t;
+extern const Ability* poisonHeal_t;
 extern const Ability* pressure_t;
 extern const Ability* sereneGrace_t;
 extern const Ability* stickyHold_t;
@@ -128,7 +129,6 @@ extern const Ability* swarm_t;
 extern const Ability* synchronize_t;
 extern const Ability* technician_t;
 extern const Ability* torrent_t;
-extern const Ability* poisonHeal_t;
 
 extern const Type* normal_t;
 extern const Type* fighting_t;

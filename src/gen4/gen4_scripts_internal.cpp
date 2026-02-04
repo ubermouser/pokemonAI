@@ -103,6 +103,7 @@ const Ability* levitate_t;
 const Ability* naturalCure_t;
 const Ability* noGuard_t;
 const Ability* overgrow_t;
+const Ability* poisonHeal_t;
 const Ability* pressure_t;
 const Ability* sereneGrace_t;
 const Ability* stickyHold_t;
@@ -111,7 +112,6 @@ const Ability* swarm_t;
 const Ability* synchronize_t;
 const Ability* technician_t;
 const Ability* torrent_t;
-const Ability* poisonHeal_t;
 
 const Type* normal_t;
 const Type* fighting_t;
@@ -234,6 +234,7 @@ void initializePointers(const Pokedex& pkAI) {
   naturalCure_t = orphan::orphanCheck(abilities, "natural cure");
   noGuard_t = orphan::orphanCheck(abilities, "no guard");
   overgrow_t = orphan::orphanCheck(abilities, "overgrow");
+  poisonHeal_t = orphan::orphanCheck(abilities, "poison heal");
   pressure_t = orphan::orphanCheck(abilities, "pressure");
   sereneGrace_t = orphan::orphanCheck(abilities, "serene grace");
   shadowTag_t = orphan::orphanCheck(abilities, "shadow tag");
@@ -242,7 +243,6 @@ void initializePointers(const Pokedex& pkAI) {
   synchronize_t = orphan::orphanCheck(abilities, "synchronize");
   technician_t = orphan::orphanCheck(abilities, "technician");
   torrent_t = orphan::orphanCheck(abilities, "torrent");
-  poisonHeal_t = orphan::orphanCheck(abilities, "poison heal");
   // types:
   const Types& types = dex->getTypes();
   normal_t = orphan::orphanCheck(types, "normal");
