@@ -61,6 +61,7 @@ extern const Move* magicalLeaf_t;
 extern const Move* meanLook_t;
 extern const Move* megaDrain_t;
 extern const Move* memento_t;
+extern const Move* metalBurst_t;
 extern const Move* milkDrink_t;
 extern const Move* mirrorCoat_t;
 extern const Move* nightShade_t;
@@ -168,6 +169,7 @@ void register_move_knock_off(const Pokedex& pkAI, std::vector<plugin>& extension
 void register_move_leech_seed(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_leveled_damage(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_lifeLeech50(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_move_metal_burst(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_outrage(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_pain_split(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_payback(const Pokedex& pkAI, std::vector<plugin>& extensions);

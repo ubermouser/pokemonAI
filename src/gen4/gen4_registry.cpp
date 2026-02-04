@@ -22,6 +22,7 @@ void registerGen4Extensions(const Pokedex& pkAI, std::vector<plugin>& extensions
   register_move_leech_seed(pkAI, extensions);
   register_move_leveled_damage(pkAI, extensions);
   register_move_lifeLeech50(pkAI, extensions);
+  register_move_metal_burst(pkAI, extensions);
   register_move_outrage(pkAI, extensions);
   register_move_pain_split(pkAI, extensions);
   register_move_payback(pkAI, extensions);
