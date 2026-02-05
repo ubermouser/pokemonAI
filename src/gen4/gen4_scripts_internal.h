@@ -98,6 +98,7 @@ extern const Move* substitute_t;
 extern const Move* suckerPunch_t;
 extern const Move* swift_t;
 extern const Move* toxicSpikes_t;
+extern const Move* torment_t;
 extern const Move* trick_t;
 extern const Move* taunt_t;
 extern const Move* uTurn_t;
@@ -189,6 +190,7 @@ void register_move_sucker_punch(const Pokedex& pkAI, std::vector<plugin>& extens
 void register_move_suicide(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_struggle(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_taunt(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_move_torment(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_trap(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_trick(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_u_turn(const Pokedex& pkAI, std::vector<plugin>& extensions);
