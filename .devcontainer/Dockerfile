@@ -42,6 +42,7 @@ RUN apt-get install -y \
   valgrind \
   clang-format \
   libomp-dev \
+  linux-perf \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # C++ Dependencies
@@ -79,6 +80,11 @@ USER node
 
 # Setup a dummy git config:
 RUN printf "[user]\n\temail = gemini@google.com\n\tname = Antigravity Gemini 3.0\n" > /home/node/.gitconfig
+
+# Copy the conan2 clang profile:
+RUN mkdir -p /home/node/.conan2/profiles
+COPY clang_profile /home/node/.conan2/profiles/default
+RUN chmod 444 /home/node/.conan2/profiles/default
 
 # Install global packages
 ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global
