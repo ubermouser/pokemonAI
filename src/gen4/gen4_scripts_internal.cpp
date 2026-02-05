@@ -59,6 +59,7 @@ const Move* pursuit_t;
 const Move* rapidSpin_t;
 const Move* razorLeaf_t;
 const Move* recover_t;
+const Move* refresh_t;
 const Move* reflect_t;
 const Move* rest_t;
 const Move* roar_t;
@@ -189,6 +190,7 @@ void initializePointers(const Pokedex& pkAI) {
   pursuit_t = orphan::orphanCheck(moves, "pursuit");
   rapidSpin_t = orphan::orphanCheck(moves, "rapid spin");
   razorLeaf_t = orphan::orphanCheck(moves, "razor leaf");
+  refresh_t = orphan::orphanCheck(moves, "refresh");
   reflect_t = orphan::orphanCheck(moves, "reflect");
   lightScreen_t = orphan::orphanCheck(moves, "light screen");
   rest_t = orphan::orphanCheck(moves, "rest");

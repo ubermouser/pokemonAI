@@ -76,6 +76,7 @@ extern const Move* pursuit_t;
 extern const Move* rapidSpin_t;
 extern const Move* razorLeaf_t;
 extern const Move* recover_t;
+extern const Move* refresh_t;
 extern const Move* reflect_t;
 extern const Move* rest_t;
 extern const Move* roar_t;
@@ -179,6 +180,7 @@ void register_move_protect(const Pokedex& pkAI, std::vector<plugin>& extensions)
 void register_move_pursuit(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_rapid_spin(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_recoil33(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_move_refresh(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_rest(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_roar(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_screens(const Pokedex& pkAI, std::vector<plugin>& extensions);
