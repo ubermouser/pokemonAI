@@ -71,6 +71,7 @@ extern const Move* payback_t;
 extern const Move* perishSong_t;
 extern const Move* pursuit_t;
 extern const Move* psychoCut_t;
+extern const Move* protect_t;
 extern const Move* rapidSpin_t;
 extern const Move* razorLeaf_t;
 extern const Move* recover_t;
@@ -173,6 +174,7 @@ void register_move_pain_split(const Pokedex& pkAI, std::vector<plugin>& extensio
 void register_move_payback(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_perish_song(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_pursuit(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_move_protect(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_rapid_spin(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_recoil33(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_rest(const Pokedex& pkAI, std::vector<plugin>& extensions);

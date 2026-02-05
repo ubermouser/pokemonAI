@@ -61,6 +61,9 @@ struct VolatileStatus
   uint32_t taunt_duration : 3;
   uint32_t destinyBond : 1;
   // END OF THIRD WORD
+  uint32_t protect_counter : 3;
+  uint32_t protected_flag : 1;
+  // END OF FOURTH WORD
 
   void reset();
 };
