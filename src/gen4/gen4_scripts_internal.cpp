@@ -44,6 +44,7 @@ const Move* magicalLeaf_t;
 const Move* meanLook_t;
 const Move* megaDrain_t;
 const Move* memento_t;
+const Move* metalBurst_t;
 const Move* milkDrink_t;
 const Move* mirrorCoat_t;
 const Move* nightShade_t;
@@ -174,6 +175,7 @@ void initializePointers(const Pokedex& pkAI) {
   meanLook_t = orphan::orphanCheck(moves, "mean look");
   megaDrain_t = orphan::orphanCheck(moves, "mega drain");
   memento_t = orphan::orphanCheck(moves, "memento");
+  metalBurst_t = orphan::orphanCheck(moves, "metal burst");
   milkDrink_t = orphan::orphanCheck(moves, "milk drink");
   mirrorCoat_t = orphan::orphanCheck(moves, "mirror coat");
   nightShade_t = orphan::orphanCheck(moves, "night shade");

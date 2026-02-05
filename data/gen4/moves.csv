@@ -201,7 +201,7 @@ mega kick	Normal	5	75	120	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	
 mega punch	Normal	20	85	80	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The foe is slugged by a punch thrown with muscle-packed power.
 megahorn	Bug	10	85	120	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Utilizing its tough and impressive horn, the user rams into the foe  with no letup.
 memento	Dark	10	100	---	0	1	0	0	0	0	0	0	0	0	0	0	100	2	2	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SetHP(self,always,0)	The user faints upon using this move. In return, it sharply lowers the target's Attack and Sp. Atk.
-metal burst	Steel	10	100	Var	1	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	ModHP(attacker,self.InjuredThisTurn,attacker.dmg*1.5)	The user retaliates against the foe that last inflicted damage on it with much greater power.
+metal burst	Steel	10	100	Var	3	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	ModHP(attacker,self.InjuredThisTurn,attacker.dmg*1.5)	The user retaliates against the foe that last inflicted damage on it with much greater power.
 metal claw	Steel	35	95	50	1	1	0	1	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The foe is raked with steel claws. It may also raise the user's Attack stat.
 metal sound	Steel	40	100	---	0	1	0	0	0	0	0	0	0	0	0	0	85	0	0	0	2	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	A horrible sound like scraping metal is emitted to sharply reduce the foe's Sp. Def stat.
 meteor mash	Steel	10	85	100	1	1	1	1	0	0	0	0	0	0	0	0	20	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The foe is hit with a hard punch fired like a meteor. It may also raise the user's Attack.
