@@ -31,6 +31,7 @@ void registerGen4Extensions(const Pokedex& pkAI, std::vector<plugin>& extensions
   register_move_protect(pkAI, extensions);
   register_move_rapid_spin(pkAI, extensions);
   register_move_recoil33(pkAI, extensions);
+  register_move_refresh(pkAI, extensions);
   register_move_rest(pkAI, extensions);
   register_move_roar(pkAI, extensions);
   register_move_screens(pkAI, extensions);
