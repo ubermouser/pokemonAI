@@ -21,9 +21,7 @@ int move_protect(
   // 2nd use (2) -> 50%
   // 3rd use (3) -> 25%
   FixType probability = FixType(1);
-  for (uint32_t i = 1; i < counter; ++i) {
-    probability = probability * FixType(0.5);
-  }
+  probability.intValue >>= (counter - 1);
 
   if (probability < FixType(1)) {
     // Split state: Success vs Failure
