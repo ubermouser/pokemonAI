@@ -13,6 +13,7 @@ const Move* attackOrder_t;
 const Move* aromatherapy_t;
 const Move* auraSphere_t;
 const Move* batonPass_t;
+const Move* bellyDrum_t;
 const Move* blazeKick_t;
 const Move* block_t;
 const Move* braveBird_t;
@@ -148,6 +149,7 @@ void initializePointers(const Pokedex& pkAI) {
   attackOrder_t = orphan::orphanCheck(moves, "attack order");
   auraSphere_t = orphan::orphanCheck(moves, "aura sphere");
   batonPass_t = orphan::orphanCheck(moves, "baton pass");
+  bellyDrum_t = orphan::orphanCheck(moves, "belly drum");
   blazeKick_t = orphan::orphanCheck(moves, "blaze kick");
   block_t = orphan::orphanCheck(moves, "block");
   braveBird_t = orphan::orphanCheck(moves, "brave bird");
