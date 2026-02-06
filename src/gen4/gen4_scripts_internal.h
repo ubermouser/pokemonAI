@@ -38,6 +38,7 @@ extern const Move* counter_t;
 extern const Move* crabHammer_t;
 extern const Move* crossChop_t;
 extern const Move* crossPoison_t;
+extern const Move* curse_t;
 extern const Move* destinyBond_t;
 extern const Move* disable_t;
 extern const Move* doubleEdge_t;
@@ -160,6 +161,7 @@ void register_move_alwaysHits(const Pokedex& pkAI, std::vector<plugin>& extensio
 void register_move_baton_pass(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_brick_break(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_counter_mirror_coat(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_move_curse(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_cure_team(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_destiny_bond(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_disable(const Pokedex& pkAI, std::vector<plugin>& extensions);

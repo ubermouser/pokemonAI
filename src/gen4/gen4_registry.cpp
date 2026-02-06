@@ -9,6 +9,7 @@ void registerGen4Extensions(const Pokedex& pkAI, std::vector<plugin>& extensions
   register_move_baton_pass(pkAI, extensions);
   register_move_brick_break(pkAI, extensions);
   register_move_counter_mirror_coat(pkAI, extensions);
+  register_move_curse(pkAI, extensions);
   register_move_cure_team(pkAI, extensions);
   register_move_destiny_bond(pkAI, extensions);
   register_move_disable(pkAI, extensions);
