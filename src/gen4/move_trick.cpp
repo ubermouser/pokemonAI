@@ -7,7 +7,7 @@ int move_trick(
     MoveVolatile mV,
     PokemonVolatile cPKV,
     PokemonVolatile tPKV) {
-  if (&mV.getBase() != trick_t) { return 0; }
+  if (&mV.getBase() != trick_t && &mV.getBase() != switcheroo_t) { return 0; }
 
   // TODO: Trick fails if the target is behind a substitute.
   if (tPKV.nv().abilityExists()) {
@@ -38,6 +38,7 @@ int move_trick(
 
 void register_move_trick(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(plugin(move, "trick", PLUGIN_ON_EVALUATEMOVE, move_trick, 0, current_team));
+  extensions.push_back(plugin(move, "switcheroo", PLUGIN_ON_EVALUATEMOVE, move_trick, 0, current_team));
 }
 
 } // namespace gen4

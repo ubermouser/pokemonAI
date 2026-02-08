@@ -99,6 +99,7 @@ extern const Move* struggle_t;
 extern const Move* substitute_t;
 extern const Move* suckerPunch_t;
 extern const Move* swift_t;
+extern const Move* switcheroo_t;
 extern const Move* toxicSpikes_t;
 extern const Move* torment_t;
 extern const Move* trick_t;
