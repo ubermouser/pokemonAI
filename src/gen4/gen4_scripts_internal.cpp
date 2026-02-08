@@ -22,6 +22,7 @@ const Move* counter_t;
 const Move* crabHammer_t;
 const Move* crossChop_t;
 const Move* crossPoison_t;
+const Move* curse_t;
 const Move* destinyBond_t;
 const Move* disable_t;
 const Move* doubleEdge_t;
@@ -159,6 +160,7 @@ void initializePointers(const Pokedex& pkAI) {
   crabHammer_t = orphan::orphanCheck(moves, "crabhammer");
   crossChop_t = orphan::orphanCheck(moves, "cross chop");
   crossPoison_t = orphan::orphanCheck(moves, "cross poison");
+  curse_t = orphan::orphanCheck(moves, "curse");
   destinyBond_t = orphan::orphanCheck(moves, "destiny bond");
   disable_t = orphan::orphanCheck(moves, "disable");
   doubleEdge_t = orphan::orphanCheck(moves, "double-edge");
