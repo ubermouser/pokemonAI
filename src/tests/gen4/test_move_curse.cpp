@@ -101,21 +101,5 @@ TEST_F(CurseTest, GhostCurse_FailsIfTargetAlreadyCursed) {
   auto r2_env = r2.where1().getEnv();
 
   // Gengar HP should still be 0.5 (didn't pay cost again?)
-  // Actually, if move fails, does it pay cost?
-  // implementation: if (tPKV.status().cTeammate.curse) { return 0; }
-  // return 0 means "move failed" or "plugin didn't handle"?
-  // If plugin returns 0, the engine might proceed to other plugins or default behavior?
-  // But Curse is "Unknown" type and likely has no default implementation.
-  // PkCUEngine::evaluateMove_script calls plugin. If plugin returns 0, it does nothing?
-  // `result` starts at `isImplemented()`?
-  // In `evaluateMove_script`:
-  // `int result = mV.getBase().isImplemented()?1:0;`
-  // Since we haven't modified `Move::isImplemented`, it likely returns false (0).
-  // `CALLPLUGIN` ORs the result.
-  // So if `move_curse_set` returns 0, `result` remains 0.
-  // Does that mean "move failed"?
-  // Usually failure is indicated by NOT modifying anything.
-  // So HP shouldn't change.
-
   EXPECT_NEAR(r2_env.teammate(0, 0).getPercentHP(), 0.5, 0.01);
 }
