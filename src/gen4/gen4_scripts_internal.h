@@ -30,6 +30,7 @@ extern const Move* attackOrder_t;
 extern const Move* aromatherapy_t;
 extern const Move* auraSphere_t;
 extern const Move* batonPass_t;
+extern const Move* bellyDrum_t;
 extern const Move* blazeKick_t;
 extern const Move* block_t;
 extern const Move* braveBird_t;
@@ -158,6 +159,7 @@ void initializePointers(const Pokedex& pkAI);
 
 void register_move_alwaysHits(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_baton_pass(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_move_belly_drum(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_brick_break(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_counter_mirror_coat(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_cure_team(const Pokedex& pkAI, std::vector<plugin>& extensions);
