@@ -361,13 +361,20 @@ GameResult Game::digestGame(
     std::vector<Turn>& cLog, const ConstEnvironmentVolatile& initialState, int endStatus) const {
   GameResult cResult{};
 
+  // encounter tracking:
+  for (size_t iTurn = 1; iTurn < cLog.size(); ++iTurn) {
+    const auto& previousTurn = cLog[iTurn - 1];
+    const auto& currentTurn = cLog[iTurn];
+    digestGameEncounters(cResult, previousTurn, currentTurn);
+  }
+
   // foreach team:
   for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
     auto& team = cResult.teams[iTeam];
     // starter pokemon participation:
     team.pokemon[initialState.getTeam(iTeam).getICPKV()].participation += 1;
     // for each turn:
-    for (const auto& turn: cLog) {
+    for (const auto& turn : cLog) {
       const auto& tTurn = turn.teams[iTeam];
       auto& pokemon = team.pokemon[tTurn.activePokemon];
       // increment turns evaluated and time spent:
@@ -449,6 +456,44 @@ GameResult Game::digestGame(
 } // endOf digestGame
 
 
+void Game::digestGameEncounters(
+    GameResult& cResult,
+    const Turn& previousTurn,
+    const Turn& currentTurn) const {
+  size_t pkA_start = previousTurn.teams[TEAM_A].activePokemon;
+  size_t pkB_start = previousTurn.teams[TEAM_B].activePokemon;
+  size_t pkA_end = currentTurn.teams[TEAM_A].activePokemon;
+  size_t pkB_end = currentTurn.teams[TEAM_B].activePokemon;
+
+  // both were active at start of turn:
+  cResult.teams[TEAM_A].pokemon[pkA_start].encounters[pkB_start].numTotal++;
+  cResult.teams[TEAM_B].pokemon[pkB_start].encounters[pkA_start].numTotal++;
+
+  if (pkA_start != pkA_end || pkB_start != pkB_end) {
+    ConstEnvironmentPossible env{*nv_, currentTurn.env};
+
+    auto updateStats = [&](size_t iTeam,
+                           size_t pk_start,
+                           size_t pk_end,
+                           size_t pk_opp) {
+      if (pk_start != pk_end) {
+        if (currentTurn.teams[iTeam].action.isSwitch()) {
+          cResult.teams[iTeam]
+              .pokemon[pk_start]
+              .encounters[pk_opp]
+              .numSwitches++;
+        } else if (!env.getTeam(iTeam).teammate(pk_start).isAlive()) {
+          cResult.teams[iTeam].pokemon[pk_start].encounters[pk_opp].numKOs++;
+        }
+      }
+    };
+
+    updateStats(TEAM_A, pkA_start, pkA_end, pkB_start);
+    updateStats(TEAM_B, pkB_start, pkB_end, pkA_start);
+  }
+}
+
+
 HeatResult Game::digestMatch(std::vector<GameResult>& gLog) const {
   // initialize heatResult:
   HeatResult hResult{};
@@ -494,6 +539,15 @@ HeatResult Game::digestMatch(std::vector<GameResult>& gLog) const {
 
         for (size_t iMove = 0; iMove < 5; ++iMove) {
           pokemon.moveUse[iMove] += source.moveUse[iMove];
+        }
+
+        for (size_t iOpponent = 0; iOpponent < 6; ++iOpponent) {
+          pokemon.encounters[iOpponent].numKOs +=
+              source.encounters[iOpponent].numKOs;
+          pokemon.encounters[iOpponent].numSwitches +=
+              source.encounters[iOpponent].numSwitches;
+          pokemon.encounters[iOpponent].numTotal +=
+              source.encounters[iOpponent].numTotal;
         }
       } // endOf forEach log
 

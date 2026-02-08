@@ -9,7 +9,7 @@ class Trainer : public TeamBuilder {
   struct Config : public TeamBuilder::Config {
     TrainerRegressFitness::Config training;
 
-    Config() : TeamBuilder::Config() {}
+    Config() : TeamBuilder::Config() { printDatasheets = false; }
 
     boost::program_options::options_description options(
         const std::string& category = "trainer configuration",

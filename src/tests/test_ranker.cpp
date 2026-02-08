@@ -57,3 +57,19 @@ TEST_F(RankerTest, CalculateLeagueStats) {
   EXPECT_FALSE(league.counts.types.empty());
   EXPECT_FALSE(league.counts.moves.empty());
 }
+
+TEST_F(RankerTest, CalculateDatasheet) {
+  ranker_->initialize();
+  LeagueHeat league = ranker_->rank();
+  // Produce a datasheet for the first pokemon found
+  ASSERT_FALSE(league.counts.pokemon.empty());
+  std::string pkName = league.counts.pokemon.begin()->first;
+  std::string datasheet = league.produceDatasheet(pkName);
+
+  std::cout << datasheet << std::endl;
+  EXPECT_NE(datasheet.find(pkName), std::string::npos);
+  EXPECT_NE(datasheet.find("Abilities"), std::string::npos);
+  EXPECT_NE(datasheet.find("Items"), std::string::npos);
+  EXPECT_NE(datasheet.find("Moves"), std::string::npos);
+  EXPECT_NE(datasheet.find("Checks and Counters"), std::string::npos);
+}

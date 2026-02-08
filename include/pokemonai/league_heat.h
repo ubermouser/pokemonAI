@@ -56,10 +56,37 @@ struct LeagueHeat : public League {
   void calculateStats() {
     calculateCounts();
     calculateContribution();
+    calculateUsage();
   }
 
   void calculateCounts();
   void calculateContribution();
+  void calculateUsage();
+
+  struct PokemonUsageStats {
+    struct EncounterStats {
+      uint64_t numKOs = 0;
+      uint64_t numSwitches = 0;
+      uint64_t numTotal = 0;
+      double score = 0;
+      double mean = 0;
+      double stddev = 0;
+    };
+
+    uint64_t count = 0;
+    double avgSkill = 0;
+    double maximumSkill = 0;
+    std::unordered_map<std::string, uint64_t> abilities;
+    std::unordered_map<std::string, uint64_t> items;
+    std::unordered_map<std::string, uint64_t> spreads;
+    std::unordered_map<std::string, double> moves;
+    std::unordered_map<std::string, uint64_t> teammates;
+    std::unordered_map<std::string, EncounterStats> encounters;
+  };
+
+  std::unordered_map<std::string, PokemonUsageStats> pokemonUsage;
+
+  std::string produceDatasheet(const std::string& pokemonName) const;
 
   struct StatEntry {
     uint64_t count = 0;

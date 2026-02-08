@@ -38,7 +38,14 @@ struct Turn {
 struct GameResult {
   struct PerTeam {
     struct PerPokemon {
+      struct Encounter {
+        uint32_t numKOs = 0;
+        uint32_t numSwitches = 0;
+        uint32_t numTotal = 0;
+      };
+
       std::array<double, 5> moveUse = {0., 0., 0., 0., 0.};
+      std::array<Encounter, 6> encounters;
       double participation = 0;
       double aggregateContribution = 0;
       double simpleContribution = 0;
@@ -66,6 +73,8 @@ struct HeatResult {
   struct PerTeam {
     struct PerPokemon {
       std::array<double, 5> moveUse = {0., 0., 0., 0., 0.};
+      std::array<typename GameResult::PerTeam::PerPokemon::Encounter, 6>
+          encounters;
       double participation = 0;
       double aggregateContribution = 0;
       double simpleContribution = 0;
@@ -211,6 +220,11 @@ protected:
   /* creates a log of the current completed game */
   GameResult digestGame(
       std::vector<Turn>& cLog, const ConstEnvironmentVolatile& initialState, int gameResult) const;
+
+  void digestGameEncounters(
+      GameResult& cResult,
+      const Turn& previousTurn,
+      const Turn& currentTurn) const;
 
   HeatResult digestMatch(std::vector<GameResult>& gLog) const;
 

@@ -19,55 +19,58 @@ namespace bf = boost::filesystem;
 namespace po = boost::program_options;
 
 
-po::options_description Ranker::Config::options(const std::string& category, std::string prefix) {
-  Config defaults{};
+po::options_description Ranker::Config::options(
+    const std::string& category, std::string prefix) {
   po::options_description desc{category};
 
   if (prefix.size() > 0) { prefix.append("-"); }
   // clang-format off
   desc.add_options()
       ((prefix + "save-on-completion").c_str(),
-      po::value<bool>(&saveOnCompletion)->default_value(defaults.saveOnCompletion),
+      po::value<bool>(&saveOnCompletion)->default_value(saveOnCompletion),
       "when true, resulting artifacts are saved to disk.")
       ((prefix + "allow-same-planner").c_str(),
-      po::value<bool>(&allowSamePlanner)->default_value(defaults.allowSamePlanner),
+      po::value<bool>(&allowSamePlanner)->default_value(allowSamePlanner),
       "when true, a given planner may fight itself.")
       ((prefix + "allow-same-evaluator").c_str(),
-      po::value<bool>(&allowSameEvaluator)->default_value(defaults.allowSameEvaluator),
+      po::value<bool>(&allowSameEvaluator)->default_value(allowSameEvaluator),
       "when true, a given evaluator may fight itself.")
       ((prefix + "allow-same-team").c_str(),
-      po::value<bool>(&allowSameTeam)->default_value(defaults.allowSameTeam),
+      po::value<bool>(&allowSameTeam)->default_value(allowSameTeam),
       "when true, a given team may fight itself.")
       ((prefix + "enforce-same-league").c_str(),
-      po::value<bool>(&enforceSameLeague)->default_value(defaults.enforceSameLeague),
+      po::value<bool>(&enforceSameLeague)->default_value(enforceSameLeague),
       "when true, teams will only fight teams with the same number of pokemon.")
       ((prefix + "print-battlegroup-leaderboard").c_str(),
-      po::value<bool>(&printBattlegroupLeaderboard)->default_value(defaults.printBattlegroupLeaderboard),
+      po::value<bool>(&printBattlegroupLeaderboard)->default_value(printBattlegroupLeaderboard),
       "Prints a leaderboard of battlegroups.")
       ((prefix + "print-pokemon-leaderboard").c_str(),
-      po::value<bool>(&printPokemonLeaderboard)->default_value(defaults.printPokemonLeaderboard),
+      po::value<bool>(&printPokemonLeaderboard)->default_value(printPokemonLeaderboard),
       "Prints a leaderboard of pokemon.")
       ((prefix + "leaderboard-size").c_str(),
-      po::value<size_t>(&leaderboardPrintCount)->default_value(defaults.leaderboardPrintCount),
+      po::value<size_t>(&leaderboardPrintCount)->default_value(leaderboardPrintCount),
       "number of entities displayed per leaderboard.")
       ((prefix + "league-stats-size").c_str(),
-      po::value<size_t>(&leagueStatsPrintCount)->default_value(defaults.leagueStatsPrintCount),
+      po::value<size_t>(&leagueStatsPrintCount)->default_value(leagueStatsPrintCount),
       "number of entities displayed in descriptive stats.")
       ((prefix + "games-per-battlegroup").c_str(),
-      po::value<size_t>(&minGamesPerBattlegroup)->default_value(defaults.minGamesPerBattlegroup),
+      po::value<size_t>(&minGamesPerBattlegroup)->default_value(minGamesPerBattlegroup),
       "minimum number of games played per battlegroup per league.")
       ((prefix + "ranker-verbosity").c_str(),
-      po::value<int>(&verbosity)->default_value(defaults.verbosity),
+      po::value<int>(&verbosity)->default_value(verbosity),
       "verbosity level, controls intermediate rank printing.")
       ((prefix + "ranker-seed").c_str(),
-      po::value<uint32_t>(&randomSeed)->default_value(defaults.randomSeed),
+      po::value<uint32_t>(&randomSeed)->default_value(randomSeed),
       "random number generator seed.")
       ((prefix + "num-threads").c_str(),
-      po::value<size_t>(&numThreads)->default_value(defaults.numThreads),
+      po::value<size_t>(&numThreads)->default_value(numThreads),
       "number of threads to use when ranking teams")
       ((prefix + "team-path").c_str(),
-      po::value<std::string>(&teamPath)->default_value(defaults.teamPath),
-      "folder for loading / saving pokemon teams");
+      po::value<std::string>(&teamPath)->default_value(teamPath),
+      "folder for loading / saving pokemon teams")
+      ((prefix + "print-datasheets").c_str(),
+      po::value<bool>(&printDatasheets)->default_value(printDatasheets),
+      "when true, datasheets for popular species are printed.");
   // clang-format on
   return desc;
 }
@@ -435,6 +438,7 @@ void Ranker::printLeagueStatistics(LeagueHeat& league) const {
 
 void Ranker::printLeagueCounts(const LeagueHeat& league) const {
   std::ostringstream os;
+  std::vector<std::string> topSpecies;
 
   auto printMapStats =
       [&](const std::unordered_map<std::string, LeagueHeat::StatEntry>& map,
@@ -468,6 +472,8 @@ void Ranker::printLeagueCounts(const LeagueHeat& league) const {
                 stat.participation);
           }
           os << "\n";
+
+          if (name == "SPECIES") { topSpecies.push_back(key); }
         }
       };
 
@@ -479,6 +485,12 @@ void Ranker::printLeagueCounts(const LeagueHeat& league) const {
   printMapStats(league.counts.moves, "MOVE", true);
 
   out_.get() << os.str();
+
+  if (cfg_.printDatasheets) {
+    for (const auto& species : topSpecies) {
+      out_.get() << league.produceDatasheet(species);
+    }
+  }
 }
 
 
