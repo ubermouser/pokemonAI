@@ -13,8 +13,8 @@ The project is organized into the following modules:
 *   **trainer**: An executable used to training machine-learning based planners and evaluators.
 *   **ranker**: An executable for ranking Pokémon planners, evaluators, and teams.
 *   **genX_scripts**: Contains scripts and data specific to a specific generation of Pokémon games. Supports Generation 1 (RB) and 4 (DP).
-    *   **Gen 4 Architecture**: Modularized into `src/gen4/` with individual implementations for moves, abilities, and items registered via `src/gen4/gen4_registry.cpp`.
-    *   **Gen 1 Architecture**: Modularized into `src/gen1/` with implementations registered via `src/gen1/gen1_registry.cpp`.
+    *   **Gen 4 Architecture**: Modularized into `src/gen4/` with individual implementations for moves, abilities, and items registered via `src/gen4/gen4_scripts_internal.cpp`.
+    *   **Gen 1 Architecture**: Modularized into `src/gen1/` with implementations registered via `src/gen1/gen1_scripts_internal.cpp`.
 *   **data**: Contains general game data used by the simulator.
 *   **teams**: A directory to store Pokémon team files.
 *   **networks**: A directory for storing trained neural network models.
@@ -26,7 +26,7 @@ To implement new moves or abilities for a specific generation:
 1.  **Register Script Pointer**: Ensure the Ability / Move / Pokemon / Item / etc. has a matching name in the generation's data file (e.g., `data/gen4/moves.csv`).
 2.  **File Structure**: Add a new `.cpp` file in `src/gen4/` or `src/gen1/` following the naming convention `[type]_[name].cpp` (e.g., `move_earthquake.cpp`, `ability_pressure.cpp`).
 3.  **Implement Plugin**: Use the appropriate plugin hooks (e.g., `PLUGIN_ON_EVALUATEMOVE`, `PLUGIN_ON_MODIFYBASEPOWER`).
-4.  **Registering**: Add a registration function in `genX_scripts_internal.h` and call it from the central `genX_registry.cpp`.
+4.  **Registering**: Add a registration function in `genX_scripts_internal.h` and call it from the central `genX::registerGenXExtensions(..)`.
 5.  **Verification**: Add or update unit tests in `src/tests/genX/` using the generation's test fixture (e.g., `Gen4EngineTest`).
 
 ## Building and Running

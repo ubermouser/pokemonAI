@@ -7,7 +7,7 @@ trigger: always_on
 ### Code Organization
 - Header files are located in the `include/pokemonai` directory and should be included with the `pokemonai/` prefix.
 - Generation-specific code (Gen 1 and Gen 4) is in `src/gen1/` and `src/gen4/`.
-- New move/ability implementations should be added as separate files in these directories and registered in the corresponding `genX_registry.cpp`.
+- New move/ability implementations should be added as separate files in these directories and registered in the corresponding `genX_scripts_internal.cpp`.
 
 ### Building and Testing
 - The project is a C++ application built with CMake and managed by Conan.
