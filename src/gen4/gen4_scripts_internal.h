@@ -205,6 +205,7 @@ void register_move_trap(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_tri_attack(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_trick(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_u_turn(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_move_recharge(const Pokedex& pkAI, std::vector<plugin>& extensions);
 
 void register_ability_clear_body(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_inner_focus(const Pokedex& pkAI, std::vector<plugin>& extensions);
