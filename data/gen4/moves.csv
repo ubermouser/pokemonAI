@@ -232,6 +232,7 @@ pay day	Normal	20	100	40	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0
 payback	Dark	10	100	50	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SetDMG(self,self.InjuredThisTurn|target.switchedOut,dmg*2)	If the user can use this attack after the foe attacks, its power is doubled.
 peck	Flying	35	100	35	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The foe is jabbed with a sharply pointed beak or horn.
 perish song	Normal	5	100	---	0	7	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!PERISHSONG	Any Pokémon that hears this song faints in three turns unless it switches out of battle.
+petal dance	Grass	20	100	90	2	3	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	lock-in(self,always,2-3);SetStatus(self,endOfEffect,confusion)	The user attacks by scattering petals for two to three turns. The user then becomes confused.
 pluck	Flying	20	100	60	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!BUG-BITE	The user pecks the foe. If the foe is holding a Berry, the user plucks it and gains its effect.
 poison fang	Poison	15	100	50	1	1	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0	0	0	0	0	0	2	0	0	0	0	0	0	0	0	---	The user bites the foe with toxic fangs. It may also leave the foe badly poisoned.
 poison gas	Poison	40	100	---	0	1	0	0	0	0	0	0	0	0	0	0	55	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	---	A cloud of poison gas is sprayed in the foe's face. It may poison the target.
