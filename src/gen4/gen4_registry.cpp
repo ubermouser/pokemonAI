@@ -45,6 +45,7 @@ void registerGen4Extensions(const Pokedex& pkAI, std::vector<plugin>& extensions
   register_move_taunt(pkAI, extensions);
   register_move_torment(pkAI, extensions);
   register_move_trap(pkAI, extensions);
+  register_move_tri_attack(pkAI, extensions);
   register_move_trick(pkAI, extensions);
   register_move_u_turn(pkAI, extensions);
 

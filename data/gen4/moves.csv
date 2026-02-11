@@ -356,7 +356,7 @@ tickle	Normal	20	100	---	0	1	0	0	0	0	0	0	0	0	0	0	100	1	0	1	0	0	0	0	0	0	0	0	0	0	0
 torment	Dark	15	100	---	0	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!TORMENT	The user torments and enrages the foe, making it incapable of using the same move twice in a row.
 toxic	Poison	10	100	---	0	1	0	0	0	0	0	0	0	0	0	0	85	0	0	0	0	0	0	0	0	0	0	0	0	2	0	0	0	0	0	0	0	0	---	A move that leaves the target badly poisoned. Its poison damage worsens every turn.
 toxic spikes	Poison	20	---	---	0	5	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!TOXICSPIKES	The user lays a trap of poison spikes at the foe's feet. They poison foes that switch into battle.
-tri attack	Normal	10	100	80	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!TRI-ATTACK	The user strikes with a simultaneous three-beam attack. May also paralyze, burn, or freeze the target.
+tri attack	Normal	10	100	80	2	1	0	0	0	0	0	0	0	0	0	0	20	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!TRI-ATTACK	The user strikes with a simultaneous three-beam attack. May also paralyze, burn, or freeze the target.
 trick	Psychic	10	100	---	0	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!TRICK	The user catches the foe off guard and swaps the foe's held item with its own.
 trick room	Psychic	5	---	---	0	7	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SetEnvironment(trickroom,5)	The user creates a bizarre area in which slower Pokémon get to move first for five turns.
 trump card	Normal	5	---	Var	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!TRUMPCARD	The fewer PP this move has, the more power it has for attack.

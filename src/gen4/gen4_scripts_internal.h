@@ -199,6 +199,7 @@ void register_move_struggle(const Pokedex& pkAI, std::vector<plugin>& extensions
 void register_move_taunt(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_torment(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_trap(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_move_tri_attack(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_trick(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_u_turn(const Pokedex& pkAI, std::vector<plugin>& extensions);
 
