@@ -1,0 +1,38 @@
+{
+  "header": "PKAIE0",
+  "name": "x1_Coolking49_CounterSwampert",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "CounterSwampert",
+      "species": "Swampert",
+      "level": 100,
+      "item": "Rindo Berry",
+      "sex": 1,
+      "ability": "Torrent",
+      "nature": "Relaxed",
+      "moves": [
+        "Counter",
+        "Mirror Coat",
+        "Earthquake",
+        "Protect"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "atk": 108,
+        "spa": 0,
+        "def": 84,
+        "spd": 64,
+        "spe": 0,
+        "hp": 252
+      }
+    }
+  ]
+}
