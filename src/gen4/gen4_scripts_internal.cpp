@@ -28,6 +28,7 @@ const Move* disable_t;
 const Move* doubleEdge_t;
 const Move* drainPunch_t;
 const Move* encore_t;
+const Move* endeavor_t;
 const Move* explosion_t;
 const Move* facade_t;
 const Move* faintAttack_t;
@@ -166,6 +167,7 @@ void initializePointers(const Pokedex& pkAI) {
   doubleEdge_t = orphan::orphanCheck(moves, "double-edge");
   drainPunch_t = orphan::orphanCheck(moves, "drain punch");
   encore_t = orphan::orphanCheck(moves, "encore");
+  endeavor_t = orphan::orphanCheck(moves, "endeavor");
   explosion_t = orphan::orphanCheck(moves, "explosion");
   facade_t = orphan::orphanCheck(moves, "facade");
   faintAttack_t = orphan::orphanCheck(moves, "faint attack");
