@@ -7,6 +7,8 @@ int move_tri_attack_secondary(
     MoveVolatile mV,
     PokemonVolatile cPKV,
     PokemonVolatile tPKV) {
+  if (&mV.getBase() != triAttack_t) { return 0; }
+
   // Check if target already has status
   if (tPKV.getStatusAilment() != AIL_NV_NONE) {
     return 0;
