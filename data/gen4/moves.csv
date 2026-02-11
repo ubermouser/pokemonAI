@@ -93,7 +93,7 @@ earth power	Ground	10	100	90	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	1	0	0	0	0	0	0	0	0	
 earthquake	Ground	10	100	100	1	6	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user sets off an earthquake that hits all the Pokémon in the battle.
 ember	Fire	25	100	40	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	---	The foe is attacked with small flames. The target may also be left with a burn.
 encore	Normal	5	100	---	0	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	lockIn(target,always,4-8)	The user compels the foe to keep using only the move it last used for two to six turns.
-endeavor	Normal	5	100	Var	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SetDMG(Always, Max(target.HP - user.HP,0))	An attack move that cuts down the foe's HP to equal the user's HP.
+endeavor	Normal	5	100	Var	3	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SetDMG(Always, Max(target.HP - user.HP,0))	An attack move that cuts down the foe's HP to equal the user's HP.
 endure	Normal	10	100	---	0	0	3	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SetHP(self, Max(target.dmg - self.hp, 1));dr	The user endures any attack, leaving 1 HP. Its chance of failing rises if it is used in succession.
 energy ball	Grass	10	100	80	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user draws power from nature and fires it at the foe. It may also lower the target's Sp. Def.
 eruption	Fire	5	100	150	2	5	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SetDMG(self,Always, 150*self.%HP)	The user attacks in an explosive fury. The lower the user's HP, the less powerful this attack becomes.
