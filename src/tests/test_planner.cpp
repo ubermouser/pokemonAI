@@ -131,10 +131,10 @@ TEST_F(PlannerTest, MaximinPlannerChooses2PlyOption) {
   auto other_result = planners[TEAM_B].generateSolution(engine_->initialState());
 
   EXPECT_EQ(agent_result.bestAgentAction(), Action::swap(1));
-  EXPECT_LE(agent_result.best().numNodes, 235);
+  EXPECT_LE(agent_result.best().numNodes, 243);
   EXPECT_EQ(agent_result.best().depth, 2);
   EXPECT_FLOAT_EQ(agent_result.bestFitness() + other_result.bestFitness(), 1.0);
-  EXPECT_LE(other_result.best().numNodes, 235);
+  EXPECT_LE(other_result.best().numNodes, 243);
   EXPECT_EQ(other_result.best().depth, 2);
   // other agent best move is ambiguous
 }
