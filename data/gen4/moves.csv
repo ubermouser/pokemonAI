@@ -1,4 +1,4 @@
-PKAIM	383							Buff, self										Debuff, Enemy									Ailment					Ailment, Volatile								
+PKAIM	387							Buff, self										Debuff, Enemy									Ailment					Ailment, Volatile
 Name	Type	PP	P.Accuracy	Power	Damage	Target	Priority	Atk	SpA	Def	SpD	Spe	Hitpoints	Evasion	Accuracy	Critical	S.Accuracy	Atk	SpA	Def	SpD	Spe	Hitpoints	Evasion	Accuracy	Critical	Burn	Freeze	Paralysis	Poison	Sleep	Confusion	Flinch	Identify	Infatuation	Lock On	Nightmare	P. Trap	Other	Description
 absorb	Grass	25	100	20	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	ModHP(self,.50*dmgInflicted)	A nutrient-draining attack. The user's HP is restored by half the damage taken by the target.
 acid armor	Poison	40	---	---	0	0	0	0	0	2	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user alters its cellular structure to liquefy itself, sharply raising its Defense stat.
@@ -111,7 +111,7 @@ fire blast	Fire	5	85	120	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	1	0	0	0	0	
 fire fang	Fire	15	95	65	1	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	1	0	0	0	0	0	---	The user bites with flame-cloaked fangs. It may also make the foe flinch or sustain a burn.
 fire punch	Fire	15	100	75	1	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	---	The foe is punched with a fiery fist. It may leave the target with a burn.
 fire spin	Fire	15	70	15	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	---	The foe becomes trapped within a fierce vortex of fire that rages for two to five turns.
-fissure	Ground	5	30	Var	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	ModHP(target,((self.level-target.level)+30)/100,-1*target.HP)	The user opens up a fissure in the ground and drops the foe in. The target instantly faints if it hits.
+fissure	Ground	5	30	---	3	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!OHKO	The user opens up a fissure in the ground and drops the foe in. The target instantly faints if it hits.
 flail	Normal	15	100	Var	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SetDMG(Always,64*self.%HP)	The user flails about aimlessly to attack. It becomes more powerful the less HP the user has.
 flame wheel	Fire	25	100	60	1	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	---	The user cloaks itself in fire and charges at the foe. It may also leave the target with a burn.
 flamethrower	Fire	15	100	95	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	---	The foe is scorched with an intense blast of fire. The target may also be left with a burn.
@@ -141,6 +141,7 @@ gravity	Psychic	5	---	---	0	7	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	
 growl	Normal	40	100	---	0	3	0	0	0	0	0	0	0	0	0	0	100	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user growls in an endearing way, making the foe less wary. The target's Attack stat is lowered.
 growth	Normal	40	---	---	0	0	0	0	1	0	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user's body is forced to grow all at once. It raises the Sp. Atk stat.
 grudge	Ghost	5	100	---	0	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	FailIf(!self.InjuredthisTurn);SetPP(target,target.attackingMove,0)	If the user faints, the user's grudge fully depletes the PP of the foe's move that knocked it out.
+guillotine	Normal	5	30	---	3	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!OHKO	A vicious tearing attack with big pincers. The target faints instantly if this attack hits.
 gunk shot	Poison	5	70	120	1	1	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	---	The user shoots filthy garbage at the foe to attack. It may also poison the target.
 gust	Flying	35	100	40	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	A gust of wind is whipped up by wings and launched at the foe to inflict damage.
 gyro ball	Steel	5	100	Var	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SetDMG(always,min(150,1+25*target.speed/user.speed))	The user tackles the foe with a high-speed spin. The slower the user, the greater the damage.
@@ -157,6 +158,7 @@ heat wave	Fire	10	90	100	2	5	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	1	0	0	0	0	
 hi jump kick	Fighting	20	90	100	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	FailIf(!attackMisses);ModHP(self,-.5*dmg)	The foe is attacked with a knee kick from a jump. If it misses, the user is hurt instead.
 hidden power	None	15	100	Var	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!HIDDENPOWER	Hidden Power inflicts damage using a type and base power determined by the user's Ivs.
 horn attack	Normal	25	100	65	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The foe is jabbed with a sharply pointed horn to inflict damage.
+horn drill	Normal	5	30	---	3	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!OHKO	The user stabs the target with a horn that rotates like a drill. The target faints instantly if it hits.
 howl	Normal	40	---	---	0	0	0	1	0	0	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user howls loudly to raise its spirit, boosting its Attack stat.
 hurt confusion	None	5	100	40	1	0	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	When a Pokemon is confused, it has a chance to hurt itself in confusion for 1-4 actual attacks
 hydro cannon	Water	5	90	150	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SetStatus(self,flinch,1)	The foe is hit with a watery blast. The user must rest on the next turn, however.
@@ -285,7 +287,7 @@ shadow ball	Ghost	15	100	80	2	1	0	0	0	0	0	0	0	0	0	0	20	0	0	0	1	0	0	0	0	0	0	0	0	0
 shadow claw	Ghost	15	100	70	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	High-Crit	The user slashes with a sharp claw made from shadows. It has a high critical-hit ratio.
 shadow punch	Ghost	20	100	60	1	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	Always-Hits	The user throws a punch at the foe from the shadows. The punch lands without fail.
 shadow sneak	Ghost	30	100	40	1	1	1	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user extends its shadow and attacks the foe from behind. This move always goes first.
-sheer cold	Ice	5	30	Var	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	ModHP(target,((self.level-target.level)+30)/100,-1*target.HP)	The foe is attacked with a blast of absolute-zero cold. The foe instantly faints if it hits.
+sheer cold	Ice	5	30	---	3	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!OHKO	The foe is attacked with a blast of absolute-zero cold. The foe instantly faints if it hits.
 shock wave	Electric	20	100	60	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	Always-Hits	The user strikes the foe with a quick jolt of electricity. This attack cannot be evaded.
 signal beam	Bug	15	100	75	2	1	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	---	The user attacks with a sinister beam of light. It may also confuse the target.
 silver wind	Bug	5	100	60	2	1	0	1	1	1	1	1	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The foe is attacked with powdery scales blown by wind. It may also raise all the user's stats.
