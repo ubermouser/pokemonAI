@@ -1,4 +1,4 @@
-PKAIM	387							Buff, self										Debuff, Enemy									Ailment					Ailment, Volatile
+PKAIM	388							Buff, self										Debuff, Enemy									Ailment					Ailment, Volatile
 Name	Type	PP	P.Accuracy	Power	Damage	Target	Priority	Atk	SpA	Def	SpD	Spe	Hitpoints	Evasion	Accuracy	Critical	S.Accuracy	Atk	SpA	Def	SpD	Spe	Hitpoints	Evasion	Accuracy	Critical	Burn	Freeze	Paralysis	Poison	Sleep	Confusion	Flinch	Identify	Infatuation	Lock On	Nightmare	P. Trap	Other	Description
 absorb	Grass	25	100	20	2	1	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	ModHP(self,.50*dmgInflicted)	A nutrient-draining attack. The user's HP is restored by half the damage taken by the target.
 acid armor	Poison	40	---	---	0	0	0	0	0	2	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user alters its cellular structure to liquefy itself, sharply raising its Defense stat.
