@@ -52,6 +52,13 @@ int engine_beginTurnNonvolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
   uint32_t cStatus = cPKV.getStatusAilment();
   switch (cStatus) {
   case AIL_NV_FREEZE: {
+    // 100% chance for certain fire moves to thaw the user:
+    const Move& cMove = cPKV.getMV(cu.getCAction()).getBase();
+    if (&cMove == flameWheel_t || &cMove == flareBlitz_t) {
+      cPKV.clearStatusAilment();
+      break;
+    }
+
     // generate a new environment on the result array:
     std::array<size_t, 2> iREnv;
     cu.duplicateState(iREnv, FixType(0.8f));
@@ -62,11 +69,9 @@ int engine_beginTurnNonvolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
       EnvironmentPossible statEnv = cu.getStack().at(iREnv[1]);
       statEnv.setBlocked(cu.getICTeam());
     }
-    // 20% chance for pokemon to not be completely frozen:
+    // 20% chance for pokemon to thaw:
     {
-      if (&cPKV.getMV(cu.getCAction()).getBase().getType() == fire_t) {
-        cu.getPKV(iREnv[0]).clearStatusAilment();
-      }
+      cu.getPKV(iREnv[0]).clearStatusAilment();
     }
     break;
   }
@@ -277,6 +282,19 @@ int engine_updateLastAction(PkCUEngine& cu, PokemonVolatile cPKV) {
   }
 };
 
+int engine_thawOnFireHit(
+    PkCUEngine& cu,
+    MoveVolatile mV,
+    PokemonVolatile cPKV,
+    PokemonVolatile tPKV,
+    uint32_t& damage) {
+  if (damage > 0 && &mV.getBase().getType() == fire_t &&
+      tPKV.getStatusAilment() == AIL_NV_FREEZE) {
+    tPKV.clearStatusAilment();
+  }
+  return 1;
+}
+
 void register_engine_common(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   // clang-format off
   extensions.push_back(plugin(engine, "engine record last action", PLUGIN_ON_ENDOFTURN, engine_updateLastAction, 1, all_teams));
@@ -289,6 +307,7 @@ void register_engine_common(const Pokedex& pkAI, std::vector<plugin>& extensions
   extensions.push_back(plugin(engine, "secondary effect volatile", PLUGIN_ON_SECONDARYEFFECT, engine_secondaryVolatileEffect, -1, all_teams));
   extensions.push_back(plugin(engine, "nonvolatile end-of-round damage", PLUGIN_ON_ENDOFROUND, engine_endRoundDamageEffect, 0, all_teams));
   extensions.push_back(plugin(engine, "damage mod burn", PLUGIN_ON_MODIFYATTACKPOWER, engine_modifyAttackPower_burn, 0, all_teams));
+  extensions.push_back(plugin(engine, "thaw on fire hit", PLUGIN_ON_CALCULATEDAMAGE, engine_thawOnFireHit, 0, all_teams));
   // clang-format on
 }
 
