@@ -23,6 +23,7 @@ int move_trap_set(
 int engine_checkTrapped(
     ConstPokemonVolatile cPKV,
     ConstPokemonVolatile fPKV,
+    ConstPokemonVolatile tPKV,
     const Action& action,
     ValidSwapSet& switchAllowed) {
   // If fully trapped (trap == 7), prevent switching

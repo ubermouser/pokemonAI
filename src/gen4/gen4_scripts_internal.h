@@ -128,11 +128,13 @@ extern const Item* lumBerry_t;
 extern const Item* shedShell_t;
 extern const Item* toxicOrb_t;
 
+extern const Ability* arenaTrap_t;
 extern const Ability* blaze_t;
 extern const Ability* clearBody_t;
 extern const Ability* innerFocus_t;
 extern const Ability* intimidate_t;
 extern const Ability* levitate_t;
+extern const Ability* magnetPull_t;
 extern const Ability* naturalCure_t;
 extern const Ability* noGuard_t;
 extern const Ability* overgrow_t;
@@ -213,10 +215,12 @@ void register_move_tri_attack(const Pokedex& pkAI, std::vector<plugin>& extensio
 void register_move_trick(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_u_turn(const Pokedex& pkAI, std::vector<plugin>& extensions);
 
+void register_ability_arena_trap(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_clear_body(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_inner_focus(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_intimidate(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_levitate(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_ability_magnet_pull(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_natural_cure(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_no_guard(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_pinch_boost(const Pokedex& pkAI, std::vector<plugin>& extensions);
@@ -238,6 +242,14 @@ void register_item_toxic_orb(const Pokedex& pkAI, std::vector<plugin>& extension
 void register_item_type_resisting_berry(const Pokedex& pkAI, std::vector<plugin>& extensions);
 
 void register_engine_common(const Pokedex& pkAI, std::vector<plugin>& extensions);
+
+int trapped_by_ability_common(
+    ConstPokemonVolatile cPKV,
+    ConstPokemonVolatile tPKV,
+    bool isGroundedOnly,
+    bool isSteelOnly,
+    const Ability* trappingAbility,
+    ValidSwapSet& switchAllowed);
 
 void registerGen4Extensions(const Pokedex& pkAI, std::vector<plugin>& extensions);
 // clang-format on
