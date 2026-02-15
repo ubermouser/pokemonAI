@@ -33,6 +33,7 @@ const Move* explosion_t;
 const Move* facade_t;
 const Move* faintAttack_t;
 const Move* fissure_t;
+const Move* flameWheel_t;
 const Move* flareBlitz_t;
 const Move* gigaDrain_t;
 const Move* guillotine_t;
@@ -180,6 +181,7 @@ void initializePointers(const Pokedex& pkAI) {
   facade_t = orphan::orphanCheck(moves, "facade");
   faintAttack_t = orphan::orphanCheck(moves, "faint attack");
   fissure_t = orphan::orphanCheck(moves, "fissure");
+  flameWheel_t = orphan::orphanCheck(moves, "flame wheel");
   flareBlitz_t = orphan::orphanCheck(moves, "flare blitz");
   gigaDrain_t = orphan::orphanCheck(moves, "giga drain");
   guillotine_t = orphan::orphanCheck(moves, "guillotine");

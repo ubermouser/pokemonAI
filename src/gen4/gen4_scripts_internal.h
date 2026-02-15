@@ -50,6 +50,7 @@ extern const Move* explosion_t;
 extern const Move* facade_t;
 extern const Move* faintAttack_t;
 extern const Move* fissure_t;
+extern const Move* flameWheel_t;
 extern const Move* flareBlitz_t;
 extern const Move* gigaDrain_t;
 extern const Move* guillotine_t;
