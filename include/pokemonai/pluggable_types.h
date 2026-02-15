@@ -101,6 +101,7 @@ typedef int (*onTestMove_rawType)
 typedef int (*onTestSwitch_rawType)
   (ConstPokemonVolatile,
   ConstPokemonVolatile,
+  ConstPokemonVolatile,
   const Action&,
   ValidSwapSet&);
 

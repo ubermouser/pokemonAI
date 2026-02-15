@@ -6,6 +6,7 @@ namespace gen4 {
 int item_shedShell_allowSwitch(
     ConstPokemonVolatile cPKV,
     ConstPokemonVolatile fPKV,
+    ConstPokemonVolatile tPKV,
     const Action& action,
     ValidSwapSet& switchAllowed) {
   if (cPKV.hasItem() && (&cPKV.getItem() == shedShell_t)) {

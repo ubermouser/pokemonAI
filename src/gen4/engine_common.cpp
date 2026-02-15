@@ -277,6 +277,37 @@ int engine_updateLastAction(PkCUEngine& cu, PokemonVolatile cPKV) {
   }
 };
 
+int trapped_by_ability_common(
+    ConstPokemonVolatile cPKV,
+    ConstPokemonVolatile tPKV,
+    bool isGroundedOnly,
+    bool isSteelOnly,
+    const Ability* trappingAbility,
+    ValidSwapSet& switchAllowed) {
+  if (!cPKV.isAlive()) { return 0; }
+
+  // 1. Validate trapping ability is in play on the opponent
+  if (!tPKV.isAlive()) { return 0; }
+  if (!tPKV.nv().abilityExists() || &tPKV.nv().getAbility() != trappingAbility) {
+    return 0;
+  }
+
+  // 2. Check for exceptions
+  if (isGroundedOnly) {
+    if (cPKV.getBase().hasType(flying_t)) { return 0; }
+    if (cPKV.nv().abilityExists() && &cPKV.nv().getAbility() == levitate_t) {
+      return 0;
+    }
+  }
+
+  if (isSteelOnly) {
+    if (!cPKV.getBase().hasType(steel_t)) { return 0; }
+  }
+
+  switchAllowed[VALID_SWAP_SCRIPT] = false;
+  return 1;
+}
+
 void register_engine_common(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   // clang-format off
   extensions.push_back(plugin(engine, "engine record last action", PLUGIN_ON_ENDOFTURN, engine_updateLastAction, 1, all_teams));

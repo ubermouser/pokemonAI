@@ -77,6 +77,7 @@ int move_rampage_testLockedIn(
 int move_rampage_testLockedSwitch(
     ConstPokemonVolatile cPKV,
     ConstPokemonVolatile cOPKV,
+    ConstPokemonVolatile tPKV,
     const Action& action,
     ValidSwapSet& switchAllowed) {
   if (cPKV.status().cTeammate.lockIn_duration == 0) { return 0; }

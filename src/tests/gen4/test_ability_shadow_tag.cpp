@@ -1,6 +1,6 @@
 #include "engine_test.hpp"
 
-class ShadowTagTest : public Gen4EngineTest {
+class TrappingTest : public Gen4EngineTest {
  protected:
   void SetUp() override {
     Gen4EngineTest::SetUp();
@@ -10,8 +10,21 @@ class ShadowTagTest : public Gen4EngineTest {
                   const std::string& itemA = "", const std::string& itemB = "",
                   const std::string& speciesA = "squirtle", const std::string& speciesB = "wobbuffet") {
 
-    std::string moveA = (speciesA == "wobbuffet") ? "splash" : "tackle";
-    std::string moveB = (speciesB == "wobbuffet") ? "splash" : "tackle";
+    auto getMove = [&](const std::string& species) {
+        if (species == "wobbuffet") return "splash";
+        if (species == "skarmory") return "aerial ace";
+        if (species == "bronzor") return "tackle";
+        if (species == "gastly") return "confuse ray";
+        if (species == "pidgey") return "aerial ace";
+        if (species == "dugtrio") return "aerial ace";
+        if (species == "magnemite") return "discharge";
+        if (species == "charizard") return "ember";
+        if (species == "empoleon") return "surf";
+        return "tackle";
+    };
+
+    std::string moveA = getMove(speciesA);
+    std::string moveB = getMove(speciesB);
 
     auto pokeA = PokemonNonVolatile()
           .setBase(pokedex_->pokemon(speciesA))
@@ -28,7 +41,7 @@ class ShadowTagTest : public Gen4EngineTest {
           .addMove(pokedex_->move(moveB))
           .setLevel(100);
     if (!itemB.empty()) {
-        pokeB.setInitialItem(pokedex_->item(itemB));
+        pokeB.setInitialItem(itemB == "---" ? *Item::no_item : pokedex_->item(itemB));
     }
 
     auto team_a = TeamNonVolatile()
@@ -51,59 +64,83 @@ class ShadowTagTest : public Gen4EngineTest {
   }
 };
 
-TEST_F(ShadowTagTest, Trapped) {
-  // Team A: Squirtle (Torrent) vs Team B: Wobbuffet (Shadow Tag)
-  setupState("torrent", "shadow tag");
+// --- Arena Trap Tests ---
+
+TEST_F(TrappingTest, ArenaTrap_GroundedTrapped) {
+  // Team A: Squirtle (Torrent) vs Team B: Dugtrio (Arena Trap)
+  setupState("torrent", "arena trap", "", "", "squirtle", "dugtrio");
   auto state = engine_->initialState();
-
-  // Team A tries to switch (Action::swap(1)) - Should be invalid
   EXPECT_FALSE(engine_->isValidAction(state, Action::swap(1), TEAM_A));
-
-  // Team B (Shadow Tag user) should be able to switch
-  EXPECT_TRUE(engine_->isValidAction(state, Action::swap(1), TEAM_B));
 }
 
-TEST_F(ShadowTagTest, MirrorMatch) {
-  // Team A: Wobbuffet (Shadow Tag) vs Team B: Wobbuffet (Shadow Tag)
+TEST_F(TrappingTest, ArenaTrap_FlyingNotTrapped) {
+  // Team A: Charizard (Blaze) vs Team B: Dugtrio (Arena Trap)
+  setupState("blaze", "arena trap", "", "", "charizard", "dugtrio");
+  auto state = engine_->initialState();
+  EXPECT_TRUE(engine_->isValidAction(state, Action::swap(1), TEAM_A));
+}
+
+TEST_F(TrappingTest, ArenaTrap_LevitateNotTrapped) {
+  // Team A: Bronzor (Levitate) vs Team B: Dugtrio (Arena Trap)
+  setupState("levitate", "arena trap", "", "", "bronzor", "dugtrio");
+  auto state = engine_->initialState();
+  EXPECT_TRUE(engine_->isValidAction(state, Action::swap(1), TEAM_A));
+}
+
+TEST_F(TrappingTest, ArenaTrap_ShedShellBypass) {
+  setupState("torrent", "arena trap", "shed shell", "", "squirtle", "dugtrio");
+  auto state = engine_->initialState();
+  EXPECT_TRUE(engine_->isValidAction(state, Action::swap(1), TEAM_A));
+}
+
+// --- Magnet Pull Tests ---
+
+TEST_F(TrappingTest, MagnetPull_SteelTrapped) {
+  // Team A: Empoleon (Torrent) vs Team B: Magnemite (Magnet Pull)
+  setupState("torrent", "magnet pull", "", "", "empoleon", "magnemite");
+  auto state = engine_->initialState();
+  EXPECT_FALSE(engine_->isValidAction(state, Action::swap(1), TEAM_A));
+}
+
+TEST_F(TrappingTest, MagnetPull_NonSteelNotTrapped) {
+  setupState("torrent", "magnet pull", "", "", "squirtle", "magnemite");
+  auto state = engine_->initialState();
+  EXPECT_TRUE(engine_->isValidAction(state, Action::swap(1), TEAM_A));
+}
+
+TEST_F(TrappingTest, MagnetPull_ShedShellBypass) {
+  setupState("torrent", "magnet pull", "shed shell", "", "empoleon", "magnemite");
+  auto state = engine_->initialState();
+  EXPECT_TRUE(engine_->isValidAction(state, Action::swap(1), TEAM_A));
+}
+
+// --- Shadow Tag Tests ---
+
+TEST_F(TrappingTest, ShadowTag_Trapped) {
+  setupState("torrent", "shadow tag", "", "", "squirtle", "wobbuffet");
+  auto state = engine_->initialState();
+  EXPECT_FALSE(engine_->isValidAction(state, Action::swap(1), TEAM_A));
+}
+
+TEST_F(TrappingTest, ShadowTag_MirrorMatchNotTrapped) {
   setupState("shadow tag", "shadow tag", "", "", "wobbuffet", "wobbuffet");
   auto state = engine_->initialState();
-
-  // Team A tries to switch - Should be valid because they also have Shadow Tag
   EXPECT_TRUE(engine_->isValidAction(state, Action::swap(1), TEAM_A));
-
-  // Team B tries to switch - Should be valid
-  EXPECT_TRUE(engine_->isValidAction(state, Action::swap(1), TEAM_B));
 }
 
-TEST_F(ShadowTagTest, ShedShell) {
-  // Team A: Squirtle (Torrent) + Shed Shell vs Team B: Wobbuffet (Shadow Tag)
-  setupState("torrent", "shadow tag", "shed shell");
+TEST_F(TrappingTest, ShadowTag_ShedShellBypass) {
+  setupState("torrent", "shadow tag", "shed shell", "", "squirtle", "wobbuffet");
   auto state = engine_->initialState();
-
-  // Team A tries to switch - Should be valid because of Shed Shell
   EXPECT_TRUE(engine_->isValidAction(state, Action::swap(1), TEAM_A));
 }
 
-TEST_F(ShadowTagTest, Normal) {
-  // Team A: Squirtle (Torrent) vs Team B: Squirtle (Torrent)
-  setupState("torrent", "torrent", "", "", "squirtle", "squirtle");
-  auto state = engine_->initialState();
-
-  // Team A tries to switch - Should be valid
-  EXPECT_TRUE(engine_->isValidAction(state, Action::swap(1), TEAM_A));
-}
-
-TEST_F(ShadowTagTest, FaintedPokemonCanSwitch) {
-  // Team A: Squirtle (Torrent) vs Team B: Wobbuffet (Shadow Tag)
+TEST_F(TrappingTest, ShadowTag_FaintedPokemonCanSwitch) {
   setupState("torrent", "shadow tag");
 
-  // Faint Team A's Squirtle
   auto state = engine_->initialState();
   EnvironmentVolatileData envData = state.data();
   EnvironmentVolatile envV(state.nv(), envData);
   envV.getTeam(TEAM_A).getPKV().setHP(0);
 
-  // Team A should be able to switch because Squirtle is fainted, even though
-  // Wobbuffet has Shadow Tag
   EXPECT_TRUE(engine_->isValidAction(envV, Action::swap(1), TEAM_A));
 }

@@ -111,11 +111,13 @@ const Item* lumBerry_t;
 const Item* shedShell_t;
 const Item* toxicOrb_t;
 
+const Ability* arenaTrap_t;
 const Ability* blaze_t;
 const Ability* clearBody_t;
 const Ability* innerFocus_t;
 const Ability* intimidate_t;
 const Ability* levitate_t;
+const Ability* magnetPull_t;
 const Ability* naturalCure_t;
 const Ability* noGuard_t;
 const Ability* overgrow_t;
@@ -260,11 +262,13 @@ void initializePointers(const Pokedex& pkAI) {
   toxicOrb_t = orphan::orphanCheck(items, "toxic orb");
   // abilities:
   const Abilities& abilities = dex->getAbilities();
+  arenaTrap_t = orphan::orphanCheck(abilities, "arena trap");
   blaze_t = orphan::orphanCheck(abilities, "blaze");
   clearBody_t = orphan::orphanCheck(abilities, "clear body");
   innerFocus_t = orphan::orphanCheck(abilities, "inner focus");
   intimidate_t = orphan::orphanCheck(abilities, "intimidate");
   levitate_t = orphan::orphanCheck(abilities, "levitate");
+  magnetPull_t = orphan::orphanCheck(abilities, "magnet pull");
   naturalCure_t = orphan::orphanCheck(abilities, "natural cure");
   noGuard_t = orphan::orphanCheck(abilities, "no guard");
   overgrow_t = orphan::orphanCheck(abilities, "overgrow");
@@ -350,10 +354,12 @@ void registerGen4Extensions(
   register_move_trick(pkAI, extensions);
   register_move_u_turn(pkAI, extensions);
 
+  register_ability_arena_trap(pkAI, extensions);
   register_ability_clear_body(pkAI, extensions);
   register_ability_inner_focus(pkAI, extensions);
   register_ability_intimidate(pkAI, extensions);
   register_ability_levitate(pkAI, extensions);
+  register_ability_magnet_pull(pkAI, extensions);
   register_ability_natural_cure(pkAI, extensions);
   register_ability_no_guard(pkAI, extensions);
   register_ability_pinch_boost(pkAI, extensions);

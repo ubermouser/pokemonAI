@@ -1569,7 +1569,7 @@ IsValidResult PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Ac
       // Are we locked out of switching?
       for (const auto& cPlugin : getCPluginSet(envV, iTeam)[PLUGIN_ON_TESTSWITCH]) {
         onTestSwitch_rawType pFunction = (onTestSwitch_rawType)cPlugin.pFunction;
-        if (pFunction(cPKV, fPKV, action, doAllowSwitch) > 1) { break; }
+        if (pFunction(cPKV, fPKV, tPKV, action, doAllowSwitch) > 1) { break; }
       }
 
       if (!doAllowSwitch[VALID_SWAP_FRIENDLY_IS_OTHER]) { return IsValidResult::SWITCH_TO_SELF; }
