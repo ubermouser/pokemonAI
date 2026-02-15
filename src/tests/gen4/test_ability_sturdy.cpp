@@ -37,18 +37,14 @@ TEST_F(SturdyTest, ImmuneToHornDrill) {
   auto state = engine_->initialState();
   // Smeargle uses Horn Drill (Move 0) against Skarmory (Sturdy)
   auto results = engine_->updateState(state, Action::move(0), Action::wait());
-  for (size_t i = 0; i < results.size(); ++i) {
-    EXPECT_FALSE(results.at(i).hasHit(0));
-  }
+  EXPECT_TRUE(results.whereHit(0).empty());
 }
 
 TEST_F(SturdyTest, ImmuneToGuillotine) {
   auto state = engine_->initialState();
   // Smeargle uses Guillotine (Move 1) against Skarmory (Sturdy)
   auto results = engine_->updateState(state, Action::move(1), Action::wait());
-  for (size_t i = 0; i < results.size(); ++i) {
-    EXPECT_FALSE(results.at(i).hasHit(0));
-  }
+  EXPECT_TRUE(results.whereHit(0).empty());
 }
 
 TEST_F(SturdyTest, ImmuneToFissure) {
@@ -56,18 +52,14 @@ TEST_F(SturdyTest, ImmuneToFissure) {
   // Smeargle uses Fissure (Move 2) against Skarmory (Sturdy)
   // Note: Skarmory is Flying type, so it's already immune, but Sturdy should also apply.
   auto results = engine_->updateState(state, Action::move(2), Action::wait());
-  for (size_t i = 0; i < results.size(); ++i) {
-    EXPECT_FALSE(results.at(i).hasHit(0));
-  }
+  EXPECT_TRUE(results.whereHit(0).empty());
 }
 
 TEST_F(SturdyTest, ImmuneToSheerCold) {
   auto state = engine_->initialState();
   // Smeargle uses Sheer Cold (Move 3) against Skarmory (Sturdy)
   auto results = engine_->updateState(state, Action::move(3), Action::wait());
-  for (size_t i = 0; i < results.size(); ++i) {
-    EXPECT_FALSE(results.at(i).hasHit(0));
-  }
+  EXPECT_TRUE(results.whereHit(0).empty());
 }
 
 TEST_F(SturdyTest, NotImmuneWithoutSturdy) {
@@ -78,10 +70,5 @@ TEST_F(SturdyTest, NotImmuneWithoutSturdy) {
 
   // Smeargle uses Horn Drill (Move 0)
   auto results = engine_->updateState(state, Action::move(0), Action::wait());
-
-  bool hit = false;
-  for (size_t i = 0; i < results.size(); ++i) {
-    if (results.at(i).hasHit(0)) hit = true;
-  }
-  EXPECT_TRUE(hit); // Should be able to hit (30% accuracy by default)
+  EXPECT_FALSE(results.whereHit(0).empty());
 }
