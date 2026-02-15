@@ -124,6 +124,7 @@ const Ability* pressure_t;
 const Ability* sereneGrace_t;
 const Ability* shadowTag_t;
 const Ability* stickyHold_t;
+const Ability* sturdy_t;
 const Ability* swarm_t;
 const Ability* synchronize_t;
 const Ability* technician_t;
@@ -272,6 +273,7 @@ void initializePointers(const Pokedex& pkAI) {
   sereneGrace_t = orphan::orphanCheck(abilities, "serene grace");
   shadowTag_t = orphan::orphanCheck(abilities, "shadow tag");
   stickyHold_t = orphan::orphanCheck(abilities, "sticky hold");
+  sturdy_t = orphan::orphanCheck(abilities, "sturdy");
   swarm_t = orphan::orphanCheck(abilities, "swarm");
   synchronize_t = orphan::orphanCheck(abilities, "synchronize");
   technician_t = orphan::orphanCheck(abilities, "technician");
@@ -360,6 +362,7 @@ void registerGen4Extensions(
   register_ability_serene_grace(pkAI, extensions);
   register_ability_shadow_tag(pkAI, extensions);
   register_ability_sticky_hold(pkAI, extensions);
+  register_ability_sturdy(pkAI, extensions);
   register_ability_synchronize(pkAI, extensions);
   register_ability_technician(pkAI, extensions);
 

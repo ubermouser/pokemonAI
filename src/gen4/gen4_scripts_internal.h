@@ -141,6 +141,7 @@ extern const Ability* pressure_t;
 extern const Ability* sereneGrace_t;
 extern const Ability* shadowTag_t;
 extern const Ability* stickyHold_t;
+extern const Ability* sturdy_t;
 extern const Ability* swarm_t;
 extern const Ability* synchronize_t;
 extern const Ability* technician_t;
@@ -225,6 +226,7 @@ void register_ability_pressure(const Pokedex& pkAI, std::vector<plugin>& extensi
 void register_ability_serene_grace(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_shadow_tag(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_sticky_hold(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_ability_sturdy(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_synchronize(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_technician(const Pokedex& pkAI, std::vector<plugin>& extensions);
 
