@@ -245,6 +245,7 @@ int engine_secondaryVolatileEffect(
     break;
   case AIL_V_FLINCH:
     tPKV.status().cTeammate.flinch = 1;
+    break;
   case AIL_V_INFATUATED:
   default:
   case AIL_V_NONE:
