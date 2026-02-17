@@ -216,14 +216,16 @@ randomly generated teams:
 ```bash
 ${BUILD_DIR}/trainer/trainer \
     --planners=softmax softmax \
-    --evaluators=network16 network64 simple random \
+    --evaluators=tnetwork16 tnetwork64 simple random \
     --p1-max-search-depth=1 \
     --p2-max-search-depth=1 \
     --p2-temperature=0.25 \
     --e1-net-architecture 64 \
     --e1-net-model-path ./networks/net16-64.model \
+    --e1-net-random-weights \
     --e2-net-architecture 128 \
     --e2-net-model-path ./networks/net64-128.model \
+    --e2-net-random-weights \
     --save-on-completion=1 \
     --allow-same-planner=1 \
     --training-epochs=25 \

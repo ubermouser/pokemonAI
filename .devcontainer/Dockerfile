@@ -67,6 +67,12 @@ ENV DEVCONTAINER=true
 RUN mkdir -p /workspace /home/node/.claude && \
   chown -R node:node /workspace /home/node/.claude
 
+# Copy the conan2 clang profile:
+RUN mkdir -p /home/node/.conan2/profiles
+COPY clang_profile /home/node/.conan2/profiles/default
+RUN chmod 444 /home/node/.conan2/profiles/default
+RUN chown -R node:node /home/node/.conan2
+
 WORKDIR /workspace
 
 ARG GIT_DELTA_VERSION=0.18.2
@@ -80,11 +86,6 @@ USER node
 
 # Setup a dummy git config:
 RUN printf "[user]\n\temail = gemini@google.com\n\tname = Antigravity Gemini 3.0\n" > /home/node/.gitconfig
-
-# Copy the conan2 clang profile:
-RUN mkdir -p /home/node/.conan2/profiles
-COPY clang_profile /home/node/.conan2/profiles/default
-RUN chmod 444 /home/node/.conan2/profiles/default
 
 # Install global packages
 ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global

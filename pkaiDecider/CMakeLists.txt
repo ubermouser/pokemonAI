@@ -44,8 +44,6 @@ add_library(pkaiDecider STATIC
 
 target_include_directories(pkaiDecider PUBLIC ../include)
 
-find_library(NUMA_LIB numa)
-
 if(NOT TORCH_LIBRARIES)
     set(TORCH_LIBRARIES libtorch::libtorch)
 endif()
@@ -54,7 +52,6 @@ target_link_libraries(pkaiDecider
     PUBLIC
     pkaiEngine
     "${TORCH_LIBRARIES}"
-    ${NUMA_LIB}
     Boost::program_options
     Boost::filesystem
     fmt::fmt
