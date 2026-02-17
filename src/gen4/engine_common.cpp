@@ -133,6 +133,16 @@ int engine_beginTurnVolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
     // set user blocked 100% of the time
     cu.getBase().setBlocked(cu.getICTeam());
   }
+  if (cPKV.status().cTeammate.infatuate > 0) {
+    // 50% chance to move:
+    std::array<size_t, 2> iREnv;
+    cu.duplicateState(iREnv, FixType(0.5));
+
+    // 50% chance to not move:
+    {
+      cu.getStack().at(iREnv[1]).setBlocked(cu.getICTeam());
+    }
+  }
   if (cPKV.status().cTeammate.confused > 0) {
     uint32_t iConfused = cPKV.status().cTeammate.confused;
     if (iConfused != AIL_V_CONFUSED_0T) {
@@ -245,7 +255,10 @@ int engine_secondaryVolatileEffect(
     break;
   case AIL_V_FLINCH:
     tPKV.status().cTeammate.flinch = 1;
+    break;
   case AIL_V_INFATUATED:
+    tPKV.status().cTeammate.infatuate = 1;
+    break;
   default:
   case AIL_V_NONE:
     break;  // do not apply a status condition, or push anything back
