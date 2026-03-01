@@ -39,6 +39,49 @@ TEST_F(Gen4EngineTest, HighEngineAccuracy) {
 }
 
 
+TEST_F(Gen4EngineTest, DISABLED_LowAccuracyMove) {
+  // Reproduce branchProbability > FixType(0) assertion failure
+  // engine_->setAccuracy(1);
+  auto team_a = TeamNonVolatile().addPokemon(
+      PokemonNonVolatile()
+          .setBase(pokedex_->pokemon("smeargle"))
+          .addMove(pokedex_->move("mud-slap")));
+
+  auto team_b = TeamNonVolatile().addPokemon(
+      PokemonNonVolatile()
+          .setBase(pokedex_->pokemon("smeargle"))
+          .addMove(pokedex_->move("sweet scent")));
+
+  auto environment_nv =
+      std::make_shared<EnvironmentNonvolatile>(team_a, team_b, true);
+  engine_->setEnvironment(environment_nv);
+
+  PossibleEnvironments results = engine_->updateState(
+      engine_->initialState(), Action::move(0), Action::move(0));
+  auto currentState = results.where1Hit(TEAM_A);
+  results.printStates();
+
+  // Run 7 turns of accuracy/evasion debuffs
+  for (int turn = 1; turn <= 7; ++turn) {
+    std::cout << "Turn " << turn << ": Mud-slap vs Sweet Scent" << std::endl;
+    // We want to ensure Mud-slap hits to keep the debuff loop going.
+    // results.whereHit(TEAM_A) returns states where Team A's move hit.
+    results =
+        engine_->updateState(currentState, Action::move(0), Action::move(0));
+    results.printStates();
+
+    ASSERT_FALSE(results.empty())
+        << "Engine returned no states on turn " << turn;
+
+    // will throw if Mud-slap fails to hit
+    currentState = results.where1Hit(TEAM_A);
+  }
+
+  std::cout << "Successfully completed 7 turns of Mud-slap vs Sweet Scent"
+            << std::endl;
+}
+
+
 TEST_F(Gen4EngineTest, Swap) {
   auto team = TeamNonVolatile()
       .addPokemon(PokemonNonVolatile()
