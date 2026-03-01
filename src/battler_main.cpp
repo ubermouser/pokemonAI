@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <string>
 
+#include "pokemonai/app_utils.h"
 #include "pokemonai/evaluators.h"
 #include "pokemonai/game.h"
 #include "pokemonai/pkCU.h"
@@ -44,8 +45,10 @@ struct Config {
     Config defaults = Config::create(*this);
     po::options_description desc;
 
+    // clang-format off
     desc.add_options()
         ("help", "produce this help message")
+        ("config", po::value<std::string>(), "config file path")
         ("team-a",
         po::value<std::string>(&team[TEAM_A])->default_value(defaults.team[TEAM_A]),
         "filepath of the first team")
@@ -70,6 +73,7 @@ struct Config {
         ("verbosity",
         po::value<int>(&verbosity)->default_value(defaults.verbosity),
         "static verbosity level.");
+    // clang-format on
     desc.add(pokedex.options());
     desc.add(game.options());
     desc.add(engine.options("engine configuration"));
@@ -93,17 +97,16 @@ Config parse_command_line(int argc, char**argv) {
   {
     po::variables_map vm;
     auto description = protocfg.options();
-    po::store(
-        po::command_line_parser(argc, argv).options(description).allow_unregistered().run(), vm);
-    po::notify(vm);
+    PokemonAIAppUtils::parse_command_line_and_config(
+        argc, argv, description, vm, true);
   }
 
   Config cfg = Config::create(protocfg);
   {
     po::variables_map vm;
     auto description = cfg.options();
-    po::store(po::parse_command_line(argc, argv, description), vm);
-    po::notify(vm);
+    PokemonAIAppUtils::parse_command_line_and_config(
+        argc, argv, description, vm, false);
 
     if (vm.count("help")) {
       std::cout << description << std::endl;

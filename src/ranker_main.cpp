@@ -64,6 +64,7 @@ struct Config {
         po::value<std::vector<std::string>>(&teams)->multitoken(),
         "teams to seed.")
         ("help", "produce this help message")
+        ("config", po::value<std::string>(), "config file path")
         ("random-seed",
         po::value<int>(&random_seed)->default_value(defaults.random_seed),
         "random number generator seed. -1 for TIME.")
@@ -99,17 +100,16 @@ Config parse_command_line(int argc, char**argv) {
   {
     po::variables_map vm;
     auto description = cfg.options();
-    po::store(
-        po::command_line_parser(argc, argv).options(description).allow_unregistered().run(), vm);
-    po::notify(vm);
+    PokemonAIAppUtils::parse_command_line_and_config(
+        argc, argv, description, vm, true);
   }
 
   cfg.updateEvalTypes();
   {
     po::variables_map vm;
     auto description = cfg.options();
-    po::store(po::parse_command_line(argc, argv, description), vm);
-    po::notify(vm);
+    PokemonAIAppUtils::parse_command_line_and_config(
+        argc, argv, description, vm, false);
 
     if (vm.count("help")) {
       std::cerr << description << std::endl;
@@ -120,7 +120,6 @@ Config parse_command_line(int argc, char**argv) {
   return cfg;
 }
 
-#include "pokemonai/app_utils.h"
 
 int main(int argc, char** argv) {
   auto cfg = parse_command_line(argc, argv);
