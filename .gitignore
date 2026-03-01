@@ -25,6 +25,7 @@ bld/
 [Bb]in/
 [Oo]bj/
 plugins/
+league_stats.txt
 
 # MSTest test Results
 [Tt]est[Rr]esult*/

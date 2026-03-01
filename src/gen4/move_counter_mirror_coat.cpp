@@ -19,12 +19,7 @@ int move_counterMirrorCoat(
 
   const DamageComponents_t& oDamage =
       cu.getDamageComponent(cu.getIBase(), cu.getIOTeam());
-
-  // Get the move the opponent used
-  const Action& oAction = cu.getOAction();
-  if (!oAction.isMove()) { return 1; }
-  MoveVolatile oMV = tPKV.getMV(oAction);
-  uint32_t oCategory = oMV.getBase().getDamageType();
+  uint32_t oCategory = oDamage.category;
 
   if (cMove == counter_t) {
     if (oCategory != ATK_PHYSICAL) { return 1; }

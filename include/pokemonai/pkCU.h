@@ -196,6 +196,8 @@ static const char* invalidActionReasonToString(IsValidResult result) {
  */
 struct DamageComponents_t {
   uint32_t damage;      /**< The calculated damage of the move. */
+  uint32_t category;    /**< The damage category of the move
+                           (Physical/Special/Fixed). */
   const Type* mType;    /**< The type of the move. */
   FixType cProbability; /**< The probability of the current environment
                            occurring. */

@@ -49,6 +49,11 @@ class CounterMirrorCoatTest : public Gen4EngineTest {
           .addMove(pokedex_->move("counter"))
           .addMove(pokedex_->move("brick break"))
           .setIV(FV_SPEED, 0)
+          .setLevel(100))
+        .addPokemon(PokemonNonVolatile()
+          .setBase(pokedex_->pokemon("ambipom"))
+          .addMove(pokedex_->move("u-turn"))
+          .setIV(FV_SPEED, 31)
           .setLevel(100));
     // clang-format on
 
@@ -86,6 +91,18 @@ class CounterMirrorCoatTest : public Gen4EngineTest {
     // Turn 2: Machamp attacks substitute, Mew uses Counter
     sub_turn2 = engine_->updateState(
         sub_turn1.where1Hit(0).getEnv(), Action::move(1), Action::move(0));
+
+    // U-turn sequence: Blastoise (Slow) vs Ambipom (Fast)
+    // Turn 1: Swap Charmander to Ambipom (index 4)
+    uturn_turn1 = engine_->updateState(
+        state_standard.where1().getEnv(), Action::wait(), Action::swap(4));
+    // Turn 2: Ambipom uses U-turn, Blastoise uses Counter
+    // Ambipom switches to Machamp (index 3)
+    uturn_turn2 = engine_->updateState(
+        uturn_turn1.where1(EnvironmentBitfield().team(1).hasSwitched())
+            .getEnv(),
+        Action::move(0),
+        Action::moveAlly(0, 3));
   }
 
   EnvironmentBitfield both_hit;
@@ -96,6 +113,8 @@ class CounterMirrorCoatTest : public Gen4EngineTest {
   PossibleEnvironments state_speed;
   PossibleEnvironments sub_turn1;
   PossibleEnvironments sub_turn2;
+  PossibleEnvironments uturn_turn1;
+  PossibleEnvironments uturn_turn2;
 };
 
 
@@ -197,4 +216,15 @@ TEST_F(CounterMirrorCoatTest, CounterFailsIfDamageAbsorbedBySubstitute) {
 
   EXPECT_EQ(hp1, hp2); // No damage taken in Turn 2
   EXPECT_EQ(state2.teammate(1, 3).getMissingHP(), 0);  // Counter should fail
+}
+
+
+TEST_F(CounterMirrorCoatTest, CounterUTurnSwitch) {
+  auto state = uturn_turn2.where1(both_hit);
+
+  uint32_t damageToBlastoise = state.teammate(0, 0).getMissingHP();
+  uint32_t damageToMachamp = state.teammate(1, 3).getMissingHP();
+
+  EXPECT_GT(damageToBlastoise, 0);
+  EXPECT_EQ(damageToMachamp, damageToBlastoise * 2);
 }

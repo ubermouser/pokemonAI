@@ -767,6 +767,7 @@ void PkCUEngine::evaluateMove_damage() {
   size_t baseFloor = iBase_, baseCeil = getStack().size();
 
   const Move& cMove = getMV().getBase();
+  getDamageComponent().category = cMove.getDamageType();
 
   stackStage_[iBase_] = STAGE_MODIFYHITCHANCE;
 
