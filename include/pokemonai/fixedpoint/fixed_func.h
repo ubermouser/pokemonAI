@@ -69,25 +69,8 @@ inline int32_t fixmul(int32_t a, int32_t b)
 
 // Fixed point division
 template <int p>
-inline int fixdiv(int32_t a, int32_t b)
-{
-#if 0
+inline int32_t fixdiv(int32_t a, int32_t b) {
   return (int32_t)((((int64_t)a) << p) / b);
-#else	
-  // The following produces the same results as the above but gcc 4.0.3 
-  // generates fewer instructions (at least on the ARM processor).
-  union {
-    int64_t a;
-    struct {
-      int32_t l;
-      int32_t h;
-    };
-  } x;
-
-  x.l = a << p;
-  x.h = a >> (sizeof(int32_t) * 8 - p);
-  return (int32_t)(x.a / b);
-#endif
 }
 
 namespace detail {

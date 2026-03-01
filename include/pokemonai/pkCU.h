@@ -391,7 +391,7 @@ public:
 
   static bool isSwitchAction(const Action& action) { return action.isSwitch(); };
 
-protected:
+ protected:
   Config cfg_;
 
   /**
