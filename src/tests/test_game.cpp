@@ -89,3 +89,15 @@ TEST_F(GameTest, UninitializedCustom) {
     game.run();
   }, std::runtime_error);
 }
+
+TEST_F(GameTest, KODetection) {
+  auto game =
+      Game().setMaxMatches(1).setVerbosity(0).setEnvironment(environment_nv);
+  auto result = game.run();
+
+  // Charmander (TEAM_A, Pokemon 0) should have exactly 1 KO against Bulbasaur
+  // (TEAM_B, Pokemon 0)
+  EXPECT_EQ(result.teams[TEAM_A].pokemon[0].encounters[0].numKOs, 1);
+  // Bulbasaur should have 0 KOs
+  EXPECT_EQ(result.teams[TEAM_B].pokemon[0].encounters[0].numKOs, 0);
+}

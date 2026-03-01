@@ -84,7 +84,7 @@ public:
     size_t datasheetMaxItems = 12;
 
     /* Below this threshold, datasheet categories are aggregated together */
-    double datasheetThreshold = 0.005;
+    double datasheetThreshold = 0.05;
 
     boost::program_options::options_description options(
         const std::string& category="ranker configuration",

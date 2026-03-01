@@ -211,6 +211,9 @@ protected:
 
   bool isInitialized_;
 
+  /* create a log of the initial state */
+  Turn digestInitialState(const ConstEnvironmentPossible& envP) const;
+
   /* create a log of the current turn */
   Turn digestTurn(
       const std::array<PlannerResult, 2>& actions,

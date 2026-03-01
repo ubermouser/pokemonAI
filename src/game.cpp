@@ -237,14 +237,16 @@ HeatResult Game::rollout(const EnvironmentVolatileData& initialState) const {
 
 GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_t iMatch) const {
   if (!isInitialized_) { throw std::runtime_error("game not initialized"); }
-  std::vector<Turn> turnLog; turnLog.reserve(cfg_.maxPlies + nv_->getNumPokemon());
   EnvironmentPossibleData stateData = EnvironmentPossibleData::create(initialState);
   ConstEnvironmentPossible envP{*nv_, stateData};
+  std::vector<Turn> turnLog;
+  turnLog.reserve(cfg_.maxPlies + nv_->getNumPokemon());
+  turnLog.push_back(digestInitialState(envP));
   int32_t matchState = cu_->getGameState(envP);
   size_t iPly;
 
   if (cfg_.verbosity >= 2) { printGameStart(iMatch); }
-  
+
   for (iPly = 0; iPly < cfg_.maxPlies && (matchState == MATCH_MIDGAME); ++iPly) {
     // determine which move the teams will use:
     std::array<PlannerResult, 2> actions;
@@ -310,6 +312,16 @@ GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_
 } // endof rollout_game
 
 
+Turn Game::digestInitialState(const ConstEnvironmentPossible& envP) const {
+  Turn initialTurn{};
+  initialTurn.env = envP.data();
+  for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
+    initialTurn.teams[iTeam].activePokemon = envP.getTeam(iTeam).getICPKV();
+  }
+  return initialTurn;
+}
+
+
 Turn Game::digestTurn(
     const std::array<PlannerResult, 2>& actions,
     size_t resultingState,
@@ -363,16 +375,12 @@ GameResult Game::digestGame(
 
   // encounter tracking:
   for (size_t iTurn = 1; iTurn < cLog.size(); ++iTurn) {
-    const auto& previousTurn = cLog[iTurn - 1];
-    const auto& currentTurn = cLog[iTurn];
-    digestGameEncounters(cResult, previousTurn, currentTurn);
+    digestGameEncounters(cResult, cLog[iTurn - 1], cLog[iTurn]);
   }
 
   // foreach team:
   for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
     auto& team = cResult.teams[iTeam];
-    // starter pokemon participation:
-    team.pokemon[initialState.getTeam(iTeam).getICPKV()].participation += 1;
     // for each turn:
     for (const auto& turn : cLog) {
       const auto& tTurn = turn.teams[iTeam];
@@ -446,7 +454,7 @@ GameResult Game::digestGame(
 
   // set game status:
   cResult.endStatus = endStatus;
-  cResult.numPlies = cLog.size();
+  cResult.numPlies = cLog.size() > 0 ? cLog.size() - 1 : 0;
   if (cfg_.storeSubcomponents) {
     cResult.log = std::move(cLog);
     cResult.log.shrink_to_fit();
@@ -469,28 +477,26 @@ void Game::digestGameEncounters(
   cResult.teams[TEAM_A].pokemon[pkA_start].encounters[pkB_start].numTotal++;
   cResult.teams[TEAM_B].pokemon[pkB_start].encounters[pkA_start].numTotal++;
 
-  if (pkA_start != pkA_end || pkB_start != pkB_end) {
-    ConstEnvironmentPossible env{*nv_, currentTurn.env};
+  ConstEnvironmentPossible env_prev{*nv_, previousTurn.env};
+  ConstEnvironmentPossible env_curr{*nv_, currentTurn.env};
 
-    auto updateStats = [&](size_t iTeam,
-                           size_t pk_start,
-                           size_t pk_end,
-                           size_t pk_opp) {
-      if (pk_start != pk_end) {
-        if (currentTurn.teams[iTeam].action.isSwitch()) {
-          cResult.teams[iTeam]
-              .pokemon[pk_start]
-              .encounters[pk_opp]
-              .numSwitches++;
-        } else if (!env.getTeam(iTeam).teammate(pk_start).isAlive()) {
-          cResult.teams[iTeam].pokemon[pk_start].encounters[pk_opp].numKOs++;
-        }
-      }
-    };
+  auto updateStats = [&](size_t iTeam,
+                         size_t pk_start,
+                         size_t pk_end,
+                         size_t pk_opp) {
+    bool wasAlive = env_prev.getTeam(iTeam).teammate(pk_start).isAlive();
+    bool isAlive = env_curr.getTeam(iTeam).teammate(pk_start).isAlive();
 
-    updateStats(TEAM_A, pkA_start, pkA_end, pkB_start);
-    updateStats(TEAM_B, pkB_start, pkB_end, pkA_start);
-  }
+    if (wasAlive && !isAlive) {
+      cResult.teams[1 - iTeam].pokemon[pk_opp].encounters[pk_start].numKOs++;
+    } else if (
+        pk_start != pk_end && currentTurn.teams[iTeam].action.isSwitch()) {
+      cResult.teams[iTeam].pokemon[pk_start].encounters[pk_opp].numSwitches++;
+    }
+  };
+
+  updateStats(TEAM_A, pkA_start, pkA_end, pkB_start);
+  updateStats(TEAM_B, pkB_start, pkB_end, pkA_start);
 }
 
 
