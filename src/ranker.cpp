@@ -496,23 +496,25 @@ void Ranker::printLeagueCounts(const LeagueHeat& league) const {
 void Ranker::printDatasheets(const LeagueHeat& league) const {
   if (cfg_.datasheetsPath.empty()) { return; }
 
+  SPDLOG_WARN("Printing datasheets to {}...", cfg_.datasheetsPath);
+
   std::ofstream fout(cfg_.datasheetsPath);
   if (!fout.is_open()) {
-    SPDLOG_ERROR("Failed to open datasheets path: {}", cfg_.datasheetsPath);
+    SPDLOG_ERROR("Failed to open datasheets path \"{}\"!", cfg_.datasheetsPath);
     return;
   }
 
   std::vector<std::pair<std::string, LeagueHeat::StatEntry>> sorted(
       league.counts.pokemon.begin(), league.counts.pokemon.end());
+  size_t printCount = std::min(sorted.size(), cfg_.datasheetPrintCount);
   std::partial_sort(
       sorted.begin(),
-      sorted.begin() + std::min(sorted.size(), cfg_.leagueStatsPrintCount),
+      sorted.begin() + printCount,
       sorted.end(),
       [](const auto& a, const auto& b) {
         return a.second.count > b.second.count;
       });
 
-  size_t printCount = std::min(sorted.size(), cfg_.leagueStatsPrintCount);
   for (size_t i = 0; i < printCount; ++i) {
     fout << league.produceDatasheet(
         sorted[i].first, cfg_.datasheetMaxItems, cfg_.datasheetThreshold);

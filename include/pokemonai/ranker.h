@@ -76,8 +76,14 @@ public:
 
     std::string datasheetsPath = "league_stats.txt";
 
+    /* Maximum number of species to print datasheets for */
+    size_t datasheetPrintCount = 100;
+
+    /* Maximum number of items/moves/spreads/teammates/etc to print for each
+     * datasheet */
     size_t datasheetMaxItems = 12;
 
+    /* Below this threshold, datasheet categories are aggregated together */
     double datasheetThreshold = 0.005;
 
     boost::program_options::options_description options(
