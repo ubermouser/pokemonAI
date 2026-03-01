@@ -74,7 +74,11 @@ public:
 
     bool allowSamePlanner = true;
 
-    bool printDatasheets = true;
+    std::string datasheetsPath = "league_stats.txt";
+
+    size_t datasheetMaxItems = 12;
+
+    double datasheetThreshold = 0.005;
 
     boost::program_options::options_description options(
         const std::string& category="ranker configuration",
@@ -160,6 +164,9 @@ protected:
 
   /* print popularity information about the league */
   void printLeagueCounts(const LeagueHeat& league) const;
+
+  /* print datasheets for the most popular species in the league */
+  void printDatasheets(const LeagueHeat& league) const;
 
   /* print information about a single heat */
   void printHeatResult(const GameHeat& heat) const;

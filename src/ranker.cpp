@@ -9,6 +9,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <chrono>
+#include <fstream>
 #include <iostream>
 #include <iterator>
 #include <random>
@@ -68,9 +69,15 @@ po::options_description Ranker::Config::options(
       ((prefix + "team-path").c_str(),
       po::value<std::string>(&teamPath)->default_value(teamPath),
       "folder for loading / saving pokemon teams")
-      ((prefix + "print-datasheets").c_str(),
-      po::value<bool>(&printDatasheets)->default_value(printDatasheets),
-      "when true, datasheets for popular species are printed.");
+      ((prefix + "datasheets-path").c_str(),
+      po::value<std::string>(&datasheetsPath)->default_value(datasheetsPath),
+      "file-path for saving pokemon datasheets. If empty, datasheets are not produced.")
+      ((prefix + "datasheet-max-items").c_str(),
+      po::value<size_t>(&datasheetMaxItems)->default_value(datasheetMaxItems),
+      "Maximum number of items to show in each section of the datasheet before aggregating into 'Other'.")
+      ((prefix + "datasheet-threshold").c_str(),
+      po::value<double>(&datasheetThreshold)->default_value(datasheetThreshold),
+      "Minimum usage probability to show an item individually in the datasheet.");
   // clang-format on
   return desc;
 }
@@ -114,6 +121,7 @@ LeagueHeat Ranker::rank() const {
   runLeague(league);
 
   if (cfg_.verbosity >= 2) { printLeagueCounts(league); }
+  if (!cfg_.datasheetsPath.empty()) { printDatasheets(league); }
   if (cfg_.saveOnCompletion) { saveTeamPopulation(league); }
   return league;
 }
@@ -438,7 +446,6 @@ void Ranker::printLeagueStatistics(LeagueHeat& league) const {
 
 void Ranker::printLeagueCounts(const LeagueHeat& league) const {
   std::ostringstream os;
-  std::vector<std::string> topSpecies;
 
   auto printMapStats =
       [&](const std::unordered_map<std::string, LeagueHeat::StatEntry>& map,
@@ -472,8 +479,6 @@ void Ranker::printLeagueCounts(const LeagueHeat& league) const {
                 stat.participation);
           }
           os << "\n";
-
-          if (name == "SPECIES") { topSpecies.push_back(key); }
         }
       };
 
@@ -485,11 +490,32 @@ void Ranker::printLeagueCounts(const LeagueHeat& league) const {
   printMapStats(league.counts.moves, "MOVE", true);
 
   out_.get() << os.str();
+}
 
-  if (cfg_.printDatasheets) {
-    for (const auto& species : topSpecies) {
-      out_.get() << league.produceDatasheet(species);
-    }
+
+void Ranker::printDatasheets(const LeagueHeat& league) const {
+  if (cfg_.datasheetsPath.empty()) { return; }
+
+  std::ofstream fout(cfg_.datasheetsPath);
+  if (!fout.is_open()) {
+    SPDLOG_ERROR("Failed to open datasheets path: {}", cfg_.datasheetsPath);
+    return;
+  }
+
+  std::vector<std::pair<std::string, LeagueHeat::StatEntry>> sorted(
+      league.counts.pokemon.begin(), league.counts.pokemon.end());
+  std::partial_sort(
+      sorted.begin(),
+      sorted.begin() + std::min(sorted.size(), cfg_.leagueStatsPrintCount),
+      sorted.end(),
+      [](const auto& a, const auto& b) {
+        return a.second.count > b.second.count;
+      });
+
+  size_t printCount = std::min(sorted.size(), cfg_.leagueStatsPrintCount);
+  for (size_t i = 0; i < printCount; ++i) {
+    fout << league.produceDatasheet(
+        sorted[i].first, cfg_.datasheetMaxItems, cfg_.datasheetThreshold);
   }
 }
 

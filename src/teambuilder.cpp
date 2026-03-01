@@ -86,6 +86,7 @@ LeagueHeat TeamBuilder::evolve() const {
 
   if (cfg_.verbosity >= 1) { out_.get() << "Evolution Complete!\n"; }
   if (cfg_.verbosity >= 2) { printLeagueCounts(league); }
+  if (!cfg_.datasheetsPath.empty()) { printDatasheets(league); }
   if (cfg_.saveOnCompletion) { saveTeamPopulation(league); }
 
   postEvolveHook(league);

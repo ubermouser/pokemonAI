@@ -168,7 +168,10 @@ void LeagueHeat::calculateUsage() {
   }
 }
 
-std::string LeagueHeat::produceDatasheet(const std::string& pokemonName) const {
+std::string LeagueHeat::produceDatasheet(
+    const std::string& pokemonName,
+    size_t datasheetMaxItems,
+    double datasheetThreshold) const {
   if (pokemonUsage.count(pokemonName) == 0) return "No data for " + pokemonName;
   const auto& usage = pokemonUsage.at(pokemonName);
 
@@ -181,67 +184,40 @@ std::string LeagueHeat::produceDatasheet(const std::string& pokemonName) const {
   out += fmt::format("| Max. Skill: {:<26.1f} |\n", usage.maximumSkill);
   out += "+----------------------------------------+\n";
 
-  auto printSection =
-      [&](const std::string& title, const auto& map, bool isDouble = false) {
-        out += fmt::format("| {:<38} |\n", title);
-        std::vector<std::pair<std::string, double>> sorted;
-        double total = 0;
-        for (auto& p : map) {
-          sorted.push_back({p.first, (double)p.second});
-          total += (double)p.second;
-        }
-        std::sort(sorted.begin(), sorted.end(), [](auto& a, auto& b) {
-          return b.second > a.second;
-        });
-
-        for (size_t i = 0; i < std::min(sorted.size(), size_t(12)); ++i) {
-          double pct = 100.0 * sorted[i].second / usage.count;
-          out += fmt::format("| {:<29} {:>7.3f}% |\n", sorted[i].first, pct);
-        }
-        out += "+----------------------------------------+\n";
-      };
-
-  // Abilities
-  printSection("Abilities", usage.abilities);
-  // Items
-  printSection("Items", usage.items);
-  // Spreads
-  printSection("Spreads", usage.spreads);
-  // Moves (moves are already normalized per game in GameResult, so we need to
-  // divide by game count of this pokemon)
-  {
-    out += "| Moves                                  |\n";
+  auto printSection = [&](const std::string& title,
+                          const auto& map,
+                          double divisor,
+                          bool isMoves = false) {
+    out += fmt::format("| {:<38} |\n", title);
     std::vector<std::pair<std::string, double>> sorted;
-    for (auto& p : usage.moves) sorted.push_back(p);
+    for (auto& p : map) { sorted.push_back({p.first, (double)p.second}); }
     std::sort(sorted.begin(), sorted.end(), [](auto& a, auto& b) {
-      return b.second > a.second;
+      return a.second > b.second;
     });
-    for (size_t i = 0; i < std::min(sorted.size(), size_t(12)); ++i) {
+
+    size_t numShown = 0;
+    double otherTotal = 0;
+    for (const auto& p : sorted) {
+      double pct = p.second / divisor;
+      if (numShown < datasheetMaxItems && pct >= datasheetThreshold) {
+        out += fmt::format("| {:<29} {:>7.3f}% |\n", p.first, 100.0 * pct);
+        numShown++;
+      } else {
+        otherTotal += p.second;
+      }
+    }
+
+    if (otherTotal > 0) {
       out += fmt::format(
-          "| {:<29} {:>7.3f}% |\n",
-          sorted[i].first,
-          100.0 * sorted[i].second / usage.count);
+          "| {:<29} {:>7.3f}% |\n", "Other", 100.0 * otherTotal / divisor);
     }
     out += "+----------------------------------------+\n";
-  }
-  // Teammates
-  printSection("Teammates", usage.teammates);
+  };
 
-  // Checks and Counters
-  out += "| Checks and Counters                    |\n";
-  std::vector<std::pair<std::string, const PokemonUsageStats::EncounterStats*>>
-      sortedEnc;
-  for (auto& p : usage.encounters) sortedEnc.push_back({p.first, &p.second});
-  std::sort(sortedEnc.begin(), sortedEnc.end(), [](auto& a, auto& b) {
-    return b.second->score > a.second->score;
-  });
-
-  for (size_t i = 0; i < std::min(sortedEnc.size(), size_t(12)); ++i) {
-    const auto& name = sortedEnc[i].first;
-    const auto& e = *sortedEnc[i].second;
-    if (e.numTotal == 0) continue;
+  auto printEncounter = [&](const std::string& name,
+                            const PokemonUsageStats::EncounterStats& e) {
     out += fmt::format(
-        "| {:<12.12} {:>6.2f} ({:>5.2f}±{:>4.2f}){:>6} |\n",
+        "| {:<12.12} {:>6.2f} ({:>5.2f}~{:>4.2f}){:>6} |\n",
         name,
         e.score,
         100.0 * e.mean,
@@ -252,8 +228,61 @@ std::string LeagueHeat::produceDatasheet(const std::string& pokemonName) const {
     out += fmt::format(
         "| {:^38} |\n",
         fmt::format("({:>4.1f}% KOed / {:>4.1f}% switched out)", koPct, swPct));
-  }
-  out += "+----------------------------------------+\n";
+  };
+
+  auto printCounters = [&](const std::string& title, const auto& encounters) {
+    out += fmt::format("| {:<38} |\n", title);
+    std::vector<
+        std::pair<std::string, const PokemonUsageStats::EncounterStats*>>
+        sortedEnc;
+    for (auto& p : encounters) sortedEnc.push_back({p.first, &p.second});
+    std::sort(sortedEnc.begin(), sortedEnc.end(), [](auto& a, auto& b) {
+      return a.second->score > b.second->score;
+    });
+
+    PokemonUsageStats::EncounterStats otherEnc;
+    size_t numShownEnc = 0;
+
+    for (const auto& p : sortedEnc) {
+      const auto& name = p.first;
+      const auto& e = *p.second;
+      if (e.numTotal == 0) continue;
+
+      if (numShownEnc < datasheetMaxItems) {
+        printEncounter(name, e);
+        numShownEnc++;
+      } else {
+        otherEnc.numKOs += e.numKOs;
+        otherEnc.numSwitches += e.numSwitches;
+        otherEnc.numTotal += e.numTotal;
+      }
+    }
+
+    if (otherEnc.numTotal > 0) {
+      double k = (double)(otherEnc.numKOs + otherEnc.numSwitches);
+      double n = (double)otherEnc.numTotal;
+      otherEnc.mean = k / n;
+      otherEnc.stddev = std::sqrt(otherEnc.mean * (1.0 - otherEnc.mean) / n);
+      otherEnc.score = 100.0 * (otherEnc.mean - 4.0 * otherEnc.stddev);
+      printEncounter("Other", otherEnc);
+    }
+    out += "+----------------------------------------+\n";
+  };
+
+  // Abilities
+  printSection("Abilities", usage.abilities, usage.count);
+  // Items
+  printSection("Items", usage.items, usage.count);
+  // Spreads
+  printSection("Spreads", usage.spreads, usage.count);
+  // Moves
+  printSection("Moves", usage.moves, usage.count, true);
+
+  // Teammates
+  printSection("Teammates", usage.teammates, usage.count);
+
+  // Checks and Counters
+  printCounters("Checks and Counters", usage.encounters);
 
   return out;
 }

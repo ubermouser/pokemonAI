@@ -86,7 +86,10 @@ struct LeagueHeat : public League {
 
   std::unordered_map<std::string, PokemonUsageStats> pokemonUsage;
 
-  std::string produceDatasheet(const std::string& pokemonName) const;
+  std::string produceDatasheet(
+      const std::string& pokemonName,
+      size_t datasheetMaxItems = 12,
+      double datasheetThreshold = 0.005) const;
 
   struct StatEntry {
     uint64_t count = 0;

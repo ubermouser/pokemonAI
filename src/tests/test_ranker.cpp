@@ -20,6 +20,7 @@ class RankerTest : public Gen4EngineTest {
     ranker_cfg_.verbosity = 3;
     ranker_cfg_.minGamesPerBattlegroup = 2;
     ranker_cfg_.numThreads = 2;
+    ranker_cfg_.datasheetsPath = "/dev/stdout";
     ranker_ = std::make_shared<Ranker>(ranker_cfg_);
     ranker_->setEngine(*engine_);
     ranker_->setGame(Game{game_cfg_});
@@ -64,7 +65,7 @@ TEST_F(RankerTest, CalculateDatasheet) {
   // Produce a datasheet for the first pokemon found
   ASSERT_FALSE(league.counts.pokemon.empty());
   std::string pkName = league.counts.pokemon.begin()->first;
-  std::string datasheet = league.produceDatasheet(pkName);
+  std::string datasheet = league.produceDatasheet(pkName, 2, 0.5);
 
   std::cout << datasheet << std::endl;
   EXPECT_NE(datasheet.find(pkName), std::string::npos);
