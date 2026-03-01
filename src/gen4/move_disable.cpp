@@ -55,6 +55,10 @@ int move_disable_update(PkCUEngine& cu, PokemonVolatile cPKV) {
 
   if (duration > 4) {
     teamStatus.disable_duration = duration - 1;
+  } else if (duration == 1) {
+    // Deterministic: Disable ends
+    teamStatus.disable_duration = 0;
+    teamStatus.disable_action = 0;
   } else {
     std::array<size_t, 2> iREnv;
     // Probability to end: 1/duration

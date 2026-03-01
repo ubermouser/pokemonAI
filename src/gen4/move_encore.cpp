@@ -64,6 +64,10 @@ int move_encore_update(PkCUEngine& cu, PokemonVolatile cPKV) {
 
   if (duration > 4) {
     teamStatus.encore_duration = duration - 1;
+  } else if (duration == 1) {
+    // Deterministic: Encore ends
+    teamStatus.encore_duration = 0;
+    teamStatus.encore_action = 0;
   } else {
     std::array<size_t, 2> iREnv;
     // Probability to end: 1/duration

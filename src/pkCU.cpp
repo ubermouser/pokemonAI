@@ -1655,16 +1655,20 @@ bool PkCU::saneStackProbability(PossibleEnvironments& envs) {
  */
 void PkCUEngine::duplicateState(
     std::array<size_t, 2>& result, FixType _probability, size_t iState) {
-  _probability = std::max(std::min(_probability, FixType(1)), FixType(0));
+  assert(_probability > FixType(0) && _probability < FixType(1));
 
   // duplicate state 2 times
   nPlicateState(result, iState);
 
   // modify probabilities of resulting states:
   FixType totalProbability = getBase(result[0]).getProbability();
-  getBase(result[1]).getProbability() = totalProbability * _probability;
-  getBase(result[0]).getProbability() =
-      totalProbability - getBase(result[1]).getProbability();
+  FixType branchProbability = totalProbability * _probability;
+
+  assert(branchProbability > FixType(0));
+  assert(branchProbability < totalProbability);
+
+  getBase(result[1]).getProbability() = branchProbability;
+  getBase(result[0]).getProbability() = totalProbability - branchProbability;
 
   assert(PkCU::saneStackProbability(getStack()));
 }
@@ -1686,22 +1690,33 @@ void PkCUEngine::triplicateState(
     FixType _probability,
     FixType _oProbability,
     size_t iState) {
-  _probability = std::max(std::min(_probability, FixType(1)), FixType(0));
-  _oProbability = std::max(std::min(_oProbability, FixType(1)), FixType(0));
-  if (_probability + _oProbability > FixType(1)) {
-    _oProbability = FixType(1) - _probability;
-  }
+  assert(
+      _probability > FixType(0) && _oProbability > FixType(0) &&
+      (_probability + _oProbability) < FixType(1));
 
   // duplicate state 3 times
   nPlicateState(result, iState);
 
   // modify probabilities of resulting states:
   FixType totalProbability = getBase(result[0]).getProbability();
-  getBase(result[1]).getProbability() = totalProbability * _probability;
-  getBase(result[2]).getProbability() = totalProbability * _oProbability;
-  getBase(result[0]).getProbability() =
-      totalProbability - getBase(result[1]).getProbability() -
-      getBase(result[2]).getProbability();
+  FixType branchBProbability = totalProbability * _probability;
+  FixType branchCProbability = totalProbability * _oProbability;
+  FixType remainingProbability =
+      totalProbability - branchBProbability - branchCProbability;
+
+  // Branch B
+  assert(branchBProbability > FixType(0));
+  assert(branchBProbability < (totalProbability - branchCProbability));
+  getBase(result[1]).getProbability() = branchBProbability;
+
+  // Branch C
+  assert(branchCProbability > FixType(0));
+  assert(branchCProbability < (totalProbability - branchBProbability));
+  getBase(result[2]).getProbability() = branchCProbability;
+
+  // Branch A (Original)
+  assert(remainingProbability > FixType(0));
+  getBase(result[0]).getProbability() = remainingProbability;
 
   assert(PkCU::saneStackProbability(getStack()));
 }
