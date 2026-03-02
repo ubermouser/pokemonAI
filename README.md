@@ -253,3 +253,45 @@ ${BUILD_DIR}/ranker/ranker \
     --verbosity=2 \
     --num-threads=16
 ```
+
+#### Configuration Files
+
+Many applications in this project support the use of configuration files to
+simplify long command-line invocations. You can provide a path to a configuration
+file using the `--config` flag.
+
+##### Usage
+
+```bash
+${BUILD_DIR}/teambuilder/teambuilder --config configs/teambuilder_200heat.cfg
+```
+
+##### File Format
+
+Configuration files use a simple `key=value` format. Lines starting with `#` are
+treated as comments and ignored. For options that accept multiple values (like
+`--planners` or `--evaluators`), you can repeat the key on multiple lines.
+
+Example (`configs/teambuilder_200heat.cfg`):
+```ini
+evaluators=simple
+planners=random  # p1
+p1-max-search-depth=0
+planners=max     # p2
+p2-max-search-depth=1
+planners=negamax # p3
+p3-max-search-depth=2
+planners=negamax # p4
+p4-max-search-depth=3
+ranker-verbosity=1
+verbosity=2
+num-threads=32
+max-generations=10
+# leagues of size 1-6:
+team-populations=200
+team-populations=150
+team-populations=100
+team-populations=75
+team-populations=50
+team-populations=25
+```
