@@ -39,9 +39,9 @@ TEST_F(Gen4EngineTest, HighEngineAccuracy) {
 }
 
 
-TEST_F(Gen4EngineTest, DISABLED_LowAccuracyMove) {
+TEST_F(Gen4EngineTest, HighEvasionAndAccuracy) {
   // Reproduce branchProbability > FixType(0) assertion failure
-  // engine_->setAccuracy(1);
+  engine_->setAccuracy(16);
   auto team_a = TeamNonVolatile().addPokemon(
       PokemonNonVolatile()
           .setBase(pokedex_->pokemon("smeargle"))

@@ -1230,12 +1230,13 @@ FixType PkCUEngine::getProbabilityToHit() {
   MoveVolatile mV = getMV();
 
   /* probability to hit enemy pokemon */
-  // TODO - integer math
+  // combine accuracy/evasion stages before look-up to ensure precision
+  int32_t netBoost = cPKV.getBoost(FV_ACCURACY) - tPKV.getBoost(FV_EVASION);
+  netBoost = std::min(std::max(netBoost, -6), 6);
+
   FixType probabilityToHit =
-      // lowest is 33% or 3333 / 10000
-      getPKV().getAccuracy_boosted(FV_ACCURACY) *
-      // highest is 300% or 3
-      getTPKV().getAccuracy_boosted(FV_EVASION) *
+      // map net boost stage to precision look-up table
+      PokemonNonVolatile::aFV_base[FV_ACCURACY - 6][netBoost + 6] *
       // lowest is 30% or 30 / 100
       mV.getBase().getPrimaryAccuracy();
 
