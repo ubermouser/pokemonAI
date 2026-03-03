@@ -351,6 +351,7 @@ void registerGen4Extensions(
   register_move_tri_attack(pkAI, extensions);
   register_move_trick(pkAI, extensions);
   register_move_u_turn(pkAI, extensions);
+  register_move_recharge(pkAI, extensions);
 
   register_ability_clear_body(pkAI, extensions);
   register_ability_inner_focus(pkAI, extensions);

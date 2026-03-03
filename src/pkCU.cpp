@@ -563,8 +563,13 @@ void PkCUEngine::evaluateMove() {
 
   // end of turn occurences:
   for (iBase_ = baseFloor, baseCeil = getStack().size(); iBase_ != baseCeil; ++iBase_) {
-    if (getStackStage() != STAGE_POSTSECONDARY) { continue; }
-    stackStage_[iBase_] = STAGE_POSTTURN;
+    if (getStackStage() != STAGE_POSTSECONDARY && getStackStage() != STAGE_POSTTURN) {
+      continue;
+    }
+
+    if (getStackStage() == STAGE_POSTSECONDARY) {
+      stackStage_[iBase_] = STAGE_POSTTURN;
+    }
 
     evaluateMove_postTurn();
   }
