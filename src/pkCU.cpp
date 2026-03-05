@@ -697,9 +697,10 @@ void PkCUEngine::evaluateMove_postMove() {
         std::max(std::min(secondaryHitProbability, FixType(1)), FixType(0));
 
     // did the ability hit its target? Is it possible for the secondary ability to miss?
-    if (getBase().hasHit(iCTeam) && (secondaryHitProbability > FixType(0))) {
+    if (getBase().hasHit(iCTeam) &&
+        mostlyGT(secondaryHitProbability, FixType(0))) {
       // if there's a chance the secondary effect will not occur:
-      if (secondaryHitProbability < FixType(1)) {
+      if (mostlyLT(secondaryHitProbability, FixType(1))) {
         // duplicate the environment (duplicated environment is the secondary effect missed):
         duplicateState(iREnv, (FixType(1) - secondaryHitProbability));
       }
@@ -814,9 +815,9 @@ void PkCUEngine::evaluateMove_damage() {
 
     std::array<size_t, 2> iHEnv = {{getIBase(), SIZE_MAX}};
     // did the move hit its target? Is it possible for the move to miss?
-    if (probabilityToHit > FixType(0)) {
+    if (mostlyGT(probabilityToHit, FixType(0))) {
       // if there's a chance the primary effect will not occur:
-      if (probabilityToHit < FixType(1)) {
+      if (mostlyLT(probabilityToHit, FixType(1))) {
         // duplicate the environment (duplicated environment is the miss
         // environment):
         duplicateState(iHEnv, (FixType(1) - probabilityToHit));
@@ -873,8 +874,8 @@ void PkCUEngine::evaluateMove_damage() {
     // determine the possibility that the move crit:
     std::array<size_t, 2> iCEnv = {{SIZE_MAX, getIBase()}};
 
-    if (probabilityToCrit > FixType(0)) {
-      if (probabilityToCrit < FixType(1)) {
+    if (mostlyGT(probabilityToCrit, FixType(0))) {
+      if (mostlyLT(probabilityToCrit, FixType(1))) {
         // duplicate the environment (duplicated environment is the crit
         // environment):
         duplicateState(iCEnv, probabilityToCrit);
@@ -1155,9 +1156,9 @@ void PkCUEngine::evaluateMove_script() {
 
     std::array<size_t, 2> iHEnv = {{ getIBase(), SIZE_MAX }};
     // did the move hit its target? Is it possible for the move to miss?
-    if (probabilityToHit > FixType(0)) {
+    if (mostlyGT(probabilityToHit, FixType(0))) {
       // if there's a chance the primary effect will not occur:
-      if (probabilityToHit < FixType(1)) {
+      if (mostlyLT(probabilityToHit, FixType(1))) {
         // duplicate the environment (duplicated environment is the miss environment):
         duplicateState(iHEnv, (FixType(1) - probabilityToHit));
       }
