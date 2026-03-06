@@ -37,10 +37,7 @@ boost::program_options::options_description TrainerRegressFitness::Config::optio
     "Maximum number of training examples to keep in the buffer")
     ((prefix + "train-on-own-data").c_str(),
     po::value<bool>(&trainOnOwnData)->default_value(trainOnOwnData),
-    "Include only training data where this neural network was involved")
-    ((prefix + "monte-carlo").c_str(),
-    po::value<bool>(&monteCarlo)->default_value(monteCarlo),
-    "Disable TD-learning and train directly on state evaluations (Monte-Carlo)");
+    "Include only training data where this neural network was involved");
   // clang-format on
   return desc;
 }
@@ -230,15 +227,9 @@ std::vector<HeatDataset::Sample> TrainerRegressFitness::prepareDataset(
         // This interpolates between current state fitness and bootstrapped
         // future results.
         float currentFitness = turn.teams[iTeam].simpleFitness;
-        float target;
-        if (cfg_.monteCarlo) {
-          target = currentFitness;
-        } else {
-          float deltaNextFitness = nextTarget - currentFitness;
-          target = currentFitness + cfg_.discountFactor * deltaNextFitness;
-        }
-        auto targetTensor =
-            torch::tensor({target}, torch::kFloat);
+        float deltaNextFitness = nextTarget - currentFitness;
+        float target = currentFitness + cfg_.discountFactor * deltaNextFitness;
+        auto targetTensor = torch::tensor({target}, torch::kFloat);
 
         samples.push_back({inputTensor, targetTensor});
         nextTarget = target;

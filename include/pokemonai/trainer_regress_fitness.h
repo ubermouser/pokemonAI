@@ -60,12 +60,6 @@ public:
      */
     bool trainOnOwnData = true;
 
-    /**
-     * If true, training is performed directly on state evaluations (Monte-Carlo)
-     * rather than using temporal-difference bootstrapping.
-     */
-    bool monteCarlo = false;
-
     Config() {}
 
     boost::program_options::options_description options(
