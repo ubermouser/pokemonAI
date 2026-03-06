@@ -31,21 +31,30 @@ struct Config {
   PkCU::Config engine;
   std::vector<std::string> teams;
   std::vector<std::string> evalTypes = {"tnetwork16", "simple", "random"};
-  std::vector<std::shared_ptr<Evaluator::Config> > evalConfigs;
+  std::vector<std::shared_ptr<Evaluator::Config>> evalConfigs;
+  std::shared_ptr<Evaluator::Config> stateEvalConfig;
   std::vector<std::string> plannerTypes = {"softmax"};
-  std::vector<std::shared_ptr<Planner::Config> > plannerConfigs;
+  std::vector<std::shared_ptr<Planner::Config>> plannerConfigs;
 
   int verbosity = spdlog::level::info;
   int random_seed = -1;
 
   void updateEvalTypes() {
-    for (auto& evalType: evalTypes) { evalConfigs.push_back(evaluators::config(evalType)); }
-    for (auto& planType: plannerTypes) { plannerConfigs.push_back(planners::config(planType)); }
+    evalConfigs.clear();
+    for (auto& evalType : evalTypes) {
+      evalConfigs.push_back(evaluators::config(evalType));
+    }
+    stateEvalConfig = evaluators::config(trainer.stateEvaluatorType);
+    plannerConfigs.clear();
+    for (auto& planType : plannerTypes) {
+      plannerConfigs.push_back(planners::config(planType));
+    }
   }
 
   Config() {
     game.storeSubcomponents = true;
     game.maxMatches = 1;
+    stateEvalConfig = evaluators::config(trainer.stateEvaluatorType);
   }
 
   po::options_description options() {
@@ -88,6 +97,12 @@ struct Config {
               "evaluator-{} {} configuration", iEval + 1, evalTypes[iEval]),
           fmt::format("e{}", iEval + 1)));
     }
+    if (stateEvalConfig) {
+      desc.add(stateEvalConfig->options(
+          fmt::format(
+              "state-evaluator {} configuration", trainer.stateEvaluatorType),
+          "se"));
+    }
 
     return desc;
   }
@@ -126,7 +141,10 @@ int main(int argc, char** argv) {
   Trainer trainer{cfg.trainer};
   trainer.setEngine(PkCU{cfg.engine});
   trainer.setGame(Game{cfg.game});
-  trainer.setStateEvaluator(EvaluatorSimple().setEngine(PkCU{cfg.engine}));
+  auto stateEvaluator =
+      evaluators::choose(cfg.trainer.stateEvaluatorType, *cfg.stateEvalConfig);
+  stateEvaluator->setEngine(std::make_shared<PkCU>(cfg.engine));
+  trainer.setStateEvaluator(*stateEvaluator);
   for (size_t iPlan = 0; iPlan != cfg.plannerTypes.size(); ++iPlan) {
     trainer.addPlanner(planners::choose(cfg.plannerTypes[iPlan], *cfg.plannerConfigs[iPlan]));
   }
