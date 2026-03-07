@@ -14,7 +14,8 @@ add_library(pkaiEngine SHARED
     ../src/name.cpp
     ../src/nature.cpp
     ../src/orphan.cpp
-    ../src/pkCU.cpp
+    ../src/legacy_pkCU.cpp
+    ../src/neo_pkCU.cpp
     ../src/pluggable.cpp
     ../src/pokedex.cpp
     ../src/pokedex_dynamic.cpp

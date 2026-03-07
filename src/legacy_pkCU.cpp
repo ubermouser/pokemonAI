@@ -1,14 +1,14 @@
 /**
- * @file pkCU.cpp
- * @brief Implements the core battle engine (PkCU) and its internal state
- * machine (PkCUEngine).
+ * @file legacy_pkCU.cpp
+ * @brief Implements the core battle engine (LegacyPkCU) and its internal state
+ * machine (LegacyPkCUEngine).
  *
- * This file contains the implementation of the PkCU and PkCUEngine classes,
+ * This file contains the implementation of the LegacyPkCU and LegacyPkCUEngine classes,
  * which are responsible for simulating Pokemon battles. The logic follows the
  * standard Pokemon battle mechanics, including move priority, damage
  * calculation, status effects, and plugin handling.
  */
-#include "pokemonai/pkCU.h"
+#include "pokemonai/legacy_pkCU.h"
 
 #include <algorithm>
 #include <iostream>
@@ -57,12 +57,12 @@ typedef std::vector<plugin_t>::const_iterator pluginIt;
 }
 
 
-PkCU* PkCU::clone() const {
-  return new PkCU(*this);
+LegacyPkCU* LegacyPkCU::clone() const {
+  return new LegacyPkCU(*this);
 }
 
 
-po::options_description PkCU::Config::options(
+po::options_description LegacyPkCU::Config::options(
     const std::string& category, std::string prefix) {
   Config defaults{};
   po::options_description desc{category};
@@ -78,7 +78,7 @@ po::options_description PkCU::Config::options(
 }
 
 
-PkCU& PkCU::setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& nv) {
+LegacyPkCU& LegacyPkCU::setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& nv) {
   if (nv_ != nv) {
     nv_ = nv;
     initialState_ = EnvironmentVolatileData::create(*nv_);
@@ -90,7 +90,7 @@ PkCU& PkCU::setEnvironment(const std::shared_ptr<const EnvironmentNonvolatile>& 
   return *this;
 };
 
-PkCU& PkCU::setAccuracy(size_t accuracy)
+LegacyPkCU& LegacyPkCU::setAccuracy(size_t accuracy)
 {
   cfg_.numRandomEnvironments = std::max((size_t)1, std::min((size_t)16, accuracy));
   return *this;
@@ -107,7 +107,7 @@ PkCU& PkCU::setAccuracy(size_t accuracy)
  *
  * @return `true` if initialization was successful, `false` otherwise.
  */
-bool PkCU::initialize() {
+bool LegacyPkCU::initialize() {
   size_t numPlugins = 0;
   // clear plugin arrays:
   for (size_t iNCTeammate = 0; iNCTeammate != pluginSets_.size(); ++iNCTeammate)
@@ -203,7 +203,7 @@ bool PkCU::initialize() {
  *        `SIZE_MAX`, the plugin is considered global.
  * @return The number of plugin sets the plugin was added to.
  */
-size_t PkCU::insertPluginHandler(plugin_t& cPlugin, size_t pluginType, size_t iNTeammate) {
+size_t LegacyPkCU::insertPluginHandler(plugin_t& cPlugin, size_t pluginType, size_t iNTeammate) {
   size_t numAdded = 0;
 
   pluginTarget target = cPlugin.target;
@@ -238,8 +238,8 @@ size_t PkCU::insertPluginHandler(plugin_t& cPlugin, size_t pluginType, size_t iN
   return numAdded;
 }
 
-PkCUEngine::PkCUEngine(
-    const PkCU& cu,
+LegacyPkCUEngine::LegacyPkCUEngine(
+    const LegacyPkCU& cu,
     PossibleEnvironments& stack,
     const EnvironmentVolatileData& initial,
     const Action& actionA,
@@ -265,7 +265,7 @@ PkCUEngine::PkCUEngine(
 }
 
 
-void PkCUEngine::swapTeamIndexes() {
+void LegacyPkCUEngine::swapTeamIndexes() {
   std::swap(iTeams_[0], iTeams_[1]);
   std::swap(actions_[0], actions_[1]);
 
@@ -282,7 +282,7 @@ void PkCUEngine::swapTeamIndexes() {
  * first. Finally, it evaluates end-of-round effects and combines similar
  * resulting environments.
  */
-void PkCUEngine::updateState() {
+void LegacyPkCUEngine::updateState() {
   // determine who moves first
   uint32_t priority = movePriority();
 
@@ -324,7 +324,7 @@ void PkCUEngine::updateState() {
 }
 
 
-uint32_t PkCUEngine::movePriority_Speed() {
+uint32_t LegacyPkCUEngine::movePriority_Speed() {
   PokemonVolatile cPKV = getPKV();
 
   // grab FV_boosted speed
@@ -338,7 +338,7 @@ uint32_t PkCUEngine::movePriority_Speed() {
 }
 
 
-int32_t PkCUEngine::movePriority_Bracket() {
+int32_t LegacyPkCUEngine::movePriority_Bracket() {
   // SOURCE: http://www.smogon.com/dp/articles/move_priority
 
    /* action:
@@ -388,7 +388,7 @@ int32_t PkCUEngine::movePriority_Bracket() {
 }
 
 
-uint32_t PkCUEngine::movePriority() {
+uint32_t LegacyPkCUEngine::movePriority() {
   std::array<MoveBracket, 2> moveBracket;
 
   size_t iCTeam = getICTeam();
@@ -426,7 +426,7 @@ uint32_t PkCUEngine::movePriority() {
 }
 
 
-void PkCUEngine::evaluateRound_end() {
+void LegacyPkCUEngine::evaluateRound_end() {
   iBase_ = 0;
 
   for (size_t iSize = getStack().size(); iBase_ != iSize; ++iBase_)
@@ -464,7 +464,7 @@ void PkCUEngine::evaluateRound_end() {
  * damaging moves or `evaluateMove_script` for other moves, and finally handle
  * post-move effects.
  */
-void PkCUEngine::evaluateMove() {
+void LegacyPkCUEngine::evaluateMove() {
   // NOTE: ONLY ONE stage is set to preturn at a time
   assert(getStackStage() == STAGE_PRETURN);
   Action cAction = getCAction();
@@ -531,11 +531,11 @@ void PkCUEngine::evaluateMove() {
     // POSSIBLE THAT POKEMON MIGHT HAVE DIED IN PREVIOUS STEP
 
     const Move& cMove = getMV().getBase();
-    void (PkCUEngine::*evaluate_t)();
+    void (LegacyPkCUEngine::*evaluate_t)();
     if ( cMove.damageType_ == ATK_PHYSICAL || cMove.damageType_ == ATK_SPECIAL)
-    { evaluate_t = &PkCUEngine::evaluateMove_damage;}
+    { evaluate_t = &LegacyPkCUEngine::evaluateMove_damage;}
     else
-    { evaluate_t = &PkCUEngine::evaluateMove_script;}
+    { evaluate_t = &LegacyPkCUEngine::evaluateMove_script;}
 
     // evaluate either move or plugin move: (increment with iNBase, as evaluateMove_damage will manipulate stack)
     for (iNBase = baseFloor, iBase_ = iNBase, baseCeil = getStack().size(); iNBase != baseCeil; ++iNBase, iBase_ = iNBase) {
@@ -573,7 +573,7 @@ void PkCUEngine::evaluateMove() {
 } // end of evaluateMove
 
 
-void PkCUEngine::evaluateMove_switch()
+void LegacyPkCUEngine::evaluateMove_switch()
 {
   assert(getStackStage() == STAGE_PRESWITCH);
 
@@ -619,7 +619,7 @@ void PkCUEngine::evaluateMove_switch()
 } // endOf evaluateMove_switch
 
 
-void PkCUEngine::evaluateMove_preMove() {
+void LegacyPkCUEngine::evaluateMove_preMove() {
   assert(getStackStage() == STAGE_STATUS);
 
   // parse beginning of turn plugins:
@@ -629,7 +629,7 @@ void PkCUEngine::evaluateMove_preMove() {
 }
 
 
-void PkCUEngine::evaluateMove_postMove() {
+void LegacyPkCUEngine::evaluateMove_postMove() {
   assert(getStackStage() == STAGE_POSTMOVE);
 
   // the floor of the stack: everything below this stack value has been evaluated
@@ -732,7 +732,7 @@ void PkCUEngine::evaluateMove_postMove() {
 } // endOf evaluateMove_postMove
 
 
-void PkCUEngine::evaluateMove_postTurn() {
+void LegacyPkCUEngine::evaluateMove_postTurn() {
   // parse end of turn plugins:
   int result = 0;
   CALLPLUGIN(result, PLUGIN_ON_ENDOFTURN, onEndOfTurn_rawType,
@@ -760,7 +760,7 @@ void PkCUEngine::evaluateMove_postTurn() {
  *     environments for crit and non-crit scenarios.
  * 8.  Apply the final calculated damage to the target Pokemon.
  */
-void PkCUEngine::evaluateMove_damage() {
+void LegacyPkCUEngine::evaluateMove_damage() {
   assert(getStackStage() == STAGE_MOVEBASE);
   assert(getTPKV().isAlive() && getPKV().isAlive());
 
@@ -1102,7 +1102,7 @@ void PkCUEngine::evaluateMove_damage() {
 } // end of evaluateMove_damage
 
 
-void PkCUEngine::evaluateMove_script() {
+void LegacyPkCUEngine::evaluateMove_script() {
   assert(getStackStage() == STAGE_MOVEBASE);
   assert(getTPKV().isAlive() && getPKV().isAlive());
 
@@ -1191,7 +1191,7 @@ void PkCUEngine::evaluateMove_script() {
 }
 
 
-void PkCUEngine::calculateDamage() {
+void LegacyPkCUEngine::calculateDamage() {
   FixType partitionEnvironmentProbability =
       (FixType(1) / (int32_t)cfg_.numRandomEnvironments);
   DamageComponents_t& cDMG = getDamageComponent();
@@ -1225,7 +1225,7 @@ void PkCUEngine::calculateDamage() {
 }  // end of evaluateMove_damage
 
 
-FixType PkCUEngine::getProbabilityToHit() {
+FixType LegacyPkCUEngine::getProbabilityToHit() {
   PokemonVolatile cPKV = getPKV();
   PokemonVolatile tPKV = getTPKV();
   MoveVolatile mV = getMV();
@@ -1257,7 +1257,7 @@ FixType PkCUEngine::getProbabilityToHit() {
  *
  * @return The number of unique environments remaining on the stack.
  */
-size_t PkCUEngine::combineSimilarEnvironments() {
+size_t LegacyPkCUEngine::combineSimilarEnvironments() {
   PossibleEnvironments& stack = getStack();
 
   // hash environments (and summate probabilities for check):
@@ -1318,7 +1318,7 @@ size_t PkCUEngine::combineSimilarEnvironments() {
   }
 
   // Calculate accumulated probability for verification
-  assert(PkCU::saneStackProbability(stack));
+  assert(LegacyPkCU::saneStackProbability(stack));
   return stack.getNumUnique();
 } //endOf combineSimilarEnvironments
 
@@ -1332,7 +1332,7 @@ size_t PkCUEngine::combineSimilarEnvironments() {
  * Pokemon's action is evaluated in the context of every possible outcome of the
  * first Pokemon's action.
  */
-void PkCUEngine::updateState_move() {
+void LegacyPkCUEngine::updateState_move() {
   assert(getStackStage() == STAGE_SEEDED);
   advanceStackStage();
 
@@ -1371,7 +1371,7 @@ void PkCUEngine::updateState_move() {
 }
 
 
-PossibleEnvironments PkCU::updateState(
+PossibleEnvironments LegacyPkCU::updateState(
     const ConstEnvironmentVolatile& cEnv,
     const Action& actionA,
     const Action& actionB) const {
@@ -1390,7 +1390,7 @@ PossibleEnvironments PkCU::updateState(
   }
 
   // construct an engine from the action + state combination:
-  PkCUEngine engine{*this, result, cEnv.data(), actionA, actionB};
+  LegacyPkCUEngine engine{*this, result, cEnv.data(), actionA, actionB};
   // and evaluate the state
   engine.updateState();
 
@@ -1398,7 +1398,7 @@ PossibleEnvironments PkCU::updateState(
 }; // end of updateState
 
 
-MatchState PkCU::getGameState(const ConstEnvironmentVolatile& envV) const {
+MatchState LegacyPkCU::getGameState(const ConstEnvironmentVolatile& envV) const {
   guardNonvolatileState(envV);
   bool teamAisDead = !envV.getTeam(TEAM_A).isAlive();
   bool teamBisDead = !envV.getTeam(TEAM_B).isAlive();
@@ -1421,7 +1421,7 @@ MatchState PkCU::getGameState(const ConstEnvironmentVolatile& envV) const {
 }
 
 
-ActionPairVector PkCU::getAllValidActions(
+ActionPairVector LegacyPkCU::getAllValidActions(
     const ConstEnvironmentVolatile& envV, size_t agentTeam) const {
   auto agentActions = getValidActions(envV, agentTeam);
   auto otherActions = getValidActions(envV, (agentTeam+1) % 2);
@@ -1437,7 +1437,7 @@ ActionPairVector PkCU::getAllValidActions(
 }
 
 
-ActionVector PkCU::getValidActionsInRange(
+ActionVector LegacyPkCU::getValidActionsInRange(
     const ConstEnvironmentVolatile& envV, size_t iTeam, size_t iFirst, size_t iLast) const {
   ActionVector result; result.reserve((iLast - iFirst) + envV.getTeam(iTeam).nv().getNumTeammates());
   ConstTeamVolatile cTV = envV.getTeam(iTeam);
@@ -1490,7 +1490,7 @@ ActionVector PkCU::getValidActionsInRange(
  * @return An `IsValidResult` object indicating if the action is valid and, if
  *         not, the reason why.
  */
-IsValidResult PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Action& action, size_t iTeam) const {
+IsValidResult LegacyPkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Action& action, size_t iTeam) const {
   guardNonvolatileState(envV);
   ConstTeamVolatile cTV = envV.getTeam(iTeam);
   ConstTeamVolatile oTV = envV.getOtherTeam(iTeam);
@@ -1622,14 +1622,14 @@ IsValidResult PkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Ac
 } // endOf is valid action
 
 
-void PkCU::guardNonvolatileState(const ConstEnvironmentVolatile& cEnv) const {
+void LegacyPkCU::guardNonvolatileState(const ConstEnvironmentVolatile& cEnv) const {
   if (cEnv.nv_ != nv_.get()) {
     throw std::runtime_error("mismatched nonvolatile state - call setEnvironment first");
   }
 }
 
 
-bool PkCU::saneStackProbability(PossibleEnvironments& envs) {
+bool LegacyPkCU::saneStackProbability(PossibleEnvironments& envs) {
   FixType sum = FixType(0);
   for (auto begin = envs.begin(), end = envs.end(); begin != end; ++begin) {
     auto probability = begin->getProbability();
@@ -1656,7 +1656,7 @@ bool PkCU::saneStackProbability(PossibleEnvironments& envs) {
  *        the first outcome is calculated as `1.0 - _probability`.
  * @param iState The index of the environment to duplicate.
  */
-void PkCUEngine::duplicateState(
+void LegacyPkCUEngine::duplicateState(
     std::array<size_t, 2>& result, FixType _probability, size_t iState) {
   assert(_probability > FixType(0) && _probability < FixType(1));
 
@@ -1673,7 +1673,7 @@ void PkCUEngine::duplicateState(
   getBase(result[1]).getProbability() = branchProbability;
   getBase(result[0]).getProbability() = totalProbability - branchProbability;
 
-  assert(PkCU::saneStackProbability(getStack()));
+  assert(LegacyPkCU::saneStackProbability(getStack()));
 }
 
 
@@ -1688,7 +1688,7 @@ void PkCUEngine::duplicateState(
  * @param _oProbability The probability of the third outcome.
  * @param iState The index of the environment to triplicate.
  */
-void PkCUEngine::triplicateState(
+void LegacyPkCUEngine::triplicateState(
     std::array<size_t, 3>& result,
     FixType _probability,
     FixType _oProbability,
@@ -1721,44 +1721,44 @@ void PkCUEngine::triplicateState(
   assert(remainingProbability > FixType(0));
   getBase(result[0]).getProbability() = remainingProbability;
 
-  assert(PkCU::saneStackProbability(getStack()));
+  assert(LegacyPkCU::saneStackProbability(getStack()));
 }
 
 
-PokemonVolatile PkCUEngine::getPKV(size_t iState) {
+PokemonVolatile LegacyPkCUEngine::getPKV(size_t iState) {
   return getTV(iState).getPKV();
 }
 
 
-PokemonVolatile PkCUEngine::getTPKV(size_t iState) {
+PokemonVolatile LegacyPkCUEngine::getTPKV(size_t iState) {
   return getTTV(iState).getPKV();
 }
 
 
-TeamVolatile PkCUEngine::getTV(size_t iState) {
+TeamVolatile LegacyPkCUEngine::getTV(size_t iState) {
   return getStack().at(iState).getTeam(getICTeam());
 }
 
 
-TeamVolatile PkCUEngine::getTTV(size_t iState) {
+TeamVolatile LegacyPkCUEngine::getTTV(size_t iState) {
   return getStack().at(iState).getTeam(getIOTeam());
 }
 
 
-MoveVolatile PkCUEngine::getMV(size_t iState) {
+MoveVolatile LegacyPkCUEngine::getMV(size_t iState) {
   return getPKV(iState).getMV(getCAction());
 }
 
 
-MoveVolatile PkCUEngine::getTMV(size_t iState) {
+MoveVolatile LegacyPkCUEngine::getTMV(size_t iState) {
   return getPKV(iState).getMV(getOAction());
 }
 
 
-const PluginSet& PkCUEngine::getCPluginSet() { return *cPluginSet_; }
+const PluginSet& LegacyPkCUEngine::getCPluginSet() { return *cPluginSet_; }
 
 
-const PluginSet& PkCU::getCPluginSet(
+const PluginSet& LegacyPkCU::getCPluginSet(
     const ConstEnvironmentVolatile& cEnv, size_t iTeam) const {
   size_t iCPokemon = cEnv.getTeam(iTeam).getICPKV();
   size_t iOPokemon = cEnv.getOtherTeam(iTeam).getICPKV();
@@ -1766,7 +1766,7 @@ const PluginSet& PkCU::getCPluginSet(
 }
 
 
-void PkCUEngine::setCPluginSet() {
+void LegacyPkCUEngine::setCPluginSet() {
   size_t iCPokemon = getBase().getTeam(getICTeam()).getICPKV();
   size_t iOPokemon = getBase().getTeam(getIOTeam()).getICPKV();
   cPluginSet_ = &pluginSets_[getICTeam() * 6 + iCPokemon][iOPokemon];
