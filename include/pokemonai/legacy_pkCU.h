@@ -387,10 +387,6 @@ public:
     return getGameState(envV.getEnv());
   }
 
-  static bool isMoveAction(const Action& action) { return action.isMove(); };
-
-  static bool isSwitchAction(const Action& action) { return action.isSwitch(); };
-
  protected:
   Config cfg_;
 

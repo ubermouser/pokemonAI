@@ -95,14 +95,6 @@ MatchState NeoPkCU::getGameState(const ConstEnvironmentPossible& envV) const {
     return getGameState(envV.getEnv());
 }
 
-bool NeoPkCU::isMoveAction(const Action& action) {
-    return action.isMove();
-}
-
-bool NeoPkCU::isSwitchAction(const Action& action) {
-    return action.isSwitch();
-}
-
 NeoPkCUEngine::NeoPkCUEngine(
     const NeoPkCU& cu,
     PossibleEnvironments& stack,

@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(pokemonAI)
 
+option(USE_LEGACY_ENGINE "Use the legacy battle engine" ON)
+
 enable_testing()
 include(CTest)
 

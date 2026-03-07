@@ -1,3 +1,12 @@
+# option(USE_LEGACY_ENGINE ...) is now in global CMakeLists.txt
+
+set(ENGINE_SOURCES "")
+if(USE_LEGACY_ENGINE)
+    list(APPEND ENGINE_SOURCES ../src/legacy_pkCU.cpp)
+else()
+    list(APPEND ENGINE_SOURCES ../src/neo_pkCU.cpp)
+endif()
+
 add_library(pkaiEngine SHARED
     ../src/ability.cpp
     ../src/action.cpp
@@ -14,8 +23,7 @@ add_library(pkaiEngine SHARED
     ../src/name.cpp
     ../src/nature.cpp
     ../src/orphan.cpp
-    ../src/legacy_pkCU.cpp
-    ../src/neo_pkCU.cpp
+    ${ENGINE_SOURCES}
     ../src/pluggable.cpp
     ../src/pokedex.cpp
     ../src/pokedex_dynamic.cpp
@@ -35,6 +43,7 @@ set_target_properties(pkaiEngine PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 target_compile_definitions(pkaiEngine PUBLIC
     FORCE_INLINE=
+    USE_LEGACY_ENGINE=$<BOOL:${USE_LEGACY_ENGINE}>
 )
 
 target_link_libraries(pkaiEngine
