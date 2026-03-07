@@ -14,15 +14,6 @@ po::options_description Trainer::Config::options(
   auto desc = TeamBuilder::Config::options(category, prefix);
   desc.add(training.options(category + " [Training]", prefix + "training"));
 
-  if (prefix.size() > 0) {
-    prefix.append("-");
-  }
-  desc.add_options()(
-      (prefix + "state-evaluator").c_str(),
-      po::value<std::string>(&stateEvaluatorType)
-          ->default_value(stateEvaluatorType),
-      "Type of state evaluator used to generate training data.");
-
   return desc;
 }
 

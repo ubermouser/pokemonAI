@@ -9,8 +9,6 @@ class Trainer : public TeamBuilder {
   struct Config : public TeamBuilder::Config {
     TrainerRegressFitness::Config training;
 
-    std::string stateEvaluatorType = "simple";
-
     Config() : TeamBuilder::Config() { datasheetsPath = ""; }
 
     boost::program_options::options_description options(

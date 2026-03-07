@@ -77,7 +77,10 @@ po::options_description Ranker::Config::options(
       "Maximum number of items to show in each section of the datasheet before aggregating into 'Other'.")
       ((prefix + "datasheet-threshold").c_str(),
       po::value<double>(&datasheetThreshold)->default_value(datasheetThreshold),
-      "Minimum usage probability to show an item individually in the datasheet.");
+      "Minimum usage probability to show an item individually in the datasheet.")
+      ((prefix + "state-evaluator").c_str(),
+      po::value<std::string>(&stateEvaluatorType)->default_value(stateEvaluatorType),
+      "Type of state evaluator used during game evaluation.");
   // clang-format on
   return desc;
 }

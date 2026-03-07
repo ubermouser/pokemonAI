@@ -74,6 +74,8 @@ public:
 
     bool allowSamePlanner = true;
 
+    std::string stateEvaluatorType = "simple";
+
     std::string datasheetsPath = "league_stats.txt";
 
     /* Maximum number of species to print datasheets for */

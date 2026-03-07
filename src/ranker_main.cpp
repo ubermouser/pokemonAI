@@ -32,6 +32,7 @@ struct Config {
   std::vector<std::string> teams;
   std::vector<std::string> evalTypes = {"simple"};
   std::vector<std::shared_ptr<Evaluator::Config> > evalConfigs;
+  std::shared_ptr<Evaluator::Config> stateEvalConfig;
   std::vector<std::string> plannerTypes = {"random", "maximin"};
   std::vector<std::shared_ptr<Planner::Config> > plannerConfigs;
 
@@ -40,12 +41,14 @@ struct Config {
 
   void updateEvalTypes() {
     for (auto& evalType: evalTypes) { evalConfigs.push_back(evaluators::config(evalType)); }
+    stateEvalConfig = evaluators::config(ranker.stateEvaluatorType);
     for (auto& planType: plannerTypes) { plannerConfigs.push_back(planners::config(planType)); }
   }
 
   Config() {
     game.storeSubcomponents = false;
     game.maxMatches = 1;
+    stateEvalConfig = evaluators::config(ranker.stateEvaluatorType);
   }
 
   po::options_description options() {
@@ -88,6 +91,12 @@ struct Config {
               "evaluator-{} {} configuration", iEval + 1, evalTypes[iEval]),
           fmt::format("e{}", iEval + 1)));
     }
+    if (stateEvalConfig) {
+      desc.add(stateEvalConfig->options(
+          fmt::format(
+              "state-evaluator {} configuration", ranker.stateEvaluatorType),
+          "se"));
+    }
 
     return desc;
   }
@@ -129,7 +138,10 @@ int main(int argc, char** argv) {
   Ranker ranker{cfg.ranker};
   ranker.setEngine(PkCU{cfg.engine});
   ranker.setGame(Game{cfg.game});
-  ranker.setStateEvaluator(EvaluatorSimple().setEngine(PkCU{cfg.engine}));
+  auto stateEvaluator =
+      evaluators::choose(cfg.ranker.stateEvaluatorType, *cfg.stateEvalConfig);
+  stateEvaluator->setEngine(std::make_shared<PkCU>(cfg.engine));
+  ranker.setStateEvaluator(*stateEvaluator);
   for (size_t iPlan = 0; iPlan != cfg.plannerTypes.size(); ++iPlan) {
     ranker.addPlanner(planners::choose(cfg.plannerTypes[iPlan], *cfg.plannerConfigs[iPlan]));
   }
