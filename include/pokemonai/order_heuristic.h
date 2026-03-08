@@ -16,17 +16,22 @@
 
 class OrderHeuristic {
 public:
-  using ActionMap = std::unordered_map<Action, uint64_t>;
+ using ActionCounts = std::unordered_map<Action, uint64_t>;
 
-  void increment(const ConstEnvironmentVolatile& env, size_t iTeam, const Action& action);
+ void increment(
+     const ConstEnvironmentVolatile& env, size_t iTeam, const Action& action);
 
-  ActionVector& order(const ConstEnvironmentVolatile& env, size_t iTeam, ActionVector& actions, const Action& killer=Action{}) const;
+ ActionVector& order(
+     const ConstEnvironmentVolatile& env,
+     size_t iTeam,
+     ActionVector& actions,
+     const Action& killer = Action{}) const;
 
-  void initialize();
+ void initialize();
 protected:
   size_t getBin(const ConstEnvironmentVolatile& env, size_t iTeam) const;
 
-  std::array<ActionMap, (6 * 6 * 2)> major_counts_;
+  std::array<ActionCounts, (6 * 6 * 2)> major_counts_;
 };
 
 #endif

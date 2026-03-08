@@ -4,9 +4,7 @@
 #include <unordered_map>
 
 
-void OrderHeuristic::initialize() {
-  major_counts_.fill(ActionMap{});
-}
+void OrderHeuristic::initialize() { major_counts_.fill(ActionCounts{}); }
 
 
 size_t OrderHeuristic::getBin(const ConstEnvironmentVolatile& env, size_t iTeam) const {
@@ -24,7 +22,7 @@ ActionVector& OrderHeuristic::order(
 
   auto getCount = [&](const Action& a){
     uint64_t count = 0;
-    const ActionMap& counts = major_counts_[getBin(env, iTeam)];
+    const ActionCounts& counts = major_counts_[getBin(env, iTeam)];
     auto countIterator = counts.find(a);
     if (countIterator != counts.end()) {
       count = countIterator->second;

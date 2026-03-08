@@ -8,14 +8,16 @@
 #ifndef ENVIRONMENT_VOLATILE_H
 #define	ENVIRONMENT_VOLATILE_H
 
-#include "pkai.h"
+#include <stdint.h>
 
 #include <array>
 #include <iosfwd>
-#include <stdint.h>
+#include <vector>
 
+#include "actor.h"
 #include "environment_nonvolatile.h"
 #include "nonvolatile_volatile.h"
+#include "pkai.h"
 #include "team_volatile.h"
 
 class EnvironmentNonvolatile;
@@ -57,9 +59,16 @@ public:
   }
 
   typename teamvolatile_t::pokemonvolatile_t teammate(
-      size_t iTeam, size_t iTeammate) const {
-    return getTeam(iTeam).teammate(iTeammate);
+      const Actor& actor) const {
+    return getTeam(actor.iTeam()).teammate(actor.iTeammate());
   }
+
+  typename teamvolatile_t::pokemonvolatile_t teammate(
+      size_t iTeam, size_t iTeammate) const {
+    return teammate({iTeam, iTeammate});
+  }
+
+  std::vector<Actor> getActivePokemon() const;
 
   void printActivePokemon(std::ostream& os, size_t firstTeam=0) const;
 };

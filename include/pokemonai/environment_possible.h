@@ -8,17 +8,18 @@
 #ifndef POSSIBLE_ENVIRONMENT_H
 #define	POSSIBLE_ENVIRONMENT_H
 
-#include "pkai.h"
+#include <stdint.h>
 
 #include <deque>
 #include <iosfwd>
 #include <memory>
-#include <stdint.h>
 
-#include "nonvolatile_volatile.h"
-#include "environment_volatile.h"
+#include "actor.h"
 #include "environment_nonvolatile.h"
+#include "environment_volatile.h"
 #include "fixedpoint/fixed_class.h"
+#include "nonvolatile_volatile.h"
+#include "pkai.h"
 
 
 struct TeamEnvironmentFlags {
@@ -283,6 +284,9 @@ public:
 
   team_t getTeam(size_t iTeam) const { return getEnv().getTeam(iTeam); }
 
+  pokemon_t teammate(const Actor& actor) const {
+    return getEnv().teammate(actor);
+  }
   pokemon_t teammate(size_t iTeam, size_t iTeammate) const {
     return getEnv().teammate(iTeam, iTeammate);
   }

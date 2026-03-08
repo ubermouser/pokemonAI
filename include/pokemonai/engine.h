@@ -8,11 +8,13 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+// clang-format off
 #include "pkai.h"
 #include "pokedex.h"
 #include "pluggable.h"
 
 #include "action.h"
+#include "actor.h"
 #include "ability.h"
 #include "item.h"
 #include "type.h"
@@ -28,5 +30,6 @@
 #include "environment_nonvolatile.h"
 #include "environment_volatile.h"
 #include "environment_possible.h"
+// clang-format on
 
 #endif /* ENGINE_H */

@@ -4,12 +4,13 @@ set(ENGINE_SOURCES "")
 if(USE_LEGACY_ENGINE)
     list(APPEND ENGINE_SOURCES ../src/legacy_pkCU.cpp)
 else()
-    list(APPEND ENGINE_SOURCES ../src/neo_pkCU.cpp)
+    list(APPEND ENGINE_SOURCES ../src/neo_pkCU.cpp ../src/neo_pkCU_engine.cpp)
 endif()
 
 add_library(pkaiEngine SHARED
     ../src/ability.cpp
     ../src/action.cpp
+    ../src/actor.cpp
     ../src/environment_nonvolatile.cpp
     ../src/environment_possible.cpp
     ../src/environment_volatile.cpp

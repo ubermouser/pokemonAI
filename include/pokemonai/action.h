@@ -8,11 +8,15 @@
 #ifndef ACTION_H
 #define ACTION_H
 
-#include <array>
 #include <assert.h>
-#include <iosfwd>
 #include <stdint.h>
+
+#include <array>
+#include <iosfwd>
+#include <unordered_map>
 #include <vector>
+
+#include "actor.h"
 
 class Action {
 public:
@@ -104,6 +108,7 @@ protected:
 
 };
 
+using ActionMap = std::unordered_map<Actor, Action>;
 using ActionVector = std::vector<Action>;
 using ActionPairVector = std::vector<std::array<Action, 2> >;
 

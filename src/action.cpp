@@ -89,5 +89,7 @@ std::istream& operator >>(std::istream& is, Action& action) {
 
 
 size_t std::hash<Action>::operator()(const Action& a) const {
-  return std::hash<uint16_t>()(*a.data());
+  uint16_t val;
+  std::memcpy(&val, &a, sizeof(uint16_t));
+  return std::hash<uint16_t>()(val);
 }

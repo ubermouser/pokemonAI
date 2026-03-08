@@ -133,6 +133,59 @@ struct MoveBracket {
   unsigned int speed;   /**< The speed of the Pokemon, used as a tie-breaker. */
 };
 
+// clang-format off
+/**
+ * @name Battle Stages
+ * @brief Defines the different stages of the battle engine's state machine.
+ *
+ * The battle simulation is processed as a sequence of stages. These identifiers
+ * define each stage in the process, from the initial seed to the final hash
+ * of the resulting environments.
+ * @{
+ */
+enum StageType : int {
+  // seed and priority evaluation:
+  DNE = 0,                 /**< Stage does not exist. */
+  SEEDED = 1,              /**< Initial environment has been seeded. */
+  PRETURN = 2,             /**< Before a Pokemon takes its turn. */
+  // switch evaluation:
+  PRESWITCH = 3,           /**< Before a Pokemon switches out. */
+  POSTSWITCH = 4,          /**< After a Pokemon switches in. */
+  // pre move evaluation:
+  STATUS = 5,              /**< Before a move is executed, for status effects like paralysis. */
+  // move damage evaluation:
+  MOVEBASE = 6,            /**< Base move evaluation. */
+  MODIFYHITCHANCE = 7,     /**< Modify the chance of the move hitting. */
+  EVALUATEHITCHANCE = 8,   /**< Evaluate if the move hits. */
+  MODIFYCRITCHANCE = 9,    /**< Modify the chance of a critical hit. */
+  EVALUATECRITCHANCE = 10, /**< Evaluate if the move crits. */
+  SETBASEPOWER = 11,       /**< Set the base power of the move. */
+  SETMOVETYPE = 12,        /**< Set the type of the move. */
+  MODIFYBASEPOWER = 13,    /**< Modify the base power of the move. */
+  MODIFYATTACKPOWER = 14,  /**< Modify the attack power of the user. */
+  MODIFYCRITICALPOWER = 15, /**< Modify the power of a critical hit. */
+  MODIFYRAWDAMAGE = 16,    /**< Modify the raw damage calculated. */
+  MODIFYSTAB = 17,         /**< Modify the Same-Type Attack Bonus (STAB). */
+  MODIFYTYPERESISTANCE = 18, /**< Modify the type resistance of the target. */
+  MODIFYITEMPOWER = 19,    /**< Modify the power based on items. */
+  PREDAMAGE = 20,          /**< Before damage is applied. */
+  POSTDAMAGE = 21,         /**< After damage is applied. */
+  // post move evaluation:
+  POSTMOVE = 22,           /**< After a move has been executed. */
+  PRESECONDARY = 23,       /**< Before secondary effects are calculated. */
+  MODIFYSECONDARYHITCHANCE = 24, /**< Modify the hit chance of secondary effects. */
+  SECONDARY = 25,          /**< Secondary effects are being applied. */
+  POSTSECONDARY = 26,      /**< After secondary effects have been applied. */
+  // post turn status
+  POSTTURN = 27,           /**< After a Pokemon has completed its turn. */
+  // post round status
+  POSTROUND = 28,          /**< After both Pokemon have completed their turns. */
+  FINAL = 29,              /**< The final stage of the round. */
+  HASH = 30                /**< The resulting environment is being hashed. */
+};
+/** @} */
+// clang-format on
+
 using PluginSet = std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>;
 using PluginSets = std::array< std::array<PluginSet, 6>, 12>;
 using ValidMoveSet = std::bitset<VALID_MOVE_SIZE>;
