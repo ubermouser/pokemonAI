@@ -27,8 +27,9 @@ bool EnvironmentPossibleData::operator <(const EnvironmentPossibleData& other) c
 }
 
 
-void EnvironmentPossibleData::generateHash() {
+uint64_t EnvironmentPossibleData::generateHash() {
   hash = env.generateHash();
+  return hash;
 }
 
 

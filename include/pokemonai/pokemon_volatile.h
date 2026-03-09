@@ -110,6 +110,9 @@ class PokemonVolatileImpl : public NonvolatileVolatilePair<
   /* True if the pokemon has at least one move they can perform */
   bool hasPP() const;
 
+  /* True if the pokemon is currently on the field */
+  bool isActive() const { return data().active > 0; }
+
   /* return the proportion of this pokemon's HP that remains, from 0..1*/
   fpType getPercentHP() const;
 

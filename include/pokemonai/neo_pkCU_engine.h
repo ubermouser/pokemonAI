@@ -16,13 +16,18 @@ class NeoPkCUEngine {
   struct MoveBracket {
     int32_t actionBracket;  // The priority bracket of the action. Higher values
                             // go first.
-    uint32_t speed;         // The speed of the Pokemon, used as a tie-breaker.
+    uint32_t speed;         // The speed of the Pokemon
+    uint32_t tiebreaker;  // If actionBracket and speed are equal, tieBreaker is
+                          // set to disambiguate ties.
   };
 
   struct StackFrame {
-    size_t iStack;     // Index into stack_
+    size_t iStack;     // Index into stack_ (same as stackframe index)
     StageType stage;   // Next stage to execute
     size_t iActor;     // Index of the teammate currently executing
+    size_t iTarget;    // Index of the target being executed upon
+
+    std::vector<Actor> actors;  // The order in which actors will move.
 
     std::unordered_map<Actor, DamageComponents_t> damageComponents;
   };
@@ -88,6 +93,35 @@ class NeoPkCUEngine {
   const PossibleEnvironments& getStack() const { return stack_; };
 
   /**
+   * Engine computation stages:
+   */
+  void evaluateMove_preturn();
+  void evaluateMove_status();
+  void evaluateMove_damage_moveBase();
+  void evaluateMove_damage_modifyHitChance();
+  void evaluateMove_damage_evaluateHitChance();
+  void evaluateMove_damage_modifyCritChance();
+  void evaluateMove_damage_evaluateCritChance();
+  void evaluateMove_damage_setBasePower();
+  void evaluateMove_damage_setMoveType();
+  void evaluateMove_damage_modifyBasePower();
+  void evaluateMove_damage_modifyAttackPower();
+  void evaluateMove_damage_modifyCriticalPower();
+  void evaluateMove_damage_modifyRawDamage();
+  void evaluateMove_damage_modifySTAB();
+  void evaluateMove_damage_modifyTypeResistance();
+  void evaluateMove_damage_modifyItemPower();
+  void evaluateMove_damage_preDamage();
+  void evaluateMove_postMove();
+  void evaluateMove_preSecondary();
+  void evaluateMove_modifySecondaryHitChance();
+  void evaluateMove_secondary();
+  void evaluateMove_postTurn();
+  void evaluateMove_postRound();
+  void evaluateMove_round_hash();
+
+
+  /**
    * @name Compatibility Methods
    * @brief Methods implemented for compatibility with LegacyPkCUEngine.
    * @{
@@ -95,13 +129,6 @@ class NeoPkCUEngine {
   void updateState_move();
   int32_t movePriority_Bracket();
   uint32_t movePriority_Speed();
-  void evaluateMove_switch();
-  void evaluateMove_preMove();
-  void evaluateMove_postMove();
-  void evaluateMove_damage();
-  void evaluateMove_script();
-  void evaluateMove_postTurn();
-  void evaluateRound_end();
   size_t combineSimilarEnvironments();
   uint32_t movePriority();
   void evaluateMove();
@@ -133,11 +160,12 @@ class NeoPkCUEngine {
       fpType probability,
       size_t iState = SIZE_MAX);
 
-  uint32_t getStackStage() const;
-  void advanceStackStage();
-  void swapTeamIndexes();
+  StackFrame& getStackFrame() { return stackFrame_[iBase_]; }
+  const StackFrame& getStackFrame() const { return stackFrame_[iBase_]; }
+  StageType getStackStage() const { return getStackFrame().stage; }
   const PluginSet& getCPluginSet();
   void setCPluginSet();
+  void advanceStackStage();
 
   TeamVolatile getTV();
   TeamVolatile getTTV();
@@ -181,9 +209,9 @@ class NeoPkCUEngine {
   ActionMap actions_;
 
   /**
-   * @brief The order in which actors will move.
+   * @brief the targets that each actor's move will affect.
    */
-  std::vector<Actor> actors_;
+  std::unordered_map<Actor, std::vector<Actor>> targets_;
 
   /**
    * @brief The stack of possible environments being generated.
@@ -201,11 +229,6 @@ class NeoPkCUEngine {
    * currently being processed.
    */
   size_t iBase_;
-
-  /**
-   * @brief The actor that is currently executing.
-   */
-  Actor* currentActor_;
 
   const PluginSet& getCPluginSet() const { return *cPlugins_; }
 

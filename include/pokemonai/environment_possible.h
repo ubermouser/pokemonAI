@@ -178,7 +178,7 @@ struct PKAISHARED EnvironmentPossibleData {
    the other entity occuring?*/
   bool operator<(const EnvironmentPossibleData& other) const;
 
-  void generateHash();
+  uint64_t generateHash();
 
   const uint64_t& getHash() const { return hash; };
 

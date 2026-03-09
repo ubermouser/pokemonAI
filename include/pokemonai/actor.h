@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <iosfwd>
 
 /**
  * @struct Actor
@@ -31,7 +32,12 @@ class Actor {
 
   bool operator==(const Actor& other) const;
   bool operator!=(const Actor& other) const { return !(*this == other); }
+
+  void print() const;
+  void print(std::ostream& os) const;
 };
+
+std::ostream& operator<<(std::ostream& os, const Actor& actor);
 
 namespace std {
 template <>

@@ -117,14 +117,18 @@ class PKAISHARED NeoPkCU {
    * @param actionB The action of the first active pokemon of team B.
    * @return A `PossibleEnvironments` object containing all possible outcomes.
    */
-  [[deprecated]] PossibleEnvironments updateState(
+  PossibleEnvironments updateState(
       const ConstEnvironmentVolatile& cEnv,
       const Action& actionA,
       const Action& actionB) const;
-  [[deprecated]] PossibleEnvironments updateState(
+  PossibleEnvironments updateState(
       const ConstEnvironmentPossible& cEnvP,
       const Action& actionA,
       const Action& actionB) const;
+  PossibleEnvironments updateState(
+      const ConstEnvironmentVolatile& cEnv,
+      const ActionMap& actionsA,
+      const ActionMap& actionsB) const;
   PossibleEnvironments updateState(
       const ConstEnvironmentVolatile& cEnv, const ActionMap& actions) const;
 

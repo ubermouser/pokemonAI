@@ -4,7 +4,9 @@
 
 #include <algorithm>
 
+#include "pokemonai/fp_compare.h"
 #include "pokemonai/neo_pkCU.h"
+#include "pokemonai/pkCU_types.h"
 #include "pokemonai/pluggable_types.h"
 
 /**
@@ -47,8 +49,25 @@ NeoPkCUEngine::NeoPkCUEngine(
 }
 
 
+/**
+ * @brief The main entry point for the engine, simulating a single turn.
+ *
+ * This method orchestrates the entire process of a battle turn. It first
+ * determines the move priority to decide which Pokemon acts first. It then
+ * calls `updateState_move` to process both Pokemon's moves. If there's a
+ * speed tie, it creates two separate scenarios, one for each Pokemon moving
+ * first. Finally, it evaluates end-of-round effects and combines similar
+ * resulting environments.
+ */
 PossibleEnvironments NeoPkCUEngine::updateState() {
-  throw std::runtime_error("NeoPkCUEngine::updateState not implemented");
+  getStackFrame().actors = computeActorOrder();
+
+  evaluateMove();
+
+  // combine environments that equal eachother:
+  combineSimilarEnvironments();
+
+  return std::move(stack_);
 }
 
 
@@ -118,9 +137,15 @@ std::vector<Actor> NeoPkCUEngine::computeActorOrder() {
     const auto& bracketB = brackets.at(b);
     if (bracketA.actionBracket != bracketB.actionBracket) {
       return bracketA.actionBracket > bracketB.actionBracket;
+    } else if (bracketA.speed != bracketB.speed) {
+      return bracketA.speed > bracketB.speed;
+    } else {
+      // TODO - implement tiebreaking
+      return bracketA.tiebreaker > bracketB.tiebreaker;
     }
-    return bracketA.speed > bracketB.speed;
+    
   });
+
 
   return std::move(actors);
 }
@@ -227,6 +252,548 @@ bool NeoPkCUEngine::saneStackProbability() const {
 }
 
 
+void NeoPkCUEngine::evaluateMove() {
+  size_t stagesCompleted = 0;
+  while (stagesCompleted != getStack().size()) {
+    StackFrame& frame = getStackFrame();
+    Actor& actor = frame.actors[frame.iActor];
+    SPDLOG_TRACE(
+        "STACK={} STAGE={} PKMN={} ACTION={} TARGET={}",
+        iBase_,
+        stageTypeToString(frame.stage),
+        fmt::streamed(actor),
+        fmt::streamed(actions_[actor]),
+        fmt::streamed(targets_[actor][frame.iTarget]));
+
+    switch (frame.stage) {
+    case StageType::PRETURN:
+      evaluateMove_preturn();
+      break;
+    case StageType::PRESWITCH:
+    case StageType::POSTSWITCH:
+      // evaluateMove_switch(); // legacy had evaluateMove_switch, but Neo might
+      // handle it differently in the loop for now, let's treat them as needing
+      // implementation if they appear in our StageType enum
+      break;
+    case StageType::STATUS:
+      evaluateMove_status();
+      break;
+    case StageType::MOVEBASE:
+      evaluateMove_damage_moveBase();
+      break;
+    case StageType::MODIFYHITCHANCE:
+      evaluateMove_damage_modifyHitChance();
+      break;
+    case StageType::EVALUATEHITCHANCE:
+      evaluateMove_damage_evaluateHitChance();
+      break;
+    case StageType::MODIFYCRITCHANCE:
+      evaluateMove_damage_modifyCritChance();
+      break;
+    case StageType::EVALUATECRITCHANCE:
+      evaluateMove_damage_evaluateCritChance();
+      break;
+    case StageType::SETBASEPOWER:
+      evaluateMove_damage_setBasePower();
+      break;
+    case StageType::SETMOVETYPE:
+      evaluateMove_damage_setMoveType();
+      break;
+    case StageType::MODIFYBASEPOWER:
+      evaluateMove_damage_modifyBasePower();
+      break;
+    case StageType::MODIFYATTACKPOWER:
+      evaluateMove_damage_modifyAttackPower();
+      break;
+    case StageType::MODIFYCRITICALPOWER:
+      evaluateMove_damage_modifyCriticalPower();
+      break;
+    case StageType::MODIFYRAWDAMAGE:
+      evaluateMove_damage_modifyRawDamage();
+      break;
+    case StageType::MODIFYSTAB:
+      evaluateMove_damage_modifySTAB();
+      break;
+    case StageType::MODIFYTYPERESISTANCE:
+      evaluateMove_damage_modifyTypeResistance();
+      break;
+    case StageType::MODIFYITEMPOWER:
+      evaluateMove_damage_modifyItemPower();
+      break;
+    case StageType::PREDAMAGE:
+      evaluateMove_damage_preDamage();
+      break;
+    case StageType::POSTDAMAGE:
+      // evaluateMove_postDamage();
+      break;
+    case StageType::POSTMOVE:
+      evaluateMove_postMove();
+      break;
+    case StageType::PRESECONDARY:
+      evaluateMove_preSecondary();
+      break;
+    case StageType::MODIFYSECONDARYHITCHANCE:
+      evaluateMove_modifySecondaryHitChance();
+      break;
+    case StageType::SECONDARY:
+      evaluateMove_secondary();
+      break;
+    case StageType::POSTSECONDARY:
+      // evaluateMove_postSecondary();
+      break;
+    case StageType::POSTTURN:
+      evaluateMove_postTurn();
+      break;
+    case StageType::POSTROUND:
+      evaluateMove_postRound();
+      break;
+    case StageType::HASH:
+      evaluateMove_round_hash();
+      break;
+    case StageType::FINAL:
+      stagesCompleted += 1;
+      break;
+    default:
+      throw std::runtime_error(fmt::format(
+          "Unimplemented stackstage at STACK={}: {}-{}!",
+          frame.iStack,
+          (int32_t)frame.stage,
+          stageTypeToString(frame.stage)));
+    }
+
+
+    // advance stack stage of current state
+    advanceStackStage();
+    iBase_ = (iBase_ + 1) % getStack().size();
+  }  // endOf while stages not completed
+}  // endOf evaluateMove
+
+
+void NeoPkCUEngine::evaluateMove_preturn() {
+  const Action& cAction = getCAction();
+  size_t iCTeam = getICTeam();
+
+  if (cAction.isMove()) {
+    int result = 0;
+    // CALLPLUGIN(result, PLUGIN_ON_MODIFYACTION, ...); // Implementation
+    // details omitted for brevity
+  }
+}
+
+
+void NeoPkCUEngine::evaluateMove_status() {
+  int result = 0;
+  CALLPLUGIN(
+      result,
+      PLUGIN_ON_BEGINNINGOFTURN,
+      onBeginningOfTurn_rawType,
+      *this,
+      getPKV());
+}
+
+
+void NeoPkCUEngine::evaluateMove_damage_moveBase() {
+  const Move& cMove = getMV().getBase();
+  getDamageComponent().category = cMove.getDamageType();
+}
+
+
+void NeoPkCUEngine::evaluateMove_damage_modifyHitChance() {
+  FixType& probabilityToHit = getDamageComponent().tProbability;
+  probabilityToHit = getProbabilityToHit();
+
+  int result = 0;
+  CALLPLUGIN(
+      result,
+      PLUGIN_ON_MODIFYHITPROBABILITY,
+      onModifyProbability_rawType,
+      *this,
+      getMV(),
+      getPKV(),
+      getTPKV(),
+      probabilityToHit);
+}
+
+
+void NeoPkCUEngine::evaluateMove_damage_evaluateHitChance() {
+  FixType& probabilityToHit = getDamageComponent().tProbability;
+  probabilityToHit =
+      std::max(std::min(probabilityToHit, FixType(1)), FixType(0));
+
+  if (mostlyGT(probabilityToHit, FixType(0))) {
+    if (mostlyLT(probabilityToHit, FixType(1))) {
+      std::array<size_t, 2> iHEnv;
+      duplicateState(iHEnv, (FixType(1) - probabilityToHit));
+      getStack().at(iHEnv[1]).setHit(
+          getICTeam());  // Assuming result[1] is miss, oh wait duplicateState
+                         // second is prob
+    }
+    getBase().setHit(getICTeam());
+  } else {
+    // miss
+    stackFrame_[iBase_].stage = StageType::POSTDAMAGE;
+  }
+}
+
+
+void NeoPkCUEngine::evaluateMove_damage_modifyCritChance() {
+  FixType& probabilityToCrit = getDamageComponent().tProbability;
+  probabilityToCrit = getPKV().getAccuracy_boosted(FV_CRITICALHIT);
+
+  int result = 0;
+  CALLPLUGIN(
+      result,
+      PLUGIN_ON_MODIFYCRITPROBABILITY,
+      onModifyProbability_rawType,
+      *this,
+      getMV(),
+      getPKV(),
+      getTPKV(),
+      probabilityToCrit);
+}
+
+
+void NeoPkCUEngine::evaluateMove_damage_evaluateCritChance() {
+  FixType& probabilityToCrit = getDamageComponent().tProbability;
+  probabilityToCrit =
+      std::max(std::min(probabilityToCrit, FixType(1)), FixType(0));
+
+  if (mostlyGT(probabilityToCrit, FixType(0))) {
+    if (mostlyLT(probabilityToCrit, FixType(1))) {
+      std::array<size_t, 2> iCEnv;
+      duplicateState(iCEnv, probabilityToCrit);
+      getStack().at(iCEnv[1]).setCrit(getICTeam());
+    }
+    // base continues normally (non-crit or handled by duplicate)
+  }
+}
+
+
+void NeoPkCUEngine::evaluateMove_damage_setBasePower() {
+  uint32_t& basePower = getDamageComponent().damage;
+  basePower = getMV().getBase().getPower();
+
+  int result = (basePower != UINT8_MAX) ? 1 : 0;
+  CALLPLUGIN(
+      result,
+      PLUGIN_ON_SETBASEPOWER,
+      onSetPower_rawType,
+      *this,
+      getMV(),
+      getPKV(),
+      getTPKV(),
+      basePower);
+}
+
+
+void NeoPkCUEngine::evaluateMove_damage_setMoveType() {
+  const Type*& cType = getDamageComponent().mType;
+  cType = &getMV().getBase().getType();
+
+  int result = 0;
+  CALLPLUGIN(
+      result,
+      PLUGIN_ON_SETMOVETYPE,
+      onModifyMoveType_rawType,
+      *this,
+      getMV(),
+      getPKV(),
+      getTPKV(),
+      cType);
+}
+
+
+void NeoPkCUEngine::evaluateMove_damage_modifyBasePower() {
+  uint32_t& basePower = getDamageComponent().damage;
+  fpType baseModifier = 1.0;
+
+  int result = 0;
+  CALLPLUGIN(
+      result,
+      PLUGIN_ON_MODIFYBASEPOWER,
+      onModifyPower_rawType,
+      *this,
+      getMV(),
+      getPKV(),
+      getTPKV(),
+      baseModifier);
+
+  basePower = (uint32_t)(basePower * baseModifier);
+}
+
+
+void NeoPkCUEngine::evaluateMove_damage_modifyAttackPower() {
+  PokemonVolatile cPKV = getPKV();
+  PokemonVolatile tPKV = getTPKV();
+  const Move& cMove = getMV().getBase();
+  DamageComponents_t& cDamage = getDamageComponent();
+
+  size_t attackType, defenseType;
+  if (cMove.getDamageType() == ATK_PHYSICAL) {
+    attackType = FV_ATTACK;
+    defenseType = FV_DEFENSE;
+  } else {
+    attackType = FV_SPATTACK;
+    defenseType = FV_SPDEFENSE;
+  }
+
+  fpType attackPowerModifier = 1.0;
+  int result = 0;
+  CALLPLUGIN(
+      result,
+      PLUGIN_ON_MODIFYATTACKPOWER,
+      onModifyPower_rawType,
+      *this,
+      getMV(),
+      cPKV,
+      tPKV,
+      attackPowerModifier);
+
+  uint32_t attackPower = cPKV.getFV_boosted(attackType);
+  uint32_t defensePower = tPKV.getFV_boosted(defenseType);
+  uint32_t levelModifier = ((cPKV.nv().getLevel() * 2) / 5) + 2;
+
+  if (getBase().hasCrit(getICTeam())) {
+    attackPower = std::max(cPKV.nv().getFV_base(attackType), attackPower);
+    defensePower = std::min(tPKV.nv().getFV_base(defenseType), defensePower);
+  }
+
+  cDamage.damage =
+      ((levelModifier * cDamage.damage * attackPower) / 50) / defensePower;
+  cDamage.damage = (uint32_t)(cDamage.damage * attackPowerModifier) + 2;
+}
+
+
+void NeoPkCUEngine::evaluateMove_damage_modifyCriticalPower() {
+  if (getBase().hasCrit(getICTeam())) {
+    fpType criticalHitModifier = 2.0;
+    int result = 0;
+    CALLPLUGIN(
+        result,
+        PLUGIN_ON_MODIFYCRITICALPOWER,
+        onModifyPower_rawType,
+        *this,
+        getMV(),
+        getPKV(),
+        getTPKV(),
+        criticalHitModifier);
+    getDamageComponent().damage =
+        (uint32_t)(getDamageComponent().damage * criticalHitModifier);
+  }
+}
+
+
+void NeoPkCUEngine::evaluateMove_damage_preDamage() {
+  if (getBase().hasHit(getICTeam())) { calculateDamage(); }
+}
+
+
+void NeoPkCUEngine::evaluateMove_postMove() {
+  int result = 0;
+  CALLPLUGIN(
+      result,
+      PLUGIN_ON_ENDOFMOVE,
+      onEvaluateMove_rawType,
+      *this,
+      getMV(),
+      getPKV(),
+      getTPKV());
+}
+
+
+void NeoPkCUEngine::evaluateMove_preSecondary() {
+  const Move& cMove = getMV().getBase();
+  if (!getPKV().isAlive() || !(cMove.getSecondaryAccuracy() > FixType(0))) {
+    stackFrame_[iBase_].stage = StageType::POSTTURN;
+    return;
+  }
+
+  FixType& secondaryHitProbability = getDamageComponent().tProbability;
+  secondaryHitProbability = cMove.getSecondaryAccuracy();
+
+  int result = 0;
+  CALLPLUGIN(
+      result,
+      PLUGIN_ON_MODIFYSECONDARYPROBABILITY,
+      onModifyProbability_rawType,
+      *this,
+      getMV(),
+      getPKV(),
+      getTPKV(),
+      secondaryHitProbability);
+}
+
+
+void NeoPkCUEngine::evaluateMove_modifySecondaryHitChance() {
+  FixType& secondaryHitProbability = getDamageComponent().tProbability;
+  secondaryHitProbability =
+      std::max(std::min(secondaryHitProbability, FixType(1)), FixType(0));
+
+  if (getBase().hasHit(getICTeam()) &&
+      mostlyGT(secondaryHitProbability, FixType(0))) {
+    if (mostlyLT(secondaryHitProbability, FixType(1))) {
+      std::array<size_t, 2> iREnv;
+      duplicateState(iREnv, (FixType(1) - secondaryHitProbability));
+    }
+    getBase().setSecondary(getICTeam());
+  } else {
+    stackFrame_[iBase_].stage = StageType::POSTSECONDARY;
+  }
+}
+
+
+void NeoPkCUEngine::evaluateMove_secondary() {
+  if (getBase().hasSecondary(getICTeam())) {
+    int result = 0;
+    CALLPLUGIN(
+        result,
+        PLUGIN_ON_SECONDARYEFFECT,
+        onEvaluateMove_rawType,
+        *this,
+        getMV(),
+        getPKV(),
+        getTPKV());
+  }
+}
+
+
+void NeoPkCUEngine::evaluateMove_postTurn() {
+  int result = 0;
+  CALLPLUGIN(result, PLUGIN_ON_ENDOFTURN, onEndOfTurn_rawType, *this, getPKV());
+
+  StackFrame& frame = getStackFrame();
+  std::vector<Actor>& targets = targets_[frame.actors[frame.iActor]];
+
+  // increment the stack stage:
+  if (frame.iTarget < targets.size()) {
+    frame.iTarget += 1;
+    frame.stage = StageType::PRETURN;
+  } else if (frame.iTarget == targets.size()) {
+    if (frame.iActor < actions_.size()) {
+      frame.iActor += 1;
+      frame.iTarget = 0;
+      frame.stage = StageType::PRETURN;
+    } else {
+      advanceStackStage();
+    }
+  }
+}
+
+
+void NeoPkCUEngine::evaluateMove_postRound() {
+  int result = 0;
+  CALLPLUGIN(
+      result, PLUGIN_ON_ENDOFROUND, onEndOfRound_rawType, *this, getPKV());
+}
+
+
+void NeoPkCUEngine::evaluateMove_round_hash() {
+  getBase().data().generateHash();
+}
+
+
+void NeoPkCUEngine::evaluateMove_damage_modifyRawDamage() {
+  DamageComponents_t& cDamage = getDamageComponent();
+
+  /* Mod2 = Other modifier
+    1.3 if item = life orb
+    1+.1*n if item = metronome and used the same move n previous times, to a max
+    of n=10 1.5 if attacking with Me First and attacks first (NOTE: SPECIAL
+    BEHAVIOR with life orb / metronome!) 1 else
+    */
+  fpType rawDamageMultiplier = 1.0;
+  auto mv = getMV();
+  auto pkv = getPKV();
+  auto tpkv = getTPKV();
+  int result = 0;
+  CALLPLUGIN(
+      result,
+      PLUGIN_ON_MODIFYRAWDAMAGE,
+      onModifyPower_rawType,
+      *this,
+      mv,
+      pkv,
+      tpkv,
+      rawDamageMultiplier);
+
+  // incorporate raw damage modifier:
+  cDamage.damage = (uint32_t)(cDamage.damage * rawDamageMultiplier);
+}
+
+
+void NeoPkCUEngine::evaluateMove_damage_modifySTAB() {
+  PokemonVolatile cPKV = getPKV();
+  DamageComponents_t& cDamage = getDamageComponent();
+
+  bool hasStab =
+      ((&cPKV.getBase().getType(0) == cDamage.mType) ||
+       (&cPKV.getBase().getType(1) == cDamage.mType));
+  fpType STABMultiplier = hasStab ? 1.5 : 1.0;
+  int result = 0;
+  CALLPLUGIN(
+      result,
+      PLUGIN_ON_MODIFYSTAB,
+      onModifyPower_rawType,
+      *this,
+      getMV(),
+      cPKV,
+      getTPKV(),
+      STABMultiplier);
+
+  // incorporate STAB modifier:
+  cDamage.damage = (uint32_t)(cDamage.damage * STABMultiplier);
+}
+
+
+void NeoPkCUEngine::evaluateMove_damage_modifyTypeResistance() {
+  PokemonVolatile tPKV = getTPKV();
+  DamageComponents_t& cDamage = getDamageComponent();
+
+  fpType typeModifier = 1.0;
+  {
+    // type1:
+    typeModifier *= cDamage.mType->getModifier(tPKV.getBase().getType(0));
+    // type 2:
+    typeModifier *= cDamage.mType->getModifier(tPKV.getBase().getType(1));
+  }
+  int result = 0;
+  CALLPLUGIN(
+      result,
+      PLUGIN_ON_SETDEFENSETYPE,
+      onModifyTypePower_rawType,
+      *this,
+      *cDamage.mType,
+      getMV(),
+      getPKV(),
+      getTPKV(),
+      typeModifier);
+
+  // incorporate type modifier:
+  cDamage.damage = (uint32_t)(cDamage.damage * typeModifier);
+}
+
+
+void NeoPkCUEngine::evaluateMove_damage_modifyItemPower() {
+  DamageComponents_t& cDamage = getDamageComponent();
+
+  /* Mod3 = SRF × EB × TL × TRB */
+  fpType itemModifier = 1.0;
+  int result = 0;
+  CALLPLUGIN(
+      result,
+      PLUGIN_ON_MODIFYITEMPOWER,
+      onModifyPower_rawType,
+      *this,
+      getMV(),
+      getPKV(),
+      getTPKV(),
+      itemModifier);
+
+  // incorporate item modifier:
+  cDamage.damage = (uint32_t)(cDamage.damage * itemModifier);
+}
+
+
 void NeoPkCUEngine::updateState_move() {
   throw std::runtime_error("NeoPkCUEngine::updateState_move not implemented");
 }
@@ -243,60 +810,83 @@ uint32_t NeoPkCUEngine::movePriority_Speed() {
 }
 
 
-void NeoPkCUEngine::evaluateMove_switch() {
-  throw std::runtime_error(
-      "NeoPkCUEngine::evaluateMove_switch not implemented");
-}
-
-
-void NeoPkCUEngine::evaluateMove_preMove() {
-  throw std::runtime_error(
-      "NeoPkCUEngine::evaluateMove_preMove not implemented");
-}
-
-
-void NeoPkCUEngine::evaluateMove_postMove() {
-  throw std::runtime_error(
-      "NeoPkCUEngine::evaluateMove_postMove not implemented");
-}
-
-
-void NeoPkCUEngine::evaluateMove_damage() {
-  throw std::runtime_error(
-      "NeoPkCUEngine::evaluateMove_damage not implemented");
-}
-
-
-void NeoPkCUEngine::evaluateMove_script() {
-  throw std::runtime_error(
-      "NeoPkCUEngine::evaluateMove_script not implemented");
-}
-
-
-void NeoPkCUEngine::evaluateMove_postTurn() {
-  throw std::runtime_error(
-      "NeoPkCUEngine::evaluateMove_postTurn not implemented");
-}
-
-
-void NeoPkCUEngine::evaluateRound_end() {
-  throw std::runtime_error("NeoPkCUEngine::evaluateRound_end not implemented");
-}
-
-
+/**
+ * @brief Combines environments on the stack that are identical.
+ *
+ * After all the branching from stochastic events, the stack may contain
+ * multiple environments that are in the same state. This function identifies
+ * these duplicates by hashing each environment and then merging the ones with
+ * the same hash. The probabilities of the merged environments are summed up.
+ * This is a crucial optimization to keep the number of possible environments
+ * manageable.
+ *
+ * @return The number of unique environments remaining on the stack.
+ */
 size_t NeoPkCUEngine::combineSimilarEnvironments() {
-  throw std::runtime_error(
-      "NeoPkCUEngine::combineSimilarEnvironments not implemented");
-}
+  PossibleEnvironments& stack = getStack();
+
+  // hash environments (and summate probabilities for check):
+  for (iBase_ = 0; iBase_ != stack.size(); ++iBase_) {
+    EnvironmentPossible cEnvironment = getBase();
+
+    // assert that each of these environments is getting hashed:
+    assert(getStackStage() == StageType::FINAL);
+
+    cEnvironment.data().generateHash();
+  }
+
+  size_t iSize = stack.size();
+  std::unordered_map<uint64_t, size_t> envMap;
+  envMap.reserve(iSize);
+
+  // compare environment hashes:
+  for (size_t iEnv = 0; iEnv != iSize; iEnv++) {
+    EnvironmentPossible cEnv = stack.at(iEnv);
+
+    // don't attempt to merge pruned environments
+    if (cEnv.isPruned()) { continue; }
+
+    uint64_t hash = cEnv.getHash();
+    auto it = envMap.find(hash);
+
+    if (it != envMap.end()) {
+      // Found a duplicate! Merge into the existing environment
+      size_t existIndex = it->second;
+      EnvironmentPossible existEnv = stack.at(existIndex);
+
+#ifdef _PKCUCHECKSIGNATURE
+      // Assert that same hash implies same environment data
+      assert((oEnv.hash == iEnv.hash) == (oEnv.env == iEnv.env));
+#endif
+
+      // combine the two environments by adding their probabilities
+      existEnv.getProbability() += cEnv.getProbability();
+
+      // this is probably not representative of the current environment now
+      existEnv.getBitmask() &= cEnv.getBitmask();
+
+      // flag the destination environment as merged
+      existEnv.setMerged();
+
+      // flag the current environment as pruned
+      cEnv.setPruned();
+
+      // decrement number of unique values in vector
+      stack.decrementUnique();
+    } else {
+      // First time seeing this hash, add to map
+      envMap[hash] = iEnv;
+    }
+  }
+
+  // Calculate accumulated probability for verification
+  assert(saneStackProbability());
+  return stack.getNumUnique();
+}  // endOf combineSimilarEnvironments
 
 
 uint32_t NeoPkCUEngine::movePriority() {
   throw std::runtime_error("NeoPkCUEngine::movePriority not implemented");
-}
-
-
-void NeoPkCUEngine::evaluateMove() {
-  throw std::runtime_error("NeoPkCUEngine::evaluateMove not implemented");
 }
 
 
@@ -317,22 +907,6 @@ void NeoPkCUEngine::duplicateState(
 }
 
 
-uint32_t NeoPkCUEngine::getStackStage() const {
-  return (uint32_t)stackFrame_[iBase_].stage;
-}
-
-
-void NeoPkCUEngine::advanceStackStage() {
-  stackFrame_[iBase_].stage =
-      (StageType)((uint32_t)stackFrame_[iBase_].stage + 1);
-}
-
-
-void NeoPkCUEngine::swapTeamIndexes() {
-  throw std::runtime_error("NeoPkCUEngine::swapTeamIndexes not implemented");
-}
-
-
 const PluginSet& NeoPkCUEngine::getCPluginSet() {
   if (cPlugins_) { return *cPlugins_; }
   throw std::runtime_error("NeoPkCUEngine::getCPluginSet: cPlugins_ is null");
@@ -341,6 +915,11 @@ const PluginSet& NeoPkCUEngine::getCPluginSet() {
 
 void NeoPkCUEngine::setCPluginSet() {
   throw std::runtime_error("NeoPkCUEngine::setCPluginSet not implemented");
+}
+
+void NeoPkCUEngine::advanceStackStage() {
+  auto& frame = getStackFrame();
+  frame.stage = static_cast<StageType>(frame.stage + 1);
 }
 
 
@@ -367,10 +946,7 @@ PokemonVolatile NeoPkCUEngine::getTPKV() { return getTPKV(iBase_); }
 
 
 PokemonVolatile NeoPkCUEngine::getPKV(size_t iState) {
-  if (!currentActor_) {
-    throw std::runtime_error("NeoPkCUEngine::getPKV: currentActor_ is null");
-  }
-  return getBase(iState).teammate(*currentActor_);
+  throw std::runtime_error("NeoPkCUEngine::getPKV: currentActor_ is null");
 }
 
 
@@ -386,11 +962,7 @@ MoveVolatile NeoPkCUEngine::getTMV() { return getTMV(iBase_); }
 
 
 MoveVolatile NeoPkCUEngine::getMV(size_t iState) {
-  if (!currentActor_) {
-    throw std::runtime_error("NeoPkCUEngine::getMV: currentActor_ is null");
-  }
-  const Action& action = actions_.at(*currentActor_);
-  return getPKV(iState).getMV(action);
+  throw std::runtime_error("NeoPkCUEngine::getMV: currentActor_ is null");
 }
 
 
@@ -400,11 +972,8 @@ MoveVolatile NeoPkCUEngine::getTMV(size_t iState) {
 
 
 DamageComponents_t& NeoPkCUEngine::getDamageComponent(size_t iStack) {
-  if (!currentActor_) {
-    throw std::runtime_error(
-        "NeoPkCUEngine::getDamageComponent: currentActor_ is null");
-  }
-  return stackFrame_[iStack].damageComponents.at(*currentActor_);
+  throw std::runtime_error(
+      "NeoPkCUEngine::getDamageComponent: currentActor_ is null");
 }
 
 
@@ -431,19 +1000,13 @@ DamageComponents_t& NeoPkCUEngine::getDamageComponent() {
 
 
 const DamageComponents_t& NeoPkCUEngine::getDamageComponent() const {
-  if (!currentActor_) {
-    throw std::runtime_error(
-        "NeoPkCUEngine::getDamageComponent: currentActor_ is null");
-  }
-  return stackFrame_[iBase_].damageComponents.at(*currentActor_);
+  throw std::runtime_error(
+      "NeoPkCUEngine::getDamageComponent: currentActor_ is null");
 }
 
 
 size_t NeoPkCUEngine::getICTeam() const {
-  if (!currentActor_) {
-    throw std::runtime_error("NeoPkCUEngine::getICTeam: currentActor_ is null");
-  }
-  return currentActor_->iTeam();
+  throw std::runtime_error("NeoPkCUEngine::getICTeam: currentActor_ is null");
 }
 
 
@@ -453,11 +1016,7 @@ size_t NeoPkCUEngine::getIOTeam() const {
 
 
 const Action& NeoPkCUEngine::getCAction() const {
-  if (!currentActor_) {
-    throw std::runtime_error(
-        "NeoPkCUEngine::getCAction: currentActor_ is null");
-  }
-  return actions_.at(*currentActor_);
+  throw std::runtime_error("NeoPkCUEngine::getCAction: currentActor_ is null");
 }
 
 

@@ -18,19 +18,23 @@ class Type;
  * based on game mechanics.
  * @{
  */
+// clang-format off
 #define VALID_MOVE_SELF_ALIVE 0        /**< The user is alive. */
 #define VALID_MOVE_TARGET_ALIVE 1      /**< The target is alive. */
 #define VALID_MOVE_HAS_PP 2            /**< The move has remaining PP. */
 #define VALID_MOVE_FRIENDLY_ALIVE 3    /**< A friendly target is alive. */
 #define VALID_MOVE_FRIENDLY_IS_OTHER 4 /**< A friendly target is not the user. */
 #define VALID_MOVE_SCRIPT 5            /**< The move is not locked by a script. */
-#define VALID_MOVE_SIZE 6              /**< The total number of move validity flags. */
+#define VALID_MOVE_ACTOR_ACTIVE 6      /**< The user is currently active on the field. */
+#define VALID_MOVE_SIZE 7              /**< The total number of move validity flags. */
 
 #define VALID_SWAP_FRIENDLY_ALIVE 0    /**< The Pokemon to switch to is alive. */
 #define VALID_SWAP_FRIENDLY_IS_OTHER 1 /**< The Pokemon to switch to is not the active Pokemon. */
 #define VALID_SWAP_MUST_WAIT 2         /**< A switch is allowed (not during an opponent's free move). */
 #define VALID_SWAP_SCRIPT 3            /**< The switch is not locked by a script. */
-#define VALID_SWAP_SIZE 4              /**< The total number of swap validity flags. */
+#define VALID_SWAP_TARGET_INACTIVE 4   /**< The switch target is currently not active on the field */
+#define VALID_SWAP_SIZE 5              /**< The total number of swap validity flags. */
+// clang-format on
 /** @} */
 
 /**
@@ -48,6 +52,7 @@ struct IsValidResult {
    */
   enum InvalidActionReason {
     VALID,
+    MOVE_ACTOR_NOT_ACTIVE,
     MOVE_INVALID,
     MOVE_TARGET_DEAD,
     MOVE_SELF_DEAD,
@@ -57,13 +62,15 @@ struct IsValidResult {
     MOVE_LOCKED_BY_SCRIPT,
     SWITCH_INVALID_POKEMON,
     SWITCH_TO_SELF,
+    SWITCH_ACTIVE_POKEMON,
     SWITCH_POKEMON_DEAD,
     SWITCH_MUST_WAIT,
     SWITCH_LOCKED_BY_SCRIPT,
     WAIT_NOT_ALLOWED,
     STRUGGLE_NOT_ALLOWED,
-    ACTION_TYPE_DISABLED,         /**< The action type is disabled (e.g., using an item). */
-    INVALID_FRIENDLY_TARGET,      /**< The target for a friendly move is invalid. */
+    ACTION_TYPE_DISABLED,    /**< The action type is disabled (e.g., using an
+                                item). */
+    INVALID_FRIENDLY_TARGET, /**< The target for a friendly move is invalid. */
   };
 
   InvalidActionReason reason;  /**< The reason for the invalid action. */
@@ -88,7 +95,9 @@ struct IsValidResult {
  */
 static const char* invalidActionReasonToString(IsValidResult result) {
   switch (result.reason) {
+    // clang-format off
     case IsValidResult::VALID: return "Valid action";
+    case IsValidResult::MOVE_ACTOR_NOT_ACTIVE: return "Actor is currently not in play";
     case IsValidResult::MOVE_INVALID: return "Move index out of bounds";
     case IsValidResult::MOVE_TARGET_DEAD: return "Target is dead";
     case IsValidResult::MOVE_SELF_DEAD: return "Current pokemon is dead";
@@ -98,6 +107,7 @@ static const char* invalidActionReasonToString(IsValidResult result) {
     case IsValidResult::MOVE_LOCKED_BY_SCRIPT: return "Move locked by script";
     case IsValidResult::SWITCH_INVALID_POKEMON: return "Teammate index is out of bounds";
     case IsValidResult::SWITCH_TO_SELF: return "Cannot switch to self";
+    case IsValidResult::SWITCH_ACTIVE_POKEMON: return "Cannot switch to an already active teammate";
     case IsValidResult::SWITCH_POKEMON_DEAD: return "Cannot switch to a dead pokemon";
     case IsValidResult::SWITCH_MUST_WAIT: return "Must wait for opponent's free move";
     case IsValidResult::SWITCH_LOCKED_BY_SCRIPT: return "Switch locked by script";
@@ -106,6 +116,7 @@ static const char* invalidActionReasonToString(IsValidResult result) {
     case IsValidResult::ACTION_TYPE_DISABLED: return "Action type disabled";
     case IsValidResult::INVALID_FRIENDLY_TARGET: return "Invalid friendly target";
     default: return "Unknown invalid action reason";
+      // clang-format on
   }
 }
 
@@ -180,10 +191,54 @@ enum StageType : int {
   POSTTURN = 27,           /**< After a Pokemon has completed its turn. */
   // post round status
   POSTROUND = 28,          /**< After both Pokemon have completed their turns. */
-  FINAL = 29,              /**< The final stage of the round. */
-  HASH = 30                /**< The resulting environment is being hashed. */
+  HASH = 29,                /**< The resulting environment is being hashed. */
+  FINAL = 30,              /**< The final stage of the round. */
 };
+
+/**
+ * @brief Converts a StageType to a human-readable string.
+ * @param stage The StageType to convert.
+ * @return A C-string representing the name of the stage.
+ */
+static const char* stageTypeToString(StageType stage) {
+  switch (stage) {
+    case StageType::DNE: return "DNE";
+    case StageType::SEEDED: return "SEEDED";
+    case StageType::PRETURN: return "PRETURN";
+    case StageType::PRESWITCH: return "PRESWITCH";
+    case StageType::POSTSWITCH: return "POSTSWITCH";
+    case StageType::STATUS: return "STATUS";
+    case StageType::MOVEBASE: return "MOVEBASE";
+    case StageType::MODIFYHITCHANCE: return "MODIFYHITCHANCE";
+    case StageType::EVALUATEHITCHANCE: return "EVALUATEHITCHANCE";
+    case StageType::MODIFYCRITCHANCE: return "MODIFYCRITCHANCE";
+    case StageType::EVALUATECRITCHANCE: return "EVALUATECRITCHANCE";
+    case StageType::SETBASEPOWER: return "SETBASEPOWER";
+    case StageType::SETMOVETYPE: return "SETMOVETYPE";
+    case StageType::MODIFYBASEPOWER: return "MODIFYBASEPOWER";
+    case StageType::MODIFYATTACKPOWER: return "MODIFYATTACKPOWER";
+    case StageType::MODIFYCRITICALPOWER: return "MODIFYCRITICALPOWER";
+    case StageType::MODIFYRAWDAMAGE: return "MODIFYRAWDAMAGE";
+    case StageType::MODIFYSTAB: return "MODIFYSTAB";
+    case StageType::MODIFYTYPERESISTANCE: return "MODIFYTYPERESISTANCE";
+    case StageType::MODIFYITEMPOWER: return "MODIFYITEMPOWER";
+    case StageType::PREDAMAGE: return "PREDAMAGE";
+    case StageType::POSTDAMAGE: return "POSTDAMAGE";
+    case StageType::POSTMOVE: return "POSTMOVE";
+    case StageType::PRESECONDARY: return "PRESECONDARY";
+    case StageType::MODIFYSECONDARYHITCHANCE: return "MODIFYSECONDARYHITCHANCE";
+    case StageType::SECONDARY: return "SECONDARY";
+    case StageType::POSTSECONDARY: return "POSTSECONDARY";
+    case StageType::POSTTURN: return "POSTTURN";
+    case StageType::POSTROUND: return "POSTROUND";
+    case StageType::HASH: return "HASH";
+    case StageType::FINAL: return "FINAL";
+    default: return "UNKNOWN";
+  }
+}
+
 /** @} */
+
 // clang-format on
 
 using PluginSet = std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>;

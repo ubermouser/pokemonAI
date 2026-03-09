@@ -3,6 +3,8 @@
 #include <stdexcept>
 
 #include "pokemonai/environment_volatile.h"
+#include "pokemonai/neo_pkCU_engine.h"
+#include "pokemonai/pkCU_types.h"
 #include "pokemonai/pluggable_types.h"
 
 
@@ -91,13 +93,14 @@ void NeoPkCU::guardCorrectActionCount(
 
 void NeoPkCU::guardInvalidActions(
     const ConstEnvironmentVolatile& cEnv, const ActionMap& actions) const {
+  if (cfg_.allowInvalidMoves) { return; }
   for (auto& action : actions) {
-    auto reason = isValidAction(cEnv, action.second, action.first);
+    auto reason = isValidAction(cEnv, action.first, action.second);
     if (!reason) {
       throw std::invalid_argument(fmt::format(
           "Invalid Action {} for {} : {}",
-          action.first,
-          action.second,
+          fmt::streamed(action.second),
+          fmt::streamed(action.first),
           invalidActionReasonToString(reason)));
     }
   }
@@ -143,12 +146,26 @@ PossibleEnvironments NeoPkCU::updateState(
 
 
 PossibleEnvironments NeoPkCU::updateState(
+    const ConstEnvironmentVolatile& cEnv,
+    const ActionMap& actionsA,
+    const ActionMap& actionsB) const {
+  ActionMap actions;
+  actions.insert(actionsA.begin(), actionsA.end());
+  actions.insert(actionsB.begin(), actionsB.end());
+  return updateState(cEnv, actions);
+}
+
+
+PossibleEnvironments NeoPkCU::updateState(
     const ConstEnvironmentVolatile& cEnv, const ActionMap& actions) const {
   guardNonvolatileState(cEnv);
   guardCorrectActionCount(cEnv, actions);
   guardInvalidActions(cEnv, actions);
 
-  throw std::runtime_error("NeoPkCU::updateState not implemented");
+  NeoPkCUEngine engine(*this, cEnv.data(), actions);
+  PossibleEnvironments result = engine.updateState();
+
+  return std::move(result);
 }
 
 
@@ -190,7 +207,8 @@ IsValidResult NeoPkCU::isValidAction(const ConstEnvironmentPossible& envV, const
 
 IsValidResult NeoPkCU::isValidAction(
     const ConstEnvironmentVolatile& envV,
-    const Actor& actor const Action& action) const {
+    const Actor& actor,
+    const Action& action) const {
   guardNonvolatileState(envV);
   ConstTeamVolatile cTV = envV.getTeam(actor.iTeam());
   ConstTeamVolatile oTV = envV.getOtherTeam(actor.iTeam());
@@ -216,6 +234,9 @@ IsValidResult NeoPkCU::isValidAction(
 
     // is the pokemon we're currently using alive?
     doAllowMove[VALID_MOVE_SELF_ALIVE] = cPKV.isAlive();
+
+    // is the pokemon we're currently using on the field?
+    doAllowMove[VALID_MOVE_ACTOR_ACTIVE] = cPKV.isActive();
 
     // does the move we're using have any PP left?
     ConstMoveVolatile cMV = cPKV.getMV(action);
@@ -251,6 +272,9 @@ IsValidResult NeoPkCU::isValidAction(
     if (!doAllowMove[VALID_MOVE_SELF_ALIVE]) {
       return IsValidResult::MOVE_SELF_DEAD;
     }
+    if (!doAllowMove[VALID_MOVE_ACTOR_ACTIVE]) {
+      return IsValidResult::MOVE_ACTOR_NOT_ACTIVE;
+    }
     if (!doAllowMove[VALID_MOVE_HAS_PP]) { return IsValidResult::MOVE_NO_PP; }
     if (cMV.getBase().targetsAlly()) {
       if (!doAllowMove[VALID_MOVE_FRIENDLY_ALIVE]) {
@@ -283,6 +307,9 @@ IsValidResult NeoPkCU::isValidAction(
     ConstPokemonVolatile fPKV = cTV.teammate(action.iFriendly());
     doAllowSwitch[VALID_SWAP_FRIENDLY_ALIVE] = fPKV.isAlive();
 
+    // is the pokemon we're switching to already on the field?
+    doAllowSwitch[VALID_SWAP_TARGET_INACTIVE] = !fPKV.isActive();
+
     // are we trying to move during the other team's free move?
     doAllowSwitch[VALID_SWAP_MUST_WAIT] = tPKV.isAlive() || !cPKV.isAlive();
 
@@ -294,6 +321,9 @@ IsValidResult NeoPkCU::isValidAction(
 
     if (!doAllowSwitch[VALID_SWAP_FRIENDLY_IS_OTHER]) {
       return IsValidResult::SWITCH_TO_SELF;
+    }
+    if (!doAllowSwitch[VALID_SWAP_TARGET_INACTIVE]) {
+      return IsValidResult::SWITCH_ACTIVE_POKEMON;
     }
     if (!doAllowSwitch[VALID_SWAP_FRIENDLY_ALIVE]) {
       return IsValidResult::SWITCH_POKEMON_DEAD;
@@ -329,12 +359,12 @@ IsValidResult NeoPkCU::isValidAction(
         for (size_t iFriendly = 0, numTeammates = cTV.nv().getNumTeammates();
              iFriendly != numTeammates;
              ++iFriendly) {
-          if (isValidAction(envV, Action::moveAlly(iMove, iFriendly), actor)) {
+          if (isValidAction(envV, actor, Action::moveAlly(iMove, iFriendly))) {
             return IsValidResult::STRUGGLE_NOT_ALLOWED;
           }
         }
       } else {
-        if (isValidAction(envV, Action::move(iMove), actor)) {
+        if (isValidAction(envV, actor, Action::move(iMove))) {
           return IsValidResult::STRUGGLE_NOT_ALLOWED;
         }
       }
@@ -349,20 +379,36 @@ IsValidResult NeoPkCU::isValidAction(
 
 
 bool NeoPkCU::isGameOver(const ConstEnvironmentPossible& envV) const {
-    return false;
+  return isGameOver(envV.getEnv());
 }
 
 
 bool NeoPkCU::isGameOver(const ConstEnvironmentVolatile& envV) const {
-    return false;
+  return getGameState(envV) != MATCH_MIDGAME;
 }
 
 
 MatchState NeoPkCU::getGameState(const ConstEnvironmentVolatile& envV) const {
+  guardNonvolatileState(envV);
+  bool teamAisDead = !envV.getTeam(TEAM_A).isAlive();
+  bool teamBisDead = !envV.getTeam(TEAM_B).isAlive();
+  int status = (teamAisDead * 1) + (teamBisDead * 2);
+
+  switch (status) {
+  case 0:  // game isn't over, neither team dead
     return MATCH_MIDGAME;
+  case 1:  // game is over, team A is dead
+    return MATCH_TEAM_B_WINS;
+  case 2:  // game is over, team B is dead
+    return MATCH_TEAM_A_WINS;
+  default:
+    assert(false && "isGameOver returned an unacceptable terminal game value!");
+  case 3:  // game is over, tie
+    return MATCH_TIE;
+  };
 }
 
 
 MatchState NeoPkCU::getGameState(const ConstEnvironmentPossible& envV) const {
-    return getGameState(envV.getEnv());
+  return getGameState(envV.getEnv());
 }
