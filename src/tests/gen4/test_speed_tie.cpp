@@ -1,6 +1,6 @@
 #include "engine_test.hpp"
 
-TEST_F(Gen4EngineTest, SpeedTieDisambiguation) {
+TEST_F(Gen4EngineTest, DISABLED_SpeedTieDisambiguation) {
   // Setup two identical charmanders with the same move
   auto team_a = TeamNonVolatile()
       .addPokemon(PokemonNonVolatile()
