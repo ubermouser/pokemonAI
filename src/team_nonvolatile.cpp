@@ -10,6 +10,7 @@
 
 #include "pokemonai/init_toolbox.h"
 #include "pokemonai/orphan.h"
+#include "pokemonai/pokedex.h"
 #include "pokemonai/pokemon_base.h"
 #include "pokemonai/team_volatile.h"
 
@@ -42,7 +43,13 @@ const PokemonNonVolatile& TeamNonVolatile::getPKNV(const TeamVolatile& source) c
 
 
 TeamNonVolatile& TeamNonVolatile::addPokemon(const PokemonNonVolatile& cPokemon) {
-  if (!isLegalAdd(cPokemon)) { throw std::invalid_argument("TeamNonVolatile illegal pokemon"); }
+  if (!isLegalAdd(cPokemon)) {
+    if (pkdex->allowInvalidTeams()) {
+      SPDLOG_WARN("Ignoring illegal team addition for {}", cPokemon.getName());
+    } else {
+      throw std::invalid_argument("TeamNonVolatile illegal pokemon");
+    }
+  }
 
   teammates_.push_back(cPokemon);
   return *this;
@@ -51,7 +58,11 @@ TeamNonVolatile& TeamNonVolatile::addPokemon(const PokemonNonVolatile& cPokemon)
 
 TeamNonVolatile& TeamNonVolatile::setPokemon(size_t iPokemon, const PokemonNonVolatile& swappedPokemon) {
   if (isLegalSet(iPokemon, swappedPokemon)) {
-    throw std::invalid_argument("TeamNonVolatile illegal pokemon");
+    if (pkdex->allowInvalidTeams()) {
+      SPDLOG_WARN("Ignoring illegal team set for {}", swappedPokemon.getName());
+    } else {
+      throw std::invalid_argument("TeamNonVolatile illegal pokemon");
+    }
   }
 
   teammate(iPokemon) = swappedPokemon;

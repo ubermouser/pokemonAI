@@ -116,3 +116,33 @@ class PokedexGen1DynamicTest : public PokedexGen1Test {
 
 
 TEST_F(PokedexGen1DynamicTest, LoadsItems) { validateCounts(*pokedex); }
+
+
+TEST_F(PokedexGen4DynamicTest, AllowsInvalidMovesAndAbilities) {
+  pokedex->setAllowInvalidPokemon(true);
+  PokemonNonVolatile pkmn;
+  pkmn.setBase(pokedex->pokemon("bulbasaur"));
+
+  // Bulbasaur cannot normally learn "Absorb"
+  EXPECT_NO_THROW(pkmn.addMove(pokedex->move("absorb")));
+
+  // Bulbasaur cannot normally have "Blaze"
+  EXPECT_NO_THROW(pkmn.setAbility(pokedex->ability("blaze")));
+}
+
+
+TEST_F(PokedexGen4DynamicTest, AllowsInvalidTeams) {
+  pokedex->setAllowInvalidTeams(true);
+  TeamNonVolatile team;
+  PokemonNonVolatile pkmn1;
+  pkmn1.setBase(pokedex->pokemon("bulbasaur"));
+  pkmn1.setLevel(100);
+
+  PokemonNonVolatile pkmn2;
+  pkmn2.setBase(pokedex->pokemon("bulbasaur"));
+  pkmn2.setLevel(100);
+
+  EXPECT_NO_THROW(team.addPokemon(pkmn1));
+  EXPECT_NO_THROW(team.addPokemon(pkmn2));
+  EXPECT_EQ(team.getNumTeammates(), 2);
+}

@@ -44,6 +44,9 @@ public:
     // location of pokemon movelists
     std::string movelistsPath_ = "movelist.csv";
 
+    bool allowInvalidPokemon_ = false;
+    bool allowInvalidTeams_ = false;
+
     Config(){};
 
     virtual boost::program_options::options_description options(
@@ -83,6 +86,18 @@ public:
   virtual const Ability& ability(const std::string& name) const override;
   virtual const Nature& nature(const std::string& name) const override;
   virtual const Item& item(const std::string& name) const override;
+
+  virtual bool allowInvalidPokemon() const override {
+    return config_.allowInvalidPokemon_;
+  }
+  virtual bool allowInvalidTeams() const override { return config_.allowInvalidTeams_; }
+
+  virtual void setAllowInvalidPokemon(bool allow) override {
+    config_.allowInvalidPokemon_ = allow;
+  }
+  virtual void setAllowInvalidTeams(bool allow) override {
+    config_.allowInvalidTeams_ = allow;
+  }
 
   virtual bool initialize();
   virtual bool inputPlugins(); // input scripts for registered moves
