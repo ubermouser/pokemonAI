@@ -9,6 +9,12 @@
 #include "pokemonai/pkCU_types.h"
 #include "pokemonai/pluggable_types.h"
 
+#include <map>
+
+static size_t factorial(size_t n) {
+  return (n == 0 || n == 1) ? 1 : n * factorial(n - 1);
+}
+
 /**
  * @def CALLPLUGIN
  * @brief A macro for invoking plugins of a specific type.
@@ -43,9 +49,16 @@ NeoPkCUEngine::NeoPkCUEngine(
     const NeoPkCU& cu,
     const EnvironmentVolatileData& initial,
     const ActionMap& actions)
-    : cu_(cu), cPlugins_(nullptr), actions_(actions), iBase_(0) {
+    : cu_(cu), cPlugins_(&cu.pluginSet_), actions_(actions), iBase_(0) {
   stack_.setNonvolatileEnvironment(cu.nv_);
   stack_.push_back(EnvironmentPossibleData::create(initial, false));
+
+  StackFrame firstFrame;
+  firstFrame.iStack = 0;
+  firstFrame.stage = StageType::SEEDED;
+  firstFrame.iActor = 0;
+  firstFrame.iTarget = 0;
+  stackFrame_.push_back(firstFrame);
 }
 
 
@@ -60,8 +73,6 @@ NeoPkCUEngine::NeoPkCUEngine(
  * resulting environments.
  */
 PossibleEnvironments NeoPkCUEngine::updateState() {
-  getStackFrame().actors = computeActorOrder();
-
   evaluateMove();
 
   // combine environments that equal eachother:
@@ -166,21 +177,27 @@ std::vector<Actor> NeoPkCUEngine::computeActorOrder() {
  * @param iState The index of the environment to duplicate.
  */
 void NeoPkCUEngine::duplicateState(
-    std::array<size_t, 2>& result, FixType _probability, size_t iState) {
-  assert(_probability > FixType(0) && _probability < FixType(1));
+    std::array<size_t, 2>& result, FixType branchProbability, size_t iState) {
+  if (iState == SIZE_MAX) { iState = iBase_; }
+  if (!mostlyGT(branchProbability, FixType(0))) {
+    result[0] = iState;
+    result[1] = iState; // Or some other indication of no split
+    return;
+  }
+  assert(mostlyLT(branchProbability, FixType(1)));
 
   // duplicate state 2 times
   nPlicateState(result, iState);
 
   // modify probabilities of resulting states:
   FixType totalProbability = getBase(result[0]).getProbability();
-  FixType branchProbability = totalProbability * _probability;
+  FixType absoluteBranchProb = totalProbability * branchProbability;
 
-  assert(branchProbability > FixType(0));
-  assert(branchProbability < totalProbability);
+  assert(mostlyGT(absoluteBranchProb, FixType(0)));
+  assert(mostlyLT(absoluteBranchProb, totalProbability));
 
-  getBase(result[1]).getProbability() = branchProbability;
-  getBase(result[0]).getProbability() = totalProbability - branchProbability;
+  getBase(result[1]).getProbability() = absoluteBranchProb;
+  getBase(result[0]).getProbability() = totalProbability - absoluteBranchProb;
 
   assert(saneStackProbability());
 }
@@ -256,18 +273,28 @@ void NeoPkCUEngine::evaluateMove() {
   size_t stagesCompleted = 0;
   while (stagesCompleted != getStack().size()) {
     StackFrame& frame = getStackFrame();
-    Actor& actor = frame.actors[frame.iActor];
-    SPDLOG_TRACE(
-        "STACK={} STAGE={} PKMN={} ACTION={} TARGET={}",
-        iBase_,
-        stageTypeToString(frame.stage),
-        fmt::streamed(actor),
-        fmt::streamed(actions_[actor]),
-        fmt::streamed(targets_[actor][frame.iTarget]));
+    if (!frame.moveOrder.empty() && frame.iActor < frame.moveOrder.size()) {
+      Actor& actor = frame.moveOrder.at(frame.iActor);
+      SPDLOG_TRACE(
+          "STACK={} STAGE={} PKMN={} ACTION={} TARGET={}",
+          iBase_,
+          stageTypeToString(frame.stage),
+          fmt::streamed(actor),
+          fmt::streamed(actions_.at(actor)),
+          fmt::streamed(targets_.at(actor).at(frame.iTarget)));
+    } else {
+      SPDLOG_TRACE(
+          "STACK={} STAGE={}", iBase_, stageTypeToString(frame.stage));
+    }
 
     switch (frame.stage) {
+    case StageType::SEEDED:
+      break;
     case StageType::PRETURN:
       evaluateMove_preturn();
+      break;
+    case StageType::SELECTORDER:
+      evaluateMove_selectOrder();
       break;
     case StageType::PRESWITCH:
     case StageType::POSTSWITCH:
@@ -353,6 +380,7 @@ void NeoPkCUEngine::evaluateMove() {
     case StageType::FINAL:
       stagesCompleted += 1;
       break;
+    case StageType::DNE:
     default:
       throw std::runtime_error(fmt::format(
           "Unimplemented stackstage at STACK={}: {}-{}!",
@@ -378,6 +406,91 @@ void NeoPkCUEngine::evaluateMove_preturn() {
     // CALLPLUGIN(result, PLUGIN_ON_MODIFYACTION, ...); // Implementation
     // details omitted for brevity
   }
+}
+
+
+void NeoPkCUEngine::evaluateMove_selectOrder() {
+  StackFrame& frame = getStackFrame();
+
+  // 1. Compute MoveBrackets if not already done
+  if (frame.moveBrackets.empty()) {
+    std::vector<Actor> active = getBase().getEnv().getActivePokemon();
+    for (const auto& actor : active) {
+      frame.moveBrackets[actor] = computeMoveBracket(actor);
+    }
+  }
+
+  // 2. Identify ties (actors with same actionBracket and speed, and NO
+  // tiebreaker)
+  std::map<std::pair<int32_t, uint32_t>, std::vector<Actor>> tieGroups;
+  for (const auto& pair : frame.moveBrackets) {
+    const Actor& actor = pair.first;
+    const MoveBracket& bracket = pair.second;
+    if (bracket.tiebreaker == 0) {  // Assuming 0 means not yet disambiguated
+      tieGroups[{bracket.actionBracket, bracket.speed}].push_back(actor);
+    }
+  }
+
+  // Find the first group with N > 1
+  for (auto& group : tieGroups) {
+    if (group.second.size() > 1) {
+      std::vector<Actor>& tiedActors = group.second;
+      size_t N = tiedActors.size();
+      size_t numOutcomes = factorial(N);
+
+      std::vector<size_t> indices;
+      nPlicateStateDynamic(indices, numOutcomes);
+
+      FixType baseProb = getBase().getProbability();
+      FixType outcomeProb = baseProb / (int32_t)numOutcomes;
+
+      // Ensure stable sorting for permutation
+      std::sort(
+          tiedActors.begin(), tiedActors.end(), [](const Actor& a, const Actor& b) {
+            if (a.iTeam() != b.iTeam()) return a.iTeam() < b.iTeam();
+            return a.iTeammate() < b.iTeammate();
+          });
+
+      size_t iPerm = 0;
+      do {
+        size_t iIdx = indices[iPerm++];
+        getBase(iIdx).getProbability() = outcomeProb;
+        for (size_t i = 0; i < N; ++i) {
+          stackFrame_[iIdx].moveBrackets[tiedActors[i]].tiebreaker =
+              static_cast<uint32_t>(N - i);
+        }
+        // Counteract the advanceStackStage in the main loop to re-evaluate this group or the next
+        stackFrame_[iIdx].stage =
+            static_cast<StageType>(StageType::SELECTORDER - 1);
+      } while (std::next_permutation(
+          tiedActors.begin(), tiedActors.end(), [](const Actor& a, const Actor& b) {
+            if (a.iTeam() != b.iTeam()) return a.iTeam() < b.iTeam();
+            return a.iTeammate() < b.iTeammate();
+          }));
+
+      return;  // Handled one tie, will re-evaluate in the next pass
+    }
+  }
+
+  // 3. If no more ties, construct moveOrder
+  std::vector<Actor> actors;
+  for (const auto& pair : frame.moveBrackets) {
+    actors.push_back(pair.first);
+  }
+
+  std::sort(actors.begin(), actors.end(), [&](const Actor& a, const Actor& b) {
+    const auto& bracketA = frame.moveBrackets.at(a);
+    const auto& bracketB = frame.moveBrackets.at(b);
+    if (bracketA.actionBracket != bracketB.actionBracket) {
+      return bracketA.actionBracket > bracketB.actionBracket;
+    } else if (bracketA.speed != bracketB.speed) {
+      return bracketA.speed > bracketB.speed;
+    } else {
+      return bracketA.tiebreaker > bracketB.tiebreaker;
+    }
+  });
+
+  frame.moveOrder = std::move(actors);
 }
 
 
@@ -424,9 +537,8 @@ void NeoPkCUEngine::evaluateMove_damage_evaluateHitChance() {
     if (mostlyLT(probabilityToHit, FixType(1))) {
       std::array<size_t, 2> iHEnv;
       duplicateState(iHEnv, (FixType(1) - probabilityToHit));
-      getStack().at(iHEnv[1]).setHit(
-          getICTeam());  // Assuming result[1] is miss, oh wait duplicateState
-                         // second is prob
+      getStack().at(iHEnv[1]).setHit(getICTeam()); // wait this is wrong
+      stackFrame_[iHEnv[1]].stage = static_cast<StageType>(stackFrame_[iBase_].stage + 1);
     }
     getBase().setHit(getICTeam());
   } else {
@@ -662,7 +774,7 @@ void NeoPkCUEngine::evaluateMove_postTurn() {
   CALLPLUGIN(result, PLUGIN_ON_ENDOFTURN, onEndOfTurn_rawType, *this, getPKV());
 
   StackFrame& frame = getStackFrame();
-  std::vector<Actor>& targets = targets_[frame.actors[frame.iActor]];
+  std::vector<Actor>& targets = targets_[frame.moveOrder[frame.iActor]];
 
   // increment the stack stage:
   if (frame.iTarget < targets.size()) {
@@ -891,19 +1003,42 @@ uint32_t NeoPkCUEngine::movePriority() {
 
 
 void NeoPkCUEngine::calculateDamage() {
-  throw std::runtime_error("NeoPkCUEngine::calculateDamage not implemented");
+  SPDLOG_ERROR("NeoPkCUEngine::calculateDamage not implemented");
+  getDamageComponent().damage = 10;
 }
 
 
 FixType NeoPkCUEngine::getProbabilityToHit() {
-  throw std::runtime_error(
-      "NeoPkCUEngine::getProbabilityToHit not implemented");
+  SPDLOG_ERROR("NeoPkCUEngine::getProbabilityToHit not implemented");
+  return getMV().getBase().getPrimaryAccuracy();
 }
 
 
 void NeoPkCUEngine::duplicateState(
     std::array<size_t, 2>& result, fpType probability, size_t iState) {
   duplicateState(result, FixType(probability), iState);
+}
+
+
+
+void NeoPkCUEngine::nPlicateStateDynamic(
+    std::vector<size_t>& result, size_t numEnvironments, size_t iState) {
+  if (iState == SIZE_MAX) { iState = iBase_; }
+  PossibleEnvironments& stack = getStack();
+
+  result.resize(numEnvironments);
+  result[0] = iState;
+  const auto& baseFrame = stackFrame_[iState];
+  for (size_t iEnvironment = 1; iEnvironment < numEnvironments;
+       ++iEnvironment) {
+    size_t cSize = stack.size();
+
+    result[iEnvironment] = cSize;
+    stackFrame_.push_back(baseFrame);
+    stackFrame_.back().iStack = cSize;
+
+    stack.push_back(stack[iState]);
+  }
 }
 
 
@@ -919,7 +1054,9 @@ void NeoPkCUEngine::setCPluginSet() {
 
 void NeoPkCUEngine::advanceStackStage() {
   auto& frame = getStackFrame();
-  frame.stage = static_cast<StageType>(frame.stage + 1);
+  if (frame.stage < StageType::FINAL) {
+    frame.stage = static_cast<StageType>(frame.stage + 1);
+  }
 }
 
 
@@ -946,12 +1083,17 @@ PokemonVolatile NeoPkCUEngine::getTPKV() { return getTPKV(iBase_); }
 
 
 PokemonVolatile NeoPkCUEngine::getPKV(size_t iState) {
-  throw std::runtime_error("NeoPkCUEngine::getPKV: currentActor_ is null");
+  const StackFrame& frame = stackFrame_[iState];
+  if (frame.iActor < frame.moveOrder.size()) {
+    const Actor& actor = frame.moveOrder[frame.iActor];
+    return getBase(iState).teammate(actor);
+  }
+  throw std::runtime_error("NeoPkCUEngine::getPKV: no active actor");
 }
 
 
 PokemonVolatile NeoPkCUEngine::getTPKV(size_t iState) {
-  throw std::runtime_error("NeoPkCUEngine::getTPKV not implemented");
+  return getBase(iState).getTeam(getIOTeam()).getPKV();
 }
 
 
@@ -962,18 +1104,29 @@ MoveVolatile NeoPkCUEngine::getTMV() { return getTMV(iBase_); }
 
 
 MoveVolatile NeoPkCUEngine::getMV(size_t iState) {
-  throw std::runtime_error("NeoPkCUEngine::getMV: currentActor_ is null");
+  const StackFrame& frame = stackFrame_[iState];
+  if (frame.iActor < frame.moveOrder.size()) {
+    const Actor& actor = frame.moveOrder[frame.iActor];
+    return getBase(iState).teammate(actor).getMV(actions_.at(actor));
+  }
+  throw std::runtime_error("NeoPkCUEngine::getMV: no active actor");
 }
 
 
 MoveVolatile NeoPkCUEngine::getTMV(size_t iState) {
-  throw std::runtime_error("NeoPkCUEngine::getTMV not implemented");
+  // Target move is not usually needed in damage calc unless for specific plugins
+  // For now, return first move of target
+  return getBase(iState).getTeam(getIOTeam()).getPKV().getMV(0);
 }
 
 
 DamageComponents_t& NeoPkCUEngine::getDamageComponent(size_t iStack) {
-  throw std::runtime_error(
-      "NeoPkCUEngine::getDamageComponent: currentActor_ is null");
+  const StackFrame& frame = stackFrame_[iStack];
+  if (frame.iActor < frame.moveOrder.size()) {
+    const Actor& actor = frame.moveOrder[frame.iActor];
+    return stackFrame_[iStack].damageComponents[actor];
+  }
+  throw std::runtime_error("NeoPkCUEngine::getDamageComponent: no active actor");
 }
 
 
@@ -1000,13 +1153,20 @@ DamageComponents_t& NeoPkCUEngine::getDamageComponent() {
 
 
 const DamageComponents_t& NeoPkCUEngine::getDamageComponent() const {
-  throw std::runtime_error(
-      "NeoPkCUEngine::getDamageComponent: currentActor_ is null");
+  const StackFrame& frame = getStackFrame();
+  if (frame.iActor < frame.moveOrder.size()) {
+    return frame.damageComponents.at(frame.moveOrder[frame.iActor]);
+  }
+  throw std::runtime_error("NeoPkCUEngine::getDamageComponent: no active actor");
 }
 
 
 size_t NeoPkCUEngine::getICTeam() const {
-  throw std::runtime_error("NeoPkCUEngine::getICTeam: currentActor_ is null");
+  const StackFrame& frame = getStackFrame();
+  if (frame.iActor < frame.moveOrder.size()) {
+    return frame.moveOrder[frame.iActor].iTeam();
+  }
+  throw std::runtime_error("NeoPkCUEngine::getICTeam: no active actor");
 }
 
 
@@ -1016,10 +1176,23 @@ size_t NeoPkCUEngine::getIOTeam() const {
 
 
 const Action& NeoPkCUEngine::getCAction() const {
-  throw std::runtime_error("NeoPkCUEngine::getCAction: currentActor_ is null");
+  const StackFrame& frame = getStackFrame();
+  if (frame.iActor < frame.moveOrder.size()) {
+    return actions_.at(frame.moveOrder[frame.iActor]);
+  }
+  throw std::runtime_error("NeoPkCUEngine::getCAction: no active actor");
 }
 
 
 const Action& NeoPkCUEngine::getOAction() const {
+  const StackFrame& frame = getStackFrame();
+  if (frame.iActor < frame.moveOrder.size()) {
+    const Actor& currentActor = frame.moveOrder[frame.iActor];
+    for (const auto& actor : frame.moveOrder) {
+      if (actor.iTeam() != currentActor.iTeam()) {
+        return actions_.at(actor);
+      }
+    }
+  }
   throw std::runtime_error("NeoPkCUEngine::getOAction not implemented");
 }

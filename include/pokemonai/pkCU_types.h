@@ -158,41 +158,42 @@ enum StageType : int {
   // seed and priority evaluation:
   DNE = 0,                 /**< Stage does not exist. */
   SEEDED = 1,              /**< Initial environment has been seeded. */
-  PRETURN = 2,             /**< Before a Pokemon takes its turn. */
+  SELECTORDER = 2,         /**< Determine acter order and disambiguate ties. */
+  PRETURN = 3,             /**< Before a Pokemon takes its turn. */
   // switch evaluation:
-  PRESWITCH = 3,           /**< Before a Pokemon switches out. */
-  POSTSWITCH = 4,          /**< After a Pokemon switches in. */
+  PRESWITCH = 4,           /**< Before a Pokemon switches out. */
+  POSTSWITCH = 5,          /**< After a Pokemon switches in. */
   // pre move evaluation:
-  STATUS = 5,              /**< Before a move is executed, for status effects like paralysis. */
+  STATUS = 6,              /**< Before a move is executed, for status effects like paralysis. */
   // move damage evaluation:
-  MOVEBASE = 6,            /**< Base move evaluation. */
-  MODIFYHITCHANCE = 7,     /**< Modify the chance of the move hitting. */
-  EVALUATEHITCHANCE = 8,   /**< Evaluate if the move hits. */
-  MODIFYCRITCHANCE = 9,    /**< Modify the chance of a critical hit. */
-  EVALUATECRITCHANCE = 10, /**< Evaluate if the move crits. */
-  SETBASEPOWER = 11,       /**< Set the base power of the move. */
-  SETMOVETYPE = 12,        /**< Set the type of the move. */
-  MODIFYBASEPOWER = 13,    /**< Modify the base power of the move. */
-  MODIFYATTACKPOWER = 14,  /**< Modify the attack power of the user. */
-  MODIFYCRITICALPOWER = 15, /**< Modify the power of a critical hit. */
-  MODIFYRAWDAMAGE = 16,    /**< Modify the raw damage calculated. */
-  MODIFYSTAB = 17,         /**< Modify the Same-Type Attack Bonus (STAB). */
-  MODIFYTYPERESISTANCE = 18, /**< Modify the type resistance of the target. */
-  MODIFYITEMPOWER = 19,    /**< Modify the power based on items. */
-  PREDAMAGE = 20,          /**< Before damage is applied. */
-  POSTDAMAGE = 21,         /**< After damage is applied. */
+  MOVEBASE = 7,            /**< Base move evaluation. */
+  MODIFYHITCHANCE = 8,     /**< Modify the chance of the move hitting. */
+  EVALUATEHITCHANCE = 9,   /**< Evaluate if the move hits. */
+  MODIFYCRITCHANCE = 10,    /**< Modify the chance of a critical hit. */
+  EVALUATECRITCHANCE = 11, /**< Evaluate if the move crits. */
+  SETBASEPOWER = 12,       /**< Set the base power of the move. */
+  SETMOVETYPE = 13,        /**< Set the type of the move. */
+  MODIFYBASEPOWER = 14,    /**< Modify the base power of the move. */
+  MODIFYATTACKPOWER = 15,  /**< Modify the attack power of the user. */
+  MODIFYCRITICALPOWER = 16, /**< Modify the power of a critical hit. */
+  MODIFYRAWDAMAGE = 17,    /**< Modify the raw damage calculated. */
+  MODIFYSTAB = 18,         /**< Modify the Same-Type Attack Bonus (STAB). */
+  MODIFYTYPERESISTANCE = 19, /**< Modify the type resistance of the target. */
+  MODIFYITEMPOWER = 20,    /**< Modify the power based on items. */
+  PREDAMAGE = 21,          /**< Before damage is applied. */
+  POSTDAMAGE = 22,         /**< After damage is applied. */
   // post move evaluation:
-  POSTMOVE = 22,           /**< After a move has been executed. */
-  PRESECONDARY = 23,       /**< Before secondary effects are calculated. */
-  MODIFYSECONDARYHITCHANCE = 24, /**< Modify the hit chance of secondary effects. */
-  SECONDARY = 25,          /**< Secondary effects are being applied. */
-  POSTSECONDARY = 26,      /**< After secondary effects have been applied. */
+  POSTMOVE = 23,           /**< After a move has been executed. */
+  PRESECONDARY = 24,       /**< Before secondary effects are calculated. */
+  MODIFYSECONDARYHITCHANCE = 25, /**< Modify the hit chance of secondary effects. */
+  SECONDARY = 26,          /**< Secondary effects are being applied. */
+  POSTSECONDARY = 27,      /**< After secondary effects have been applied. */
   // post turn status
-  POSTTURN = 27,           /**< After a Pokemon has completed its turn. */
+  POSTTURN = 28,           /**< After a Pokemon has completed its turn. */
   // post round status
-  POSTROUND = 28,          /**< After both Pokemon have completed their turns. */
-  HASH = 29,                /**< The resulting environment is being hashed. */
-  FINAL = 30,              /**< The final stage of the round. */
+  POSTROUND = 29,          /**< After both Pokemon have completed their turns. */
+  HASH = 30,                /**< The resulting environment is being hashed. */
+  FINAL = 31,              /**< The final stage of the round. */
 };
 
 /**
@@ -204,6 +205,7 @@ static const char* stageTypeToString(StageType stage) {
   switch (stage) {
     case StageType::DNE: return "DNE";
     case StageType::SEEDED: return "SEEDED";
+    case StageType::SELECTORDER: return "SELECTORDER";
     case StageType::PRETURN: return "PRETURN";
     case StageType::PRESWITCH: return "PRESWITCH";
     case StageType::POSTSWITCH: return "POSTSWITCH";

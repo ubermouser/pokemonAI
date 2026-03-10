@@ -27,7 +27,8 @@ class NeoPkCUEngine {
     size_t iActor;     // Index of the teammate currently executing
     size_t iTarget;    // Index of the target being executed upon
 
-    std::vector<Actor> actors;  // The order in which actors will move.
+    std::vector<Actor> moveOrder;  // The order in which actors will move.
+    std::unordered_map<Actor, MoveBracket> moveBrackets;
 
     std::unordered_map<Actor, DamageComponents_t> damageComponents;
   };
@@ -96,6 +97,7 @@ class NeoPkCUEngine {
    * Engine computation stages:
    */
   void evaluateMove_preturn();
+  void evaluateMove_selectOrder();
   void evaluateMove_status();
   void evaluateMove_damage_moveBase();
   void evaluateMove_damage_modifyHitChance();
@@ -154,6 +156,11 @@ class NeoPkCUEngine {
       stack.push_back(stack[iState]);
     }
   };
+
+  void nPlicateStateDynamic(
+      std::vector<size_t>& result,
+      size_t numEnvironments,
+      size_t iState = SIZE_MAX);
 
   void duplicateState(
       std::array<size_t, 2>& result,

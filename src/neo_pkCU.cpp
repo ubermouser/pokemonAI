@@ -37,6 +37,7 @@ NeoPkCU& NeoPkCU::setEnvironment(
     const std::shared_ptr<const EnvironmentNonvolatile>& cEnv) {
   nv_ = cEnv;
   initialState_ = createInitialVolatileState();
+  initialize();
   return *this;
 }
 
@@ -172,6 +173,72 @@ PossibleEnvironments NeoPkCU::updateState(
 ConstEnvironmentVolatile NeoPkCU::initialState() const {
     if (!nv_) throw std::runtime_error("NeoPkCU environment not set");
     return ConstEnvironmentVolatile{*nv_, initialState_};
+}
+
+
+void NeoPkCU::initialize() {
+  if (!nv_) return;
+
+  // Clear existing plugins
+  for (auto& set : pluginSet_) {
+    set.clear();
+  }
+
+  // Add plugins from all teammates on both teams
+  for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
+    const auto& team = nv_->getTeam(iTeam);
+    for (size_t iTeammate = 0; iTeammate < team.getNumTeammates(); ++iTeammate) {
+      const auto& pokemon = team.teammate(iTeammate);
+
+      // Moves
+      for (size_t iMove = 0; iMove < pokemon.getNumMoves(); ++iMove) {
+        const auto& move = pokemon.getMove_base(iMove);
+        for (size_t iPlugin = 0; iPlugin < PLUGIN_MAXSIZE; ++iPlugin) {
+          plugin_t p = move.getPlugin(iPlugin);
+          if (p.pFunction) {
+            pluginSet_[iPlugin].push_back(p);
+          }
+        }
+      }
+
+      // Ability
+      if (pokemon.abilityExists()) {
+        const auto& ability = pokemon.getAbility();
+        for (size_t iPlugin = 0; iPlugin < PLUGIN_MAXSIZE; ++iPlugin) {
+          plugin_t p = ability.getPlugin(iPlugin);
+          if (p.pFunction) {
+            pluginSet_[iPlugin].push_back(p);
+          }
+        }
+      }
+
+      // Items
+      if (pokemon.hasInitialItem()) {
+        const auto& item = pokemon.getInitialItem();
+        for (size_t iPlugin = 0; iPlugin < PLUGIN_MAXSIZE; ++iPlugin) {
+          plugin_t p = item.getPlugin(iPlugin);
+          if (p.pFunction) {
+            pluginSet_[iPlugin].push_back(p);
+          }
+        }
+      }
+    }
+  }
+
+  // Add global extensions from Pokedex
+  if (pkdex) {
+    const auto& extensions = pkdex->getExtensions();
+    for (size_t iPlugin = 0; iPlugin < PLUGIN_MAXSIZE; ++iPlugin) {
+      for (size_t i = 0; i < extensions.getNumPlugins(iPlugin); ++i) {
+        pluginSet_[iPlugin].push_back(extensions.getPlugin(iPlugin, i));
+      }
+    }
+  }
+
+  // Sort by priority
+  for (auto& set : pluginSet_) {
+    std::sort(set.begin(), set.end());
+  }
 }
 
 

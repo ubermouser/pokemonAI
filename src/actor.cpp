@@ -30,7 +30,7 @@ std::ostream& operator<<(std::ostream& os, const Actor& actor) {
 
 
 size_t std::hash<Actor>::operator()(const Actor& a) const {
-  uint64_t val;
-  std::memcpy(&val, &a, sizeof(uint64_t));
+  uint64_t val = 0;
+  std::memcpy(&val, &a, sizeof(Actor));
   return std::hash<uint64_t>()(val);
 }
