@@ -341,13 +341,13 @@ AbilityLearnResult PokemonNonVolatile::isLegalAbility(const Ability& candidate) 
   if (pkdex->getAbilities().count(candidate.getName()) == 0) {
     return AbilityLearnResult::ABILITY_NOT_IN_POKEDEX;
   }
-  if(!candidate.isImplemented()) {
+  if (!candidate.isImplemented() && !pkdex->allowInvalidPokemon()) {
     return AbilityLearnResult::ABILITY_NOT_IMPLEMENTED;
   }
   if (!pokemonExists()) {
     return AbilityLearnResult::POKEMON_DOES_NOT_EXIST;
   }
-  if (getBase().getAbilities().count(&candidate) == 0) {
+  if (getBase().getAbilities().count(&candidate) == 0 && !pkdex->allowInvalidPokemon()) {
     return AbilityLearnResult::INVALID_ABILITY_FOR_SPECIES;
   }
   return AbilityLearnResult::SUCCESS;
@@ -376,11 +376,16 @@ MoveLearnResult PokemonNonVolatile::isLegalSet(size_t iAction, const Move& candi
   size_t iPosition = iAction;
   if (!pokemonExists()) { return MoveLearnResult::POKEMON_DOES_NOT_EXIST; }
   if ((iPosition != SIZE_MAX) && (iPosition >= getNumMoves()) ) { return MoveLearnResult::INVALID_MOVE_INDEX; }
-  if ((candidate.lostChild == true) || (candidate.isImplemented() == false)) { return MoveLearnResult::MOVE_NOT_IMPLEMENTED; }
+  if ((candidate.lostChild == true) ||
+      (candidate.isImplemented() == false && !pkdex->allowInvalidPokemon())) {
+    return MoveLearnResult::MOVE_NOT_IMPLEMENTED;
+  }
 
   // ensure that the move is within the pokemon's moveset
   const auto& cMovelist = getBase().moves_;
-  if (!cMovelist.count(&candidate)) { return MoveLearnResult::MOVE_NOT_IN_MOVELIST; }
+  if (!cMovelist.count(&candidate) && !pkdex->allowInvalidPokemon()) {
+    return MoveLearnResult::MOVE_NOT_IN_MOVELIST;
+  }
 
   // ensure that the move is not assigned multiple times to the same pokemon
   for (size_t iMove = 0; iMove != getNumMoves(); ++iMove) {

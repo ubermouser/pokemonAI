@@ -349,7 +349,13 @@ po::options_description PokedexStatic::Config::options(
       "location of the types library")
       ((prefix + "movelist").c_str(),
       po::value<std::string>(&movelistsPath_)->default_value(defaults.movelistsPath_),
-      "location of pokemon movelists");
+      "location of pokemon movelists")
+      ((prefix + "allow-invalid-pokemon").c_str(),
+      po::value<bool>(&allowInvalidPokemon_)->default_value(defaults.allowInvalidPokemon_),
+      "allow pokemon to have moves/abilities they can't normally learn")
+      ((prefix + "allow-invalid-teams").c_str(),
+      po::value<bool>(&allowInvalidTeams_)->default_value(defaults.allowInvalidTeams_),
+      "allow teams to have multiple of the same species");
   // clang-format on
   return desc;
 }

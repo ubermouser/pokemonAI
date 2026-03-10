@@ -10,6 +10,7 @@
 
 #include "pokemonai/init_toolbox.h"
 #include "pokemonai/orphan.h"
+#include "pokemonai/pokedex.h"
 #include "pokemonai/pokemon_base.h"
 #include "pokemonai/team_volatile.h"
 
@@ -94,7 +95,16 @@ bool TeamNonVolatile::isLegalSet(size_t iPosition, const PokemonBase& candidate)
   for (size_t iTeammate = 0; iTeammate != getNumTeammates(); ++iTeammate)
   {
     if (iPosition == iTeammate) { continue; }
-    if (&teammate(iTeammate).getBase() == &candidate) { return false; }
+    if (&teammate(iTeammate).getBase() == &candidate) {
+      if (pkdex->allowInvalidTeams()) {
+        SPDLOG_WARN(
+            "team \"{}\" has duplicate species \"{}\"!",
+            getName(),
+            candidate.getName());
+        continue;
+      }
+      return false;
+    }
   }
 
   return true;
