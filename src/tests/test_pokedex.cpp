@@ -118,28 +118,12 @@ class PokedexGen1DynamicTest : public PokedexGen1Test {
 TEST_F(PokedexGen1DynamicTest, LoadsItems) { validateCounts(*pokedex); }
 
 
-class PokedexInvalidTest : public ::testing::Test {
- protected:
-  void SetUp() override {
-    PokedexStatic::Config cfg;
-    cfg.prefixPath_ = "data/gen4/";
-    cfg.allowInvalidPokemon_ = true;
-    cfg.allowInvalidTeams_ = true;
-
-    pokedex = std::make_shared<PokedexStatic>(cfg);
-  }
-
-  std::shared_ptr<Pokedex> pokedex;
-};
-
-
-TEST_F(PokedexInvalidTest, AllowsInvalidMovesAndAbilities) {
+TEST_F(PokedexGen4DynamicTest, AllowsInvalidMovesAndAbilities) {
+  pokedex->setAllowInvalidPokemon(true);
   PokemonNonVolatile pkmn;
   pkmn.setBase(pokedex->pokemon("bulbasaur"));
 
-  // Bulbasaur cannot normally learn "Absorb" (it's in the CSV but might be marked as not implemented if I used another one)
-  // Actually, I found "Absorb" IS implemented.
-  // Let's use something that is definitely NOT in Bulbasaur's movelist.
+  // Bulbasaur cannot normally learn "Absorb"
   EXPECT_NO_THROW(pkmn.addMove(pokedex->move("absorb")));
 
   // Bulbasaur cannot normally have "Blaze"
@@ -147,7 +131,8 @@ TEST_F(PokedexInvalidTest, AllowsInvalidMovesAndAbilities) {
 }
 
 
-TEST_F(PokedexInvalidTest, AllowsInvalidTeams) {
+TEST_F(PokedexGen4DynamicTest, AllowsInvalidTeams) {
+  pokedex->setAllowInvalidTeams(true);
   TeamNonVolatile team;
   PokemonNonVolatile pkmn1;
   pkmn1.setBase(pokedex->pokemon("bulbasaur"));

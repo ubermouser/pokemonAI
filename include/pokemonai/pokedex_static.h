@@ -92,6 +92,13 @@ public:
   }
   virtual bool allowInvalidTeams() const override { return config_.allowInvalidTeams_; }
 
+  virtual void setAllowInvalidPokemon(bool allow) override {
+    config_.allowInvalidPokemon_ = allow;
+  }
+  virtual void setAllowInvalidTeams(bool allow) override {
+    config_.allowInvalidTeams_ = allow;
+  }
+
   virtual bool initialize();
   virtual bool inputPlugins(); // input scripts for registered moves
 

@@ -43,7 +43,13 @@ const PokemonNonVolatile& TeamNonVolatile::getPKNV(const TeamVolatile& source) c
 
 
 TeamNonVolatile& TeamNonVolatile::addPokemon(const PokemonNonVolatile& cPokemon) {
-  if (!isLegalAdd(cPokemon)) { throw std::invalid_argument("TeamNonVolatile illegal pokemon"); }
+  if (!isLegalAdd(cPokemon)) {
+    if (pkdex->allowInvalidTeams()) {
+      SPDLOG_WARN("Ignoring illegal team addition for {}", cPokemon.getName());
+    } else {
+      throw std::invalid_argument("TeamNonVolatile illegal pokemon");
+    }
+  }
 
   teammates_.push_back(cPokemon);
   return *this;
@@ -52,7 +58,11 @@ TeamNonVolatile& TeamNonVolatile::addPokemon(const PokemonNonVolatile& cPokemon)
 
 TeamNonVolatile& TeamNonVolatile::setPokemon(size_t iPokemon, const PokemonNonVolatile& swappedPokemon) {
   if (isLegalSet(iPokemon, swappedPokemon)) {
-    throw std::invalid_argument("TeamNonVolatile illegal pokemon");
+    if (pkdex->allowInvalidTeams()) {
+      SPDLOG_WARN("Ignoring illegal team set for {}", swappedPokemon.getName());
+    } else {
+      throw std::invalid_argument("TeamNonVolatile illegal pokemon");
+    }
   }
 
   teammate(iPokemon) = swappedPokemon;
@@ -95,16 +105,7 @@ bool TeamNonVolatile::isLegalSet(size_t iPosition, const PokemonBase& candidate)
   for (size_t iTeammate = 0; iTeammate != getNumTeammates(); ++iTeammate)
   {
     if (iPosition == iTeammate) { continue; }
-    if (&teammate(iTeammate).getBase() == &candidate) {
-      if (pkdex->allowInvalidTeams()) {
-        SPDLOG_WARN(
-            "team \"{}\" has duplicate species \"{}\"!",
-            getName(),
-            candidate.getName());
-        continue;
-      }
-      return false;
-    }
+    if (&teammate(iTeammate).getBase() == &candidate) { return false; }
   }
 
   return true;

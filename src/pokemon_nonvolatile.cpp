@@ -250,26 +250,33 @@ PokemonNonVolatile& PokemonNonVolatile::setAbility(const Ability& _chosenAbility
   if(result != AbilityLearnResult::SUCCESS) {
     const auto& ability_name = _chosenAbility.getName();
     const auto& species_name = this->getBase().getName();
+
+    std::string errorMessage;
     switch (result)
     {
     case AbilityLearnResult::SUCCESS:
       break;
     case AbilityLearnResult::POKEMON_DOES_NOT_EXIST:
-      throw std::invalid_argument(
-        "Pokemon \"" + getName() + "\" has no base class");
+      errorMessage = "Pokemon \"" + getName() + "\" has no base class";
+      break;
     case AbilityLearnResult::ABILITY_NOT_IMPLEMENTED:
-      throw std::invalid_argument(
-        "Ability '" + ability_name + "' is not implemented / has no base class");
+      errorMessage = "Ability '" + ability_name + "' is not implemented / has no base class";
+      break;
     case AbilityLearnResult::ABILITY_NOT_IN_POKEDEX:
-      throw std::invalid_argument(
-        "Ability " + ability_name +
-        " is not in the pokedex");
+      errorMessage = "Ability " + ability_name + " is not in the pokedex";
+      break;
     case AbilityLearnResult::INVALID_ABILITY_FOR_SPECIES:
-      throw std::invalid_argument(
-        "Ability " + ability_name +
-        " is not a valid ability for species " + species_name);
+      errorMessage = "Ability " + ability_name + " is not a valid ability for species " + species_name;
+      break;
     default:
-      throw std::invalid_argument("Unknown error");
+      errorMessage = "Unknown error";
+      break;
+    }
+
+    if (pkdex->allowInvalidPokemon()) {
+      SPDLOG_WARN("Ignoring illegal ability for {}: {}", species_name, errorMessage);
+    } else {
+      throw std::invalid_argument(errorMessage);
     }
   }
 
@@ -341,13 +348,13 @@ AbilityLearnResult PokemonNonVolatile::isLegalAbility(const Ability& candidate) 
   if (pkdex->getAbilities().count(candidate.getName()) == 0) {
     return AbilityLearnResult::ABILITY_NOT_IN_POKEDEX;
   }
-  if (!candidate.isImplemented() && !pkdex->allowInvalidPokemon()) {
+  if (!candidate.isImplemented()) {
     return AbilityLearnResult::ABILITY_NOT_IMPLEMENTED;
   }
   if (!pokemonExists()) {
     return AbilityLearnResult::POKEMON_DOES_NOT_EXIST;
   }
-  if (getBase().getAbilities().count(&candidate) == 0 && !pkdex->allowInvalidPokemon()) {
+  if (getBase().getAbilities().count(&candidate) == 0) {
     return AbilityLearnResult::INVALID_ABILITY_FOR_SPECIES;
   }
   return AbilityLearnResult::SUCCESS;
@@ -376,14 +383,13 @@ MoveLearnResult PokemonNonVolatile::isLegalSet(size_t iAction, const Move& candi
   size_t iPosition = iAction;
   if (!pokemonExists()) { return MoveLearnResult::POKEMON_DOES_NOT_EXIST; }
   if ((iPosition != SIZE_MAX) && (iPosition >= getNumMoves()) ) { return MoveLearnResult::INVALID_MOVE_INDEX; }
-  if ((candidate.lostChild == true) ||
-      (candidate.isImplemented() == false && !pkdex->allowInvalidPokemon())) {
+  if ((candidate.lostChild == true) || (candidate.isImplemented() == false)) {
     return MoveLearnResult::MOVE_NOT_IMPLEMENTED;
   }
 
   // ensure that the move is within the pokemon's moveset
   const auto& cMovelist = getBase().moves_;
-  if (!cMovelist.count(&candidate) && !pkdex->allowInvalidPokemon()) {
+  if (!cMovelist.count(&candidate)) {
     return MoveLearnResult::MOVE_NOT_IN_MOVELIST;
   }
 
@@ -399,34 +405,39 @@ MoveLearnResult PokemonNonVolatile::isLegalSet(size_t iAction, const Move& candi
 void PokemonNonVolatile::handleMoveLearnResult(MoveLearnResult result, const MoveNonVolatile& candidate) const {
   const auto& move_name = candidate.getBase().getName();
   const auto& species_name = this->getBase().getName();
+
+  std::string errorMessage;
   switch (result)
   {
   case MoveLearnResult::SUCCESS:
     break;
   case MoveLearnResult::POKEMON_DOES_NOT_EXIST:
-    throw std::invalid_argument(
-      "Pokemon \"" + getName() + "\" has no base class");
+    errorMessage = "Pokemon \"" + getName() + "\" has no base class";
+    break;
   case MoveLearnResult::MAX_MOVES_REACHED:
-    throw std::invalid_argument(
-      "Pokemon \"" + getName() + "\" cannot learn more than 4 moves");
+    errorMessage = "Pokemon \"" + getName() + "\" cannot learn more than 4 moves";
+    break;
   case MoveLearnResult::INVALID_MOVE_INDEX:
-    throw std::invalid_argument(
-      "Invalid move index");
+    errorMessage = "Invalid move index";
+    break;
   case MoveLearnResult::MOVE_NOT_IMPLEMENTED:
-    throw std::invalid_argument(
-      "Move " + move_name +
-      " is not implemented / has no base class");
+    errorMessage = "Move " + move_name + " is not implemented / has no base class";
+    break;
   case MoveLearnResult::MOVE_NOT_IN_MOVELIST:
-    throw std::invalid_argument(
-      "Move " + move_name +
-      " is not in species " + species_name +
-      "'s movelist");
+    errorMessage = "Move " + move_name + " is not in species " + species_name + "'s movelist";
+    break;
   case MoveLearnResult::MOVE_ALREADY_KNOWN:
-    throw std::invalid_argument(
-      "Pokemon n=" + getName() +
-      " already knows move" + move_name);
+    errorMessage = "Pokemon n=" + getName() + " already knows move" + move_name;
+    break;
   default:
-    throw std::invalid_argument("Unknown error");
+    errorMessage = "Unknown error";
+    break;
+  }
+
+  if (pkdex->allowInvalidPokemon()) {
+    SPDLOG_WARN("Ignoring illegal move for {}: {}", species_name, errorMessage);
+  } else {
+    throw std::invalid_argument(errorMessage);
   }
 }
 

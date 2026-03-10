@@ -52,6 +52,9 @@ public:
   virtual bool allowInvalidPokemon() const = 0;
   virtual bool allowInvalidTeams() const = 0;
 
+  virtual void setAllowInvalidPokemon(bool allow) = 0;
+  virtual void setAllowInvalidTeams(bool allow) = 0;
+
   virtual ~Pokedex() = default;
 };
 
