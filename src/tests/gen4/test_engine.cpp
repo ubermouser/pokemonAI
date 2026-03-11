@@ -350,3 +350,32 @@ TEST_F(Gen4EngineTest, HighEvasionAndAccuracy) {
   std::cout << "Successfully completed 7 turns of Mud-slap vs Sweet Scent"
             << std::endl;
 }
+
+TEST_F(Gen4EngineTest, StatusHitAndMiss) {
+  auto team_a = TeamNonVolatile().addPokemon(
+      PokemonNonVolatile()
+          .setBase(pokedex_->pokemon("arbok"))
+          .addMove(pokedex_->move("glare")));
+  auto team_b = TeamNonVolatile().addPokemon(
+      PokemonNonVolatile()
+          .setBase(pokedex_->pokemon("charmander"))
+          .addMove(pokedex_->move("cut")));
+  auto environment = EnvironmentNonvolatile(team_a, team_b, true);
+  engine_->setEnvironment(environment);
+
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(), Action::move(0), Action::wait());
+
+  result.printStates();
+  // Glare has 75% accuracy and no damage/crit.
+  // It should produce two states: hit and miss.
+  EXPECT_EQ(result.size(), 2);
+
+  auto hit_state = result.at(0);
+  EXPECT_EQ(hit_state.getTeam(1).teammate(0).getStatusAilment(),
+            AIL_NV_PARALYSIS);
+
+  auto miss_state = result.at(1);
+  EXPECT_EQ(miss_state.getTeam(1).teammate(0).getStatusAilment(),
+            AIL_NV_NONE);
+}
