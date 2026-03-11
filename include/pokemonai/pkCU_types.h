@@ -243,6 +243,37 @@ static const char* stageTypeToString(StageType stage) {
 
 // clang-format on
 
+
+/**
+ * @def CALLPLUGIN
+ * @brief A macro for invoking plugins of a specific type.
+ *
+ * This macro iterates through all registered plugins of a given `pluginType`
+ * for the current matchup and calls their `pluginFunction`. The return value
+ * of each plugin is OR'd with `retValue`. The loop breaks if `retValue`
+ * becomes greater than 1, which is a convention to indicate that a plugin has
+ * handled the event and no further plugins should be called.
+ *
+ * @param retValue The variable to store the combined return values of the
+ * plugins.
+ * @param pluginType The type of plugin to call (e.g., `PLUGIN_ON_MODIFYSPEED`).
+ * @param pluginFunction The function signature of the plugin to be called.
+ * @param ... The arguments to pass to the plugin function.
+ */
+#define CALLPLUGIN(retValue, pluginType, pluginFunction, ...)        \
+  {                                                                  \
+    const std::vector<plugin_t>& cPlugins =                          \
+        getCPluginSet()[(size_t)pluginType];                         \
+    for (auto iPlugin = cPlugins.cbegin(), iPSize = cPlugins.cend(); \
+         iPlugin != iPSize;                                          \
+         ++iPlugin) {                                                \
+      pluginFunction cPlugin = (pluginFunction)iPlugin->pFunction;   \
+      retValue = retValue | cPlugin(__VA_ARGS__);                    \
+      if (retValue > 1) { break; }                                   \
+    }                                                                \
+  }
+
+
 using PluginSet = std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>;
 using PluginSets = std::array< std::array<PluginSet, 6>, 12>;
 using ValidMoveSet = std::bitset<VALID_MOVE_SIZE>;

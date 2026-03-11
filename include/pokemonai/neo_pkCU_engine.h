@@ -29,7 +29,7 @@ class NeoPkCUEngine {
 
     std::vector<Actor> moveOrder;  // The order in which actors will move.
     std::unordered_map<Actor, MoveBracket> moveBrackets;
-
+    std::unordered_map<Actor, std::vector<Actor>> targets;  // The targets of each actor's action.
     std::unordered_map<Actor, DamageComponents_t> damageComponents;
   };
 
@@ -72,6 +72,12 @@ class NeoPkCUEngine {
   MoveBracket computeMoveBracket(const Actor& actor);
 
   /**
+   * @brief Computes the move targets for each actor.
+   */
+  std::unordered_map<Actor, std::vector<Actor>> computeMoveTargets(
+      const ConstEnvironmentPossible& env, const ActionMap& actions) const;
+
+  /**
    * @brief Computes the speed of a Pokemon.
    */
   uint32_t computeSpeed(const Actor& actor);
@@ -98,6 +104,8 @@ class NeoPkCUEngine {
    */
   void evaluateMove_preturn();
   void evaluateMove_selectOrder();
+  void evaluateMove_switch_onSwitchOut();
+  void evaluateMove_switch_onSwitchIn();
   void evaluateMove_status();
   void evaluateMove_damage_moveBase();
   void evaluateMove_damage_modifyHitChance();
@@ -169,10 +177,19 @@ class NeoPkCUEngine {
 
   StackFrame& getStackFrame() { return stackFrame_[iBase_]; }
   const StackFrame& getStackFrame() const { return stackFrame_[iBase_]; }
+  StackFrame& getStackFrame(size_t iFrame) { return stackFrame_.at(iFrame); }
+  const StackFrame& getStackFrame(size_t iFrame) const {
+    return stackFrame_.at(iFrame);
+  }
+
   StageType getStackStage() const { return getStackFrame().stage; }
   const PluginSet& getCPluginSet();
   void setCPluginSet();
-  void advanceStackStage();
+  void reportStackSizeChange() const;
+  size_t advanceStackStage(size_t iStack);
+  size_t advanceAllStages();
+  void gotoStackStage(size_t iStage, StageType stage);
+  void gotoStackStage(StageType stage);
 
   TeamVolatile getTV();
   TeamVolatile getTTV();
@@ -216,11 +233,6 @@ class NeoPkCUEngine {
   ActionMap actions_;
 
   /**
-   * @brief the targets that each actor's move will affect.
-   */
-  std::unordered_map<Actor, std::vector<Actor>> targets_;
-
-  /**
    * @brief The stack of possible environments being generated.
    */
   PossibleEnvironments stack_;
@@ -236,6 +248,12 @@ class NeoPkCUEngine {
    * currently being processed.
    */
   size_t iBase_;
+
+
+  /**
+   * @brief The size of the stack just prior to the last stage being executed.
+   */
+  size_t lastStackSize_;
 
   const PluginSet& getCPluginSet() const { return *cPlugins_; }
 

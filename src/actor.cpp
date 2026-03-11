@@ -19,7 +19,7 @@ void Actor::print() const { print(std::cout); }
 
 
 void Actor::print(std::ostream& os) const {
-  os << fmt::format("T{}:{}", 'A' + iTeam(), iTeammate());
+  os << fmt::format("T{:c}:{}", 'A' + iTeam(), iTeammate() + 1);
 }
 
 

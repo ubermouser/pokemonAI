@@ -280,6 +280,7 @@ TEST_F(Gen4EngineTest, PrimaryHitAndCrit) {
   PossibleEnvironments result = engine_->updateState(
       engine_->initialState(), Action::move(0), Action::wait());
 
+  result.printStates();
   EXPECT_EQ(result.size(), 3);
   EXPECT_EQ(result.where1Hit(0).hasHit(0), true);
   EXPECT_EQ(result.where1Miss(0).hasHit(0), false);

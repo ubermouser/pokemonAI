@@ -4,7 +4,7 @@ set(ENGINE_SOURCES "")
 if(USE_LEGACY_ENGINE)
     list(APPEND ENGINE_SOURCES ../src/legacy_pkCU.cpp)
 else()
-    list(APPEND ENGINE_SOURCES ../src/neo_pkCU.cpp ../src/neo_pkCU_engine.cpp)
+    list(APPEND ENGINE_SOURCES ../src/neo_pkCU.cpp ../src/neo_pkCU_engine.cpp ../src/neo_pkCU_engine_stages.cpp)
 endif()
 
 add_library(pkaiEngine SHARED

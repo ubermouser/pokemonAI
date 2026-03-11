@@ -243,17 +243,40 @@ void NeoPkCU::initialize() {
 
 
 ActionVector NeoPkCU::getValidActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
-    return ActionVector{};
+  ActionVector result;
+  for (size_t iMove = 0; iMove < 4; ++iMove) {
+    Action action = Action::move(iMove);
+    if (isValidAction(envV, action, iTeam)) { result.push_back(action); }
+  }
+  for (size_t iTeammate = 0; iTeammate < 6; ++iTeammate) {
+    Action action = Action::swap(iTeammate);
+    if (isValidAction(envV, action, iTeam)) { result.push_back(action); }
+  }
+  if (isValidAction(envV, Action::wait(), iTeam)) {
+    result.push_back(Action::wait());
+  }
+  if (result.empty()) { result.push_back(Action::struggle()); }
+  return result;
 }
 
 
 ActionVector NeoPkCU::getValidMoveActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
-    return ActionVector{};
+  ActionVector result;
+  for (size_t iMove = 0; iMove < 4; ++iMove) {
+    Action action = Action::move(iMove);
+    if (isValidAction(envV, action, iTeam)) { result.push_back(action); }
+  }
+  return result;
 }
 
 
 ActionVector NeoPkCU::getValidSwapActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
-    return ActionVector{};
+  ActionVector result;
+  for (size_t iTeammate = 0; iTeammate < 6; ++iTeammate) {
+    Action action = Action::swap(iTeammate);
+    if (isValidAction(envV, action, iTeam)) { result.push_back(action); }
+  }
+  return result;
 }
 
 
