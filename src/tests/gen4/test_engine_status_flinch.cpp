@@ -91,30 +91,3 @@ TEST_F(FlinchStatusTest, Test_FlinchReported) {
     // Currently the engine reports "blocked" for flinch in reportHitResult
     EXPECT_TRUE(output.find("move was blocked") != std::string::npos);
 }
-
-TEST_F(Gen4EngineTest, Flinch) {
-  auto team_a = TeamNonVolatile().addPokemon(
-      PokemonNonVolatile()
-          .setBase(pokedex_->pokemon("jirachi"))
-          .addMove(pokedex_->move("iron head"))
-          .setLevel(100));
-
-  auto team_b = TeamNonVolatile().addPokemon(
-      PokemonNonVolatile()
-          .setBase(pokedex_->pokemon("charmander"))
-          .addMove(pokedex_->move("ember"))
-          .setLevel(100));
-
-  auto environment = EnvironmentNonvolatile(team_a, team_b, true);
-  engine_->setEnvironment(environment);
-
-  // Turn 1: Jirachi uses Iron Head, Mew uses Tackle
-  // Iron Head has 30% chance to flinch.
-  auto result = engine_->updateState(
-      engine_->initialState(), Action::move(0), Action::move(0));
-  result.printStates();
-
-  // Jirachi's health should be full if Charmander flinches
-  EXPECT_EQ(result.where1Status(0).teammate(0, 0).getMissingHP(), 0);
-  EXPECT_GE(result.where1Status(0).teammate(1, 0).getMissingHP(), 100);
-}

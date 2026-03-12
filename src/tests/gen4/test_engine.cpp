@@ -17,14 +17,15 @@ class IsValidSwapTest : public Gen4EngineTest {
  protected:
   void SetUp() override {
     Gen4EngineTest::SetUp();
-    auto team =
-        TeamNonVolatile()
+    // clang-format off
+    auto team = TeamNonVolatile()
             .addPokemon(PokemonNonVolatile()
-                            .setBase(pokedex_->pokemon("torkoal"))
-                            .addMove(pokedex_->move("explosion")))
+                .setBase(pokedex_->pokemon("torkoal"))
+                .addMove(pokedex_->move("explosion")))
             .addPokemon(PokemonNonVolatile()
-                            .setBase(pokedex_->pokemon("squirtle"))
-                            .addMove(pokedex_->move("surf")));
+                .setBase(pokedex_->pokemon("squirtle"))
+                .addMove(pokedex_->move("surf")));
+    // clang-format on
     auto environment = EnvironmentNonvolatile(team, team, true);
     engine_->setEnvironment(environment);
 
@@ -39,6 +40,27 @@ class IsValidSwapTest : public Gen4EngineTest {
   PossibleEnvironments swap_squirtle;
   PossibleEnvironments torkoal_dead;
   PossibleEnvironments both_dead;
+};
+
+
+class BasicEngineTest : public Gen4EngineTest {
+  void SetUp() override {
+    Gen4EngineTest::SetUp();
+
+    // clang-format off
+    auto team = TeamNonVolatile()
+        .addPokemon(PokemonNonVolatile()
+            .setBase(pokedex_->pokemon("charmander"))
+            .addMove(pokedex_->move("cut"))
+            .addMove(pokedex_->move("fire blast"))
+            .addMove(pokedex_->move("swords dance")))
+        .addPokemon(PokemonNonVolatile()
+            .setBase(pokedex_->pokemon("aipom"))
+            .addMove(pokedex_->move("screech")));
+    // clang-format on
+    auto environment = EnvironmentNonvolatile(team, team, true);
+    engine_->setEnvironment(environment);
+  }
 };
 
 
@@ -269,16 +291,9 @@ TEST_F(IsValidSwapTest, MoveSelfDead) {
 }
 
 
-TEST_F(Gen4EngineTest, PrimaryHitAndCrit) {
-  auto team = TeamNonVolatile().addPokemon(
-      PokemonNonVolatile()
-          .setBase(pokedex_->pokemon("charmander"))
-          .addMove(pokedex_->move("cut")));
-  auto environment = EnvironmentNonvolatile(team, team, true);
-  engine_->setEnvironment(environment);
-
+TEST_F(BasicEngineTest, PrimaryHitAndCrit) {
   PossibleEnvironments result = engine_->updateState(
-      engine_->initialState(), Action::move(0), Action::wait());
+      engine_->initialState(), Action::move(0), Action::wait());  // cut
 
   result.printStates();
   EXPECT_EQ(result.size(), 3);
@@ -288,16 +303,69 @@ TEST_F(Gen4EngineTest, PrimaryHitAndCrit) {
 }
 
 
-TEST_F(Gen4EngineTest, BuffStat) {
-  auto team = TeamNonVolatile().addPokemon(
-      PokemonNonVolatile()
-          .setBase(pokedex_->pokemon("charmander"))
-          .addMove(pokedex_->move("swords dance")));
-  auto environment = EnvironmentNonvolatile(team, team, true);
-  engine_->setEnvironment(environment);
-
+TEST_F(BasicEngineTest, PrimaryHitAgainstSwap) {
   PossibleEnvironments result = engine_->updateState(
-      engine_->initialState(), Action::move(0), Action::wait());
+      engine_->initialState(),
+      Action::move(0),
+      Action::swap(1));  // cut vs swap
+
+  result.printStates();
+  auto state = result.where1Hit(0);
+  // swapped-out pokemon takes no damage
+  EXPECT_EQ(state.teammate(TEAM_B, 0).getPercentHP(), 1.);
+  // swapped-in pokemon takes damage
+  EXPECT_LT(state.teammate(TEAM_B, 1).getPercentHP(), 1.);
+  // swapped-in pokemon is active
+  EXPECT_TRUE(state.teammate(TEAM_B, 1).isActive());
+  EXPECT_FALSE(state.teammate(TEAM_B, 0).isActive());
+}
+
+
+TEST_F(BasicEngineTest, Swap) {
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(), Action::swap(1), Action::wait());
+
+  result.printStates();
+  auto state = result.where1Switch(0);
+  // swapped-in pokemon is active
+  EXPECT_TRUE(state.teammate(TEAM_A, 1).isActive());
+  EXPECT_FALSE(state.teammate(TEAM_A, 0).isActive());
+}
+
+
+TEST_F(BasicEngineTest, PrimaryHitStatusAndCrit) {
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(), Action::move(1), Action::wait());  // fire blast
+
+  result.printStates();
+  EXPECT_EQ(result.size(), 5);
+  EXPECT_EQ(result.whereMiss(0).size(), 1);
+  EXPECT_EQ(result.whereHit(0).size(), 4);
+  EXPECT_EQ(result.whereHitNoCrit(0).size(), 2);
+  EXPECT_EQ(result.whereHitNoStatus(0).size(), 2);
+  EXPECT_EQ(result.whereCrit(0).size(), 2);
+  EXPECT_EQ(result.whereStatus(0).size(), 2);
+}
+
+
+TEST_F(BasicEngineTest, SpeedTie) {
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(), Action::move(0), Action::move(0));  // cut vs cut
+
+  result.printStates();
+  EXPECT_EQ(result.size(), 18);
+  EXPECT_EQ(result.getNumUnique(), 9);
+  EXPECT_EQ(result.whereHit(0).size(), 6);
+  EXPECT_EQ(result.whereMiss(0).size(), 3);
+  EXPECT_EQ(result.whereCrit(0).size(), 3);
+}
+
+
+TEST_F(BasicEngineTest, BuffStat) {
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(),
+      Action::move(2),  // swords dance
+      Action::wait());
 
   result.printStates();
   // swords dance has --- P.Accuracy and 100 S.Accuracy, so it should always hit
@@ -309,7 +377,7 @@ TEST_F(Gen4EngineTest, BuffStat) {
 }
 
 
-TEST_F(Gen4EngineTest, DebuffStat) {
+TEST_F(BasicEngineTest, DebuffStat) {
   auto team_a = TeamNonVolatile().addPokemon(
       PokemonNonVolatile()
           .setBase(pokedex_->pokemon("aipom"))
@@ -343,20 +411,44 @@ TEST_F(Gen4EngineTest, DebuffStat) {
 }
 
 
-TEST_F(Gen4EngineTest, HighEngineAccuracy) {
-  // moves with extremely high numbers of branches might cause stack probability
-  // that sums less than 1
-  engine_->setAccuracy(16);
-  auto team = TeamNonVolatile().addPokemon(
+TEST_F(BasicEngineTest, StatusHitAndMiss) {
+  auto team_a = TeamNonVolatile().addPokemon(
+      PokemonNonVolatile()
+          .setBase(pokedex_->pokemon("arbok"))
+          .addMove(pokedex_->move("glare")));
+  auto team_b = TeamNonVolatile().addPokemon(
       PokemonNonVolatile()
           .setBase(pokedex_->pokemon("charmander"))
-          .addMove(pokedex_->move(
-              "fire blast")));  // move can hit, crit, status, and miss
-  auto environment = EnvironmentNonvolatile(team, team, true);
+          .addMove(pokedex_->move("cut")));
+  auto environment = EnvironmentNonvolatile(team_a, team_b, true);
   engine_->setEnvironment(environment);
 
   PossibleEnvironments result = engine_->updateState(
-      engine_->initialState(), Action::move(0), Action::move(0));
+      engine_->initialState(), Action::move(0), Action::wait());
+
+  result.printStates();
+  // Glare has 75% accuracy and no damage/crit.
+  // It should produce two states: hit and miss.
+  EXPECT_EQ(result.size(), 2);
+
+  auto hit_state = result.at(0);
+  EXPECT_EQ(
+      hit_state.getTeam(1).teammate(0).getStatusAilment(), AIL_NV_PARALYSIS);
+
+  auto miss_state = result.at(1);
+  EXPECT_EQ(miss_state.getTeam(1).teammate(0).getStatusAilment(), AIL_NV_NONE);
+}
+
+
+TEST_F(BasicEngineTest, HighEngineAccuracy) {
+  // moves with extremely high numbers of branches might cause stack probability
+  // that sums less than 1
+  engine_->setAccuracy(16);
+
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(),
+      Action::move(1),
+      Action::move(1));  // two fire blasts
 
   EXPECT_EQ(result.size(), 8450);
   EXPECT_EQ(result.getNumUnique(), 49);
@@ -364,7 +456,7 @@ TEST_F(Gen4EngineTest, HighEngineAccuracy) {
 }
 
 
-TEST_F(Gen4EngineTest, HighEvasionAndAccuracy) {
+TEST_F(BasicEngineTest, HighEvasionAndAccuracy) {
   // Reproduce branchProbability > FixType(0) assertion failure
   engine_->setAccuracy(16);
   auto team_a = TeamNonVolatile().addPokemon(
@@ -404,33 +496,4 @@ TEST_F(Gen4EngineTest, HighEvasionAndAccuracy) {
 
   std::cout << "Successfully completed 7 turns of Mud-slap vs Sweet Scent"
             << std::endl;
-}
-
-TEST_F(Gen4EngineTest, StatusHitAndMiss) {
-  auto team_a = TeamNonVolatile().addPokemon(
-      PokemonNonVolatile()
-          .setBase(pokedex_->pokemon("arbok"))
-          .addMove(pokedex_->move("glare")));
-  auto team_b = TeamNonVolatile().addPokemon(
-      PokemonNonVolatile()
-          .setBase(pokedex_->pokemon("charmander"))
-          .addMove(pokedex_->move("cut")));
-  auto environment = EnvironmentNonvolatile(team_a, team_b, true);
-  engine_->setEnvironment(environment);
-
-  PossibleEnvironments result = engine_->updateState(
-      engine_->initialState(), Action::move(0), Action::wait());
-
-  result.printStates();
-  // Glare has 75% accuracy and no damage/crit.
-  // It should produce two states: hit and miss.
-  EXPECT_EQ(result.size(), 2);
-
-  auto hit_state = result.at(0);
-  EXPECT_EQ(hit_state.getTeam(1).teammate(0).getStatusAilment(),
-            AIL_NV_PARALYSIS);
-
-  auto miss_state = result.at(1);
-  EXPECT_EQ(miss_state.getTeam(1).teammate(0).getStatusAilment(),
-            AIL_NV_NONE);
 }

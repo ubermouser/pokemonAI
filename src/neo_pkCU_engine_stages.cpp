@@ -61,14 +61,11 @@ void NeoPkCUEngine::evaluateMove() {
     case StageType::MOVEBASE:
       evaluateMove_damage_moveBase();
       break;
-    case StageType::MODIFYHITCHANCE:
-      evaluateMove_damage_modifyHitChance();
-      break;
     case StageType::EVALUATEHITCHANCE:
       evaluateMove_damage_evaluateHitChance();
       break;
-    case StageType::MODIFYCRITCHANCE:
-      evaluateMove_damage_modifyCritChance();
+    case StageType::DAMAGINGMOVEBASE:
+      evaluateMove_damage_damagingMoveBase();
       break;
     case StageType::EVALUATECRITCHANCE:
       evaluateMove_damage_evaluateCritChance();
@@ -112,14 +109,11 @@ void NeoPkCUEngine::evaluateMove() {
     case StageType::PRESECONDARY:
       evaluateMove_preSecondary();
       break;
-    case StageType::MODIFYSECONDARYHITCHANCE:
-      evaluateMove_modifySecondaryHitChance();
+    case StageType::EVALSECONDARYHITCHANCE:
+      evaluateMove_evaluateSecondaryHitChance();
       break;
     case StageType::SECONDARY:
       evaluateMove_secondary();
-      break;
-    case StageType::POSTSECONDARY:
-      // evaluateMove_postSecondary();
       break;
     case StageType::POSTTURN:
       evaluateMove_postTurn();
@@ -158,6 +152,7 @@ void NeoPkCUEngine::evaluateMove_preturn() {
   } else if (cAction.isSwitch()) {
     gotoStackStage(StageType::PRESWITCH);
   } else if (cAction.isWait()) {
+    getBase().setWaited(getICTeam());
     gotoStackStage(StageType::POSTTURN);
   } else {
     throw std::runtime_error(fmt::format(
@@ -217,7 +212,7 @@ void NeoPkCUEngine::evaluateMove_selectOrder() {
               static_cast<uint32_t>(N - i);
         }
         // Counteract the advanceStackStage in the main loop to re-evaluate this group or the next
-        gotoStackStage(StageType::SELECTORDER);
+        gotoStackStage(iIdx, StageType::SELECTORDER);
       } while (std::next_permutation(
           tiedActors.begin(), tiedActors.end(), [](const Actor& a, const Actor& b) {
             if (a.iTeam() != b.iTeam()) return a.iTeam() < b.iTeam();
@@ -264,12 +259,19 @@ void NeoPkCUEngine::evaluateMove_status() {
 void NeoPkCUEngine::evaluateMove_damage_moveBase() {
   const Move& cMove = getMV().getBase();
   getDamageComponent().category = cMove.getDamageType();
+
+  // if not a damaging move, skip damage and critical hit stages:
 }
 
 
-void NeoPkCUEngine::evaluateMove_damage_modifyHitChance() {
+void NeoPkCUEngine::evaluateMove_damage_evaluateHitChance() {
   FixType& probabilityToHit = getDamageComponent().tProbability;
-  probabilityToHit = getProbabilityToHit();
+  const Move& cMove = getMV().getBase();
+  if (cMove.targetsEnemy()) {
+    probabilityToHit = getProbabilityToHit();
+  } else {
+    probabilityToHit = FixType(1);
+  }
 
   int result = 0;
   CALLPLUGIN(
@@ -281,36 +283,50 @@ void NeoPkCUEngine::evaluateMove_damage_modifyHitChance() {
       getPKV(),
       getTPKV(),
       probabilityToHit);
-}
 
-
-void NeoPkCUEngine::evaluateMove_damage_evaluateHitChance() {
-  FixType& probabilityToHit = getDamageComponent().tProbability;
   probabilityToHit =
       std::max(std::min(probabilityToHit, FixType(1)), FixType(0));
 
+  SPDLOG_TRACE(
+      "iSTACK={} STAGE={:25s} HITPROB={:.4f}",
+      iBase_,
+      stageTypeToString(getStackStage()),
+      probabilityToHit.to_double());
+
+  // hit chance is probabilitistic
   if (mostlyGT(probabilityToHit, FixType(0))) {
     if (mostlyLT(probabilityToHit, FixType(1))) {
-      // hit chance is probabilitistic
-      std::array<size_t, 2> iHEnv;
-      duplicateState(iHEnv, (FixType(1) - probabilityToHit));
+      std::array<size_t, 2> iHEnv =
+          duplicateState((FixType(1) - probabilityToHit));
 
       auto hitEnv = getStack().at(iHEnv[0]);
       auto& missFrame = getStackFrame(iHEnv[1]);
 
       hitEnv.setHit(getICTeam());
-      gotoStackStage(missFrame.iStack, StageType::POSTDAMAGE);
+      gotoStackStage(missFrame.iStack, StageType::POSTTURN);
     } else {  // hits 100% of the time
       getBase().setHit(getICTeam());
     }
   } else {
     // misses 100% of the time
-    gotoStackStage(StageType::POSTDAMAGE);
+    gotoStackStage(StageType::POSTTURN);
   }
 }
 
 
-void NeoPkCUEngine::evaluateMove_damage_modifyCritChance() {
+void NeoPkCUEngine::evaluateMove_damage_damagingMoveBase() {
+  const Move& cMove = getMV().getBase();
+  // moves that are not physical or special attacks skip all damage computation
+  // stages:
+  if (cMove.damageType_ == ATK_PHYSICAL || cMove.damageType_ == ATK_SPECIAL) {
+    return;
+  }
+
+  gotoStackStage(StageType::PREDAMAGE);
+}
+
+
+void NeoPkCUEngine::evaluateMove_damage_evaluateCritChance() {
   FixType& probabilityToCrit = getDamageComponent().tProbability;
   probabilityToCrit = getPKV().getAccuracy_boosted(FV_CRITICALHIT);
 
@@ -324,19 +340,20 @@ void NeoPkCUEngine::evaluateMove_damage_modifyCritChance() {
       getPKV(),
       getTPKV(),
       probabilityToCrit);
-}
 
-
-void NeoPkCUEngine::evaluateMove_damage_evaluateCritChance() {
-  FixType& probabilityToCrit = getDamageComponent().tProbability;
   probabilityToCrit =
       std::max(std::min(probabilityToCrit, FixType(1)), FixType(0));
 
+  SPDLOG_TRACE(
+      "iSTACK={} STAGE={:25s} CRITPROB={:.4f}",
+      iBase_,
+      stageTypeToString(getStackStage()),
+      probabilityToCrit.to_double());
+
+  // crit chance is probabilistic
   if (mostlyGT(probabilityToCrit, FixType(0))) {
     if (mostlyLT(probabilityToCrit, FixType(1))) {
-      // crit chance is probabilistic
-      std::array<size_t, 2> iCEnv;
-      duplicateState(iCEnv, probabilityToCrit);
+      std::array<size_t, 2> iCEnv = duplicateState(probabilityToCrit);
 
       auto critEnv = getStack().at(iCEnv[1]);
       auto& critFrame = getStackFrame(iCEnv[1]);
@@ -488,9 +505,15 @@ void NeoPkCUEngine::evaluateMove_preSecondary() {
     gotoStackStage(StageType::POSTTURN);
     return;
   }
+}
 
-  FixType& secondaryHitProbability = getDamageComponent().tProbability;
-  secondaryHitProbability = cMove.getSecondaryAccuracy();
+
+void NeoPkCUEngine::evaluateMove_evaluateSecondaryHitChance() {
+  assert(getBase().hasHit(getICTeam()));
+
+  const Move& cMove = getMV().getBase();
+  FixType& probabilityToSecondary = getDamageComponent().tProbability;
+  probabilityToSecondary = cMove.getSecondaryAccuracy();
 
   int result = 0;
   CALLPLUGIN(
@@ -501,24 +524,27 @@ void NeoPkCUEngine::evaluateMove_preSecondary() {
       getMV(),
       getPKV(),
       getTPKV(),
-      secondaryHitProbability);
-}
+      probabilityToSecondary);
 
+  probabilityToSecondary =
+      std::max(std::min(probabilityToSecondary, FixType(1)), FixType(0));
 
-void NeoPkCUEngine::evaluateMove_modifySecondaryHitChance() {
-  FixType& secondaryHitProbability = getDamageComponent().tProbability;
-  secondaryHitProbability =
-      std::max(std::min(secondaryHitProbability, FixType(1)), FixType(0));
+  SPDLOG_TRACE(
+      "iSTACK={} STAGE={:25s} SECPROB={:.4f}",
+      iBase_,
+      stageTypeToString(getStackStage()),
+      probabilityToSecondary.to_double());
 
-  if (getBase().hasHit(getICTeam()) &&
-      mostlyGT(secondaryHitProbability, FixType(0))) {
-    if (mostlyLT(secondaryHitProbability, FixType(1))) {
-      std::array<size_t, 2> iREnv;
-      duplicateState(iREnv, (FixType(1) - secondaryHitProbability));
+  // probabilistic chance of secondary:
+  if (mostlyGT(probabilityToSecondary, FixType(0))) {
+    if (mostlyLT(probabilityToSecondary, FixType(1))) {
+      std::array<size_t, 2> iREnv =
+          duplicateState((FixType(1) - probabilityToSecondary));
     }
+    // secondary occurs 100% of the time:
     getBase().setSecondary(getICTeam());
-  } else {
-    gotoStackStage(StageType::POSTSECONDARY);
+  } else {  // secondary occurs 0% of the time:
+    gotoStackStage(StageType::POSTTURN);
   }
 }
 
@@ -688,13 +714,10 @@ void NeoPkCUEngine::evaluateMove_switch_onSwitchOut() {
 
 void NeoPkCUEngine::evaluateMove_switch_onSwitchIn() {
   getTV().swapPokemon(getCAction().iFriendly());
+  getBase().setSwitched(getICTeam());
 
   int result = 0;
   CALLPLUGIN(result, PLUGIN_ON_SWITCHIN, onSwitch_rawType, *this, getPKV());
 
   gotoStackStage(StageType::POSTTURN);
-}
-
-void NeoPkCUEngine::updateState_move() {
-  throw std::runtime_error("NeoPkCUEngine::updateState_move not implemented");
 }

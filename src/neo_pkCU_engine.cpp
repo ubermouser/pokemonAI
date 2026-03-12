@@ -158,7 +158,6 @@ std::vector<Actor> NeoPkCUEngine::computeActorOrder() {
     
   });
 
-
   return std::move(actors);
 }
 
@@ -179,13 +178,14 @@ std::vector<Actor> NeoPkCUEngine::computeActorOrder() {
  */
 void NeoPkCUEngine::duplicateState(
     std::array<size_t, 2>& result, FixType branchProbability, size_t iState) {
-  if (iState == SIZE_MAX) { iState = iBase_; }
-  if (!mostlyGT(branchProbability, FixType(0))) {
-    result[0] = iState;
-    result[1] = iState; // Or some other indication of no split
-    return;
-  }
-  assert(mostlyLT(branchProbability, FixType(1)));
+  result = duplicateState(branchProbability, iState);
+}
+
+
+std::array<size_t, 2> NeoPkCUEngine::duplicateState(
+    FixType branchProbability, size_t iState) {
+  assert(branchProbability > FixType(0) && branchProbability < FixType(1));
+  std::array<size_t, 2> result;
 
   // duplicate state 2 times
   nPlicateState(result, iState);
@@ -201,6 +201,7 @@ void NeoPkCUEngine::duplicateState(
   getBase(result[0]).getProbability() = totalProbability - absoluteBranchProb;
 
   assert(saneStackProbability());
+  return std::move(result);
 }
 
 
@@ -348,20 +349,68 @@ size_t NeoPkCUEngine::combineSimilarEnvironments() {
 }  // endOf combineSimilarEnvironments
 
 
-uint32_t NeoPkCUEngine::movePriority() {
-  throw std::runtime_error("NeoPkCUEngine::movePriority not implemented");
-}
-
-
 void NeoPkCUEngine::calculateDamage() {
-  SPDLOG_ERROR("NeoPkCUEngine::calculateDamage not implemented");
-  getDamageComponent().damage = 10;
+  FixType partitionEnvironmentProbability =
+      (FixType(1) / (int32_t)cu_.cfg_.numRandomEnvironments);
+  DamageComponents_t& cDMG = getDamageComponent();
+
+  uint32_t power = cDMG.damage;
+
+  std::array<size_t, 2> iREnv = {{SIZE_MAX, getIBase()}};
+  for (size_t iEnv = 0; iEnv != cu_.cfg_.numRandomEnvironments; ++iEnv) {
+    if (cu_.cfg_.numRandomEnvironments > 1) {
+      if ((iEnv + 1) == cu_.cfg_.numRandomEnvironments) {
+        iREnv[1] = getIBase();
+      } else {
+        duplicateState(iREnv, partitionEnvironmentProbability);
+      }
+    };
+
+    // find the mean random value for this partition of the random environment
+    fpType randomValue =
+        (iEnv / (fpType)cu_.cfg_.numRandomEnvironments) +
+        ((fpType)1.0 / (fpType)cu_.cfg_.numRandomEnvironments / (fpType)2.0);
+
+    // scale our random value modifier to 0.85..1.0
+    randomValue = deScale(randomValue, (fpType)1.0, (fpType)0.85);
+
+    uint32_t& actualDamage = getDamageComponent(iREnv[1], getICTeam()).damage;
+    actualDamage = (uint32_t)((fpType)power * randomValue);
+
+    int result = 0;
+    CALLPLUGIN(
+        result,
+        PLUGIN_ON_CALCULATEDAMAGE,
+        onSetPower_rawType,
+        *this,
+        getMV(),
+        getPKV(),
+        getTPKV(),
+        actualDamage);
+
+    // inflict damage caused upon the targetPokemon:
+    getTPKV(iREnv[1]).modHP(-1 * actualDamage);
+  }
 }
 
 
 FixType NeoPkCUEngine::getProbabilityToHit() {
-  SPDLOG_ERROR("NeoPkCUEngine::getProbabilityToHit not implemented");
-  return getMV().getBase().getPrimaryAccuracy();
+  PokemonVolatile cPKV = getPKV();
+  PokemonVolatile tPKV = getTPKV();
+  MoveVolatile mV = getMV();
+
+  /* probability to hit enemy pokemon */
+  // combine accuracy/evasion stages before look-up to ensure precision
+  int32_t netBoost = cPKV.getBoost(FV_ACCURACY) - tPKV.getBoost(FV_EVASION);
+  netBoost = std::min(std::max(netBoost, -6), 6);
+
+  FixType probabilityToHit =
+      // map net boost stage to precision look-up table
+      PokemonNonVolatile::aFV_base[FV_ACCURACY - 6][netBoost + 6] *
+      // lowest is 30% or 30 / 100
+      mV.getBase().getPrimaryAccuracy();
+
+  return probabilityToHit;
 }
 
 
@@ -558,12 +607,23 @@ size_t NeoPkCUEngine::getIOTeam() const {
 }
 
 
-const Action& NeoPkCUEngine::getCAction() const {
+const Actor& NeoPkCUEngine::getCActor() const {
   const StackFrame& frame = getStackFrame();
-  if (frame.iActor < frame.moveOrder.size()) {
-    return actions_.at(frame.moveOrder[frame.iActor]);
-  }
-  throw std::runtime_error("NeoPkCUEngine::getCAction: no active actor");
+  assert(frame.iActor < frame.moveOrder.size());
+
+  return frame.moveOrder[frame.iActor];
+}
+
+
+const Actor& NeoPkCUEngine::getTarget() const {
+  const StackFrame& frame = getStackFrame();
+  const Actor& actor = getCActor();
+  return frame.targets.at(actor).at(frame.iTarget);
+}
+
+
+const Action& NeoPkCUEngine::getCAction() const {
+  return actions_.at(getCActor());
 }
 
 

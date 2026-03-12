@@ -110,6 +110,7 @@ class NeoPkCUEngine {
   void evaluateMove_damage_moveBase();
   void evaluateMove_damage_modifyHitChance();
   void evaluateMove_damage_evaluateHitChance();
+  void evaluateMove_damage_damagingMoveBase();
   void evaluateMove_damage_modifyCritChance();
   void evaluateMove_damage_evaluateCritChance();
   void evaluateMove_damage_setBasePower();
@@ -124,7 +125,7 @@ class NeoPkCUEngine {
   void evaluateMove_damage_preDamage();
   void evaluateMove_postMove();
   void evaluateMove_preSecondary();
-  void evaluateMove_modifySecondaryHitChance();
+  void evaluateMove_evaluateSecondaryHitChance();
   void evaluateMove_secondary();
   void evaluateMove_postTurn();
   void evaluateMove_postRound();
@@ -136,11 +137,7 @@ class NeoPkCUEngine {
    * @brief Methods implemented for compatibility with LegacyPkCUEngine.
    * @{
    */
-  void updateState_move();
-  int32_t movePriority_Bracket();
-  uint32_t movePriority_Speed();
   size_t combineSimilarEnvironments();
-  uint32_t movePriority();
   void evaluateMove();
   void calculateDamage();
   FixType getProbabilityToHit();
@@ -170,10 +167,13 @@ class NeoPkCUEngine {
       size_t numEnvironments,
       size_t iState = SIZE_MAX);
 
-  void duplicateState(
+  [[deprecated]] void duplicateState(
       std::array<size_t, 2>& result,
       fpType probability,
       size_t iState = SIZE_MAX);
+
+  std::array<size_t, 2> duplicateState(
+      FixType probability, size_t iState = SIZE_MAX);
 
   StackFrame& getStackFrame() { return stackFrame_[iBase_]; }
   const StackFrame& getStackFrame() const { return stackFrame_[iBase_]; }
@@ -212,6 +212,9 @@ class NeoPkCUEngine {
 
   size_t getICTeam() const;
   size_t getIOTeam() const;
+
+  const Actor& getCActor() const;
+  const Actor& getTarget() const;
   const Action& getCAction() const;
   const Action& getOAction() const;
   size_t getIBase() const { return iBase_; }
