@@ -55,9 +55,6 @@ void NeoPkCUEngine::seedStack() {
 PossibleEnvironments NeoPkCUEngine::updateState() {
   evaluateMove();
 
-  // combine environments that equal eachother:
-  combineSimilarEnvironments();
-
   return std::move(stack_);
 }
 
@@ -277,76 +274,6 @@ bool NeoPkCUEngine::saneStackProbability() const {
 
   return sumOfStateProbabilities == FixType(1);
 }
-
-
-/**
- * @brief Combines environments on the stack that are identical.
- *
- * After all the branching from stochastic events, the stack may contain
- * multiple environments that are in the same state. This function identifies
- * these duplicates by hashing each environment and then merging the ones with
- * the same hash. The probabilities of the merged environments are summed up.
- * This is a crucial optimization to keep the number of possible environments
- * manageable.
- *
- * @return The number of unique environments remaining on the stack.
- */
-size_t NeoPkCUEngine::combineSimilarEnvironments() {
-  PossibleEnvironments& stack = getStack();
-
-  // hash environments (and summate probabilities for check):
-  for (iBase_ = 0; iBase_ != stack.size(); ++iBase_) {
-    EnvironmentPossible cEnvironment = getBase();
-
-    // assert that each of these environments is getting hashed:
-    assert(getStackStage() == StageType::FINAL);
-
-    cEnvironment.data().generateHash();
-  }
-
-  size_t iSize = stack.size();
-  std::unordered_map<uint64_t, size_t> envMap;
-  envMap.reserve(iSize);
-
-  // compare environment hashes:
-  for (size_t iEnv = 0; iEnv != iSize; iEnv++) {
-    EnvironmentPossible cEnv = stack.at(iEnv);
-
-    // don't attempt to merge pruned environments
-    if (cEnv.isPruned()) { continue; }
-
-    uint64_t hash = cEnv.getHash();
-    auto it = envMap.find(hash);
-
-    if (it != envMap.end()) {
-      // Found a duplicate! Merge into the existing environment
-      size_t existIndex = it->second;
-      EnvironmentPossible existEnv = stack.at(existIndex);
-
-      // combine the two environments by adding their probabilities
-      existEnv.getProbability() += cEnv.getProbability();
-
-      // this is probably not representative of the current environment now
-      existEnv.getBitmask() &= cEnv.getBitmask();
-
-      // flag the destination environment as merged
-      existEnv.setMerged();
-
-      // flag the current environment as pruned
-      cEnv.setPruned();
-
-      // decrement number of unique values in vector
-      stack.decrementUnique();
-    } else {
-      // First time seeing this hash, add to map
-      envMap[hash] = iEnv;
-    }
-  }
-
-  // Calculate accumulated probability for verification
-  assert(saneStackProbability());
-  return stack.getNumUnique();
-}  // endOf combineSimilarEnvironments
 
 
 void NeoPkCUEngine::calculateDamage() {

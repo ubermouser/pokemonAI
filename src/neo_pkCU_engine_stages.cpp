@@ -463,6 +463,7 @@ void NeoPkCUEngine::evaluateMove_damage_modifyAttackPower() {
 
 
 void NeoPkCUEngine::evaluateMove_damage_modifyCriticalPower() {
+  // TODO: use gotoStackStage so we don't need to check for hasCrit
   if (getBase().hasCrit(getICTeam())) {
     fpType criticalHitModifier = 2.0;
     int result = 0;
@@ -482,7 +483,8 @@ void NeoPkCUEngine::evaluateMove_damage_modifyCriticalPower() {
 
 
 void NeoPkCUEngine::evaluateMove_damage_preDamage() {
-  if (getBase().hasHit(getICTeam())) { calculateDamage(); }
+  assert(getBase().hasHit(getICTeam()));
+  calculateDamage();
 }
 
 
@@ -603,7 +605,32 @@ void NeoPkCUEngine::evaluateMove_postRound() {
 
 
 void NeoPkCUEngine::evaluateMove_round_hash() {
-  getBase().data().generateHash();
+  EnvironmentPossible cEnv = getBase();
+  uint64_t hash = cEnv.data().generateHash();
+
+  // we've never seen this state before:
+  auto it = stackHashToIdx_.find(hash);
+  if (it == stackHashToIdx_.end()) {
+    stackHashToIdx_[hash] = iBase_;
+    return;
+  }
+  // merge this duplicate state:
+  EnvironmentPossible existEnv = getStack().at(it->second);
+
+  // combine the two environments by adding their probabilities
+  existEnv.getProbability() += cEnv.getProbability();
+
+  // merge status flags for visualization
+  existEnv.getBitmask() &= cEnv.getBitmask();
+
+  // flag the destination environment as merged
+  existEnv.setMerged();
+
+  // flag the current environment as pruned
+  cEnv.setPruned();
+
+  // decrement number of unique values in vector
+  getStack().decrementUnique();
 }
 
 

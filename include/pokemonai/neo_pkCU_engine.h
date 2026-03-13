@@ -242,6 +242,12 @@ class NeoPkCUEngine {
   PossibleEnvironments stack_;
 
   /**
+   * @brief A map that stores the hash of each environment on the stack and the
+   * index of the environment.
+   */
+  std::unordered_map<uint64_t, size_t> stackHashToIdx_;
+
+  /**
    * @brief A deque that tracks the current stack frame for each environment on
    * the stack.
    */
