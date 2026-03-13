@@ -202,8 +202,8 @@ std::array<size_t, 2> NeoPkCUEngine::duplicateState(
   FixType totalProbability = getBase(result[0]).getProbability();
   FixType absoluteBranchProb = totalProbability * branchProbability;
 
-  assert(mostlyGT(absoluteBranchProb, FixType(0)));
-  assert(mostlyLT(absoluteBranchProb, totalProbability));
+  assert(absoluteBranchProb > FixType(0));
+  assert(absoluteBranchProb < totalProbability);
 
   getBase(result[1]).getProbability() = absoluteBranchProb;
   getBase(result[0]).getProbability() = totalProbability - absoluteBranchProb;
