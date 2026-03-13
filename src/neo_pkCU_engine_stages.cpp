@@ -591,16 +591,28 @@ void NeoPkCUEngine::evaluateMove_postTurn() {
       // no more actors or targets. Next stage
       frame.iActor = 0;
       frame.iTarget = 0;
-      advanceStackStage(frame.iStack);
+      // allow stackStage to increment at end of postTurn
     }
   }
 }
 
 
 void NeoPkCUEngine::evaluateMove_postRound() {
+  // post-round action for current actor:
   int result = 0;
   CALLPLUGIN(
       result, PLUGIN_ON_ENDOFROUND, onEndOfRound_rawType, *this, getPKV());
+
+  // test if other pkmn need to perform their post-round action:
+  StackFrame& frame = getStackFrame();
+  size_t nextActor = frame.iActor += 1;
+  if (nextActor < actions_.size()) {
+    frame.iActor = nextActor;
+    gotoStackStage(StageType::POSTROUND);
+  } else {
+    frame.iActor = 0;
+    // allow stackStage to increment at end of postRound
+  }
 }
 
 

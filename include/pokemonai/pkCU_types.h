@@ -189,7 +189,7 @@ enum StageType : int {
   // post turn status
   POSTTURN,                /**< After a Pokemon has completed its turn. */
   // post round status
-  POSTROUND,               /**< After both Pokemon have completed their turns. */
+  POSTROUND,               /**< After all Pokemon have completed their turns. */
   HASH,                    /**< The resulting environment is being hashed. */
   FINAL,                   /**< The final stage of the round. */
 };
