@@ -38,6 +38,7 @@ class NeoPkCUEngine {
       const EnvironmentVolatileData& initial,
       const ActionMap& actions);
 
+  void seedStack();
   PossibleEnvironments updateState();
 
   /**

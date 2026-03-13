@@ -50,6 +50,7 @@ struct fixed_point {
 
   fixed_point() {}
   explicit fixed_point(int32_t i) : intValue(i << p) {}
+  explicit fixed_point(int32_t n, int32_t d) : intValue(fixdiv<p>(n, d)) {}
   explicit fixed_point(float f) : intValue(float2fix<p>(f)) {}
   explicit fixed_point(double f) : intValue(double2fix<p>(f)) {}
 

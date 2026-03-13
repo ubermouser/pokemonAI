@@ -440,9 +440,7 @@ TEST_F(BasicEngineTest, StatusHitAndMiss) {
 }
 
 
-TEST_F(BasicEngineTest, HighEngineAccuracy) {
-  // moves with extremely high numbers of branches might cause stack probability
-  // that sums less than 1
+TEST_F(BasicEngineTest, HighEngineAccuracyWithSpeedTie) {
   engine_->setAccuracy(16);
 
   PossibleEnvironments result = engine_->updateState(
@@ -452,6 +450,20 @@ TEST_F(BasicEngineTest, HighEngineAccuracy) {
 
   EXPECT_EQ(result.size(), 8450);
   EXPECT_EQ(result.getNumUnique(), 49);
+  result.printStates();
+}
+
+
+TEST_F(BasicEngineTest, HighEngineAccuracySingleMove) {
+  engine_->setAccuracy(16);
+
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(),
+      Action::move(1),
+      Action::wait());  // fire blast
+
+  EXPECT_EQ(result.size(), 65);
+  EXPECT_EQ(result.getNumUnique(), 7);
   result.printStates();
 }
 

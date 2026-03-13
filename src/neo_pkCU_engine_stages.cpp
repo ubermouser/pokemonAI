@@ -25,7 +25,7 @@ void NeoPkCUEngine::evaluateMove() {
     if (!frame.moveOrder.empty() && frame.iActor < frame.moveOrder.size()) {
       Actor& actor = frame.moveOrder.at(frame.iActor);
       SPDLOG_TRACE(
-          "iSTACK={} P={:.4f} PKMN={} ACT={} TGT={} STAGE={:25s}",
+          "iSTACK={:4d} P={:.5f} PKMN={} ACT={} TGT={} STAGE={:25s}",
           iBase_,
           base.getProbability().to_double(),
           fmt::streamed(actor),
@@ -34,7 +34,7 @@ void NeoPkCUEngine::evaluateMove() {
           stageTypeToString(frame.stage));
     } else {
       SPDLOG_TRACE(
-          "iSTACK={} P={:.4f} STAGE={:25s}",
+          "iSTACK={:4d} P={:.5f} STAGE={:25s}",
           iBase_,
           base.getProbability().to_double(),
           stageTypeToString(frame.stage));
@@ -288,7 +288,7 @@ void NeoPkCUEngine::evaluateMove_damage_evaluateHitChance() {
       std::max(std::min(probabilityToHit, FixType(1)), FixType(0));
 
   SPDLOG_TRACE(
-      "iSTACK={} STAGE={:25s} HITPROB={:.4f}",
+      "iSTACK={:4d} STAGE={:25s} HITPROB={:.4f}",
       iBase_,
       stageTypeToString(getStackStage()),
       probabilityToHit.to_double());
@@ -345,7 +345,7 @@ void NeoPkCUEngine::evaluateMove_damage_evaluateCritChance() {
       std::max(std::min(probabilityToCrit, FixType(1)), FixType(0));
 
   SPDLOG_TRACE(
-      "iSTACK={} STAGE={:25s} CRITPROB={:.4f}",
+      "iSTACK={:4d} STAGE={:25s} CRITPROB={:.4f}",
       iBase_,
       stageTypeToString(getStackStage()),
       probabilityToCrit.to_double());
@@ -530,7 +530,7 @@ void NeoPkCUEngine::evaluateMove_evaluateSecondaryHitChance() {
       std::max(std::min(probabilityToSecondary, FixType(1)), FixType(0));
 
   SPDLOG_TRACE(
-      "iSTACK={} STAGE={:25s} SECPROB={:.4f}",
+      "iSTACK={:4d} STAGE={:25s} SECPROB={:.4f}",
       iBase_,
       stageTypeToString(getStackStage()),
       probabilityToSecondary.to_double());
@@ -587,6 +587,8 @@ void NeoPkCUEngine::evaluateMove_postTurn() {
       gotoStackStage(StageType::PRETURN);
     } else {
       // no more actors or targets. Next stage
+      frame.iActor = 0;
+      frame.iTarget = 0;
       advanceStackStage(frame.iStack);
     }
   }

@@ -165,8 +165,7 @@ int engine_beginTurnVolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
             std::min((unsigned)4, iConfused - AIL_V_CONFUSED_0T);
         uint32_t numTerminalEnv =
             ((iConfused - AIL_V_CONFUSED_0T) >= 5) ? 0 : 1;
-        FixType terminalProbability =
-            FixType((float)numTerminalEnv) / FixType((float)numTotalEnv);
+        FixType terminalProbability = FixType(numTerminalEnv, numTotalEnv);
 
         std::array<size_t, 2> iTEnv;
 

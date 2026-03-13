@@ -24,12 +24,20 @@ NeoPkCUEngine::NeoPkCUEngine(
   stack_.setNonvolatileEnvironment(cu.nv_);
   stack_.push_back(EnvironmentPossibleData::create(initial, false));
 
+  seedStack();
+}
+
+
+void NeoPkCUEngine::seedStack() {
   StackFrame firstFrame;
   firstFrame.iStack = 0;
   firstFrame.stage = StageType::SEEDED;
   firstFrame.iActor = 0;
   firstFrame.iTarget = 0;
+  firstFrame.moveOrder = {};
+  firstFrame.moveBrackets = {};
   firstFrame.targets = computeMoveTargets(stack_.at(0), actions_);
+  firstFrame.damageComponents = {};
   stackFrame_.push_back(firstFrame);
 }
 
@@ -271,14 +279,6 @@ bool NeoPkCUEngine::saneStackProbability() const {
 }
 
 
-void NeoPkCUEngine::reportStackSizeChange() const {
-  if (getStack().size() == lastStackSize_) { return; }
-
-  SPDLOG_TRACE(
-      "STACKSIZE CHANGED FROM {} TO {}", lastStackSize_, getStack().size());
-}
-
-
 /**
  * @brief Combines environments on the stack that are identical.
  *
@@ -475,8 +475,20 @@ size_t NeoPkCUEngine::advanceStackStage(size_t iStack) {
 }
 
 
+void NeoPkCUEngine::reportStackSizeChange() const {
+  if (getStack().size() == lastStackSize_) { return; }
+
+  SPDLOG_TRACE(
+      "iSTACK={:4d} STACK GROWS +{} TO {}",
+      iBase_,
+      getStack().size() - lastStackSize_,
+      getStack().size());
+}
+
+
 size_t NeoPkCUEngine::advanceAllStages() {
   size_t numCompletedFrames = 0;
+  reportStackSizeChange();
 
   // advance the current stage:
   numCompletedFrames += advanceStackStage(iBase_);
@@ -486,7 +498,6 @@ size_t NeoPkCUEngine::advanceAllStages() {
     numCompletedFrames += advanceStackStage(iStack);
   }
 
-  reportStackSizeChange();
   lastStackSize_ = stackFrame_.size();
   return numCompletedFrames;
 }
