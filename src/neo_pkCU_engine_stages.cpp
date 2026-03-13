@@ -55,9 +55,6 @@ void NeoPkCUEngine::evaluateMove() {
     case StageType::POSTSWITCH:
       evaluateMove_switch_onSwitchIn();
       break;
-    case StageType::STATUS:
-      evaluateMove_status();
-      break;
     case StageType::MOVEBASE:
       evaluateMove_damage_moveBase();
       break;
@@ -245,7 +242,10 @@ void NeoPkCUEngine::evaluateMove_selectOrder() {
 }
 
 
-void NeoPkCUEngine::evaluateMove_status() {
+void NeoPkCUEngine::evaluateMove_status() {}
+
+
+void NeoPkCUEngine::evaluateMove_damage_moveBase() {
   int result = 0;
   CALLPLUGIN(
       result,
@@ -253,14 +253,13 @@ void NeoPkCUEngine::evaluateMove_status() {
       onBeginningOfTurn_rawType,
       *this,
       getPKV());
-}
 
-
-void NeoPkCUEngine::evaluateMove_damage_moveBase() {
-  const Move& cMove = getMV().getBase();
-  getDamageComponent().category = cMove.getDamageType();
-
-  // if not a damaging move, skip damage and critical hit stages:
+  // was this move blocked by a status?
+  // did this pokemon die from the last pokemon's action?
+  if (getBase().wasBlocked(getICTeam()) || !getPKV().isAlive()) {
+    gotoStackStage(StageType::POSTTURN);
+    return;
+  }
 }
 
 

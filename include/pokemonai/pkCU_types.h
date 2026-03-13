@@ -164,9 +164,8 @@ enum StageType : int {
   PRESWITCH,               /**< Before a Pokemon switches out. */
   POSTSWITCH,              /**< After a Pokemon switches in. */
   // pre move evaluation:
-  STATUS,                  /**< Before a move is executed, for status effects like paralysis. */
+  MOVEBASE,                /**< Before a move is executed, for status effects like paralysis. */
   // move damage evaluation:
-  MOVEBASE,                /**< Base move evaluation. */
   EVALUATEHITCHANCE,       /**< Evaluate if the move hits. */
   DAMAGINGMOVEBASE,        /**< Base move evaluation for damaging moves. */
   EVALUATECRITCHANCE,      /**< Evaluate if the move crits. */
@@ -207,7 +206,6 @@ static const char* stageTypeToString(StageType stage) {
     case StageType::PRETURN: return "PRETURN";
     case StageType::PRESWITCH: return "PRESWITCH";
     case StageType::POSTSWITCH: return "POSTSWITCH";
-    case StageType::STATUS: return "STATUS";
     case StageType::MOVEBASE: return "MOVEBASE";
     case StageType::EVALUATEHITCHANCE: return "EVALUATEHITCHANCE";
     case StageType::DAMAGINGMOVEBASE: return "DAMAGINGMOVEBASE";

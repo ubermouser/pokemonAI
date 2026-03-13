@@ -82,7 +82,7 @@ TEST_F(FreezeStatusTest, Test_FrozenPokemonCannotMove) {
 
     // In blocked states, Team B Smeargle should have full HP
     for (const auto& state : blocked_states) {
-        EXPECT_EQ(state.getTeam(1).getPKV().getHP(), state.getTeam(1).getPKV().nv().getMaxHP());
+      EXPECT_EQ(state.getTeam(1).getPKV().getPercentHP(), 1.);
     }
 }
 
