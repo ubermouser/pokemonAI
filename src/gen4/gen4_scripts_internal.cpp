@@ -36,6 +36,7 @@ const Move* fissure_t;
 const Move* flameWheel_t;
 const Move* flareBlitz_t;
 const Move* gigaDrain_t;
+const Move* grudge_t;
 const Move* guillotine_t;
 const Move* haze_t;
 const Move* healBell_t;
@@ -184,6 +185,7 @@ void initializePointers(const Pokedex& pkAI) {
   flameWheel_t = orphan::orphanCheck(moves, "flame wheel");
   flareBlitz_t = orphan::orphanCheck(moves, "flare blitz");
   gigaDrain_t = orphan::orphanCheck(moves, "giga drain");
+  grudge_t = orphan::orphanCheck(moves, "grudge");
   guillotine_t = orphan::orphanCheck(moves, "guillotine");
   haze_t = orphan::orphanCheck(moves, "haze");
   healBell_t = orphan::orphanCheck(moves, "heal bell");
@@ -318,6 +320,7 @@ void registerGen4Extensions(
   register_move_encore(pkAI, extensions);
   register_move_endeavor(pkAI, extensions);
   register_move_facade(pkAI, extensions);
+  register_move_grudge(pkAI, extensions);
   register_move_hazards(pkAI, extensions);
   register_move_haze(pkAI, extensions);
   register_move_heal50(pkAI, extensions);
