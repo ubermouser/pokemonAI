@@ -73,8 +73,10 @@ void PokemonVolatile::modHP(int32_t quantity) {
   if (!isAlive())
   {
     // completely zero the pokemon
+    bool wasActive = data().active;
     data() = PokemonVolatileData();
     status().cTeammate = VolatileStatus();
+    data().active = wasActive;
   }
 }
 
@@ -86,8 +88,10 @@ void PokemonVolatile::setHP(uint32_t _HP) {
   if (!isAlive())
   {
     // completely zero the pokemon and teammate status
+    bool wasActive = data().active;
     data() = PokemonVolatileData();
     status().cTeammate = VolatileStatus();
+    data().active = wasActive;
   }
 }
 

@@ -483,7 +483,21 @@ void NeoPkCUEngine::evaluateMove_damage_modifyCriticalPower() {
 
 void NeoPkCUEngine::evaluateMove_damage_preDamage() {
   assert(getBase().hasHit(getICTeam()));
-  calculateDamage();
+  const Move& cMove = getMV().getBase();
+  if (cMove.damageType_ == ATK_PHYSICAL || cMove.damageType_ == ATK_SPECIAL) {
+    calculateDamage();
+  } else {
+    // TODO - move to different stage
+    int result = cMove.isImplemented() ? 1 : 0;
+    CALLPLUGIN(
+        result,
+        PLUGIN_ON_EVALUATEMOVE,
+        onEvaluateMove_rawType,
+        *this,
+        getMV(),
+        getPKV(),
+        getTPKV());
+  }
 }
 
 

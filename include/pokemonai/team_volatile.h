@@ -65,10 +65,14 @@ public:
   bool isAlive() const;
 
   /* Retrieves a pointer to the current pokemon active on this team */
-  pokemonvolatile_t getPKV() const { return teammate(getICPKV()); }
+  [[deprecated]] pokemonvolatile_t getPKV() const {
+    return teammate(getICPKV());
+  }
 
   /* gets current index of pokemon volatile on this team */
-  size_t getICPKV() const { return data().status.nonvolatile.iCPokemon; };
+  [[deprecated]] size_t getICPKV() const {
+    return data().status.nonvolatile.iCPokemon;
+  };
 
   status_t& status() const { return data().status; }
 

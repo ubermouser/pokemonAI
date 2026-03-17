@@ -217,7 +217,7 @@ class NeoPkCUEngine {
   const Actor& getCActor() const;
   const Actor& getTarget() const;
   const Action& getCAction() const;
-  const Action& getOAction() const;
+  [[deprecated]] const Action& getOAction() const;
   size_t getIBase() const { return iBase_; }
   /** @} */
 
