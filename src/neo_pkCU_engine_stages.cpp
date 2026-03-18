@@ -141,7 +141,38 @@ void NeoPkCUEngine::evaluateMove() {
 
 
 void NeoPkCUEngine::evaluateMove_preturn() {
-  const Action& cAction = getCAction();
+  Action cAction = getCAction();
+
+  // if either pokemon is dead at this point, the only valid moves are switching and waiting
+  if ((!getPKV().isAlive() || !getTPKV().isAlive()) && cAction.isMove()) {
+    cAction = Action::wait();
+    actions_[getCActor()] = cAction;
+  }
+
+  // if the current pokemon has been switched out, its move should be canceled
+  // We skip evaluation entirely to avoid illegal move access and incorrect wait flags.
+  if (getBase().hasSwitched(getICTeam()) && cAction.isMove()) {
+    gotoStackStage(StageType::POSTTURN);
+    return;
+  }
+
+  // Pre-move script: modify action?
+  if (cAction.isMove()) {
+    int result = 0;
+    CALLPLUGIN(
+        result, PLUGIN_ON_MODIFYACTION, onModifyAction_rawType, *this, cAction);
+
+    // If the plugin changed the action, we must validate it.
+    if (cAction != getCAction()) {
+      auto validation = cu_.isValidAction(getBase().getEnv(), cAction, getICTeam());
+      if (!validation) { cAction = Action::struggle(); }
+      // Update the action in the engine's internal state
+      actions_[getCActor()] = cAction;
+
+      // Set blocked if we want the environment to reflect that the original choice was preempted
+      getBase().setBlocked(getICTeam());
+    }
+  }
 
   // dispatch to appropriate stage:
   if (cAction.isMove()) {
