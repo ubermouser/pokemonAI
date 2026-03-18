@@ -1,6 +1,7 @@
 #include "engine_test.hpp"
 #include "pokemonai/pkai.h"
 
+
 class GrudgeTest : public Gen4EngineTest {
  protected:
   void SetUp() override {
@@ -31,6 +32,7 @@ class GrudgeTest : public Gen4EngineTest {
   }
 };
 
+
 TEST_F(GrudgeTest, DepletesPPOnKnockout) {
   // Misdreavus (fast) uses Grudge. Gardevoir (slow) uses Psychic.
   auto turn = engine_->updateState(
@@ -41,6 +43,7 @@ TEST_F(GrudgeTest, DepletesPPOnKnockout) {
   EXPECT_FALSE(state.teammate(0, 0).isAlive());
   EXPECT_EQ(state.teammate(1, 0).getMV(0).getPP(), 0);
 }
+
 
 TEST_F(GrudgeTest, WearsOffAfterNextMove) {
   // Turn 1: Misdreavus uses Grudge. Gardevoir uses Calm Mind (non-damaging).
@@ -56,11 +59,11 @@ TEST_F(GrudgeTest, WearsOffAfterNextMove) {
 
   auto state2 = turn2.where1Hit(1);
 
-
   EXPECT_FALSE(state2.teammate(0, 0).isAlive());
   // Gardevoir's Psychic should still have PP because Grudge wore off.
   EXPECT_GT(state2.teammate(1, 0).getMV(0).getPP(), 0);
 }
+
 
 TEST_F(GrudgeTest, DISABLED_TriggersOnOHKOMoves) {
   // OHKO moves like Sheer Cold also cause Grudge to trigger if they KO.
