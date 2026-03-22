@@ -345,7 +345,7 @@ IsValidResult NeoPkCU::isValidAction(
 
       // is the friendly target us?
       doAllowMove[VALID_MOVE_FRIENDLY_IS_OTHER] =
-          action.iFriendly() != cTV.getICPKV();
+          action.iFriendly() != actor.iTeammate();
     } else if (action.friendlyTarget() != Action::FRIENDLY_DEFAULT) {
       return IsValidResult::INVALID_FRIENDLY_TARGET;
     }
@@ -391,7 +391,7 @@ IsValidResult NeoPkCU::isValidAction(
 
     // are we trying to switch to ourself?
     doAllowSwitch[VALID_SWAP_FRIENDLY_IS_OTHER] =
-        action.iFriendly() != cTV.getICPKV();
+        action.iFriendly() != actor.iTeammate();
 
     // is the pokemon we're switching to even alive?
     ConstPokemonVolatile fPKV = cTV.teammate(action.iFriendly());

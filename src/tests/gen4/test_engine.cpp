@@ -4,10 +4,15 @@ class IsValidActionTest : public Gen4EngineTest {
  protected:
   void SetUp() override {
     Gen4EngineTest::SetUp();
-    auto team = TeamNonVolatile().addPokemon(
-        PokemonNonVolatile()
+    // clang-format off
+    auto team = TeamNonVolatile()
+        .addPokemon(PokemonNonVolatile()
             .setBase(pokedex_->pokemon("charmander"))
-            .addMove(pokedex_->move("cut")));
+            .addMove(pokedex_->move("cut")))
+        .addPokemon(PokemonNonVolatile()
+            .setBase(pokedex_->pokemon("squirtle"))
+            .addMove(pokedex_->move("surf")));
+    // clang-format on
     auto environment = EnvironmentNonvolatile(team, team, true);
     engine_->setEnvironment(environment);
   }
@@ -141,10 +146,10 @@ TEST_F(IsValidActionTest, MoveFriendlyTargetSelf) {
 }
 
 
-TEST_F(IsValidActionTest, SwitchInvalidPokemon) {
-  // Team has only 1 pokemon, cannot switch to index 1
+TEST_F(IsValidSwapTest, SwitchInvalidPokemon) {
+  // Team has 2 pokemon, cannot switch to index 3
   EXPECT_EQ(
-      engine_->isValidAction(engine_->initialState(), Action::swap(1), TEAM_A)
+      engine_->isValidAction(engine_->initialState(), Action::swap(3), TEAM_A)
           .reason,
       IsValidResult::SWITCH_INVALID_POKEMON);
 }
@@ -218,6 +223,25 @@ TEST_F(IsValidActionTest, InvalidFriendlyTarget) {
               engine_->initialState(), Action::moveAlly(0, 1), TEAM_A)
           .reason,
       IsValidResult::INVALID_FRIENDLY_TARGET);
+}
+
+
+TEST_F(IsValidActionTest, MoveActorNotActive) {
+  // Actor(TEAM_A, 1) is Squirtle, who is NOT active (Charmander is 0)
+  auto state = engine_->initialState();
+  EXPECT_EQ(
+      engine_->isValidAction(state, Actor(TEAM_A, 1), Action::move(0)).reason,
+      IsValidResult::MOVE_ACTOR_NOT_ACTIVE);
+}
+
+
+TEST_F(IsValidSwapTest, SwitchActivePokemon) {
+  // Team A: 0 is active, 1 is bench.
+  // Actor(TEAM_A, 1) is bench. Trying to swap to 0 (which is active).
+  auto state = engine_->initialState();
+  EXPECT_EQ(
+      engine_->isValidAction(state, Actor(TEAM_A, 1), Action::swap(0)).reason,
+      IsValidResult::SWITCH_ACTIVE_POKEMON);
 }
 
 

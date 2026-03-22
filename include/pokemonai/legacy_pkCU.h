@@ -101,13 +101,15 @@ class LegacyPkCUEngine;
 #define VALID_MOVE_FRIENDLY_ALIVE 3    /**< A friendly target is alive. */
 #define VALID_MOVE_FRIENDLY_IS_OTHER 4 /**< A friendly target is not the user. */
 #define VALID_MOVE_SCRIPT 5            /**< The move is not locked by a script. */
-#define VALID_MOVE_SIZE 6              /**< The total number of move validity flags. */
+#define VALID_MOVE_ACTOR_ACTIVE 6      /**< The user is currently active on the field. */
+#define VALID_MOVE_SIZE 7              /**< The total number of move validity flags. */
 
 #define VALID_SWAP_FRIENDLY_ALIVE 0    /**< The Pokemon to switch to is alive. */
 #define VALID_SWAP_FRIENDLY_IS_OTHER 1 /**< The Pokemon to switch to is not the active Pokemon. */
 #define VALID_SWAP_MUST_WAIT 2         /**< A switch is allowed (not during an opponent's free move). */
 #define VALID_SWAP_SCRIPT 3            /**< The switch is not locked by a script. */
-#define VALID_SWAP_SIZE 4              /**< The total number of swap validity flags. */
+#define VALID_SWAP_TARGET_INACTIVE 4   /**< The switch target is currently not active on the field */
+#define VALID_SWAP_SIZE 5              /**< The total number of swap validity flags. */
 /** @} */
 
 /**
@@ -125,6 +127,7 @@ struct IsValidResult {
    */
   enum InvalidActionReason {
     VALID,
+    MOVE_ACTOR_NOT_ACTIVE,
     MOVE_INVALID,
     MOVE_TARGET_DEAD,
     MOVE_SELF_DEAD,
@@ -134,6 +137,7 @@ struct IsValidResult {
     MOVE_LOCKED_BY_SCRIPT,
     SWITCH_INVALID_POKEMON,
     SWITCH_TO_SELF,
+    SWITCH_ACTIVE_POKEMON,
     SWITCH_POKEMON_DEAD,
     SWITCH_MUST_WAIT,
     SWITCH_LOCKED_BY_SCRIPT,
@@ -166,6 +170,7 @@ struct IsValidResult {
 static const char* invalidActionReasonToString(IsValidResult result) {
   switch (result.reason) {
     case IsValidResult::VALID: return "Valid action";
+    case IsValidResult::MOVE_ACTOR_NOT_ACTIVE: return "Actor is currently not in play";
     case IsValidResult::MOVE_INVALID: return "Move index out of bounds";
     case IsValidResult::MOVE_TARGET_DEAD: return "Target is dead";
     case IsValidResult::MOVE_SELF_DEAD: return "Current pokemon is dead";
@@ -175,6 +180,7 @@ static const char* invalidActionReasonToString(IsValidResult result) {
     case IsValidResult::MOVE_LOCKED_BY_SCRIPT: return "Move locked by script";
     case IsValidResult::SWITCH_INVALID_POKEMON: return "Teammate index is out of bounds";
     case IsValidResult::SWITCH_TO_SELF: return "Cannot switch to self";
+    case IsValidResult::SWITCH_ACTIVE_POKEMON: return "Cannot switch to an already active teammate";
     case IsValidResult::SWITCH_POKEMON_DEAD: return "Cannot switch to a dead pokemon";
     case IsValidResult::SWITCH_MUST_WAIT: return "Must wait for opponent's free move";
     case IsValidResult::SWITCH_LOCKED_BY_SCRIPT: return "Switch locked by script";
@@ -362,10 +368,20 @@ public:
    * @param iTeam The index of the team performing the action.
    * @return An `IsValidResult` object indicating if the action is valid.
    */
-  IsValidResult isValidAction(const ConstEnvironmentVolatile& envV, const Action& action, size_t iTeam) const;
-  IsValidResult isValidAction(const ConstEnvironmentPossible& envV, const Action& action, size_t iTeam) const {
+  [[deprecated]] IsValidResult isValidAction(
+      const ConstEnvironmentVolatile& envV,
+      const Action& action,
+      size_t iTeam) const;
+  [[deprecated]] IsValidResult isValidAction(
+      const ConstEnvironmentPossible& envV,
+      const Action& action,
+      size_t iTeam) const {
     return isValidAction(envV.getEnv(), action, iTeam);
   }
+  IsValidResult isValidAction(
+      const ConstEnvironmentVolatile& envV,
+      const Actor& actor,
+      const Action& action) const;
 
   /**
    * @brief Checks if the game is over.
