@@ -69,10 +69,28 @@ std::vector<Actor> ENV_VOLATILE_IMPL::getActivePokemon() const {
 
 ENV_VOLATILE_IMPL_TEMPLATE
 void ENV_VOLATILE_IMPL::printActivePokemon(std::ostream& os, size_t first) const {
+  std::string agent_str;
+  auto team1 = getTeam(first);
+  for (size_t iTeammate = 0; iTeammate < team1.nv().getNumTeammates(); ++iTeammate) {
+    if (team1.teammate(iTeammate).data().active) {
+      if (!agent_str.empty()) agent_str += ", ";
+      agent_str += fmt::format("{}", fmt::streamed(team1.teammate(iTeammate)));
+    }
+  }
+
+  std::string other_str;
+  auto team2 = getOtherTeam(first);
+  for (size_t iTeammate = 0; iTeammate < team2.nv().getNumTeammates(); ++iTeammate) {
+    if (team2.teammate(iTeammate).data().active) {
+      if (!other_str.empty()) other_str += ", ";
+      other_str += fmt::format("{}", fmt::streamed(team2.teammate(iTeammate)));
+    }
+  }
+
   os << fmt::format(
       "\tagent: {}\n\tother: {}\n",
-      fmt::streamed(getTeam(first).getPKV()),
-      fmt::streamed(getOtherTeam(first).getPKV()));
+      agent_str,
+      other_str);
 }
 
 
