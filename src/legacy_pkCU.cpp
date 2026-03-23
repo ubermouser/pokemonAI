@@ -1439,17 +1439,22 @@ ActionPairVector LegacyPkCU::getAllValidActions(
 
 
 ActionVector LegacyPkCU::getValidActionsInRange(
-    const ConstEnvironmentVolatile& envV, size_t iTeam, size_t iFirst, size_t iLast) const {
-  ActionVector result; result.reserve((iLast - iFirst) + envV.getTeam(iTeam).nv().getNumTeammates());
-  ConstTeamVolatile cTV = envV.getTeam(iTeam);
-  ConstPokemonVolatile cPKV = envV.getTeam(iTeam).getPKV();
+    const ConstEnvironmentVolatile& envV,
+    const Actor& actor,
+    size_t iFirst,
+    size_t iLast) const {
+  ActionVector result;
+  result.reserve(
+      (iLast - iFirst) + envV.getTeam(actor.iTeam()).nv().getNumTeammates());
+  ConstTeamVolatile cTV = envV.getTeam(actor.iTeam());
+  ConstPokemonVolatile cPKV = envV.teammate(actor);
   // foreach move type:
   for (size_t iType = iFirst; iType < iLast; ++iType) {
     Action action{iType};
     bool isMoveAction = action.isMove() && (action.iMove() < cPKV.nv().getNumMoves());
     bool isSwitchAction = action.isSwitch();
     bool targetsFriendly =
-        (isMoveAction)?envV.getTeam(iTeam).getPKV().getMV(action).getBase().targetsAlly():false;
+        (isMoveAction) ? cPKV.getMV(action).getBase().targetsAlly() : false;
     targetsFriendly |= isSwitchAction;
     size_t iFriendlyMin = targetsFriendly?(Action::FRIENDLY_0):(Action::FRIENDLY_DEFAULT);
     size_t iFriendlyMax = targetsFriendly?(Action::FRIENDLY_0 + cTV.nv().getNumTeammates()):(Action::FRIENDLY_DEFAULT);
@@ -1463,7 +1468,7 @@ ActionVector LegacyPkCU::getValidActionsInRange(
       for (size_t iHostile = iHostileMin; iHostile <= iHostileMax; ++iHostile) {
         // test if move is valid:
         action = Action{iType, iFriendly, iHostile};
-        if (isValidAction(envV, action, iTeam)) {
+        if (isValidAction(envV, actor, action)) {
           // and if so, add it to result vector
           result.push_back(action);
         }

@@ -351,16 +351,36 @@ public:
    * @param iTeam The index of the team.
    * @return An `ActionVector` containing all valid actions.
    */
-  ActionVector getValidActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
-    return getValidActionsInRange(envV, iTeam, 0, Action::MOVE_LAST);
+  ActionVector getValidActions(
+      const ConstEnvironmentVolatile& envV, const Actor& actor) const {
+    return getValidActionsInRange(envV, actor, 0, Action::MOVE_LAST);
   }
-  ActionVector getValidMoveActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
-    return getValidActionsInRange(envV, iTeam, Action::MOVE_0, Action::MOVE_WAIT + 1);
+  ActionVector getValidMoveActions(
+      const ConstEnvironmentVolatile& envV, const Actor& actor) const {
+    return getValidActionsInRange(
+        envV, actor, Action::MOVE_0, Action::MOVE_WAIT + 1);
   }
-  ActionVector getValidSwapActions(const ConstEnvironmentVolatile& envV, size_t iTeam) const {
-    return getValidActionsInRange(envV, iTeam, Action::MOVE_SWITCH, Action::MOVE_SWITCH + 1);
+  ActionVector getValidSwapActions(
+      const ConstEnvironmentVolatile& envV, const Actor& actor) const {
+    return getValidActionsInRange(
+        envV, actor, Action::MOVE_SWITCH, Action::MOVE_SWITCH + 1);
   }
-  ActionPairVector getAllValidActions(const ConstEnvironmentVolatile& envV, size_t agentTeam=TEAM_A) const;
+  [[deprecated]] ActionVector getValidActions(
+      const ConstEnvironmentVolatile& envV, size_t iTeam) const {
+    return getValidActions(envV, Actor(iTeam, envV.getTeam(iTeam).getICPKV()));
+  }
+  [[deprecated]] ActionVector getValidMoveActions(
+      const ConstEnvironmentVolatile& envV, size_t iTeam) const {
+    return getValidMoveActions(
+        envV, Actor(iTeam, envV.getTeam(iTeam).getICPKV()));
+  }
+  [[deprecated]] ActionVector getValidSwapActions(
+      const ConstEnvironmentVolatile& envV, size_t iTeam) const {
+    return getValidSwapActions(
+        envV, Actor(iTeam, envV.getTeam(iTeam).getICPKV()));
+  }
+  [[deprecated]] ActionPairVector getAllValidActions(
+      const ConstEnvironmentVolatile& envV, size_t agentTeam = TEAM_A) const;
 
   /**
    * @brief Checks if a given action is valid for a team in the current state.
@@ -449,7 +469,10 @@ public:
 
 
   ActionVector getValidActionsInRange(
-      const ConstEnvironmentVolatile& envV, size_t iTeam, size_t iStart, size_t iEnd) const;
+      const ConstEnvironmentVolatile& envV,
+      const Actor& actor,
+      size_t iStart,
+      size_t iEnd) const;
 
   /**
    * @brief Inserts a plugin into the plugin sets for the appropriate matchups.

@@ -146,6 +146,12 @@ class PKAISHARED NeoPkCU {
    * @param iTeam The index of the team.
    * @return An `ActionVector` containing all valid actions.
    */
+  ActionVector getValidActions(
+      const ConstEnvironmentVolatile& envV, const Actor& actor) const;
+  ActionVector getValidMoveActions(
+      const ConstEnvironmentVolatile& envV, const Actor& actor) const;
+  ActionVector getValidSwapActions(
+      const ConstEnvironmentVolatile& envV, const Actor& actor) const;
   [[deprecated]] ActionVector getValidActions(
       const ConstEnvironmentVolatile& envV, size_t iTeam) const;
   [[deprecated]] ActionVector getValidMoveActions(
