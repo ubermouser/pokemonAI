@@ -82,7 +82,7 @@ void NeoPkCU::guardNonvolatileState(
 
 void NeoPkCU::guardCorrectActionCount(
     const ConstEnvironmentVolatile& cEnv, const ActionMap& actions) const {
-  size_t numActivePokemon = cEnv.getActivePokemon().size();
+  size_t numActivePokemon = cEnv.getNumActivePokemon();
   if (numActivePokemon != actions.size()) {
     throw std::invalid_argument(fmt::format(
         "wrong number of actions: expected {}, got {}",

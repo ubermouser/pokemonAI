@@ -18,20 +18,21 @@
 #ifndef LEGACY_PKAI_CU_H
 #define	LEGACY_PKAI_CU_H
 
-#include "pkai.h"
+#include <assert.h>
+#include <stdint.h>
 
 #include <array>
-#include <assert.h>
 #include <bitset>
+#include <boost/program_options.hpp>
 #include <deque>
 #include <memory>
-#include <stdint.h>
 #include <string>
-#include <vector>
 #include <utility>
-#include <boost/program_options.hpp>
+#include <vector>
 
 #include "engine.h"
+#include "pkai.h"
+#include "pokemonai/environment_volatile.h"
 
 class LegacyPkCUEngine;
 
@@ -431,6 +432,13 @@ public:
    * @param cEnv The environment to check.
    */
   void guardNonvolatileState(const ConstEnvironmentVolatile& cEnv) const;
+
+  /**
+   * @brief Throws an exception if the provided environment is not a 1v1
+   * environment.
+   * @param cEnv The environment to check.
+   */
+  void guardOnly1v1Supported(const ConstEnvironmentVolatile& cEnv) const;
 
   /**
    * @brief Checks if the sum of the probabilities in the stack is sane.

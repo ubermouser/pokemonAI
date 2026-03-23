@@ -56,11 +56,8 @@ std::vector<Actor> ENV_VOLATILE_IMPL::getActivePokemon() const {
   std::vector<Actor> result;
   for (size_t iTeam = 0; iTeam < data().teams.size(); ++iTeam) {
     auto team = getTeam(iTeam);
-    for (size_t iTeammate = 0; iTeammate < team.nv().getNumTeammates();
-         ++iTeammate) {
-      if (team.teammate(iTeammate).data().active) {
-        result.push_back({iTeam, iTeammate});
-      }
+    for (size_t iTeammate : team.getActivePokemon()) {
+      result.push_back({iTeam, iTeammate});
     }
   }
   return result;
@@ -68,11 +65,28 @@ std::vector<Actor> ENV_VOLATILE_IMPL::getActivePokemon() const {
 
 
 ENV_VOLATILE_IMPL_TEMPLATE
+size_t ENV_VOLATILE_IMPL::getNumActivePokemon() const {
+  size_t result = 0;
+  for (size_t iTeam = 0; iTeam < data().teams.size(); ++iTeam) {
+    result += getTeam(iTeam).getNumActivePokemon();
+  }
+  return result;
+}
+
+
+ENV_VOLATILE_IMPL_TEMPLATE
 void ENV_VOLATILE_IMPL::printActivePokemon(std::ostream& os, size_t first) const {
-  os << fmt::format(
-      "\tagent: {}\n\tother: {}\n",
-      fmt::streamed(getTeam(first).getPKV()),
-      fmt::streamed(getOtherTeam(first).getPKV()));
+  auto agentTeam = getTeam(first);
+  auto otherTeam = getOtherTeam(first);
+
+  for (size_t iTeammate : agentTeam.getActivePokemon()) {
+    os << fmt::format(
+        "\tagent: {}\n", fmt::streamed(agentTeam.teammate(iTeammate)));
+  }
+  for (size_t iTeammate : otherTeam.getActivePokemon()) {
+    os << fmt::format(
+        "\tother: {}\n", fmt::streamed(otherTeam.teammate(iTeammate)));
+  }
 }
 
 

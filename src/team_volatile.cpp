@@ -48,6 +48,30 @@ TEAM_VOLATILE_IMPL::teammate(size_t iTeammate) const {
 
 
 TEAM_VOLATILE_IMPL_TEMPLATE
+std::vector<size_t> TEAM_VOLATILE_IMPL::getActivePokemon() const {
+  std::vector<size_t> result;
+  for (size_t iTeammate = 0; iTeammate != nv().getNumTeammates(); ++iTeammate) {
+    if (teammate(iTeammate).data().active) {
+      result.push_back(iTeammate);
+    }
+  }
+  return result;
+}
+
+
+TEAM_VOLATILE_IMPL_TEMPLATE
+size_t TEAM_VOLATILE_IMPL::getNumActivePokemon() const {
+  size_t result = 0;
+  for (size_t iTeammate = 0; iTeammate != nv().getNumTeammates(); ++iTeammate) {
+    if (teammate(iTeammate).data().active) {
+      ++result;
+    }
+  }
+  return result;
+}
+
+
+TEAM_VOLATILE_IMPL_TEMPLATE
 uint32_t TEAM_VOLATILE_IMPL::numTeammatesAlive() const {
   uint32_t result = 0; // accumulate living teammates
   for (size_t iPokemon= 0; iPokemon != nv().getNumTeammates(); ++iPokemon) {

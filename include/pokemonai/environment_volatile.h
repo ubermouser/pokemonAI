@@ -69,6 +69,7 @@ public:
   }
 
   std::vector<Actor> getActivePokemon() const;
+  size_t getNumActivePokemon() const;
 
   void printActivePokemon(std::ostream& os, size_t firstTeam=0) const;
 };

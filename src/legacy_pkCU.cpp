@@ -1378,6 +1378,7 @@ PossibleEnvironments LegacyPkCU::updateState(
   PossibleEnvironments result;
 
   guardNonvolatileState(cEnv);
+  guardOnly1v1Supported(cEnv);
   if (!cfg_.allowInvalidMoves) {
     auto reasonA = isValidAction(cEnv, actionA, TEAM_A);
     if (!reasonA) {
@@ -1674,6 +1675,14 @@ IsValidResult LegacyPkCU::isValidAction(
 void LegacyPkCU::guardNonvolatileState(const ConstEnvironmentVolatile& cEnv) const {
   if (cEnv.nv_ != nv_.get()) {
     throw std::runtime_error("mismatched nonvolatile state - call setEnvironment first");
+  }
+}
+
+
+void LegacyPkCU::guardOnly1v1Supported(
+    const ConstEnvironmentVolatile& cEnv) const {
+  if (cEnv.getNumActivePokemon() != 2) {
+    throw std::runtime_error("only 1v1 environments are supported!");
   }
 }
 

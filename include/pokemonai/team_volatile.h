@@ -13,6 +13,7 @@
 #include <array>
 #include <iosfwd>
 #include <stdint.h>
+#include <vector>
 
 #include "nonvolatile_volatile.h"
 #include "pokemon_volatile.h"
@@ -60,6 +61,12 @@ public:
 
   /* returns number of teammates on this team that are still alive */
   uint32_t numTeammatesAlive() const;
+
+  /* returns indices of teammates on this team that are active */
+  std::vector<size_t> getActivePokemon() const;
+
+  /* returns number of teammates on this team that are active */
+  size_t getNumActivePokemon() const;
   
   /* returns true if at least one teammate on the team is alive */
   bool isAlive() const;
