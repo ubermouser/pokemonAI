@@ -163,8 +163,7 @@ void NeoPkCUEngine::evaluateMove_selectOrder() {
 
   // 1. Compute MoveBrackets if not already done
   if (frame.moveBrackets.empty()) {
-    std::vector<Actor> active = getBase().getEnv().getActivePokemon();
-    for (const auto& actor : active) {
+    for (const auto& actor : getBase().getEnv().yieldActivePokemon()) {
       frame.moveBrackets[actor] = computeMoveBracket(actor);
     }
   }

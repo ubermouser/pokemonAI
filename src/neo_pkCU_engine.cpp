@@ -137,8 +137,7 @@ std::unordered_map<Actor, std::vector<Actor>> NeoPkCUEngine::computeMoveTargets(
 std::unordered_map<Actor, NeoPkCUEngine::MoveBracket>
 NeoPkCUEngine::computeMoveBrackets() {
   std::unordered_map<Actor, MoveBracket> results;
-  std::vector<Actor> active = getBase().getEnv().getActivePokemon();
-  for (const auto& actor : active) {
+  for (const auto& actor : getBase().getEnv().yieldActivePokemon()) {
     results[actor] = computeMoveBracket(actor);
   }
   return std::move(results);

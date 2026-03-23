@@ -67,6 +67,47 @@ public:
 
   /* returns number of teammates on this team that are active */
   size_t getNumActivePokemon() const;
+
+  struct ActivePokemonRange {
+    const TeamNonVolatile* nv;
+    const TeamVolatileData* data;
+    struct Iterator {
+      const TeamNonVolatile* nv;
+      const TeamVolatileData* data;
+      size_t index;
+
+      void advance() {
+        while (index < nv->getNumTeammates() &&
+               !data->teammates[index].active) {
+          ++index;
+        }
+      }
+
+      size_t operator*() const { return index; }
+      Iterator& operator++() {
+        ++index;
+        advance();
+        return *this;
+      }
+      bool operator==(const Iterator& other) const { return index == other.index; }
+      bool operator!=(const Iterator& other) const { return index != other.index; }
+
+      using iterator_category = std::input_iterator_tag;
+      using value_type = size_t;
+      using difference_type = std::ptrdiff_t;
+      using pointer = const size_t*;
+      using reference = const size_t&;
+    };
+
+    Iterator begin() const {
+      Iterator it{nv, data, 0};
+      it.advance();
+      return it;
+    }
+    Iterator end() const { return Iterator{nv, data, nv->getNumTeammates()}; }
+  };
+
+  ActivePokemonRange yieldActivePokemon() const { return {&nv(), &data()}; }
   
   /* returns true if at least one teammate on the team is alive */
   bool isAlive() const;
