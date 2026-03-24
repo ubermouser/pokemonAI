@@ -38,7 +38,7 @@ TEST_F(KnockOffTest, removes_item) {
 
   auto final_env_v = turn1.where1().getEnv();
   // Expect Blissey to have lost Leftovers
-  EXPECT_FALSE(final_env_v.getTeam(1).getPKV().hasItem());
+  EXPECT_FALSE(final_env_v.teammate(1, 0).hasItem());
 }
 
 TEST_F(KnockOffTest, sticky_hold) {
@@ -51,8 +51,8 @@ TEST_F(KnockOffTest, sticky_hold) {
 
   auto final_env_v = turn1.where1().getEnv();
   // Expect Muk to still have Leftovers
-  EXPECT_TRUE(final_env_v.getTeam(1).getPKV().hasItem());
-  EXPECT_EQ(final_env_v.getTeam(1).getPKV().getItem().getName(), "leftovers");
+  EXPECT_TRUE(final_env_v.teammate(1, 1).hasItem());
+  EXPECT_EQ(final_env_v.teammate(1, 1).getItem().getName(), "leftovers");
 }
 
 TEST_F(KnockOffTest, substitute_active) {
@@ -65,7 +65,7 @@ TEST_F(KnockOffTest, substitute_active) {
     swap_gengar.where1(), Action::wait(), Action::move(0));
 
   // Verify substitute is up
-  EXPECT_GT(substitute_up.where1().getEnv().getTeam(1).getPKV().status().cTeammate.substitute, 0);
+  EXPECT_GT(substitute_up.where1().teammate(1, 2).status().cTeammate.substitute, 0);
 
   // Alakazam uses Knock Off
   auto knock_off = engine_->updateState(
@@ -74,8 +74,8 @@ TEST_F(KnockOffTest, substitute_active) {
   auto final_env_v = knock_off.where1().getEnv();
 
   // Expect Gengar to still have Life Orb
-  EXPECT_TRUE(final_env_v.getTeam(1).getPKV().hasItem());
-  EXPECT_EQ(final_env_v.getTeam(1).getPKV().getItem().getName(), "life orb");
+  EXPECT_TRUE(final_env_v.teammate(1, 2).hasItem());
+  EXPECT_EQ(final_env_v.teammate(1, 2).getItem().getName(), "life orb");
 }
 
 TEST_F(KnockOffTest, no_item) {
@@ -90,7 +90,7 @@ TEST_F(KnockOffTest, no_item) {
       turn1.where1(), Action::move(0), Action::wait());
 
   auto final_env_v = turn2.where1().getEnv();
-  EXPECT_FALSE(final_env_v.getTeam(1).getPKV().hasItem());
+  EXPECT_FALSE(final_env_v.teammate(1, 0).hasItem());
 }
 
 TEST_F(KnockOffTest, DISABLED_arceus_plate) {
@@ -111,6 +111,6 @@ TEST_F(KnockOffTest, DISABLED_arceus_plate) {
 
   auto final_env_v = turn1.where1().getEnv();
   // Expect Arceus to still have Draco Plate
-  EXPECT_TRUE(final_env_v.getTeam(1).getPKV().hasItem());
-  EXPECT_EQ(final_env_v.getTeam(1).getPKV().getItem().getName(), "draco plate");
+  EXPECT_TRUE(final_env_v.teammate(1, 0).hasItem());
+  EXPECT_EQ(final_env_v.teammate(1, 0).getItem().getName(), "draco plate");
 }

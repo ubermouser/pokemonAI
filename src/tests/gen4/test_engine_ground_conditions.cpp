@@ -33,14 +33,14 @@ TEST_F(Gen4EngineTest, GroundConditions) {
     auto removed_vs_spikes = engine_->updateState(
         spikes_removed.where1(), Action::wait(), Action::swap(1));
     EXPECT_EQ(
-        removed_vs_spikes.where1().getTeam(1).getPKV().getPercentHP(),
+        removed_vs_spikes.where1().teammate(1, 1).getPercentHP(),
         1.);  // 100%
   }
   { // test normal harmed vs spikes:
     auto normal_vs_spikes =
         engine_->updateState(spikes.where1(), Action::wait(), Action::swap(1));
     EXPECT_NEAR(
-        normal_vs_spikes.where1().getTeam(1).getPKV().getPercentHP(),
+        normal_vs_spikes.where1().teammate(1, 1).getPercentHP(),
         0.875,
         0.005);  // 87.5%
   }
@@ -48,13 +48,12 @@ TEST_F(Gen4EngineTest, GroundConditions) {
     auto normal_vs_toxic = engine_->updateState(
         toxic_spikes.where1(), Action::wait(), Action::swap(1));
     EXPECT_NEAR(
-        normal_vs_toxic.where1().getTeam(1).getPKV().getPercentHP(),
+        normal_vs_toxic.where1().teammate(1, 1).getPercentHP(),
         0.875,
         0.005);  // 87.5%
     EXPECT_EQ(
         normal_vs_toxic.where1()
-            .getTeam(1)
-            .getPKV()
+            .teammate(1, 1)
             .getStatusAilment(),
         AIL_NV_POISON);  // 87.5%
   }
@@ -62,21 +61,21 @@ TEST_F(Gen4EngineTest, GroundConditions) {
     auto lev_vs_spikes =
         engine_->updateState(spikes.where1(), Action::wait(), Action::swap(2));
     EXPECT_EQ(
-        lev_vs_spikes.where1().getTeam(1).getPKV().getPercentHP(),
+        lev_vs_spikes.where1().teammate(1, 2).getPercentHP(),
         1.);  // 100%
   }
   { // test levitate unharmed vs toxic spikes:
     auto lev_vs_toxic = engine_->updateState(
         toxic_spikes.where1(), Action::wait(), Action::swap(2));
     EXPECT_EQ(
-        lev_vs_toxic.where1().getTeam(1).getPKV().getPercentHP(),
+        lev_vs_toxic.where1().teammate(1, 2).getPercentHP(),
         1.);  // 100%
   }
   { // test levitate harmed vs stealth rock:
     auto lev_vs_sr = engine_->updateState(
         stealth_rock.where1(), Action::wait(), Action::swap(2));
     EXPECT_NEAR(
-        lev_vs_sr.where1().getTeam(1).getPKV().getPercentHP(),
+        lev_vs_sr.where1().teammate(1, 2).getPercentHP(),
         0.875,
         0.005);  // 87.5%
   }
@@ -84,14 +83,14 @@ TEST_F(Gen4EngineTest, GroundConditions) {
     auto flying_vs_spikes =
         engine_->updateState(spikes.where1(), Action::wait(), Action::swap(3));
     EXPECT_EQ(
-        flying_vs_spikes.where1().getTeam(1).getPKV().getPercentHP(),
+        flying_vs_spikes.where1().teammate(1, 3).getPercentHP(),
         1.);  // 100%
   }
   { // test flying harmed vs stealth rock:
     auto flying_vs_sr = engine_->updateState(
         stealth_rock.where1(), Action::wait(), Action::swap(3));
     EXPECT_NEAR(
-        flying_vs_sr.where1().getTeam(1).getPKV().getPercentHP(),
+        flying_vs_sr.where1().teammate(1, 3).getPercentHP(),
         0.75,
         0.005);  // 75%
   }

@@ -67,7 +67,7 @@ TEST_F(ChoiceItemsTest, LockedIntoMove) {
 TEST_F(ChoiceItemsTest, StruggleWhenNoPP) {
   // when all PP have been used, only struggle is available:
   auto noPPState = bulletpunch_cb.where1Hit(0);
-  noPPState.getTeam(0).getPKV().getMV(0).setPP(0);
+  noPPState.teammate(0, 0).getMV(0).setPP(0);
   EXPECT_FALSE(engine_->isValidAction(noPPState.getEnv(), Actor(TEAM_A, 0), Action::move(0))); // locked due to PP
   EXPECT_FALSE(engine_->isValidAction(noPPState.getEnv(), Actor(TEAM_A, 0), Action::move(1))); // locked due to Choice
   EXPECT_TRUE(engine_->isValidAction(noPPState.getEnv(), Actor(TEAM_A, 0), Action::struggle()));

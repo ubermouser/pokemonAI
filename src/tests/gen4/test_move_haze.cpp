@@ -54,16 +54,16 @@ TEST_F(HazeTest, ResetsStats) {
   auto state = haze_result.where1Hit(0);
 
   // Check Team A (Crobat) stats
-  EXPECT_EQ(state.getTeam(0).getPKV().getBoost(FV_ATTACK), 0);
-  EXPECT_EQ(state.getTeam(0).getPKV().getBoost(FV_DEFENSE), 0);
-  EXPECT_EQ(state.getTeam(0).getPKV().getBoost(FV_ACCURACY), 0);
-  EXPECT_EQ(state.getTeam(0).getPKV().getBoost(FV_CRITICALHIT), 0);
+  EXPECT_EQ(state.teammate(0, 0).getBoost(FV_ATTACK), 0);
+  EXPECT_EQ(state.teammate(0, 0).getBoost(FV_DEFENSE), 0);
+  EXPECT_EQ(state.teammate(0, 0).getBoost(FV_ACCURACY), 0);
+  EXPECT_EQ(state.teammate(0, 0).getBoost(FV_CRITICALHIT), 0);
 
   // Check Team B (Charmander) stats
-  EXPECT_EQ(state.getTeam(1).getPKV().getBoost(FV_SPATTACK), 0);
-  EXPECT_EQ(state.getTeam(1).getPKV().getBoost(FV_SPEED), 0);
+  EXPECT_EQ(state.teammate(1, 0).getBoost(FV_SPATTACK), 0);
+  EXPECT_EQ(state.teammate(1, 0).getBoost(FV_SPEED), 0);
 
   // Verify other stats are 0 (default)
-  EXPECT_EQ(state.getTeam(0).getPKV().getBoost(FV_SPATTACK), 0);
-  EXPECT_EQ(state.getTeam(1).getPKV().getBoost(FV_DEFENSE), 0);
+  EXPECT_EQ(state.teammate(0, 0).getBoost(FV_SPATTACK), 0);
+  EXPECT_EQ(state.teammate(1, 0).getBoost(FV_DEFENSE), 0);
 }

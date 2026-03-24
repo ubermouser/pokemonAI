@@ -52,19 +52,19 @@ class FocusSashTest : public Gen4EngineTest {
 
 TEST_F(FocusSashTest, FocusSashPreventsOHKO) {
   // Garchomp uses Earthquake (index 0) on full HP Magikarp
-  ASSERT_EQ(target_bigdamage.where1().getTeam(1).getPKV().getHP(), 1);
+  ASSERT_EQ(target_bigdamage.where1().teammate(1, 0).getHP(), 1);
 }
 
 
 TEST_F(FocusSashTest, FocusSashConsumedAfterUse) {
   // Garchomp uses Earthquake (index 0) on full HP Magikarp
-  ASSERT_FALSE(target_bigdamage.where1().getTeam(1).getPKV().hasItem());
+  ASSERT_FALSE(target_bigdamage.where1().teammate(1, 0).hasItem());
 }
 
 
 TEST_F(FocusSashTest, FocusSashDoesNotWorkIfNotFullHP) {
   // Garchomp uses Earthquake (index 0) on damaged Magikarp
-  ASSERT_FALSE(target_dead.where1().getTeam(1).getPKV().isAlive());
+  ASSERT_FALSE(target_dead.where1().teammate(1, 0).isAlive());
 }
 
 

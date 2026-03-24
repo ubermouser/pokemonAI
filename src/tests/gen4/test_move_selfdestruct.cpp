@@ -28,8 +28,8 @@ TEST_F(SuicideMoveTest, Explosion) {
     engine_->initialState(), Action::move(0), Action::wait());
   auto final_env_v = possible_envs.where1().getEnv();
 
-  EXPECT_EQ(final_env_v.getTeam(0).getPKV().getHP(), 0);
-  EXPECT_LT(final_env_v.getTeam(1).getPKV().getPercentHP(), 0.5);
+  EXPECT_EQ(final_env_v.teammate(0, 0).getHP(), 0);
+  EXPECT_LT(final_env_v.teammate(1, 0).getPercentHP(), 0.5);
 }
 
 
@@ -38,6 +38,6 @@ TEST_F(SuicideMoveTest, SelfDestruct) {
     engine_->initialState(), Action::move(1), Action::wait());
   auto final_env_v = possible_envs.where1().getEnv();
 
-  EXPECT_EQ(final_env_v.getTeam(0).getPKV().getHP(), 0);
-  EXPECT_LT(final_env_v.getTeam(1).getPKV().getPercentHP(), 0.5);
+  EXPECT_EQ(final_env_v.teammate(0, 0).getHP(), 0);
+  EXPECT_LT(final_env_v.teammate(1, 0).getPercentHP(), 0.5);
 }

@@ -56,7 +56,7 @@ TEST_F(BrickBreakTest, RemovesReflect) {
   // Reflect should be removed (set to 0)
   EXPECT_EQ(result_env.getTeam(1).getNonVolatile().reflect, 0);
   // Damage should be dealt
-  EXPECT_LT(result_env.getTeam(1).getPKV().getPercentHP(), 1.0);
+  EXPECT_LT(result_env.teammate(1, 0).getPercentHP(), 1.0);
 }
 
 TEST_F(BrickBreakTest, RemovesLightScreen) {
@@ -71,7 +71,7 @@ TEST_F(BrickBreakTest, RemovesLightScreen) {
   // Light Screen should be removed
   EXPECT_EQ(result_env.getTeam(1).getNonVolatile().lightScreen, 0);
   // Damage should be dealt
-  EXPECT_LT(result_env.getTeam(1).getPKV().getPercentHP(), 1.0);
+  EXPECT_LT(result_env.teammate(1, 0).getPercentHP(), 1.0);
 }
 
 TEST_F(BrickBreakTest, RemovesBothScreens) {
@@ -94,7 +94,7 @@ TEST_F(BrickBreakTest, WorksWithoutScreens) {
   auto result_env = result.where1().getEnv();
 
   // Damage should still be dealt
-  EXPECT_LT(result_env.getTeam(1).getPKV().getPercentHP(), 1.0);
+  EXPECT_LT(result_env.teammate(1, 0).getPercentHP(), 1.0);
 }
 
 TEST_F(BrickBreakTest, DoesNotRemoveUserScreens) {
@@ -121,5 +121,5 @@ TEST_F(BrickBreakTest, DoesNotRemoveScreensIfImmune) {
   // Reflect should REMAIN (decremented to 3) because Ghost is immune to Fighting
   EXPECT_EQ(result_env.getTeam(1).getNonVolatile().reflect, 4);
   // No damage dealt
-  EXPECT_EQ(result_env.getTeam(1).getPKV().getPercentHP(), 1.0);
+  EXPECT_EQ(result_env.teammate(1, 1).getPercentHP(), 1.0);
 }

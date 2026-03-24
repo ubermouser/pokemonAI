@@ -29,7 +29,7 @@ TEST_F(BellyDrumTest, Success) {
   auto result = engine_->updateState(
       engine_->initialState(), Action::move(0), Action::wait());
 
-  auto pkv = result.where1().getTeam(0).getPKV();
+  auto pkv = result.where1().teammate(0, 0);
 
   // Check HP reduction (50% max HP)
   uint32_t maxHP = pkv.nv().getMaxHP();
@@ -50,14 +50,14 @@ TEST_F(BellyDrumTest, FailLowHP) {
   // Create modifiable environment using ENGINE's NV
   EnvironmentVolatile env(initialState.nv(), envData);
 
-  uint32_t maxHP = env.getTeam(0).getPKV().nv().getMaxHP();
+  uint32_t maxHP = env.teammate(0, 0).nv().getMaxHP();
   // Set HP to 50%
-  env.getTeam(0).getPKV().setHP(maxHP / 2);
+  env.teammate(0, 0).setHP(maxHP / 2);
 
   auto result = engine_->updateState(
       env, Action::move(0), Action::wait());
 
-  auto pkv_result = result.where1().getTeam(0).getPKV();
+  auto pkv_result = result.where1().teammate(0, 0);
 
   // Check HP did not change (move failed)
   EXPECT_EQ(pkv_result.getHP(), maxHP / 2);
@@ -77,13 +77,13 @@ TEST_F(BellyDrumTest, FailMaxAtk) {
   EnvironmentVolatile env(initialState.nv(), envData);
 
   // Set Attack to +6
-  env.getTeam(0).getPKV().setBoost(FV_ATTACK, 6);
+  env.teammate(0, 0).setBoost(FV_ATTACK, 6);
 
   auto result = engine_->updateState(
       env, Action::move(0), Action::wait());
 
-  auto pkv_result = result.where1().getTeam(0).getPKV();
+  auto pkv_result = result.where1().teammate(0, 0);
 
   // Check HP did not change (move failed)
-  EXPECT_EQ(pkv_result.getHP(), env.getTeam(0).getPKV().nv().getMaxHP());
+  EXPECT_EQ(pkv_result.getHP(), env.teammate(0, 0).nv().getMaxHP());
 }

@@ -427,7 +427,7 @@ TEST_F(BasicEngineTest, BuffStat) {
   EXPECT_EQ(result.size(), 1);
   EXPECT_EQ(result.where1().hasHit(0), true);
   EXPECT_EQ(result.where1().hasSecondary(0), true);
-  EXPECT_EQ(result.where1().getTeam(0).getPKV().getBoost(FV_ATTACK), 2);
+  EXPECT_EQ(result.where1().teammate(0, 0).getBoost(FV_ATTACK), 2);
 }
 
 
@@ -454,14 +454,14 @@ TEST_F(BasicEngineTest, DebuffStat) {
   auto hitState = result.where1Hit(0);
   EXPECT_EQ(hitState.hasHit(0), true);
   EXPECT_EQ(hitState.hasSecondary(0), true);
-  EXPECT_EQ(hitState.getTeam(1).getPKV().getBoost(FV_DEFENSE), -2);
+  EXPECT_EQ(hitState.teammate(1, 0).getBoost(FV_DEFENSE), -2);
 
   auto missState = result.where1([](const ConstEnvironmentPossible& state) {
     return !state.hasSecondary(0);
   });
   EXPECT_EQ(missState.hasHit(0), true);
   EXPECT_EQ(missState.hasSecondary(0), false);
-  EXPECT_EQ(missState.getTeam(1).getPKV().getBoost(FV_DEFENSE), 0);
+  EXPECT_EQ(missState.teammate(1, 0).getBoost(FV_DEFENSE), 0);
 }
 
 

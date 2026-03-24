@@ -34,7 +34,7 @@ TEST_F(ProtectTest, BlocksDamage) {
   // Sludge Bomb should deal 0 damage.
 
   // Get initial HP
-  uint32_t initialHP = engine_->initialState().getTeam(0).getPKV().getHP();
+  uint32_t initialHP = engine_->initialState().teammate(0, 0).getHP();
 
   auto turn1 = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(0));
   auto blissey = turn1.where1().teammate(0, 0);

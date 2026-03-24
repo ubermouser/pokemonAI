@@ -41,7 +41,7 @@ TEST_F(TriAttackTest, InflictsStatus) {
   for (const auto& state : status_states) {
     // Check the status of the target (Team B / index 1)
     // Note: getTeam(1) gets the team structure, then getPKV() gets the active pokemon.
-    uint32_t status = state.getTeam(1).getPKV().getStatusAilment();
+    uint32_t status = state.teammate(1, 0).getStatusAilment();
 
     if (status == AIL_NV_BURN) burned = true;
     if (status == AIL_NV_FREEZE) frozen = true;

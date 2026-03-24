@@ -39,7 +39,7 @@ class NaturalCureTest : public Gen4EngineTest {
 TEST_F(NaturalCureTest, NaturalCureDoesNotHealInBattle) {
   // Turn 1: Jolteon uses Thunder Wave on Starmie
   ASSERT_GE(turn1_twave.size(), 1);
-  auto starmie_after_twave = turn1_twave.where1().getTeam(TEAM_A).getPKV();
+  auto starmie_after_twave = turn1_twave.where1().teammate(TEAM_A, 0);
   EXPECT_EQ(starmie_after_twave.getStatusAilment(), AIL_NV_PARALYSIS);
 }
 

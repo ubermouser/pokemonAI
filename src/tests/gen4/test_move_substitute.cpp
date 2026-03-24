@@ -49,7 +49,7 @@ TEST_F(SubstituteTest, FailsWithLowHP) {
   // Set Blissey's HP very low
   EnvironmentVolatileData stateData = engine_->initialState().data();
   EnvironmentVolatile state{engine_->initialState().nv(), stateData};
-  state.getTeam(0).getPKV().setHP(10);
+  state.teammate(0, 0).setHP(10);
 
   // Try to use Substitute
   auto result = engine_->updateState(state, Action::move(0), Action::wait());
@@ -84,7 +84,7 @@ TEST_F(SubstituteTest, BreaksSubstitute) {
   // Force break substitute by creating a mutable state
   EnvironmentVolatileData stateData = state1.getEnv().data();
   EnvironmentVolatile mutableState{state1.getEnv().nv(), stateData};
-  mutableState.getTeam(0).getPKV().status().cTeammate.substitute = 1;
+  mutableState.teammate(0, 0).status().cTeammate.substitute = 1;
 
   // Turn 2: Gengar uses Sludge Bomb (Move index 3)
   auto turn2 = engine_->updateState(mutableState, Action::wait(), Action::move(3));
@@ -143,8 +143,8 @@ TEST_F(SubstituteTest, DoesNotBlockSelfTargetingMoves) {
   // Set Blissey's HP lower to see healing effect
   EnvironmentVolatileData stateData = state1.getEnv().data();
   EnvironmentVolatile mutableState{state1.getEnv().nv(), stateData};
-  uint32_t hpAfterSub = mutableState.getTeam(0).getPKV().getHP();
-  mutableState.getTeam(0).getPKV().setHP(hpAfterSub - 20);
+  uint32_t hpAfterSub = mutableState.teammate(0, 0).getHP();
+  mutableState.teammate(0, 0).setHP(hpAfterSub - 20);
 
   // Turn 2: Blissey uses Soft-Boiled (Move index 1)
   auto turn2 = engine_->updateState(mutableState, Action::move(1), Action::wait());

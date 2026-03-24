@@ -108,8 +108,8 @@ TEST_F(RoarTest, ForcesSwitch) {
   // Verify Aerodactyl took damage (proving swift was NOT preempted due to
   // Roar's low priority)
   EXPECT_LT(
-      state.getTeam(0).getPKV().getHP(),
-      state.getTeam(0).getPKV().nv().getMaxHP());
+      state.teammate(0, 0).getHP(),
+      state.teammate(0, 0).nv().getMaxHP());
 
   // Verification of hit symbols
   EXPECT_TRUE(state.hasHit(0));

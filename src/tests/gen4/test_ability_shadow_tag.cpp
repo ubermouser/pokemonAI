@@ -99,7 +99,7 @@ TEST_F(ShadowTagTest, FaintedPokemonCanSwitch) {
   auto state = engine_->initialState();
   EnvironmentVolatileData envData = state.data();
   EnvironmentVolatile envV(state.nv(), envData);
-  envV.getTeam(TEAM_A).getPKV().setHP(0);
+  envV.teammate(TEAM_A, 0).setHP(0);
 
   // Team A should be able to switch because Squirtle is fainted, even though
   // Wobbuffet has Shadow Tag

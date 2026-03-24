@@ -36,8 +36,8 @@ TEST_F(PerishSongTest, AppliesToBoth) {
     engine_->initialState(), Action::move(0), Action::move(0));
 
   auto env = possible_envs.where1();
-  EXPECT_EQ(env.getTeam(0).getPKV().status().cTeammate.perishSong, 2);
-  EXPECT_EQ(env.getTeam(1).getPKV().status().cTeammate.perishSong, 2);
+  EXPECT_EQ(env.teammate(0, 0).status().cTeammate.perishSong, 2);
+  EXPECT_EQ(env.teammate(1, 0).status().cTeammate.perishSong, 2);
 }
 
 TEST_F(PerishSongTest, FaintsAfter3Turns) {
@@ -45,15 +45,15 @@ TEST_F(PerishSongTest, FaintsAfter3Turns) {
   auto envs1 = engine_->updateState(
     engine_->initialState(), Action::move(0), Action::move(0));
   auto state1 = envs1.where1();
-  EXPECT_EQ(state1.getTeam(0).getPKV().status().cTeammate.perishSong, 2);
-  EXPECT_GT(state1.getTeam(0).getPKV().getHP(), 0);
+  EXPECT_EQ(state1.teammate(0, 0).status().cTeammate.perishSong, 2);
+  EXPECT_GT(state1.teammate(0, 0).getHP(), 0);
 
   // Turn 2: Decrement to 1.
   auto envs2 = engine_->updateState(
     state1.getEnv(), Action::move(1), Action::move(0));
   auto state2 = envs2.where1();
-  EXPECT_EQ(state2.getTeam(0).getPKV().status().cTeammate.perishSong, 1);
-  EXPECT_GT(state2.getTeam(0).getPKV().getHP(), 0);
+  EXPECT_EQ(state2.teammate(0, 0).status().cTeammate.perishSong, 1);
+  EXPECT_GT(state2.teammate(0, 0).getHP(), 0);
 
   // Turn 3: Decrement to 0 -> Faint.
   auto envs3 = engine_->updateState(
@@ -61,7 +61,7 @@ TEST_F(PerishSongTest, FaintsAfter3Turns) {
 
   // Both should faint.
   auto fainted_envs = envs3.where([](const ConstEnvironmentPossible& env) {
-    return env.getTeam(0).getPKV().getHP() == 0 && env.getTeam(1).getPKV().getHP() == 0;
+    return env.teammate(0, 0).getHP() == 0 && env.teammate(1, 0).getHP() == 0;
   });
 
   ASSERT_FALSE(fainted_envs.empty()) << "Both Pokemon should have fainted";
@@ -72,7 +72,7 @@ TEST_F(PerishSongTest, SwitchClearsEffect) {
   auto envs1 = engine_->updateState(
     engine_->initialState(), Action::move(0), Action::move(0));
   auto state1 = envs1.where1();
-  EXPECT_EQ(state1.getTeam(0).getPKV().status().cTeammate.perishSong, 2);
+  EXPECT_EQ(state1.teammate(0, 0).status().cTeammate.perishSong, 2);
 
   // Turn 2: Switch Gengar out to Pikachu (Index 1).
   // Result: Snorlax 2 (Paused).
@@ -81,8 +81,8 @@ TEST_F(PerishSongTest, SwitchClearsEffect) {
   auto state2 = envs2.where1();
 
   // Pikachu (now active) should have 0 perishSong.
-  EXPECT_EQ(state2.getTeam(0).getPKV().status().cTeammate.perishSong, 0);
+  EXPECT_EQ(state2.teammate(0, 1).status().cTeammate.perishSong, 0);
 
   // Snorlax (still active) should have 2.
-  EXPECT_EQ(state2.getTeam(1).getPKV().status().cTeammate.perishSong, 2);
+  EXPECT_EQ(state2.teammate(1, 0).status().cTeammate.perishSong, 2);
 }

@@ -64,7 +64,7 @@ TEST_F(FreezeStatusTest, Test_AppliesFreeze) {
     ASSERT_FALSE(status_states.empty()) << "Ice Beam secondary effect did not trigger in any environment.";
 
     // Target (Team B / index 1) should be frozen in these states
-    EXPECT_EQ(status_states.front().getTeam(1).getPKV().getStatusAilment(), AIL_NV_FREEZE);
+    EXPECT_EQ(status_states.front().teammate(1, 0).getStatusAilment(), AIL_NV_FREEZE);
 }
 
 TEST_F(FreezeStatusTest, Test_FrozenPokemonCannotMove) {
@@ -82,7 +82,7 @@ TEST_F(FreezeStatusTest, Test_FrozenPokemonCannotMove) {
 
     // In blocked states, Team B Smeargle should have full HP
     for (const auto& state : blocked_states) {
-      EXPECT_EQ(state.getTeam(1).getPKV().getPercentHP(), 1.);
+      EXPECT_EQ(state.teammate(1, 0).getPercentHP(), 1.);
     }
 }
 
@@ -94,7 +94,7 @@ TEST_F(FreezeStatusTest, Test_ThawProbabilistic) {
 
     // There should be a 20% chance to thaw?
     auto thaw_states = results.where([](const ConstEnvironmentPossible& env) {
-        return env.getTeam(0).getPKV().getStatusAilment() == AIL_NV_NONE;
+        return env.teammate(0, 0).getStatusAilment() == AIL_NV_NONE;
     });
     bool found_thaw = !thaw_states.empty();
 
@@ -109,14 +109,14 @@ TEST_F(FreezeStatusTest, Test_ThawByUsingFireMove) {
 
     // It should thaw and move
     auto thaw_states = results.where([](const ConstEnvironmentPossible& env) {
-        return env.getTeam(0).getPKV().getStatusAilment() == AIL_NV_NONE;
+        return env.teammate(0, 0).getStatusAilment() == AIL_NV_NONE;
     });
 
     EXPECT_FALSE(thaw_states.empty()) << "Flame Wheel should thaw the user";
 
     // In thaw states, it should have hit Team B Smeargle
     for (const auto& state : thaw_states) {
-        EXPECT_LT(state.getTeam(1).getPKV().getHP(), state.getTeam(1).getPKV().nv().getMaxHP());
+        EXPECT_LT(state.teammate(1, 0).getHP(), state.teammate(1, 0).nv().getMaxHP());
     }
 }
 
@@ -128,7 +128,7 @@ TEST_F(FreezeStatusTest, Test_ThawByBeingHitByFireMove) {
 
     // Team B Smeargle should thaw after being hit
     auto thaw_states = results.where([](const ConstEnvironmentPossible& env) {
-        return env.getTeam(1).getPKV().getStatusAilment() == AIL_NV_NONE;
+        return env.teammate(1, 0).getStatusAilment() == AIL_NV_NONE;
     });
 
     EXPECT_FALSE(thaw_states.empty()) << "Pokemon should thaw after being hit by a Fire-type move";

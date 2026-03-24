@@ -219,7 +219,7 @@ TEST_F(TrapTest, TrapClearedOnUserDeath) {
   auto state2 = turn2.where1();
 
   // Check that Gastly (Active pokemon of Team A) is dead
-  EXPECT_FALSE(state2.getTeam(TEAM_A).getPKV().isAlive());
+  EXPECT_FALSE(state2.teammate(TEAM_A, 0).isAlive());
 
   // A is dead. We must switch in.
   auto turn3 = engine_->updateState(state2, Action::swap(1), Action::wait());

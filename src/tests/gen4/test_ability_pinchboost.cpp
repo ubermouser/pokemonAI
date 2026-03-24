@@ -35,7 +35,7 @@ class PinchBoostTest : public Gen4EngineTest {
     if (turn_outcome.empty()) return 0;
 
     // Use the first outcome (most probable or default)
-    auto target_pkv = turn_outcome.where1().getTeam(TEAM_B).getPKV();
+    auto target_pkv = turn_outcome.where1().teammate(TEAM_B, 0);
     return target_pkv.getMissingHP();
   }
 };

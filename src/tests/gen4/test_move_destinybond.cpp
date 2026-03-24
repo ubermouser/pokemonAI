@@ -33,14 +33,14 @@ TEST_F(DestinyBondTest, TriggerOnKill) {
   
   // Gengar is fragile, Crunch from Snorlax should OHKO or at least kill.
   auto fainted_envs = possible_envs.where([](const ConstEnvironmentPossible& env) {
-    return env.getTeam(0).getPKV().getHP() == 0;
+    return env.teammate(0, 0).getHP() == 0;
   });
   
   ASSERT_FALSE(fainted_envs.empty()) << "Gengar did not faint, test cannot verify Destiny Bond trigger";
 
   for (const auto& env : fainted_envs) {
     // Snorlax should also be fainted due to Destiny Bond
-    EXPECT_EQ(env.getTeam(1).getPKV().getHP(), 0) << "Snorlax should have fainted due to Destiny Bond";
+    EXPECT_EQ(env.teammate(1, 0).getHP(), 0) << "Snorlax should have fainted due to Destiny Bond";
   }
 }
 
@@ -50,9 +50,9 @@ TEST_F(DestinyBondTest, NoTriggerNoKill) {
     engine_->initialState(), Action::move(0), Action::move(1));
   
   auto env = possible_envs.where1();
-  EXPECT_GT(env.getTeam(0).getPKV().getHP(), 0);
-  EXPECT_GT(env.getTeam(1).getPKV().getHP(), 0);
-  EXPECT_TRUE(env.getTeam(0).getPKV().status().cTeammate.destinyBond);
+  EXPECT_GT(env.teammate(0, 0).getHP(), 0);
+  EXPECT_GT(env.teammate(1, 0).getHP(), 0);
+  EXPECT_TRUE(env.teammate(0, 0).status().cTeammate.destinyBond);
 }
 
 TEST_F(DestinyBondTest, ConsecutiveUseFails) {
@@ -60,7 +60,7 @@ TEST_F(DestinyBondTest, ConsecutiveUseFails) {
   auto envs1 = engine_->updateState(
     engine_->initialState(), Action::move(0), Action::move(1));
   auto state1 = envs1.where1();
-  EXPECT_TRUE(state1.getTeam(0).getPKV().status().cTeammate.destinyBond);
+  EXPECT_TRUE(state1.teammate(0, 0).status().cTeammate.destinyBond);
 
   // Turn 2: Gengar uses Destiny Bond again
   auto envs2 = engine_->updateState(
@@ -68,7 +68,7 @@ TEST_F(DestinyBondTest, ConsecutiveUseFails) {
   auto state2 = envs2.where1();
   
   // In Gen 4, Destiny Bond fails if used consecutively.
-  EXPECT_FALSE(state2.getTeam(0).getPKV().status().cTeammate.destinyBond);
+  EXPECT_FALSE(state2.teammate(0, 0).status().cTeammate.destinyBond);
 }
 
 TEST_F(DestinyBondTest, EffectWearsOff) {
@@ -76,20 +76,20 @@ TEST_F(DestinyBondTest, EffectWearsOff) {
   auto envs1 = engine_->updateState(
     engine_->initialState(), Action::move(0), Action::move(1));
   auto state1 = envs1.where1(); 
-  EXPECT_TRUE(state1.getTeam(0).getPKV().status().cTeammate.destinyBond);
+  EXPECT_TRUE(state1.teammate(0, 0).status().cTeammate.destinyBond);
 
   // Turn 2: Gengar uses Shadow Ball, Snorlax uses Crunch and kills Gengar
   auto envs2 = engine_->updateState(
     state1.getEnv(), Action::move(1), Action::move(0));
   
   auto fainted_envs = envs2.where([](const ConstEnvironmentPossible& env) {
-    return env.getTeam(0).getPKV().getHP() == 0;
+    return env.teammate(0, 0).getHP() == 0;
   });
   
   ASSERT_FALSE(fainted_envs.empty());
   
   for (const auto& env : fainted_envs) {
     // Snorlax should NOT be fainted because Destiny Bond wore off
-    EXPECT_GT(env.getTeam(1).getPKV().getHP(), 0) << "Snorlax should not have fainted, Destiny Bond should have worn off";
+    EXPECT_GT(env.teammate(1, 0).getHP(), 0) << "Snorlax should not have fainted, Destiny Bond should have worn off";
   }
 }

@@ -39,8 +39,8 @@ class BerryTest : public Gen4EngineTest {
 
 
 TEST_F(BerryTest, TypeResistingBerry_Consumption) {
-  EXPECT_TRUE(lapras_v_berry.where1().getTeam(TEAM_A).getPKV().hasItem());
-  EXPECT_FALSE(result_berry.where1().getTeam(TEAM_A).getPKV().hasItem());
+  EXPECT_TRUE(lapras_v_berry.where1().teammate(TEAM_A, 1).hasItem());
+  EXPECT_FALSE(result_berry.where1().teammate(TEAM_A, 1).hasItem());
 }
 
 
