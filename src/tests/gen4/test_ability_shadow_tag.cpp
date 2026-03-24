@@ -57,10 +57,10 @@ TEST_F(ShadowTagTest, Trapped) {
   auto state = engine_->initialState();
 
   // Team A tries to switch (Action::swap(1)) - Should be invalid
-  EXPECT_FALSE(engine_->isValidAction(state, Action::swap(1), TEAM_A));
+  EXPECT_FALSE(engine_->isValidAction(state, Actor(TEAM_A, 0), Action::swap(1)));
 
   // Team B (Shadow Tag user) should be able to switch
-  EXPECT_TRUE(engine_->isValidAction(state, Action::swap(1), TEAM_B));
+  EXPECT_TRUE(engine_->isValidAction(state, Actor(TEAM_B, 0), Action::swap(1)));
 }
 
 TEST_F(ShadowTagTest, MirrorMatch) {
@@ -69,10 +69,8 @@ TEST_F(ShadowTagTest, MirrorMatch) {
   auto state = engine_->initialState();
 
   // Team A tries to switch - Should be valid because they also have Shadow Tag
-  EXPECT_TRUE(engine_->isValidAction(state, Action::swap(1), TEAM_A));
-
-  // Team B tries to switch - Should be valid
-  EXPECT_TRUE(engine_->isValidAction(state, Action::swap(1), TEAM_B));
+  EXPECT_TRUE(engine_->isValidAction(state, Actor(TEAM_A, 0), Action::swap(1)));
+  EXPECT_TRUE(engine_->isValidAction(state, Actor(TEAM_B, 0), Action::swap(1)));
 }
 
 TEST_F(ShadowTagTest, ShedShell) {
@@ -81,7 +79,7 @@ TEST_F(ShadowTagTest, ShedShell) {
   auto state = engine_->initialState();
 
   // Team A tries to switch - Should be valid because of Shed Shell
-  EXPECT_TRUE(engine_->isValidAction(state, Action::swap(1), TEAM_A));
+  EXPECT_TRUE(engine_->isValidAction(state, Actor(TEAM_A, 0), Action::swap(1)));
 }
 
 TEST_F(ShadowTagTest, Normal) {
@@ -90,7 +88,7 @@ TEST_F(ShadowTagTest, Normal) {
   auto state = engine_->initialState();
 
   // Team A tries to switch - Should be valid
-  EXPECT_TRUE(engine_->isValidAction(state, Action::swap(1), TEAM_A));
+  EXPECT_TRUE(engine_->isValidAction(state, Actor(TEAM_A, 0), Action::swap(1)));
 }
 
 TEST_F(ShadowTagTest, FaintedPokemonCanSwitch) {
@@ -105,5 +103,5 @@ TEST_F(ShadowTagTest, FaintedPokemonCanSwitch) {
 
   // Team A should be able to switch because Squirtle is fainted, even though
   // Wobbuffet has Shadow Tag
-  EXPECT_TRUE(engine_->isValidAction(envV, Action::swap(1), TEAM_A));
+  EXPECT_TRUE(engine_->isValidAction(envV, Actor(TEAM_A, 0), Action::swap(1)));
 }

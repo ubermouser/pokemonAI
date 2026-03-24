@@ -36,10 +36,10 @@ TEST_F(StruggleTest, ForcedWhenNoPP) {
   auto state_no_pp = EnvironmentVolatile{engine_->initialState().nv(), state_no_pp_data};
 
   // Psychic should be invalid
-  EXPECT_FALSE(engine_->isValidAction(state_no_pp, Action::move(0), TEAM_A));
+  EXPECT_FALSE(engine_->isValidAction(state_no_pp, Actor(TEAM_A, 0), Action::move(0)));
   
   // Struggle should be valid (and actually the only valid move)
-  EXPECT_TRUE(engine_->isValidAction(state_no_pp, Action::struggle(), TEAM_A));
+  EXPECT_TRUE(engine_->isValidAction(state_no_pp, Actor(TEAM_A, 0), Action::struggle()));
 }
 
 

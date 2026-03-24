@@ -88,7 +88,7 @@ Action PlannerHuman::actionSelect(const ConstEnvironmentVolatile& env) const {
     std::stringstream inputResult(input);
 
     // determine if action is valid:
-    if (!(inputResult >> action) || !cu_->isValidAction(env, action, agentTeam_)) {
+    if (!(inputResult >> action) || !cu_->isValidAction(env, Actor(agentTeam_, env.getTeam(agentTeam_).getICPKV()), action)) {
       fmt::print("Invalid action \"{}\"!\n", input);
 
       continue;

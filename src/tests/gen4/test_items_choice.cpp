@@ -59,18 +59,18 @@ class ChoiceItemsTest : public Gen4EngineTest {
 TEST_F(ChoiceItemsTest, LockedIntoMove) {
   // other moves are locked out after using a choice move:
   EXPECT_TRUE(
-      engine_->isValidAction(bulletpunch_cb.where1(), Action::move(0), TEAM_A));
+      engine_->isValidAction(bulletpunch_cb.where1().getEnv(), Actor(TEAM_A, 0), Action::move(0)));
   EXPECT_FALSE(
-      engine_->isValidAction(bulletpunch_cb.where1(), Action::move(1), TEAM_A));
+      engine_->isValidAction(bulletpunch_cb.where1().getEnv(), Actor(TEAM_A, 0), Action::move(1)));
 }
 
 TEST_F(ChoiceItemsTest, StruggleWhenNoPP) {
   // when all PP have been used, only struggle is available:
   auto noPPState = bulletpunch_cb.where1Hit(0);
   noPPState.getTeam(0).getPKV().getMV(0).setPP(0);
-  EXPECT_FALSE(engine_->isValidAction(noPPState, Action::move(0), TEAM_A)); // locked due to PP
-  EXPECT_FALSE(engine_->isValidAction(noPPState, Action::move(1), TEAM_A)); // locked due to Choice
-  EXPECT_TRUE(engine_->isValidAction(noPPState, Action::struggle(), TEAM_A));
+  EXPECT_FALSE(engine_->isValidAction(noPPState.getEnv(), Actor(TEAM_A, 0), Action::move(0))); // locked due to PP
+  EXPECT_FALSE(engine_->isValidAction(noPPState.getEnv(), Actor(TEAM_A, 0), Action::move(1))); // locked due to Choice
+  EXPECT_TRUE(engine_->isValidAction(noPPState.getEnv(), Actor(TEAM_A, 0), Action::struggle()));
 }
 
 TEST_F(ChoiceItemsTest, ChoiceBandBonus) {

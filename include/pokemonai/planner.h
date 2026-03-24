@@ -85,7 +85,7 @@ public:
   Planner() = delete;
   Planner(
       const Config& cfg = Config(), const std::string& name = "Planner"):
-      Name(name), cfg_(cfg), agentTeam_(SIZE_MAX) {};
+      Name(name), cfg_(cfg), agentTeam_(TEAM_A) {};
   Planner(const Planner& other) = default;
   virtual ~Planner() { };
 
@@ -112,7 +112,7 @@ public:
     return setEngine(std::make_shared<PkCU>(cu));
   }
 
-  virtual Planner& setTeam(size_t iTeam) { agentTeam_ = iTeam; return *this; };
+  virtual Planner& setTeam(TEAM iTeam) { agentTeam_ = iTeam; return *this; };
 
   /* generate an action */
   virtual PlannerResult generateSolution(const ConstEnvironmentVolatile& origin) const;
@@ -130,10 +130,10 @@ protected:
   std::shared_ptr<const EnvironmentNonvolatile> nv_;
 
   /* team that this agent represents */
-  size_t agentTeam_;
+  TEAM agentTeam_;
 
   /* team that the other agent represents */
-  size_t otherTeam_;
+  TEAM otherTeam_;
 
   virtual size_t maxImplDepth() const { return 0; }
   virtual bool isEvaluatorRequired() const { return true; }
@@ -203,7 +203,7 @@ protected:
       const Action& agentAction,
       const Action& otherAction) const;
 
-  virtual ActionVector getValidActions(const ConstEnvironmentPossible& origin, size_t iTeam) const;
+  virtual ActionVector getValidActions(const ConstEnvironmentPossible& origin, TEAM iTeam) const;
 
   /* test if another previously seen action always better than the current */
   virtual bool testGammaCutoff(

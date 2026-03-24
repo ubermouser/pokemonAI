@@ -29,11 +29,11 @@ class RampageTest : public Gen4EngineTest {
 
     // the pokemon cannot switch out or perform other moves when rampaging:
     EXPECT_TRUE(
-        engine_->isValidAction(rampage_0.where1(), Action::move(0), TEAM_A));
+        engine_->isValidAction(rampage_0.where1(), Actor(TEAM_A, 0), Action::move(0)));
     EXPECT_FALSE(
-        engine_->isValidAction(rampage_0.where1(), Action::move(1), TEAM_A));
+        engine_->isValidAction(rampage_0.where1(), Actor(TEAM_A, 0), Action::move(1)));
     EXPECT_FALSE(
-        engine_->isValidAction(rampage_0.where1(), Action::swap(1), TEAM_A));
+        engine_->isValidAction(rampage_0.where1(), Actor(TEAM_A, 0), Action::swap(1)));
 
     // the pokemon is confused after rampaging:
     EXPECT_EQ(
@@ -41,11 +41,11 @@ class RampageTest : public Gen4EngineTest {
         AIL_V_CONFUSED_5T);
     // the pokemon may switch out or perform other moves:
     EXPECT_TRUE(
-        engine_->isValidAction(rampage_2.where1(), Action::move(0), TEAM_A));
+        engine_->isValidAction(rampage_2.where1(), Actor(TEAM_A, 0), Action::move(0)));
     EXPECT_TRUE(
-        engine_->isValidAction(rampage_2.where1(), Action::move(1), TEAM_A));
+        engine_->isValidAction(rampage_2.where1(), Actor(TEAM_A, 0), Action::move(1)));
     EXPECT_TRUE(
-        engine_->isValidAction(rampage_2.where1(), Action::swap(1), TEAM_A));
+        engine_->isValidAction(rampage_2.where1(), Actor(TEAM_A, 0), Action::swap(1)));
   }
 };
 

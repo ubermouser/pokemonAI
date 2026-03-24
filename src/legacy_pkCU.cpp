@@ -495,7 +495,8 @@ void LegacyPkCUEngine::evaluateMove() {
 
     // If the plugin changed the action, we must validate it.
     if (cAction != getCAction()) {
-      auto validation = cu_.isValidAction(getBase().getEnv(), cAction, iCTeam);
+      auto validation =
+          cu_.isValidAction(getBase().getEnv(), cAction, (TEAM)iCTeam);
       if (!validation) { cAction = Action::struggle(); }
       // Update the action in the engine's internal state
       actions_[0] = cAction;
@@ -1423,9 +1424,9 @@ MatchState LegacyPkCU::getGameState(const ConstEnvironmentVolatile& envV) const 
 
 
 ActionPairVector LegacyPkCU::getAllValidActions(
-    const ConstEnvironmentVolatile& envV, size_t agentTeam) const {
+    const ConstEnvironmentVolatile& envV, TEAM agentTeam) const {
   auto agentActions = getValidActions(envV, agentTeam);
-  auto otherActions = getValidActions(envV, (agentTeam+1) % 2);
+  auto otherActions = getValidActions(envV, (TEAM)((agentTeam + 1) % 2));
   ActionPairVector result; result.reserve(agentActions.size() * otherActions.size());
   for (auto agentMove: agentActions) {
     for (auto otherMove: otherActions) {
@@ -1479,6 +1480,7 @@ ActionVector LegacyPkCU::getValidActionsInRange(
   return result;
 }
 
+
 /**
  * @brief Checks if a given action is valid for a team in the current state.
  *
@@ -1498,7 +1500,7 @@ ActionVector LegacyPkCU::getValidActionsInRange(
 IsValidResult LegacyPkCU::isValidAction(
     const ConstEnvironmentVolatile& envV,
     const Action& action,
-    size_t iTeam) const {
+    TEAM iTeam) const {
   return isValidAction(envV, Actor{iTeam, envV.getTeam(iTeam).getICPKV()}, action);
 }
 

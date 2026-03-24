@@ -38,8 +38,7 @@ po::options_description Planner::Config::options(const std::string& category, st
 
 
 Planner& Planner::initialize() {
-  if (agentTeam_ >= 2) { throw std::invalid_argument("planner agentTeam undefined"); }
-  otherTeam_ = (agentTeam_ + 1) % 2;
+  otherTeam_ = (TEAM)((agentTeam_ + 1) % 2);
 
   if (nv_ == NULL) { throw std::invalid_argument("planner nonvolatile environment undefined"); }
   if (cu_ == NULL) { throw std::invalid_argument("planner engine undefined"); }
@@ -168,7 +167,7 @@ PossibleEnvironments Planner::generateStates(
 
 ActionVector Planner::getValidActions(
     const ConstEnvironmentPossible& origin,
-    size_t iTeam) const {
+    TEAM iTeam) const {
   return cu_->getValidActions(origin, iTeam);
 }
 

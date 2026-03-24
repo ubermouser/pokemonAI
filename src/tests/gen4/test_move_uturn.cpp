@@ -43,21 +43,21 @@ class UTurnTest : public Gen4EngineTest {
 
 TEST_F(UTurnTest, requires_pokemon_to_swap_if_ally_exists) {
   EXPECT_FALSE(
-      engine_->isValidAction(setup_sr.where1(), Action::move(0), TEAM_A));
+      engine_->isValidAction(setup_sr.where1().getEnv(), Actor(TEAM_A, 0), Action::move(0)));
   EXPECT_TRUE(engine_->isValidAction(
-      setup_sr.where1(), Action::moveAlly(0, 1), TEAM_A));
+      setup_sr.where1().getEnv(), Actor(TEAM_A, 0), Action::moveAlly(0, 1)));
   EXPECT_FALSE(engine_->isValidAction(
-      setup_sr.where1(), Action::moveAlly(0, 0), TEAM_A));
+      setup_sr.where1().getEnv(), Actor(TEAM_A, 0), Action::struggle()));
 }
 
 
 TEST_F(UTurnTest, can_still_be_used_without_swap_if_no_allies_exist) {
   EXPECT_FALSE(
-      engine_->isValidAction(swap_to_scyzor.where1(), Action::move(0), TEAM_B));
+      engine_->isValidAction(swap_to_scyzor.where1().getEnv(), Actor(TEAM_B, 0), Action::move(0)));
   EXPECT_TRUE(engine_->isValidAction(
-      swap_to_scyzor.where1(), Action::moveAlly(0, 0), TEAM_B));
+      swap_to_scyzor.where1().getEnv(), Actor(TEAM_B, 0), Action::moveAlly(0, 0)));
   EXPECT_FALSE(engine_->isValidAction(
-      swap_to_scyzor.where1(), Action::moveAlly(0, 1), TEAM_B));
+      swap_to_scyzor.where1().getEnv(), Actor(TEAM_B, 0), Action::moveAlly(0, 1)));
 }
 
 
@@ -121,13 +121,13 @@ TEST_F(UTurnTest, NoErroneousStruggleWithChoiceItem) {
   auto state = turn1.where1Hit(0);
 
   // Verify Choice Band lock: Bullet Punch (index 1) should be disabled
-  EXPECT_FALSE(engine_->isValidAction(state, Action::move(1), TEAM_A));
+  EXPECT_FALSE(engine_->isValidAction(state, Actor(TEAM_A, 0), Action::move(1)));
 
   // Verify U-turn (index 0) remains enabled (for target 0)
-  EXPECT_TRUE(engine_->isValidAction(state, Action::moveAlly(0, 0), TEAM_A));
+  EXPECT_TRUE(engine_->isValidAction(state, Actor(TEAM_A, 0), Action::moveAlly(0, 0)));
 
   // Struggle should be disabled because U-turn is available.
-  EXPECT_FALSE(engine_->isValidAction(state, Action::struggle(), TEAM_A));
+  EXPECT_FALSE(engine_->isValidAction(state, Actor(TEAM_A, 0), Action::struggle()));
 }
 
 

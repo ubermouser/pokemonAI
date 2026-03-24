@@ -44,10 +44,10 @@ TEST_F(TormentTest, PreventsConsecutiveMoves) {
   EXPECT_EQ(state1.teammate(1, 0).status().cTeammate.iLastAction, 1);
 
   // Turn 2: Blissey tries to use Seismic Toss (Move 0). Should be invalid.
-  EXPECT_FALSE(engine_->isValidAction(state1, Action::move(0), TEAM_B));
+  EXPECT_FALSE(engine_->isValidAction(state1, Actor(TEAM_B, 0), Action::move(0)));
 
   // Blissey tries to use Softboiled (Move 1). Should be valid.
-  EXPECT_TRUE(engine_->isValidAction(state1, Action::move(1), TEAM_B));
+  EXPECT_TRUE(engine_->isValidAction(state1, Actor(TEAM_B, 0), Action::move(1)));
 
   // Turn 2 execution: Blissey uses Softboiled.
   auto results2 = engine_->updateState(state1, Action::move(1), Action::move(1));
@@ -57,9 +57,9 @@ TEST_F(TormentTest, PreventsConsecutiveMoves) {
   EXPECT_EQ(state2.teammate(1, 0).status().cTeammate.iLastAction, 2);
 
   // Turn 3: Blissey tries to use Seismic Toss (Move 0). Should be valid now.
-  EXPECT_TRUE(engine_->isValidAction(state2, Action::move(0), TEAM_B));
+  EXPECT_TRUE(engine_->isValidAction(state2, Actor(TEAM_B, 0), Action::move(0)));
   // Blissey tries to use Softboiled (Move 1). Should be invalid.
-  EXPECT_FALSE(engine_->isValidAction(state2, Action::move(1), TEAM_B));
+  EXPECT_FALSE(engine_->isValidAction(state2, Actor(TEAM_B, 0), Action::move(1)));
 }
 
 TEST_F(TormentTest, FailsIfAlreadyTormented) {

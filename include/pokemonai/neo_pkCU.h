@@ -152,12 +152,13 @@ class PKAISHARED NeoPkCU {
       const ConstEnvironmentVolatile& envV, const Actor& actor) const;
   ActionVector getValidSwapActions(
       const ConstEnvironmentVolatile& envV, const Actor& actor) const;
+
   [[deprecated]] ActionVector getValidActions(
-      const ConstEnvironmentVolatile& envV, size_t iTeam) const;
+      const ConstEnvironmentVolatile& envV, TEAM iTeam) const;
   [[deprecated]] ActionVector getValidMoveActions(
-      const ConstEnvironmentVolatile& envV, size_t iTeam) const;
+      const ConstEnvironmentVolatile& envV, TEAM iTeam) const;
   [[deprecated]] ActionVector getValidSwapActions(
-      const ConstEnvironmentVolatile& envV, size_t iTeam) const;
+      const ConstEnvironmentVolatile& envV, TEAM iTeam) const;
   ActionPairVector getAllValidActions(const ConstEnvironmentVolatile& envV, size_t agentTeam=TEAM_A) const;
 
   /**
@@ -169,14 +170,18 @@ class PKAISHARED NeoPkCU {
    */
   [[deprecated]] IsValidResult isValidAction(
       const ConstEnvironmentVolatile& envV,
-      const Action& action,
-      size_t iTeam) const;
+      const TEAM iTeam,
+      const Action& action) const;
   [[deprecated]] IsValidResult isValidAction(
       const ConstEnvironmentPossible& envV,
-      const Action& action,
-      size_t iTeam) const;
+      const TEAM iTeam,
+      const Action& action) const;
   IsValidResult isValidAction(
       const ConstEnvironmentVolatile& envV,
+      const Actor& actor,
+      const Action& action) const;
+  IsValidResult isValidAction(
+      const ConstEnvironmentPossible& envP,
       const Actor& actor,
       const Action& action) const;
 

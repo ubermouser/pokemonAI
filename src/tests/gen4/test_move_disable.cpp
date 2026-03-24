@@ -101,13 +101,11 @@ TEST_F(DisableTest, RestrictsMoves) {
   // Blissey Disabled on Move 1 (Softboiled).
 
   // Try Softboiled (Move 1) - Should be INVALID
-  EXPECT_FALSE(engine_->isValidAction(state, Action::move(1), TEAM_B));
-
+  EXPECT_FALSE(engine_->isValidAction(state, Actor(TEAM_B, 0), Action::move(1)));
   // Try Seismic Toss (Move 0) - Should be VALID
-  EXPECT_TRUE(engine_->isValidAction(state, Action::move(0), TEAM_B));
-
+  EXPECT_TRUE(engine_->isValidAction(state, Actor(TEAM_B, 0), Action::move(0)));
   // Try Toxic (Move 2) - Should be VALID
-  EXPECT_TRUE(engine_->isValidAction(state, Action::move(2), TEAM_B));
+  EXPECT_TRUE(engine_->isValidAction(state, Actor(TEAM_B, 0), Action::move(2)));
 }
 
 TEST_F(DisableTest, FailsIfAlreadyDisabled) {

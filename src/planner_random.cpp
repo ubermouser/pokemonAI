@@ -37,8 +37,8 @@ PlyResult PlannerRandom::generateSolutionAtLeaf(
   // determine if we want to perform moves only:
   bool doMove = (rand() % RAND_MAX) <= (cfg_.moveChance*RAND_MAX);
   // determine the set of all valid actions:
-  auto validMoves = cu_->getValidMoveActions(origin, agentTeam_);
-  auto validActions = cu_->getValidActions(origin, agentTeam_);
+  auto validMoves = cu_->getValidMoveActions(origin.getEnv(), agentTeam_);
+  auto validActions = cu_->getValidActions(origin.getEnv(), agentTeam_);
   auto& valid = (doMove && !validMoves.empty())?validMoves:validActions;
 
   // are there ANY valid actions?

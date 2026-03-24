@@ -259,8 +259,8 @@ ActionVector NeoPkCU::getValidActions(
 
 
 ActionVector NeoPkCU::getValidActions(
-    const ConstEnvironmentVolatile& envV, size_t iTeam) const {
-  return getValidActions(envV, {iTeam, envV.getTeam(iTeam).getICPKV()});
+    const ConstEnvironmentVolatile& envV, TEAM iTeam) const {
+  return getValidActions(envV, Actor(iTeam, envV.getTeam(iTeam).getICPKV()));
 }
 
 
@@ -288,8 +288,8 @@ ActionVector NeoPkCU::getValidMoveActions(
 
 
 ActionVector NeoPkCU::getValidMoveActions(
-    const ConstEnvironmentVolatile& envV, size_t iTeam) const {
-  return getValidMoveActions(envV, {iTeam, envV.getTeam(iTeam).getICPKV()});
+    const ConstEnvironmentVolatile& envV, TEAM iTeam) const {
+  return getValidMoveActions(envV, Actor(iTeam, envV.getTeam(iTeam).getICPKV()));
 }
 
 
@@ -307,8 +307,8 @@ ActionVector NeoPkCU::getValidSwapActions(
 
 
 ActionVector NeoPkCU::getValidSwapActions(
-    const ConstEnvironmentVolatile& envV, size_t iTeam) const {
-  return getValidSwapActions(envV, {iTeam, envV.getTeam(iTeam).getICPKV()});
+    const ConstEnvironmentVolatile& envV, TEAM iTeam) const {
+  return getValidSwapActions(envV, Actor(iTeam, envV.getTeam(iTeam).getICPKV()));
 }
 
 
@@ -317,13 +317,23 @@ ActionPairVector NeoPkCU::getAllValidActions(const ConstEnvironmentVolatile& env
 }
 
 
-IsValidResult NeoPkCU::isValidAction(const ConstEnvironmentVolatile& envV, const Action& action, size_t iTeam) const {
-  return isValidAction(envV, {iTeam, envV.getTeam(iTeam).getICPKV()}, action);
+IsValidResult NeoPkCU::isValidAction(
+    const ConstEnvironmentVolatile& envV, TEAM iTeam, const Action& action) const {
+  return isValidAction(envV, Actor(iTeam, envV.getTeam(iTeam).getICPKV()), action);
 }
 
 
-IsValidResult NeoPkCU::isValidAction(const ConstEnvironmentPossible& envV, const Action& action, size_t iTeam) const {
-    return isValidAction(envV.getEnv(), action, iTeam);
+IsValidResult NeoPkCU::isValidAction(
+    const ConstEnvironmentPossible& envV, TEAM iTeam, const Action& action) const {
+  return isValidAction(envV.getEnv(), iTeam, action);
+}
+
+
+IsValidResult NeoPkCU::isValidAction(
+    const ConstEnvironmentPossible& envP,
+    const Actor& actor,
+    const Action& action) const {
+  return isValidAction(envP.getEnv(), actor, action);
 }
 
 

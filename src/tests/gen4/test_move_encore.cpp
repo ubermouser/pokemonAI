@@ -149,10 +149,10 @@ TEST_F(EncoreTest, RestrictsMoves) {
   auto state = results_restricts_moves.where1();
 
   // Blissey tries to use Soft-Boiled (Move 1) - Should be invalid
-  EXPECT_FALSE(engine_->isValidAction(state, Action::move(1), TEAM_B));
+  EXPECT_FALSE(engine_->isValidAction(state, Actor(TEAM_B, 0), Action::move(1)));
 
   // Blissey tries to use Seismic Toss (Move 0) - Should be valid
-  EXPECT_TRUE(engine_->isValidAction(state, Action::move(0), TEAM_B));
+  EXPECT_TRUE(engine_->isValidAction(state, Actor(TEAM_B, 0), Action::move(0)));
 }
 
 TEST_F(EncoreTest, ProbabilisticDuration) {
@@ -211,12 +211,12 @@ TEST_F(EncoreTest, EncoreAndTaunt) {
   // Move 1: Soft-Boiled (Status) - Blocked by Taunt
   // Move 2: Toxic (Status) - Blocked by both
 
-  EXPECT_FALSE(engine_->isValidAction(env3, Action::move(0), TEAM_B));
-  EXPECT_FALSE(engine_->isValidAction(env3, Action::move(1), TEAM_B));
-  EXPECT_FALSE(engine_->isValidAction(env3, Action::move(2), TEAM_B));
+  EXPECT_FALSE(engine_->isValidAction(env3, Actor(TEAM_B, 0), Action::move(0)));
+  EXPECT_FALSE(engine_->isValidAction(env3, Actor(TEAM_B, 0), Action::move(1)));
+  EXPECT_FALSE(engine_->isValidAction(env3, Actor(TEAM_B, 0), Action::move(2)));
 
   // Check for Struggle
-  EXPECT_TRUE(engine_->isValidAction(env3, Action::struggle(), TEAM_B));
+  EXPECT_TRUE(engine_->isValidAction(env3, Actor(TEAM_B, 0), Action::struggle()));
 
   // Verify that updateState results in Struggle (or is blocked)
   auto env4 = results_encore_taunt_struggle.where1();

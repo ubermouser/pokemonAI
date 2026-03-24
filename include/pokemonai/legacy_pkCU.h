@@ -366,21 +366,21 @@ public:
         envV, actor, Action::MOVE_SWITCH, Action::MOVE_SWITCH + 1);
   }
   [[deprecated]] ActionVector getValidActions(
-      const ConstEnvironmentVolatile& envV, size_t iTeam) const {
+      const ConstEnvironmentVolatile& envV, TEAM iTeam) const {
     return getValidActions(envV, Actor(iTeam, envV.getTeam(iTeam).getICPKV()));
   }
   [[deprecated]] ActionVector getValidMoveActions(
-      const ConstEnvironmentVolatile& envV, size_t iTeam) const {
+      const ConstEnvironmentVolatile& envV, TEAM iTeam) const {
     return getValidMoveActions(
         envV, Actor(iTeam, envV.getTeam(iTeam).getICPKV()));
   }
   [[deprecated]] ActionVector getValidSwapActions(
-      const ConstEnvironmentVolatile& envV, size_t iTeam) const {
+      const ConstEnvironmentVolatile& envV, TEAM iTeam) const {
     return getValidSwapActions(
         envV, Actor(iTeam, envV.getTeam(iTeam).getICPKV()));
   }
   [[deprecated]] ActionPairVector getAllValidActions(
-      const ConstEnvironmentVolatile& envV, size_t agentTeam = TEAM_A) const;
+      const ConstEnvironmentVolatile& envV, TEAM agentTeam = TEAM_A) const;
 
   /**
    * @brief Checks if a given action is valid for a team in the current state.
@@ -392,17 +392,23 @@ public:
   [[deprecated]] IsValidResult isValidAction(
       const ConstEnvironmentVolatile& envV,
       const Action& action,
-      size_t iTeam) const;
+      TEAM iTeam) const;
   [[deprecated]] IsValidResult isValidAction(
       const ConstEnvironmentPossible& envV,
       const Action& action,
-      size_t iTeam) const {
+      TEAM iTeam) const {
     return isValidAction(envV.getEnv(), action, iTeam);
   }
   IsValidResult isValidAction(
       const ConstEnvironmentVolatile& envV,
       const Actor& actor,
       const Action& action) const;
+  IsValidResult isValidAction(
+      const ConstEnvironmentPossible& envP,
+      const Actor& actor,
+      const Action& action) const {
+    return isValidAction(envP.getEnv(), actor, action);
+  }
 
   /**
    * @brief Checks if the game is over.

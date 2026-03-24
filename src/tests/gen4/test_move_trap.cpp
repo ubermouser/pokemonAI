@@ -70,10 +70,10 @@ TEST_F(TrapTest, MeanLookTraps) {
   auto state = turn1.where1();
 
   // Team B tries to switch (Action::swap(1)) - Should be invalid
-  EXPECT_FALSE(engine_->isValidAction(state, Action::swap(1), TEAM_B));
+  EXPECT_FALSE(engine_->isValidAction(state.getEnv(), Actor(TEAM_B, 0), Action::swap(1)));
 
   // Team A (User) should be able to switch
-  EXPECT_TRUE(engine_->isValidAction(state, Action::swap(1), TEAM_A));
+  EXPECT_TRUE(engine_->isValidAction(state.getEnv(), Actor(TEAM_A, 0), Action::swap(1)));
 }
 
 TEST_F(TrapTest, BlockTraps) {
@@ -85,7 +85,7 @@ TEST_F(TrapTest, BlockTraps) {
   auto state = turn1.where1();
 
   // Team B tries to switch - Should be invalid
-  EXPECT_FALSE(engine_->isValidAction(state, Action::swap(1), TEAM_B));
+  EXPECT_FALSE(engine_->isValidAction(state.getEnv(), Actor(TEAM_B, 0), Action::swap(1)));
 }
 
 TEST_F(TrapTest, SpiderWebTraps) {
@@ -97,7 +97,7 @@ TEST_F(TrapTest, SpiderWebTraps) {
   auto state = turn1.where1();
 
   // Team B tries to switch - Should be invalid
-  EXPECT_FALSE(engine_->isValidAction(state, Action::swap(1), TEAM_B));
+  EXPECT_FALSE(engine_->isValidAction(state.getEnv(), Actor(TEAM_B, 0), Action::swap(1)));
 }
 
 TEST_F(TrapTest, ShedShellEscapesTrap) {
@@ -109,7 +109,7 @@ TEST_F(TrapTest, ShedShellEscapesTrap) {
   auto state = turn1.where1();
 
   // Team B has Shed Shell, so switching should be valid despite trap
-  EXPECT_TRUE(engine_->isValidAction(state, Action::swap(1), TEAM_B));
+  EXPECT_TRUE(engine_->isValidAction(state.getEnv(), Actor(TEAM_B, 0), Action::swap(1)));
 }
 
 TEST_F(TrapTest, TrapClearedOnUserSwitch) {
@@ -121,14 +121,14 @@ TEST_F(TrapTest, TrapClearedOnUserSwitch) {
   auto state1 = turn1.where1();
 
   // Verify trapped
-  EXPECT_FALSE(engine_->isValidAction(state1, Action::swap(1), TEAM_B));
+  EXPECT_FALSE(engine_->isValidAction(state1.getEnv(), Actor(TEAM_B, 0), Action::swap(1)));
 
   // Turn 2: Team A switches out (Manual switch)
   auto turn2 = engine_->updateState(state1, Action::swap(1), Action::move(0));
   auto state2 = turn2.where1();
 
   // Trap should be cleared. Team B can switch now.
-  EXPECT_TRUE(engine_->isValidAction(state2, Action::swap(1), TEAM_B));
+  EXPECT_TRUE(engine_->isValidAction(state2.getEnv(), Actor(TEAM_B, 0), Action::swap(1)));
 }
 
 TEST_F(TrapTest, TrapClearedOnUTurn) {
@@ -165,7 +165,7 @@ TEST_F(TrapTest, TrapClearedOnUTurn) {
   auto state1 = turn1.where1();
 
   // Verify trapped
-  EXPECT_FALSE(engine_->isValidAction(state1, Action::swap(1), TEAM_B));
+  EXPECT_FALSE(engine_->isValidAction(state1.getEnv(), Actor(TEAM_B, 0), Action::swap(1)));
 
   // Turn 2: Team A uses U-turn (Action::move(1))
   auto turn2 = engine_->updateState(state1, Action::moveAlly(1, 1), Action::move(0));
@@ -175,7 +175,7 @@ TEST_F(TrapTest, TrapClearedOnUTurn) {
   EXPECT_EQ(state2.getTeam(TEAM_A).getICPKV(), 1);
 
   // Trap should be cleared. Team B can switch now.
-  EXPECT_TRUE(engine_->isValidAction(state2, Action::swap(1), TEAM_B));
+  EXPECT_TRUE(engine_->isValidAction(state2.getEnv(), Actor(TEAM_B, 0), Action::swap(1)));
 }
 
 TEST_F(TrapTest, TrapClearedOnUserDeath) {
@@ -212,7 +212,7 @@ TEST_F(TrapTest, TrapClearedOnUserDeath) {
   auto state1 = turn1.where1();
 
   // Verify trapped
-  EXPECT_FALSE(engine_->isValidAction(state1, Action::swap(1), TEAM_B));
+  EXPECT_FALSE(engine_->isValidAction(state1.getEnv(), Actor(TEAM_B, 0), Action::swap(1)));
 
   // Turn 2: A uses Mean Look, B uses Thunderbolt (kills A)
   auto turn2 = engine_->updateState(state1, Action::move(0), Action::move(0));
@@ -228,5 +228,5 @@ TEST_F(TrapTest, TrapClearedOnUserDeath) {
   EXPECT_EQ(state3.getTeam(TEAM_A).getICPKV(), 1); // Bulbasaur in
 
   // Trap should be cleared. Team B can switch now.
-  EXPECT_TRUE(engine_->isValidAction(state3, Action::swap(1), TEAM_B));
+  EXPECT_TRUE(engine_->isValidAction(state3.getEnv(), Actor(TEAM_B, 0), Action::swap(1)));
 }

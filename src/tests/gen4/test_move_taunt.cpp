@@ -47,11 +47,11 @@ TEST_F(TauntTest, PreventsStatusMoves) {
 
   // Shuckle tries to use Toxic (Move 0, Status) - Should be invalid
   EXPECT_FALSE(
-      engine_->isValidAction(turn1_taunt.where1(), Action::move(0), TEAM_B));
+      engine_->isValidAction(turn1_taunt.where1().getEnv(), Actor(TEAM_B, 0), Action::move(0)));
 
   // Shuckle tries to use Constrict (Move 1, Physical) - Should be valid
   EXPECT_TRUE(
-      engine_->isValidAction(turn1_taunt.where1(), Action::move(1), TEAM_B));
+      engine_->isValidAction(turn1_taunt.where1().getEnv(), Actor(TEAM_B, 0), Action::move(1)));
 }
 
 TEST_F(TauntTest, WearsOff) {
@@ -88,7 +88,7 @@ TEST_F(TauntTest, WearsOff) {
   EXPECT_EQ(current_state.teammate(1, 0).status().cTeammate.taunt_duration, 0);
 
   // Now Shuckle can use Toxic again.
-  EXPECT_TRUE(engine_->isValidAction(current_state, Action::move(0), TEAM_B));
+  EXPECT_TRUE(engine_->isValidAction(current_state, Actor(TEAM_B, 0), Action::move(0)));
 }
 
 

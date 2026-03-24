@@ -117,7 +117,7 @@ Game& Game::setEngine(const std::shared_ptr<PkCU>& cu) {
 Game& Game::setPlanner(size_t iAgent, const std::shared_ptr<Planner>& cPlanner) {
   assert(iAgent < 2);
   agents_[iAgent] = cPlanner;
-  agents_[iAgent]->setTeam(iAgent);
+  agents_[iAgent]->setTeam((TEAM)iAgent);
 
   if (nv_ != NULL) { agents_[iAgent]->setEnvironment(nv_); }
   isInitialized_ = false;

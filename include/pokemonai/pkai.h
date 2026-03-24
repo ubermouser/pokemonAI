@@ -25,6 +25,23 @@ typedef float fpType;
 typedef fixedpoint::fixed_point<27> FixType;
 typedef FixType fixType;
 
+// teams:
+enum TEAM {
+  TEAM_A = 0,
+  TEAM_B = 1
+};
+
+// win conditions:
+enum MatchState
+{
+  MATCH_UNPLAYED = -2,
+  MATCH_MIDGAME = -1,
+  MATCH_TEAM_A_WINS = TEAM_A,
+  MATCH_TEAM_B_WINS = TEAM_B,
+  MATCH_TIE = 2
+};
+#define MATCH_DRAW MATCH_MIDGAME
+
 
 // Global constants:
 #define SRANDOMSEED 5
@@ -128,20 +145,7 @@ typedef FixType fixType;
 #define AIL_NV_POISON_TOXIC 12 // has 15 possible stages from 1/16 hp to 15/16 hp. This is stage 1/16
 #define AIL_NV_MAX 12
 
-// teams:
-#define TEAM_A 0
-#define TEAM_B 1
 
-// win conditions:
-enum MatchState
-{
-  MATCH_UNPLAYED = -2,
-  MATCH_MIDGAME = -1,
-  MATCH_TEAM_A_WINS = TEAM_A,
-  MATCH_TEAM_B_WINS = TEAM_B,
-  MATCH_TIE = 2
-};
-#define MATCH_DRAW MATCH_MIDGAME
 
 // multithreading vars:
 #define THREADS_MINDEPTH 2

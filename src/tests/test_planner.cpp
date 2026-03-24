@@ -64,7 +64,7 @@ TEST_F(PlannerTest, MaxPlannerChoosesGreedyOption) {
   for (auto& planner: planners) {
     planner
         .setEvaluator(evaluator_)
-        .setTeam(&planner - planners.begin())
+        .setTeam(static_cast<TEAM>(&planner - planners.begin()))
         .setEngine(engine_)
         .setEnvironment(environment_)
         .initialize();
@@ -94,7 +94,7 @@ TEST_F(PlannerTest, MaximinPlannerChooses1PlyOption) {
   for (auto& planner: planners) {
     planner
         .setEvaluator(evaluator_)
-        .setTeam(&planner - planners.begin())
+        .setTeam(static_cast<TEAM>(&planner - planners.begin()))
         .setEngine(engine_)
         .setEnvironment(environment_)
         .initialize();
@@ -121,7 +121,7 @@ TEST_F(PlannerTest, MaximinPlannerChooses2PlyOption) {
   for (auto& planner: planners) {
     planner
         .setEvaluator(evaluator_)
-        .setTeam(&planner - planners.begin())
+        .setTeam(static_cast<TEAM>(&planner - planners.begin()))
         .setEngine(engine_)
         .setEnvironment(environment_)
         .initialize();

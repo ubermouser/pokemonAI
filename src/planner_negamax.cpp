@@ -40,7 +40,7 @@ PlannerNegamax& PlannerNegamax::initialize() {
 
 ActionVector PlannerNegamax::getValidActions(
     const ConstEnvironmentPossible& origin,
-    size_t iTeam) const {
+    TEAM iTeam) const {
   // if this state has been evaluated at a shallower depth, immediately consider the shallower
   //  depth's best move first. Odds are, it will still be quite good.
   Action killerMove;

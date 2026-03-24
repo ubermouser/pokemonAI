@@ -1,6 +1,7 @@
 #ifndef ACTOR_H
 #define ACTOR_H
 
+#include "pkai.h"
 #include <assert.h>
 
 #include <cstddef>

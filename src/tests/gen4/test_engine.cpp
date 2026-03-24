@@ -69,17 +69,20 @@ class BasicEngineTest : public Gen4EngineTest {
 };
 
 
+class GetAllValidActionsTest : public BasicEngineTest {};
+
+
 TEST_F(IsValidActionTest, Basic) {
   // pokemon may move freely when both are alive:
   EXPECT_TRUE(
-      engine_->isValidAction(engine_->initialState(), Action::move(0), TEAM_A));
+      engine_->isValidAction(engine_->initialState(), Actor(TEAM_A, 0), Action::move(0)));
 }
 
 
 TEST_F(IsValidActionTest, MoveInvalid) {
   // Move index out of bounds (charmander has only 1 move)
   EXPECT_EQ(
-      engine_->isValidAction(engine_->initialState(), Action::move(1), TEAM_A)
+      engine_->isValidAction(engine_->initialState(), Actor(TEAM_A, 0), Action::move(1))
           .reason,
       IsValidResult::MOVE_INVALID);
 }
@@ -92,7 +95,7 @@ TEST_F(IsValidActionTest, MoveNoPP) {
   ConstEnvironmentVolatile noPPState(state.nv(), data);
 
   EXPECT_EQ(
-      engine_->isValidAction(noPPState, Action::move(0), TEAM_A).reason,
+      engine_->isValidAction(noPPState, Actor(TEAM_A, 0), Action::move(0)).reason,
       IsValidResult::MOVE_NO_PP);
 }
 
@@ -119,7 +122,7 @@ TEST_F(IsValidActionTest, MoveFriendlyTargetDead) {
 
   // Softboiled targeting fainted squirtle
   EXPECT_EQ(
-      engine_->isValidAction(allyDeadState, Action::moveAlly(0, 1), TEAM_A)
+      engine_->isValidAction(allyDeadState, Actor(TEAM_A, 0), Action::moveAlly(0, 1))
           .reason,
       IsValidResult::MOVE_FRIENDLY_TARGET_DEAD);
 }
@@ -140,7 +143,7 @@ TEST_F(IsValidActionTest, MoveFriendlyTargetSelf) {
   EXPECT_EQ(
       engine_
           ->isValidAction(
-              engine_->initialState(), Action::moveAlly(0, 0), TEAM_A)
+              engine_->initialState(), Actor(TEAM_A, 0), Action::moveAlly(0, 0))
           .reason,
       IsValidResult::MOVE_FRIENDLY_TARGET_SELF);
 }
@@ -149,7 +152,7 @@ TEST_F(IsValidActionTest, MoveFriendlyTargetSelf) {
 TEST_F(IsValidSwapTest, SwitchInvalidPokemon) {
   // Team has 2 pokemon, cannot switch to index 3
   EXPECT_EQ(
-      engine_->isValidAction(engine_->initialState(), Action::swap(3), TEAM_A)
+      engine_->isValidAction(engine_->initialState(), Actor(TEAM_A, 0), Action::swap(3))
           .reason,
       IsValidResult::SWITCH_INVALID_POKEMON);
 }
@@ -174,7 +177,7 @@ TEST_F(IsValidActionTest, SwitchPokemonDead) {
   ConstEnvironmentVolatile allyDeadState(state.nv(), data);
 
   EXPECT_EQ(
-      engine_->isValidAction(allyDeadState, Action::swap(1), TEAM_A).reason,
+      engine_->isValidAction(allyDeadState, Actor(TEAM_A, 0), Action::swap(1)).reason,
       IsValidResult::SWITCH_POKEMON_DEAD);
 }
 
@@ -182,33 +185,40 @@ TEST_F(IsValidActionTest, SwitchPokemonDead) {
 TEST_F(IsValidActionTest, WaitNotAllowed) {
   // Wait not allowed if opponent is alive
   EXPECT_EQ(
-      engine_->isValidAction(engine_->initialState(), Action::wait(), TEAM_A)
+      engine_->isValidAction(engine_->initialState(), Actor(TEAM_A, 0), Action::wait())
           .reason,
       IsValidResult::WAIT_NOT_ALLOWED);
 }
 
 
-TEST_F(IsValidActionTest, Struggle) {
+TEST_F(IsValidActionTest, StruggleNotAllowed) {
   // Struggle not allowed if moves still have PP
   EXPECT_EQ(
       engine_
-          ->isValidAction(engine_->initialState(), Action::struggle(), TEAM_A)
+          ->isValidAction(engine_->initialState(), Actor(TEAM_A, 0), Action::struggle())
           .reason,
       IsValidResult::STRUGGLE_NOT_ALLOWED);
+}
 
-  // Struggle IS allowed if all moves have 0 PP
+
+TEST_F(IsValidActionTest, StruggleAllowed) {
   auto state = engine_->initialState();
   auto data = state.data();
   data.teams[0].teammates[0].actions[0].PPcurrent = 0;
   ConstEnvironmentVolatile noPPState(state.nv(), data);
-  EXPECT_TRUE(engine_->isValidAction(noPPState, Action::struggle(), TEAM_A));
+
+  // Struggle IS allowed if all moves have 0 PP
+  EXPECT_TRUE(engine_->isValidAction(noPPState, Actor(TEAM_A, 0), Action::struggle()));
+  // Struggle is the only valid move action:
+  EXPECT_EQ(
+      engine_->getValidMoveActions(noPPState, Actor(TEAM_A, 0)).size(), 1);
 }
 
 
 TEST_F(IsValidActionTest, ActionTypeDisabled) {
   // Undefined action type (e.g. Action::MOVE_UNDEFINED which is 0)
   EXPECT_EQ(
-      engine_->isValidAction(engine_->initialState(), Action(), TEAM_A).reason,
+      engine_->isValidAction(engine_->initialState(), Actor(TEAM_A, 0), Action()).reason,
       IsValidResult::ACTION_TYPE_DISABLED);
 }
 
@@ -220,7 +230,7 @@ TEST_F(IsValidActionTest, InvalidFriendlyTarget) {
   EXPECT_EQ(
       engine_
           ->isValidAction(
-              engine_->initialState(), Action::moveAlly(0, 1), TEAM_A)
+              engine_->initialState(), Actor(TEAM_A, 0), Action::moveAlly(0, 1))
           .reason,
       IsValidResult::INVALID_FRIENDLY_TARGET);
 }
@@ -254,45 +264,45 @@ TEST_F(IsValidSwapTest, ActivePokemonChanged) {
 TEST_F(IsValidSwapTest, SwapSelf) {
   // pokemon may not swap to themselves:
   EXPECT_FALSE(
-      engine_->isValidAction(engine_->initialState(), Action::swap(0), TEAM_A));
+      engine_->isValidAction(engine_->initialState(), Actor(TEAM_A, 0), Action::swap(0)));
   EXPECT_FALSE(
-      engine_->isValidAction(swap_squirtle.where1(), Action::swap(1), TEAM_A));
+      engine_->isValidAction(swap_squirtle.where1(), Actor(TEAM_A, 1), Action::swap(1)));
 }
 
 TEST_F(IsValidSwapTest, SwapLiving) {
   // pokemon may swap when alive if teammate is also alive:
   EXPECT_TRUE(
-      engine_->isValidAction(engine_->initialState(), Action::swap(1), TEAM_A));
+      engine_->isValidAction(engine_->initialState(), Actor(TEAM_A, 0), Action::swap(1)));
   EXPECT_TRUE(
-      engine_->isValidAction(engine_->initialState(), Action::swap(1), TEAM_B));
+      engine_->isValidAction(engine_->initialState(), Actor(TEAM_B, 0), Action::swap(1)));
 }
 
 TEST_F(IsValidSwapTest, SwapFromDeadActive) {
   // dead pokemon may swap:
   EXPECT_TRUE(
-      engine_->isValidAction(torkoal_dead.where1(), Action::swap(1), TEAM_B));
+      engine_->isValidAction(torkoal_dead.where1(), Actor(TEAM_B, 0), Action::swap(1)));
 }
 
 TEST_F(IsValidSwapTest, SwapEnemyDead) {
   // living pokemon may NOT swap when the enemy is dead (standard engine rules):
   EXPECT_FALSE(
-      engine_->isValidAction(torkoal_dead.where1(), Action::swap(0), TEAM_A));
+      engine_->isValidAction(torkoal_dead.where1(), Actor(TEAM_A, 1), Action::swap(0)));
   EXPECT_TRUE(
-      engine_->isValidAction(torkoal_dead.where1(), Action::wait(), TEAM_A));
+      engine_->isValidAction(torkoal_dead.where1(), Actor(TEAM_A, 1), Action::wait()));
 }
 
 TEST_F(IsValidSwapTest, SwapBothDead) {
   // if BOTH pokemon are dead, both pokemon may swap:
   EXPECT_TRUE(
-      engine_->isValidAction(both_dead.where1(), Action::swap(0), TEAM_A));
+      engine_->isValidAction(both_dead.where1(), Actor(TEAM_A, 1), Action::swap(0)));
   EXPECT_TRUE(
-      engine_->isValidAction(both_dead.where1(), Action::swap(1), TEAM_B));
+      engine_->isValidAction(both_dead.where1(), Actor(TEAM_B, 0), Action::swap(1)));
 }
 
 TEST_F(IsValidSwapTest, ValidActionsCount) {
   // move counts should be accurate:
   EXPECT_EQ(
-      engine_->getValidActions(torkoal_dead.where1().getEnv(), TEAM_B).size(),
+      engine_->getValidActions(torkoal_dead.where1().getEnv(), Actor(TEAM_B, 0)).size(),
       1);
 }
 
@@ -300,7 +310,7 @@ TEST_F(IsValidSwapTest, ValidActionsCount) {
 TEST_F(IsValidSwapTest, MoveTargetDead) {
   // Team B's active pokemon is dead, Team A squirtle cannot target it
   EXPECT_EQ(
-      engine_->isValidAction(torkoal_dead.where1(), Action::move(0), TEAM_A)
+      engine_->isValidAction(torkoal_dead.where1(), Actor(TEAM_A, 1), Action::move(0))
           .reason,
       IsValidResult::MOVE_TARGET_DEAD);
 }
@@ -309,9 +319,29 @@ TEST_F(IsValidSwapTest, MoveTargetDead) {
 TEST_F(IsValidSwapTest, MoveSelfDead) {
   // Team B's active pokemon (torkoal) is dead, it cannot move
   EXPECT_EQ(
-      engine_->isValidAction(torkoal_dead.where1(), Action::move(0), TEAM_B)
+      engine_->isValidAction(torkoal_dead.where1(), Actor(TEAM_B, 0), Action::move(0))
           .reason,
       IsValidResult::MOVE_SELF_DEAD);
+}
+
+
+TEST_F(GetAllValidActionsTest, AllActionsActiveTeammate) {
+  EXPECT_EQ(
+      engine_->getValidActions(engine_->initialState(), {TEAM_A, 0}).size(), 4);
+}
+
+
+TEST_F(GetAllValidActionsTest, AllMoveActions) {
+  EXPECT_EQ(
+      engine_->getValidMoveActions(engine_->initialState(), {TEAM_A, 0}).size(),
+      3);
+}
+
+
+TEST_F(GetAllValidActionsTest, AllSwapActions) {
+  EXPECT_EQ(
+      engine_->getValidSwapActions(engine_->initialState(), {TEAM_A, 0}).size(),
+      1);
 }
 
 

@@ -49,7 +49,8 @@ TEST_F(TrickTest, item_behavior_propagates) {
     engine_->initialState(), Action::move(0), Action::move(0));
 
   auto final_env_v = trick_item.where1().getEnv();
-  EXPECT_FALSE(engine_->isValidAction(final_env_v, Action::move(1), 1));
+  EXPECT_TRUE(engine_->isValidAction(final_env_v, Actor(TEAM_B, 0), Action::move(0)));
+  EXPECT_FALSE(engine_->isValidAction(final_env_v, Actor(TEAM_B, 0), Action::move(1)));
 }
 
 

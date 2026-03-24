@@ -408,13 +408,13 @@ TEST_F(EnginePluginTest, NonvolatileStateInitialization) {
 
 
 TEST_F(EnginePluginTest, IsValidActionMove) {
-  engine_->isValidAction(engine_->initialState(), Action::move(0), TEAM_A);
+  engine_->isValidAction(engine_->initialState(), Actor(TEAM_A, 0), Action::move(0));
   EXPECT_GT(plugin_calls[PLUGIN_ON_TESTMOVE], 0);
 }
 
 
 TEST_F(EnginePluginTest, IsValidActionSwap) {
-  engine_->isValidAction(engine_->initialState(), Action::swap(1), TEAM_A);
+  engine_->isValidAction(engine_->initialState(), Actor(TEAM_A, 0), Action::swap(1));
   EXPECT_GT(plugin_calls[PLUGIN_ON_TESTSWITCH], 0);
 }
 

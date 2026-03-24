@@ -192,7 +192,7 @@ uint32_t planner_directed::generateSolution(const EnvironmentPossible& origin)
 
   for (size_t iAction = 0; iAction != AT_ITEM_USE; ++iAction)
   {
-    if (!cu->isValidAction(origin.getEnv(), iAction, agentTeam)) { continue; }
+    if (!cu->isValidAction(origin.getEnv(), Actor((TEAM)agentTeam, 0), iAction)) { continue; }
 
     // produce the resulting state of iAction:
     PossibleEnvironments rEnvP = cu->updateState(
