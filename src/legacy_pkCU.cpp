@@ -96,6 +96,15 @@ LegacyPkCU& LegacyPkCU::setAccuracy(size_t accuracy)
   return *this;
 };
 
+
+LegacyPkCU& LegacyPkCU::setNumActivePokemon(size_t numActivePokemon) {
+  if (numActivePokemon != 1) {
+    throw std::runtime_error(
+        "Legacy engine only supports 1 active pokemon per team!");
+  }
+  return *this;
+};
+
 /**
  * @brief Initializes the plugin sets for the configured non-volatile environment.
  *

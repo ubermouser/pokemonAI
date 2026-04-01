@@ -76,21 +76,21 @@ public:
 
   auto yieldPokemon(size_t iCurrent = 0) const {
     return nv().yieldActors(iCurrent) |
-           boost::adaptors::transformed([&](const auto& actor) {
+           boost::adaptors::transformed([*this](const auto& actor) {
              return std::make_tuple(actor, teammate(actor));
            });
   }
 
   auto yieldActiveActors(size_t iCurrent = 0) const {
     return nv().yieldActors(iCurrent) |
-           boost::adaptors::filtered([&](const auto& actor) {
+           boost::adaptors::filtered([*this](const auto& actor) {
              return teammate(actor).isActive();
            });
   }
 
   auto yieldActivePokemon(size_t iCurrent = 0) const {
     return yieldActiveActors(iCurrent) |
-           boost::adaptors::transformed([&](const auto& actor) {
+           boost::adaptors::transformed([*this](const auto& actor) {
              return std::make_tuple(actor, teammate(actor));
            });
   }

@@ -157,6 +157,30 @@ class PKAISHARED NeoPkCU {
   ActionVector getValidSwapActions(
       const ConstEnvironmentVolatile& envV, const Actor& actor) const;
 
+  /**
+   * @brief Checks if a given action is valid for a team in the current state.
+   * @param envV The current volatile environment.
+   * @param actor The teammate performing the action.
+   * @param action The action to check.
+   * @return An `IsValidResult` object indicating if the action is valid.
+   */
+  [[deprecated]] IsValidResult isValidAction(
+      const ConstEnvironmentVolatile& envV,
+      const TEAM iTeam,
+      const Action& action) const;
+  [[deprecated]] IsValidResult isValidAction(
+      const ConstEnvironmentPossible& envV,
+      const TEAM iTeam,
+      const Action& action) const;
+  IsValidResult isValidAction(
+      const ConstEnvironmentVolatile& envV,
+      const Actor& actor,
+      const Action& action) const;
+  IsValidResult isValidAction(
+      const ConstEnvironmentPossible& envP,
+      const Actor& actor,
+      const Action& action) const;
+
  private:
   struct ActionFilter {
     const NeoPkCU* cu;
@@ -185,13 +209,6 @@ class PKAISHARED NeoPkCU {
     return range | boost::adaptors::transformed(ActionTransform{}) |
            boost::adaptors::filtered(ActionFilter{this, envV, actor});
   }
-
-  void generateActionMaps(
-      const ConstEnvironmentVolatile& envV,
-      std::vector<Actor>::const_iterator actorIt,
-      std::vector<Actor>::const_iterator actorEnd,
-      ActionMap& currentMap,
-      std::vector<ActionMap>& results) const;
 
  public:
   auto yieldValidMoveActions(
@@ -224,32 +241,9 @@ class PKAISHARED NeoPkCU {
 
   auto yieldAllValidActions(
       const ConstEnvironmentVolatile& envV, TEAM agentTeam = TEAM_A) const {
-    return getAllValidActions(envV, agentTeam);
+    
   }
 
-  /**
-   * @brief Checks if a given action is valid for a team in the current state.
-   * @param envV The current volatile environment.
-   * @param actor The teammate performing the action.
-   * @param action The action to check.
-   * @return An `IsValidResult` object indicating if the action is valid.
-   */
-  [[deprecated]] IsValidResult isValidAction(
-      const ConstEnvironmentVolatile& envV,
-      const TEAM iTeam,
-      const Action& action) const;
-  [[deprecated]] IsValidResult isValidAction(
-      const ConstEnvironmentPossible& envV,
-      const TEAM iTeam,
-      const Action& action) const;
-  IsValidResult isValidAction(
-      const ConstEnvironmentVolatile& envV,
-      const Actor& actor,
-      const Action& action) const;
-  IsValidResult isValidAction(
-      const ConstEnvironmentPossible& envP,
-      const Actor& actor,
-      const Action& action) const;
 
   /**
    * @brief Checks if the game is over.
@@ -283,6 +277,11 @@ protected:
    */
   EnvironmentVolatileData initialState_;
 
+  /**
+   * @brief Whether the engine has been initialized for the current environment.
+   */
+  bool initialized_;
+
 
   /**
    * @brief All plugins loaded for the given nonvolatile state.
@@ -304,6 +303,8 @@ protected:
 
   void guardInvalidActions(
       const ConstEnvironmentVolatile& cEnv, const ActionMap& actions) const;
+
+  void guardInitialized() const;
 
   /**
    * @brief Creates the initial volatile state for the configured non-volatile

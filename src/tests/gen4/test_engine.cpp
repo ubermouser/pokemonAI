@@ -49,6 +49,7 @@ class IsValidSwapTest : public Gen4EngineTest {
 
 
 class BasicEngineTest : public Gen4EngineTest {
+ protected:
   void SetUp() override {
     Gen4EngineTest::SetUp();
 
@@ -69,7 +70,24 @@ class BasicEngineTest : public Gen4EngineTest {
 };
 
 
-class GetAllValidActionsTest : public BasicEngineTest {};
+class BasicEngine2v2Test : public BasicEngineTest {
+ protected:
+  void SetUp() override {
+#if USE_LEGACY_ENGINE
+    GTEST_SKIP() << "Neo-Engine test";
+#endif
+
+    BasicEngineTest::SetUp();
+
+    engine_->setNumActivePokemon(2);
+    engine_->initialize();
+  }
+};
+
+
+class GetValidActionsTest : public BasicEngineTest {};
+
+class GetValidActions2v2Test : public BasicEngine2v2Test {};
 
 
 TEST_F(IsValidActionTest, Basic) {
@@ -325,33 +343,51 @@ TEST_F(IsValidSwapTest, MoveSelfDead) {
 }
 
 
-TEST_F(GetAllValidActionsTest, AllActionsActiveTeammate) {
+TEST_F(GetValidActionsTest, AllActionsActiveTeammate) {
   EXPECT_EQ(
       engine_->getValidActions(engine_->initialState(), {TEAM_A, 0}).size(), 4);
 }
 
 
-TEST_F(GetAllValidActionsTest, AllMoveActions) {
+TEST_F(GetValidActionsTest, AllMoveActions) {
   EXPECT_EQ(
       engine_->getValidMoveActions(engine_->initialState(), {TEAM_A, 0}).size(),
       3);
 }
 
 
-TEST_F(GetAllValidActionsTest, AllSwapActions) {
+TEST_F(GetValidActionsTest, AllSwapActions) {
   EXPECT_EQ(
       engine_->getValidSwapActions(engine_->initialState(), {TEAM_A, 0}).size(),
       1);
 }
 
 
-TEST_F(GetAllValidActionsTest, AllValidActionMaps) {
+TEST_F(GetValidActionsTest, AllValidActionMaps) {
   auto maps = engine_->getAllValidActions(engine_->initialState(), TEAM_A);
   // Charmander has 3 valid move actions and 1 valid swap action.
   EXPECT_EQ(maps.size(), 4);
   for (const auto& map : maps) {
     EXPECT_EQ(map.size(), 1);
     EXPECT_TRUE(map.count(Actor(TEAM_A, 0)));
+  }
+}
+
+
+TEST_F(GetValidActions2v2Test, Activates2PokemonPerTeam) {
+  auto state = engine_->initialState();
+  EXPECT_EQ(state.getNumActivePokemon(), 4);
+}
+
+
+TEST_F(GetValidActions2v2Test, AllValidActionMaps) {
+  auto maps = engine_->getAllValidActions(engine_->initialState(), TEAM_A);
+  // Charmander has 3 valid move actions and 1 valid swap action.
+  EXPECT_EQ(maps.size(), 8);
+  for (const auto& map : maps) {
+    EXPECT_EQ(map.size(), 2);
+    EXPECT_TRUE(map.count(Actor(TEAM_A, 0)));
+    EXPECT_TRUE(map.count(Actor(TEAM_A, 1)));
   }
 }
 

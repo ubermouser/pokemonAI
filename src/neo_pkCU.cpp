@@ -11,7 +11,7 @@
 namespace po = boost::program_options;
 
 
-NeoPkCU::NeoPkCU(const Config& cfg) : cfg_(cfg) {}
+NeoPkCU::NeoPkCU(const Config& cfg) : cfg_(cfg), initialized_(false) {}
 
 
 NeoPkCU::NeoPkCU(const NeoPkCU& other) = default;
@@ -55,6 +55,7 @@ NeoPkCU& NeoPkCU::setAccuracy(size_t engineAccuracy) {
 
 NeoPkCU& NeoPkCU::setNumActivePokemon(size_t numActivePokemon) {
   cfg_.numActivePokemon = numActivePokemon;
+  if (nv_ != nullptr) { initialState_ = createInitialVolatileState(); }
   return *this;
 }
 
@@ -171,13 +172,13 @@ PossibleEnvironments NeoPkCU::updateState(
 
 
 ConstEnvironmentVolatile NeoPkCU::initialState() const {
-    if (!nv_) throw std::runtime_error("NeoPkCU environment not set");
-    return ConstEnvironmentVolatile{*nv_, initialState_};
+  if (!initialized_) throw std::runtime_error("NeoPkCU environment not set");
+  return ConstEnvironmentVolatile{*nv_, initialState_};
 }
 
 
 void NeoPkCU::initialize() {
-  if (!nv_) return;
+  if (!nv_) throw std::runtime_error("NeoPkCU environment not set");
 
   // Clear existing plugins
   for (auto& set : pluginSet_) {
@@ -239,6 +240,9 @@ void NeoPkCU::initialize() {
   for (auto& set : pluginSet_) {
     std::sort(set.begin(), set.end());
   }
+
+  initialState_ = createInitialVolatileState();
+  initialized_ = true;
 }
 
 
@@ -292,34 +296,11 @@ ActionVector NeoPkCU::getValidSwapActions(
 
 std::vector<ActionMap> NeoPkCU::getAllValidActions(
     const ConstEnvironmentVolatile& envV, TEAM agentTeam) const {
-  std::vector<Actor> activeActors;
-  for (const auto& actor : envV.getTeam(agentTeam).yieldActiveActors()) {
-    activeActors.push_back(actor);
+  std::vector<ActionMap> result;
+  for (const auto& actionMap : yieldAllValidActions(envV, agentTeam)) {
+    result.push_back(actionMap);
   }
-
-  std::vector<ActionMap> results;
-  ActionMap currentMap;
-  generateActionMaps(
-      envV, activeActors.begin(), activeActors.end(), currentMap, results);
-  return results;
-}
-
-void NeoPkCU::generateActionMaps(
-    const ConstEnvironmentVolatile& envV,
-    std::vector<Actor>::const_iterator actorIt,
-    std::vector<Actor>::const_iterator actorEnd,
-    ActionMap& currentMap,
-    std::vector<ActionMap>& results) const {
-  if (actorIt == actorEnd) {
-    results.push_back(currentMap);
-    return;
-  }
-
-  auto actor = *actorIt;
-  for (const auto& action : yieldValidActions(envV, actor)) {
-    currentMap[actor] = action;
-    generateActionMaps(envV, actorIt + 1, actorEnd, currentMap, results);
-  }
+  return result;
 }
 
 

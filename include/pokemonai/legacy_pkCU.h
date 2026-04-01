@@ -253,6 +253,13 @@ public:
     size_t numRandomEnvironments = 1;
 
     /**
+     * @brief The number of active Pokemon on each team in the battle.
+     *
+     * Legacy engine only supports 1 active pokemon per team.
+     */
+    size_t numActivePokemon = 1;
+
+    /**
      * @brief If `true`, the engine will not throw an exception for invalid moves.
      *
      * This is useful for scenarios where you want to handle invalid moves
@@ -305,6 +312,16 @@ public:
    * @return A reference to this LegacyPkCU instance.
    */
   LegacyPkCU& setAccuracy(size_t engineAccuracy);
+
+  /**
+   * @brief Sets the number of active pokemon.
+   *
+   * Legacy engine only supports 1 active pokemon per team.
+   *
+   * @param numActivePokemon The number of active pokemon.
+   * @return A reference to this LegacyPkCU instance.
+   */
+  LegacyPkCU& setNumActivePokemon(size_t numActivePokemon);
 
   /**
    * @brief Sets whether to allow invalid moves.

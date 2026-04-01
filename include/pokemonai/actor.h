@@ -18,6 +18,7 @@ class Actor {
   uint32_t iTeam_;      // team of the pokemon that moves next
   uint32_t iTeammate_;  // teammate index of pokemon that moves next
 
+  Actor() : iTeam_(0), iTeammate_(0) {}
   Actor(size_t iTeam, size_t iTeammate) : iTeam_(iTeam), iTeammate_(iTeammate) {
     assert(iTeam < 2);
     assert(iTeammate < 6);
