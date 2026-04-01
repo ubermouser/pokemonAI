@@ -345,6 +345,17 @@ TEST_F(GetAllValidActionsTest, AllSwapActions) {
 }
 
 
+TEST_F(GetAllValidActionsTest, AllValidActionMaps) {
+  auto maps = engine_->getAllValidActions(engine_->initialState(), TEAM_A);
+  // Charmander has 3 valid move actions and 1 valid swap action.
+  EXPECT_EQ(maps.size(), 4);
+  for (const auto& map : maps) {
+    EXPECT_EQ(map.size(), 1);
+    EXPECT_TRUE(map.count(Actor(TEAM_A, 0)));
+  }
+}
+
+
 TEST_F(BasicEngineTest, PrimaryHitAndCrit) {
   PossibleEnvironments result = engine_->updateState(
       engine_->initialState(), Action::move(0), Action::wait());  // cut

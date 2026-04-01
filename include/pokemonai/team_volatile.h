@@ -8,14 +8,17 @@
 #ifndef TEAM_VOLATILE_H
 #define	TEAM_VOLATILE_H
 
-#include "pkai.h"
+#include <stdint.h>
 
 #include <array>
+#include <boost/range/adaptor/filtered.hpp>
+#include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/irange.hpp>
 #include <iosfwd>
-#include <stdint.h>
 #include <vector>
 
 #include "nonvolatile_volatile.h"
+#include "pkai.h"
 #include "pokemon_volatile.h"
 #include "team_nonvolatile.h"
 #include "team_status.h"
@@ -56,6 +59,9 @@ public:
   const VolatileStatus& getVolatile() const { return data().status.cTeammate; };
   const NonVolatileStatus& getNonVolatile() const { return data().status.nonvolatile; };
 
+  pokemonvolatile_t teammate(const Actor& actor) const {
+    return teammate(actor.iTeammate());
+  }
   pokemonvolatile_t teammate(const Action& action) const { return teammate(action.iFriendly()); }
   pokemonvolatile_t teammate(size_t iTeammate) const;
 
@@ -63,52 +69,32 @@ public:
   uint32_t numTeammatesAlive() const;
 
   /* returns indices of teammates on this team that are active */
-  std::vector<size_t> getActivePokemon() const;
+  std::vector<Actor> getActiveActors() const;
 
   /* returns number of teammates on this team that are active */
   size_t getNumActivePokemon() const;
 
-  struct ActivePokemonRange {
-    const TeamNonVolatile* nv;
-    const TeamVolatileData* data;
-    struct Iterator {
-      const TeamNonVolatile* nv;
-      const TeamVolatileData* data;
-      size_t index;
+  auto yieldPokemon(size_t iCurrent = 0) const {
+    return nv().yieldActors(iCurrent) |
+           boost::adaptors::transformed([&](const auto& actor) {
+             return std::make_tuple(actor, teammate(actor));
+           });
+  }
 
-      void advance() {
-        while (index < nv->getNumTeammates() &&
-               !data->teammates[index].active) {
-          ++index;
-        }
-      }
+  auto yieldActiveActors(size_t iCurrent = 0) const {
+    return nv().yieldActors(iCurrent) |
+           boost::adaptors::filtered([&](const auto& actor) {
+             return teammate(actor).isActive();
+           });
+  }
 
-      size_t operator*() const { return index; }
-      Iterator& operator++() {
-        ++index;
-        advance();
-        return *this;
-      }
-      bool operator==(const Iterator& other) const { return index == other.index; }
-      bool operator!=(const Iterator& other) const { return index != other.index; }
+  auto yieldActivePokemon(size_t iCurrent = 0) const {
+    return yieldActiveActors(iCurrent) |
+           boost::adaptors::transformed([&](const auto& actor) {
+             return std::make_tuple(actor, teammate(actor));
+           });
+  }
 
-      using iterator_category = std::input_iterator_tag;
-      using value_type = size_t;
-      using difference_type = std::ptrdiff_t;
-      using pointer = const size_t*;
-      using reference = const size_t&;
-    };
-
-    Iterator begin() const {
-      Iterator it{nv, data, 0};
-      it.advance();
-      return it;
-    }
-    Iterator end() const { return Iterator{nv, data, nv->getNumTeammates()}; }
-  };
-
-  ActivePokemonRange yieldActivePokemon() const { return {&nv(), &data()}; }
-  
   /* returns true if at least one teammate on the team is alive */
   bool isAlive() const;
 
@@ -123,20 +109,6 @@ public:
   };
 
   status_t& status() const { return data().status; }
-
-  int32_t cGetBoost(size_t type) const { return getPKV().getBoost(type); };
-
-  uint32_t cGetFV_boosted(size_t type, int32_t tempBoost = 0) const {
-    return getPKV().getFV_boosted(type, tempBoost);
-  };
-  FixType cGetAccuracy_boosted(size_t type, int32_t tempBoost = 0) const {
-    return getPKV().getAccuracy_boosted(type, tempBoost);
-  };
-
-  bool cHasPP() const { return getPKV().hasPP(); };
-
-  /* returns TRUE if the pokemon has more than 0 hitpoints */
-  bool cIsAlive() const { return getPKV().isAlive(); }
 
   void printTeam(std::ostream& os, const std::string& linePrefix="") const;
 };
@@ -167,23 +139,8 @@ public:
   void initialize();
   
   /* Swaps the currently active pokemon with the target pokemon */
-  bool swapPokemon(size_t iAction, bool preserveVolatile = false);
-
-  void cSetBoost(size_t type, int32_t value) { getPKV().setBoost(type, value); }
-
-  bool cModBoost(size_t type, int32_t amt) { return getPKV().modBoost(type, amt); }
-
-  /* increment target's hp by quantity. */
-  void cModHP(int32_t quantity) { getPKV().modHP(quantity); };
-
-  /* set target's hp to quantity. */
-  void cSetHP(uint32_t amt) { getPKV().setHP(amt); };
-
-  /* set target's hp to % quantity of total */
-  void cSetPercentHP(fpType percent) { getPKV().setPercentHP(percent); };
-  
-  /* increment target's HP by percent of total. */
-  void cModPercentHP(fpType percent) { getPKV().modPercentHP(percent); };
+  [[deprecated]] bool swapPokemon(
+      size_t iAction, bool preserveVolatile = false);
 };
 
 PKAISHARED std::ostream& operator <<(std::ostream& os, const ConstTeamVolatile& team);

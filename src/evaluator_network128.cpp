@@ -65,7 +65,18 @@ void evaluator_network128_impl<Base>::seed(
     const std::array<uint8_t, 6>& iOTeammates =
         this->orders_[iOTeam][tTV.getICPKV()];
 
-    std::array<float, 8> modifiers = {{ 1.0f, statMultipliers[cTV.cGetBoost(FV_ATTACK)+6], statMultipliers[6-tTV.cGetBoost(FV_DEFENSE)], statMultipliers[cTV.cGetBoost(FV_ATTACK)+6]*statMultipliers[6-tTV.cGetBoost(FV_DEFENSE)], 1.0f, statMultipliers[cTV.cGetBoost(FV_SPATTACK)+6], statMultipliers[6-tTV.cGetBoost(FV_SPDEFENSE)], statMultipliers[cTV.cGetBoost(FV_SPATTACK)+6]*statMultipliers[6-tTV.cGetBoost(FV_SPDEFENSE)] }};
+    // clang-format off
+    std::array<float, 8> modifiers = {{ 
+      1.0f, 
+      statMultipliers[cTV.getPKV().getBoost(FV_ATTACK)+6], 
+      statMultipliers[6-tTV.getPKV().getBoost(FV_DEFENSE)], 
+      statMultipliers[cTV.getPKV().getBoost(FV_ATTACK)+6] * statMultipliers[6-tTV.getPKV().getBoost(FV_DEFENSE)], 
+      1.0f, 
+      statMultipliers[cTV.getPKV().getBoost(FV_SPATTACK)+6], 
+      statMultipliers[6-tTV.getPKV().getBoost(FV_SPDEFENSE)], 
+      statMultipliers[cTV.getPKV().getBoost(FV_SPATTACK)+6] * statMultipliers[6-tTV.getPKV().getBoost(FV_SPDEFENSE)] 
+    }};
+    // clang-format on
 
     cInput = inputBegin + (NEURONSPERTEAM * iNTeam);
     size_t numTeammatesAlive = cTNV.getNumTeammates();
@@ -118,10 +129,12 @@ void evaluator_network128_impl<Base>::seed(
     std::fill(
         cInput, cInput + NEURONSPERTEAMMATE * (6 - numTeammatesAlive), 0.0f);
     cInput += NEURONSPERTEAMMATE * (6 - numTeammatesAlive);
-    cInput[0] = (float)(cTV.cGetFV_boosted(FV_SPEED) > tTV.cGetFV_boosted(FV_SPEED));
-    cInput[1] = std::max(0.0f, std::min(1.0f, (float)(cTV.cGetAccuracy_boosted(FV_ACCURACY) * tTV.cGetAccuracy_boosted(FV_EVASION))));
+    // clang-format off
+    cInput[0] = (float)(cTV.getPKV().getFV_boosted(FV_SPEED) > tTV.getPKV().getFV_boosted(FV_SPEED));
+    cInput[1] = std::max(0.0f, std::min(1.0f, (float)(cTV.getPKV().getAccuracy_boosted(FV_ACCURACY) * tTV.getPKV().getAccuracy_boosted(FV_EVASION))));
     cInput[2] = (float)((cTV.getVolatile().confused | cTV.getVolatile().infatuate) > AIL_V_NONE);
     cInput[3] = scale((float)((cTV.getNonVolatile().spikes>0) + (cTV.getNonVolatile().stealthRock>0)), 2.0f, 0.0f);
+    // clang-format on
     cInput += NEURONSPERSTATUS;
   }
 }

@@ -52,11 +52,9 @@ bool EnvironmentVolatileData::operator !=(const EnvironmentVolatileData& other) 
 
 
 ENV_VOLATILE_IMPL_TEMPLATE
-std::vector<Actor> ENV_VOLATILE_IMPL::getActivePokemon() const {
+std::vector<Actor> ENV_VOLATILE_IMPL::getActiveActors() const {
   std::vector<Actor> result;
-  for (const Actor& actor : yieldActivePokemon()) {
-    result.push_back(actor);
-  }
+  for (const Actor& actor : yieldActiveActors()) { result.push_back(actor); }
   return result;
 }
 
@@ -64,7 +62,7 @@ std::vector<Actor> ENV_VOLATILE_IMPL::getActivePokemon() const {
 ENV_VOLATILE_IMPL_TEMPLATE
 size_t ENV_VOLATILE_IMPL::getNumActivePokemon() const {
   size_t result = 0;
-  for (const Actor& actor : yieldActivePokemon()) {
+  for (const Actor& actor : yieldActiveActors()) {
     (void)actor;
     ++result;
   }
@@ -75,7 +73,7 @@ size_t ENV_VOLATILE_IMPL::getNumActivePokemon() const {
 ENV_VOLATILE_IMPL_TEMPLATE
 void ENV_VOLATILE_IMPL::printActivePokemon(std::ostream& os, size_t first) const {
   // TODO: print actor id, only print agent/other once
-  for (const Actor& actor : yieldActivePokemon()) {
+  for (const Actor& actor : yieldActiveActors()) {
     if (actor.iTeam() == first) {
       os << fmt::format(
           "\tagent: {}\n", fmt::streamed(teammate(actor)));

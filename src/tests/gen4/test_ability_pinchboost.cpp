@@ -25,9 +25,7 @@ class PinchBoostTest : public Gen4EngineTest {
     EnvironmentVolatileData mutable_data = initial_state.data();
     EnvironmentVolatile env_v(initial_state.nv(), mutable_data);
 
-    if (lowHP) {
-        env_v.getTeam(TEAM_A).cSetPercentHP(0.3);
-    }
+    if (lowHP) { env_v.teammate(TEAM_A, 0).setPercentHP(0.3); }
 
     auto turn_outcome = engine_->updateState(
       env_v, Action::move(0), Action::wait());

@@ -78,9 +78,9 @@ TEST_F(EvaluatorTest, TerminalStatesProduceTerminalFitness) {
   auto terminalState = EnvironmentVolatile{*environment_, terminalStateData};
   auto terminalTieState = EnvironmentVolatile{*environment_, terminalTieStateData};
 
-  terminalState.getTeam(0).cSetHP(0); // kill first pokemon
-  terminalTieState.getTeam(0).cSetHP(0); // kill both first pokemon
-  terminalTieState.getTeam(1).cSetHP(0); 
+  terminalState.teammate(TEAM_A, 0).setHP(0);     // kill first pokemon
+  terminalTieState.teammate(TEAM_A, 0).setHP(0);  // kill both first pokemon
+  terminalTieState.teammate(TEAM_B, 0).setHP(0);
 
   for (auto& evaluator : evaluators) {
     validateTerminalState(*evaluator, terminalState, 0.0);

@@ -8,7 +8,9 @@
 EnvironmentNonvolatile& EnvironmentNonvolatile::initialize() {
   for (size_t iTeam = 0; iTeam < teams.size(); ++iTeam)
   {
-    getTeam(iTeam).initialize();
+    auto& team = getTeam(iTeam);
+    team.team_ = (TEAM)iTeam;
+    team.initialize();
   }
   return *this;
 };

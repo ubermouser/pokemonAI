@@ -48,11 +48,9 @@ TEAM_VOLATILE_IMPL::teammate(size_t iTeammate) const {
 
 
 TEAM_VOLATILE_IMPL_TEMPLATE
-std::vector<size_t> TEAM_VOLATILE_IMPL::getActivePokemon() const {
-  std::vector<size_t> result;
-  for (size_t iTeammate : yieldActivePokemon()) {
-    result.push_back(iTeammate);
-  }
+std::vector<Actor> TEAM_VOLATILE_IMPL::getActiveActors() const {
+  std::vector<Actor> result;
+  for (const Actor& actor : yieldActiveActors()) { result.push_back(actor); }
   return result;
 }
 
@@ -60,8 +58,8 @@ std::vector<size_t> TEAM_VOLATILE_IMPL::getActivePokemon() const {
 TEAM_VOLATILE_IMPL_TEMPLATE
 size_t TEAM_VOLATILE_IMPL::getNumActivePokemon() const {
   size_t result = 0;
-  for (size_t iTeammate : yieldActivePokemon()) {
-    (void)iTeammate;
+  for (const Actor& actor : yieldActiveActors()) {
+    (void)actor;
     ++result;
   }
   return result;
@@ -71,9 +69,7 @@ size_t TEAM_VOLATILE_IMPL::getNumActivePokemon() const {
 TEAM_VOLATILE_IMPL_TEMPLATE
 uint32_t TEAM_VOLATILE_IMPL::numTeammatesAlive() const {
   uint32_t result = 0; // accumulate living teammates
-  for (size_t iPokemon= 0; iPokemon != nv().getNumTeammates(); ++iPokemon) {
-    result += teammate(iPokemon).isAlive();
-  }
+  for (const auto& [actor, pkmn] : yieldPokemon()) { result += pkmn.isAlive(); }
 
   return result;
 }
@@ -81,10 +77,8 @@ uint32_t TEAM_VOLATILE_IMPL::numTeammatesAlive() const {
 
 TEAM_VOLATILE_IMPL_TEMPLATE
 bool TEAM_VOLATILE_IMPL::isAlive() const {
-  size_t numTeammates = nv().getNumTeammates();
-  size_t iCurrent = getICPKV();
-  for (size_t iPokemon=iCurrent, iMax=iCurrent+numTeammates; iPokemon < iMax; ++iPokemon) {
-    if (teammate(iPokemon % numTeammates).isAlive()) { return true; }
+  for (const auto& [actor, pkmn] : yieldPokemon()) {
+    if (pkmn.isAlive()) { return true; }
   }
 
   return false;

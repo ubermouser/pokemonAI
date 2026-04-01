@@ -65,12 +65,14 @@ void evaluator_network64_impl<Base>::seed(
         this->orders_[iOTeam][tTV.getICPKV()];
     const ConstPokemonVolatile& tPKV = tTV.teammate(iOTeammates[0]);
 
+    // clang-format off
     std::array<float, 4> modifiers = {{
-      statMultipliers[6-tTV.cGetBoost(FV_DEFENSE)],
-      statMultipliers[6-tTV.cGetBoost(FV_DEFENSE)] * statMultipliers[cTV.cGetBoost(FV_ATTACK)+6],
-      statMultipliers[6-tTV.cGetBoost(FV_SPDEFENSE)],
-      statMultipliers[6-tTV.cGetBoost(FV_SPDEFENSE)] * statMultipliers[cTV.cGetBoost(FV_SPATTACK)+6]
+      statMultipliers[6-tTV.getPKV().getBoost(FV_DEFENSE)],
+      statMultipliers[6-tTV.getPKV().getBoost(FV_DEFENSE)] * statMultipliers[cTV.getPKV().getBoost(FV_ATTACK)+6],
+      statMultipliers[6-tTV.getPKV().getBoost(FV_SPDEFENSE)],
+      statMultipliers[6-tTV.getPKV().getBoost(FV_SPDEFENSE)] * statMultipliers[cTV.getPKV().getBoost(FV_SPATTACK)+6]
     }};
+    // clang-format on
 
     cInput = inputBegin + (NEURONSPERTEAM * iNTeam);
     size_t numTeammatesAlive = cTNV.getNumTeammates();

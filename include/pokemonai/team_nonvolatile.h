@@ -8,18 +8,21 @@
 #ifndef TEAM_NONVOLATILE_H
 #define	TEAM_NONVOLATILE_H
 
-#include "pokemonai/pkai.h"
+#include <stdint.h>
 
 #include <array>
+#include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/irange.hpp>
 #include <iosfwd>
-#include <stdint.h>
 #include <string>
 #include <vector>
 
+#include "actor.h"
 #include "name.h"
+#include "pkai.h"
 #include "pokemon_nonvolatile.h"
-#include "signature.h"
 #include "serializable.h"
+#include "signature.h"
 
 
 class TeamVolatile;
@@ -33,7 +36,9 @@ class PKAISHARED TeamNonVolatile
 public:
   /* nonvolatile teammmates of this team */ 
   std::vector<PokemonNonVolatile> teammates_;
-  
+
+  TEAM team_;
+
   TeamNonVolatile();
   TeamNonVolatile(const TeamNonVolatile& orig) = default;
   ~TeamNonVolatile() = default;
@@ -70,6 +75,22 @@ public:
   TeamNonVolatile& setLeadPokemon(size_t iPokemon);
 
   TeamNonVolatile& initialize();
+
+  auto yieldActors(size_t iCurrent = 0) const {
+    size_t numTeammates = getNumTeammates();
+    TEAM team = team_;
+    return boost::irange(iCurrent, iCurrent + numTeammates) |
+           boost::adaptors::transformed([=](size_t iTeammate) {
+             return Actor((size_t)team, iTeammate % numTeammates);
+           });
+  }
+
+  auto yieldPokemon(size_t iCurrent = 0) const {
+    return yieldActors(iCurrent) |
+           boost::adaptors::transformed([&](const Actor& actor) {
+             return std::make_tuple(actor, teammate(actor.iTeammate()));
+           });
+  }
 
   void uninitialize();
 

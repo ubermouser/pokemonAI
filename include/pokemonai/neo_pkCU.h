@@ -7,6 +7,10 @@
 #define NEO_PKAI_CU_H
 
 #include <boost/program_options.hpp>
+#include <boost/range/adaptor/filtered.hpp>
+#include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/irange.hpp>
+#include <boost/range/join.hpp>
 #include <memory>
 #include <vector>
 
@@ -153,13 +157,75 @@ class PKAISHARED NeoPkCU {
   ActionVector getValidSwapActions(
       const ConstEnvironmentVolatile& envV, const Actor& actor) const;
 
+ private:
+  struct ActionFilter {
+    const NeoPkCU* cu;
+    const ConstEnvironmentVolatile& envV;
+    const Actor actor;
+    bool operator()(const Action& action) const {
+      return (bool)cu->isValidAction(envV, actor, action);
+    }
+  };
+
+  struct ActionTransform {
+    Action operator()(size_t i) const {
+      if (i < 4) return Action::move(i);
+      if (i < 28) return Action::moveAlly((i - 4) / 6, (i - 4) % 6);
+      if (i == 28) return Action::wait();
+      if (i == 29) return Action::struggle();
+      return Action::swap(i - 30);
+    }
+  };
+
+  template <typename Range>
+  auto yieldValidActionsInRange(
+      const Range& range,
+      const ConstEnvironmentVolatile& envV,
+      const Actor& actor) const {
+    return range | boost::adaptors::transformed(ActionTransform{}) |
+           boost::adaptors::filtered(ActionFilter{this, envV, actor});
+  }
+
+  void generateActionMaps(
+      const ConstEnvironmentVolatile& envV,
+      std::vector<Actor>::const_iterator actorIt,
+      std::vector<Actor>::const_iterator actorEnd,
+      ActionMap& currentMap,
+      std::vector<ActionMap>& results) const;
+
+ public:
+  auto yieldValidMoveActions(
+      const ConstEnvironmentVolatile& envV, const Actor& actor) const {
+    return yieldValidActionsInRange(
+        boost::irange(size_t(0), size_t(30)), envV, actor);
+  }
+
+  auto yieldValidSwapActions(
+      const ConstEnvironmentVolatile& envV, const Actor& actor) const {
+    return yieldValidActionsInRange(
+        boost::irange(size_t(30), size_t(36)), envV, actor);
+  }
+
+  auto yieldValidActions(
+      const ConstEnvironmentVolatile& envV, const Actor& actor) const {
+    return boost::join(
+        yieldValidMoveActions(envV, actor), yieldValidSwapActions(envV, actor));
+  }
+
   [[deprecated]] ActionVector getValidActions(
       const ConstEnvironmentVolatile& envV, TEAM iTeam) const;
   [[deprecated]] ActionVector getValidMoveActions(
       const ConstEnvironmentVolatile& envV, TEAM iTeam) const;
   [[deprecated]] ActionVector getValidSwapActions(
       const ConstEnvironmentVolatile& envV, TEAM iTeam) const;
-  ActionPairVector getAllValidActions(const ConstEnvironmentVolatile& envV, size_t agentTeam=TEAM_A) const;
+
+  std::vector<ActionMap> getAllValidActions(
+      const ConstEnvironmentVolatile& envV, TEAM agentTeam = TEAM_A) const;
+
+  auto yieldAllValidActions(
+      const ConstEnvironmentVolatile& envV, TEAM agentTeam = TEAM_A) const {
+    return getAllValidActions(envV, agentTeam);
+  }
 
   /**
    * @brief Checks if a given action is valid for a team in the current state.

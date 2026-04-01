@@ -13,6 +13,8 @@
 #include <array>
 #include <iosfwd>
 #include <vector>
+#include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/join.hpp>
 
 #include "actor.h"
 #include "environment_nonvolatile.h"
@@ -68,69 +70,20 @@ public:
     return teammate({iTeam, iTeammate});
   }
 
-  std::vector<Actor> getActivePokemon() const;
+  std::vector<Actor> getActiveActors() const;
   size_t getNumActivePokemon() const;
 
-  struct ActivePokemonRange {
-    const EnvironmentNonvolatile* nv;
-    const EnvironmentVolatileData* data;
-    struct Iterator {
-      const EnvironmentNonvolatile* nv;
-      const EnvironmentVolatileData* data;
-      size_t iTeam;
-      typename teamvolatile_t::ActivePokemonRange::Iterator teamIt;
+  auto yieldActiveActors(size_t movesFirst = TEAM_A) const {
+    auto teamA = getTeam(movesFirst).yieldActiveActors();
+    auto teamB = getOtherTeam(movesFirst).yieldActiveActors();
+    return boost::join(teamA, teamB);
+  }
 
-      void advance() {
-        while (iTeam < 2) {
-          if (teamIt.index < nv->getTeam(iTeam).getNumTeammates()) {
-            return;
-          }
-          ++iTeam;
-          if (iTeam < 2) {
-            teamIt = {&nv->getTeam(iTeam), &data->teams[iTeam], 0};
-            teamIt.advance();
-          }
-        }
-      }
-
-      Actor operator*() const { return {iTeam, *teamIt}; }
-      Iterator& operator++() {
-        ++teamIt;
-        advance();
-        return *this;
-      }
-      bool operator==(const Iterator& other) const {
-        if (iTeam != other.iTeam) return false;
-        if (iTeam >= 2) return true;
-        return teamIt == other.teamIt;
-      }
-      bool operator!=(const Iterator& other) const { return !(*this == other); }
-
-      using iterator_category = std::input_iterator_tag;
-      using value_type = Actor;
-      using difference_type = std::ptrdiff_t;
-      using pointer = const Actor*;
-      using reference = const Actor&;
-    };
-
-    Iterator begin() const {
-      Iterator it{nv, data, 0, {&nv->getTeam(0), &data->teams[0], 0}};
-      it.teamIt.advance();
-      it.advance();
-      return it;
-    }
-    Iterator end() const {
-      return Iterator{
-          nv,
-          data,
-          2,
-          {&nv->getTeam(1),
-           &data->teams[1],
-           nv->getTeam(1).getNumTeammates()}};
-    }
-  };
-
-  ActivePokemonRange yieldActivePokemon() const { return {&nv(), &data()}; }
+  auto yieldActivePokemon(size_t movesFirst = TEAM_A) const {
+    auto teamA = getTeam(movesFirst).yieldActivePokemon();
+    auto teamB = getOtherTeam(movesFirst).yieldActivePokemon();
+    return boost::join(teamA, teamB);
+  }
 
   void printActivePokemon(std::ostream& os, size_t firstTeam=0) const;
 };
