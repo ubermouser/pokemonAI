@@ -49,8 +49,8 @@ TEST_F(BatonPassTest, PassesBoosts) {
 
   // Verify switch happened
   EXPECT_EQ(torterra_switched_in.getTeam(0).getICPKV(), 1);
-  EXPECT_TRUE(torterra_switched_in.teammate(0, 1).data().active);
-  EXPECT_FALSE(torterra_switched_in.teammate(0, 0).data().active);
+  EXPECT_TRUE(torterra_switched_in.teammate(0, 1).isActive());
+  EXPECT_FALSE(torterra_switched_in.teammate(0, 0).isActive());
 
   // Verify Boosts passed (+2 Atk)
   EXPECT_EQ(torterra_switched_in.teammate(0, 1).getBoost(FV_ATTACK), 2);

@@ -30,8 +30,7 @@ bool PokemonVolatileData::operator !=(const PokemonVolatileData& other) const {
 }
 
 
-void PokemonVolatile::initialize(bool isActive)
-{
+void PokemonVolatile::initialize(size_t iActive) {
   // reassign initial item
   data().iHeldItem = nv().initialItem_->index_;
 
@@ -39,7 +38,7 @@ void PokemonVolatile::initialize(bool isActive)
   data().HPcurrent = nv().getMaxHP();
 
   // if lead pokemon, set isLead to true
-  data().active = isActive;
+  data().active = iActive;
 
   // reset volatile moves:
   for (size_t iMove = 0, iSize = nv().getNumMoves(); iMove != iSize; ++iMove)
@@ -73,10 +72,10 @@ void PokemonVolatile::modHP(int32_t quantity) {
   if (!isAlive())
   {
     // completely zero the pokemon
-    bool wasActive = data().active;
+    auto activeState = data().active;
     data() = PokemonVolatileData();
     status().cTeammate = VolatileStatus();
-    data().active = wasActive;
+    data().active = activeState;
   }
 }
 
@@ -88,10 +87,10 @@ void PokemonVolatile::setHP(uint32_t _HP) {
   if (!isAlive())
   {
     // completely zero the pokemon and teammate status
-    bool wasActive = data().active;
+    auto activeState = data().active;
     data() = PokemonVolatileData();
     status().cTeammate = VolatileStatus();
-    data().active = wasActive;
+    data().active = activeState;
   }
 }
 
@@ -415,7 +414,7 @@ std::ostream& operator<<(std::ostream& os, const ConstPokemonVolatile& pkmn) {
     break;
   }
 
-  if (pkmn.data().active) {
+  if (pkmn.isActive()) {
     // volatile ailments:
     // target confused:
     if (pkmn.status().cTeammate.confused > 0) {

@@ -136,11 +136,14 @@ public:
   const NonVolatileStatus& getNonVolatile() const { return data().status.nonvolatile; };
 
   /* Resets all pokemon in this team */
-  void initialize();
-  
+  void initialize(size_t numActivePokemon);
+
   /* Swaps the currently active pokemon with the target pokemon */
   [[deprecated]] bool swapPokemon(
       size_t iAction, bool preserveVolatile = false);
+
+  bool swapPokemon(
+      const Actor& actor, const Actor& target, bool preserveVolatile = false);
 };
 
 PKAISHARED std::ostream& operator <<(std::ostream& os, const ConstTeamVolatile& team);

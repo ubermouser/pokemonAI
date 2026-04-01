@@ -1383,6 +1383,28 @@ void LegacyPkCUEngine::updateState_move() {
 
 PossibleEnvironments LegacyPkCU::updateState(
     const ConstEnvironmentVolatile& cEnv,
+    const ActionMap& actionsA,
+    const ActionMap& actionsB) const {
+  return updateState(cEnv, actionsA.begin()->second, actionsB.begin()->second);
+}
+
+
+PossibleEnvironments LegacyPkCU::updateState(
+    const ConstEnvironmentVolatile& cEnv, const ActionMap& actions) const {
+  Action actionA, actionB;
+  for (const auto& action : actions) {
+    if (action.first.iTeam() == TEAM_A) {
+      actionA = action.second;
+    } else {
+      actionB = action.second;
+    }
+  }
+  return updateState(cEnv, actionA, actionB);
+}
+
+
+PossibleEnvironments LegacyPkCU::updateState(
+    const ConstEnvironmentVolatile& cEnv,
     const Action& actionA,
     const Action& actionB) const {
   PossibleEnvironments result;
@@ -1432,15 +1454,15 @@ MatchState LegacyPkCU::getGameState(const ConstEnvironmentVolatile& envV) const 
 }
 
 
-ActionPairVector LegacyPkCU::getAllValidActions(
+std::vector<ActionMap> LegacyPkCU::getAllValidActions(
     const ConstEnvironmentVolatile& envV, TEAM agentTeam) const {
   auto agentActions = getValidActions(envV, agentTeam);
-  auto otherActions = getValidActions(envV, (TEAM)((agentTeam + 1) % 2));
-  ActionPairVector result; result.reserve(agentActions.size() * otherActions.size());
+  Actor agentActor{agentTeam, envV.getTeam(agentTeam).getICPKV()};
+
+  std::vector<ActionMap> result;
+  result.reserve(agentActions.size());
   for (auto agentMove: agentActions) {
-    for (auto otherMove: otherActions) {
-      result.push_back({agentMove, otherMove});
-    }
+    result.push_back({{agentActor, agentMove}});
   }
   // the list of valid actions should never be empty if the game is not over
   assert(!result.empty() || isGameOver(envV));

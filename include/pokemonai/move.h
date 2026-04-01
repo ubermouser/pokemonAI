@@ -167,8 +167,26 @@ public:
 
   const Type& getType() const;
 
-  bool targetsEnemy() const { return primaryAccuracy_ > 0; };
-  bool targetsAlly() const { return target_ == 8; } // TODO(@drendleman) make targeting sane
+  bool targetsSelf() const { return target_ == 0; };
+  bool targetsSingleOther() const { return target_ == 1; };
+  bool targetsSingleAlly() const { return target_ == 2; };
+  bool targetsSingleOpponent() const { return target_ == 3; };
+  bool targetsAllAllies() const { return target_ == 4; };
+  bool targetsAllOpponents() const { return target_ == 5; };
+  bool targetsAdjacentOthers() const { return target_ == 6; };
+  bool targetsAllField() const { return target_ == 7; };
+
+  bool targetsMultiple() const { return target_ >= 4 && target_ <= 7; };
+
+  bool targetsEnemy() const {
+    return targetsSingleOpponent() || targetsSingleOther() ||
+           targetsAllOpponents() || targetsAdjacentOthers() ||
+           targetsAllField();
+  };
+  bool targetsAlly() const {
+    return targetsSingleAlly() || targetsSingleOther() || targetsAllAllies() ||
+           targetsAdjacentOthers() || targetsAllField();
+  };
 
   int32_t getSpeedPriority() const { return priority_; }
 

@@ -53,6 +53,7 @@ struct IsValidResult {
   enum InvalidActionReason {
     VALID,
     MOVE_ACTOR_NOT_ACTIVE,
+    MOVE_TARGET_NOT_ACTIVE,
     MOVE_INVALID,
     MOVE_TARGET_DEAD,
     MOVE_SELF_DEAD,
@@ -94,10 +95,11 @@ struct IsValidResult {
  * @return A C-string describing the reason for the invalid action.
  */
 static const char* invalidActionReasonToString(IsValidResult result) {
+  // clang-format off
   switch (result.reason) {
-    // clang-format off
     case IsValidResult::VALID: return "Valid action";
     case IsValidResult::MOVE_ACTOR_NOT_ACTIVE: return "Actor is currently not in play";
+    case IsValidResult::MOVE_TARGET_NOT_ACTIVE: return "Target is currently not in play";
     case IsValidResult::MOVE_INVALID: return "Move index out of bounds";
     case IsValidResult::MOVE_TARGET_DEAD: return "Target is dead";
     case IsValidResult::MOVE_SELF_DEAD: return "Current pokemon is dead";
@@ -116,8 +118,8 @@ static const char* invalidActionReasonToString(IsValidResult result) {
     case IsValidResult::ACTION_TYPE_DISABLED: return "Action type disabled";
     case IsValidResult::INVALID_FRIENDLY_TARGET: return "Invalid friendly target";
     default: return "Unknown invalid action reason";
-      // clang-format on
   }
+  // clang-format on
 }
 
 /**

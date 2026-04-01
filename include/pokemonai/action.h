@@ -38,26 +38,49 @@ public:
   static constexpr size_t FRIENDLY_3 = 4;
   static constexpr size_t FRIENDLY_4 = 5;
   static constexpr size_t FRIENDLY_5 = 6;
-  static constexpr size_t FRIENDLY_ALL = 7;
-  static constexpr size_t FRIENDLY_LAST = 8;
+  static constexpr size_t FRIENDLY_ADJACENT = 7;
+  static constexpr size_t FRIENDLY_ALL = 8;
+  static constexpr size_t FRIENDLY_LAST = 9;
 
   static constexpr size_t HOSTILE_DEFAULT = 0;
   static constexpr size_t HOSTILE_ANY = 0;
-  static constexpr size_t HOSTILE_ADJACENT_C = 1;
-  static constexpr size_t HOSTILE_ADJACENT_L = 2;
-  static constexpr size_t HOSTILE_ADJACENT_R = 3;
-  static constexpr size_t HOSTILE_ALL = 4;
-  static constexpr size_t HOSTILE_LAST = 5;
+  static constexpr size_t HOSTILE_0 = 1;
+  static constexpr size_t HOSTILE_1 = 2;
+  static constexpr size_t HOSTILE_2 = 3;
+  static constexpr size_t HOSTILE_3 = 4;
+  static constexpr size_t HOSTILE_4 = 5;
+  static constexpr size_t HOSTILE_5 = 6;
+  static constexpr size_t HOSTILE_ADJACENT = 7;
+  static constexpr size_t HOSTILE_ALL = 8;
+  static constexpr size_t HOSTILE_LAST = 9;
 
   static Action move(size_t iMove) {
     assert(iMove < 4);
     return Action{MOVE_0 + iMove};
   }
+
   static Action moveAlly(size_t iMove, size_t iFriendly) {
     assert(iMove < 4);
     assert(iFriendly < 6);
     return Action{MOVE_0 + iMove, FRIENDLY_0 + iFriendly};
   }
+
+  static Action moveEnemy(size_t iMove, size_t iEnemy) {
+    assert(iMove < 4);
+    assert(iEnemy < 6);
+    return Action{MOVE_0 + iMove, 0, HOSTILE_0 + iEnemy};
+  }
+
+  static Action moveAdjacent(size_t iMove) {
+    assert(iMove < 4);
+    return Action{MOVE_0 + iMove, 0, HOSTILE_ADJACENT};
+  }
+
+  static Action moveAll(size_t iMove) {
+    assert(iMove < 4);
+    return Action{MOVE_0 + iMove, FRIENDLY_ALL, HOSTILE_ALL};
+  }
+
   static Action swap(size_t iPokemon) {
     assert(iPokemon < 6);
     return Action{MOVE_SWITCH, FRIENDLY_0 + iPokemon};

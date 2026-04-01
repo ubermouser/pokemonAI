@@ -14,12 +14,12 @@
 BOOST_STATIC_ASSERT(sizeof(EnvironmentVolatileData) == (sizeof(uint64_t)*17));
 
 
-void EnvironmentVolatile::initialize() {
+void EnvironmentVolatile::initialize(size_t numActivePokemon) {
   // zero datastructure:
   std::memset(data_, 0, sizeof(EnvironmentVolatileData));
   // initialize:
-  getTeam(0).initialize();
-  getTeam(1).initialize();
+  getTeam(0).initialize(numActivePokemon);
+  getTeam(1).initialize(numActivePokemon);
 }
 
 
@@ -34,9 +34,10 @@ uint64_t EnvironmentVolatileData::generateHash() const {
 }
 
 
-EnvironmentVolatileData EnvironmentVolatileData::create(const EnvironmentNonvolatile& envNV) {
+EnvironmentVolatileData EnvironmentVolatileData::create(
+    const EnvironmentNonvolatile& envNV, size_t numActivePokemon) {
   EnvironmentVolatileData result;
-  EnvironmentVolatile{envNV, result}.initialize();
+  EnvironmentVolatile{envNV, result}.initialize(numActivePokemon);
   return result;
 };
 

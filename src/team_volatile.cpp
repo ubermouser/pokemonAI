@@ -25,13 +25,13 @@ bool TeamVolatileData::operator !=(const TeamVolatileData& other) const
 }
 
 
-void TeamVolatile::initialize()
-{
+void TeamVolatile::initialize(size_t numActivePokemon) {
   // status and all other variables have been zeroed from a different context
   for (size_t iTeammate = 0, _numTeammates = nv_->getNumTeammates(); iTeammate != _numTeammates; ++iTeammate)
   {
     // 0th teammate is active at the start of the game
-    teammate(iTeammate).initialize(iTeammate == 0);
+    size_t iActive = iTeammate < numActivePokemon ? iTeammate + 1 : 0;
+    teammate(iTeammate).initialize(iActive);
   }
 }
 
@@ -85,21 +85,32 @@ bool TEAM_VOLATILE_IMPL::isAlive() const {
 }
 
 
-bool TeamVolatile::swapPokemon(size_t iAction, bool preserveVolatile)
-{
-  size_t iOldPokemon = getICPKV();
-  size_t iNewPokemon = iAction;
+bool TeamVolatile::swapPokemon(size_t iAction, bool preserveVolatile) {
+  return swapPokemon(
+      Actor{nv().iTeam(), getICPKV()},
+      Actor{nv().iTeam(), iAction},
+      preserveVolatile);
+}
+
+
+bool TeamVolatile::swapPokemon(
+    const Actor& actor, const Actor& target, bool preserveVolatile) {
+  assert(actor.iTeam() == nv().iTeam());
+  assert(target.iTeam() == nv().iTeam());
 
   // make sure we're not switching to ourself
-  if (iNewPokemon == iOldPokemon) { return false; }
+  if (actor == target) { return false; }
 
   // reset the volatile status:
   if (!preserveVolatile) { resetVolatile(); };
 
   // rewrite swap pokemon value:
-  data_->status.nonvolatile.iCPokemon = (uint8_t)iNewPokemon;
-  teammate(iOldPokemon).data().active = false;
-  teammate(iNewPokemon).data().active = true;
+  auto oPkmn = teammate(actor);
+  auto nPkmn = teammate(target);
+  data_->status.nonvolatile.iCPokemon = (uint8_t)target.iTeammate();
+  auto nPkmnActive = nPkmn.data().active;
+  nPkmn.data().active = oPkmn.data().active;
+  oPkmn.data().active = nPkmnActive;
 
   return true;
 }

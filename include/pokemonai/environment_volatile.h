@@ -33,7 +33,8 @@ struct PKAISHARED EnvironmentVolatileData
   bool operator==(const EnvironmentVolatileData& other) const;
   bool operator!=(const EnvironmentVolatileData& other) const;
 
-  static EnvironmentVolatileData create(const EnvironmentNonvolatile& envNV);
+  static EnvironmentVolatileData create(
+      const EnvironmentNonvolatile& envNV, size_t numActivePokemon = 1);
 
   uint64_t generateHash() const;
 };
@@ -100,7 +101,7 @@ public:
   using impl_t::impl_t;
 
   operator ConstEnvironmentVolatile() { return ConstEnvironmentVolatile{nv(), data()}; };
-  void initialize();
+  void initialize(size_t numActivePokemon = 1);
 };
 
 

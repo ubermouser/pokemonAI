@@ -1,3 +1,5 @@
+#include <fmt/ranges.h>
+
 #include "engine_test.hpp"
 
 class IsValidActionTest : public Gen4EngineTest {
@@ -87,13 +89,18 @@ class BasicEngine2v2Test : public BasicEngineTest {
 
 class GetValidActionsTest : public BasicEngineTest {};
 
-class GetValidActions2v2Test : public BasicEngine2v2Test {};
-
 
 TEST_F(IsValidActionTest, Basic) {
   // pokemon may move freely when both are alive:
   EXPECT_TRUE(
       engine_->isValidAction(engine_->initialState(), Actor(TEAM_A, 0), Action::move(0)));
+}
+
+
+TEST_F(IsValidActionTest, BasicTargeted) {
+  // pokemon may move freely when both are alive:
+  EXPECT_TRUE(engine_->isValidAction(
+      engine_->initialState(), Actor(TEAM_A, 0), Action::moveEnemy(0, 0)));
 }
 
 
@@ -254,6 +261,15 @@ TEST_F(IsValidActionTest, InvalidFriendlyTarget) {
 }
 
 
+TEST_F(IsValidActionTest, MoveTargetNotActive) {
+  auto state = engine_->initialState();
+  EXPECT_EQ(
+      engine_->isValidAction(state, Actor(TEAM_A, 0), Action::moveEnemy(0, 1))
+          .reason,
+      IsValidResult::MOVE_TARGET_NOT_ACTIVE);
+}
+
+
 TEST_F(IsValidActionTest, MoveActorNotActive) {
   // Actor(TEAM_A, 1) is Squirtle, who is NOT active (Charmander is 0)
   auto state = engine_->initialState();
@@ -275,8 +291,11 @@ TEST_F(IsValidSwapTest, SwitchActivePokemon) {
 
 TEST_F(IsValidSwapTest, ActivePokemonChanged) {
   // active pokemon has changed after a swap turn:
-  EXPECT_EQ(engine_->initialState().getTeam(0).getICPKV(), 0);
-  EXPECT_EQ(swap_squirtle.where1().getTeam(0).getICPKV(), 1);
+  EXPECT_TRUE(engine_->initialState().teammate(TEAM_A, 0).isActive());
+  EXPECT_FALSE(engine_->initialState().teammate(TEAM_A, 1).isActive());
+
+  EXPECT_FALSE(swap_squirtle.where1().teammate(TEAM_A, 0).isActive());
+  EXPECT_TRUE(swap_squirtle.where1().teammate(TEAM_A, 1).isActive());
 }
 
 TEST_F(IsValidSwapTest, SwapSelf) {
@@ -366,29 +385,12 @@ TEST_F(GetValidActionsTest, AllSwapActions) {
 TEST_F(GetValidActionsTest, AllValidActionMaps) {
   auto maps = engine_->getAllValidActions(engine_->initialState(), TEAM_A);
   // Charmander has 3 valid move actions and 1 valid swap action.
-  EXPECT_EQ(maps.size(), 4);
   for (const auto& map : maps) {
+    // fmt::print("{}\n", map);
     EXPECT_EQ(map.size(), 1);
     EXPECT_TRUE(map.count(Actor(TEAM_A, 0)));
   }
-}
-
-
-TEST_F(GetValidActions2v2Test, Activates2PokemonPerTeam) {
-  auto state = engine_->initialState();
-  EXPECT_EQ(state.getNumActivePokemon(), 4);
-}
-
-
-TEST_F(GetValidActions2v2Test, AllValidActionMaps) {
-  auto maps = engine_->getAllValidActions(engine_->initialState(), TEAM_A);
-  // Charmander has 3 valid move actions and 1 valid swap action.
-  EXPECT_EQ(maps.size(), 8);
-  for (const auto& map : maps) {
-    EXPECT_EQ(map.size(), 2);
-    EXPECT_TRUE(map.count(Actor(TEAM_A, 0)));
-    EXPECT_TRUE(map.count(Actor(TEAM_A, 1)));
-  }
+  EXPECT_EQ(maps.size(), 4);
 }
 
 

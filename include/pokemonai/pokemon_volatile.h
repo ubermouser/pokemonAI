@@ -47,11 +47,12 @@ struct PKAISHARED PokemonVolatileData {
   /* index to the item that the pokemon is holding. If 0, no item is held. If greater than 0, index is iHeldItem - 1*/
   uint32_t iHeldItem : 7;
 
-  /* when 1, the current pokemon is on the field. When 0, the pokemon is in reserve. */
-  uint32_t active : 1;
+  /* when >1, the current pokemon is on the field. When 0, the pokemon is in
+   * reserve. */
+  uint32_t active : 2;
 
   /* not currently used, value must always be 0 */
-  uint32_t unused : 10;
+  uint32_t unused : 9;
 
   /* Compares values of selected pokemon. Base values are compared by
    * pointer, volatile values are compared by value DEPRECIATED, use hash instead! */
@@ -192,7 +193,7 @@ public:
    * all status conditions, increasing all PP back to max, 
    * and raising HP back to normal.
    */
-  void initialize(bool isActive=false);
+  void initialize(size_t iActive = 0);
 };
 
 

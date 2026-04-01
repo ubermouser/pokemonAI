@@ -129,6 +129,7 @@ struct IsValidResult {
   enum InvalidActionReason {
     VALID,
     MOVE_ACTOR_NOT_ACTIVE,
+    MOVE_TARGET_NOT_ACTIVE,
     MOVE_INVALID,
     MOVE_TARGET_DEAD,
     MOVE_SELF_DEAD,
@@ -144,8 +145,9 @@ struct IsValidResult {
     SWITCH_LOCKED_BY_SCRIPT,
     WAIT_NOT_ALLOWED,
     STRUGGLE_NOT_ALLOWED,
-    ACTION_TYPE_DISABLED,         /**< The action type is disabled (e.g., using an item). */
-    INVALID_FRIENDLY_TARGET,      /**< The target for a friendly move is invalid. */
+    ACTION_TYPE_DISABLED,    /**< The action type is disabled (e.g., using an
+                                item). */
+    INVALID_FRIENDLY_TARGET, /**< The target for a friendly move is invalid. */
   };
 
   InvalidActionReason reason;  /**< The reason for the invalid action. */
@@ -169,9 +171,11 @@ struct IsValidResult {
  * @return A C-string describing the reason for the invalid action.
  */
 static const char* invalidActionReasonToString(IsValidResult result) {
+  // clang-format off
   switch (result.reason) {
     case IsValidResult::VALID: return "Valid action";
     case IsValidResult::MOVE_ACTOR_NOT_ACTIVE: return "Actor is currently not in play";
+    case IsValidResult::MOVE_TARGET_NOT_ACTIVE: return "Target is currently not in play";
     case IsValidResult::MOVE_INVALID: return "Move index out of bounds";
     case IsValidResult::MOVE_TARGET_DEAD: return "Target is dead";
     case IsValidResult::MOVE_SELF_DEAD: return "Current pokemon is dead";
@@ -191,6 +195,7 @@ static const char* invalidActionReasonToString(IsValidResult result) {
     case IsValidResult::INVALID_FRIENDLY_TARGET: return "Invalid friendly target";
     default: return "Unknown invalid action reason";
   }
+  // clang-format on
 }
 
 /**
@@ -333,7 +338,14 @@ public:
    * @return A reference to this LegacyPkCU instance.
    */
   LegacyPkCU& setAllowInvalidMoves(bool allow = true) { cfg_.allowInvalidMoves = allow; return *this; }
-  
+
+  /**
+   * @brief Initializes the plugin sets for the configured non-volatile
+   * environment.
+   * @return `true` if initialization was successful, `false` otherwise.
+   */
+  bool initialize();
+
   /**
    * @brief Simulates a single turn of a Pokemon battle.
    *
@@ -353,6 +365,12 @@ public:
       const ConstEnvironmentPossible& cEnvP, const Action& actionA, const Action& actionB) const {
     return updateState(cEnvP.getEnv(), actionA, actionB);
   };
+  PossibleEnvironments updateState(
+      const ConstEnvironmentVolatile& cEnv,
+      const ActionMap& actionsA,
+      const ActionMap& actionsB) const;
+  PossibleEnvironments updateState(
+      const ConstEnvironmentVolatile& cEnv, const ActionMap& actions) const;
 
   /**
    * @brief Returns the initial volatile state for the configured environment.
@@ -382,6 +400,8 @@ public:
     return getValidActionsInRange(
         envV, actor, Action::MOVE_SWITCH, Action::MOVE_SWITCH + 1);
   }
+  std::vector<ActionMap> getAllValidActions(
+      const ConstEnvironmentVolatile& envV, TEAM agentTeam = TEAM_A) const;
   [[deprecated]] ActionVector getValidActions(
       const ConstEnvironmentVolatile& envV, TEAM iTeam) const {
     return getValidActions(envV, Actor(iTeam, envV.getTeam(iTeam).getICPKV()));
@@ -396,8 +416,6 @@ public:
     return getValidSwapActions(
         envV, Actor(iTeam, envV.getTeam(iTeam).getICPKV()));
   }
-  [[deprecated]] ActionPairVector getAllValidActions(
-      const ConstEnvironmentVolatile& envV, TEAM agentTeam = TEAM_A) const;
 
   /**
    * @brief Checks if a given action is valid for a team in the current state.
@@ -505,12 +523,6 @@ public:
    * @return The number of plugin sets the plugin was added to.
    */
   size_t insertPluginHandler(plugin_t& cPlugin, size_t pluginType, size_t iNTeammate = SIZE_MAX);
-
-  /**
-   * @brief Initializes the plugin sets for the configured non-volatile environment.
-   * @return `true` if initialization was successful, `false` otherwise.
-   */
-  bool initialize();
 
   const PluginSet& getCPluginSet(const ConstEnvironmentVolatile& cEnv, size_t iTeam) const;
 

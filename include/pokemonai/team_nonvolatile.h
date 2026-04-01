@@ -53,6 +53,8 @@ public:
 
   static size_t getMaxNumTeammates() { return 6; }
 
+  size_t iTeam() const { return team_; }
+
   /* is this pokemon allowed to be on the given team according to the current ruleset? */
   bool isLegalAdd(const PokemonNonVolatile& cPokemon) const;
 

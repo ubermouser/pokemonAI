@@ -111,16 +111,8 @@ void NeoPkCU::guardInvalidActions(
 
 EnvironmentVolatileData NeoPkCU::createInitialVolatileState() const {
   if (!nv_) throw std::runtime_error("NeoPkCU environment not set");
-  EnvironmentVolatileData initialState = EnvironmentVolatileData::create(*nv_);
-  for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
-    size_t numTeammatesToActivate =
-        std::min(cfg_.numActivePokemon, nv_->getTeam(iTeam).getNumTeammates());
-
-    for (size_t iTeammate = 0; iTeammate < numTeammatesToActivate;
-         ++iTeammate) {
-      initialState.teams[iTeam].teammates[iTeammate].active = 1;
-    }
-  }
+  EnvironmentVolatileData initialState =
+      EnvironmentVolatileData::create(*nv_, cfg_.numActivePokemon);
 
   // TODO - beginning of game plugins
 
