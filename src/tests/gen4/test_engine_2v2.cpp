@@ -167,6 +167,25 @@ TEST_F(BasicEngine2v2Test, TwoTargetedMoves) {
 }
 
 
+TEST_F(BasicEngine2v2Test, TargetedMovesAgainstSwap) {
+  // clang-format off
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(),
+      {{Actor(TEAM_A, 0), Action::moveEnemy(0, 1)},
+       {Actor(TEAM_A, 1), Action::moveEnemy(0, 1)}},
+      {{Actor(TEAM_B, 0), Action::wait()},
+       {Actor(TEAM_B, 1), Action::swap(2)}}
+  );
+  // clang-format on
+
+  result.printStates();
+
+  auto state = result.where1Hit(0);
+  EXPECT_EQ(state.teammate(TEAM_B, 1).getMissingHP(), 0);
+  EXPECT_GT(state.teammate(TEAM_B, 2).getMissingHP(), 0);
+}
+
+
 TEST_F(BasicEngine2v2Test, TwoTargetedDefaultMoves) {
   // clang-format off
   PossibleEnvironments result = engine_->updateState(

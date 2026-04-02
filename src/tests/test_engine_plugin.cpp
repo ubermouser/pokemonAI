@@ -287,13 +287,13 @@ public:
 
     // clang-format off
     Move m_obj(
-        "test_move", t, 100, 100, 20, ATK_PHYSICAL, 3, 0, 10, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "test move");
+        "test_move", t, 100, 100, 20, ATK_PHYSICAL, Move::TargetType::ANY_ADJACENT, 0, 10, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "test move");
     m_obj.lostChild = false;
     m_obj.registerPlugin(plugin(pluginCategory::move, "init", PLUGIN_ON_INIT, mock_onInitMove), true);
     moves_.insert(m_obj);
 
     Move m2_obj(
-        "status_move", t, 100, 0, 20, ATK_NODMG, 3, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "status move");
+        "status_move", t, 100, 0, 20, ATK_NODMG, Move::TargetType::ANY_ADJACENT, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "status move");
     m2_obj.lostChild = false;
     m2_obj.registerPlugin(plugin(pluginCategory::move, "init", PLUGIN_ON_INIT, mock_onInitMove), true);
     moves_.insert(m2_obj);

@@ -22,7 +22,7 @@ Move::Move(
     uint32_t power,
     uint32_t PP,
     uint32_t damageType,
-    int32_t target,
+    TargetType target,
     int32_t priority,
     int32_t secondaryAccuracy,
     const BuffModArray& selfBuff,
@@ -30,30 +30,28 @@ Move::Move(
     uint32_t targetAilment,
     uint32_t targetVolatileAilment,
     bool hasPlugins,
-    const std::string& description) :
-    Name(name),
-    Pluggable(),
-    type_(type),
-    primaryAccuracy_(primaryAccuracy),
-    power_(power),
-    PP_(PP),
-    damageType_(damageType),
-    target_(target),
-    priority_(priority),
-    secondaryAccuracy_(secondaryAccuracy),
-    selfBuff_(selfBuff),
-    targetDebuff_(targetDebuff),
-    targetAilment_(targetAilment),
-    targetVolatileAilment_(targetVolatileAilment),
-    description_(description),
-    lostChild(false)
-{
+    const std::string& description)
+    : Name(name),
+      Pluggable(),
+      type_(type),
+      primaryAccuracy_(primaryAccuracy),
+      power_(power),
+      PP_(PP),
+      damageType_(damageType),
+      target_(target),
+      priority_(priority),
+      secondaryAccuracy_(secondaryAccuracy),
+      selfBuff_(selfBuff),
+      targetDebuff_(targetDebuff),
+      targetAilment_(targetAilment),
+      targetVolatileAilment_(targetVolatileAilment),
+      description_(description),
+      lostChild(false) {
   if (!hasPlugins) { setHasNoPlugins(); }
   checkRangeB(primaryAccuracy, -1, 100);
   checkRangeB(power, 0, 254);
   checkRangeB(PP, 5, 40);
   checkRangeB(damageType, 0, 3);
-  checkRangeB(target, -1, 8);
   checkRangeB(priority, -7, 7);
   checkRangeB(*std::max_element(begin(selfBuff), end(selfBuff)), -12, 12);
   checkRangeB(*std::min_element(begin(selfBuff), end(selfBuff)), -12, 12);
@@ -61,6 +59,31 @@ Move::Move(
   checkRangeB(*std::min_element(begin(targetDebuff), end(targetDebuff)), -12, 12);
   checkRangeB(targetAilment, AIL_NV_NONE, AIL_NV_MAX);
   if (type == NULL) { type_ = Type::no_type; lostChild = true; }
+}
+
+
+Move::TargetType Move::targetTypeFromString(const std::string& str) {
+  std::string s = lowerCase(str);
+  if (s == "self") return SELF;
+  if (s == "any_adjacent") return ANY_ADJACENT;
+  if (s == "any_adjacent_ally") return ANY_ADJACENT_ALLY;
+  if (s == "any_adjacent_enemy") return ANY_ADJACENT_ENEMY;
+  if (s == "any_adjacent_ally_self") return ANY_ADJACENT_ALLY_SELF;
+  if (s == "any_nonadjacent") return ANY_NONADJACENT;
+  if (s == "any_ally") return ANY_ALLY;
+  if (s == "all_adjacent") return ALL_ADJACENT;
+  if (s == "all_adjacent_enemy") return ALL_ADJACENT_ENEMY;
+  if (s == "all_adjacent_ally") return ALL_ADJACENT_ALLY;
+  if (s == "all_active_allies") return ALL_ACTIVE_ALLIES;
+  if (s == "all_active_enemies") return ALL_ACTIVE_ENEMIES;
+  if (s == "all_active") return ALL_ACTIVE;
+  if (s == "side_ally") return SIDE_ALLY;
+  if (s == "side_enemy") return SIDE_ENEMY;
+  if (s == "side_all") return SIDE_ALL;
+  if (s == "all_allies") return ALL_ALLIES;
+  if (s == "all_enemies") return ALL_ENEMIES;
+  if (s == "all_field") return ALL_FIELD;
+  return UNKNOWN;
 }
 
 
@@ -151,18 +174,39 @@ bool Moves::loadFromFile(const std::string& path, const Types& types) {
 } // end of inputMoves
 
 
-template<class IntegerType>
+template <class IntegerType>
 bool intFromToken(
     const std::vector<std::string> tokens,
     size_t iLine,
     size_t iToken,
     const std::string& argName,
     IntegerType& result,
-    IntegerType default_value=IntegerType(0)) {
+    IntegerType default_value = IntegerType(0)) {
   const auto& token = tokens.at(iToken);
   if (token == "---" || token == "Var") {
     result = default_value;
   } else if (!setArg(tokens.at(iToken), result)) {
+    incorrectArgs(argName, iLine, iToken);
+    return false;
+  }
+  return true;
+}
+
+
+bool targetTypeFromToken(
+    const std::vector<std::string>& tokens,
+    size_t iLine,
+    size_t iToken,
+    const std::string& argName,
+    Move::TargetType& result) {
+  const std::string& token = tokens.at(iToken);
+  if (token == "---" || token == "Var") {
+    result = Move::TargetType::UNKNOWN;
+    return true;
+  }
+
+  result = Move::targetTypeFromString(token);
+  if (result == Move::TargetType::UNKNOWN && lowerCase(token) != "unknown") {
     incorrectArgs(argName, iLine, iToken);
     return false;
   }
@@ -332,7 +376,8 @@ bool Moves::loadFromFile_lines(
    * Header data:
    * PKAIM\t<SIZE>\t#fluff\n
    * #fluff line\n
-   * <String NAME>\t<int TYPE>\t<int PP>\t<int P.Accuracy>\t<int Power>\t<int Damage>\t<int Target>\t<int Priority>\t ... etc
+   * <String NAME>\t<int TYPE>\t<int PP>\t<int P.Accuracy>\t<int Power>\t<int
+   * Damage>\t<String Target>\t<int Priority>\t ... etc
    */
 
   // are the enough lines in the input stream for at least the header:
@@ -383,22 +428,25 @@ bool Moves::loadFromFile_lines(
     bool hasPlugins;
     const Type* type;
     uint32_t PP, power, damageType, targetAilment, targetVolatileAilment;
-    int32_t target, priority, primaryAccuracy, secondaryAccuracy;
+    int32_t priority, primaryAccuracy, secondaryAccuracy;
     Move::BuffModArray selfBuff, targetDebuff;
+    Move::TargetType target;
 
     name = lowerCase(tokens.at(0)); // move name
     type = orphanCheck(types, tokens.at(1), &orphanTypes); // type
+    // clang-format off
     if (!intFromToken(tokens, iLine, 2, "PP", PP)) { return false; }
     if (!intFromToken(tokens, iLine, 3, "primaryAccuracy", primaryAccuracy, -1)) { return false; }
     if (!intFromToken(tokens, iLine, 4, "Power", power)) { return false; }
     if (!intFromToken(tokens, iLine, 5, "DamageType", damageType)) { return false; }
-    if (!intFromToken(tokens, iLine, 6, "Target", target, -1)) { return false; }
+    if (!targetTypeFromToken(tokens, iLine, 6, "Target", target)) { return false; }
     if (!intFromToken(tokens, iLine, 7, "Priority", priority, 0)) { return false; }
     if (!integerArrayFromTokens(tokens, iLine, 8, "buff", selfBuff, 0)) { return false; }
     if (!intFromToken(tokens, iLine, 17, "secondaryAccuracy", secondaryAccuracy, -1)) { return false; }
     if (!integerArrayFromTokens(tokens, iLine, 18, "debuff", targetDebuff, 0)) { return false; }
     if (!ailmentFromToken(tokens, iLine, 27, targetAilment)) { return false; }
     if (!volatileAilmentFromToken(tokens, iLine, 32, targetVolatileAilment)) { return false; }
+    // clang-format on
     hasPlugins = tokens.at(39) != "---";
     description = tokens.at(40);
 

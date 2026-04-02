@@ -64,20 +64,34 @@ public:
    * 3 - damage not boosted by atk or spa (exceptional)
    */
   uint32_t damageType_ = 0;
-  
-  /*
-   * -1: varies / unknown
-   *  0: may target self only
-   *  1: may target a pokemon other than the self
-   *  2: may target one of the currently deployed friendly team
-   *  3: may target one of the currently deployed enemy team
-   *  4: targets the currently deployed friendly team
-   *  5: targets the currently deployed enemy team
-   *  6: targets all currently deployed pokemon except for the self
-   *  7: targets all pokemon, including the self
-   */
-  int32_t target_ = -1;
-  
+
+  // clang-format off
+  enum TargetType : int {
+    UNKNOWN = -1,           /* varies / unknown */
+    SELF = 0,               /* may target self only (defense curl, protect) */
+    ANY_ADJACENT = 1,       /* may target an adjacent pokemon (tackle, charm) */
+    ANY_ADJACENT_ALLY = 2,      /* may target an adjacent ally (helping hand) */
+    ANY_ADJACENT_ENEMY = 3,     /* may target an adjacent enemy (me first) */
+    ANY_ADJACENT_ALLY_SELF = 4, /* may target an adjacent ally or self (acupressure) */
+    ANY_NONADJACENT = 5,    /* may target adjacent or non-adjacent active pokemon (gust, peck) */
+    ANY_ALLY = 6,           /* may target any ally, active or not (baton pass, u-turn) */
+    ALL_ADJACENT = 7,       /* targets all adjacent pokemon (earthquake, explosion) */
+    ALL_ADJACENT_ENEMY = 8, /* targets all adjacent enemy pokemon (growl, blizzard) */
+    ALL_ADJACENT_ALLY = 9,  /* targets all adjacent friendly pokemon */
+    ALL_ACTIVE_ALLIES = 10,  /* targets all active teammates (coaching) */
+    ALL_ACTIVE_ENEMIES = 11, /* targets all active enemies */
+    ALL_ACTIVE = 12,        /* targets all active pokemon (perish song) */
+    SIDE_ALLY = 13,         /* targets the allied side (mist, light screen) */
+    SIDE_ENEMY = 14,        /* targets the enemy side (spikes, stealth rock) */
+    SIDE_ALL = 15,          /* targets the entire battlefield (haze, rain dance) */
+    ALL_ALLIES = 16,        /* targets all teammates, active or not (heal bell, aromatherapy) */
+    ALL_ENEMIES = 17,       /* targets all enemies, active or not */
+    ALL_FIELD = 18,         /* targets all pokemon, including the self, active or not */
+  };
+  // clang-format on
+  static TargetType targetTypeFromString(const std::string& str);
+  TargetType target_ = TargetType::UNKNOWN;
+
   /*
    * the priority ranking of the move.
    * Positive numbers go first, usually ranges from +6 to -7. 
@@ -167,21 +181,21 @@ public:
 
   const Type& getType() const;
 
-  bool targetsSelf() const { return target_ == 0; };
-  bool targetsSingleOther() const { return target_ == 1; };
-  bool targetsSingleAlly() const { return target_ == 2; };
-  bool targetsSingleOpponent() const { return target_ == 3; };
-  bool targetsAllAllies() const { return target_ == 4; };
-  bool targetsAllOpponents() const { return target_ == 5; };
-  bool targetsAdjacentOthers() const { return target_ == 6; };
-  bool targetsAllField() const { return target_ == 7; };
+  bool targetsSelf() const { return target_ == TargetType::SELF; };
+  bool targetsSingleOther() const { return target_ == TargetType::ANY_ADJACENT; };
+  bool targetsSingleAlly() const { return target_ == TargetType::ANY_ADJACENT_ALLY; };
+  bool targetsSingleOpponent() const { return target_ == TargetType::ANY_ADJACENT_ENEMY; };
+  bool targetsAllAllies() const { return target_ == TargetType::ALL_ACTIVE_ALLIES; };
+  bool targetsAllOpponents() const { return target_ == TargetType::ALL_ACTIVE_ENEMIES; };
+  bool targetsAdjacentOthers() const { return target_ == TargetType::ALL_ADJACENT; };
+  bool targetsAllField() const { return target_ == TargetType::ALL_FIELD; };
 
-  bool targetsMultiple() const { return target_ >= 4 && target_ <= 7; };
+  bool targetsMultiple() const { return target_ >= TargetType::ALL_ADJACENT; };
 
   [[deprecated]] bool legacyTargetsEnemy() const {
     return primaryAccuracy_ > 0;
   };
-  [[deprecated]] bool legacyTargetsAlly() const { return target_ == 8; }
+  [[deprecated]] bool legacyTargetsAlly() const { return target_ == ANY_ALLY; }
 
   bool targetsEnemy() const {
     return targetsSingleOpponent() || targetsSingleOther() ||
@@ -221,21 +235,21 @@ public:
 
 
   Move(
-    const std::string& name,
-    const Type* type,
-    int32_t primaryAccuracy,
-    uint32_t power,
-    uint32_t PP,
-    uint32_t damageType,
-    int32_t target,
-    int32_t priority,
-    int32_t secondaryAccuracy,
-    const BuffModArray& selfBuff,
-    const BuffModArray& targetDebuff,
-    uint32_t targetAilment,
-    uint32_t targetVolatileAilment,
-    bool hasPlugins,
-    const std::string& description);
+      const std::string& name,
+      const Type* type,
+      int32_t primaryAccuracy,
+      uint32_t power,
+      uint32_t PP,
+      uint32_t damageType,
+      TargetType target,
+      int32_t priority,
+      int32_t secondaryAccuracy,
+      const BuffModArray& selfBuff,
+      const BuffModArray& targetDebuff,
+      uint32_t targetAilment,
+      uint32_t targetVolatileAilment,
+      bool hasPlugins,
+      const std::string& description);
   Move() = default;
   Move(const Move& source) = default;
   Move& operator=(const Move& source) = default;
