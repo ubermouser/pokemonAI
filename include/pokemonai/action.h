@@ -135,8 +135,11 @@ using ActionMap = std::unordered_map<Actor, Action>;
 using ActionVector = std::vector<Action>;
 using ActionPairVector = std::vector<std::array<Action, 2> >;
 
-std::ostream& operator <<(std::ostream& os, const Action& action);
-std::istream& operator >>(std::istream& is, Action& action);
+std::ostream& operator<<(std::ostream& os, const Action& action);
+std::ostream& operator<<(std::ostream& os, const ActionMap& actionMap);
+std::ostream& operator<<(
+    std::ostream& os, const std::vector<ActionMap>& actionMapVector);
+std::istream& operator>>(std::istream& is, Action& action);
 
 namespace std { template<> struct hash<Action> { 
   size_t operator()(const Action& a) const;

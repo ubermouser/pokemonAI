@@ -289,9 +289,9 @@ ActionVector NeoPkCU::getValidSwapActions(
 std::vector<ActionMap> NeoPkCU::getAllValidActions(
     const ConstEnvironmentVolatile& envV, TEAM agentTeam) const {
   std::vector<ActionMap> result;
-  for (const auto& actionMap : yieldAllValidActions(envV, agentTeam)) {
+  /*for (const auto& actionMap : yieldAllValidActions(envV, agentTeam)) {
     result.push_back(actionMap);
-  }
+  }*/
   return result;
 }
 

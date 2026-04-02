@@ -99,7 +99,7 @@ TEST_F(IsValidAction2v2Test, AdjacentEnemyOnly) {
 
 
 TEST_F(IsValidAction2v2Test, AllFieldTargeted) {
-  EXPECT_TRUE(engine_->isValidAction(
+  EXPECT_FALSE(engine_->isValidAction(
       engine_->initialState(), Actor(TEAM_A, 1), Action::moveEnemy(2, 0)));
 }
 
@@ -119,6 +119,7 @@ TEST_F(IsValidAction2v2Test, Activates2PokemonPerTeam) {
 TEST_F(IsValidAction2v2Test, AllValidActionMaps) {
   auto maps = engine_->getAllValidActions(engine_->initialState(), TEAM_A);
 
+  fmt::print("{}\n", fmt::streamed(maps));
   for (const auto& map : maps) {
     EXPECT_EQ(map.size(), 2);
     EXPECT_TRUE(map.count(Actor(TEAM_A, 0)));

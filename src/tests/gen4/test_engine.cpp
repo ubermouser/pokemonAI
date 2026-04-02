@@ -384,9 +384,9 @@ TEST_F(GetValidActionsTest, AllSwapActions) {
 
 TEST_F(GetValidActionsTest, AllValidActionMaps) {
   auto maps = engine_->getAllValidActions(engine_->initialState(), TEAM_A);
-  // Charmander has 3 valid move actions and 1 valid swap action.
+
+  fmt::print("{}\n", fmt::streamed(maps));
   for (const auto& map : maps) {
-    // fmt::print("{}\n", map);
     EXPECT_EQ(map.size(), 1);
     EXPECT_TRUE(map.count(Actor(TEAM_A, 0)));
   }

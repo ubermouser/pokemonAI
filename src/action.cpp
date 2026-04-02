@@ -27,7 +27,24 @@ void Action::print(std::ostream& os) const {
   } else if (isMove()) {
     os << fmt::format("m{}", iMove() + 1);
     if (friendlyTarget() != FRIENDLY_DEFAULT) {
-      os << fmt::format("-{}", friendlyTarget());
+      if (friendlyTarget() == FRIENDLY_ADJACENT) {
+        os << fmt::format("-fa");
+      } else if (friendlyTarget() == FRIENDLY_ALL) {
+        // only print a friendly target marker if enemy target isn't also all
+        // (rare)
+        if (enemyTarget() != HOSTILE_ALL) { os << fmt::format("-fs"); }
+      } else {
+        os << fmt::format("-f{}", friendlyTarget());
+      }
+    }
+    if (enemyTarget() != HOSTILE_DEFAULT) {
+      if (enemyTarget() == HOSTILE_ADJACENT) {
+        os << fmt::format("-a");
+      } else if (enemyTarget() == HOSTILE_ALL) {
+        os << fmt::format("-s");
+      } else {
+        os << fmt::format("-{}", enemyTarget());
+      }
     }
   } else if (isSwitch()) {
     os << fmt::format("s{}", iFriendly() + 1);
@@ -85,6 +102,31 @@ std::istream& operator >>(std::istream& is, Action& action) {
 
   if (!success) { is.setstate(std::ios::failbit); }
   return is;
+}
+
+
+std::ostream& operator<<(std::ostream& os, const ActionMap& actionMap) {
+  size_t iAction = 0;
+  os << "[";
+  for (const auto& [actor, action] : actionMap) {
+    if (iAction > 0) { os << ", "; }
+    os << fmt::format("{}: {}", fmt::streamed(actor), fmt::streamed(action));
+    iAction++;
+  }
+  os << "]";
+  return os;
+}
+
+
+std::ostream& operator<<(
+    std::ostream& os, const std::vector<ActionMap>& actionMapVector) {
+  size_t iActionMap = 0;
+  for (const auto& actionMap : actionMapVector) {
+    if (iActionMap > 0) { os << "\n"; }
+    os << fmt::format("i{}: {}", iActionMap, fmt::streamed(actionMap));
+    iActionMap++;
+  }
+  return os;
 }
 
 
