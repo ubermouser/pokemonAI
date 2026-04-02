@@ -178,6 +178,11 @@ public:
 
   bool targetsMultiple() const { return target_ >= 4 && target_ <= 7; };
 
+  [[deprecated]] bool legacyTargetsEnemy() const {
+    return primaryAccuracy_ > 0;
+  };
+  [[deprecated]] bool legacyTargetsAlly() const { return target_ == 8; }
+
   bool targetsEnemy() const {
     return targetsSingleOpponent() || targetsSingleOther() ||
            targetsAllOpponents() || targetsAdjacentOthers() ||

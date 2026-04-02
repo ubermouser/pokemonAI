@@ -1130,11 +1130,9 @@ void LegacyPkCUEngine::evaluateMove_script() {
     FixType& probabilityToHit = getDamageComponent().tProbability;
 
     /* probability to hit enemy pokemon */
-    if (cMove.targetsEnemy()) {
+    if (cMove.legacyTargetsEnemy()) {
       probabilityToHit = getProbabilityToHit();
-    }
-    else
-    {
+    } else {
       // TODO(@drendleman) - the probabilityToHit of a move with no accuracy is always 100%
       //probabilityToHit = cMove.getPrimaryAccuracy(); // REMOVED DUE TO ABOVE TODO
       probabilityToHit = FixType(1);
@@ -1486,7 +1484,8 @@ ActionVector LegacyPkCU::getValidActionsInRange(
     bool isMoveAction = action.isMove() && (action.iMove() < cPKV.nv().getNumMoves());
     bool isSwitchAction = action.isSwitch();
     bool targetsFriendly =
-        (isMoveAction) ? cPKV.getMV(action).getBase().targetsAlly() : false;
+        (isMoveAction) ? cPKV.getMV(action).getBase().legacyTargetsAlly()
+                       : false;
     targetsFriendly |= isSwitchAction;
     size_t iFriendlyMin = targetsFriendly?(Action::FRIENDLY_0):(Action::FRIENDLY_DEFAULT);
     size_t iFriendlyMax = targetsFriendly?(Action::FRIENDLY_0 + cTV.nv().getNumTeammates()):(Action::FRIENDLY_DEFAULT);
@@ -1573,7 +1572,7 @@ IsValidResult LegacyPkCU::isValidAction(
       doAllowMove[VALID_MOVE_HAS_PP] = cMV.hasPP();
 
       // if the target of the move is friendly, is the friendly pokemon alive?
-      if (cMV.getBase().targetsAlly()) {
+      if (cMV.getBase().legacyTargetsAlly()) {
         // is this a valid friendly-targeting move?
         if (action.iFriendly() >= cTV.nv().getNumTeammates()) {
           return IsValidResult::INVALID_FRIENDLY_TARGET;
@@ -1607,7 +1606,7 @@ IsValidResult LegacyPkCU::isValidAction(
         return IsValidResult::MOVE_ACTOR_NOT_ACTIVE;
       }
       if (!doAllowMove[VALID_MOVE_HAS_PP]) { return IsValidResult::MOVE_NO_PP; }
-      if (cMV.getBase().targetsAlly()) {
+      if (cMV.getBase().legacyTargetsAlly()) {
         if (!doAllowMove[VALID_MOVE_FRIENDLY_ALIVE]) {
           return IsValidResult::MOVE_FRIENDLY_TARGET_DEAD;
         }
@@ -1687,7 +1686,7 @@ IsValidResult LegacyPkCU::isValidAction(
            ++iMove) {
         const Move& move = cPKV.nv().getMove_base(iMove);
 
-        if (move.targetsAlly()) {
+        if (move.legacyTargetsAlly()) {
           for (size_t iFriendly = 0, numTeammates = cTV.nv().getNumTeammates();
                iFriendly != numTeammates;
                ++iFriendly) {
