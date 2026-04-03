@@ -2,16 +2,18 @@
 #ifndef POKEMON_VOLATILE_H
 #define	POKEMON_VOLATILE_H
 
-#include "pkai.h"
-
 #include <stdint.h>
+
 #include <array>
+#include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/irange.hpp>
 
 #include "action.h"
 #include "move_volatile.h"
 #include "nonvolatile_volatile.h"
-#include "team_status.h"
+#include "pkai.h"
 #include "pokemon_nonvolatile.h"
+#include "team_status.h"
 
 class Item;
 class Pokedex;
@@ -94,19 +96,26 @@ class PokemonVolatileImpl : public NonvolatileVolatilePair<
       typename impl_t::status_t& status)
       : base_t(nv, data), status_(&status){};
 
- StatusType& status() const { return *status_; }
- operator StatusType&() const { return *status_; }
+  StatusType& status() const { return *status_; }
+  operator StatusType&() const { return *status_; }
 
- /* retrieve the base species of the current volatile pokemon */
- const PokemonBase& getBase() const { return nv().getBase(); };
+  /* retrieve the base species of the current volatile pokemon */
+  const PokemonBase& getBase() const { return nv().getBase(); };
 
- /* returns TRUE if the pokemon has more than 0 hitpoints */
- bool isAlive() const;
+  /* returns TRUE if the pokemon has more than 0 hitpoints */
+  bool isAlive() const;
 
- movevolatile_t getMV(const Action& action) const {
-   return getMV(action.iMove());
+  movevolatile_t getMV(const Action& action) const {
+    return getMV(action.iMove());
   }
   movevolatile_t getMV(size_t index) const;
+
+  auto yieldMoves() const {
+    return boost::irange(size_t(0), nv().getNumMoves()) |
+           boost::adaptors::transformed([*this](size_t iMove) {
+             return std::make_tuple(iMove, getMV(iMove));
+           });
+  }
 
   /* True if the pokemon has at least one move they can perform */
   bool hasPP() const;

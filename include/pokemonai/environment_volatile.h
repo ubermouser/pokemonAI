@@ -75,13 +75,34 @@ public:
   size_t getNumActivePokemon() const;
 
   /**
-   * @brief Get all possible actions for the given actor and move
+   * @brief Get all candidate (move and swap) actions for the given actor.
+   * @param actor The actor performing the action
+   * @return A vector of candidate actions
+   */
+  std::vector<Action> getActions(const Actor& actor) const;
+
+  /**
+   * @brief Get all candidate actions for the given actor and move
    * @param actor The actor performing the move
    * @param move The move to generate actions for
-   * @return A vector of possible actions
+   * @return A vector of candidate actions
    */
   std::vector<Action> getActions(
       const Actor& actor, const MoveNonVolatile& move) const;
+
+  /**
+   * @brief Get all move candidates for the given actor (struggle, wait, and all moves)
+   * @param actor The actor to generate candidates for
+   * @return A vector of candidate actions
+   */
+  std::vector<Action> getMoveActions(const Actor& actor) const;
+
+  /**
+   * @brief Get all swap candidates for the given actor
+   * @param actor The actor to generate candidates for
+   * @return A vector of candidate actions
+   */
+  std::vector<Action> getSwapActions(const Actor& actor) const;
 
   /**
    * @brief Get all valid targets for the given actor and action

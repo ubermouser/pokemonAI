@@ -270,6 +270,7 @@ TEST_F(BasicEngine2v2Test, AllFieldMove) {
 
 
 TEST_F(BasicEngine2v2Test, HighEngineAccuracyTwoMoves) {
+  spdlog::set_level(spdlog::level::warn);
   engine_->setAccuracy(16);
 
   // clang-format off
@@ -289,6 +290,7 @@ TEST_F(BasicEngine2v2Test, HighEngineAccuracyTwoMoves) {
 
 
 TEST_F(BasicEngine2v2Test, HighEngineAccuracyFourMoves) {
+  spdlog::set_level(spdlog::level::warn);
   engine_->setAccuracy(16);
 
   // clang-format off

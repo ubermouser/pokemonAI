@@ -363,22 +363,28 @@ TEST_F(IsValidSwapTest, MoveSelfDead) {
 
 
 TEST_F(GetValidActionsTest, AllActionsActiveTeammate) {
-  EXPECT_EQ(
-      engine_->getValidActions(engine_->initialState(), {TEAM_A, 0}).size(), 4);
+  auto actions = engine_->getValidActions(engine_->initialState(), {TEAM_A, 0});
+
+  fmt::print("{}", fmt::streamed(actions));
+  EXPECT_EQ(actions.size(), 4);
 }
 
 
 TEST_F(GetValidActionsTest, AllMoveActions) {
-  EXPECT_EQ(
-      engine_->getValidMoveActions(engine_->initialState(), {TEAM_A, 0}).size(),
-      3);
+  auto actions =
+      engine_->getValidMoveActions(engine_->initialState(), {TEAM_A, 0});
+
+  fmt::print("{}", fmt::streamed(actions));
+  EXPECT_EQ(actions.size(), 3);
 }
 
 
 TEST_F(GetValidActionsTest, AllSwapActions) {
-  EXPECT_EQ(
-      engine_->getValidSwapActions(engine_->initialState(), {TEAM_A, 0}).size(),
-      1);
+  auto actions =
+      engine_->getValidSwapActions(engine_->initialState(), {TEAM_A, 0});
+
+  fmt::print("{}", fmt::streamed(actions));
+  EXPECT_EQ(actions.size(), 1);
 }
 
 
@@ -544,6 +550,7 @@ TEST_F(BasicEngineTest, StatusHitAndMiss) {
 
 
 TEST_F(BasicEngineTest, HighEngineAccuracyWithSpeedTie) {
+  spdlog::set_level(spdlog::level::warn);
   engine_->setAccuracy(16);
 
   PossibleEnvironments result = engine_->updateState(
@@ -558,6 +565,7 @@ TEST_F(BasicEngineTest, HighEngineAccuracyWithSpeedTie) {
 
 
 TEST_F(BasicEngineTest, HighEngineAccuracySingleMove) {
+  spdlog::set_level(spdlog::level::warn);
   engine_->setAccuracy(16);
 
   PossibleEnvironments result = engine_->updateState(
@@ -572,6 +580,7 @@ TEST_F(BasicEngineTest, HighEngineAccuracySingleMove) {
 
 
 TEST_F(BasicEngineTest, HighEvasionAndAccuracy) {
+  spdlog::set_level(spdlog::level::warn);
   // Reproduce branchProbability > FixType(0) assertion failure
   engine_->setAccuracy(16);
   auto team_a = TeamNonVolatile().addPokemon(

@@ -156,6 +156,12 @@ class PKAISHARED NeoPkCU {
       const ConstEnvironmentVolatile& envV, const Actor& actor) const;
   ActionVector getValidSwapActions(
       const ConstEnvironmentVolatile& envV, const Actor& actor) const;
+  [[deprecated]] ActionVector getValidActions(
+      const ConstEnvironmentVolatile& envV, TEAM iTeam) const;
+  [[deprecated]] ActionVector getValidMoveActions(
+      const ConstEnvironmentVolatile& envV, TEAM iTeam) const;
+  [[deprecated]] ActionVector getValidSwapActions(
+      const ConstEnvironmentVolatile& envV, TEAM iTeam) const;
 
   /**
    * @brief Checks if a given action is valid for a team in the current state.
@@ -181,71 +187,9 @@ class PKAISHARED NeoPkCU {
       const Actor& actor,
       const Action& action) const;
 
- private:
-  struct ActionFilter {
-    const NeoPkCU* cu;
-    const ConstEnvironmentVolatile& envV;
-    const Actor actor;
-    bool operator()(const Action& action) const {
-      return (bool)cu->isValidAction(envV, actor, action);
-    }
-  };
-
-  struct ActionTransform {
-    Action operator()(size_t i) const {
-      if (i < 4) return Action::move(i);
-      if (i < 28) return Action::moveAlly((i - 4) / 6, (i - 4) % 6);
-      if (i < 52) return Action::moveEnemy((i - 28) / 6, (i - 28) % 6);
-      if (i < 56) return Action::moveAdjacent(i - 52);
-      if (i < 60) return Action::moveAll(i - 56);
-      if (i == 60) return Action::wait();
-      if (i == 61) return Action::struggle();
-      return Action::swap(i - 62);
-    }
-  };
-
-  template <typename Range>
-  auto yieldValidActionsInRange(
-      const Range& range,
-      const ConstEnvironmentVolatile& envV,
-      const Actor& actor) const {
-    return range | boost::adaptors::transformed(ActionTransform{}) |
-           boost::adaptors::filtered(ActionFilter{this, envV, actor});
-  }
-
  public:
-  auto yieldValidMoveActions(
-      const ConstEnvironmentVolatile& envV, const Actor& actor) const {
-    return yieldValidActionsInRange(
-        boost::irange(size_t(0), size_t(62)), envV, actor);
-  }
-
-  auto yieldValidSwapActions(
-      const ConstEnvironmentVolatile& envV, const Actor& actor) const {
-    return yieldValidActionsInRange(
-        boost::irange(size_t(62), size_t(68)), envV, actor);
-  }
-
-  auto yieldValidActions(
-      const ConstEnvironmentVolatile& envV, const Actor& actor) const {
-    return yieldValidActionsInRange(
-        boost::irange(size_t(0), size_t(68)), envV, actor);
-  }
-
-  [[deprecated]] ActionVector getValidActions(
-      const ConstEnvironmentVolatile& envV, TEAM iTeam) const;
-  [[deprecated]] ActionVector getValidMoveActions(
-      const ConstEnvironmentVolatile& envV, TEAM iTeam) const;
-  [[deprecated]] ActionVector getValidSwapActions(
-      const ConstEnvironmentVolatile& envV, TEAM iTeam) const;
-
   std::vector<ActionMap> getAllValidActions(
       const ConstEnvironmentVolatile& envV, TEAM agentTeam = TEAM_A) const;
-
-  auto yieldAllValidActions(
-      const ConstEnvironmentVolatile& envV, TEAM agentTeam = TEAM_A) const {
-    
-  }
 
 
   /**

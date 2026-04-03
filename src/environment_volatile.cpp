@@ -205,6 +205,45 @@ std::vector<Action> ENV_VOLATILE_IMPL::getActions(
 
 
 ENV_VOLATILE_IMPL_TEMPLATE
+std::vector<Action> ENV_VOLATILE_IMPL::getActions(const Actor& actor) const {
+  std::vector<Action> result = getMoveActions(actor);
+  std::vector<Action> swaps = getSwapActions(actor);
+  result.insert(result.end(), swaps.begin(), swaps.end());
+  return result;
+}
+
+
+ENV_VOLATILE_IMPL_TEMPLATE
+std::vector<Action> ENV_VOLATILE_IMPL::getMoveActions(
+    const Actor& actor) const {
+  std::vector<Action> candidates;
+  auto current = teammate(actor);
+
+  for (const auto& [iMove, mNV] : current.nv().yieldMoves()) {
+    for (const auto& action : getActions(actor, mNV)) {
+      candidates.push_back(action);
+    }
+  }
+
+  candidates.push_back(Action::struggle());
+  candidates.push_back(Action::wait());
+  return candidates;
+}
+
+
+ENV_VOLATILE_IMPL_TEMPLATE
+std::vector<Action> ENV_VOLATILE_IMPL::getSwapActions(
+    const Actor& actor) const {
+  std::vector<Action> candidates;
+  auto currentTeam = getTeam(actor.iTeam());
+  for (size_t i = 0; i < currentTeam.nv().getNumTeammates(); ++i) {
+    candidates.push_back(Action::swap(i));
+  }
+  return candidates;
+}
+
+
+ENV_VOLATILE_IMPL_TEMPLATE
 std::vector<Actor> ENV_VOLATILE_IMPL::getTargets(
     const Actor& actor, const Action& action) const {
   std::vector<Actor> targets;

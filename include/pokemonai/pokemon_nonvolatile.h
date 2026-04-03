@@ -8,20 +8,21 @@
 #ifndef POKEMON_NONVOLATILE_H
 #define	POKEMON_NONVOLATILE_H
 
-#include "pkai.h"
-
 #include <stdint.h>
-#include <iosfwd>
+
 #include <array>
+#include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/irange.hpp>
+#include <iosfwd>
 #include <vector>
 
-#include "signature.h"
-#include "serializable.h"
-
 #include "action.h"
-#include "orphan.h"
-#include "name.h"
 #include "move_nonvolatile.h"
+#include "name.h"
+#include "orphan.h"
+#include "pkai.h"
+#include "serializable.h"
+#include "signature.h"
 
 #define STAGE0 6
 
@@ -243,6 +244,13 @@ public:
   const MoveNonVolatile& getMove(size_t index) const;
   const MoveNonVolatile& getMove(const Action& action) const {
     return getMove(action.iMove());
+  }
+
+  auto yieldMoves() const {
+    return boost::irange(size_t(0), getNumMoves()) |
+           boost::adaptors::transformed([*this](size_t iMove) {
+             return std::make_tuple(iMove, getMove(iMove));
+           });
   }
 
   uint32_t getFV_base(size_t type) const

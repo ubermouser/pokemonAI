@@ -197,6 +197,7 @@ using ActionVector = std::vector<Action>;
 using ActionPairVector = std::vector<std::array<Action, 2> >;
 
 std::ostream& operator<<(std::ostream& os, const Action& action);
+std::ostream& operator<<(std::ostream& os, const ActionVector& actionVector);
 std::ostream& operator<<(std::ostream& os, const ActionMap& actionMap);
 std::ostream& operator<<(
     std::ostream& os, const std::vector<ActionMap>& actionMapVector);

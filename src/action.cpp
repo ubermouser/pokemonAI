@@ -118,6 +118,19 @@ std::ostream& operator<<(std::ostream& os, const ActionMap& actionMap) {
 }
 
 
+std::ostream& operator<<(std::ostream& os, const ActionVector& actionVector) {
+  size_t iAction = 0;
+  os << "[";
+  for (const auto& action : actionVector) {
+    if (iAction > 0) { os << ", "; }
+    os << fmt::format("{}", fmt::streamed(action));
+    iAction++;
+  }
+  os << "]";
+  return os;
+}
+
+
 std::ostream& operator<<(
     std::ostream& os, const std::vector<ActionMap>& actionMapVector) {
   size_t iActionMap = 0;
