@@ -8,16 +8,12 @@
 MoveNonVolatile* MoveNonVolatile::mNV_struggle = NULL;
 
 MoveNonVolatile::MoveNonVolatile(const Move& _base, unsigned int PPmultiplier)
-  : Signature<MoveNonVolatile, MOVE_NONVOLATILE_DIGESTSIZE>(),
-  base(&_base),
-  scriptVal_a(0),
-  scriptVal_b(0),
-  PPmax(moveExists() ? ((_base.PP_ * PPmultiplier) / 10) : 0)
-{
-};
-
-
-
+    : Signature<MoveNonVolatile, MOVE_NONVOLATILE_DIGESTSIZE>(),
+      base(&_base),
+      scriptVal_a(0),
+      scriptVal_b(0),
+      PPmax(moveExists() ? ((_base.PP_ * PPmultiplier) / 10) : 0),
+      iMove_(0){};
 
 
 void MoveNonVolatile::initialize(PokemonNonVolatile& cPokemon)
@@ -62,6 +58,8 @@ void MoveNonVolatile::createDigest_impl(std::array<uint8_t, MOVE_NONVOLATILE_DIG
   pack(scriptVal_b, digest, iDigest);*/
   // pack PPmax:
   pack(PPmax, digest, iDigest);
+  // pack iMove_:
+  pack(iMove_, digest, iDigest);
 
   assert(iDigest == MOVE_NONVOLATILE_DIGESTSIZE);
 }

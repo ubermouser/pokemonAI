@@ -15,7 +15,7 @@ class PokemonNonVolatile;
 
 class MoveVolatile;
 
-#define MOVE_NONVOLATILE_DIGESTSIZE 21
+#define MOVE_NONVOLATILE_DIGESTSIZE 22
 
 class PKAISHARED MoveNonVolatile : public Signature<MoveNonVolatile, MOVE_NONVOLATILE_DIGESTSIZE>
 {
@@ -24,11 +24,12 @@ public:
   uint16_t scriptVal_a;
   uint16_t scriptVal_b;
   uint8_t PPmax;
+  uint8_t iMove_;
 
   static MoveNonVolatile* mNV_struggle;
 
   MoveNonVolatile(const Move& _base, unsigned int PPmultiplier = 16);
-  MoveNonVolatile() = default;
+  MoveNonVolatile() : iMove_(0) {}
   MoveNonVolatile(const MoveNonVolatile& orig) = default;
   MoveNonVolatile& operator=(const MoveNonVolatile& source) = default;
   virtual ~MoveNonVolatile() = default;
@@ -64,6 +65,8 @@ public:
     return scriptVal_b;
   };
 
+  size_t getIMove() const { return iMove_; };
+
   void createDigest_impl(std::array<uint8_t, MOVE_NONVOLATILE_DIGESTSIZE>& digest) const;
 
   void initialize(PokemonNonVolatile& cPokemon);
@@ -80,6 +83,7 @@ public:
     scriptVal_b = newVal;
   };
 
+  void setIMove(size_t iMove) { iMove_ = (uint8_t)iMove; };
 };
 
 #endif /* MOVE_NONVOLATILE_H */

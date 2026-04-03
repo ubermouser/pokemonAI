@@ -69,7 +69,7 @@ Move::TargetType Move::targetTypeFromString(const std::string& str) {
   if (s == "any_adjacent_ally") return ANY_ADJACENT_ALLY;
   if (s == "any_adjacent_enemy") return ANY_ADJACENT_ENEMY;
   if (s == "any_adjacent_ally_self") return ANY_ADJACENT_ALLY_SELF;
-  if (s == "any_nonadjacent") return ANY_NONADJACENT;
+  if (s == "any_active") return ANY_ACTIVE;
   if (s == "any_ally") return ANY_ALLY;
   if (s == "all_adjacent") return ALL_ADJACENT;
   if (s == "all_adjacent_enemy") return ALL_ADJACENT_ENEMY;
@@ -140,6 +140,7 @@ bool Moves::initialize(const std::string& path, const Types& types) {
     } else {
       MoveNonVolatile::mNV_struggle->setBase(*Move::move_struggle);
     }
+    MoveNonVolatile::mNV_struggle->setIMove(4);
   }
   
   return true;

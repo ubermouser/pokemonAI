@@ -445,6 +445,7 @@ PokemonNonVolatile& PokemonNonVolatile::addMove(const MoveNonVolatile& _cMove) {
   handleMoveLearnResult(result, _cMove);
 
   actions_.push_back(_cMove);
+  actions_.back().setIMove(actions_.size() - 1);
   return *this;
 }
 
@@ -487,6 +488,7 @@ PokemonNonVolatile& PokemonNonVolatile::setMove(size_t iAction, const MoveNonVol
     handleMoveLearnResult(result, _cMove);
   }
   getMove(iAction) = _cMove;
+  getMove(iAction).setIMove(iAction);
   return *this;
 };
 
@@ -495,6 +497,9 @@ PokemonNonVolatile& PokemonNonVolatile::removeMove(size_t iRemovedAction) {
   // don't bother removing a move that doesn't exist
   if (iRemovedAction >= getNumMoves()) { return *this; }
   actions_.erase(actions_.begin() + iRemovedAction);
+  for (size_t i = iRemovedAction; i < actions_.size(); ++i) {
+    actions_[i].setIMove(i);
+  }
 
   return *this;
 };

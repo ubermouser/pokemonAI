@@ -30,6 +30,13 @@ public:
   static constexpr size_t MOVE_SWITCH = 7;
   static constexpr size_t MOVE_LAST = 8;
 
+  /**
+   * FRIENDLY/HOSTILE_x - refers to a specific pokemon on the team
+   * FRIENDLY/HOSTILE_DEFAULT - refers to self / the directly opposite enemy
+   * FRIENDLY/HOSTILE_ADJACENT - refers to all adjacent targets
+   * FRIENDLY/HOSTILE_ACTIVE - refers to all active targets
+   * FRIENDLY/HOSTILE_ALL - refers to all targets
+   */
   static constexpr size_t FRIENDLY_DEFAULT = 0;
   static constexpr size_t FRIENDLY_ANY = 0;
   static constexpr size_t FRIENDLY_0 = 1;
@@ -39,8 +46,10 @@ public:
   static constexpr size_t FRIENDLY_4 = 5;
   static constexpr size_t FRIENDLY_5 = 6;
   static constexpr size_t FRIENDLY_ADJACENT = 7;
-  static constexpr size_t FRIENDLY_ALL = 8;
-  static constexpr size_t FRIENDLY_LAST = 9;
+  static constexpr size_t FRIENDLY_ADJACENT_SELF = 8;
+  static constexpr size_t FRIENDLY_ACTIVE = 9;
+  static constexpr size_t FRIENDLY_ALL = 10;
+  static constexpr size_t FRIENDLY_LAST = 11;
 
   static constexpr size_t HOSTILE_DEFAULT = 0;
   static constexpr size_t HOSTILE_ANY = 0;
@@ -51,8 +60,9 @@ public:
   static constexpr size_t HOSTILE_4 = 5;
   static constexpr size_t HOSTILE_5 = 6;
   static constexpr size_t HOSTILE_ADJACENT = 7;
-  static constexpr size_t HOSTILE_ALL = 8;
-  static constexpr size_t HOSTILE_LAST = 9;
+  static constexpr size_t HOSTILE_ACTIVE = 8;
+  static constexpr size_t HOSTILE_ALL = 9;
+  static constexpr size_t HOSTILE_LAST = 10;
 
   static Action move(size_t iMove) {
     assert(iMove < 4);
@@ -71,14 +81,58 @@ public:
     return Action{MOVE_0 + iMove, 0, HOSTILE_0 + iEnemy};
   }
 
+  static Action moveTarget(
+      size_t iMove, const Actor& actor, const Actor& target) {
+    if (target.iTeam() == actor.iTeam()) {
+      return Action::moveAlly(iMove, target.iTeammate());
+    } else {
+      return Action::moveEnemy(iMove, target.iTeammate());
+    }
+  }
+
   static Action moveAdjacent(size_t iMove) {
     assert(iMove < 4);
+    return Action{MOVE_0 + iMove, FRIENDLY_ADJACENT, HOSTILE_ADJACENT};
+  }
+
+  static Action moveAdjacentEnemy(size_t iMove) {
+    assert(iMove < 4);
     return Action{MOVE_0 + iMove, 0, HOSTILE_ADJACENT};
+  }
+
+  static Action moveAdjacentAlly(size_t iMove) {
+    assert(iMove < 4);
+    return Action{MOVE_0 + iMove, FRIENDLY_ADJACENT, 0};
+  }
+
+  static Action moveActive(size_t iMove) {
+    assert(iMove < 4);
+    return Action{MOVE_0 + iMove, FRIENDLY_ACTIVE, HOSTILE_ACTIVE};
+  }
+
+  static Action moveActiveEnemy(size_t iMove) {
+    assert(iMove < 4);
+    return Action{MOVE_0 + iMove, 0, HOSTILE_ACTIVE};
+  }
+
+  static Action moveActiveAlly(size_t iMove) {
+    assert(iMove < 4);
+    return Action{MOVE_0 + iMove, FRIENDLY_ACTIVE, 0};
   }
 
   static Action moveAll(size_t iMove) {
     assert(iMove < 4);
     return Action{MOVE_0 + iMove, FRIENDLY_ALL, HOSTILE_ALL};
+  }
+
+  static Action moveAllEnemies(size_t iMove) {
+    assert(iMove < 4);
+    return Action{MOVE_0 + iMove, 0, HOSTILE_ALL};
+  }
+
+  static Action moveAllAllies(size_t iMove) {
+    assert(iMove < 4);
+    return Action{MOVE_0 + iMove, FRIENDLY_ALL, 0};
   }
 
   static Action swap(size_t iPokemon) {
@@ -106,6 +160,13 @@ public:
   size_t iFriendly() const { return friendlyTarget() - FRIENDLY_0; }
 
   size_t enemyTarget() const { return enemyTarget_; }
+
+  bool targetsMultipleFriendly() const {
+    return friendlyTarget_ >= FRIENDLY_ADJACENT;
+  }
+  bool targetsMultipleHostile() const {
+    return enemyTarget_ >= HOSTILE_ADJACENT;
+  }
 
   bool isSwitch() const { return type() == MOVE_SWITCH; }
   bool isMove() const { return type() >= MOVE_0 && type_ <= MOVE_STRUGGLE; }

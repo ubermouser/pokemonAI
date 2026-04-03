@@ -74,6 +74,31 @@ public:
   std::vector<Actor> getActiveActors() const;
   size_t getNumActivePokemon() const;
 
+  /**
+   * @brief Get all possible actions for the given actor and move
+   * @param actor The actor performing the move
+   * @param move The move to generate actions for
+   * @return A vector of possible actions
+   */
+  std::vector<Action> getActions(
+      const Actor& actor, const MoveNonVolatile& move) const;
+
+  /**
+   * @brief Get all valid targets for the given actor and action
+   * @param actor The actor performing the action
+   * @param action The action to get targets for
+   * @return A vector of valid targets
+   */
+  std::vector<Actor> getTargets(const Actor& actor, const Action& action) const;
+
+  /**
+   * @brief Get the default target for the given actor and action
+   * @param actor The actor performing the action
+   * @param action The action to get the default target for
+   * @return The default target
+   */
+  Actor defaultTarget(const Actor& actor, const Action& action) const;
+
   auto yieldActiveActors(size_t movesFirst = TEAM_A) const {
     auto teamA = getTeam(movesFirst).yieldActiveActors();
     auto teamB = getOtherTeam(movesFirst).yieldActiveActors();

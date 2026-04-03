@@ -36,7 +36,7 @@ Double Team	Normal	15	---	---	0	SELF	0	0	0	0	0	0	0	1	0	0	---	0	0	0	0	0	0	0	0	0	0
 Double-Edge	Normal	15	100	120	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User receives recoil damage.
 Dragon Rage	Dragon	10	100	---	2	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Always inflicts 40 HP.
 Dream Eater	Psychic	15	100	100	2	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User recovers half the HP inflicted on a sleeping opponent.
-Drill Peck	Flying	20	100	80	1	ANY_NONADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Drill Peck	Flying	20	100	80	1	ANY_ACTIVE	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
 Earthquake	Ground	10	100	100	1	ALL_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Power is doubled if opponent is underground from using Dig.
 Egg Bomb	Normal	10	75	100	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
 Ember	Fire	25	100	40	2	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	---	May burn opponent.
@@ -47,7 +47,7 @@ Fire Spin	Fire	15	85	35	2	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0
 Fissure	Ground	5	30	---	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	One-Hit-KO, if it hits.
 Flamethrower	Fire	15	100	90	2	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	---	May burn opponent.
 Flash	Normal	20	100	---	0	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	70	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Lowers opponent's Accuracy.
-Fly	Flying	15	95	90	1	ANY_NONADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Flies up on first turn, attacks on second turn.
+Fly	Flying	15	95	90	1	ANY_ACTIVE	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Flies up on first turn, attacks on second turn.
 Focus Energy	Normal	30	---	---	0	SELF	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Increases critical hit ratio.
 Fury Attack	Normal	20	85	15	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Hits 2-5 times in one turn.
 Fury Swipes	Normal	15	80	18	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Hits 2-5 times in one turn.
@@ -55,7 +55,7 @@ Glare	Normal	30	100	---	0	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	75	0	0	0	0	0	0	0	0	0	
 Growl	Normal	40	100	---	0	ALL_ADJACENT_ENEMY	0	0	0	0	0	0	0	0	0	0	100	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Lowers opponent's Attack.
 Growth	Normal	20	---	---	0	SELF	0	0	1	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Raises user's Attack and Special Attack.
 Guillotine	Normal	5	30	---	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	One-Hit-KO, if it hits.
-Gust	Flying	35	100	40	1	ANY_NONADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Hits Pokemon using Fly/Bounce/Sky Drop with double power.
+Gust	Flying	35	100	40	1	ANY_ACTIVE	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Hits Pokemon using Fly/Bounce/Sky Drop with double power.
 Harden	Normal	30	---	---	0	SELF	0	0	0	1	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Raises user's Defense.
 Haze	Ice	30	---	---	0	SIDE_ALL	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Resets all stat changes.
 Headbutt	Normal	15	100	70	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	---	May cause flinching.
@@ -89,7 +89,7 @@ Mirror Move	Flying	20	---	---	0	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0
 Mist	Ice	30	---	---	0	SIDE_ALLY	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User's stats cannot be changed for a period of time.
 Night Shade	Ghost	15	100	---	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Inflicts damage equal to user's level.
 Pay Day	Normal	20	100	40	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Money is earned after the battle.
-Peck	Flying	35	100	35	1	ANY_NONADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Peck	Flying	35	100	35	1	ANY_ACTIVE	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
 Petal Dance	Grass	10	100	120	2	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User attacks for 2-3 turns but then becomes confused.
 Pin Missile	Bug	20	95	25	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Hits 2-5 times in one turn.
 Poison Gas	Poison	40	90	---	0	ALL_ADJACENT_ENEMY	0	0	0	0	0	0	0	0	0	0	55	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	---	Poisons opponent.
@@ -118,7 +118,7 @@ Self-Destruct	Normal	5	100	200	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	
 Sharpen	Normal	30	---	---	0	SELF	0	1	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Raises user's Attack.
 Sing	Normal	15	55	---	0	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	55	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	---	Puts opponent to sleep.
 Skull Bash	Normal	10	100	130	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Raises Defense on first turn, attacks on second.
-Sky Attack	Flying	5	90	140	1	ANY_NONADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Charges on first turn, attacks on second. May cause flinching. High critical hit ratio.
+Sky Attack	Flying	5	90	140	1	ANY_ACTIVE	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Charges on first turn, attacks on second. May cause flinching. High critical hit ratio.
 Slam	Normal	20	75	80	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
 Slash	Normal	20	100	70	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	High critical hit ratio.
 Sleep Powder	Grass	15	75	---	0	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	75	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	---	Puts opponent to sleep.
@@ -162,6 +162,6 @@ Vise Grip	Normal	30	100	55	2	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	
 Water Gun	Water	25	100	40	2	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
 Waterfall	Water	15	100	80	2	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	May cause flinching.
 Whirlwind	Normal	20	---	---	0	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	In battles, the opponent switches. In the wild, the Pokemon runs.
-Wing Attack	Flying	35	100	60	1	ANY_NONADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
+Wing Attack	Flying	35	100	60	1	ANY_ACTIVE	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
 Withdraw	Water	40	---	---	0	SELF	0	0	0	1	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Raises user's Defense.
 Wrap	Normal	20	90	15	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	---	Traps opponent, damaging them for 4-5 turns.

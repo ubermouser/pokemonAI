@@ -70,11 +70,11 @@ public:
     UNKNOWN = -1,           /* varies / unknown */
     SELF = 0,               /* may target self only (defense curl, protect) */
     ANY_ADJACENT = 1,       /* may target an adjacent pokemon (tackle, charm) */
-    ANY_ADJACENT_ALLY = 2,      /* may target an adjacent ally (helping hand) */
-    ANY_ADJACENT_ENEMY = 3,     /* may target an adjacent enemy (me first) */
+    ANY_ADJACENT_ALLY = 2,  /* may target an adjacent ally (helping hand) */
+    ANY_ADJACENT_ENEMY = 3, /* may target an adjacent enemy (me first) */
     ANY_ADJACENT_ALLY_SELF = 4, /* may target an adjacent ally or self (acupressure) */
-    ANY_NONADJACENT = 5,    /* may target adjacent or non-adjacent active pokemon (gust, peck) */
-    ANY_ALLY = 6,           /* may target any ally, active or not (baton pass, u-turn) */
+    ANY_ACTIVE = 5,         /* may target any active pokemon (gust, peck) */
+    ANY_ALLY = 6,           /* may target any living ally, active or not (baton pass, u-turn) */
     ALL_ADJACENT = 7,       /* targets all adjacent pokemon (earthquake, explosion) */
     ALL_ADJACENT_ENEMY = 8, /* targets all adjacent enemy pokemon (growl, blizzard) */
     ALL_ADJACENT_ALLY = 9,  /* targets all adjacent friendly pokemon */
@@ -84,9 +84,9 @@ public:
     SIDE_ALLY = 13,         /* targets the allied side (mist, light screen) */
     SIDE_ENEMY = 14,        /* targets the enemy side (spikes, stealth rock) */
     SIDE_ALL = 15,          /* targets the entire battlefield (haze, rain dance) */
-    ALL_ALLIES = 16,        /* targets all teammates, active or not (heal bell, aromatherapy) */
-    ALL_ENEMIES = 17,       /* targets all enemies, active or not */
-    ALL_FIELD = 18,         /* targets all pokemon, including the self, active or not */
+    ALL_ALLIES = 16,        /* targets all living teammates, active or not (heal bell, aromatherapy) */
+    ALL_ENEMIES = 17,       /* targets all living enemies, active or not */
+    ALL_FIELD = 18,         /* targets all living pokemon, including the self, active or not */
   };
   // clang-format on
   static TargetType targetTypeFromString(const std::string& str);

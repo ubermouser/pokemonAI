@@ -114,6 +114,17 @@ class PokemonVolatileImpl : public NonvolatileVolatilePair<
   /* True if the pokemon is currently on the field */
   bool isActive() const { return data().active > 0; }
 
+  /* Returns the distance between two pokemon on the field */
+  int distance(const impl_t& other) const {
+    return std::abs((int)data().active - (int)other.data().active);
+  }
+
+  /* True if a pokemon is adjacent to the current pokemon */
+  bool isAdjacent(const impl_t& other) const {
+    if (!isActive() || !other.isActive()) { return false; }
+    return distance(other) <= 1;
+  }
+
   /* return the proportion of this pokemon's HP that remains, from 0..1*/
   fpType getPercentHP() const;
 

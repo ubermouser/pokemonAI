@@ -1,7 +1,7 @@
 import csv
 
-input_file = '/workspace/data/gen4/moves.csv'
-output_file = '/workspace/data/gen4/moves.csv'
+input_file = '/workspace/data/gen1/moves.csv'
+output_file = '/workspace/data/gen1/moves.csv'
 
 # Target categories
 SELF = {
@@ -35,7 +35,7 @@ ANY_ADJACENT_ENEMY = {
     'Max Starfall', 'Max Wyrmwind', 'Max Mindstorm', 'Max Rockfall', 'Max Quake', 
     'Max Darkness', 'Max Overgrowth', 'Max Steelspike', 'Doodle',
 }
-ANY_NONADJACENT = {
+ANY_ACTIVE = {
     'Gust', 'Wing Attack', 'Fly', 'Peck', 'Drill Peck', 'Sky Attack', 'Aeroblast', 
     'Aerial Ace', 'Bounce', 'Water Pulse', 'Pluck', 'Aura Sphere', 'Dark Pulse', 
     'Air Slash', 'Dragon Pulse', 'Brave Bird', 'Chatter', 'Heal Pulse', 'Sky Drop', 
@@ -95,7 +95,7 @@ TARGET_TYPE_MAP = {
     'ANY_ADJACENT_ALLY': ANY_ADJACENT_ALLY,
     'ANY_ADJACENT_ENEMY': ANY_ADJACENT_ENEMY,
     'ANY_ADJACENT_ALLY_SELF': ANY_ADJACENT_ALLY_SELF,
-    'ANY_NONADJACENT': ANY_NONADJACENT,
+    'ANY_ACTIVE': ANY_ACTIVE,
     'ANY_ALLY': ANY_ALLY,
     'ALL_ADJACENT': ALL_ADJACENT,
     'ALL_ADJACENT_ENEMY': ALL_ADJACENT_ENEMY,
