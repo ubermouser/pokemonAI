@@ -542,9 +542,18 @@ IsValidResult NeoPkCU::isValidAction_wait(
   ConstPokemonVolatile cPKV = cTV.teammate(actor.iTeammate());
 
   // are we waiting for the other team to take its free move?
-  if (!(envV.getOtherTeam(actor.iTeam()).isAlive()) && cPKV.isAlive()) {
-    return IsValidResult::VALID;
+  // We should wait if all of the opponent's active pokemon are dead (until
+  // replacement)
+  bool anyEnemyActiveAlive = false;
+  for (const auto& [oActor, oPKV] :
+       envV.getOtherTeam(actor.iTeam()).yieldActivePokemon()) {
+    if (oPKV.isAlive()) {
+      anyEnemyActiveAlive = true;
+      break;
+    }
   }
+
+  if (!anyEnemyActiveAlive && cPKV.isAlive()) { return IsValidResult::VALID; }
 
   // in most cases, do not allow not moving
   return IsValidResult::WAIT_NOT_ALLOWED;
@@ -650,9 +659,18 @@ ValidSwapSet NeoPkCU::getValidSwapFlags(
   doAllowSwitch[VALID_SWAP_TARGET_INACTIVE] = !fPKV.isActive();
 
   // are we trying to move during the other team's free move?
-  // Can swap if any enemy is alive, or if we ourselves are dead (replacement)
-  bool anyEnemyAlive = envV.getOtherTeam(actor.iTeam()).isAlive();
-  doAllowSwitch[VALID_SWAP_MUST_WAIT] = anyEnemyAlive || !cPKV.isAlive();
+  // Can swap if all enemies on the field are alive, AND we ourselves are dead
+  // (replacement)
+  bool anyEnemyActiveAlive = false;
+  for (const auto& [oActor, oPKV] :
+       envV.getOtherTeam(actor.iTeam()).yieldActivePokemon()) {
+    if (oPKV.isAlive()) {
+      anyEnemyActiveAlive = true;
+      break;
+    }
+  }
+
+  doAllowSwitch[VALID_SWAP_MUST_WAIT] = anyEnemyActiveAlive || !cPKV.isAlive();
 
   return doAllowSwitch;
 }
