@@ -120,6 +120,15 @@ public:
    */
   Actor defaultTarget(const Actor& actor, const Action& action) const;
 
+ protected:
+  Actor defaultEnemy(const Actor& actor, const Action& action) const;
+  Actor defaultFriendly(const Actor& actor, const Action& action) const;
+
+ public:
+  auto yieldActors(size_t movesFirst = TEAM_A) const {
+    return nv().yieldActors(movesFirst);
+  }
+
   auto yieldActiveActors(size_t movesFirst = TEAM_A) const {
     auto teamA = getTeam(movesFirst).yieldActiveActors();
     auto teamB = getOtherTeam(movesFirst).yieldActiveActors();

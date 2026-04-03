@@ -60,15 +60,15 @@ public:
     return getTeam(0).getNumTeammates() + getTeam(1).getNumTeammates();
   }
 
-  auto yieldActors() const {
-    auto teamA = getTeam(TEAM_A).yieldActors();
-    auto teamB = getTeam(TEAM_B).yieldActors();
+  auto yieldActors(size_t movesFirst = TEAM_A) const {
+    auto teamA = getTeam(movesFirst).yieldActors();
+    auto teamB = getOtherTeam(movesFirst).yieldActors();
     return boost::join(teamA, teamB);
   };
 
-  auto yieldPokemon() const {
-    auto teamA = getTeam(TEAM_A).yieldPokemon();
-    auto teamB = getTeam(TEAM_B).yieldPokemon();
+  auto yieldPokemon(size_t movesFirst = TEAM_A) const {
+    auto teamA = getTeam(movesFirst).yieldPokemon();
+    auto teamB = getOtherTeam(movesFirst).yieldPokemon();
     return boost::join(teamA, teamB);
   };
 

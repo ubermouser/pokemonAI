@@ -33,6 +33,8 @@ void Action::print(std::ostream& os) const {
         // only print a friendly target marker if enemy target isn't also all
         // (rare)
         if (enemyTarget() != HOSTILE_ALL) { os << fmt::format("-fs"); }
+      } else if (friendlyTarget() == FRIENDLY_SIDE) {
+        os << fmt::format("-fg");
       } else {
         os << fmt::format("-f{}", friendlyTarget());
       }
@@ -42,6 +44,8 @@ void Action::print(std::ostream& os) const {
         os << fmt::format("-a");
       } else if (enemyTarget() == HOSTILE_ALL) {
         os << fmt::format("-s");
+      } else if (enemyTarget() == HOSTILE_SIDE) {
+        os << fmt::format("-g");
       } else {
         os << fmt::format("-{}", enemyTarget());
       }

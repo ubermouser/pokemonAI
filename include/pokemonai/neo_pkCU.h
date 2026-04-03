@@ -187,6 +187,38 @@ class PKAISHARED NeoPkCU {
       const Actor& actor,
       const Action& action) const;
 
+ protected:
+  IsValidResult isValidAction_move(
+      const ConstEnvironmentVolatile& envV,
+      const Actor& actor,
+      const Action& action) const;
+  IsValidResult isValidAction_switch(
+      const ConstEnvironmentVolatile& envV,
+      const Actor& actor,
+      const Action& action) const;
+  IsValidResult isValidAction_wait(
+      const ConstEnvironmentVolatile& envV,
+      const Actor& actor,
+      const Action& action) const;
+  IsValidResult isValidAction_struggle(
+      const ConstEnvironmentVolatile& envV,
+      const Actor& actor,
+      const Action& action) const;
+
+  ValidMoveSet getValidMoveFlags(
+      const ConstEnvironmentVolatile& envV,
+      const Actor& actor,
+      const Action& action,
+      const ConstPokemonVolatile& cPKV,
+      const ConstMoveVolatile& cMV,
+      const std::vector<Actor>& targets) const;
+
+  ValidSwapSet getValidSwapFlags(
+      const ConstEnvironmentVolatile& envV,
+      const Actor& actor,
+      const Action& action,
+      const ConstPokemonVolatile& cPKV) const;
+
  public:
   std::vector<ActionMap> getAllValidActions(
       const ConstEnvironmentVolatile& envV, TEAM agentTeam = TEAM_A) const;

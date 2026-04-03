@@ -1555,6 +1555,11 @@ IsValidResult LegacyPkCU::isValidAction(
         return IsValidResult::MOVE_INVALID;
       }
 
+      // cannot target a pokemon that isn't active (legacy 1v1 case)
+      if (action.targetedHostile() && action.iEnemy() != oTV.getICPKV()) {
+        return IsValidResult::MOVE_TARGET_NOT_ACTIVE;
+      }
+
       // By default, allow moves
       ValidMoveSet doAllowMove((1 << VALID_MOVE_SIZE) - 1);
 

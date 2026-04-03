@@ -74,15 +74,19 @@ public:
   /* returns number of teammates on this team that are active */
   size_t getNumActivePokemon() const;
 
+  auto yieldActors(size_t iCurrent = 0) const {
+    return nv().yieldActors(iCurrent);
+  }
+
   auto yieldPokemon(size_t iCurrent = 0) const {
-    return nv().yieldActors(iCurrent) |
+    return yieldActors(iCurrent) |
            boost::adaptors::transformed([*this](const auto& actor) {
              return std::make_tuple(actor, teammate(actor));
            });
   }
 
   auto yieldActiveActors(size_t iCurrent = 0) const {
-    return nv().yieldActors(iCurrent) |
+    return yieldActors(iCurrent) |
            boost::adaptors::filtered([*this](const auto& actor) {
              return teammate(actor).isActive();
            });

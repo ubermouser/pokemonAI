@@ -98,21 +98,39 @@ TEST_F(IsValidAction2v2Test, AdjacentEnemyOnly) {
 }
 
 
-TEST_F(IsValidAction2v2Test, AllFieldTargeted) {
+TEST_F(IsValidAction2v2Test, AllActiveTargeted) {
   EXPECT_FALSE(engine_->isValidAction(
       engine_->initialState(), Actor(TEAM_A, 1), Action::moveEnemy(2, 0)));
 }
 
 
-TEST_F(IsValidAction2v2Test, AllField) {
+TEST_F(IsValidAction2v2Test, AllActive) {
   EXPECT_TRUE(engine_->isValidAction(
-      engine_->initialState(), Actor(TEAM_A, 1), Action::moveAll(2)));
+      engine_->initialState(), Actor(TEAM_A, 1), Action::moveActive(2)));
 }
 
 
 TEST_F(IsValidAction2v2Test, Activates2PokemonPerTeam) {
   auto actors = engine_->initialState().getActiveActors();
   EXPECT_EQ(actors.size(), 4);
+}
+
+
+TEST_F(IsValidAction2v2Test, AllMoveActions) {
+  auto actions =
+      engine_->getValidMoveActions(engine_->initialState(), {TEAM_A, 0});
+
+  fmt::print("{}\n", fmt::streamed(actions));
+  EXPECT_EQ(actions.size(), 6);
+}
+
+
+TEST_F(IsValidAction2v2Test, AllSwapActions) {
+  auto actions =
+      engine_->getValidSwapActions(engine_->initialState(), {TEAM_A, 0});
+
+  fmt::print("{}\n", fmt::streamed(actions));
+  EXPECT_EQ(actions.size(), 1);
 }
 
 

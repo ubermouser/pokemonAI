@@ -105,6 +105,7 @@ std::vector<Action> ENV_VOLATILE_IMPL::getActions(
   }
 
   switch (base.target_) {
+  // unambiguous cases:
   case Move::ALL_ACTIVE:
     actions.push_back(Action::moveActive(iMove));
     break;
@@ -135,13 +136,20 @@ std::vector<Action> ENV_VOLATILE_IMPL::getActions(
   case Move::SELF:
     actions.push_back(Action::moveAlly(iMove, actor.iTeammate()));
     break;
-  case Move::UNKNOWN:
   case Move::SIDE_ALLY:
+    actions.push_back(Action::moveSideAlly(iMove));
+    break;
   case Move::SIDE_ENEMY:
+    actions.push_back(Action::moveSideEnemy(iMove));
+    break;
   case Move::SIDE_ALL:
+    actions.push_back(Action::moveSideAll(iMove));
+    break;
+  case Move::UNKNOWN:
     actions.push_back(Action::move(iMove));
     break;
 
+  // ambiguous cases:
   case Move::ANY_ACTIVE:
     for (const auto& other : yieldActiveActors()) {
       if (other == actor) { continue; }
@@ -186,6 +194,7 @@ std::vector<Action> ENV_VOLATILE_IMPL::getActions(
       actions.push_back(Action::moveTarget(iMove, actor, other));
     }
     break;
+
   case Move::ANY_ALLY:
     for (const auto& [other, teammate] :
          getTeam(actor.iTeam()).yieldPokemon()) {
@@ -247,6 +256,7 @@ ENV_VOLATILE_IMPL_TEMPLATE
 std::vector<Actor> ENV_VOLATILE_IMPL::getTargets(
     const Actor& actor, const Action& action) const {
   std::vector<Actor> targets;
+  auto current = teammate(actor);
   size_t iTeam = actor.iTeam();
   size_t iOtherTeam = iTeam ^ 1;
 
@@ -260,50 +270,90 @@ std::vector<Actor> ENV_VOLATILE_IMPL::getTargets(
     return targets;
   }
 
+  // undefined, wait, and unknown move may return 0 targets:
   if (!action.isMove()) { return targets; }
 
   // Resolve Hostile Targets
-  if (action.enemyTarget() != Action::HOSTILE_DEFAULT) {
-    size_t eTarget = action.enemyTarget();
-    if (eTarget <= Action::HOSTILE_5) {
-      targets.push_back(Actor(iOtherTeam, eTarget - Action::HOSTILE_0));
-    } else if (
-        eTarget == Action::HOSTILE_ADJACENT ||
-        eTarget == Action::HOSTILE_ACTIVE) {
-      for (const auto& other : getOtherTeam(iTeam).yieldActiveActors()) {
-        targets.push_back(other);
+  if (action.targetsHostiles()) {
+    if (action.targetsMultipleHostile()) {
+      switch (action.enemyTarget()) {
+      case Action::HOSTILE_ACTIVE:  // target all active pokemon:
+        for (const auto& other : getOtherTeam(iTeam).yieldActiveActors()) {
+          targets.push_back(other);
+        }
+        break;
+      case Action::HOSTILE_ADJACENT:  // target all adjacent pokemon:
+        for (const auto& [other, teammate] :
+             getOtherTeam(iTeam).yieldPokemon()) {
+          if (!current.isAdjacent(teammate)) { continue; }
+          targets.push_back(other);
+        }
+        break;
+      case Action::HOSTILE_ALL:  // target every hostile pokemon:
+        for (const auto& other : getOtherTeam(iTeam).yieldActors()) {
+          targets.push_back(other);
+        }
+        break;
+      case Action::HOSTILE_SIDE:  // does not target a pokemon
+        targets.push_back(defaultTarget(actor, action));
+        break;
+      default:
+        throw std::runtime_error(fmt::format(
+            "Invalid Enemy Action Target {}!", (int)action.enemyTarget()));
       }
-    } else if (eTarget == Action::HOSTILE_ALL) {
-      for (const auto& [other, teammate] : getOtherTeam(iTeam).yieldPokemon()) {
-        targets.push_back(other);
-      }
+    } else if (action.targetedHostile()) {  // single-target and default target:
+      targets.push_back(Actor(iOtherTeam, action.iEnemy()));
+    } else {  // default target, side target:
+      targets.push_back(defaultTarget(actor, action));
     }
-    return targets;
-  }
+  }  // end of resolve hostile targets
 
   // Resolve Friendly Targets
-  if (action.friendlyTarget() != Action::FRIENDLY_DEFAULT) {
-    size_t fTarget = action.friendlyTarget();
-    if (fTarget <= Action::FRIENDLY_5) {
-      targets.push_back(Actor(iTeam, fTarget - Action::FRIENDLY_0));
-    } else if (fTarget == Action::FRIENDLY_ADJACENT) {
-      for (const auto& other : getTeam(iTeam).yieldActiveActors()) {
-        if (other != actor) { targets.push_back(other); }
+  if (action.targetsFriendlies()) {
+    if (action.targetsMultipleFriendly()) {
+      switch (action.friendlyTarget()) {
+      case Action::FRIENDLY_ACTIVE:  // target all active pokemon:
+        for (const auto& other : getTeam(iTeam).yieldActiveActors()) {
+          targets.push_back(other);
+        }
+        break;
+      case Action::FRIENDLY_ADJACENT_SELF:  // target all adjacent + self:
+        targets.push_back(actor);
+      case Action::FRIENDLY_ADJACENT:  // target all adjacent pokemon:
+        for (const auto& [other, teammate] : getTeam(iTeam).yieldPokemon()) {
+          if (!current.isAdjacent(teammate)) { continue; }
+          targets.push_back(other);
+        }
+        break;
+      case Action::FRIENDLY_ALL:  // target every friendly pokemon:
+        for (const auto& other : getTeam(iTeam).yieldActors()) {
+          targets.push_back(other);
+        }
+        break;
+      case Action::FRIENDLY_SIDE:  // does not target a pokemon
+        targets.push_back(defaultTarget(actor, action));
+        break;
+      default:
+        throw std::runtime_error(fmt::format(
+            "Invalid Friendly Action Target {}!",
+            (int)action.friendlyTarget()));
       }
-    } else if (fTarget == Action::FRIENDLY_ACTIVE) {
-      for (const auto& other : getTeam(iTeam).yieldActiveActors()) {
-        targets.push_back(other);
-      }
-    } else if (fTarget == Action::FRIENDLY_ALL) {
-      for (const auto& [other, teammate] : getTeam(iTeam).yieldPokemon()) {
-        targets.push_back(other);
-      }
+    } else if (action
+                   .targetedFriendly()) {  // single-target and default target:
+      targets.push_back(Actor(iTeam, action.iFriendly()));
+    } else {  // default target, side target:
+      targets.push_back(defaultTarget(actor, action));
     }
-    return targets;
+  }  // end of resolve friendly targets
+
+  // If no specific targets found, raise:
+  if (targets.empty()) {
+    throw std::runtime_error(fmt::format(
+        "No targets found for Action {}:{}!",
+        fmt::streamed(actor),
+        fmt::streamed(action)));
   }
 
-  // Default:
-  targets.push_back(defaultTarget(actor, action));
   return targets;
 }
 
@@ -311,15 +361,22 @@ std::vector<Actor> ENV_VOLATILE_IMPL::getTargets(
 ENV_VOLATILE_IMPL_TEMPLATE
 Actor ENV_VOLATILE_IMPL::defaultTarget(
     const Actor& actor, const Action& action) const {
-  // friendly default always chooses self
-  if (action.isMove()) {
-    if (action.friendlyTarget() != Action::FRIENDLY_DEFAULT ||
-        action.enemyTarget() == Action::HOSTILE_DEFAULT) {
-      return actor;
-    }
+  if (action.targetsHostiles()) {
+    return defaultEnemy(actor, action);
+  } else if (action.targetsFriendlies()) {
+    return defaultFriendly(actor, action);
+  } else {
+    throw std::runtime_error(fmt::format(
+        "No default target available for for Action {}:{}!",
+        fmt::streamed(actor),
+        fmt::streamed(action)));
   }
+}
 
-  // Struggle or Hostile default chooses closest enemy
+
+ENV_VOLATILE_IMPL_TEMPLATE
+Actor ENV_VOLATILE_IMPL::defaultEnemy(
+    const Actor& actor, const Action& action) const {
   size_t iOtherTeam = actor.iTeam() ^ 1;
   const auto& current = teammate(actor);
 
@@ -335,6 +392,13 @@ Actor ENV_VOLATILE_IMPL::defaultTarget(
     }
   }
   return bestTarget;
+}
+
+
+ENV_VOLATILE_IMPL_TEMPLATE
+Actor ENV_VOLATILE_IMPL::defaultFriendly(
+    const Actor& actor, const Action& action) const {
+  return actor;
 }
 
 

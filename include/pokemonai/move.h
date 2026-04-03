@@ -198,13 +198,22 @@ public:
   [[deprecated]] bool legacyTargetsAlly() const { return target_ == ANY_ALLY; }
 
   bool targetsEnemy() const {
-    return targetsSingleOpponent() || targetsSingleOther() ||
-           targetsAllOpponents() || targetsAdjacentOthers() ||
-           targetsAllField();
+    // TODO - set or bitmask operaton
+    return target_ == ANY_ADJACENT_ENEMY || target_ == ANY_ADJACENT ||
+           target_ == ANY_ACTIVE || target_ == ALL_ADJACENT_ENEMY ||
+           target_ == ALL_ADJACENT || target_ == ALL_ACTIVE_ENEMIES ||
+           target_ == ALL_ACTIVE || target_ == ALL_ENEMIES ||
+           target_ == ALL_FIELD;
   };
   bool targetsAlly() const {
-    return targetsSingleAlly() || targetsSingleOther() || targetsAllAllies() ||
-           targetsAdjacentOthers() || targetsAllField();
+    // TODO - set or bitmask operaton
+    return target_ == SELF || target_ == ANY_ADJACENT_ALLY ||
+           target_ == ANY_ADJACENT ||
+           target_ == ANY_ADJACENT_ALLY_SELF || target_ == ANY_ACTIVE ||
+           target_ == ANY_ALLY || target_ == ALL_ADJACENT_ALLY ||
+           target_ == ALL_ADJACENT || target_ == ALL_ACTIVE_ALLIES ||
+           target_ == ALL_ACTIVE || target_ == ALL_ALLIES ||
+           target_ == ALL_FIELD;
   };
 
   int32_t getSpeedPriority() const { return priority_; }

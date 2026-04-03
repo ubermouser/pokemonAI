@@ -365,7 +365,7 @@ TEST_F(IsValidSwapTest, MoveSelfDead) {
 TEST_F(GetValidActionsTest, AllActionsActiveTeammate) {
   auto actions = engine_->getValidActions(engine_->initialState(), {TEAM_A, 0});
 
-  fmt::print("{}", fmt::streamed(actions));
+  fmt::print("{}\n", fmt::streamed(actions));
   EXPECT_EQ(actions.size(), 4);
 }
 
@@ -374,7 +374,7 @@ TEST_F(GetValidActionsTest, AllMoveActions) {
   auto actions =
       engine_->getValidMoveActions(engine_->initialState(), {TEAM_A, 0});
 
-  fmt::print("{}", fmt::streamed(actions));
+  fmt::print("{}\n", fmt::streamed(actions));
   EXPECT_EQ(actions.size(), 3);
 }
 
@@ -383,7 +383,7 @@ TEST_F(GetValidActionsTest, AllSwapActions) {
   auto actions =
       engine_->getValidSwapActions(engine_->initialState(), {TEAM_A, 0});
 
-  fmt::print("{}", fmt::streamed(actions));
+  fmt::print("{}\n", fmt::streamed(actions));
   EXPECT_EQ(actions.size(), 1);
 }
 
