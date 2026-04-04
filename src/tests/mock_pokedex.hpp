@@ -392,6 +392,7 @@ public:
   }
 
   void setupPlugins() {
+    // clang-format off
     engineExtensions_.registerPlugin(plugin(pluginCategory::engine, "p0", PLUGIN_ON_INIT, mock_onInitMove, 0, current_team), true);
     engineExtensions_.registerPlugin(plugin(pluginCategory::engine, "p1", PLUGIN_ON_RESET, mock_onReset, 0, all_teams), true);
     engineExtensions_.registerPlugin(plugin(pluginCategory::engine, "p2", PLUGIN_ON_SETSPEEDBRACKET, mock_onSetSpeedBracket, 0, all_teams), true);
@@ -421,11 +422,7 @@ public:
     engineExtensions_.registerPlugin(plugin(pluginCategory::engine, "p26", PLUGIN_ON_TESTSWITCH, mock_onTestSwitch, 0, all_teams), true);
     engineExtensions_.registerPlugin(plugin(pluginCategory::engine, "p27", PLUGIN_ON_MODIFYACTION, mock_onModifyAction, 0, all_teams), true);
     engineExtensions_.registerPlugin(plugin(pluginCategory::engine, "p28", PLUGIN_ON_UNINIT, mock_onUninitMove, 0, all_teams), true);
-    
-    // Register explosion and one-shot
-    engineExtensions_.registerPlugin(plugin(pluginCategory::move, "move_explosion", PLUGIN_ON_EVALUATEMOVE, mock_onExplosion, 0, current_team), true);
-    engineExtensions_.registerPlugin(plugin(pluginCategory::move, "move_faint", PLUGIN_ON_EVALUATEMOVE, mock_onFaint, 0, current_team), true);
-    engineExtensions_.registerPlugin(plugin(pluginCategory::move, "move_suicide", PLUGIN_ON_EVALUATEMOVE, mock_onSuicide, 0, current_team), true);
+    // clang-format on
   }
 };
 

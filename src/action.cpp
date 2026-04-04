@@ -26,7 +26,7 @@ void Action::print(std::ostream& os) const {
     os << "mS";
   } else if (isMove()) {
     os << fmt::format("m{}", iMove() + 1);
-    if (friendlyTarget() != FRIENDLY_DEFAULT) {
+    if (friendlyTarget() != FRIENDLY_NONE) {
       if (friendlyTarget() == FRIENDLY_ADJACENT) {
         os << fmt::format("-fa");
       } else if (friendlyTarget() == FRIENDLY_ALL) {
@@ -39,7 +39,7 @@ void Action::print(std::ostream& os) const {
         os << fmt::format("-f{}", friendlyTarget());
       }
     }
-    if (enemyTarget() != HOSTILE_DEFAULT) {
+    if (enemyTarget() != HOSTILE_NONE) {
       if (enemyTarget() == HOSTILE_ADJACENT) {
         os << fmt::format("-a");
       } else if (enemyTarget() == HOSTILE_ALL) {

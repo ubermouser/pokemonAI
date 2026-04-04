@@ -73,10 +73,12 @@ class NeoPkCUEngine {
   MoveBracket computeMoveBracket(const Actor& actor);
 
   /**
-   * @brief Computes the move targets for each actor.
+   * @brief Computes the move target for the current actor.
    */
-  std::unordered_map<Actor, std::vector<Actor>> computeMoveTargets(
-      const ConstEnvironmentPossible& env, const ActionMap& actions) const;
+  std::vector<Actor> computeMoveTarget(
+      const ConstEnvironmentVolatile& env,
+      const Actor& actor,
+      const Action& action) const;
 
   /**
    * @brief Computes the speed of a Pokemon.
@@ -201,21 +203,21 @@ class NeoPkCUEngine {
   PokemonVolatile getPKV(size_t iState);
   PokemonVolatile getTPKV(size_t iState);
   MoveVolatile getMV();
-  MoveVolatile getTMV();
   MoveVolatile getMV(size_t iState);
-  MoveVolatile getTMV(size_t iState);
 
   DamageComponents_t& getDamageComponent(size_t iStack);
   DamageComponents_t& getDamageComponent(size_t iStack, const Actor& actor);
-  DamageComponents_t& getDamageComponent(size_t iStack, size_t iTeam);
+  [[deprecated]] DamageComponents_t& getDamageComponent(
+      size_t iStack, size_t iTeam);
   DamageComponents_t& getDamageComponent();
-  const DamageComponents_t& getDamageComponent() const;
 
   size_t getICTeam() const;
   size_t getIOTeam() const;
 
   const Actor& getCActor() const;
+  const Actor& getCActor(size_t iStack) const;
   const Actor& getTarget() const;
+  const Actor& getTarget(size_t iStack) const;
   const Action& getCAction() const;
   [[deprecated]] const Action& getOAction() const;
   size_t getIBase() const { return iBase_; }

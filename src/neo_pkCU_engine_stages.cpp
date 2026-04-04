@@ -766,7 +766,7 @@ void NeoPkCUEngine::evaluateMove_switch_onSwitchOut() {
 }
 
 void NeoPkCUEngine::evaluateMove_switch_onSwitchIn() {
-  getTV().swapPokemon(getCAction().iFriendly());
+  getTV().swapPokemon(getCActor(), getTarget());
   getBase().setSwitched(getICTeam());
 
   int result = 0;

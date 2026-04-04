@@ -34,11 +34,16 @@ void NeoPkCUEngine::seedStack() {
   firstFrame.stage = StageType::SEEDED;
   firstFrame.iActor = 0;
   firstFrame.iTarget = 0;
-  firstFrame.moveOrder = {};
-  firstFrame.moveBrackets = {};
-  firstFrame.targets = computeMoveTargets(stack_.at(0), actions_);
-  firstFrame.damageComponents = {};
-  stackFrame_.push_back(firstFrame);
+
+  for (const auto& [actor, action] : actions_) {
+    // default ordering is arbitrary until we've calculated speed bracket
+    firstFrame.moveOrder.push_back(actor);
+    firstFrame.damageComponents[actor] = {};
+    firstFrame.moveBrackets[actor] = computeMoveBracket(actor);
+    firstFrame.targets[actor] =
+        computeMoveTarget(stack_.at(0).getEnv(), actor, action);
+  }
+  stackFrame_.push_back(std::move(firstFrame));
 }
 
 
@@ -75,6 +80,9 @@ NeoPkCUEngine::MoveBracket NeoPkCUEngine::computeMoveBracket(
     const Actor& actor) {
   const Action& action = actions_.at(actor);
   int32_t actionBracket = 0;
+  uint32_t speed = 0;
+  uint32_t tiebreaker = 0;
+
 
   if (action.isSwitch()) {
     actionBracket = 6;
@@ -96,41 +104,26 @@ NeoPkCUEngine::MoveBracket NeoPkCUEngine::computeMoveBracket(
           pkv,
           actionBracket);
     }
+
+    speed = computeSpeed(actor);
   } else if (action.isWait()) {
     actionBracket = -7;
+    // no need to disambiguate wait actions
+    tiebreaker = actor.index();
   }
 
-  uint32_t speed = computeSpeed(actor);
-  return {actionBracket, speed};
+
+  return {actionBracket, speed, tiebreaker};
 }
 
 
-std::unordered_map<Actor, std::vector<Actor>> NeoPkCUEngine::computeMoveTargets(
-    const ConstEnvironmentPossible& envP, const ActionMap& actions) const {
-  std::unordered_map<Actor, std::vector<Actor>> targets;
-
-  // Initialize targets for each actor
-  for (const auto& pair : actions) {
-    const Actor& actor = pair.first;
-    const Action& action = pair.second;
-    if (action.isMove()) {
-      ConstMoveVolatile mv = envP.teammate(actor).getMV(action);
-
-      // single target friendly:
-      if (action.friendlyTarget() != Action::FRIENDLY_DEFAULT) {
-        targets[actor] = {Actor(actor.iTeam(), action.iFriendly())};
-      } else {  // single-target enemy:
-        targets[actor] = {Actor(actor.iTeam() == TEAM_A ? TEAM_B : TEAM_A, 0)};
-      }
-      // TODO multi-target moves:
-    } else if (action.isSwitch()) {
-      targets[actor] = {Actor(actor.iTeam(), action.iFriendly())};
-    } else {  // self target:
-      targets[actor] = {actor};
-    }
-  }
-
-  return std::move(targets);
+std::vector<Actor> NeoPkCUEngine::computeMoveTarget(
+    const ConstEnvironmentVolatile& env,
+    const Actor& actor,
+    const Action& action) const {
+  auto t = env.getTargets(actor, action);
+  if (t.empty()) { t.push_back(actor); }
+  return std::move(t);
 }
 
 
@@ -300,7 +293,7 @@ void NeoPkCUEngine::calculateDamage() {
     // scale our random value modifier to 0.85..1.0
     randomValue = deScale(randomValue, (fpType)1.0, (fpType)0.85);
 
-    uint32_t& actualDamage = getDamageComponent(iREnv[1], getICTeam()).damage;
+    uint32_t& actualDamage = getDamageComponent(iREnv[1]).damage;
     actualDamage = (uint32_t)((fpType)power * randomValue);
 
     int result = 0;
@@ -452,50 +445,27 @@ PokemonVolatile NeoPkCUEngine::getTPKV() { return getTPKV(iBase_); }
 
 
 PokemonVolatile NeoPkCUEngine::getPKV(size_t iState) {
-  const StackFrame& frame = stackFrame_[iState];
-  if (frame.iActor < frame.moveOrder.size()) {
-    const Actor& actor = frame.moveOrder[frame.iActor];
-    return getBase(iState).teammate(actor);
-  }
-  throw std::runtime_error("NeoPkCUEngine::getPKV: no active actor");
+  return getBase(iState).teammate(getCActor(iState));
 }
 
 
 PokemonVolatile NeoPkCUEngine::getTPKV(size_t iState) {
-  return getBase(iState).getTeam(getIOTeam()).getPKV();
+  return getBase(iState).teammate(getTarget(iState));
 }
 
 
 MoveVolatile NeoPkCUEngine::getMV() { return getMV(iBase_); }
 
 
-MoveVolatile NeoPkCUEngine::getTMV() { return getTMV(iBase_); }
-
-
 MoveVolatile NeoPkCUEngine::getMV(size_t iState) {
-  const StackFrame& frame = stackFrame_[iState];
-  if (frame.iActor < frame.moveOrder.size()) {
-    const Actor& actor = frame.moveOrder[frame.iActor];
-    return getBase(iState).teammate(actor).getMV(actions_.at(actor));
-  }
-  throw std::runtime_error("NeoPkCUEngine::getMV: no active actor");
-}
-
-
-MoveVolatile NeoPkCUEngine::getTMV(size_t iState) {
-  // Target move is not usually needed in damage calc unless for specific plugins
-  // For now, return first move of target
-  return getBase(iState).getTeam(getIOTeam()).getPKV().getMV(0);
+  auto& actor = getCActor(iState);
+  return getBase(iState).teammate(actor).getMV(actions_.at(actor));
 }
 
 
 DamageComponents_t& NeoPkCUEngine::getDamageComponent(size_t iStack) {
-  const StackFrame& frame = stackFrame_[iStack];
-  if (frame.iActor < frame.moveOrder.size()) {
-    const Actor& actor = frame.moveOrder[frame.iActor];
-    return stackFrame_[iStack].damageComponents[actor];
-  }
-  throw std::runtime_error("NeoPkCUEngine::getDamageComponent: no active actor");
+  auto& actor = getCActor(iStack);
+  return stackFrame_[iStack].damageComponents.at(actor);
 }
 
 
@@ -521,15 +491,6 @@ DamageComponents_t& NeoPkCUEngine::getDamageComponent() {
 }
 
 
-const DamageComponents_t& NeoPkCUEngine::getDamageComponent() const {
-  const StackFrame& frame = getStackFrame();
-  if (frame.iActor < frame.moveOrder.size()) {
-    return frame.damageComponents.at(frame.moveOrder[frame.iActor]);
-  }
-  throw std::runtime_error("NeoPkCUEngine::getDamageComponent: no active actor");
-}
-
-
 size_t NeoPkCUEngine::getICTeam() const {
   const StackFrame& frame = getStackFrame();
   if (frame.iActor < frame.moveOrder.size()) {
@@ -552,9 +513,24 @@ const Actor& NeoPkCUEngine::getCActor() const {
 }
 
 
+const Actor& NeoPkCUEngine::getCActor(size_t iStack) const {
+  const StackFrame& frame = getStackFrame(iStack);
+  assert(frame.iActor < frame.moveOrder.size());
+
+  return frame.moveOrder[frame.iActor];
+}
+
+
 const Actor& NeoPkCUEngine::getTarget() const {
   const StackFrame& frame = getStackFrame();
   const Actor& actor = getCActor();
+  return frame.targets.at(actor).at(frame.iTarget);
+}
+
+
+const Actor& NeoPkCUEngine::getTarget(size_t iStack) const {
+  const StackFrame& frame = getStackFrame(iStack);
+  const Actor& actor = getCActor(iStack);
   return frame.targets.at(actor).at(frame.iTarget);
 }
 

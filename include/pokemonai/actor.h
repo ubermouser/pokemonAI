@@ -24,7 +24,11 @@ class Actor {
     assert(iTeammate < 6);
   }
 
+  // environment-unique index of this actor
+  size_t index() const { return iTeam_ * 6 + iTeammate_; }
+  // team index of this actor
   size_t iTeam() const { return iTeam_; }
+  // teammate index of this actor
   size_t iTeammate() const { return iTeammate_; }
 
   const uint64_t* data() const {
