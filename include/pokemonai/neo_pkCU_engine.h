@@ -140,10 +140,16 @@ class NeoPkCUEngine {
    * @brief Methods implemented for compatibility with LegacyPkCUEngine.
    * @{
    */
-  size_t combineSimilarEnvironments();
   void evaluateMove();
   void calculateDamage();
   FixType getProbabilityToHit();
+
+  /**
+   * If returnAllStates is false, choose a state at random to keep, discard the
+   * rest
+   */
+  void maybeCollapseStages();
+  void collapseStages();
 
   template <size_t numEnvironments>
   void nPlicateState(
@@ -187,7 +193,7 @@ class NeoPkCUEngine {
 
   StageType getStackStage() const { return getStackFrame().stage; }
   const PluginSet& getCPluginSet();
-  void setCPluginSet();
+  void setCPluginSet(){};
   void reportStackSizeChange() const;
   size_t advanceStackStage(size_t iStack);
   size_t advanceAllStages();

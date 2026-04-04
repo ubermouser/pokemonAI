@@ -158,6 +158,35 @@ std::vector<Actor> NeoPkCUEngine::computeActorOrder() {
   return std::move(actors);
 }
 
+void NeoPkCUEngine::maybeCollapseStages() {
+  if (cu_.cfg_.returnAllStates) { return; }
+
+  collapseStages();
+}
+
+
+void NeoPkCUEngine::collapseStages() {
+  if (stack_.size() <= 1) { return; }
+
+  size_t indexState;
+  stack_.stateSelect_roulette(indexState);
+
+  SPDLOG_TRACE(
+      "Collapsing to iSTACK={:4d} of {:4d} with P={:.5f}",
+      indexState,
+      stack_.size(),
+      getBase(indexState).getProbability().to_double());
+
+  // remove all but indexState
+  stack_.erase(stack_.begin() + indexState + 1, stack_.end());
+  stack_.erase(stack_.begin(), stack_.begin() + indexState);
+
+  stackFrame_.erase(stackFrame_.begin() + indexState + 1, stackFrame_.end());
+  stackFrame_.erase(stackFrame_.begin(), stackFrame_.begin() + indexState);
+
+  iBase_ = 0;
+}
+
 
 /**
  * @brief Duplicates an environment on the stack to represent two possible
@@ -367,11 +396,6 @@ const PluginSet& NeoPkCUEngine::getCPluginSet() {
 }
 
 
-void NeoPkCUEngine::setCPluginSet() {
-  throw std::runtime_error("NeoPkCUEngine::setCPluginSet not implemented");
-}
-
-
 void NeoPkCUEngine::gotoStackStage(StageType stage) {
   gotoStackStage(getStackFrame().iStack, stage);
 }
@@ -491,13 +515,7 @@ DamageComponents_t& NeoPkCUEngine::getDamageComponent() {
 }
 
 
-size_t NeoPkCUEngine::getICTeam() const {
-  const StackFrame& frame = getStackFrame();
-  if (frame.iActor < frame.moveOrder.size()) {
-    return frame.moveOrder[frame.iActor].iTeam();
-  }
-  throw std::runtime_error("NeoPkCUEngine::getICTeam: no active actor");
-}
+size_t NeoPkCUEngine::getICTeam() const { return getCActor().iTeam(); }
 
 
 size_t NeoPkCUEngine::getIOTeam() const {
@@ -521,16 +539,13 @@ const Actor& NeoPkCUEngine::getCActor(size_t iStack) const {
 }
 
 
-const Actor& NeoPkCUEngine::getTarget() const {
-  const StackFrame& frame = getStackFrame();
-  const Actor& actor = getCActor();
-  return frame.targets.at(actor).at(frame.iTarget);
-}
+const Actor& NeoPkCUEngine::getTarget() const { return getTarget(getIBase()); }
 
 
 const Actor& NeoPkCUEngine::getTarget(size_t iStack) const {
   const StackFrame& frame = getStackFrame(iStack);
   const Actor& actor = getCActor(iStack);
+
   return frame.targets.at(actor).at(frame.iTarget);
 }
 
@@ -541,14 +556,5 @@ const Action& NeoPkCUEngine::getCAction() const {
 
 
 const Action& NeoPkCUEngine::getOAction() const {
-  const StackFrame& frame = getStackFrame();
-  if (frame.iActor < frame.moveOrder.size()) {
-    const Actor& currentActor = frame.moveOrder[frame.iActor];
-    for (const auto& actor : frame.moveOrder) {
-      if (actor.iTeam() != currentActor.iTeam()) {
-        return actions_.at(actor);
-      }
-    }
-  }
-  throw std::runtime_error("NeoPkCUEngine::getOAction not implemented");
+  return actions_.at(getTarget());
 }

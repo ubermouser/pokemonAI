@@ -133,6 +133,7 @@ void NeoPkCUEngine::evaluateMove() {
           stageTypeToString(frame.stage)));
     }
 
+    maybeCollapseStages();
     // advance stack stage of current state, as well as all new states
     stagesCompleted += advanceAllStages();
     iBase_ = (iBase_ + 1) % getStack().size();
@@ -766,8 +767,21 @@ void NeoPkCUEngine::evaluateMove_switch_onSwitchOut() {
 }
 
 void NeoPkCUEngine::evaluateMove_switch_onSwitchIn() {
-  getTV().swapPokemon(getCActor(), getTarget());
+  const Actor& switchingActor = getCActor();
+  const Actor& swapTarget = getTarget();
+  getTV().swapPokemon(switchingActor, swapTarget);
   getBase().setSwitched(getICTeam());
+
+  // Update target lists for all other actors: if they were targeting the
+  // pokemon that just switched out, redirect to the pokemon that switched in.
+  StackFrame& frame = getStackFrame();
+  for (auto& [actor, targetList] : frame.targets) {
+    if (actor == switchingActor) { continue; }
+    for (auto& target : targetList) {
+      if (target == switchingActor) { target = swapTarget; }
+    }
+  }
+  // TODO: if action is targeted, it needs to change as well
 
   int result = 0;
   CALLPLUGIN(result, PLUGIN_ON_SWITCHIN, onSwitch_rawType, *this, getPKV());
