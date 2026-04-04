@@ -8,7 +8,7 @@ int move_struggle_recoil25(
     PokemonVolatile cPKV,
     PokemonVolatile tPKV) {
   // this plugin_t only triggered if primary has hit
-  if (!cu.getBase().hasHit(cu.getICTeam())) { return 0; }
+  if (!cu.getBase().actor(cu.getICTeam(), ActorProxy::ALL_TEAMMATES).isHit()) { return 0; }
 
   const Move* cMove = &mV.getBase();
 

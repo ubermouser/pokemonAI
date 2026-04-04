@@ -29,7 +29,7 @@ int move_rampage_endLockOn(PkCUEngine& cu, PokemonVolatile cPKV) {
   MoveVolatile mV = cPKV.getMV(status.cTeammate.lockIn_action - 1);
   if (!is_rampage_move(&mV.getBase())) { return 0; }
   // if the enemy team has a free move, do not decrement lock-on counter
-  if (cu.getBase().hasWaited(cu.getICTeam())) { return 0; }
+  if (cu.getBase().actor(cu.getICTeam(), ActorProxy::ALL_TEAMMATES).isWaited()) { return 0; }
 
   // 50% chance to end at stage 1:
   if (status.cTeammate.lockIn_duration == 2) {

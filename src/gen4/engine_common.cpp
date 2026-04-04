@@ -67,7 +67,7 @@ int engine_beginTurnNonvolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
     {
       // modify the status environment:
       EnvironmentPossible statEnv = cu.getStack().at(iREnv[1]);
-      statEnv.setBlocked(cu.getICTeam());
+      statEnv.actor(cu.getCActor()).setBlocked();
     }
     // 20% chance for pokemon to thaw:
     {
@@ -95,14 +95,14 @@ int engine_beginTurnNonvolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
       cu.getPKV(iREnv[1]).clearStatusAilment();
     }
     // pokemon has a chance to move this turn:
-    cu.getStack().at(iREnv[0]).setBlocked(cu.getICTeam());
+    cu.getStack().at(iREnv[0]).actor(cu.getCActor()).setBlocked();
     break;
   }
   case AIL_NV_REST_3T:
   case AIL_NV_REST_2T: {
     // pokemon is sleeping for a fixed number of turns
     cPKV.setStatusAilment(cStatus - 1);
-    cu.getBase().setBlocked(cu.getICTeam());
+    cu.getBase().actor(cu.getCActor()).setBlocked();
     break;
   }
   case AIL_NV_REST_1T: {
@@ -115,7 +115,7 @@ int engine_beginTurnNonvolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
     std::array<size_t, 2> iREnv;
     cu.duplicateState(iREnv, FixType(0.25));
     // 25% chance to be paralyzed and not move
-    cu.getStack().at(iREnv[1]).setBlocked(cu.getICTeam());
+    cu.getStack().at(iREnv[1]).actor(cu.getCActor()).setBlocked();
     break;
   }
   case AIL_NV_NONE:
@@ -131,7 +131,7 @@ int engine_beginTurnVolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
   // Does this pokemon have a volatile condition?
   if (cPKV.status().cTeammate.flinch > 0) {
     // set user blocked 100% of the time
-    cu.getBase().setBlocked(cu.getICTeam());
+    cu.getBase().actor(cu.getCActor()).setBlocked();
   }
   if (cPKV.status().cTeammate.infatuate > 0) {
     // 50% chance to move:
@@ -140,7 +140,7 @@ int engine_beginTurnVolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
 
     // 50% chance to not move:
     {
-      cu.getStack().at(iREnv[1]).setBlocked(cu.getICTeam());
+      cu.getStack().at(iREnv[1]).actor(cu.getCActor()).setBlocked();
     }
   }
   if (cPKV.status().cTeammate.confused > 0) {
@@ -154,7 +154,7 @@ int engine_beginTurnVolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
 
       // 50% chance to not move:
       {
-        cu.getStack().at(iREnv[1]).setBlocked(cu.getICTeam());
+        cu.getStack().at(iREnv[1]).actor(cu.getCActor()).setBlocked();
         cConfusedPKV.status().cTeammate.confused--;
         // TODO: actual damage calculation
         cConfusedPKV.modHP(-40);
@@ -271,7 +271,7 @@ int engine_decrementPP(
     PokemonVolatile cPKV,
     PokemonVolatile tPKV) {
   // don't decrement PP if this move is struggle_t or the move did not hit
-  if (!cu.getBase().hasHit(cu.getICTeam()) || (&mV.getBase() == struggle_t)) {
+  if (!cu.getBase().actor(cu.getCActor()).isHit() || (&mV.getBase() == struggle_t)) {
     return 0;
   }
 
@@ -284,7 +284,7 @@ int engine_updateLastAction(PkCUEngine& cu, PokemonVolatile cPKV) {
   if (!cPKV.isAlive()) { return 0; }
 
   const auto& lastAction = cu.getCAction();
-  bool switched = cu.getBase().hasSwitched(cu.getICTeam());
+  bool switched = cu.getBase().actor(cu.getCActor()).isSwitched();
   if (lastAction.isMove() && !switched) {
     cPKV.status().cTeammate.iLastAction = lastAction.iMove() + 1;
     return 1;

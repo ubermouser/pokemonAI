@@ -10,7 +10,7 @@
 #include "pokemonai/environment_nonvolatile.h"
 #include "pokemonai/roulette.h"
 
-BOOST_STATIC_ASSERT(sizeof(EnvironmentPossibleData) == (sizeof(uint64_t)*19));
+BOOST_STATIC_ASSERT(sizeof(EnvironmentPossibleData) == (sizeof(uint64_t)*21));
 
 
 EnvironmentPossibleData EnvironmentPossibleData::create(
@@ -64,22 +64,24 @@ void ENV_POSSIBLE_IMPL::printEnvironment(std::ostream& os) const {
   // print state and probability:
   os << fmt::format("p={:.4f}", getProbability().to_double());
   // print status tokens:
-  for (unsigned int iTeam = 0; iTeam < 2; iTeam++) {
-    std::string teamLabel = (iTeam == TEAM_A ? "A" : "B");
-    if (hasFreeMove(iTeam)) { os << fmt::format(" {}-Free", teamLabel); }
-    if (hasSwitched(iTeam)) {
-      os << fmt::format(" {}-Switch", teamLabel);
+  for (const auto& actor : this->getEnv().yieldActiveActors()) {
+    std::string actorLabel =
+        fmt::format("{}{}", (actor.iTeam() == TEAM_A ? "A" : "B"), actor.iTeammate());
+    auto proxy = this->actor(actor);
+    if (proxy.isFreeMove()) { os << fmt::format(" {}-Free", actorLabel); }
+    if (proxy.isSwitched()) {
+      os << fmt::format(" {}-Switch", actorLabel);
       continue;
     }
-    if (hasWaited(iTeam)) {
-      os << fmt::format(" {}-Wait", teamLabel);
+    if (proxy.isWaited()) {
+      os << fmt::format(" {}-Wait", actorLabel);
       continue;
     }
-    if (!hasHit(iTeam)) { os << fmt::format(" {}-Miss", teamLabel); }
-    if (hasSecondary(iTeam)) { os << fmt::format(" {}-Status", teamLabel); }
-    if (hasCrit(iTeam)) { os << fmt::format(" {}-Crit", teamLabel); }
-    if (wasBlocked(iTeam)) { os << fmt::format(" {}-Blocked", teamLabel); }
-  }  // endof foreach team
+    if (!proxy.isHit()) { os << fmt::format(" {}-Miss", actorLabel); }
+    if (proxy.isSecondary()) { os << fmt::format(" {}-Status", actorLabel); }
+    if (proxy.isCrit()) { os << fmt::format(" {}-Crit", actorLabel); }
+    if (proxy.isBlocked()) { os << fmt::format(" {}-Blocked", actorLabel); }
+  }  // endof foreach actor
 
   if (isMerged()) { os << " (MERGED)"; }
 
@@ -229,8 +231,11 @@ std::vector<EnvironmentPossible> PossibleEnvironments::where(
 
 std::vector<ConstEnvironmentPossible> PossibleEnvironments::where(
     EnvironmentBitfield mask, EnvironmentBitfield expected) const {
-  return where([mask, expected](const ConstEnvironmentPossible& state) {
-    return (state.data().flags.raw & mask.raw) == expected.raw;
+  return where([mask, expected, this](const ConstEnvironmentPossible& state) {
+    EnvironmentBitfield collapsed = state.data().getBitmask().collapseTeams();
+    EnvironmentBitfield collapsed_mask = mask.collapseTeams();
+    EnvironmentBitfield collapsed_expected = expected.collapseTeams();
+    return (collapsed & collapsed_mask) == collapsed_expected;
   });
 }
 
@@ -238,101 +243,114 @@ std::vector<ConstEnvironmentPossible> PossibleEnvironments::where(
 std::vector<EnvironmentPossible> PossibleEnvironments::where(
     EnvironmentBitfield mask, EnvironmentBitfield expected) {
   return where([mask, expected](const ConstEnvironmentPossible& state) {
-    return (state.data().flags.raw & mask.raw) == expected.raw;
+    EnvironmentBitfield collapsed = state.data().getBitmask().collapseTeams();
+    EnvironmentBitfield collapsed_mask = mask.collapseTeams();
+    EnvironmentBitfield collapsed_expected = expected.collapseTeams();
+    return (collapsed & collapsed_mask) == collapsed_expected;
+  });
+}
+
+
+template <typename ResultType, typename ThisType>
+static std::vector<ResultType> whereFlagsImpl(
+    ThisType& self, size_t iTeam, uint8_t mask, uint8_t expected) {
+  return self.where([iTeam, mask, expected](const auto& state) {
+    return (state.data().getBitmask().getTeamOr(iTeam) & mask) == expected;
   });
 }
 
 
 std::vector<ConstEnvironmentPossible> PossibleEnvironments::whereHit(
     size_t iTeam) const {
-  return where(EnvironmentBitfield().team(iTeam).hasHit());
+  return whereFlagsImpl<ConstEnvironmentPossible>(
+      *this, iTeam, FLAG_HIT, FLAG_HIT);
 }
 
 
 std::vector<EnvironmentPossible> PossibleEnvironments::whereHit(size_t iTeam) {
-  return where(EnvironmentBitfield().team(iTeam).hasHit());
+  return whereFlagsImpl<EnvironmentPossible>(*this, iTeam, FLAG_HIT, FLAG_HIT);
 }
 
 
 std::vector<ConstEnvironmentPossible> PossibleEnvironments::whereCrit(
     size_t iTeam) const {
-  return where(EnvironmentBitfield().team(iTeam).hasCrit());
+  return whereFlagsImpl<ConstEnvironmentPossible>(
+      *this, iTeam, FLAG_CRIT, FLAG_CRIT);
 }
 
 
 std::vector<EnvironmentPossible> PossibleEnvironments::whereCrit(size_t iTeam) {
-  return where(EnvironmentBitfield().team(iTeam).hasCrit());
+  return whereFlagsImpl<EnvironmentPossible>(
+      *this, iTeam, FLAG_CRIT, FLAG_CRIT);
 }
 
 
 std::vector<ConstEnvironmentPossible> PossibleEnvironments::whereStatus(
     size_t iTeam) const {
-  return where(EnvironmentBitfield().team(iTeam).hasSecondary());
+  return whereFlagsImpl<ConstEnvironmentPossible>(
+      *this, iTeam, FLAG_SECONDARY, FLAG_SECONDARY);
 }
 
 
 std::vector<EnvironmentPossible> PossibleEnvironments::whereStatus(
     size_t iTeam) {
-  return where(EnvironmentBitfield().team(iTeam).hasSecondary());
+  return whereFlagsImpl<EnvironmentPossible>(
+      *this, iTeam, FLAG_SECONDARY, FLAG_SECONDARY);
 }
 
 
 std::vector<ConstEnvironmentPossible> PossibleEnvironments::whereMiss(
     size_t iTeam) const {
-  return where(
-      EnvironmentBitfield().team(iTeam).hasHit().hasSwitched().hasWait(),
-      EnvironmentBitfield());
+  uint8_t avoid = FLAG_HIT | FLAG_SWITCHED | FLAG_WAITED;
+  return whereFlagsImpl<ConstEnvironmentPossible>(*this, iTeam, avoid, 0);
 }
 
 
 std::vector<EnvironmentPossible> PossibleEnvironments::whereMiss(size_t iTeam) {
-  return where(
-      EnvironmentBitfield().team(iTeam).hasHit().hasSwitched().hasWait(),
-      EnvironmentBitfield());
+  uint8_t avoid = FLAG_HIT | FLAG_SWITCHED | FLAG_WAITED;
+  return whereFlagsImpl<EnvironmentPossible>(*this, iTeam, avoid, 0);
 }
 
 
 std::vector<ConstEnvironmentPossible> PossibleEnvironments::whereSwitch(
     size_t iTeam) const {
-  return where(EnvironmentBitfield().team(iTeam).hasSwitched());
+  return whereFlagsImpl<ConstEnvironmentPossible>(
+      *this, iTeam, FLAG_SWITCHED, FLAG_SWITCHED);
 }
 
 
 std::vector<EnvironmentPossible> PossibleEnvironments::whereSwitch(
     size_t iTeam) {
-  return where(EnvironmentBitfield().team(iTeam).hasSwitched());
+  return whereFlagsImpl<EnvironmentPossible>(
+      *this, iTeam, FLAG_SWITCHED, FLAG_SWITCHED);
 }
 
 
 std::vector<ConstEnvironmentPossible> PossibleEnvironments::whereHitNoCrit(
     size_t iTeam) const {
-  return where(
-      EnvironmentBitfield().team(iTeam).hasHit().hasCrit(),
-      EnvironmentBitfield().team(iTeam).hasHit());
+  uint8_t mask = FLAG_HIT | FLAG_CRIT;
+  return whereFlagsImpl<ConstEnvironmentPossible>(*this, iTeam, mask, FLAG_HIT);
 }
 
 
 std::vector<EnvironmentPossible> PossibleEnvironments::whereHitNoCrit(
     size_t iTeam) {
-  return where(
-      EnvironmentBitfield().team(iTeam).hasHit().hasCrit(),
-      EnvironmentBitfield().team(iTeam).hasHit());
+  uint8_t mask = FLAG_HIT | FLAG_CRIT;
+  return whereFlagsImpl<EnvironmentPossible>(*this, iTeam, mask, FLAG_HIT);
 }
 
 
 std::vector<ConstEnvironmentPossible> PossibleEnvironments::whereHitNoStatus(
     size_t iTeam) const {
-  return where(
-      EnvironmentBitfield().team(iTeam).hasHit().hasSecondary(),
-      EnvironmentBitfield().team(iTeam).hasHit());
+  uint8_t mask = FLAG_HIT | FLAG_SECONDARY;
+  return whereFlagsImpl<ConstEnvironmentPossible>(*this, iTeam, mask, FLAG_HIT);
 }
 
 
 std::vector<EnvironmentPossible> PossibleEnvironments::whereHitNoStatus(
     size_t iTeam) {
-  return where(
-      EnvironmentBitfield().team(iTeam).hasHit().hasSecondary(),
-      EnvironmentBitfield().team(iTeam).hasHit());
+  uint8_t mask = FLAG_HIT | FLAG_SECONDARY;
+  return whereFlagsImpl<EnvironmentPossible>(*this, iTeam, mask, FLAG_HIT);
 }
 
 
@@ -373,7 +391,10 @@ EnvironmentPossible PossibleEnvironments::where1(
 ConstEnvironmentPossible PossibleEnvironments::where1(
     EnvironmentBitfield mask, EnvironmentBitfield expected) const {
   return where1([mask, expected](const ConstEnvironmentPossible& state) {
-    return (state.data().flags.raw & mask.raw) == expected.raw;
+    EnvironmentBitfield collapsed = state.data().getBitmask().collapseTeams();
+    EnvironmentBitfield collapsed_mask = mask.collapseTeams();
+    EnvironmentBitfield collapsed_expected = expected.collapseTeams();
+    return (collapsed & collapsed_mask) == collapsed_expected;
   });
 }
 
@@ -381,94 +402,109 @@ ConstEnvironmentPossible PossibleEnvironments::where1(
 EnvironmentPossible PossibleEnvironments::where1(
     EnvironmentBitfield mask, EnvironmentBitfield expected) {
   return where1([mask, expected](const ConstEnvironmentPossible& state) {
-    return (state.data().flags.raw & mask.raw) == expected.raw;
+    EnvironmentBitfield collapsed = state.data().getBitmask().collapseTeams();
+    EnvironmentBitfield collapsed_mask = mask.collapseTeams();
+    EnvironmentBitfield collapsed_expected = expected.collapseTeams();
+    return (collapsed & collapsed_mask) == collapsed_expected;
+  });
+}
+
+
+template <typename ResultType, typename ThisType>
+static ResultType where1FlagsImpl(
+    ThisType& self, size_t iTeam, uint8_t mask, uint8_t expected) {
+  return self.where1([iTeam, mask, expected](const auto& state) {
+    return (state.data().getBitmask().getTeamOr(iTeam) & mask) == expected;
   });
 }
 
 
 ConstEnvironmentPossible PossibleEnvironments::where1Hit(size_t iTeam) const {
-  return where1(EnvironmentBitfield().team(iTeam).hasHit());
+  return where1FlagsImpl<ConstEnvironmentPossible>(
+      *this, iTeam, FLAG_HIT, FLAG_HIT);
 }
 
 
 EnvironmentPossible PossibleEnvironments::where1Hit(size_t iTeam) {
-  return where1(EnvironmentBitfield().team(iTeam).hasHit());
+  return where1FlagsImpl<EnvironmentPossible>(*this, iTeam, FLAG_HIT, FLAG_HIT);
 }
 
 
 ConstEnvironmentPossible PossibleEnvironments::where1Crit(size_t iTeam) const {
-  return where1(EnvironmentBitfield().team(iTeam).hasCrit());
+  return where1FlagsImpl<ConstEnvironmentPossible>(
+      *this, iTeam, FLAG_CRIT, FLAG_CRIT);
 }
 
 
 EnvironmentPossible PossibleEnvironments::where1Crit(size_t iTeam) {
-  return where1(EnvironmentBitfield().team(iTeam).hasCrit());
+  return where1FlagsImpl<EnvironmentPossible>(
+      *this, iTeam, FLAG_CRIT, FLAG_CRIT);
 }
 
 
 ConstEnvironmentPossible PossibleEnvironments::where1Status(
     size_t iTeam) const {
-  return where1(EnvironmentBitfield().team(iTeam).hasSecondary());
+  return where1FlagsImpl<ConstEnvironmentPossible>(
+      *this, iTeam, FLAG_SECONDARY, FLAG_SECONDARY);
 }
 
 
 EnvironmentPossible PossibleEnvironments::where1Status(size_t iTeam) {
-  return where1(EnvironmentBitfield().team(iTeam).hasSecondary());
+  return where1FlagsImpl<EnvironmentPossible>(
+      *this, iTeam, FLAG_SECONDARY, FLAG_SECONDARY);
 }
 
 
 ConstEnvironmentPossible PossibleEnvironments::where1Miss(size_t iTeam) const {
-  return where1(
-      EnvironmentBitfield().team(iTeam).hasHit().hasSwitched().hasWait(),
-      EnvironmentBitfield());
+  uint8_t avoid = FLAG_HIT | FLAG_SWITCHED | FLAG_WAITED;
+  return where1FlagsImpl<ConstEnvironmentPossible>(*this, iTeam, avoid, 0);
 }
 
 
 EnvironmentPossible PossibleEnvironments::where1Miss(size_t iTeam) {
-  return where1(
-      EnvironmentBitfield().team(iTeam).hasHit().hasSwitched().hasWait(),
-      EnvironmentBitfield());
+  uint8_t avoid = FLAG_HIT | FLAG_SWITCHED | FLAG_WAITED;
+  return where1FlagsImpl<EnvironmentPossible>(*this, iTeam, avoid, 0);
 }
 
 
 ConstEnvironmentPossible PossibleEnvironments::where1Switch(
     size_t iTeam) const {
-  return where1(EnvironmentBitfield().team(iTeam).hasSwitched());
+  return where1FlagsImpl<ConstEnvironmentPossible>(
+      *this, iTeam, FLAG_SWITCHED, FLAG_SWITCHED);
 }
 
 
 EnvironmentPossible PossibleEnvironments::where1Switch(size_t iTeam) {
-  return where1(EnvironmentBitfield().team(iTeam).hasSwitched());
+  return where1FlagsImpl<EnvironmentPossible>(
+      *this, iTeam, FLAG_SWITCHED, FLAG_SWITCHED);
 }
 
 
 ConstEnvironmentPossible PossibleEnvironments::where1HitNoCrit(
     size_t iTeam) const {
-  return where1(
-      EnvironmentBitfield().team(iTeam).hasHit().hasCrit(),
-      EnvironmentBitfield().team(iTeam).hasHit());
+  uint8_t mask = FLAG_HIT | FLAG_CRIT;
+  return where1FlagsImpl<ConstEnvironmentPossible>(
+      *this, iTeam, mask, FLAG_HIT);
 }
 
 
 EnvironmentPossible PossibleEnvironments::where1HitNoCrit(size_t iTeam) {
-  return where1(
-      EnvironmentBitfield().team(iTeam).hasHit().hasCrit(),
-      EnvironmentBitfield().team(iTeam).hasHit());
+  uint8_t mask = FLAG_HIT | FLAG_CRIT;
+  return where1FlagsImpl<EnvironmentPossible>(*this, iTeam, mask, FLAG_HIT);
 }
 
 
 ConstEnvironmentPossible PossibleEnvironments::where1HitNoStatus(
     size_t iTeam) const {
-  return where1(
-      EnvironmentBitfield().team(iTeam).hasHit().hasSecondary(),
-      EnvironmentBitfield().team(iTeam).hasHit());
+  uint8_t mask = FLAG_HIT | FLAG_SECONDARY;
+  return where1FlagsImpl<ConstEnvironmentPossible>(
+      *this, iTeam, mask, FLAG_HIT);
 }
 
 
 EnvironmentPossible PossibleEnvironments::where1HitNoStatus(size_t iTeam) {
-  return where1(
-      EnvironmentBitfield().team(iTeam).hasHit().hasSecondary(),
-      EnvironmentBitfield().team(iTeam).hasHit());
+  uint8_t mask = FLAG_HIT | FLAG_SECONDARY;
+  return where1FlagsImpl<EnvironmentPossible>(*this, iTeam, mask, FLAG_HIT);
 }
 
 

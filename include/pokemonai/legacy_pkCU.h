@@ -793,6 +793,14 @@ public:
   ConstEnvironmentPossible getBase() const { return getStack().at(iBase_); };
   size_t getICTeam() const { return iTeams_[0]; };
   size_t getIOTeam() const { return iTeams_[1]; };
+  Actor getCActor() const {
+    return Actor(
+        getICTeam(), getBase(getIBase()).getTeam(getICTeam()).getICPKV());
+  }
+  Actor getOActor() const {
+    return Actor(
+        getIOTeam(), getBase(getIBase()).getTeam(getIOTeam()).getICPKV());
+  }
   const Action& getCAction() const { return actions_[0]; };
   const Action& getOAction() const { return actions_[1]; };
   size_t getIBase() const { return iBase_; };

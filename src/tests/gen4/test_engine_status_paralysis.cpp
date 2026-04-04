@@ -43,7 +43,7 @@ TEST_F(ParalysisStatusTest, Test_ParalysisReducesSpeed) {
   // Gengar (110) is faster than Mew (100), so Gengar should move first
   auto results1 = engine_->updateState(initial_state, Action::move(0), Action::move(0));
   auto state1 = results1.where1Status(0);
-  EXPECT_TRUE(state1.hasMovedFirst(1));
+  EXPECT_TRUE(state1.actor(1, ActorProxy::ALL_TEAMMATES).isMovedFirst());
   EXPECT_EQ(state1.teammate(1, 0).getStatusAilment(), AIL_NV_PARALYSIS);
 
   // Turn 2: Mew uses Psychic, Gengar uses Shadow Ball
@@ -52,7 +52,7 @@ TEST_F(ParalysisStatusTest, Test_ParalysisReducesSpeed) {
 
   // Mew should move first in the most probable state where it hits
   auto state2 = results2.where1Hit(0);
-  EXPECT_TRUE(state2.hasMovedFirst(0));
+  EXPECT_TRUE(state2.actor(0, ActorProxy::ALL_TEAMMATES).isMovedFirst());
 }
 
 TEST_F(ParalysisStatusTest, Test_FullParalysis) {
@@ -70,7 +70,7 @@ TEST_F(ParalysisStatusTest, Test_FullParalysis) {
   bool found_not_blocked = false;
   for (size_t i = 0; i < results2.size(); ++i) {
     auto env = results2.at(i);
-    if (env.wasBlocked(1)) {
+    if (env.actor(1, ActorProxy::ALL_TEAMMATES).isBlocked()) {
       found_blocked = true;
       EXPECT_NEAR(env.getProbability().to_double(), 0.25, 0.01);
     } else {

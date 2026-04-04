@@ -15,7 +15,7 @@ int move_roar_forceSwitch(
     PokemonVolatile tPKV) {
   const Move* cMove = &mV.getBase();
   if (cMove != whirlwind_t && cMove != roar_t) { return 0; }
-  if (!cu.getBase().hasHit(cu.getICTeam())) { return 0; }
+  if (!cu.getBase().actor(cu.getICTeam(), ActorProxy::ALL_TEAMMATES).isHit()) { return 0; }
 
   TeamVolatile tTV = cu.getTTV();
 
@@ -50,7 +50,7 @@ int move_roar_forceSwitch(
 
     // Perform switch
     cu.getTTV(envIndex).swapPokemon(validSwitchIns[i]);
-    cu.getStack().at(envIndex).setSwitched(cu.getIOTeam());
+    cu.getStack().at(envIndex).actor(cu.getOActor()).setSwitched();
     PokemonVolatile newTPKV = cu.getTTV(envIndex).getPKV();
 
     // TODO(@drendleman): add support in PkCU for changing the stackstage via a

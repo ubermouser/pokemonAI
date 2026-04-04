@@ -150,7 +150,7 @@ void NeoPkCUEngine::evaluateMove_preturn() {
   } else if (cAction.isSwitch()) {
     gotoStackStage(StageType::PRESWITCH);
   } else if (cAction.isWait()) {
-    getBase().setWaited(getICTeam());
+    getBase().actor(getCActor()).setWaited();
     gotoStackStage(StageType::POSTTURN);
   } else {
     throw std::runtime_error(fmt::format(
@@ -256,7 +256,7 @@ void NeoPkCUEngine::evaluateMove_damage_moveBase() {
 
   // was this move blocked by a status?
   // did this pokemon die from the last pokemon's action?
-  if (getBase().wasBlocked(getICTeam()) || !getPKV().isAlive()) {
+  if (getBase().actor(getCActor()).isBlocked() || !getPKV().isAlive()) {
     gotoStackStage(StageType::POSTTURN);
     return;
   }
@@ -301,10 +301,10 @@ void NeoPkCUEngine::evaluateMove_damage_evaluateHitChance() {
       auto hitEnv = getStack().at(iHEnv[0]);
       auto& missFrame = getStackFrame(iHEnv[1]);
 
-      hitEnv.setHit(getICTeam());
+      hitEnv.actor(getCActor()).setHit();
       gotoStackStage(missFrame.iStack, StageType::POSTTURN);
     } else {  // hits 100% of the time
-      getBase().setHit(getICTeam());
+      getBase().actor(getCActor()).setHit();
     }
   } else {
     // misses 100% of the time
@@ -356,9 +356,9 @@ void NeoPkCUEngine::evaluateMove_damage_evaluateCritChance() {
 
       auto critEnv = getStack().at(iCEnv[1]);
       auto& critFrame = getStackFrame(iCEnv[1]);
-      critEnv.setCrit(getICTeam());
+      critEnv.actor(getCActor()).setCrit();
     } else {  // crits 100% of the time
-      getBase().setCrit(getICTeam());
+      getBase().actor(getCActor()).setCrit();
     }
   } else {
     // crit 0% of the time (continues normally)
@@ -450,7 +450,7 @@ void NeoPkCUEngine::evaluateMove_damage_modifyAttackPower() {
   uint32_t defensePower = tPKV.getFV_boosted(defenseType);
   uint32_t levelModifier = ((cPKV.nv().getLevel() * 2) / 5) + 2;
 
-  if (getBase().hasCrit(getICTeam())) {
+  if (getBase().actor(getCActor()).isCrit()) {
     attackPower = std::max(cPKV.nv().getFV_base(attackType), attackPower);
     defensePower = std::min(tPKV.nv().getFV_base(defenseType), defensePower);
   }
@@ -463,7 +463,7 @@ void NeoPkCUEngine::evaluateMove_damage_modifyAttackPower() {
 
 void NeoPkCUEngine::evaluateMove_damage_modifyCriticalPower() {
   // TODO: use gotoStackStage so we don't need to check for hasCrit
-  if (getBase().hasCrit(getICTeam())) {
+  if (getBase().actor(getCActor()).isCrit()) {
     fpType criticalHitModifier = 2.0;
     int result = 0;
     CALLPLUGIN(
@@ -482,7 +482,7 @@ void NeoPkCUEngine::evaluateMove_damage_modifyCriticalPower() {
 
 
 void NeoPkCUEngine::evaluateMove_damage_preDamage() {
-  assert(getBase().hasHit(getICTeam()));
+  assert(getBase().actor(getCActor()).isHit());
   const Move& cMove = getMV().getBase();
   if (cMove.damageType_ == ATK_PHYSICAL || cMove.damageType_ == ATK_SPECIAL) {
     calculateDamage();
@@ -524,7 +524,7 @@ void NeoPkCUEngine::evaluateMove_preSecondary() {
 
 
 void NeoPkCUEngine::evaluateMove_evaluateSecondaryHitChance() {
-  assert(getBase().hasHit(getICTeam()));
+  assert(getBase().actor(getCActor()).isHit());
 
   const Move& cMove = getMV().getBase();
   FixType& probabilityToSecondary = getDamageComponent().tProbability;
@@ -557,7 +557,7 @@ void NeoPkCUEngine::evaluateMove_evaluateSecondaryHitChance() {
           duplicateState((FixType(1) - probabilityToSecondary));
     }
     // secondary occurs 100% of the time:
-    getBase().setSecondary(getICTeam());
+    getBase().actor(getCActor()).setSecondary();
   } else {  // secondary occurs 0% of the time:
     gotoStackStage(StageType::POSTTURN);
   }
@@ -565,7 +565,7 @@ void NeoPkCUEngine::evaluateMove_evaluateSecondaryHitChance() {
 
 
 void NeoPkCUEngine::evaluateMove_secondary() {
-  if (getBase().hasSecondary(getICTeam())) {
+  if (getBase().actor(getCActor()).isSecondary()) {
     int result = 0;
     CALLPLUGIN(
         result,
@@ -646,7 +646,7 @@ void NeoPkCUEngine::evaluateMove_round_hash() {
   existEnv.getProbability() += cEnv.getProbability();
 
   // merge status flags for visualization
-  existEnv.getBitmask() &= cEnv.getBitmask();
+  existEnv.getBitmask() |= cEnv.getBitmask();
 
   // flag the destination environment as merged
   existEnv.setMerged();
@@ -770,7 +770,7 @@ void NeoPkCUEngine::evaluateMove_switch_onSwitchIn() {
   const Actor& switchingActor = getCActor();
   const Actor& swapTarget = getTarget();
   getTV().swapPokemon(switchingActor, swapTarget);
-  getBase().setSwitched(getICTeam());
+  getBase().actor(swapTarget).setSwitched();
 
   // Update target lists for all other actors: if they were targeting the
   // pokemon that just switched out, redirect to the pokemon that switched in.

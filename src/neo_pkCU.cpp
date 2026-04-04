@@ -8,6 +8,11 @@
 #include "pokemonai/pluggable_types.h"
 
 
+#ifdef LEGACY_PKAI_CU_H
+static_assert(false, "NeoPkCU should not be compiled with LegacyPkCU!");
+#endif
+
+
 namespace po = boost::program_options;
 
 

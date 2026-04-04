@@ -16,7 +16,7 @@ int move_uTurn_swapOnTurnEnd(
   // other allies alive)
   if (action.iFriendly() == tV.getICPKV()) { return 1; }
 
-  cu.getBase().setSwitched(cu.getICTeam());
+  cu.getBase().actor(cu.getCActor()).setSwitched();
   tV.swapPokemon(action.iFriendly());
   cu.setCPluginSet();
 

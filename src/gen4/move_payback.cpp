@@ -15,7 +15,7 @@ int move_payback_modPower(
   const Action& oAction = cu.getOAction();
   bool enemyMoveAction = (cu.getOAction().isMove());
   // if the enemy moves first:
-  bool enemyMovedFirst = cu.getBase().hasMovedFirst(cu.getIOTeam());
+  bool enemyMovedFirst = cu.getBase().actor(cu.getIOTeam(), ActorProxy::ALL_TEAMMATES).isMovedFirst();
 
   if (!enemyMoveAction || !enemyMovedFirst) { return 1; }
 

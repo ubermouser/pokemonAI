@@ -11,10 +11,10 @@ int move_metalBurst(
   if (cMove != metalBurst_t) { return 0; }
 
   // Metal Burst fails if the user moves first
-  if (cu.getBase().hasMovedFirst(cu.getICTeam())) { return 1; }
+  if (cu.getBase().actor(cu.getICTeam(), ActorProxy::ALL_TEAMMATES).isMovedFirst()) { return 1; }
 
   // Opponent must have hit with a move
-  if (!cu.getBase().hasHit(cu.getIOTeam())) { return 1; }
+  if (!cu.getBase().actor(cu.getIOTeam(), ActorProxy::ALL_TEAMMATES).isHit()) { return 1; }
 
   const DamageComponents_t& oDamage =
       cu.getDamageComponent(cu.getIBase(), cu.getIOTeam());

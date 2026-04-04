@@ -288,7 +288,8 @@ GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_
       turnLog.push_back(digestTurn(actions, iNextEnvironment, nextEnvironment));
 
       // remove a ply if the transition was a dummy move:
-      if (nextEnvironment.hasFreeMove(TEAM_A) || nextEnvironment.hasFreeMove(TEAM_B)) {
+      if (nextEnvironment.actor(TEAM_A, ActorProxy::ALL_TEAMMATES).isFreeMove() ||
+          nextEnvironment.actor(TEAM_B, ActorProxy::ALL_TEAMMATES).isFreeMove()) {
         iPly--;
       }
 
@@ -363,7 +364,8 @@ Turn Game::digestTurn(
   cTurn.env = envP.data();
   cTurn.stateSelected = resultingState;
   // was the transition a free one?
-  cTurn.freeTurn = envP.hasFreeMove(TEAM_A) || envP.hasFreeMove(TEAM_B);
+  cTurn.freeTurn = envP.actor(TEAM_A, ActorProxy::ALL_TEAMMATES).isFreeMove() ||
+                   envP.actor(TEAM_B, ActorProxy::ALL_TEAMMATES).isFreeMove();
 
   return cTurn;
 } // endOf digestTurn

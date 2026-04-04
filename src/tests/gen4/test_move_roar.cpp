@@ -112,8 +112,8 @@ TEST_F(RoarTest, ForcesSwitch) {
       state.teammate(0, 0).nv().getMaxHP());
 
   // Verification of hit symbols
-  EXPECT_TRUE(state.hasHit(0));
-  EXPECT_TRUE(state.hasHit(1));
+  EXPECT_TRUE(state.actor(0, ActorProxy::ALL_TEAMMATES).isHit());
+  EXPECT_TRUE(state.actor(1, ActorProxy::ALL_TEAMMATES).isHit());
 }
 
 TEST_F(RoarTest, FailsIfNoSwitch) {
@@ -128,7 +128,7 @@ TEST_F(RoarTest, BranchesIfMultipleOptions) {
 
   for (size_t i = 0; i < roar_branch.size(); ++i) {
     auto env = roar_branch.at(i);
-    if (env.hasHit(0)) {  // Team A (0) hit
+    if (env.actor(0, ActorProxy::ALL_TEAMMATES).isHit()) {  // Team A (0) hit
       hitCount++;
       switchedIndices.insert(env.getTeam(1).getICPKV());
       // Check probability

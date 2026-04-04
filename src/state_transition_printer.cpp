@@ -37,7 +37,7 @@ void StateTransitionPrinter::print(
     const ConstEnvironmentPossible& nsP) {
   // Determine order of actions based on movesFirst bit
   std::array<size_t, 2> order = {0, 1};
-  if (nsP.hasMovedFirst(1)) {
+  if (nsP.actor(1, ActorProxy::ALL_TEAMMATES).isMovedFirst()) {
     order = {1, 0};
   }
 
@@ -45,7 +45,7 @@ void StateTransitionPrinter::print(
     reportSwitch(os, nsP, iTeam);
     reportHitResult(os, nsP, iTeam);
 
-    if (nsP.hasSwitched(iTeam)) {
+    if (nsP.actor(iTeam, ActorProxy::ALL_TEAMMATES).isSwitched()) {
       size_t activeOld = osP.getTeam(iTeam).getICPKV();
       const auto& pkOld = osP.teammate(iTeam, activeOld);
       const auto& pkNew = nsP.teammate(iTeam, activeOld);
@@ -84,7 +84,7 @@ void StateTransitionPrinter::print(
 
 void StateTransitionPrinter::reportSwitch(
     std::ostream& os, const ConstEnvironmentPossible& nsP, size_t iTeam) {
-  if (nsP.hasSwitched(iTeam)) {
+  if (nsP.actor(iTeam, ActorProxy::ALL_TEAMMATES).isSwitched()) {
     fmt::print(
         os,
         "Team {} sent out {}!\n",
@@ -98,22 +98,24 @@ void StateTransitionPrinter::reportHitResult(
     std::ostream& os, const ConstEnvironmentPossible& nsP, size_t iTeam) {
   auto pkName = pokemonName(nsP.getTeam(iTeam).getPKV());
 
-  if (nsP.hasWaited(iTeam)) {
+  auto pkProxy = nsP.actor(iTeam, ActorProxy::ALL_TEAMMATES);
+
+  if (pkProxy.isWaited()) {
     // Waiting, nothing to report here usually
-  } else if (nsP.hasFreeMove(iTeam)) {
+  } else if (pkProxy.isFreeMove()) {
     // Free turn, usually for multi-turn moves or something
-  } else if (nsP.wasBlocked(iTeam)) {
+  } else if (pkProxy.isBlocked()) {
     fmt::print(os, "{}'s move was blocked!\n", pkName);
-  } else if (!nsP.hasSwitched(iTeam)) {
-    if (!nsP.hasHit(iTeam)) {
+  } else if (!pkProxy.isSwitched()) {
+    if (!pkProxy.isHit()) {
       fmt::print(os, "{}'s attack missed!\n", pkName);
     } else {
-      if (nsP.hasCrit(iTeam)) {
+      if (pkProxy.isCrit()) {
         os << fmt::format(
             fmt::fg(fmt::color::gold) | fmt::emphasis::bold,
             "A critical hit!\n");
       }
-      if (nsP.hasSecondary(iTeam)) {
+      if (pkProxy.isSecondary()) {
         // secondary effect triggered
       }
     }

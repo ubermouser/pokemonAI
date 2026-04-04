@@ -77,7 +77,7 @@ TEST_F(OHKOTest, FailsAgainstHigherLevel) {
 
   // Should always miss
   for (size_t i = 0; i < results.size(); ++i) {
-    EXPECT_FALSE(results.at(i).hasHit(0));
+    EXPECT_FALSE(results.at(i).actor(0, ActorProxy::ALL_TEAMMATES).isHit());
   }
 }
 
@@ -90,7 +90,7 @@ TEST_F(OHKOTest, AccuracyFormula) {
 
   FixType hitProb(0);
   for (size_t i = 0; i < results.size(); ++i) {
-    if (results.at(i).hasHit(0)) hitProb += results.at(i).getProbability();
+    if (results.at(i).actor(0, ActorProxy::ALL_TEAMMATES).isHit()) hitProb += results.at(i).getProbability();
   }
   EXPECT_NEAR((float)hitProb, 0.30f, 0.001f);
 }
@@ -124,7 +124,7 @@ TEST_F(OHKOTest, AccuracyWithLevelDifference) {
 
   FixType hitProb(0);
   for (size_t i = 0; i < results.size(); ++i) {
-    if (results.at(i).hasHit(0)) hitProb += results.at(i).getProbability();
+    if (results.at(i).actor(0, ActorProxy::ALL_TEAMMATES).isHit()) hitProb += results.at(i).getProbability();
   }
   EXPECT_NEAR((float)hitProb, 0.40f, 0.001f);
 }
@@ -137,10 +137,10 @@ TEST_F(OHKOTest, GhostImmunity) {
 
   // Horn Drill (Move 0) and Guillotine (Move 1) should fail
   auto res0 = engine_->updateState(state, Action::move(0), Action::wait());
-  for (size_t i = 0; i < res0.size(); ++i) EXPECT_FALSE(res0.at(i).hasHit(0));
-
+  for (size_t i = 0; i < res0.size(); ++i) EXPECT_FALSE(res0.at(i).actor(0, ActorProxy::ALL_TEAMMATES).isHit());
+  
   auto res1 = engine_->updateState(state, Action::move(1), Action::wait());
-  for (size_t i = 0; i < res1.size(); ++i) EXPECT_FALSE(res1.at(i).hasHit(0));
+  for (size_t i = 0; i < res1.size(); ++i) EXPECT_FALSE(res1.at(i).actor(0, ActorProxy::ALL_TEAMMATES).isHit());
 }
 
 TEST_F(OHKOTest, IdentifyBypassesGhostImmunity) {
@@ -157,7 +157,7 @@ TEST_F(OHKOTest, IdentifyBypassesGhostImmunity) {
 
   FixType hitProb(0);
   for (size_t i = 0; i < results.size(); ++i) {
-    if (results.at(i).hasHit(0)) hitProb += results.at(i).getProbability();
+    if (results.at(i).actor(0, ActorProxy::ALL_TEAMMATES).isHit()) hitProb += results.at(i).getProbability();
   }
   EXPECT_NEAR((float)hitProb, 0.30f, 0.001f);
 }
@@ -170,7 +170,7 @@ TEST_F(OHKOTest, FlyingImmunity) {
 
   // Fissure (Move 2) should fail
   auto results = engine_->updateState(state, Action::move(2), Action::wait());
-  for (size_t i = 0; i < results.size(); ++i) EXPECT_FALSE(results.at(i).hasHit(0));
+  for (size_t i = 0; i < results.size(); ++i) EXPECT_FALSE(results.at(i).actor(0, ActorProxy::ALL_TEAMMATES).isHit());
 }
 
 TEST_F(OHKOTest, LevitateImmunity) {
@@ -181,7 +181,7 @@ TEST_F(OHKOTest, LevitateImmunity) {
 
   // Fissure (Move 2) should fail
   auto results = engine_->updateState(state, Action::move(2), Action::wait());
-  for (size_t i = 0; i < results.size(); ++i) EXPECT_FALSE(results.at(i).hasHit(0));
+  for (size_t i = 0; i < results.size(); ++i) EXPECT_FALSE(results.at(i).actor(0, ActorProxy::ALL_TEAMMATES).isHit());
 }
 
 TEST_F(OHKOTest, SheerColdHitsIceType) {
@@ -195,7 +195,7 @@ TEST_F(OHKOTest, SheerColdHitsIceType) {
 
   FixType hitProb(0);
   for (size_t i = 0; i < results.size(); ++i) {
-    if (results.at(i).hasHit(0)) hitProb += results.at(i).getProbability();
+    if (results.at(i).actor(0, ActorProxy::ALL_TEAMMATES).isHit()) hitProb += results.at(i).getProbability();
   }
   EXPECT_NEAR((float)hitProb, 0.30f, 0.001f);
 }
@@ -209,7 +209,7 @@ TEST_F(OHKOTest, OHKOEffect) {
 
   bool foundDead = false;
   for (size_t i = 0; i < results.size(); ++i) {
-    if (results.at(i).hasHit(0)) {
+    if (results.at(i).actor(0, ActorProxy::ALL_TEAMMATES).isHit()) {
         auto target = results.at(i).teammate(1, 0);
         EXPECT_EQ(target.getHP(), 0U);
         foundDead = true;

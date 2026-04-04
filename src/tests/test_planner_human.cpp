@@ -217,8 +217,8 @@ TEST_F(PlannerHumanTest, StateTransitionPrinterDamage) {
 
   // Apply damage to gengar on team A
   newState.env.teams[TEAM_A].teammates[0].HPcurrent = 200;  // was 230
-  newState.flags.bits.team1.hit = 1;                        // Team B hit
-  newState.flags.bits.team1.movesFirst = 1;
+  newState.flags.bits.team1[0].hit = 1;                        // Team B hit
+  newState.flags.bits.team1[0].movesFirst = 1;
 
   testing::internal::CaptureStdout();
   StateTransitionPrinter::print(
@@ -240,9 +240,9 @@ TEST_F(PlannerHumanTest, StateTransitionPrinterCritAndStatus) {
   EnvironmentPossibleData newState = EnvironmentPossibleData::create(oldState);
 
   // Team A moves first, crits
-  newState.flags.bits.team0.movesFirst = 1;
-  newState.flags.bits.team0.hit = 1;
-  newState.flags.bits.team0.crit = 1;
+  newState.flags.bits.team0[0].movesFirst = 1;
+  newState.flags.bits.team0[0].hit = 1;
+  newState.flags.bits.team0[0].crit = 1;
 
   // Team B active pokemon (alakazam) gets burned
   newState.env.teams[TEAM_B].teammates[0].status_nonvolatile = AIL_NV_BURN;
@@ -271,7 +271,7 @@ TEST_F(PlannerHumanTest, StateTransitionPrinterFaintAndSwitch) {
   newState.env.teams[TEAM_A].teammates[0].HPcurrent = 0;
 
   // Team A switches to metagross
-  newState.flags.bits.team0.switched = 1;
+  newState.flags.bits.team0[0].switched = 1;
   newState.env.teams[TEAM_A].status.nonvolatile.iCPokemon = 1;
 
   testing::internal::CaptureStdout();

@@ -33,9 +33,9 @@ TEST_F(BasicEngineTest, PrimaryHitAndCrit) {
 
   result.printStates();
   EXPECT_EQ(result.size(), 3);
-  EXPECT_EQ(result.where1Hit(0).hasHit(0), true);
-  EXPECT_EQ(result.where1Miss(0).hasHit(0), false);
-  EXPECT_EQ(result.where1Crit(0).hasCrit(0), true);
+  EXPECT_EQ(result.where1Hit(0).actor(0, ActorProxy::ALL_TEAMMATES).isHit(), true);
+  EXPECT_EQ(result.where1Miss(0).actor(0, ActorProxy::ALL_TEAMMATES).isHit(), false);
+  EXPECT_EQ(result.where1Crit(0).actor(0, ActorProxy::ALL_TEAMMATES).isCrit(), true);
 }
 
 
@@ -107,8 +107,8 @@ TEST_F(BasicEngineTest, BuffStat) {
   // swords dance has --- P.Accuracy and 100 S.Accuracy, so it should always hit
   // and status.
   EXPECT_EQ(result.size(), 1);
-  EXPECT_EQ(result.where1().hasHit(0), true);
-  EXPECT_EQ(result.where1().hasSecondary(0), true);
+  EXPECT_EQ(result.where1().actor(0, ActorProxy::ALL_TEAMMATES).isHit(), true);
+  EXPECT_EQ(result.where1().actor(0, ActorProxy::ALL_TEAMMATES).isSecondary(), true);
   EXPECT_EQ(result.where1().teammate(0, 0).getBoost(FV_ATTACK), 2);
 }
 
@@ -134,15 +134,15 @@ TEST_F(BasicEngineTest, DebuffStat) {
   EXPECT_EQ(result.size(), 2);
 
   auto hitState = result.where1Hit(0);
-  EXPECT_EQ(hitState.hasHit(0), true);
-  EXPECT_EQ(hitState.hasSecondary(0), true);
+  EXPECT_EQ(hitState.actor(0, ActorProxy::ALL_TEAMMATES).isHit(), true);
+  EXPECT_EQ(hitState.actor(0, ActorProxy::ALL_TEAMMATES).isSecondary(), true);
   EXPECT_EQ(hitState.teammate(1, 0).getBoost(FV_DEFENSE), -2);
 
   auto missState = result.where1([](const ConstEnvironmentPossible& state) {
-    return !state.hasSecondary(0);
+    return !state.actor(0, ActorProxy::ALL_TEAMMATES).isSecondary();
   });
-  EXPECT_EQ(missState.hasHit(0), true);
-  EXPECT_EQ(missState.hasSecondary(0), false);
+  EXPECT_EQ(missState.actor(0, ActorProxy::ALL_TEAMMATES).isHit(), true);
+  EXPECT_EQ(missState.actor(0, ActorProxy::ALL_TEAMMATES).isSecondary(), false);
   EXPECT_EQ(missState.teammate(1, 0).getBoost(FV_DEFENSE), 0);
 }
 
