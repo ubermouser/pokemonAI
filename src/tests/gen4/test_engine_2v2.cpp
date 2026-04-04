@@ -20,7 +20,7 @@ class BasicEngine2v2Test : public Gen4EngineTest {
             .setBase(pokedex_->pokemon("charmander"))
             .addMove(pokedex_->move("cut"))  // targeted attack
             .addMove(pokedex_->move("heat wave"))  // adjacent-enemy attack
-            .addMove(pokedex_->move("rock slide"))  // all-adjacent attack
+            .addMove(pokedex_->move("earthquake"))  // all-adjacent attack
             .addMove(pokedex_->move("swords dance"))  // self target
             .setLevel(100))
         .addPokemon(PokemonNonVolatile()
@@ -90,6 +90,90 @@ TEST_F(BasicEngine2v2Test, TargetAdjacentAlly) {
 }
 
 
+TEST_F(BasicEngine2v2Test, AdjacentEnemy) {
+  // clang-format off
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(),
+      {{Actor(TEAM_A, 0), Action::moveAdjacentEnemy(1)},
+       {Actor(TEAM_A, 1), Action::wait()}},
+      {{Actor(TEAM_B, 0), Action::wait()},
+       {Actor(TEAM_B, 1), Action::wait()}}
+  );
+  // clang-format on
+
+  // pkmn does damage to 2 enemies, 5 outcomes each
+  result.printStates();
+  EXPECT_EQ(result.size(), 25);
+
+  auto state = result.where1Hit(0);
+  EXPECT_EQ(state.teammate(TEAM_A, 0).getMissingHP(), 0);
+  EXPECT_EQ(state.teammate(TEAM_A, 1).getMissingHP(), 0);
+  EXPECT_GT(state.teammate(TEAM_B, 0).getMissingHP(), 0);
+  EXPECT_GT(state.teammate(TEAM_B, 1).getMissingHP(), 0);
+}
+
+
+TEST_F(BasicEngine2v2Test, AdjacentAll) {
+  // clang-format off
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(),
+      {{Actor(TEAM_A, 0), Action::wait()},
+       {Actor(TEAM_A, 1), Action::moveAdjacent(2)}},
+      {{Actor(TEAM_B, 0), Action::wait()},
+       {Actor(TEAM_B, 1), Action::wait()}}
+  );
+  // clang-format on
+
+  result.printStates();
+  EXPECT_EQ(result.size(), 8);  // hits 3 pkmn, may hit or crit
+
+  auto state = result.where1Hit(0);
+  EXPECT_GT(state.teammate(TEAM_A, 0).getMissingHP(), 0);
+  EXPECT_EQ(state.teammate(TEAM_A, 1).getMissingHP(), 0);
+  EXPECT_GT(state.teammate(TEAM_B, 0).getMissingHP(), 0);
+  EXPECT_GT(state.teammate(TEAM_B, 1).getMissingHP(), 0);
+}
+
+
+TEST_F(BasicEngine2v2Test, TargetedMoveAgainstSwap) {
+  // clang-format off
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(),
+      {{Actor(TEAM_A, 0), Action::moveEnemy(0, 1)},
+       {Actor(TEAM_A, 1), Action::wait()}},
+      {{Actor(TEAM_B, 0), Action::wait()},
+       {Actor(TEAM_B, 1), Action::swap(2)}}
+  );
+  // clang-format on
+
+  result.printStates();
+
+  auto state = result.where1Hit(0);
+  EXPECT_EQ(state.teammate(TEAM_B, 1).getMissingHP(), 0);
+  EXPECT_GT(state.teammate(TEAM_B, 2).getMissingHP(), 0);
+}
+
+
+TEST_F(BasicEngine2v2Test, AdjacentMoveAgainstSwap) {
+  // clang-format off
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(),
+      {{Actor(TEAM_A, 0), Action::moveAdjacentEnemy(1)},
+       {Actor(TEAM_A, 1), Action::wait()}},
+      {{Actor(TEAM_B, 0), Action::wait()},
+       {Actor(TEAM_B, 1), Action::swap(2)}}
+  );
+  // clang-format on
+
+  result.printStates();
+
+  auto state = result.where1Hit(0);
+  EXPECT_GT(state.teammate(TEAM_B, 0).getMissingHP(), 0);
+  EXPECT_EQ(state.teammate(TEAM_B, 1).getMissingHP(), 0);
+  EXPECT_GT(state.teammate(TEAM_B, 2).getMissingHP(), 0);
+}
+
+
 TEST_F(BasicEngine2v2Test, TwoTargetedMoves) {
   // clang-format off
   PossibleEnvironments result = engine_->updateState(
@@ -109,25 +193,6 @@ TEST_F(BasicEngine2v2Test, TwoTargetedMoves) {
   EXPECT_EQ(state.teammate(TEAM_A, 1).getMissingHP(), 0);
   EXPECT_EQ(state.teammate(TEAM_B, 0).getMissingHP(), 0);
   EXPECT_GT(state.teammate(TEAM_B, 1).getMissingHP(), 0);
-}
-
-
-TEST_F(BasicEngine2v2Test, TargetedMovesAgainstSwap) {
-  // clang-format off
-  PossibleEnvironments result = engine_->updateState(
-      engine_->initialState(),
-      {{Actor(TEAM_A, 0), Action::moveEnemy(0, 1)},
-       {Actor(TEAM_A, 1), Action::moveEnemy(0, 1)}},
-      {{Actor(TEAM_B, 0), Action::wait()},
-       {Actor(TEAM_B, 1), Action::swap(2)}}
-  );
-  // clang-format on
-
-  result.printStates();
-
-  auto state = result.where1Hit(0);
-  EXPECT_EQ(state.teammate(TEAM_B, 1).getMissingHP(), 0);
-  EXPECT_GT(state.teammate(TEAM_B, 2).getMissingHP(), 0);
 }
 
 
@@ -151,44 +216,25 @@ TEST_F(BasicEngine2v2Test, TwoTargetedDefaultMoves) {
 }
 
 
-TEST_F(BasicEngine2v2Test, TwoAdjacentMoves) {
+TEST_F(BasicEngine2v2Test, TwoAdjacentEnemyMoves) {
   // clang-format off
   PossibleEnvironments result = engine_->updateState(
       engine_->initialState(),
-      {{Actor(TEAM_A, 0), Action::moveAdjacent(1)},
-       {Actor(TEAM_A, 1), Action::moveAdjacent(0)}},
+      {{Actor(TEAM_A, 0), Action::moveAdjacentEnemy(1)},
+       {Actor(TEAM_A, 1), Action::moveAdjacentEnemy(1)}},
       {{Actor(TEAM_B, 0), Action::wait()},
        {Actor(TEAM_B, 1), Action::wait()}}
   );
   // clang-format on
 
   result.printStates();
-  EXPECT_EQ(result.size(), 9);  // each pkmn does damage to 2 enemies
+  // each pkmn is hit twice.
+  // First move can [miss, hit, crit, status, status-crit]
+  // Second move can [miss, status, status-crit]
+  EXPECT_EQ(result.size(), 5 * 3 * 5 * 3);
 
   auto state = result.where1Hit(0);
   EXPECT_EQ(state.teammate(TEAM_A, 0).getMissingHP(), 0);
-  EXPECT_EQ(state.teammate(TEAM_A, 1).getMissingHP(), 0);
-  EXPECT_GT(state.teammate(TEAM_B, 0).getMissingHP(), 0);
-  EXPECT_GT(state.teammate(TEAM_B, 1).getMissingHP(), 0);
-}
-
-
-TEST_F(BasicEngine2v2Test, AllFieldMove) {
-  // clang-format off
-  PossibleEnvironments result = engine_->updateState(
-      engine_->initialState(),
-      {{Actor(TEAM_A, 0), Action::wait()},
-       {Actor(TEAM_A, 1), Action::moveAll(2)}},
-      {{Actor(TEAM_B, 0), Action::wait()},
-       {Actor(TEAM_B, 1), Action::wait()}}
-  );
-  // clang-format on
-
-  result.printStates();
-  EXPECT_EQ(result.size(), 5);  // hits 3 pkmn
-
-  auto state = result.where1Hit(0);
-  EXPECT_GT(state.teammate(TEAM_A, 0).getMissingHP(), 0);
   EXPECT_EQ(state.teammate(TEAM_A, 1).getMissingHP(), 0);
   EXPECT_GT(state.teammate(TEAM_B, 0).getMissingHP(), 0);
   EXPECT_GT(state.teammate(TEAM_B, 1).getMissingHP(), 0);
@@ -202,8 +248,8 @@ TEST_F(BasicEngine2v2Test, HighEngineAccuracyTwoMoves) {
   // clang-format off
   PossibleEnvironments result = engine_->updateState(
       engine_->initialState(),
-      {{Actor(TEAM_A, 0), Action::moveAll(2)},
-       {Actor(TEAM_A, 1), Action::moveAll(2)}},
+      {{Actor(TEAM_A, 0), Action::moveAdjacent(2)},
+       {Actor(TEAM_A, 1), Action::moveAdjacent(2)}},
       {{Actor(TEAM_B, 0), Action::wait()},
        {Actor(TEAM_B, 1), Action::wait()}}
   );
@@ -222,10 +268,10 @@ TEST_F(BasicEngine2v2Test, HighEngineAccuracyFourMoves) {
   // clang-format off
   PossibleEnvironments result = engine_->updateState(
       engine_->initialState(),
-      {{Actor(TEAM_A, 0), Action::moveAll(2)},
-       {Actor(TEAM_A, 1), Action::moveAll(2)}},
-      {{Actor(TEAM_B, 0), Action::moveAll(2)},
-       {Actor(TEAM_B, 1), Action::moveAll(2)}}
+      {{Actor(TEAM_A, 0), Action::moveAdjacent(2)},
+       {Actor(TEAM_A, 1), Action::moveAdjacent(2)}},
+      {{Actor(TEAM_B, 0), Action::moveAdjacent(2)},
+       {Actor(TEAM_B, 1), Action::moveAdjacent(2)}}
   );
   // clang-format on
 

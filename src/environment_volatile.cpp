@@ -321,6 +321,7 @@ std::vector<Actor> ENV_VOLATILE_IMPL::getTargets(
         targets.push_back(actor);
       case Action::FRIENDLY_ADJACENT:  // target all adjacent pokemon:
         for (const auto& [other, teammate] : getTeam(iTeam).yieldPokemon()) {
+          if (actor == other) { continue; }
           if (!current.isAdjacent(teammate)) { continue; }
           targets.push_back(other);
         }
