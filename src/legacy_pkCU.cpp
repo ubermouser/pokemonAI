@@ -1515,8 +1515,10 @@ ActionVector LegacyPkCU::getValidActionsInRange(
     size_t iFriendlyMin = targetsFriendly?(Action::FRIENDLY_0):(Action::FRIENDLY_DEFAULT);
     size_t iFriendlyMax = targetsFriendly?(Action::FRIENDLY_0 + cTV.nv().getNumTeammates()):(Action::FRIENDLY_DEFAULT);
     // TODO(@drendleman) - moves that target adjacent pokemon
-    size_t iHostileMin = Action::HOSTILE_DEFAULT;
-    size_t iHostileMax = Action::HOSTILE_DEFAULT;
+    size_t iHostileMin =
+        isSwitchAction ? Action::HOSTILE_NONE : Action::HOSTILE_DEFAULT;
+    size_t iHostileMax =
+        isSwitchAction ? Action::HOSTILE_NONE : Action::HOSTILE_DEFAULT;
 
     // foreach friendly:
     for (size_t iFriendly = iFriendlyMin; iFriendly <= iFriendlyMax; ++iFriendly) {
