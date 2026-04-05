@@ -93,12 +93,14 @@ int move_stealthRock_switch(PkCUEngine& cu, PokemonVolatile cPKV) {
 };
 
 void register_move_hazards(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "spikes", PLUGIN_ON_SWITCHIN, move_spikes_switch, 2, all_teams));
-  extensions.push_back(plugin(move, "spikes", PLUGIN_ON_EVALUATEMOVE, move_spikes_set, 0, current_team));
-  extensions.push_back(plugin(move, "toxic spikes", PLUGIN_ON_SWITCHIN, move_toxicSpikes_switch, 2, all_teams));
-  extensions.push_back(plugin(move, "toxic spikes", PLUGIN_ON_EVALUATEMOVE, move_toxicSpikes_set, 0, current_team));
-  extensions.push_back(plugin(move, "stealth rock", PLUGIN_ON_SWITCHIN, move_stealthRock_switch, 0, all_teams));
-  extensions.push_back(plugin(move, "stealth rock", PLUGIN_ON_EVALUATEMOVE, move_stealthRock_set, 0, current_team));
+  // clang-format off
+  extensions.push_back(pluginOnSwitchIn(engine, "spikes switch", move_spikes_switch, 2, all_teams));
+  extensions.push_back(pluginOnEvaluateMove(move, "spikes", move_spikes_set, 0, current_team));
+  extensions.push_back(pluginOnSwitchIn(engine, "toxic spikes switch", move_toxicSpikes_switch, 2, all_teams));
+  extensions.push_back(pluginOnEvaluateMove(move, "toxic spikes", move_toxicSpikes_set, 0, current_team));
+  extensions.push_back(pluginOnSwitchIn(engine, "stealth rock switch", move_stealthRock_switch, 0, all_teams));
+  extensions.push_back(pluginOnEvaluateMove(move, "stealth rock", move_stealthRock_set, 0, current_team));
+  // clang-format on
 }
 
 } // namespace gen4

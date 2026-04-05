@@ -4,16 +4,18 @@
 
 class RoarTest : public Gen4EngineTest {
  protected:
-  void SetUp() override {
-    Gen4EngineTest::SetUp();
+  void SetUp() override { Gen4EngineTest::SetUp(); }
 
-    // Standard Roar Setup (2 pokemon on Team B)
-    // clang-format off
-    auto team_a = TeamNonVolatile()
-        .addPokemon(PokemonNonVolatile()
+  TeamNonVolatile teamA() {
+    auto team_a = TeamNonVolatile().addPokemon(
+        PokemonNonVolatile()
             .setBase(pokedex_->pokemon("aerodactyl"))
             .addMove(pokedex_->move("roar"))
             .setLevel(100));
+    return team_a;
+  }
+
+  TeamNonVolatile teamB2() {
     auto team_b_2 = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->pokemon("charmander"))
@@ -22,29 +24,28 @@ class RoarTest : public Gen4EngineTest {
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->pokemon("squirtle"))
           .setLevel(100));
-    // clang-format on
+    return team_b_2;
+  }
 
-    engine_->setEnvironment(EnvironmentNonvolatile(team_a, team_b_2, true));
-    roar_standard = engine_->updateState(
+  PossibleEnvironments setupStandard() {
+    // Standard Roar Setup (2 pokemon on Team B)
+    engine_->setEnvironment(EnvironmentNonvolatile(teamA(), teamB2(), true));
+
+    return engine_->updateState(
         engine_->initialState(), Action::move(0), Action::move(0));
+  }
+
+  PossibleEnvironments setupTurn2() {
+    engine_->setEnvironment(EnvironmentNonvolatile(teamA(), teamB2(), true));
 
     // Wait then Roar setup
     auto turn1_wait = engine_->updateState(
         engine_->initialState(), Action::wait(), Action::wait());
-    roar_turn2 = engine_->updateState(
+    return engine_->updateState(
         turn1_wait.where1().getEnv(), Action::move(0), Action::wait());
+  }
 
-    // Single Pokemon Setup (Should fail to switch)
-    // clang-format off
-    auto team_b_1 = TeamNonVolatile()
-        .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->pokemon("charmander"))
-          .setLevel(100));
-    // clang-format on
-    engine_->setEnvironment(EnvironmentNonvolatile(team_a, team_b_1, true));
-    roar_fail = engine_->updateState(
-        engine_->initialState(), Action::move(0), Action::wait());
-
+  PossibleEnvironments setupBranch() {
     // Multiple Options Setup (Branches)
     // clang-format off
     auto team_b_3 = TeamNonVolatile()
@@ -58,10 +59,25 @@ class RoarTest : public Gen4EngineTest {
           .setBase(pokedex_->pokemon("bulbasaur"))
           .setLevel(100));
     // clang-format on
-    engine_->setEnvironment(EnvironmentNonvolatile(team_a, team_b_3, true));
-    roar_branch = engine_->updateState(
+    engine_->setEnvironment(EnvironmentNonvolatile(teamA(), team_b_3, true));
+    return engine_->updateState(
         engine_->initialState(), Action::move(0), Action::wait());
+  }
 
+  PossibleEnvironments setupFail() {
+    // Single Pokemon Setup (Should fail to switch)
+    // clang-format off
+    auto team_b_1 = TeamNonVolatile()
+        .addPokemon(PokemonNonVolatile()
+          .setBase(pokedex_->pokemon("charmander"))
+          .setLevel(100));
+    // clang-format on
+    engine_->setEnvironment(EnvironmentNonvolatile(teamA(), team_b_1, true));
+    return engine_->updateState(
+        engine_->initialState(), Action::move(0), Action::wait());
+  }
+
+  PossibleEnvironments setupWhirlwind() {
     // Whirlwind Setup
     // clang-format off
     auto team_a_whirlwind = TeamNonVolatile()
@@ -71,10 +87,12 @@ class RoarTest : public Gen4EngineTest {
           .setLevel(100));
     // clang-format on
     engine_->setEnvironment(
-        EnvironmentNonvolatile(team_a_whirlwind, team_b_2, true));
-    whirlwind = engine_->updateState(
+        EnvironmentNonvolatile(team_a_whirlwind, teamB2(), true));
+    return engine_->updateState(
         engine_->initialState(), Action::move(0), Action::wait());
+  }
 
+  PossibleEnvironments setupHazards() {
     // Hazards Setup
     // clang-format off
     auto team_a_hazards = TeamNonVolatile()
@@ -85,22 +103,17 @@ class RoarTest : public Gen4EngineTest {
           .setLevel(100));
     // clang-format on
     engine_->setEnvironment(
-        EnvironmentNonvolatile(team_a_hazards, team_b_2, true));
+        EnvironmentNonvolatile(team_a_hazards, teamB2(), true));
     auto setup_sr = engine_->updateState(
         engine_->initialState(), Action::move(1), Action::wait());
-    roar_hazards = engine_->updateState(
+    return engine_->updateState(
         setup_sr.where1Hit(0).getEnv(), Action::move(0), Action::wait());
   }
-
-  PossibleEnvironments roar_standard;
-  PossibleEnvironments roar_fail;
-  PossibleEnvironments roar_branch;
-  PossibleEnvironments whirlwind;
-  PossibleEnvironments roar_turn2;
-  PossibleEnvironments roar_hazards;
 };
 
+
 TEST_F(RoarTest, ForcesSwitch) {
+  auto roar_standard = setupStandard();
   auto state = roar_standard.where1Hit(0);
   // Verify charmander (idx 0) is swapped out for squirtle (idx 1)
   EXPECT_EQ(state.getTeam(1).getICPKV(), 1);
@@ -116,13 +129,17 @@ TEST_F(RoarTest, ForcesSwitch) {
   EXPECT_TRUE(state.flagsFor(TEAM_B).isHit());
 }
 
+
 TEST_F(RoarTest, FailsIfNoSwitch) {
+  auto roar_fail = setupFail();
   auto state = roar_fail.where1Hit(0);
   // Verify charmander is still there
   EXPECT_EQ(state.getTeam(1).getICPKV(), 0);
 }
 
+
 TEST_F(RoarTest, BranchesIfMultipleOptions) {
+  auto roar_branch = setupBranch();
   size_t hitCount = 0;
   std::set<size_t> switchedIndices;
 
@@ -143,17 +160,23 @@ TEST_F(RoarTest, BranchesIfMultipleOptions) {
   EXPECT_TRUE(switchedIndices.count(2));
 }
 
+
 TEST_F(RoarTest, WhirlwindWorks) {
+  auto whirlwind = setupWhirlwind();
   auto state = whirlwind.where1Hit(0);
   EXPECT_EQ(state.getTeam(1).getICPKV(), 1);
 }
 
+
 TEST_F(RoarTest, Turn2Roar) {
+  auto roar_turn2 = setupTurn2();
   auto state = roar_turn2.where1Hit(0);
   EXPECT_EQ(state.getTeam(1).getICPKV(), 1);
 }
 
+
 TEST_F(RoarTest, TriggersHazards) {
+  auto roar_hazards = setupHazards();
   auto state = roar_hazards.where1Hit(0);
   // Verify damage taken. Squirtle (Water) takes neutral damage from Rock
   // (12.5%). 1 - 0.125 = 0.875

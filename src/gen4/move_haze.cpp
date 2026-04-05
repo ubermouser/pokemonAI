@@ -40,7 +40,7 @@ int move_haze(
 };
 
 void register_move_haze(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "haze", PLUGIN_ON_EVALUATEMOVE, move_haze, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "haze", move_haze, 0, current_team));
 }
 
 } // namespace gen4

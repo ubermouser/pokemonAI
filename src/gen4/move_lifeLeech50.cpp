@@ -23,11 +23,11 @@ int move_lifeLeech50(
 };
 
 void register_move_lifeLeech50(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "absorb", PLUGIN_ON_ENDOFMOVE, move_lifeLeech50, 0, current_team));
-  extensions.push_back(plugin(move, "drain punch", PLUGIN_ON_ENDOFMOVE, move_lifeLeech50, 0, current_team));
-  extensions.push_back(plugin(move, "giga drain", PLUGIN_ON_ENDOFMOVE, move_lifeLeech50, 0, current_team));
-  extensions.push_back(plugin(move, "leech life", PLUGIN_ON_ENDOFMOVE, move_lifeLeech50, 0, current_team));
-  extensions.push_back(plugin(move, "mega drain", PLUGIN_ON_ENDOFMOVE, move_lifeLeech50, 0, current_team));
+  extensions.push_back(pluginOnEndOfMove(move, "absorb", move_lifeLeech50, 0, current_team));
+  extensions.push_back(pluginOnEndOfMove(move, "drain punch", move_lifeLeech50, 0, current_team));
+  extensions.push_back(pluginOnEndOfMove(move, "giga drain", move_lifeLeech50, 0, current_team));
+  extensions.push_back(pluginOnEndOfMove(move, "leech life", move_lifeLeech50, 0, current_team));
+  extensions.push_back(pluginOnEndOfMove(move, "mega drain", move_lifeLeech50, 0, current_team));
 }
 
 } // namespace gen4

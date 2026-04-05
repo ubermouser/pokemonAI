@@ -75,30 +75,26 @@ int move_ohko_effect(
 
 void register_move_ohko(
     const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(
-      move, "fissure", PLUGIN_ON_MODIFYHITPROBABILITY, move_ohko_accuracy, -5,
+  extensions.push_back(pluginOnModifyHitProbability(move, "fissure", move_ohko_accuracy, -5,
       current_team));
-  extensions.push_back(plugin(
-      move, "guillotine", PLUGIN_ON_MODIFYHITPROBABILITY, move_ohko_accuracy, -5,
+  extensions.push_back(pluginOnModifyHitProbability(move, "guillotine", move_ohko_accuracy, -5,
       current_team));
-  extensions.push_back(plugin(
-      move, "horn drill", PLUGIN_ON_MODIFYHITPROBABILITY, move_ohko_accuracy, -5,
+  extensions.push_back(pluginOnModifyHitProbability(move, "horn drill", move_ohko_accuracy, -5,
       current_team));
-  extensions.push_back(plugin(
-      move, "sheer cold", PLUGIN_ON_MODIFYHITPROBABILITY, move_ohko_accuracy, -5,
+  extensions.push_back(pluginOnModifyHitProbability(move, "sheer cold", move_ohko_accuracy, -5,
       current_team));
 
   extensions.push_back(
-      plugin(move, "fissure", PLUGIN_ON_EVALUATEMOVE, move_ohko_effect, 0,
+      pluginOnEvaluateMove(move, "fissure", move_ohko_effect, 0,
              current_team));
   extensions.push_back(
-      plugin(move, "guillotine", PLUGIN_ON_EVALUATEMOVE, move_ohko_effect, 0,
+      pluginOnEvaluateMove(move, "guillotine", move_ohko_effect, 0,
              current_team));
   extensions.push_back(
-      plugin(move, "horn drill", PLUGIN_ON_EVALUATEMOVE, move_ohko_effect, 0,
+      pluginOnEvaluateMove(move, "horn drill", move_ohko_effect, 0,
              current_team));
   extensions.push_back(
-      plugin(move, "sheer cold", PLUGIN_ON_EVALUATEMOVE, move_ohko_effect, 0,
+      pluginOnEvaluateMove(move, "sheer cold", move_ohko_effect, 0,
              current_team));
 }
 

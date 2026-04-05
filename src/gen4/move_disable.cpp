@@ -83,9 +83,9 @@ int move_disable_update(PkCUEngine& cu, PokemonVolatile cPKV) {
 }
 
 void register_move_disable(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "disable", PLUGIN_ON_EVALUATEMOVE, move_disable_set, 0, current_team));
-  extensions.push_back(plugin(move, "disable", PLUGIN_ON_TESTMOVE, move_disable_test, 0, other_team));
-  extensions.push_back(plugin(move, "disable", PLUGIN_ON_ENDOFTURN, move_disable_update, 0, other_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "disable", move_disable_set, 0, current_team));
+  extensions.push_back(pluginOnTestMove(engine, "disable_test", move_disable_test, 0, all_teams));
+  extensions.push_back(pluginOnEndOfTurn(engine, "disable_update", move_disable_update, 0, all_teams));
 }
 
 } // namespace gen4

@@ -24,16 +24,16 @@ int move_alwaysHits(
 }
 
 void register_move_alwaysHits(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "aerial ace", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
-  extensions.push_back(plugin(move, "aura sphere", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
-  extensions.push_back(plugin(move, "faint attack", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
-  extensions.push_back(plugin(move, "magical leaf", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
-  extensions.push_back(plugin(move, "magnet bomb", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
-  extensions.push_back(plugin(move, "shadow punch", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
-  extensions.push_back(plugin(move, "shock wave", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
-  extensions.push_back(plugin(move, "swift", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, current_team));
+  extensions.push_back(pluginOnModifyHitProbability(move, "aerial ace", move_alwaysHits, -1, current_team));
+  extensions.push_back(pluginOnModifyHitProbability(move, "aura sphere", move_alwaysHits, -1, current_team));
+  extensions.push_back(pluginOnModifyHitProbability(move, "faint attack", move_alwaysHits, -1, current_team));
+  extensions.push_back(pluginOnModifyHitProbability(move, "magical leaf", move_alwaysHits, -1, current_team));
+  extensions.push_back(pluginOnModifyHitProbability(move, "magnet bomb", move_alwaysHits, -1, current_team));
+  extensions.push_back(pluginOnModifyHitProbability(move, "shadow punch", move_alwaysHits, -1, current_team));
+  extensions.push_back(pluginOnModifyHitProbability(move, "shock wave", move_alwaysHits, -1, current_team));
+  extensions.push_back(pluginOnModifyHitProbability(move, "swift", move_alwaysHits, -1, current_team));
 
-  extensions.push_back(plugin(engine, "struggle always hits effect", PLUGIN_ON_MODIFYHITPROBABILITY, move_alwaysHits, -1, all_teams));
+  extensions.push_back(pluginOnModifyHitProbability(engine, "struggle always hits effect", move_alwaysHits, -1, all_teams));
 }
 
 } // namespace gen4

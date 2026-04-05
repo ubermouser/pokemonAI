@@ -25,7 +25,7 @@ int item_focusSash(
 }
 
 void register_item_focus_sash(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(item, "focus sash", PLUGIN_ON_CALCULATEDAMAGE, item_focusSash, 0, all_teams));
+  extensions.push_back(pluginOnCalculateDamage(item, "focus sash", item_focusSash, 0, all_teams));
 }
 
 } // namespace gen4

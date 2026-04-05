@@ -19,7 +19,7 @@ int move_rapidSpin(
   return 1;
 };
 void register_move_rapid_spin(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "rapid spin", PLUGIN_ON_ENDOFMOVE, move_rapidSpin, 0, current_team));
+  extensions.push_back(pluginOnEndOfMove(move, "rapid spin", move_rapidSpin, 0, current_team));
 }
 
 } // namespace gen4

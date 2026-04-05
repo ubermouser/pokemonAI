@@ -12,7 +12,7 @@ int item_leftovers(PkCUEngine& cu, PokemonVolatile cPKV) {
 };
 
 void register_item_leftovers(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(item, "leftovers", PLUGIN_ON_ENDOFROUND, item_leftovers, 0, all_teams));
+  extensions.push_back(pluginOnEndOfRound(item, "leftovers", item_leftovers, 0, all_teams));
 }
 
 } // namespace gen4

@@ -26,7 +26,7 @@ int item_typeResistingBerry(
 };
 
 void register_item_type_resisting_berry(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(engine, "type resisting berry effect", PLUGIN_ON_MODIFYITEMPOWER, item_typeResistingBerry, 0, all_teams));
+  extensions.push_back(pluginOnModifyItemPower(engine, "type resisting berry effect", item_typeResistingBerry, 0, all_teams));
 }
 
 } // namespace gen4

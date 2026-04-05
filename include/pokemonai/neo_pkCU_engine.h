@@ -194,6 +194,53 @@ class NeoPkCUEngine {
   StageType getStackStage() const { return getStackFrame().stage; }
   const PluginSet& getCPluginSet();
   void setCPluginSet(){};
+
+  bool isPluginSourceActive(const plugin& p);
+
+  /**
+   * @def callPlugins
+   * @brief A method for invoking plugins of a specific type.
+   *
+   * This method iterates through all registered plugins of a given `pluginType`
+   * for the current matchup and calls their `pluginFunction`. The return value
+   * of each plugin is OR'd with `retValue`. The loop breaks if `retValue`
+   * becomes greater than 1, which is a convention to indicate that a plugin has
+   * handled the event and no further plugins should be called.
+   *
+   * @param retValue The variable to store the combined return values of the
+   * plugins.
+   * @param pType The type of plugin to call (e.g., `PLUGIN_ON_MODIFYSPEED`).
+   * @param FuncType The function signature of the plugin to be called.
+   * @param args The arguments to pass to the plugin function.
+   */
+  template <typename FuncType, typename... Args>
+  int callPlugins(pluginType pType, Args&&... args) {
+    int retValue = 0;
+    const std::vector<plugin>& cPlugins = getCPluginSet()[(size_t)pType];
+
+    for (const auto& plugin : cPlugins) {
+      if (plugin.getSource() && !isPluginSourceActive(plugin)) { continue; }
+
+      SPDLOG_TRACE(
+          "iSTACK={:4d} PLUGIN={}:{} PR={} TGT={} Name={}",
+          iBase_,
+          pluginCategoryToString(plugin.getCategory()),
+          pluginTypeToString(pType),
+          plugin.getPriority(),
+          pluginTargetToString(plugin.getTarget()),
+          plugin.getName());
+
+      FuncType cPluginFunc = reinterpret_cast<FuncType>(plugin.getFunction());
+      retValue |= cPluginFunc(std::forward<Args>(args)...);
+
+      if (retValue > 1) {
+        break;
+      }
+    }
+
+    return retValue;
+  }
+
   void reportStackSizeChange() const;
   size_t advanceStackStage(size_t iStack);
   size_t advanceAllStages();
@@ -208,6 +255,8 @@ class NeoPkCUEngine {
   PokemonVolatile getTPKV();
   PokemonVolatile getPKV(size_t iState);
   PokemonVolatile getTPKV(size_t iState);
+  MoveVolatile getTMV();
+  MoveVolatile getTMV(size_t iState);
   MoveVolatile getMV();
   MoveVolatile getMV(size_t iState);
 

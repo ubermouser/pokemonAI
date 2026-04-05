@@ -114,9 +114,9 @@ int move_hiddenPower_setType(
 };
 
 void register_move_hidden_power(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "hidden power", PLUGIN_ON_INIT, move_hiddenPower_calculate, 0, current_team));
-  extensions.push_back(plugin(move, "hidden power", PLUGIN_ON_SETBASEPOWER, move_hiddenPower_setPower, 0, current_team));
-  extensions.push_back(plugin(move, "hidden power", PLUGIN_ON_SETMOVETYPE, move_hiddenPower_setType, 0, current_team));
+  extensions.push_back(pluginOnInit(move, "hidden power", move_hiddenPower_calculate, 0, current_team));
+  extensions.push_back(pluginOnSetBasePower(move, "hidden power", move_hiddenPower_setPower, 0, current_team));
+  extensions.push_back(pluginOnSetMoveType(move, "hidden power", move_hiddenPower_setType, 0, current_team));
 }
 
 } // namespace gen4

@@ -23,12 +23,12 @@ int move_uTurn_swapOnTurnEnd(
   // TODO(@drendleman): add support in PkCU for changing the stackstage via a
   // plugin call
   int result = 0;
-  const std::vector<plugin_t>& cPlugins =
+  const std::vector<plugin>& cPlugins =
       cu.getCPluginSet()[(size_t)PLUGIN_ON_SWITCHIN];
   for (auto iPlugin = cPlugins.cbegin(), iPSize = cPlugins.cend();
        iPlugin != iPSize;
        ++iPlugin) {
-    onSwitch_rawType cPlugin = (onSwitch_rawType)iPlugin->pFunction;
+    onSwitch_rawType cPlugin = (onSwitch_rawType)iPlugin->getFunction();
     result = result | cPlugin(cu, cu.getPKV());
     if (result > 1) { break; }
   }
@@ -55,8 +55,8 @@ int move_uTurn_testMoveSwap(
 }
 
 void register_move_u_turn(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "u-turn", PLUGIN_ON_ENDOFMOVE, move_uTurn_swapOnTurnEnd, 1, current_team));
-  extensions.push_back(plugin(move, "u-turn", PLUGIN_ON_TESTMOVE, move_uTurn_testMoveSwap, 1, current_team));
+  extensions.push_back(pluginOnEndOfMove(move, "u-turn", move_uTurn_swapOnTurnEnd, 1, current_team));
+  extensions.push_back(pluginOnTestMove(move, "u-turn", move_uTurn_testMoveSwap, 1, current_team));
 }
 
 } // namespace gen4

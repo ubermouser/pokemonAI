@@ -34,15 +34,15 @@ int move_grudge_trigger(
 
   // The attacker fainted the target.
   // Reset the PP of the move used by the attacker.
-  cPKV.getMV(cu.getCAction().iMove()).setPP(0);
+  cu.getMV().setPP(0);
   return 1;
 }
 
 void register_move_grudge(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   // clang-format off
-  extensions.push_back(plugin(move, "grudge", PLUGIN_ON_EVALUATEMOVE, move_grudge, 0, current_team));
-  extensions.push_back(plugin(move, "grudge", PLUGIN_ON_BEGINNINGOFTURN, move_grudge_clear, 0, current_team));
-  extensions.push_back(plugin(move, "grudge", PLUGIN_ON_CALCULATEDAMAGE, move_grudge_trigger, 0, other_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "grudge", move_grudge, 0, current_team));
+  extensions.push_back(pluginOnBeginningOfTurn(engine, "grudge_clear", move_grudge_clear, 0, all_teams));
+  extensions.push_back(pluginOnCalculateDamage(engine, "grudge_trigger", move_grudge_trigger, 0, all_teams));
   // clang-format on
 }
 

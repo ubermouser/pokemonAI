@@ -26,19 +26,19 @@ int move_highCrit(
 }
 
 void register_move_highCrit(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "air cutter", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
-  extensions.push_back(plugin(move, "attack order", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
-  extensions.push_back(plugin(move, "blaze kick", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
-  extensions.push_back(plugin(move, "crabhammer", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
-  extensions.push_back(plugin(move, "cross chop", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
-  extensions.push_back(plugin(move, "cross poison", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
-  extensions.push_back(plugin(move, "leaf blade", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
-  extensions.push_back(plugin(move, "night slash", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
-  extensions.push_back(plugin(move, "psycho cut", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
-  extensions.push_back(plugin(move, "razor leaf", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
-  extensions.push_back(plugin(move, "shadow claw", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
-  extensions.push_back(plugin(move, "slash", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
-  extensions.push_back(plugin(move, "stone edge", PLUGIN_ON_MODIFYCRITPROBABILITY, move_highCrit, -1, current_team));
+  extensions.push_back(pluginOnModifyCritProbability(move, "air cutter", move_highCrit, -1, current_team));
+  extensions.push_back(pluginOnModifyCritProbability(move, "attack order", move_highCrit, -1, current_team));
+  extensions.push_back(pluginOnModifyCritProbability(move, "blaze kick", move_highCrit, -1, current_team));
+  extensions.push_back(pluginOnModifyCritProbability(move, "crabhammer", move_highCrit, -1, current_team));
+  extensions.push_back(pluginOnModifyCritProbability(move, "cross chop", move_highCrit, -1, current_team));
+  extensions.push_back(pluginOnModifyCritProbability(move, "cross poison", move_highCrit, -1, current_team));
+  extensions.push_back(pluginOnModifyCritProbability(move, "leaf blade", move_highCrit, -1, current_team));
+  extensions.push_back(pluginOnModifyCritProbability(move, "night slash", move_highCrit, -1, current_team));
+  extensions.push_back(pluginOnModifyCritProbability(move, "psycho cut", move_highCrit, -1, current_team));
+  extensions.push_back(pluginOnModifyCritProbability(move, "razor leaf", move_highCrit, -1, current_team));
+  extensions.push_back(pluginOnModifyCritProbability(move, "shadow claw", move_highCrit, -1, current_team));
+  extensions.push_back(pluginOnModifyCritProbability(move, "slash", move_highCrit, -1, current_team));
+  extensions.push_back(pluginOnModifyCritProbability(move, "stone edge", move_highCrit, -1, current_team));
 }
 
 } // namespace gen4

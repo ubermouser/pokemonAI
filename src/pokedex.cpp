@@ -18,16 +18,6 @@
 #include "pokemonai/gen4_scripts.h"
 #endif
 
-const char* pluginCategoryToString(pluginCategory category) {
-  switch(category) {
-    case move: return "move";
-    case item: return "item";
-    case ability: return "ability";
-    case engine: return "engine";
-    default: return "unknown";
-  }
-}
-
 using namespace INI;
 using namespace orphan;
 namespace po = boost::program_options;
@@ -255,6 +245,8 @@ bool PokedexStatic::registerPlugin(
     // register plugin to its move/ability/item/engine:
     if (element != NULL)
     {
+      const Pluggable* pluggable = dynamic_cast<const Pluggable*>(element);
+      if (pluggable) { cCPlugin.setSource(pluggable); }
       overwritten = element->registerPlugin(cCPlugin);
     }
 
@@ -262,8 +254,9 @@ bool PokedexStatic::registerPlugin(
     if (overwritten)
     {
       SPDLOG_WARN(
-          "plugin for [{}][{}] -- overwriting previously defined plugin!",
+          "plugin for {}:{} Name={} -- overwriting previously defined plugin!",
           pluginCategoryToString(cCPlugin.getCategory()),
+          pluginTypeToString(cCPlugin.getType()),
           cCPlugin.getName());
       numOverwritten++;
     }

@@ -34,7 +34,7 @@ int move_knockOff(
 };
 
 void register_move_knock_off(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "knock off", PLUGIN_ON_ENDOFMOVE, move_knockOff, 0, current_team));
+  extensions.push_back(pluginOnEndOfMove(move, "knock off", move_knockOff, 0, current_team));
 }
 
 } // namespace gen4

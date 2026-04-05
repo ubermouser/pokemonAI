@@ -8,7 +8,7 @@ bool is_rampage_move(const Move* move) {
 
 int move_rampage_lockMove(PkCUEngine& cu, PokemonVolatile cPKV) {
   // action is guaranteed to be a move action:
-  MoveVolatile mV = cPKV.getMV(cu.getCAction());
+  MoveVolatile mV = cu.getMV();
   auto& status = cPKV.status();
   // if not a rampage move, ignore:
   if (!is_rampage_move(&mV.getBase())) { return 0; }
@@ -26,6 +26,8 @@ int move_rampage_endLockOn(PkCUEngine& cu, PokemonVolatile cPKV) {
   // are we locked in to a rampage move?
   auto& status = cPKV.status();
   if (status.cTeammate.lockIn_duration == 0) { return 0; }
+  assert(status.cTeammate.lockIn_action > 0);
+
   MoveVolatile mV = cPKV.getMV(status.cTeammate.lockIn_action - 1);
   if (!is_rampage_move(&mV.getBase())) { return 0; }
   // if the enemy team has a free move, do not decrement lock-on counter
@@ -59,8 +61,11 @@ int move_rampage_testLockedIn(
     ConstMoveVolatile mV,
     const Action& action,
     ValidMoveSet& moveAllowed) {
-  if (cPKV.status().cTeammate.lockIn_duration == 0) { return 0; }
-  ConstMoveVolatile lockmV = cPKV.getMV(cPKV.status().cTeammate.lockIn_action - 1);
+  auto& status = cPKV.status();
+  if (status.cTeammate.lockIn_duration == 0) { return 0; }
+  assert(status.cTeammate.lockIn_action > 0);
+
+  ConstMoveVolatile lockmV = cPKV.getMV(status.cTeammate.lockIn_action - 1);
   if (!is_rampage_move(&lockmV.getBase())) { return 0; }
 
   // if locked in, only the locked-in move may be used. Other move actions are
@@ -79,8 +84,11 @@ int move_rampage_testLockedSwitch(
     ConstPokemonVolatile cOPKV,
     const Action& action,
     ValidSwapSet& switchAllowed) {
-  if (cPKV.status().cTeammate.lockIn_duration == 0) { return 0; }
-  ConstMoveVolatile lockmV = cPKV.getMV(cPKV.status().cTeammate.lockIn_action - 1);
+  auto& status = cPKV.status();
+  if (status.cTeammate.lockIn_duration == 0) { return 0; }
+  assert(status.cTeammate.lockIn_action > 0);
+
+  ConstMoveVolatile lockmV = cPKV.getMV(status.cTeammate.lockIn_action - 1);
   if (!is_rampage_move(&lockmV.getBase())) { return 0; }
 
   // if locked in, only the locked-in move may be used. Switch actions are not

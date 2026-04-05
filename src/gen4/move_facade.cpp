@@ -24,7 +24,7 @@ int move_facade_modPower(
 
 void register_move_facade(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   // clang-format off
-  extensions.push_back(plugin(move, "facade", PLUGIN_ON_MODIFYBASEPOWER, move_facade_modPower, 0, current_team));
+  extensions.push_back(pluginOnModifyBasePower(move, "facade", move_facade_modPower, 0, current_team));
   // clang-format on
 }
 

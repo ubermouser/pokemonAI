@@ -16,7 +16,7 @@ int item_shedShell_allowSwitch(
 }
 
 void register_item_shed_shell(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(item, "shed shell", PLUGIN_ON_TESTSWITCH, item_shedShell_allowSwitch, -100, current_team));
+  extensions.push_back(pluginOnTestSwitch(item, "shed shell", item_shedShell_allowSwitch, -100, current_team));
 }
 
 } // namespace gen4

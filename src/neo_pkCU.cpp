@@ -188,8 +188,8 @@ void NeoPkCU::initialize() {
     for (const auto& [iMove, mNV] : pokemon.yieldMoves()) {
       const auto& move = mNV.getBase();
       for (size_t iPlugin = 0; iPlugin < PLUGIN_MAXSIZE; ++iPlugin) {
-        plugin_t p = move.getPlugin(iPlugin);
-        if (p.pFunction) { pluginSet_[iPlugin].push_back(p); }
+        plugin p = move.getPlugin(iPlugin);
+        if (p.getFunction()) { pluginSet_[iPlugin].push_back(p); }
       }
     }
 
@@ -197,8 +197,8 @@ void NeoPkCU::initialize() {
     if (pokemon.abilityExists()) {
       const auto& ability = pokemon.getAbility();
       for (size_t iPlugin = 0; iPlugin < PLUGIN_MAXSIZE; ++iPlugin) {
-        plugin_t p = ability.getPlugin(iPlugin);
-        if (p.pFunction) { pluginSet_[iPlugin].push_back(p); }
+        plugin p = ability.getPlugin(iPlugin);
+        if (p.getFunction()) { pluginSet_[iPlugin].push_back(p); }
       }
     }
 
@@ -206,8 +206,8 @@ void NeoPkCU::initialize() {
     if (pokemon.hasInitialItem()) {
       const auto& item = pokemon.getInitialItem();
       for (size_t iPlugin = 0; iPlugin < PLUGIN_MAXSIZE; ++iPlugin) {
-        plugin_t p = item.getPlugin(iPlugin);
-        if (p.pFunction) { pluginSet_[iPlugin].push_back(p); }
+        plugin p = item.getPlugin(iPlugin);
+        if (p.getFunction()) { pluginSet_[iPlugin].push_back(p); }
       }
     }
   }
@@ -432,7 +432,8 @@ IsValidResult NeoPkCU::isValidAction_move(
           getValidMoveFlags(envV, actor, action, cPKV, cMV, targets);
 
       for (const auto& cPlugin : pluginSet_[PLUGIN_ON_TESTMOVE]) {
-        onTestMove_rawType pFunction = (onTestMove_rawType)cPlugin.pFunction;
+        onTestMove_rawType pFunction =
+            (onTestMove_rawType)cPlugin.getFunction();
         if (pFunction(cTV, cPKV, cMV, action, doAllowMove) > 1) { break; }
       }
 
@@ -515,7 +516,8 @@ IsValidResult NeoPkCU::isValidAction_switch(
 
   // Are we locked out of switching?
   for (const auto& cPlugin : pluginSet_[PLUGIN_ON_TESTSWITCH]) {
-    onTestSwitch_rawType pFunction = (onTestSwitch_rawType)cPlugin.pFunction;
+    onTestSwitch_rawType pFunction =
+        (onTestSwitch_rawType)cPlugin.getFunction();
     if (pFunction(cPKV, fPKV, action, doAllowSwitch) > 1) { break; }
   }
 

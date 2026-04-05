@@ -34,8 +34,8 @@ int move_belly_drum_secondary_probability(
 }
 
 void register_move_belly_drum(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "belly drum", PLUGIN_ON_EVALUATEMOVE, move_belly_drum, 0, current_team));
-  extensions.push_back(plugin(move, "belly drum", PLUGIN_ON_MODIFYSECONDARYPROBABILITY, move_belly_drum_secondary_probability, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "belly drum", move_belly_drum, 0, current_team));
+  extensions.push_back(pluginOnModifySecondaryProbability(move, "belly drum", move_belly_drum_secondary_probability, 0, current_team));
 }
 
 } // namespace gen4

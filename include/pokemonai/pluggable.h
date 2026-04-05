@@ -3,6 +3,7 @@
 
 #include "pkai.h"
 
+#include <string>
 #include <vector>
 #include <array>
 #include <boost/function.hpp>
@@ -50,24 +51,102 @@ enum pluginType {
   PLUGIN_ON_UNINIT = 28
 };
 
+enum pluginCategory {
+  move,
+  item,
+  ability,
+  engine
+};
 
-struct plugin_t
+PKAISHARED const char* pluginTargetToString(pluginTarget target);
+PKAISHARED const char* pluginTypeToString(pluginType type);
+PKAISHARED const char* pluginCategoryToString(pluginCategory category);
+
+class PKAISHARED plugin
 {
-  /* raw pointer to actual function */
-  voidFunction_rawType pFunction;
-
-  /* a lower priority function is executed first, and has the ability to stop higher priority functions fro executing */
+private:
+  pluginCategory pCategory;
+  std::string pName;
+  pluginType pType;
+  void* pFunction;
   int32_t priority;
-
-  /* may be one of current_team, other_team, or all_teams to register to all teammates in contact with this plugin */
   pluginTarget target;
+  const class Pluggable* source;
 
-  bool operator== (const plugin_t& other) const
+public:
+  plugin()
+    : pCategory(engine),
+    pName(""),
+    pType(PLUGIN_ON_INIT),
+    pFunction(nullptr),
+    priority(0),
+    target(current_team),
+    source(nullptr)
   {
-    return pFunction == other.pFunction;
   };
 
-  bool operator< (const plugin_t& other) const
+  plugin(const plugin& other)
+    : pCategory(other.pCategory),
+    pName(other.pName),
+    pType(other.pType),
+    pFunction(other.pFunction),
+    priority(other.priority),
+    target(other.target),
+    source(other.source)
+  {
+  };
+
+  template <class unknown_rawType>
+  plugin(
+      pluginCategory _category,
+      const std::string& _name,
+      pluginType _pType,
+      unknown_rawType _function,
+      int32_t _priority = 0,
+      pluginTarget _target = current_team)
+      : pCategory(_category),
+        pName(_name),
+        pType(_pType),
+        pFunction((void*)_function),
+        priority(_priority),
+        target(_target),
+        source(nullptr){};
+
+  ~plugin() { };
+
+  pluginType getType() const { return pType; };
+
+  void* getFunction() const { return pFunction; };
+
+  pluginCategory getCategory() const
+  {
+    return pCategory;
+  };
+
+  const std::string& getName() const
+  {
+    return pName;
+  };
+
+  int32_t getPriority() const
+  {
+    return priority;
+  };
+
+  pluginTarget getTarget() const
+  {
+    return target;
+  };
+
+  const class Pluggable* getSource() const { return source; }
+  void setSource(const class Pluggable* _source) { source = _source; }
+
+  bool operator== (const plugin& other) const
+  {
+    return pFunction == other.pFunction && source == other.source;
+  };
+
+  bool operator< (const plugin& other) const
   {
     return priority < other.priority;
   };
@@ -82,8 +161,8 @@ public:
 class PKAISHARED Pluggable : public PluggableInterface
 {
 private:
-  static plugin_t emptyPlugin;
-  std::array<plugin_t, PLUGIN_MAXSIZE> plugins;
+  static plugin emptyPlugin;
+  std::array<plugin, PLUGIN_MAXSIZE> plugins;
   bool implemented;
 
   bool registerPlugin_void(
@@ -121,29 +200,28 @@ public:
 
   pluginTarget getTarget(size_t pType) const
   {
-    return plugins[pType].target;
+    return plugins[pType].getTarget();
   };
 
   int32_t getPriority(size_t pType) const
   {
-    return plugins[pType].priority;
+    return plugins[pType].getPriority();
   };
 
-  const plugin_t& getPlugin(size_t pType) const
+  const plugin& getPlugin(size_t pType) const
   {
     return plugins[pType];
   };
 
-  voidFunction_rawType getFunction(size_t pType) const
-  {
-    return plugins[pType].pFunction;
+  void* getFunction(size_t pType) const {
+    return plugins[pType].getFunction();
   };
 };
 
 class PKAISHARED EnginePlugins : public PluggableInterface
 {
 private:
-  std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE> plugins;
+  std::array<std::vector<plugin>, PLUGIN_MAXSIZE> plugins;
 
 protected:
 public:
@@ -170,22 +248,21 @@ public:
 
   uint32_t getPriority(size_t pType, size_t iPlugin) const
   {
-    return plugins[pType][iPlugin].priority;
+    return plugins[pType][iPlugin].getPriority();
   };
 
   pluginTarget getTarget(size_t pType, size_t iPlugin) const
   {
-    return plugins[pType][iPlugin].target;
+    return plugins[pType][iPlugin].getTarget();
   };
 
-  const plugin_t& getPlugin(size_t pType, size_t iPlugin) const
+  const plugin& getPlugin(size_t pType, size_t iPlugin) const
   {
     return plugins[pType][iPlugin];
   }
 
-  voidFunction_rawType getFunction(size_t pType, size_t iPlugin) const
-  {
-    return plugins[pType][iPlugin].pFunction;
+  void* getFunction(size_t pType, size_t iPlugin) const {
+    return plugins[pType][iPlugin].getFunction();
   };
 };
 

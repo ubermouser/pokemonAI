@@ -132,6 +132,7 @@ POKEMON_VOLATILE_IMPL::getMV(size_t index) const {
   case 1:
   case 2:
   case 3:
+    assert(index < nv().getNumMoves());
     return movevolatile_t{
         nv().actions_[index],
         data().actions[index]};
@@ -141,6 +142,14 @@ POKEMON_VOLATILE_IMPL::getMV(size_t index) const {
     // TODO(@drendleman) - assert struggle cannot be retrieved from non-const context
     return movevolatile_t{*MoveNonVolatile::mNV_struggle, standardMove};
   };
+}
+
+
+POKEMON_VOLATILE_IMPL_TEMPLATE
+typename POKEMON_VOLATILE_IMPL::movevolatile_t POKEMON_VOLATILE_IMPL::getMV(
+    const Action& action) const {
+  assert(action.isMove());
+  return getMV(action.iMove());
 }
 
 

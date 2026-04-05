@@ -19,7 +19,7 @@ int ability_shadowTag(
 };
 
 void register_ability_shadow_tag(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(ability, "shadow tag", PLUGIN_ON_TESTSWITCH, ability_shadowTag, 0, other_team));
+  extensions.push_back(pluginOnTestSwitch(ability, "shadow tag", ability_shadowTag, 0, other_team));
 }
 
 } // namespace gen4

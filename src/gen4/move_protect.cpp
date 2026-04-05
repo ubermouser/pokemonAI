@@ -110,15 +110,17 @@ int move_protect_cleanup_end(PkCUEngine& cu, PokemonVolatile cPKV) {
     cPKV.status().cTeammate.protect_counter = 0;
   }
 
-  return 0;
+  return 1;
 }
 
 void register_move_protect(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "protect", PLUGIN_ON_EVALUATEMOVE, move_protect, 0, current_team));
-  extensions.push_back(plugin(move, "protect", PLUGIN_ON_CALCULATEDAMAGE, move_protect_damage, -10, all_teams)); // Priority -10 to run early?
-  extensions.push_back(plugin(move, "protect", PLUGIN_ON_SECONDARYEFFECT, move_protect_secondary, -10, all_teams));
-  extensions.push_back(plugin(engine, "protect_block_status", PLUGIN_ON_EVALUATEMOVE, move_protect_status, -10, all_teams));
-  extensions.push_back(plugin(move, "protect", PLUGIN_ON_ENDOFROUND, move_protect_cleanup_end, 0, current_team));
+  // clang-format off
+  extensions.push_back(pluginOnEvaluateMove(move, "protect", move_protect, 0, current_team));
+  extensions.push_back(pluginOnCalculateDamage(engine, "protect_damage", move_protect_damage, -10, all_teams));
+  extensions.push_back(pluginOnSecondaryEffect(engine, "protect_secondary", move_protect_secondary, -10, all_teams));
+  extensions.push_back(pluginOnEvaluateMove(engine, "protect_block_status", move_protect_status, -10, all_teams));
+  extensions.push_back(pluginOnEndOfRound(engine, "protect_cleanup", move_protect_cleanup_end, 0, all_teams));
+  // clang-format on
 }
 
 } // namespace gen4

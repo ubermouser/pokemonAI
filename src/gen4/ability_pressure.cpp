@@ -19,7 +19,7 @@ int ability_pressure(
 };
 
 void register_ability_pressure(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(ability, "pressure", PLUGIN_ON_ENDOFMOVE, ability_pressure, 0, other_team));
+  extensions.push_back(pluginOnEndOfMove(ability, "pressure", ability_pressure, 0, other_team));
 }
 
 } // namespace gen4

@@ -108,10 +108,10 @@ int move_encore_preempt(PkCUEngine& cu, Action& action) {
 }
 
 void register_move_encore(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "encore", PLUGIN_ON_EVALUATEMOVE, move_encore_set, 0, current_team));
-  extensions.push_back(plugin(move, "encore", PLUGIN_ON_TESTMOVE, move_encore_test, 0, other_team));
-  extensions.push_back(plugin(move, "encore", PLUGIN_ON_MODIFYACTION, move_encore_preempt, 0, other_team));
-  extensions.push_back(plugin(move, "encore", PLUGIN_ON_ENDOFTURN, move_encore_update, 0, other_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "encore", move_encore_set, 0, current_team));
+  extensions.push_back(pluginOnTestMove(engine, "encore_test", move_encore_test, 0, all_teams));
+  extensions.push_back(pluginOnModifyAction(engine, "encore_preempt", move_encore_preempt, 0, all_teams));
+  extensions.push_back(pluginOnEndOfTurn(engine, "encore_update", move_encore_update, 0, all_teams));
 }
 
 } // namespace gen4

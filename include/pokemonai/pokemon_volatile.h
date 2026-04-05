@@ -105,9 +105,7 @@ class PokemonVolatileImpl : public NonvolatileVolatilePair<
   /* returns TRUE if the pokemon has more than 0 hitpoints */
   bool isAlive() const;
 
-  movevolatile_t getMV(const Action& action) const {
-    return getMV(action.iMove());
-  }
+  movevolatile_t getMV(const Action& action) const;
   movevolatile_t getMV(size_t index) const;
 
   auto yieldMoves() const {

@@ -42,8 +42,8 @@ int move_perishSong_update(PkCUEngine& cu, PokemonVolatile cPKV) {
 }
 
 void register_move_perish_song(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "perish song", PLUGIN_ON_EVALUATEMOVE, move_perishSong_set, 0, current_team));
-  extensions.push_back(plugin(move, "perish song", PLUGIN_ON_ENDOFROUND, move_perishSong_update, 0, all_teams));
+  extensions.push_back(pluginOnEvaluateMove(move, "perish song", move_perishSong_set, 0, current_team));
+  extensions.push_back(pluginOnEndOfRound(engine, "perish_song_update", move_perishSong_update, 0, all_teams));
 }
 
 } // namespace gen4

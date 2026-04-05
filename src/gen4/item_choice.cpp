@@ -76,15 +76,15 @@ int item_choiceItem_testLockedMove(
 }
 
 void register_item_choice(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(item, "choice band", PLUGIN_ON_BEGINNINGOFTURN, item_choiceItem_lockMove, 0, all_teams));
-  extensions.push_back(plugin(item, "choice band", PLUGIN_ON_TESTMOVE, item_choiceItem_testLockedMove, 0, all_teams));
-  extensions.push_back(plugin(item, "choice band", PLUGIN_ON_MODIFYRAWDAMAGE, item_choiceItem_modPower, 0, all_teams));
-  extensions.push_back(plugin(item, "choice scarf", PLUGIN_ON_BEGINNINGOFTURN, item_choiceItem_lockMove, 0, all_teams));
-  extensions.push_back(plugin(item, "choice scarf", PLUGIN_ON_TESTMOVE, item_choiceItem_testLockedMove, 0, all_teams));
-  extensions.push_back(plugin(item, "choice scarf", PLUGIN_ON_MODIFYSPEED, item_choiceScarf_modSpeed, 0, all_teams));
-  extensions.push_back(plugin(item, "choice specs", PLUGIN_ON_BEGINNINGOFTURN, item_choiceItem_lockMove, 0, all_teams));
-  extensions.push_back(plugin(item, "choice specs", PLUGIN_ON_TESTMOVE, item_choiceItem_testLockedMove, 0, all_teams));
-  extensions.push_back(plugin(item, "choice specs", PLUGIN_ON_MODIFYRAWDAMAGE, item_choiceItem_modPower, 0, all_teams));
+  extensions.push_back(pluginOnBeginningOfTurn(item, "choice band", item_choiceItem_lockMove, 0, all_teams));
+  extensions.push_back(pluginOnTestMove(item, "choice band", item_choiceItem_testLockedMove, 0, all_teams));
+  extensions.push_back(pluginOnModifyRawDamage(item, "choice band", item_choiceItem_modPower, 0, all_teams));
+  extensions.push_back(pluginOnBeginningOfTurn(item, "choice scarf", item_choiceItem_lockMove, 0, all_teams));
+  extensions.push_back(pluginOnTestMove(item, "choice scarf", item_choiceItem_testLockedMove, 0, all_teams));
+  extensions.push_back(pluginOnModifySpeed(item, "choice scarf", item_choiceScarf_modSpeed, 0, all_teams));
+  extensions.push_back(pluginOnBeginningOfTurn(item, "choice specs", item_choiceItem_lockMove, 0, all_teams));
+  extensions.push_back(pluginOnTestMove(item, "choice specs", item_choiceItem_testLockedMove, 0, all_teams));
+  extensions.push_back(pluginOnModifyRawDamage(item, "choice specs", item_choiceItem_modPower, 0, all_teams));
 }
 
 } // namespace gen4

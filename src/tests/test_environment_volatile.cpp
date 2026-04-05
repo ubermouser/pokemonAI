@@ -13,6 +13,10 @@ using ::testing::UnorderedElementsAreArray;
 class EnvironmentVolatileTest : public MockEngineTest {
  protected:
   void SetUp() override {
+#if USE_LEGACY_ENGINE
+    GTEST_SKIP() << "Neo-Engine test";
+#endif
+
     MockEngineTest::SetUp();
   }
 
@@ -345,3 +349,6 @@ TEST_F(EnvironmentVolatileTest, AllTypes3v3_move_side_all) {
       {::Action::moveSideAll(0)},
       {{::Action::moveSideAll(0), {Actor(1, 1)}}});
 }
+
+
+// TODO: swap actions

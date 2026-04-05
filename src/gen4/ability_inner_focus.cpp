@@ -12,7 +12,7 @@ int ability_innerFocus(PkCUEngine& cu, PokemonVolatile cPKV) {
 
 void register_ability_inner_focus(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   // clang-format off
-  extensions.push_back(plugin(ability, "inner focus", PLUGIN_ON_BEGINNINGOFTURN, ability_innerFocus, -3, current_team));
+  extensions.push_back(pluginOnBeginningOfTurn(ability, "inner focus", ability_innerFocus, -3, current_team));
   // clang-format on
 }
 

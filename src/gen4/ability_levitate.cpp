@@ -33,8 +33,8 @@ int ability_levitate_switch(PkCUEngine& cu, PokemonVolatile cPKV) {
 
 
 void register_ability_levitate(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(ability, "levitate", PLUGIN_ON_SETDEFENSETYPE, ability_levitate, -1, other_team));
-  extensions.push_back(plugin(ability, "levitate", PLUGIN_ON_SWITCHIN, ability_levitate_switch, 1, current_team));
+  extensions.push_back(pluginOnSetDefenseType(ability, "levitate", ability_levitate, -1, other_team));
+  extensions.push_back(pluginOnSwitchIn(ability, "levitate", ability_levitate_switch, 1, current_team));
 }
 
 } // namespace gen4

@@ -37,8 +37,8 @@ int move_trick(
 };
 
 void register_move_trick(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "trick", PLUGIN_ON_EVALUATEMOVE, move_trick, 0, current_team));
-  extensions.push_back(plugin(move, "switcheroo", PLUGIN_ON_EVALUATEMOVE, move_trick, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "trick", move_trick, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "switcheroo", move_trick, 0, current_team));
 }
 
 } // namespace gen4

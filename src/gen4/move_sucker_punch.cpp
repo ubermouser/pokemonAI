@@ -11,10 +11,8 @@ int move_suckerPunch_noDamageOnCondition(
   if (&mV.getBase() != suckerPunch_t) { return 0; }
 
   // if the enemy's move is NOT a damaging move:
-  const Action& oAction = cu.getOAction();
-  bool enemyMoveAction = (cu.getOAction().isMove());
-  auto damageType = enemyMoveAction
-                        ? tPKV.getMV(oAction).getBase().getDamageType()
+  auto damageType = cu.getOAction().isMove()
+                        ? cu.getTMV().getBase().getDamageType()
                         : ATK_NODMG;
   bool enemyDamagingAction =
       damageType == ATK_PHYSICAL || damageType == ATK_SPECIAL;
@@ -30,7 +28,7 @@ int move_suckerPunch_noDamageOnCondition(
 }
 
 void register_move_sucker_punch(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "sucker punch", PLUGIN_ON_CALCULATEDAMAGE, move_suckerPunch_noDamageOnCondition, 0, current_team));
+  extensions.push_back(pluginOnCalculateDamage(move, "sucker punch", move_suckerPunch_noDamageOnCondition, 0, current_team));
 }
 
 } // namespace gen4

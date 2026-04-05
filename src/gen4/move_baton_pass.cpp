@@ -46,12 +46,12 @@ int move_batonPass(
   // Trigger OnSwitchIn plugins
   cu.setCPluginSet();
   int result = 0;
-  const std::vector<plugin_t>& cPlugins =
+  const std::vector<plugin>& cPlugins =
       cu.getCPluginSet()[(size_t)PLUGIN_ON_SWITCHIN];
   for (auto iPlugin = cPlugins.cbegin(), iPSize = cPlugins.cend();
        iPlugin != iPSize;
        ++iPlugin) {
-    onSwitch_rawType cPlugin = (onSwitch_rawType)iPlugin->pFunction;
+    onSwitch_rawType cPlugin = (onSwitch_rawType)iPlugin->getFunction();
     result = result | cPlugin(cu, cu.getPKV());
     if (result > 1) { break; }
   }
@@ -60,7 +60,7 @@ int move_batonPass(
 }
 
 void register_move_baton_pass(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "baton pass", PLUGIN_ON_ENDOFMOVE, move_batonPass, 1, current_team));
+  extensions.push_back(pluginOnEndOfMove(move, "baton pass", move_batonPass, 1, current_team));
 }
 
 } // namespace gen4

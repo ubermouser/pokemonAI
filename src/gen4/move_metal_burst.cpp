@@ -33,7 +33,7 @@ int move_metalBurst(
 };
 
 void register_move_metal_burst(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "metal burst", PLUGIN_ON_EVALUATEMOVE, move_metalBurst, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "metal burst", move_metalBurst, 0, current_team));
 }
 
 } // namespace gen4

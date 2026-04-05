@@ -30,9 +30,12 @@
 #ifdef NEO_PKAI_CU_H
 static_assert(false, "LegacyPkCU should not be compiled with NeoPkCU!");
 #endif
+#ifdef PKCU_TYPES_H
+static_assert(false, "LegacyPkCU should not be compiled with PkcuTypes!");
+#endif
 
 namespace po = boost::program_options;
-typedef std::vector<plugin_t>::const_iterator pluginIt;
+typedef std::vector<plugin>::const_iterator pluginIt;
 
 /**
  * @def CALLPLUGIN
@@ -49,16 +52,17 @@ typedef std::vector<plugin_t>::const_iterator pluginIt;
  * @param pluginFunction The function signature of the plugin to be called.
  * @param ... The arguments to pass to the plugin function.
  */
-#define CALLPLUGIN(retValue, pluginType, pluginFunction, ...) \
-{\
-  const std::vector<plugin_t>& cPlugins = getCPluginSet()[(size_t)pluginType];\
-  for (pluginIt iPlugin = cPlugins.cbegin(), iPSize = cPlugins.cend(); iPlugin != iPSize; ++iPlugin)\
-  {\
-    pluginFunction cPlugin = (pluginFunction)iPlugin->pFunction; \
-    retValue = retValue | cPlugin( __VA_ARGS__ ); \
-    if (retValue > 1) { break; } \
-  }\
-}
+#define CALLPLUGIN(retValue, pluginType, pluginFunction, ...)                  \
+  {                                                                            \
+    const std::vector<plugin>& cPlugins = getCPluginSet()[(size_t)pluginType]; \
+    for (pluginIt iPlugin = cPlugins.cbegin(), iPSize = cPlugins.cend();       \
+         iPlugin != iPSize;                                                    \
+         ++iPlugin) {                                                          \
+      pluginFunction cPlugin = (pluginFunction)iPlugin->getFunction();         \
+      retValue = retValue | cPlugin(__VA_ARGS__);                              \
+      if (retValue > 1) { break; }                                             \
+    }                                                                          \
+  }
 
 
 LegacyPkCU* LegacyPkCU::clone() const {
@@ -127,7 +131,8 @@ bool LegacyPkCU::initialize() {
   {
     for (size_t iOTeammate = 0; iOTeammate != pluginSets_[iNCTeammate].size(); ++iOTeammate)
     {
-      std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>& _cPluginSet = pluginSets_[iNCTeammate][iOTeammate];
+      std::array<std::vector<plugin>, PLUGIN_MAXSIZE>& _cPluginSet =
+          pluginSets_[iNCTeammate][iOTeammate];
       for (size_t iPlugin = 0; iPlugin != _cPluginSet.size(); ++iPlugin)
       {
         _cPluginSet[iPlugin].clear();
@@ -148,8 +153,8 @@ bool LegacyPkCU::initialize() {
     for (size_t iCMove = 0; iCMove != cPKNV.getNumMoves(); ++iCMove) {
       const Pluggable& cPluggable = cPKNV.getMove_base(iCMove);
       for (size_t iPlugin = 0; iPlugin != PLUGIN_MAXSIZE; ++iPlugin) {
-        plugin_t cPlugin = cPluggable.getPlugin(iPlugin);
-        if (cPlugin.pFunction == NULL) { continue; }
+        plugin cPlugin = cPluggable.getPlugin(iPlugin);
+        if (cPlugin.getFunction() == NULL) { continue; }
         insertPluginHandler(cPlugin, iPlugin, iNCTeammate);
         numPlugins++;
       }
@@ -159,8 +164,8 @@ bool LegacyPkCU::initialize() {
     if (cPKNV.abilityExists())  {
       const Pluggable& cPluggable = cPKNV.getAbility();
       for (size_t iPlugin = 0; iPlugin != PLUGIN_MAXSIZE; ++iPlugin) {
-        plugin_t cPlugin = cPluggable.getPlugin(iPlugin);
-        if (cPlugin.pFunction == NULL) { continue; }
+        plugin cPlugin = cPluggable.getPlugin(iPlugin);
+        if (cPlugin.getFunction() == NULL) { continue; }
         insertPluginHandler(cPlugin, iPlugin, iNCTeammate);
         numPlugins++;
       }
@@ -170,8 +175,8 @@ bool LegacyPkCU::initialize() {
     if (cPKNV.hasInitialItem()) {
       const Pluggable& cPluggable = cPKNV.getInitialItem();
       for (size_t iPlugin = 0; iPlugin != PLUGIN_MAXSIZE; ++iPlugin) {
-        plugin_t cPlugin = cPluggable.getPlugin(iPlugin);
-        if (cPlugin.pFunction == NULL) { continue; }
+        plugin cPlugin = cPluggable.getPlugin(iPlugin);
+        if (cPlugin.getFunction() == NULL) { continue; }
         insertPluginHandler(cPlugin, iPlugin, iNCTeammate);
         numPlugins++;
       }
@@ -183,7 +188,7 @@ bool LegacyPkCU::initialize() {
   // add global (and engine) plugins second:
   for (size_t iPluginType = 0; iPluginType != PLUGIN_MAXSIZE; ++iPluginType) {
     for (size_t iPlugin = 0; iPlugin != pkdex->getExtensions().getNumPlugins(iPluginType); ++iPlugin) {
-      plugin_t cPlugin = pkdex->getExtensions().getPlugin(iPluginType, iPlugin);
+      plugin cPlugin = pkdex->getExtensions().getPlugin(iPluginType, iPlugin);
       numPlugins++;
 
       insertPluginHandler(cPlugin, iPluginType);
@@ -193,7 +198,8 @@ bool LegacyPkCU::initialize() {
   // SORT plugins by priority:
   for (size_t iNCTeammate = 0; iNCTeammate != pluginSets_.size(); ++iNCTeammate) {
     for (size_t iOTeammate = 0; iOTeammate != pluginSets_[iNCTeammate].size(); ++iOTeammate) {
-      std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>& _cPluginSet = pluginSets_[iNCTeammate][iOTeammate];
+      std::array<std::vector<plugin>, PLUGIN_MAXSIZE>& _cPluginSet =
+          pluginSets_[iNCTeammate][iOTeammate];
       for (size_t iPlugin = 0; iPlugin != _cPluginSet.size(); ++iPlugin) {
         std::sort(_cPluginSet[iPlugin].begin(), _cPluginSet[iPlugin].end());
       }
@@ -216,10 +222,11 @@ bool LegacyPkCU::initialize() {
  *        `SIZE_MAX`, the plugin is considered global.
  * @return The number of plugin sets the plugin was added to.
  */
-size_t LegacyPkCU::insertPluginHandler(plugin_t& cPlugin, size_t pluginType, size_t iNTeammate) {
+size_t LegacyPkCU::insertPluginHandler(
+    plugin& cPlugin, size_t pluginType, size_t iNTeammate) {
   size_t numAdded = 0;
 
-  pluginTarget target = cPlugin.target;
+  pluginTarget target = cPlugin.getTarget();
   size_t iNTeam = (iNTeammate>=6)?1:0;
   size_t iTeammate = iNTeammate - 6*iNTeam;
 
@@ -239,7 +246,8 @@ size_t LegacyPkCU::insertPluginHandler(plugin_t& cPlugin, size_t pluginType, siz
       // if on opposite team of adding team, and not add
       if ((iNTeammate != SIZE_MAX) && (iCTeam != iNTeam) && (iTeammate != iOTeammate)) { continue; }
 
-      std::vector<plugin_t>& _cPluginSet = pluginSets_[iNCTeammate][iOTeammate][pluginType];
+      std::vector<plugin>& _cPluginSet =
+          pluginSets_[iNCTeammate][iOTeammate][pluginType];
       // check for duplicate:
       if (std::find(_cPluginSet.begin(), _cPluginSet.end(), cPlugin) != _cPluginSet.end()) { continue; }
       // add:
@@ -1612,8 +1620,8 @@ IsValidResult LegacyPkCU::isValidAction(
       // Are we locked out of the current move?
       for (const auto& cPlugin :
            getCPluginSet(envV, actor.iTeam())[PLUGIN_ON_TESTMOVE]) {
-        onTestMove_rawType pFunction = (onTestMove_rawType)cPlugin.pFunction;
-        if (pFunction(cTV, cPKV, cMV, action, doAllowMove) > 1) { break; }
+        onTestMove_rawType pFunc = (onTestMove_rawType)cPlugin.getFunction();
+        if (pFunc(cTV, cPKV, cMV, action, doAllowMove) > 1) { break; }
       }
 
       if (!doAllowMove[VALID_MOVE_TARGET_ALIVE]) {
@@ -1666,8 +1674,9 @@ IsValidResult LegacyPkCU::isValidAction(
       // Are we locked out of switching?
       for (const auto& cPlugin :
            getCPluginSet(envV, actor.iTeam())[PLUGIN_ON_TESTSWITCH]) {
-        onTestSwitch_rawType pFunction = (onTestSwitch_rawType)cPlugin.pFunction;
-        if (pFunction(cPKV, fPKV, action, doAllowSwitch) > 1) { break; }
+        onTestSwitch_rawType pFunc =
+            (onTestSwitch_rawType)cPlugin.getFunction();
+        if (pFunc(cPKV, fPKV, action, doAllowSwitch) > 1) { break; }
       }
 
       if (!doAllowSwitch[VALID_SWAP_FRIENDLY_IS_OTHER]) {

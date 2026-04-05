@@ -37,10 +37,10 @@ int ability_pinch_type_boost(
 }
 
 void register_ability_pinch_boost(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(ability, "blaze", PLUGIN_ON_MODIFYBASEPOWER, ability_pinch_type_boost, -1, current_team));
-  extensions.push_back(plugin(ability, "overgrow", PLUGIN_ON_MODIFYBASEPOWER, ability_pinch_type_boost, -1, current_team));
-  extensions.push_back(plugin(ability, "swarm", PLUGIN_ON_MODIFYBASEPOWER, ability_pinch_type_boost, -1, current_team));
-  extensions.push_back(plugin(ability, "torrent", PLUGIN_ON_MODIFYBASEPOWER, ability_pinch_type_boost, -1, current_team));
+  extensions.push_back(pluginOnModifyBasePower(ability, "blaze", ability_pinch_type_boost, -1, current_team));
+  extensions.push_back(pluginOnModifyBasePower(ability, "overgrow", ability_pinch_type_boost, -1, current_team));
+  extensions.push_back(pluginOnModifyBasePower(ability, "swarm", ability_pinch_type_boost, -1, current_team));
+  extensions.push_back(pluginOnModifyBasePower(ability, "torrent", ability_pinch_type_boost, -1, current_team));
 }
 
 } // namespace gen4

@@ -19,7 +19,7 @@ int item_toxic_orb(PkCUEngine& cu, PokemonVolatile cPKV) {
 };
 
 void register_item_toxic_orb(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(item, "toxic orb", PLUGIN_ON_ENDOFROUND, item_toxic_orb, 0, current_team));
+  extensions.push_back(pluginOnEndOfRound(item, "toxic orb", item_toxic_orb, 0, current_team));
 }
 
 } // namespace gen4

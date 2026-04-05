@@ -30,8 +30,8 @@ int move_leveledDamage(
 };
 
 void register_move_leveled_damage(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "night shade", PLUGIN_ON_EVALUATEMOVE, move_leveledDamage, 0, current_team));
-  extensions.push_back(plugin(move, "seismic toss", PLUGIN_ON_EVALUATEMOVE, move_leveledDamage, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "night shade", move_leveledDamage, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "seismic toss", move_leveledDamage, 0, current_team));
 }
 
 } // namespace gen4

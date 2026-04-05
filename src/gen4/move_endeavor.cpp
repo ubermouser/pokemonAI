@@ -31,7 +31,7 @@ int move_endeavor(
 }
 
 void register_move_endeavor(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "endeavor", PLUGIN_ON_EVALUATEMOVE, move_endeavor, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "endeavor", move_endeavor, 0, current_team));
 }
 
 } // namespace gen4

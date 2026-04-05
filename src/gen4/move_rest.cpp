@@ -24,7 +24,7 @@ int move_rest(
 
 void register_move_rest(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(
-      plugin(move, "rest", PLUGIN_ON_EVALUATEMOVE, move_rest, 0, current_team));
+      pluginOnEvaluateMove(move, "rest", move_rest, 0, current_team));
 }
 
 } // namespace gen4

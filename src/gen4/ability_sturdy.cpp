@@ -20,8 +20,7 @@ int ability_sturdy(
 
 void register_ability_sturdy(
     const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(
-      ability, "sturdy", PLUGIN_ON_MODIFYHITPROBABILITY, ability_sturdy, -10,
+  extensions.push_back(pluginOnModifyHitProbability(ability, "sturdy", ability_sturdy, -10,
       other_team));
 }
 

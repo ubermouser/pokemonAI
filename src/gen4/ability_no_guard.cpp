@@ -24,7 +24,7 @@ int ability_noGuard(
 };
 
 void register_ability_no_guard(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(ability, "no guard", PLUGIN_ON_MODIFYHITPROBABILITY, ability_noGuard, -2, all_teams));
+  extensions.push_back(pluginOnModifyHitProbability(ability, "no guard", ability_noGuard, -2, all_teams));
 }
 
 } // namespace gen4

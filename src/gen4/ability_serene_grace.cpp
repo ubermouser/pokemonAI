@@ -24,7 +24,7 @@ int ability_sereneGrace(
 };
 
 void register_ability_serene_grace(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(ability, "serene grace", PLUGIN_ON_MODIFYSECONDARYPROBABILITY, ability_sereneGrace, -1, current_team));
+  extensions.push_back(pluginOnModifySecondaryProbability(ability, "serene grace", ability_sereneGrace, -1, current_team));
 }
 
 } // namespace gen4

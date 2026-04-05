@@ -19,7 +19,7 @@ int ability_restoreStats(
 };
 
 void register_ability_clear_body(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(ability, "clear body", PLUGIN_ON_SECONDARYEFFECT, ability_restoreStats, 0, other_team));
+  extensions.push_back(pluginOnSecondaryEffect(ability, "clear body", ability_restoreStats, 0, other_team));
 }
 
 } // namespace gen4

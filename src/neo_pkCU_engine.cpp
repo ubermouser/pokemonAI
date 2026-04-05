@@ -69,8 +69,8 @@ uint32_t NeoPkCUEngine::computeSpeed(const Actor& actor) {
   uint32_t speed = pkv.getFV_boosted(FV_SPEED);
 
   int result = 0;
-  CALLPLUGIN(
-      result, PLUGIN_ON_MODIFYSPEED, onModifySpeed_rawType, *this, pkv, speed);
+  result = callPlugins<onModifySpeed_rawType>(
+      PLUGIN_ON_MODIFYSPEED, *this, pkv, speed);
 
   return speed;
 }
@@ -95,10 +95,8 @@ NeoPkCUEngine::MoveBracket NeoPkCUEngine::computeMoveBracket(
       actionBracket = mv.getBase().getSpeedPriority();
 
       int result = 0;
-      CALLPLUGIN(
-          result,
+      result = callPlugins<onModifyBracket_rawType>(
           PLUGIN_ON_SETSPEEDBRACKET,
-          onModifyBracket_rawType,
           *this,
           mv,
           pkv,
@@ -326,10 +324,8 @@ void NeoPkCUEngine::calculateDamage() {
     actualDamage = (uint32_t)((fpType)power * randomValue);
 
     int result = 0;
-    CALLPLUGIN(
-        result,
+    result = callPlugins<onSetPower_rawType>(
         PLUGIN_ON_CALCULATEDAMAGE,
-        onSetPower_rawType,
         *this,
         getMV(),
         getPKV(),
@@ -448,6 +444,43 @@ size_t NeoPkCUEngine::advanceAllStages() {
 }
 
 
+bool NeoPkCUEngine::isPluginSourceActive(const plugin& p) {
+  if (!p.getSource()) return true;  // Global engine plugin
+
+  bool checkCurrentTeam =
+      (p.getTarget() == current_team || p.getTarget() == all_teams);
+  bool checkOtherTeam =
+      (p.getTarget() == other_team || p.getTarget() == all_teams);
+
+  if (checkCurrentTeam) {
+    PokemonVolatile pkv = getPKV();
+    if (getStackStage() != StageType::PRESWITCH &&
+        getStackStage() != StageType::POSTSWITCH) {
+      if (p.getSource() == &getMV().getBase()) return true;
+    }
+    if (pkv.nv().abilityExists()) {
+      if (p.getSource() == &pkv.nv().getAbility()) return true;
+    }
+    if (pkv.nv().hasInitialItem()) {
+      if (p.getSource() == &pkv.nv().getInitialItem()) return true;
+    }
+  }
+
+  if (checkOtherTeam) {
+    PokemonVolatile tpkv = getTPKV();
+    if (tpkv.isAlive()) {  // Ensure target is valid to check
+      if (tpkv.nv().abilityExists() && p.getSource() == &tpkv.nv().getAbility())
+        return true;
+      if (tpkv.nv().hasInitialItem() &&
+          p.getSource() == &tpkv.nv().getInitialItem())
+        return true;
+    }
+  }
+
+  return false;
+}
+
+
 TeamVolatile NeoPkCUEngine::getTV() { return getTV(iBase_); }
 
 
@@ -486,6 +519,15 @@ MoveVolatile NeoPkCUEngine::getMV() { return getMV(iBase_); }
 MoveVolatile NeoPkCUEngine::getMV(size_t iState) {
   auto& actor = getCActor(iState);
   return getBase(iState).teammate(actor).getMV(actions_.at(actor));
+}
+
+
+MoveVolatile NeoPkCUEngine::getTMV() { return getTMV(iBase_); }
+
+
+MoveVolatile NeoPkCUEngine::getTMV(size_t iState) {
+  auto& target = getTarget(iState);
+  return getBase(iState).teammate(target).getMV(actions_.at(target));
 }
 
 

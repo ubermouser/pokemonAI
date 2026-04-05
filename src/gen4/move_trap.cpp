@@ -53,11 +53,13 @@ int engine_clearTrap(PkCUEngine& cu, PokemonVolatile cPKV) {
 }
 
 void register_move_trap(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "block", PLUGIN_ON_EVALUATEMOVE, move_trap_set, 0, current_team));
-  extensions.push_back(plugin(move, "mean look", PLUGIN_ON_EVALUATEMOVE, move_trap_set, 0, current_team));
-  extensions.push_back(plugin(move, "spider web", PLUGIN_ON_EVALUATEMOVE, move_trap_set, 0, current_team));
-  extensions.push_back(plugin(engine, "trapped check", PLUGIN_ON_TESTSWITCH, engine_checkTrapped, 0, current_team));
-  extensions.push_back(plugin(engine, "clear trap on switch", PLUGIN_ON_SWITCHIN, engine_clearTrap, 0, all_teams));
+  // clang-format off
+  extensions.push_back(pluginOnEvaluateMove(move, "block", move_trap_set, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "mean look", move_trap_set, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "spider web", move_trap_set, 0, current_team));
+  extensions.push_back(pluginOnTestSwitch(engine, "trapped check", engine_checkTrapped, 0, all_teams));
+  extensions.push_back(pluginOnSwitchIn(engine, "clear trap on switch", engine_clearTrap, 0, all_teams));
+  // clang-format on
 }
 
 } // namespace gen4

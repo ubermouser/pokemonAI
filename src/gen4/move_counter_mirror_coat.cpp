@@ -44,8 +44,8 @@ int move_counterMirrorCoat(
 };
 
 void register_move_counter_mirror_coat(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "counter", PLUGIN_ON_EVALUATEMOVE, move_counterMirrorCoat, 0, current_team));
-  extensions.push_back(plugin(move, "mirror coat", PLUGIN_ON_EVALUATEMOVE, move_counterMirrorCoat, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "counter", move_counterMirrorCoat, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "mirror coat", move_counterMirrorCoat, 0, current_team));
 }
 
 } // namespace gen4

@@ -104,13 +104,15 @@ int move_substitute_cleanup_end(PkCUEngine& cu, PokemonVolatile cPKV) {
 }
 
 void register_move_substitute(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "substitute", PLUGIN_ON_EVALUATEMOVE, move_substitute, 0, current_team));
-  extensions.push_back(plugin(move, "substitute", PLUGIN_ON_CALCULATEDAMAGE, move_substitute_damage, 0, all_teams));
-  extensions.push_back(plugin(move, "substitute", PLUGIN_ON_SECONDARYEFFECT, move_substitute_block_secondary, -10, all_teams));
-  extensions.push_back(plugin(move, "substitute", PLUGIN_ON_MODIFYACTION, move_substitute_cleanup_preturn, 0, current_team));
-  extensions.push_back(plugin(move, "substitute", PLUGIN_ON_ENDOFTURN, move_substitute_cleanup_end, 0, all_teams));
+  // clang-format off
+  extensions.push_back(pluginOnEvaluateMove(move, "substitute", move_substitute, 0, current_team));
+  extensions.push_back(pluginOnCalculateDamage(engine, "substitute_damage", move_substitute_damage, 0, all_teams));
+  extensions.push_back(pluginOnSecondaryEffect(engine, "substitute_secondary", move_substitute_block_secondary, -10, all_teams));
+  extensions.push_back(pluginOnModifyAction(engine, "substitute_preturn", move_substitute_cleanup_preturn, 0, all_teams));
+  extensions.push_back(pluginOnEndOfTurn(engine, "substitute_cleanup", move_substitute_cleanup_end, 0, all_teams));
 
-  extensions.push_back(plugin(engine, "substitute_block_status", PLUGIN_ON_EVALUATEMOVE, move_substitute_block_status, -10, all_teams));   // TODO - conflicts with move_substitute!
+  extensions.push_back(pluginOnEvaluateMove(engine, "substitute_block_status", move_substitute_block_status, -10, all_teams));
+  // clang-format on
 }
 
 } // namespace gen4

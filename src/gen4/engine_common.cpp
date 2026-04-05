@@ -53,7 +53,7 @@ int engine_beginTurnNonvolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
   switch (cStatus) {
   case AIL_NV_FREEZE: {
     // 100% chance for certain fire moves to thaw the user:
-    const Move& cMove = cPKV.getMV(cu.getCAction()).getBase();
+    const Move& cMove = cu.getMV().getBase();
     if (&cMove == flameWheel_t || &cMove == flareBlitz_t) {
       cPKV.clearStatusAilment();
       break;
@@ -309,17 +309,17 @@ int engine_thawOnFireHit(
 
 void register_engine_common(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   // clang-format off
-  extensions.push_back(plugin(engine, "engine record last action", PLUGIN_ON_ENDOFTURN, engine_updateLastAction, 1, all_teams));
-  extensions.push_back(plugin(engine, "pp decrement", PLUGIN_ON_ENDOFMOVE, engine_decrementPP, 0, all_teams));
-  extensions.push_back(plugin(engine, "nonvolatile speed change", PLUGIN_ON_MODIFYSPEED, engine_onModifySpeed_paralyze, -1, all_teams));
-  extensions.push_back(plugin(engine, "nonvolatile beginning-of-round damage", PLUGIN_ON_BEGINNINGOFTURN, engine_beginTurnNonvolatileEffect, -2, all_teams));
-  extensions.push_back(plugin(engine, "volatile beginning-of-round damage", PLUGIN_ON_BEGINNINGOFTURN, engine_beginTurnVolatileEffect, -1, all_teams));
-  extensions.push_back(plugin(engine, "secondary effect boosts", PLUGIN_ON_SECONDARYEFFECT, engine_secondaryBoostEffect, -3, all_teams));
-  extensions.push_back(plugin(engine, "secondary effect nonvolatile", PLUGIN_ON_SECONDARYEFFECT, engine_secondaryNonvolatileEffect, -2, all_teams));
-  extensions.push_back(plugin(engine, "secondary effect volatile", PLUGIN_ON_SECONDARYEFFECT, engine_secondaryVolatileEffect, -1, all_teams));
-  extensions.push_back(plugin(engine, "nonvolatile end-of-round damage", PLUGIN_ON_ENDOFROUND, engine_endRoundDamageEffect, 0, all_teams));
-  extensions.push_back(plugin(engine, "damage mod burn", PLUGIN_ON_MODIFYATTACKPOWER, engine_modifyAttackPower_burn, 0, all_teams));
-  extensions.push_back(plugin(engine, "thaw on fire hit", PLUGIN_ON_CALCULATEDAMAGE, engine_thawOnFireHit, 0, all_teams));
+  extensions.push_back(pluginOnEndOfTurn(engine, "engine record last action", engine_updateLastAction, 1, all_teams));
+  extensions.push_back(pluginOnEndOfMove(engine, "pp decrement", engine_decrementPP, 0, all_teams));
+  extensions.push_back(pluginOnModifySpeed(engine, "nonvolatile speed change", engine_onModifySpeed_paralyze, -1, all_teams));
+  extensions.push_back(pluginOnBeginningOfTurn(engine, "nonvolatile beginning-of-round damage", engine_beginTurnNonvolatileEffect, -2, all_teams));
+  extensions.push_back(pluginOnBeginningOfTurn(engine, "volatile beginning-of-round damage", engine_beginTurnVolatileEffect, -1, all_teams));
+  extensions.push_back(pluginOnSecondaryEffect(engine, "secondary effect boosts", engine_secondaryBoostEffect, -3, all_teams));
+  extensions.push_back(pluginOnSecondaryEffect(engine, "secondary effect nonvolatile", engine_secondaryNonvolatileEffect, -2, all_teams));
+  extensions.push_back(pluginOnSecondaryEffect(engine, "secondary effect volatile", engine_secondaryVolatileEffect, -1, all_teams));
+  extensions.push_back(pluginOnEndOfRound(engine, "nonvolatile end-of-round damage", engine_endRoundDamageEffect, 0, all_teams));
+  extensions.push_back(pluginOnModifyAttackPower(engine, "damage mod burn", engine_modifyAttackPower_burn, 0, all_teams));
+  extensions.push_back(pluginOnCalculateDamage(engine, "thaw on fire hit", engine_thawOnFireHit, 0, all_teams));
   // clang-format on
 }
 

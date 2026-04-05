@@ -50,8 +50,7 @@ int move_taunt_test(
 
 int move_taunt_preempt(PkCUEngine& cu, PokemonVolatile cPKV) {
   if (cPKV.status().cTeammate.taunt_duration > 0) {
-    MoveVolatile mV = cPKV.getMV(cu.getCAction());
-    if (mV.getBase().getDamageType() == ATK_NODMG) {
+    if (cu.getMV().getBase().getDamageType() == ATK_NODMG) {
       cu.getBase().flagsFor(cu.getCActor()).setBlocked();
     }
 
@@ -62,9 +61,11 @@ int move_taunt_preempt(PkCUEngine& cu, PokemonVolatile cPKV) {
 }
 
 void register_move_taunt(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "taunt", PLUGIN_ON_EVALUATEMOVE, move_taunt_set, 0, current_team));
-  extensions.push_back(plugin(move, "taunt", PLUGIN_ON_TESTMOVE, move_taunt_test, 0, other_team));
-  extensions.push_back(plugin(move, "taunt", PLUGIN_ON_BEGINNINGOFTURN, move_taunt_preempt, -1, other_team));
+  // clang-format off
+  extensions.push_back(pluginOnEvaluateMove(move, "taunt", move_taunt_set, 0, current_team));
+  extensions.push_back(pluginOnTestMove(engine, "taunt_test", move_taunt_test, 0, all_teams));
+  extensions.push_back(pluginOnBeginningOfTurn(engine, "taunt_preempt", move_taunt_preempt, -1, all_teams));
+  // clang-format on
 }
 
 } // namespace gen4

@@ -15,7 +15,7 @@ int ability_naturalCure(PkCUEngine& cu, PokemonVolatile cPKV) {
 };
 
 void register_ability_natural_cure(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(ability, "natural cure", PLUGIN_ON_SWITCHOUT, ability_naturalCure, 0, current_team));
+  extensions.push_back(pluginOnSwitchOut(ability, "natural cure", ability_naturalCure, 0, current_team));
 }
 
 } // namespace gen4

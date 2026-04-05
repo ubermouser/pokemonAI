@@ -35,7 +35,7 @@ int item_lumBerry(PkCUEngine& cu, PokemonVolatile cPKV) {
 
 
 void register_item_lum_berry(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(item, "lum berry", PLUGIN_ON_ENDOFTURN, item_lumBerry, 0, all_teams));
+  extensions.push_back(pluginOnEndOfTurn(item, "lum berry", item_lumBerry, 0, all_teams));
 }
 
 } // namespace gen4

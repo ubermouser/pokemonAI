@@ -26,11 +26,11 @@ int move_recoil33(
 
 
 void register_move_recoil33(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "brave bird", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, current_team));
-  extensions.push_back(plugin(move, "double-edge", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, current_team));
-  extensions.push_back(plugin(move, "flare blitz", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, current_team));
-  extensions.push_back(plugin(move, "wood hammer", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, current_team));
-  extensions.push_back(plugin(move, "volt tackle", PLUGIN_ON_ENDOFMOVE, move_recoil33, -1, current_team));
+  extensions.push_back(pluginOnEndOfMove(move, "brave bird", move_recoil33, -1, current_team));
+  extensions.push_back(pluginOnEndOfMove(move, "double-edge", move_recoil33, -1, current_team));
+  extensions.push_back(pluginOnEndOfMove(move, "flare blitz", move_recoil33, -1, current_team));
+  extensions.push_back(pluginOnEndOfMove(move, "wood hammer", move_recoil33, -1, current_team));
+  extensions.push_back(pluginOnEndOfMove(move, "volt tackle", move_recoil33, -1, current_team));
 }
 
 } // namespace gen4

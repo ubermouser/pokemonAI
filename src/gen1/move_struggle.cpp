@@ -22,7 +22,7 @@ int move_struggle_recoil25(
 
 void register_move_struggle(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   // clang-format off
-  extensions.push_back(plugin(engine, "struggle damage effect", PLUGIN_ON_ENDOFMOVE, move_struggle_recoil25, 0, all_teams));
+  extensions.push_back(pluginOnEndOfMove(engine, "struggle damage effect", move_struggle_recoil25, 0, all_teams));
   // always hits effect is in move_alwaysHits.cpp
 
   // clang-format on

@@ -46,8 +46,8 @@ int move_torment_test(
 }
 
 void register_move_torment(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "torment", PLUGIN_ON_EVALUATEMOVE, move_torment_set, 0, current_team));
-  extensions.push_back(plugin(move, "torment", PLUGIN_ON_TESTMOVE, move_torment_test, 0, other_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "torment", move_torment_set, 0, current_team));
+  extensions.push_back(pluginOnTestMove(engine, "torment_test", move_torment_test, 0, all_teams));
 }
 
 } // namespace gen4

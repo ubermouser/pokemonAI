@@ -25,7 +25,7 @@ int move_refresh(
 
 void register_move_refresh(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(
-      plugin(move, "refresh", PLUGIN_ON_EVALUATEMOVE, move_refresh, 0, current_team));
+      pluginOnEvaluateMove(move, "refresh", move_refresh, 0, current_team));
 }
 
 } // namespace gen4

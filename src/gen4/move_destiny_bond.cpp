@@ -45,9 +45,9 @@ int move_destinyBond_trigger(
 }
 
 void register_move_destiny_bond(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "destiny bond", PLUGIN_ON_EVALUATEMOVE, move_destinyBond, 0, current_team));
-  extensions.push_back(plugin(move, "destiny bond", PLUGIN_ON_BEGINNINGOFTURN, move_destinyBond_clear, 0, current_team));
-  extensions.push_back(plugin(move, "destiny bond", PLUGIN_ON_CALCULATEDAMAGE, move_destinyBond_trigger, 0, all_teams));
+  extensions.push_back(pluginOnEvaluateMove(move, "destiny bond", move_destinyBond, 0, current_team));
+  extensions.push_back(pluginOnBeginningOfTurn(engine, "destiny_bond_clear", move_destinyBond_clear, 0, all_teams));
+  extensions.push_back(pluginOnCalculateDamage(engine, "destiny_bond_trigger", move_destinyBond_trigger, 0, all_teams));
 }
 
 } // namespace gen4

@@ -23,7 +23,7 @@ int ability_technician(
 };
 
 void register_ability_technician(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(ability, "technician", PLUGIN_ON_MODIFYBASEPOWER, ability_technician, -1, current_team));
+  extensions.push_back(pluginOnModifyBasePower(ability, "technician", ability_technician, -1, current_team));
 }
 
 } // namespace gen4

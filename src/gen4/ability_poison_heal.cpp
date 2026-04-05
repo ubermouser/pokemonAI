@@ -17,7 +17,7 @@ int ability_poison_heal_endOfRound(PkCUEngine& cu, PokemonVolatile cPKV) {
 }
 
 void register_ability_poison_heal(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(ability, "poison heal", PLUGIN_ON_ENDOFROUND, ability_poison_heal_endOfRound, -1, current_team));
+  extensions.push_back(pluginOnEndOfRound(ability, "poison heal", ability_poison_heal_endOfRound, -1, current_team));
 }
 
 } // namespace gen4

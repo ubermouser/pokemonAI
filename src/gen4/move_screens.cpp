@@ -69,12 +69,12 @@ int engine_lightScreen_decrement(PkCUEngine& cu, PokemonVolatile cPKV) {
 }
 
 void register_move_screens(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "reflect", PLUGIN_ON_EVALUATEMOVE, move_reflect_set, 0, current_team));
-  extensions.push_back(plugin(move, "reflect", PLUGIN_ON_BEGINNINGOFTURN, engine_reflect_decrement, -1, current_team));
-  extensions.push_back(plugin(move, "reflect", PLUGIN_ON_MODIFYRAWDAMAGE, move_reflect_damage, 0, other_team));
-  extensions.push_back(plugin(move, "light screen", PLUGIN_ON_EVALUATEMOVE, move_lightScreen_set, 0, current_team));
-  extensions.push_back(plugin(move, "light screen", PLUGIN_ON_BEGINNINGOFTURN, engine_lightScreen_decrement, -1, current_team));
-  extensions.push_back(plugin(move, "light screen", PLUGIN_ON_MODIFYRAWDAMAGE, move_lightScreen_damage, 0, other_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "reflect", move_reflect_set, 0, current_team));
+  extensions.push_back(pluginOnBeginningOfTurn(engine, "reflect_decrement", engine_reflect_decrement, -1, all_teams));
+  extensions.push_back(pluginOnModifyRawDamage(engine, "reflect_damage", move_reflect_damage, 0, all_teams));
+  extensions.push_back(pluginOnEvaluateMove(move, "light screen", move_lightScreen_set, 0, current_team));
+  extensions.push_back(pluginOnBeginningOfTurn(engine, "light_screen_decrement", engine_lightScreen_decrement, -1, all_teams));
+  extensions.push_back(pluginOnModifyRawDamage(engine, "light_screen_damage", move_lightScreen_damage, 0, all_teams));
 }
 
 } // namespace gen4

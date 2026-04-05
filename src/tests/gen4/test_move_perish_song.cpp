@@ -83,6 +83,6 @@ TEST_F(PerishSongTest, SwitchClearsEffect) {
   // Pikachu (now active) should have 0 perishSong.
   EXPECT_EQ(state2.teammate(0, 1).status().cTeammate.perishSong, 0);
 
-  // Snorlax (still active) should have 2.
-  EXPECT_EQ(state2.teammate(1, 0).status().cTeammate.perishSong, 2);
+  // Snorlax (still active) should have 1.
+  EXPECT_EQ(state2.teammate(1, 0).status().cTeammate.perishSong, 1);
 }

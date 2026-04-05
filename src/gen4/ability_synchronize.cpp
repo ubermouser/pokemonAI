@@ -64,7 +64,7 @@ int ability_synchronize(
   return 0; // Continue other plugins
 }
 void register_ability_synchronize(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(ability, "synchronize", PLUGIN_ON_SECONDARYEFFECT, ability_synchronize, -1, other_team));
+  extensions.push_back(pluginOnSecondaryEffect(ability, "synchronize", ability_synchronize, -1, other_team));
 }
 
 } // namespace gen4

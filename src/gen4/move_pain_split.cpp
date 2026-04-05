@@ -20,7 +20,7 @@ int move_painSplit(
 };
 
 void register_move_pain_split(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "pain split", PLUGIN_ON_EVALUATEMOVE, move_painSplit, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "pain split", move_painSplit, 0, current_team));
 }
 
 } // namespace gen4

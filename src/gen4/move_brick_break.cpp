@@ -23,7 +23,7 @@ int move_brickBreak_removeScreens(
 }
 
 void register_move_brick_break(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "brick break", PLUGIN_ON_MODIFYRAWDAMAGE, move_brickBreak_removeScreens, -1, current_team));
+  extensions.push_back(pluginOnModifyRawDamage(move, "brick break", move_brickBreak_removeScreens, -1, current_team));
 }
 
 } // namespace gen4

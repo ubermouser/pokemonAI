@@ -37,8 +37,8 @@ int item_lifeOrb_modLife(
 };
 
 void register_item_life_orb(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(item, "life orb", PLUGIN_ON_MODIFYRAWDAMAGE, item_lifeOrb_modPower, 0, all_teams));
-  extensions.push_back(plugin(item, "life orb", PLUGIN_ON_ENDOFMOVE, item_lifeOrb_modLife, 0, all_teams));
+  extensions.push_back(pluginOnModifyRawDamage(item, "life orb", item_lifeOrb_modPower, 0, all_teams));
+  extensions.push_back(pluginOnEndOfMove(item, "life orb", item_lifeOrb_modLife, 0, all_teams));
 }
 
 } // namespace gen4

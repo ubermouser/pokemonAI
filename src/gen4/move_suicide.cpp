@@ -38,11 +38,11 @@ int move_suicide_modPower(
 };
 
 void register_move_suicide(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "explosion", PLUGIN_ON_MODIFYATTACKPOWER, move_suicide_modPower, 0, current_team));
-  extensions.push_back(plugin(move, "explosion", PLUGIN_ON_ENDOFMOVE, move_suicide_modLife, 0, current_team));
-  extensions.push_back(plugin(move, "selfdestruct", PLUGIN_ON_MODIFYATTACKPOWER, move_suicide_modPower, 0, current_team));
-  extensions.push_back(plugin(move, "selfdestruct", PLUGIN_ON_ENDOFMOVE, move_suicide_modLife, 0, current_team));
-  extensions.push_back(plugin(move, "memento", PLUGIN_ON_ENDOFMOVE, move_suicide_modLife, 0, current_team));
+  extensions.push_back(pluginOnModifyAttackPower(move, "explosion", move_suicide_modPower, 0, current_team));
+  extensions.push_back(pluginOnEndOfMove(move, "explosion", move_suicide_modLife, 0, current_team));
+  extensions.push_back(pluginOnModifyAttackPower(move, "selfdestruct", move_suicide_modPower, 0, current_team));
+  extensions.push_back(pluginOnEndOfMove(move, "selfdestruct", move_suicide_modLife, 0, current_team));
+  extensions.push_back(pluginOnEndOfMove(move, "memento", move_suicide_modLife, 0, current_team));
 }
 
 } // namespace gen4

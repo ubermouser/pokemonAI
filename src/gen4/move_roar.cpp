@@ -4,8 +4,13 @@ namespace gen4 {
 
 // Subclass PkCUEngine to access protected members
 class RoarEngine : public PkCUEngine {
-public:
- void setIBase(size_t i) { iBase_ = i; }
+ public:
+  void setIBase(size_t i) { iBase_ = i; }
+  void setOAction(const Action& action) {
+#if USE_LEGACY_ENGINE
+    actions_[1] = action;  // TODO: doesn't work in NeoEngine!
+#endif
+  }
 };
 
 int move_roar_forceSwitch(
@@ -51,6 +56,8 @@ int move_roar_forceSwitch(
     // Perform switch
     cu.getTTV(envIndex).swapPokemon(validSwitchIns[i]);
     cu.getStack().at(envIndex).flagsFor(cu.getOActor()).setSwitched();
+    rEngine.setIBase(envIndex);
+    rEngine.setOAction(Action::swap(validSwitchIns[i]));
     PokemonVolatile newTPKV = cu.getTTV(envIndex).getPKV();
 
     // TODO(@drendleman): add support in PkCU for changing the stackstage via a
@@ -60,12 +67,12 @@ int move_roar_forceSwitch(
     cu.setCPluginSet();
 
     int result = 0;
-    const std::vector<plugin_t>& cPlugins =
+    const std::vector<plugin>& cPlugins =
         cu.getCPluginSet()[(size_t)PLUGIN_ON_SWITCHIN];
     for (auto iPlugin = cPlugins.cbegin(), iPSize = cPlugins.cend();
          iPlugin != iPSize;
          ++iPlugin) {
-      onSwitch_rawType cPlugin = (onSwitch_rawType)iPlugin->pFunction;
+      onSwitch_rawType cPlugin = (onSwitch_rawType)iPlugin->getFunction();
       result = result | cPlugin(cu, newTPKV);
       if (result > 1) { break; }
     }
@@ -79,8 +86,8 @@ int move_roar_forceSwitch(
 
 void register_move_roar(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   // clang-format off
-  extensions.push_back(plugin(move, "roar", PLUGIN_ON_EVALUATEMOVE, move_roar_forceSwitch, 0, current_team));
-  extensions.push_back(plugin(move, "whirlwind", PLUGIN_ON_EVALUATEMOVE, move_roar_forceSwitch, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "roar", move_roar_forceSwitch, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "whirlwind", move_roar_forceSwitch, 0, current_team));
   // clang-format on
 }
 

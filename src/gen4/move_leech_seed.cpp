@@ -39,8 +39,8 @@ int move_leechSeed_effect(PkCUEngine& cu, PokemonVolatile cPKV) {
 };
 
 void register_move_leech_seed(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "leech seed", PLUGIN_ON_EVALUATEMOVE, move_leechSeed_set, 0, current_team));
-  extensions.push_back(plugin(move, "leech seed", PLUGIN_ON_ENDOFROUND, move_leechSeed_effect, 0, other_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "leech seed", move_leechSeed_set, 0, current_team));
+  extensions.push_back(pluginOnEndOfRound(engine, "leech_seed_effect", move_leechSeed_effect, 0, all_teams));
 }
 
 } // namespace gen4

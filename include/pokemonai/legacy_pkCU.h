@@ -226,7 +226,7 @@ struct MoveBracket {
   unsigned int speed;   /**< The speed of the Pokemon, used as a tie-breaker. */
 };
 
-using PluginSet = std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>;
+using PluginSet = std::array<std::vector<plugin>, PLUGIN_MAXSIZE>;
 using PluginSets = std::array< std::array<PluginSet, 6>, 12>;
 using ValidMoveSet = std::bitset<VALID_MOVE_SIZE>;
 using ValidSwapSet = std::bitset<VALID_SWAP_SIZE>;
@@ -522,7 +522,8 @@ public:
    * @param iNTeammate The index of the teammate the plugin is associated with.
    * @return The number of plugin sets the plugin was added to.
    */
-  size_t insertPluginHandler(plugin_t& cPlugin, size_t pluginType, size_t iNTeammate = SIZE_MAX);
+  size_t insertPluginHandler(
+      plugin& cPlugin, size_t pluginType, size_t iNTeammate = SIZE_MAX);
 
   const PluginSet& getCPluginSet(const ConstEnvironmentVolatile& cEnv, size_t iTeam) const;
 

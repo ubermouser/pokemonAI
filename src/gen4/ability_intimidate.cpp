@@ -24,7 +24,7 @@ int ability_intimidate_switch(PkCUEngine& cu, PokemonVolatile cPKV) {
 };
 
 void register_ability_intimidate(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(ability, "intimidate", PLUGIN_ON_SWITCHIN, ability_intimidate_switch, 1, current_team));
+  extensions.push_back(pluginOnSwitchIn(ability, "intimidate", ability_intimidate_switch, 1, current_team));
 }
 
 } // namespace gen4

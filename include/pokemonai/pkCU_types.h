@@ -146,7 +146,7 @@ struct MoveBracket {
   unsigned int speed;   /**< The speed of the Pokemon, used as a tie-breaker. */
 };
 
-// clang-format off
+
 /**
  * @name Battle Stages
  * @brief Defines the different stages of the battle engine's state machine.
@@ -157,6 +157,7 @@ struct MoveBracket {
  * @{
  */
 enum StageType : int {
+  // clang-format off
   // seed and priority evaluation:
   DNE = 0,                 /**< Stage does not exist. */
   SEEDED,                  /**< Initial environment has been seeded. */
@@ -193,7 +194,9 @@ enum StageType : int {
   POSTROUND,               /**< After all Pokemon have completed their turns. */
   HASH,                    /**< The resulting environment is being hashed. */
   FINAL,                   /**< The final stage of the round. */
+  // clang-format on
 };
+
 
 /**
  * @brief Converts a StageType to a human-readable string.
@@ -202,6 +205,7 @@ enum StageType : int {
  */
 static const char* stageTypeToString(StageType stage) {
   switch (stage) {
+    // clang-format off
     case StageType::DNE: return "DNE";
     case StageType::SEEDED: return "SEEDED";
     case StageType::SELECTORDER: return "SELECTORDER";
@@ -232,45 +236,12 @@ static const char* stageTypeToString(StageType stage) {
     case StageType::HASH: return "HASH";
     case StageType::FINAL: return "FINAL";
     default: return "UNKNOWN";
+      // clang-format on
   }
 }
 
-/** @} */
 
-// clang-format on
-
-
-/**
- * @def CALLPLUGIN
- * @brief A macro for invoking plugins of a specific type.
- *
- * This macro iterates through all registered plugins of a given `pluginType`
- * for the current matchup and calls their `pluginFunction`. The return value
- * of each plugin is OR'd with `retValue`. The loop breaks if `retValue`
- * becomes greater than 1, which is a convention to indicate that a plugin has
- * handled the event and no further plugins should be called.
- *
- * @param retValue The variable to store the combined return values of the
- * plugins.
- * @param pluginType The type of plugin to call (e.g., `PLUGIN_ON_MODIFYSPEED`).
- * @param pluginFunction The function signature of the plugin to be called.
- * @param ... The arguments to pass to the plugin function.
- */
-#define CALLPLUGIN(retValue, pluginType, pluginFunction, ...)        \
-  {                                                                  \
-    const std::vector<plugin_t>& cPlugins =                          \
-        getCPluginSet()[(size_t)pluginType];                         \
-    for (auto iPlugin = cPlugins.cbegin(), iPSize = cPlugins.cend(); \
-         iPlugin != iPSize;                                          \
-         ++iPlugin) {                                                \
-      pluginFunction cPlugin = (pluginFunction)iPlugin->pFunction;   \
-      retValue = retValue | cPlugin(__VA_ARGS__);                    \
-      if (retValue > 1) { break; }                                   \
-    }                                                                \
-  }
-
-
-using PluginSet = std::array<std::vector<plugin_t>, PLUGIN_MAXSIZE>;
+using PluginSet = std::array<std::vector<plugin>, PLUGIN_MAXSIZE>;
 using PluginSets = std::array< std::array<PluginSet, 6>, 12>;
 using ValidMoveSet = std::bitset<VALID_MOVE_SIZE>;
 using ValidSwapSet = std::bitset<VALID_SWAP_SIZE>;

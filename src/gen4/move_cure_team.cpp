@@ -35,8 +35,8 @@ int move_cureNonVolatile_team(
 };
 
 void register_move_cure_team(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "aromatherapy", PLUGIN_ON_EVALUATEMOVE, move_cureNonVolatile_team, 0, current_team));
-  extensions.push_back(plugin(move, "heal bell", PLUGIN_ON_EVALUATEMOVE, move_cureNonVolatile_team, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "aromatherapy", move_cureNonVolatile_team, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "heal bell", move_cureNonVolatile_team, 0, current_team));
 }
 
 } // namespace gen4

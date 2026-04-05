@@ -7,7 +7,7 @@ int ability_doNothing(PkCUEngine& cu, PokemonVolatile cPKV) { return 0; };
 
 void register_ability_sticky_hold(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   // clang-format off
-  extensions.push_back(plugin(ability, "sticky hold", PLUGIN_ON_SWITCHOUT, ability_doNothing, 99, current_team));
+  extensions.push_back(pluginOnSwitchOut(ability, "sticky hold", ability_doNothing, 99, current_team));
   // clang-format on
 }
 

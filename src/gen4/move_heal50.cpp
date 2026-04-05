@@ -19,12 +19,12 @@ int move_heal50(
 };
 
 void register_move_heal50(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "heal order", PLUGIN_ON_EVALUATEMOVE, move_heal50, 0, current_team));
-  extensions.push_back(plugin(move, "milk drink", PLUGIN_ON_EVALUATEMOVE, move_heal50, 0, current_team));
-  extensions.push_back(plugin(move, "recover", PLUGIN_ON_EVALUATEMOVE, move_heal50, 0, current_team));
-  extensions.push_back(plugin(move, "roost", PLUGIN_ON_EVALUATEMOVE, move_heal50, 0, current_team));
-  extensions.push_back(plugin(move, "slack off", PLUGIN_ON_EVALUATEMOVE, move_heal50, 0, current_team));
-  extensions.push_back(plugin(move, "softboiled", PLUGIN_ON_EVALUATEMOVE, move_heal50, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "heal order", move_heal50, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "milk drink", move_heal50, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "recover", move_heal50, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "roost", move_heal50, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "slack off", move_heal50, 0, current_team));
+  extensions.push_back(pluginOnEvaluateMove(move, "softboiled", move_heal50, 0, current_team));
 }
 
 } // namespace gen4

@@ -34,13 +34,9 @@ int move_tri_attack_secondary(
 }
 
 void register_move_tri_attack(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(
-      move,
-      "tri attack",
-      PLUGIN_ON_SECONDARYEFFECT,
-      move_tri_attack_secondary,
-      0,
-      all_teams));
+  // clang-format off
+  extensions.push_back(pluginOnSecondaryEffect(move, "tri attack", move_tri_attack_secondary, 0, all_teams));
+  // clang-format on
 }
 
 } // namespace gen4

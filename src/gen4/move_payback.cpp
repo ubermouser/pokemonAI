@@ -26,7 +26,7 @@ int move_payback_modPower(
 }
 
 void register_move_payback(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "payback", PLUGIN_ON_MODIFYRAWDAMAGE, move_payback_modPower, 0, current_team));
+  extensions.push_back(pluginOnModifyRawDamage(move, "payback", move_payback_modPower, 0, current_team));
 }
 
 } // namespace gen4

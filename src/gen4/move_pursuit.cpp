@@ -47,9 +47,9 @@ int move_pursuit_modAccuracy(
 }
 
 void register_move_pursuit(const Pokedex& pkAI, std::vector<plugin>& extensions) {
-  extensions.push_back(plugin(move, "pursuit", PLUGIN_ON_SETSPEEDBRACKET, move_pursuit_modBracket, 0, current_team));
-  extensions.push_back(plugin(move, "pursuit", PLUGIN_ON_MODIFYHITPROBABILITY, move_pursuit_modAccuracy, 0, current_team));
-  extensions.push_back(plugin(move, "pursuit", PLUGIN_ON_MODIFYRAWDAMAGE, move_pursuit_modPower, 0, current_team));
+  extensions.push_back(pluginOnSetSpeedBracket(move, "pursuit", move_pursuit_modBracket, 0, current_team));
+  extensions.push_back(pluginOnModifyHitProbability(move, "pursuit", move_pursuit_modAccuracy, 0, current_team));
+  extensions.push_back(pluginOnModifyRawDamage(move, "pursuit", move_pursuit_modPower, 0, current_team));
 }
 
 } // namespace gen4
