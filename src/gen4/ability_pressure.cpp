@@ -8,7 +8,7 @@ int ability_pressure(
     PokemonVolatile cPKV,
     PokemonVolatile tPKV) {
   // this plugin_t only triggered if primary has hit
-  if (!cu.getBase().flagsFor(cu.getICTeam(), ActorProxy::ALL_TEAMMATES).isHit()) { return 0; }
+  if (!cu.getBase().flagsFor((TEAM)cu.getICTeam()).isHit()) { return 0; }
 
   // Struggle is not affected by Pressure
   if (&mV.getBase() == struggle_t) { return 0; }

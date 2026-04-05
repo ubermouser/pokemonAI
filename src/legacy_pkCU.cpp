@@ -305,7 +305,7 @@ void LegacyPkCUEngine::updateState() {
     swapTeamIndexes();
   default:
   case TEAM_A:
-    getBase().flagsFor(priority, ActorProxy::ALL_TEAMMATES).setMovedFirst();
+    getBase().flagsFor((TEAM)priority).setMovedFirst();
     updateState_move();
     break;
   case 2: {
@@ -315,13 +315,13 @@ void LegacyPkCUEngine::updateState() {
 
       // first team moves first:
       iBase_ = iStages[0];
-      getBase().flagsFor(TEAM_A, ActorProxy::ALL_TEAMMATES).setMovedFirst();
+      getBase().flagsFor(TEAM_A).setMovedFirst();
       updateState_move();
 
       // swap indexes:
       iBase_ = iStages[1];
       //swapTeamIndexes(); (updateState_move swaps team indexes but does not swap them back)
-      getBase().flagsFor(TEAM_B, ActorProxy::ALL_TEAMMATES).setMovedFirst();
+      getBase().flagsFor(TEAM_B).setMovedFirst();
 
       // second team moves first:
       updateState_move();
@@ -561,7 +561,7 @@ void LegacyPkCUEngine::evaluateMove() {
 
       // was this move blocked by a status?
       // did this pokemon die from the last pokemon's action?
-      if (getBase().flagsFor(iCTeam, ActorProxy::ALL_TEAMMATES).isBlocked() ||
+      if (getBase().flagsFor(static_cast<TEAM>(iCTeam)).isBlocked() ||
           !getPKV().isAlive()) {
         stackStage_[iBase_] = STAGE_POSTTURN;
         continue;
@@ -743,7 +743,7 @@ void LegacyPkCUEngine::evaluateMove_postMove() {
     advanceStackStage();
 
     // add extra effects to the move, such as secondaries and trigger effects
-    if (!getBase().flagsFor(iCTeam, ActorProxy::ALL_TEAMMATES).isSecondary()) {
+    if (!getBase().flagsFor(static_cast<TEAM>(iCTeam)).isSecondary()) {
       continue;
     }
 
@@ -847,9 +847,7 @@ void LegacyPkCUEngine::evaluateMove_damage() {
       }
 
       // modify bitmask as the hit effect occuring:
-      stack_.at(iHEnv[0])
-          .flagsFor(getICTeam(), ActorProxy::ALL_TEAMMATES)
-          .setHit();
+      stack_.at(iHEnv[0]).flagsFor((TEAM)getICTeam()).setHit();
 
     } else {  // end of primary attack hits, and secondary attack is not assured
       // pass-through: no chance to hit or crit
@@ -864,7 +862,7 @@ void LegacyPkCUEngine::evaluateMove_damage() {
     advanceStackStage();
 
     // don't continue to evaluate a stage that will not hit the enemy team:
-    if (!getBase().flagsFor(getICTeam(), ActorProxy::ALL_TEAMMATES).isHit()) {
+    if (!getBase().flagsFor((TEAM)getICTeam()).isHit()) {
       stackStage_[iBase_] = STAGE_POSTDAMAGE;
       continue;
     }
@@ -907,9 +905,7 @@ void LegacyPkCUEngine::evaluateMove_damage() {
       }
 
       // modify bitmask as the crit effect occuring:
-      stack_.at(iCEnv[1])
-          .flagsFor(getICTeam(), ActorProxy::ALL_TEAMMATES)
-          .setCrit();
+      stack_.at(iCEnv[1]).flagsFor((TEAM)getICTeam()).setCrit();
     }
     // even with no chance to crit there's still the possibility of damage
   }
@@ -997,7 +993,7 @@ void LegacyPkCUEngine::evaluateMove_damage() {
     uint32_t levelModifier = ((cPKV.nv().getLevel() * 2) / 5) + 2;
 
     // has the pokemon crit?
-    if (getBase().flagsFor(getICTeam(), ActorProxy::ALL_TEAMMATES).isCrit()) {
+    if (getBase().flagsFor((TEAM)getICTeam()).isCrit()) {
       attackPower = std::max(cPKV.nv().getFV_base(attackType), attackPower);
       defensePower = std::min(tPKV.nv().getFV_base(defenseType), defensePower);
     }
@@ -1014,9 +1010,7 @@ void LegacyPkCUEngine::evaluateMove_damage() {
     advanceStackStage();
 
     // do nothing if the move didn't crit:
-    if (!getBase().flagsFor(getICTeam(), ActorProxy::ALL_TEAMMATES).isCrit()) {
-      continue;
-    }
+    if (!getBase().flagsFor((TEAM)getICTeam()).isCrit()) { continue; }
 
     DamageComponents_t& cDamage = getDamageComponent();
 
@@ -1124,9 +1118,7 @@ void LegacyPkCUEngine::evaluateMove_damage() {
     if (getStackStage() != STAGE_PREDAMAGE) { continue; }
     advanceStackStage();
 
-    if (!getBase().flagsFor(getICTeam(), ActorProxy::ALL_TEAMMATES).isHit()) {
-      continue;
-    }
+    if (!getBase().flagsFor((TEAM)getICTeam()).isHit()) { continue; }
 
     calculateDamage();
   }
@@ -1193,9 +1185,7 @@ void LegacyPkCUEngine::evaluateMove_script() {
       }
 
       // modify bitmask as the hit effect occuring:
-      stack_.at(iHEnv[0])
-          .flagsFor(getICTeam(), ActorProxy::ALL_TEAMMATES)
-          .setHit();
+      stack_.at(iHEnv[0]).flagsFor((TEAM)getICTeam()).setHit();
 
     } else {  // end of primary attack hits, and secondary attack is not assured
       // pass-through: no chance to hit
@@ -1208,9 +1198,7 @@ void LegacyPkCUEngine::evaluateMove_script() {
     if (getStackStage() != STAGE_PREDAMAGE) { continue; }
     advanceStackStage();
 
-    if (!getBase().flagsFor(getICTeam(), ActorProxy::ALL_TEAMMATES).isHit()) {
-      continue;
-    }
+    if (!getBase().flagsFor((TEAM)getICTeam()).isHit()) { continue; }
 
     MoveVolatile mV = getMV();
 

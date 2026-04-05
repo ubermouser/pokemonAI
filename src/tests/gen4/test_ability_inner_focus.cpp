@@ -51,7 +51,7 @@ TEST_F(InnerFocusTest, PreventsFlinch) {
   for (size_t i = 0; i < turn1_outcome.size(); ++i) {
     auto env = turn1_outcome.at(i);
     // Check if Dragonite (Team A) was blocked
-    if (env.flagsFor(TEAM_A, ActorProxy::ALL_TEAMMATES).isBlocked()) {
+    if (env.flagsFor(TEAM_A).isBlocked()) {
         found_blocked = true;
         blocked_count++;
     }
@@ -68,7 +68,7 @@ TEST_F(InnerFocusTest, ControlGroupFlinches) {
 
   for (size_t j = 0; j < turn2_outcome.size(); ++j) {
     auto env_final = turn2_outcome.at(j);
-    if (env_final.flagsFor(TEAM_A, ActorProxy::ALL_TEAMMATES).isBlocked()) {
+    if (env_final.flagsFor(TEAM_A).isBlocked()) {
         found_blocked = true;
     }
   }

@@ -21,7 +21,7 @@ int item_lifeOrb_modLife(
     PokemonVolatile cPKV,
     PokemonVolatile tPKV) {
   // must have hit, must have life orb item
-  if (!cu.getBase().flagsFor(cu.getICTeam(), ActorProxy::ALL_TEAMMATES).isHit() || !cPKV.hasItem() ||
+  if (!cu.getBase().flagsFor((TEAM)cu.getICTeam()).isHit() || !cPKV.hasItem() ||
       !(&cPKV.getItem() == lifeOrb_t)) {
     return 0;
   }

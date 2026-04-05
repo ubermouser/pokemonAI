@@ -15,7 +15,7 @@ int move_roar_forceSwitch(
     PokemonVolatile tPKV) {
   const Move* cMove = &mV.getBase();
   if (cMove != whirlwind_t && cMove != roar_t) { return 0; }
-  if (!cu.getBase().flagsFor(cu.getICTeam(), ActorProxy::ALL_TEAMMATES).isHit()) { return 0; }
+  if (!cu.getBase().flagsFor((TEAM)cu.getICTeam()).isHit()) { return 0; }
 
   TeamVolatile tTV = cu.getTTV();
 

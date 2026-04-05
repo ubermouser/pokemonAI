@@ -19,7 +19,8 @@ int move_suckerPunch_noDamageOnCondition(
   bool enemyDamagingAction =
       damageType == ATK_PHYSICAL || damageType == ATK_SPECIAL;
   // if the enemy moves first:
-  bool enemyMovedFirst = cu.getBase().flagsFor(cu.getIOTeam(), ActorProxy::ALL_TEAMMATES).isMovedFirst();
+  bool enemyMovedFirst =
+      cu.getBase().flagsFor((TEAM)cu.getIOTeam()).isMovedFirst();
   if (!enemyDamagingAction || enemyMovedFirst) {
     // the move does not deal damage if these conditions are met:
     raw_damage = 0;

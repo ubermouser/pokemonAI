@@ -36,7 +36,7 @@ class MetalBurstTest : public Gen4EngineTest {
     env_nv = std::make_shared<EnvironmentNonvolatile>(team_a, team_b, true);
     engine_->setEnvironment(env_nv);
 
-    both_hit = EnvironmentBitfield().flagsFor(0, ActorProxy::ALL_TEAMMATES).setHit().flagsFor(1, ActorProxy::ALL_TEAMMATES).setHit();
+    both_hit = EnvironmentBitfield().flagsFor(TEAM_A).setHit().flagsFor(TEAM_B).setHit();
 
     // Standard state: Aggron vs Garchomp
     state_physical = PossibleEnvironments();
@@ -87,7 +87,7 @@ TEST_F(MetalBurstTest, MetalBurstPhysical) {
 TEST_F(MetalBurstTest, MetalBurstSpecial) {
   // Starmie uses Surf (0), Aggron uses Metal Burst (0)
   auto result = engine_->updateState(
-      state_special.where1(EnvironmentBitfield().flagsFor(1, ActorProxy::ALL_TEAMMATES).setSwitched()).getEnv(),
+      state_special.where1(EnvironmentBitfield().flagsFor(TEAM_B).setSwitched()).getEnv(),
       Action::move(0),
       Action::move(0));
   auto state = result.where1(both_hit);
@@ -111,7 +111,7 @@ TEST_F(MetalBurstTest, MetalBurstFailsIfMovingFirst) {
   // Aggron vs Shuckle. Aggron is faster.
   // Aggron uses Metal Burst (0), Shuckle uses Toxic (0).
   auto result = engine_->updateState(
-      state_slow.where1(EnvironmentBitfield().flagsFor(1, ActorProxy::ALL_TEAMMATES).setSwitched()).getEnv(),
+      state_slow.where1(EnvironmentBitfield().flagsFor(TEAM_B).setSwitched()).getEnv(),
       Action::move(0),
       Action::move(0));
 

@@ -82,11 +82,17 @@ struct ActorProxyImpl {
   ActorProxyImpl flagsFor(size_t nextITeam, size_t nextITeammate) {
     return ActorProxyImpl<BitfieldType>(b, nextITeam, nextITeammate);
   }
+  ActorProxyImpl flagsFor(TEAM team) {
+    return ActorProxyImpl<BitfieldType>(b, static_cast<size_t>(team), ALL_TEAMMATES);
+  }
   ActorProxyImpl flagsFor(const Actor& a) {
     return ActorProxyImpl<BitfieldType>(b, a.iTeam(), a.iTeammate());
   }
   ActorProxyImpl flagsFor(size_t nextITeam, size_t nextITeammate) const {
     return ActorProxyImpl<const BitfieldType>(b, nextITeam, nextITeammate);
+  }
+  ActorProxyImpl flagsFor(TEAM team) const {
+    return ActorProxyImpl<const BitfieldType>(b, static_cast<size_t>(team), ALL_TEAMMATES);
   }
   ActorProxyImpl flagsFor(const Actor& a) const {
     return ActorProxyImpl<const BitfieldType>(b, a.iTeam(), a.iTeammate());
@@ -172,8 +178,10 @@ union EnvironmentBitfield {
   }
 
   ActorProxy flagsFor(size_t iTeam, size_t iTeammate) { return ActorProxy(*this, iTeam, iTeammate); }
+  ActorProxy flagsFor(TEAM team) { return ActorProxy(*this, static_cast<size_t>(team), ActorProxy::ALL_TEAMMATES); }
   ActorProxy flagsFor(const Actor& a) { return ActorProxy(*this, a.iTeam(), a.iTeammate()); }
   ConstActorProxy flagsFor(size_t iTeam, size_t iTeammate) const { return ConstActorProxy(*this, iTeam, iTeammate); }
+  ConstActorProxy flagsFor(TEAM team) const { return ConstActorProxy(*this, static_cast<size_t>(team), ActorProxy::ALL_TEAMMATES); }
   ConstActorProxy flagsFor(const Actor& a) const { return ConstActorProxy(*this, a.iTeam(), a.iTeammate()); }
 
   uint8_t getTeamOr(size_t iTeam) const {

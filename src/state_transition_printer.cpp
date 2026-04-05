@@ -37,7 +37,7 @@ void StateTransitionPrinter::print(
     const ConstEnvironmentPossible& nsP) {
   // Determine order of actions based on movesFirst bit
   std::array<size_t, 2> order = {0, 1};
-  if (nsP.flagsFor(1, ActorProxy::ALL_TEAMMATES).isMovedFirst()) {
+  if (nsP.flagsFor(TEAM_B).isMovedFirst()) {
     order = {1, 0};
   }
 
@@ -45,7 +45,7 @@ void StateTransitionPrinter::print(
     reportSwitch(os, nsP, iTeam);
     reportHitResult(os, nsP, iTeam);
 
-    if (nsP.flagsFor(iTeam, ActorProxy::ALL_TEAMMATES).isSwitched()) {
+    if (nsP.flagsFor(static_cast<TEAM>(iTeam)).isSwitched()) {
       size_t activeOld = osP.getTeam(iTeam).getICPKV();
       const auto& pkOld = osP.teammate(iTeam, activeOld);
       const auto& pkNew = nsP.teammate(iTeam, activeOld);
@@ -84,7 +84,7 @@ void StateTransitionPrinter::print(
 
 void StateTransitionPrinter::reportSwitch(
     std::ostream& os, const ConstEnvironmentPossible& nsP, size_t iTeam) {
-  if (nsP.flagsFor(iTeam, ActorProxy::ALL_TEAMMATES).isSwitched()) {
+  if (nsP.flagsFor(static_cast<TEAM>(iTeam)).isSwitched()) {
     fmt::print(
         os,
         "Team {} sent out {}!\n",
@@ -98,7 +98,7 @@ void StateTransitionPrinter::reportHitResult(
     std::ostream& os, const ConstEnvironmentPossible& nsP, size_t iTeam) {
   auto pkName = pokemonName(nsP.getTeam(iTeam).getPKV());
 
-  auto pkProxy = nsP.flagsFor(iTeam, ActorProxy::ALL_TEAMMATES);
+  auto pkProxy = nsP.flagsFor(static_cast<TEAM>(iTeam));
 
   if (pkProxy.isWaited()) {
     // Waiting, nothing to report here usually

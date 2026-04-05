@@ -117,6 +117,9 @@ public:
   ConstActorProxy flagsFor(size_t iTeam, size_t iTeammate) const {
     return data().flags.flagsFor(iTeam, iTeammate);
   }
+  ConstActorProxy flagsFor(TEAM team) const {
+    return data().flags.flagsFor(team);
+  }
 
   bool isMerged() const { return data().isMerged(); }
   bool isPruned() const { return data().isPruned(); }
@@ -164,6 +167,9 @@ public:
   ActorProxy flagsFor(const Actor& actor) { return data().flags.flagsFor(actor); }
   ActorProxy flagsFor(size_t iTeam, size_t iTeammate) {
     return data().flags.flagsFor(iTeam, iTeammate);
+  }
+  ActorProxy flagsFor(TEAM team) {
+    return data().flags.flagsFor(team);
   }
 
   FixType& getProbability() { return data().getProbability(); };

@@ -101,7 +101,7 @@ TEST_F(EncoreTest, PreemptsChoiceIfMoveIsForbidden) {
   // state_p_s: Alakazam(Psychic), Blissey(Softboiled/Move 1)
   // state_encored_seismic: Alakazam(Encore), Blissey(Seismic Toss/Move 0)
   // Blissey is encored into Softboiled (Move 1).
-  EXPECT_TRUE(state2.flagsFor(TEAM_B, ActorProxy::ALL_TEAMMATES).isBlocked());  // It was "blocked" and switched to encored move
+  EXPECT_TRUE(state2.flagsFor(TEAM_B).isBlocked());  // It was "blocked" and switched to encored move
 
   // Check that Blissey is now encored into Soft-Boiled (Move 1)
   auto teamStatus = state2.teammate(1, 0).status();
@@ -221,7 +221,7 @@ TEST_F(EncoreTest, EncoreAndTaunt) {
   auto env4 = results_encore_taunt_struggle.where1();
 
   // Blissey should have been blocked (from Move 1 because of Taunt)
-  EXPECT_TRUE(env4.flagsFor(TEAM_B, ActorProxy::ALL_TEAMMATES).isBlocked());
+  EXPECT_TRUE(env4.flagsFor(TEAM_B).isBlocked());
 }
 
 TEST_F(EncoreTest, EndsOnPPDepletion) {

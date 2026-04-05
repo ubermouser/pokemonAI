@@ -54,10 +54,10 @@ TEST_F(InfatuationStatusTest, Test_InfatuationBlocksMove) {
   FixType prob_not_blocked = FixType(0);
   for (size_t i = 0; i < results2.size(); ++i) {
     auto env = results2.at(i);
-    if (env.flagsFor(1, ActorProxy::ALL_TEAMMATES).isBlocked()) {
+    if (env.flagsFor(TEAM_B).isBlocked()) {
       found_blocked = true;
       EXPECT_NEAR(env.getProbability().to_double(), 0.5, 0.01);
-    } else if (env.flagsFor(1, ActorProxy::ALL_TEAMMATES).isHit()) {
+    } else if (env.flagsFor(TEAM_B).isHit()) {
       prob_not_blocked = prob_not_blocked + env.getProbability();
     }
   }
