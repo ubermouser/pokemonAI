@@ -332,7 +332,10 @@ std::vector<Actor> ENV_VOLATILE_IMPL::getTargets(
         }
         break;
       case Action::FRIENDLY_SIDE:  // does not target a pokemon
-        targets.push_back(defaultTarget(actor, action));
+        if (action.enemyTarget() != Action::HOSTILE_SIDE) {
+          // don't add the default target twice if we are targeting both sides:
+          targets.push_back(defaultTarget(actor, action));
+        }
         break;
       default:
         throw std::runtime_error(fmt::format(

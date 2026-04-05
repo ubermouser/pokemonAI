@@ -34,6 +34,7 @@ foreach(test_file IN LISTS TEST_SOURCES)
         spdlog::spdlog
         GTest::gtest
         GTest::gtest_main
+        GTest::gmock
     )
 
     if(test_name IN_LIST DECIDER_TESTS)

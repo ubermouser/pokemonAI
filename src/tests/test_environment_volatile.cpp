@@ -1,217 +1,347 @@
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include "gen4/engine_test.hpp"
+
+#include <unordered_map>
+
+#include "mock_engine_test.hpp"
 #include "pokemonai/environment_volatile.h"
 
-class EnvironmentVolatileTest : public Gen4EngineTest {
+
+using ::testing::UnorderedElementsAreArray;
+
+
+class EnvironmentVolatileTest : public MockEngineTest {
  protected:
   void SetUp() override {
-#if USE_LEGACY_ENGINE
-    GTEST_SKIP() << "Neo-Engine test";
-#endif
+    MockEngineTest::SetUp();
+  }
 
-    Gen4EngineTest::SetUp();
+  /**
+   * @brief Helper to initialize a testing environment with a specific move on
+   * the testing actor.
+   *
+   * @param numActive Number of active pokemon per side (1, 2, or 3).
+   * @param actorSlot Internal team slot (0-5) of the pokemon to perform the
+   * move.
+   * @param moveName The name of the move from MockPokedex to assign to the
+   * actor.
+   */
+  void setupEnvironment(size_t numActive, size_t actorSlot, const std::string& moveName) {
+    auto createTeam = [&](size_t teamIdx, bool isActorTeam) {
+      auto team = TeamNonVolatile();
+      for (size_t i = 0; i < 6; ++i) {
+        auto p = PokemonNonVolatile()
+            .setBase(pokedex_->pokemon("test_pokemon"))
+            .setLevel(100);
+        if (isActorTeam && i == actorSlot) {
+          p.addMove(pokedex_->move(moveName));
+        } else {
+          p.addMove(pokedex_->move("test_move"));
+        }
+        team.addPokemon(p);
+      }
+      return team;
+    };
 
-    // 2v2 setup
-    auto team_a = TeamNonVolatile()
-        .addPokemon(PokemonNonVolatile()
-            .setBase(pokedex_->pokemon("mew"))
-            .addMove(pokedex_->move("iron head"))      // ANY_ADJACENT
-            .addMove(pokedex_->move("aerial ace"))     // ANY_ACTIVE
-            .addMove(pokedex_->move("earthquake"))     // ALL_ADJACENT
-            .addMove(pokedex_->move("baton pass"))     // ANY_ALLY
-            .setLevel(100))
-        .addPokemon(PokemonNonVolatile()
-            .setBase(pokedex_->pokemon("celebi"))
-            .addMove(pokedex_->move("recover"))        // SELF
-            .setLevel(100))
-        .addPokemon(PokemonNonVolatile() // Reserve
-            .setBase(pokedex_->pokemon("jirachi"))
-            .setLevel(100));
+    auto team_a = createTeam(0, true);
+    auto team_b = createTeam(1, false);
+    
+    engine_->setNumActivePokemon(numActive);
+    engine_->setEnvironment(EnvironmentNonvolatile(team_a, team_b, true));
+  }
 
-    auto team_b = TeamNonVolatile()
-        .addPokemon(PokemonNonVolatile()
-            .setBase(pokedex_->pokemon("charmander"))
-            .setLevel(100))
-        .addPokemon(PokemonNonVolatile()
-            .setBase(pokedex_->pokemon("squirtle"))
-            .setLevel(100));
+  /**
+   * @brief Comprehensive verification helper for move targeting.
+   *
+   * This method performs two separate validations:
+   * 1. Action Generation: It calls env.getActions() and verifies that the
+   * resulting set of Action objects matches @p expectedActions.
+   * 2. Target Resolution: For each generated action, it calls env.getTargets()
+   * and verifies that the resolved Actor list matches the pre-defined @p
+   * expectedTargets.
+   *
+   * @param numActive Number of active pokemon per side.
+   * @param actorSlot Slot of the actor performing the move.
+   * @param moveName Name of the mock move being tested.
+   * @param expectedActions The complete set of expected Action objects for this
+   * move and board state.
+   * @param expectedTargets A map from Action to its expected target Actor list.
+   */
+  void verify(
+      size_t numActive,
+      size_t actorSlot,
+      const std::string& moveName,
+      const std::vector<::Action>& expectedActions,
+      const std::unordered_map<::Action, std::vector<Actor>>& expectedTargets) {
+    setupEnvironment(numActive, actorSlot, moveName);
+    auto env = engine_->initialState();
+    Actor actor(0, actorSlot);
+    const MoveNonVolatile& move = env.teammate(actor).nv().getMove(0);
 
-    auto environment = EnvironmentNonvolatile(team_a, team_b, true);
-    engine_->setNumActivePokemon(2);
-    engine_->setEnvironment(environment);
+    // Phase 1: Action Generation
+    auto actions = env.getActions(actor, move);
+    EXPECT_THAT(actions, UnorderedElementsAreArray(expectedActions))
+        << "Failed actions for " << moveName << " [" << numActive << "v" << numActive << ", slot " << actorSlot << "]";
+
+    // Phase 2: Target Resolution per Action
+    for (const auto& action : actions) {
+      auto targets = env.getTargets(actor, action);
+      auto it = expectedTargets.find(action);
+      if (it != expectedTargets.end()) {
+        EXPECT_THAT(targets, UnorderedElementsAreArray(it->second))
+            << "Failed targets for " << moveName << " action " << action;
+      } else {
+        ADD_FAILURE() << "No expected targets defined for action " << action << " of " << moveName;
+      }
+    }
   }
 };
 
 
-TEST_F(EnvironmentVolatileTest, GetActionsSelf) {
-  ConstEnvironmentVolatile env = engine_->initialState();
-  Actor actor(0, 1); // Celebi
-  const MoveNonVolatile& move = env.teammate(actor).nv().getMove(0); // Recover
+// --- 1v1 Tests ---
 
-  auto actions = env.getActions(actor, move);
-  ASSERT_EQ(actions.size(), 1);
-  EXPECT_EQ(actions[0].type(), Action::MOVE_0);
-  EXPECT_EQ(actions[0].friendlyTarget(), Action::FRIENDLY_1);
-  EXPECT_EQ(actions[0].enemyTarget(), Action::HOSTILE_DEFAULT);
+
+TEST_F(EnvironmentVolatileTest, Targeting1v1_move_self) {
+  verify(1, 0, "move_self", 
+         {::Action::moveAlly(0, 0)}, 
+         {{::Action::moveAlly(0, 0), {Actor(0, 0)}}});
 }
 
 
-TEST_F(EnvironmentVolatileTest, GetActionsEnemy) {
-  ConstEnvironmentVolatile env = engine_->initialState();
-  Actor actor(0, 0); // Jirachi
-  const MoveNonVolatile& move = env.teammate(actor).nv().getMove(0); // Iron Head
-
-  auto actions = env.getActions(actor, move);
-  // ANY_ADJACENT should have 3 actions: teammate Celebi, enemy charmander, enemy squirtle
-  ASSERT_EQ(actions.size(), 3);
-  
-  bool foundCelebi = false;
-  bool foundCharmander = false;
-  bool foundSquirtle = false;
-  for (const auto& a : actions) {
-    if (a.friendlyTarget() == Action::FRIENDLY_1) foundCelebi = true;
-    if (a.enemyTarget() == Action::HOSTILE_0) foundCharmander = true;
-    if (a.enemyTarget() == Action::HOSTILE_1) foundSquirtle = true;
-  }
-  EXPECT_TRUE(foundCelebi);
-  EXPECT_TRUE(foundCharmander);
-  EXPECT_TRUE(foundSquirtle);
+TEST_F(EnvironmentVolatileTest, Targeting1v1_move_any_adjacent) {
+  verify(1, 0, "move_any_adjacent", 
+         {::Action::moveEnemy(0, 0)}, 
+         {{::Action::moveEnemy(0, 0), {Actor(1, 0)}}});
 }
 
 
-TEST_F(EnvironmentVolatileTest, GetActionsAnyActive) {
-  ConstEnvironmentVolatile env = engine_->initialState();
-  Actor actor(0, 0); // Jirachi
-  const MoveNonVolatile& move = env.teammate(actor).nv().getMove(1); // Aerial Ace
-
-  auto actions = env.getActions(actor, move);
-  // ANY_ACTIVE should target everyone EXCEPT self (Celebi, Charmander, Squirtle)
-  ASSERT_EQ(actions.size(), 3);
-  
-  bool foundCelebi = false;
-  bool foundCharmander = false;
-  bool foundSquirtle = false;
-  for (const auto& a : actions) {
-    if (a.friendlyTarget() == Action::FRIENDLY_1) foundCelebi = true;
-    if (a.enemyTarget() == Action::HOSTILE_0) foundCharmander = true;
-    if (a.enemyTarget() == Action::HOSTILE_1) foundSquirtle = true;
-  }
-  EXPECT_TRUE(foundCelebi);
-  EXPECT_TRUE(foundCharmander);
-  EXPECT_TRUE(foundSquirtle);
+TEST_F(EnvironmentVolatileTest, Targeting1v1_move_any_ally) {
+  verify(1, 0, "move_any_ally", 
+         {::Action::moveAlly(0, 1), ::Action::moveAlly(0, 2), ::Action::moveAlly(0, 3), ::Action::moveAlly(0, 4), ::Action::moveAlly(0, 5)}, 
+         {
+             {::Action::moveAlly(0, 1), {Actor(0, 1)}},
+             {::Action::moveAlly(0, 2), {Actor(0, 2)}},
+             {::Action::moveAlly(0, 3), {Actor(0, 3)}},
+             {::Action::moveAlly(0, 4), {Actor(0, 4)}},
+             {::Action::moveAlly(0, 5), {Actor(0, 5)}}
+         });
 }
 
 
-TEST_F(EnvironmentVolatileTest, GetActionsAllAdjacent) {
-  ConstEnvironmentVolatile env = engine_->initialState();
-  Actor actor(0, 0); // Jirachi
-  const MoveNonVolatile& move = env.teammate(actor).nv().getMove(2); // Earthquake
-
-  auto actions = env.getActions(actor, move);
-  ASSERT_EQ(actions.size(), 1);
-  EXPECT_EQ(actions[0].type(), Action::MOVE_2);
-  // For ALL_ADJACENT, we use a single action with MOVE constant
+TEST_F(EnvironmentVolatileTest, Targeting1v1_move_all_adjacent) {
+  verify(1, 0, "move_all_adjacent", 
+         {::Action::moveAdjacent(0)}, 
+         {{::Action::moveAdjacent(0), {Actor(1, 0)}}});
 }
 
 
-TEST_F(EnvironmentVolatileTest, GetActionsAnyAlly) {
-  ConstEnvironmentVolatile env = engine_->initialState();
-  Actor actor(0, 0); // Jirachi
-  const MoveNonVolatile& move = env.teammate(actor).nv().getMove(3); // Baton Pass
-
-  auto actions = env.getActions(actor, move);
-  // Should have all living teammates: Jirachi (self), Celebi (active), Mew (reserve)
-  ASSERT_EQ(actions.size(), 2);
-  
-  std::vector<size_t> targets;
-  for (const auto& a : actions) {
-    if (a.friendlyTarget() == Action::FRIENDLY_DEFAULT) targets.push_back(0);
-    else targets.push_back(a.iFriendly());
-  }
-  std::sort(targets.begin(), targets.end());
-  EXPECT_EQ(targets[0], 1);
-  EXPECT_EQ(targets[1], 2);
+TEST_F(EnvironmentVolatileTest, Targeting1v1_move_side_ally) {
+  verify(
+      1,
+      0,
+      "move_side_ally",
+      {::Action::moveSideAlly(0)},
+      {{::Action::moveSideAlly(0), {Actor(0, 0)}}});
 }
 
 
-TEST_F(EnvironmentVolatileTest, GetTargetsSpecificEnemy) {
-  ConstEnvironmentVolatile env = engine_->initialState();
-  Actor actor(0, 0);
-  Action action = Action::moveEnemy(0, 1); // Target Squirtle
+// --- 2v2 Tests (Slot 0) ---
 
-  auto targets = env.getTargets(actor, action);
-  ASSERT_EQ(targets.size(), 1);
-  EXPECT_EQ(targets[0].iTeam(), 1);
-  EXPECT_EQ(targets[0].iTeammate(), 1);
+
+TEST_F(EnvironmentVolatileTest, Targeting2v2_Slot0_move_any_adjacent) {
+  verify(2, 0, "move_any_adjacent", 
+         {::Action::moveAlly(0, 1), ::Action::moveEnemy(0, 0), ::Action::moveEnemy(0, 1)}, 
+         {
+             {::Action::moveAlly(0, 1), {Actor(0, 1)}},
+             {::Action::moveEnemy(0, 0), {Actor(1, 0)}},
+             {::Action::moveEnemy(0, 1), {Actor(1, 1)}}
+         });
 }
 
 
-TEST_F(EnvironmentVolatileTest, GetTargetsFriendlyAll) {
-  ConstEnvironmentVolatile env = engine_->initialState();
-  Actor actor(0, 0);
-  Action action(Action::MOVE_0, Action::FRIENDLY_ALL, Action::HOSTILE_DEFAULT);
-  
-  auto targets = env.getTargets(actor, action);
-  ASSERT_EQ(targets.size(), 3); // Mew, Celebi, Jirachi
-  
-  std::vector<size_t> indices;
-  for (const auto& t : targets) {
-    EXPECT_EQ(t.iTeam(), 0);
-    indices.push_back(t.iTeammate());
-  }
-  std::sort(indices.begin(), indices.end());
-  EXPECT_EQ(indices[0], 0);
-  EXPECT_EQ(indices[1], 1);
-  EXPECT_EQ(indices[2], 2);
+TEST_F(EnvironmentVolatileTest, Targeting2v2_Slot0_move_any_ally) {
+  verify(2, 0, "move_any_ally", 
+         {::Action::moveAlly(0, 1), ::Action::moveAlly(0, 2), ::Action::moveAlly(0, 3), ::Action::moveAlly(0, 4), ::Action::moveAlly(0, 5)}, 
+         {
+             {::Action::moveAlly(0, 1), {Actor(0, 1)}},
+             {::Action::moveAlly(0, 2), {Actor(0, 2)}},
+             {::Action::moveAlly(0, 3), {Actor(0, 3)}},
+             {::Action::moveAlly(0, 4), {Actor(0, 4)}},
+             {::Action::moveAlly(0, 5), {Actor(0, 5)}}
+         });
 }
 
 
-TEST_F(EnvironmentVolatileTest, MoveIndexManagement) {
-  auto pknv = PokemonNonVolatile()
-    .setBase(pokedex_->pokemon("mew"))
-    .setLevel(100);
-  
-  // Test addMove
-  pknv.addMove(pokedex_->move("iron head"));   // Index 0
-  pknv.addMove(pokedex_->move("aerial ace"));  // Index 1
-  pknv.addMove(pokedex_->move("earthquake"));  // Index 2
-  
-  EXPECT_EQ(pknv.getMove(0).getIMove(), 0);
-  EXPECT_EQ(pknv.getMove(1).getIMove(), 1);
-  EXPECT_EQ(pknv.getMove(2).getIMove(), 2);
-  
-  // Test setMove
-  pknv.setMove(1, pokedex_->move("baton pass"));
-  EXPECT_EQ(pknv.getMove(1).getIMove(), 1);
-  EXPECT_EQ(pknv.getMove(1).getBase().getName(), "baton pass");
-  
-  // Test removeMove from middle
-  pknv.removeMove(1); // Remove baton pass
-  ASSERT_EQ(pknv.getNumMoves(), 2);
-  EXPECT_EQ(pknv.getMove(0).getIMove(), 0);
-  EXPECT_EQ(pknv.getMove(0).getBase().getName(), "iron head");
-  EXPECT_EQ(pknv.getMove(1).getIMove(), 1);
-  EXPECT_EQ(pknv.getMove(1).getBase().getName(), "earthquake");
-  
-  // Test struggle
-  EXPECT_EQ(MoveNonVolatile::mNV_struggle->getIMove(), 4);
+TEST_F(EnvironmentVolatileTest, Targeting2v2_Slot0_move_all_adjacent) {
+  verify(2, 0, "move_all_adjacent", 
+         {::Action::moveAdjacent(0)}, 
+         {{::Action::moveAdjacent(0), {Actor(0, 1), Actor(1, 0), Actor(1, 1)}}});
 }
 
 
-TEST_F(EnvironmentVolatileTest, GetTargetsAllAdjacent) {
-  ConstEnvironmentVolatile env = engine_->initialState();
-  Actor actor(0, 0);
-  // Earthquake uses HOSTILE_ADJACENT or similar?
-  // Actually, Earthquake is often MOVE_X with specific target resolution in engine.
-  // But our getActions for ALL_ADJACENT returns MOVE(iMove).
-  // And getTargets for MOVE(iMove) with DEFAULT targets returns SELF.
-  // Wait, earthquake should target everyone else.
-  
-  // Let's test a HOSTILE_ADJACENT action directly
-  Action action(Action::MOVE_0, Action::FRIENDLY_DEFAULT, Action::HOSTILE_ADJACENT);
-  auto targets = env.getTargets(actor, action);
-  // Should target both active enemies
-  ASSERT_EQ(targets.size(), 2);
-  EXPECT_EQ(targets[0].iTeam(), 1);
-  EXPECT_EQ(targets[1].iTeam(), 1);
+// --- 2v2 Tests (Slot 1) ---
+
+
+TEST_F(EnvironmentVolatileTest, Targeting2v2_Slot1_move_any_adjacent) {
+  verify(2, 1, "move_any_adjacent", 
+         {::Action::moveAlly(0, 0), ::Action::moveEnemy(0, 0), ::Action::moveEnemy(0, 1)}, 
+         {
+             {::Action::moveAlly(0, 0), {Actor(0, 0)}},
+             {::Action::moveEnemy(0, 0), {Actor(1, 0)}},
+             {::Action::moveEnemy(0, 1), {Actor(1, 1)}}
+         });
+}
+
+
+// --- 3v3 Tests (Slot 0 - Edge) ---
+
+
+TEST_F(EnvironmentVolatileTest, Targeting3v3_Slot0_move_any_adjacent) {
+  verify(3, 0, "move_any_adjacent", 
+         {::Action::moveAlly(0, 1), ::Action::moveEnemy(0, 0), ::Action::moveEnemy(0, 1)}, 
+         {
+             {::Action::moveAlly(0, 1), {Actor(0, 1)}},
+             {::Action::moveEnemy(0, 0), {Actor(1, 0)}},
+             {::Action::moveEnemy(0, 1), {Actor(1, 1)}}
+         });
+}
+
+
+TEST_F(EnvironmentVolatileTest, Targeting3v3_Slot0_move_all_adjacent) {
+  verify(3, 0, "move_all_adjacent", 
+         {::Action::moveAdjacent(0)}, 
+         {{::Action::moveAdjacent(0), {Actor(0, 1), Actor(1, 0), Actor(1, 1)}}});
+}
+
+
+// --- 3v3 Tests (Slot 1 - Center) ---
+
+
+TEST_F(EnvironmentVolatileTest, Targeting3v3_Slot1_move_any_adjacent) {
+  verify(3, 1, "move_any_adjacent", 
+         {::Action::moveAlly(0, 0), ::Action::moveAlly(0, 2), ::Action::moveEnemy(0, 0), ::Action::moveEnemy(0, 1), ::Action::moveEnemy(0, 2)}, 
+         {
+             {::Action::moveAlly(0, 0), {Actor(0, 0)}},
+             {::Action::moveAlly(0, 2), {Actor(0, 2)}},
+             {::Action::moveEnemy(0, 0), {Actor(1, 0)}},
+             {::Action::moveEnemy(0, 1), {Actor(1, 1)}},
+             {::Action::moveEnemy(0, 2), {Actor(1, 2)}}
+         });
+}
+
+
+// --- Comprehensive Types 3v3 (Slot 1) ---
+
+
+TEST_F(EnvironmentVolatileTest, AllTypes3v3_move_any_active) {
+  verify(3, 1, "move_any_active", 
+         {::Action::moveAlly(0, 0), ::Action::moveAlly(0, 2), ::Action::moveEnemy(0, 0), ::Action::moveEnemy(0, 1), ::Action::moveEnemy(0, 2)}, 
+         {
+             {::Action::moveAlly(0, 0), {Actor(0, 0)}},
+             {::Action::moveAlly(0, 2), {Actor(0, 2)}},
+             {::Action::moveEnemy(0, 0), {Actor(1, 0)}},
+             {::Action::moveEnemy(0, 1), {Actor(1, 1)}},
+             {::Action::moveEnemy(0, 2), {Actor(1, 2)}}
+         });
+}
+
+
+TEST_F(EnvironmentVolatileTest, AllTypes3v3_move_all_active) {
+  verify(3, 1, "move_all_active", 
+         {::Action::moveActive(0)}, 
+         {{::Action::moveActive(0), {Actor(0, 0), Actor(0, 1), Actor(0, 2), Actor(1, 0), Actor(1, 1), Actor(1, 2)}}});
+}
+
+
+TEST_F(EnvironmentVolatileTest, AllTypes3v3_move_all_active_allies) {
+  verify(3, 1, "move_all_active_allies", 
+         {::Action::moveActiveAlly(0)}, 
+         {{::Action::moveActiveAlly(0), {Actor(0, 0), Actor(0, 1), Actor(0, 2)}}});
+}
+
+
+TEST_F(EnvironmentVolatileTest, AllTypes3v3_move_all_active_enemies) {
+  verify(3, 1, "move_all_active_enemies", 
+         {::Action::moveActiveEnemy(0)}, 
+         {{::Action::moveActiveEnemy(0), {Actor(1, 0), Actor(1, 1), Actor(1, 2)}}});
+}
+
+
+TEST_F(EnvironmentVolatileTest, AllTypes3v3_move_all_field) {
+  verify(3, 1, "move_all_field", 
+         {::Action::moveAll(0)}, 
+         {{::Action::moveAll(0), {
+             Actor(0,0), Actor(0,1), Actor(0,2), Actor(0,3), Actor(0,4), Actor(0,5),
+             Actor(1,0), Actor(1,1), Actor(1,2), Actor(1,3), Actor(1,4), Actor(1,5)
+         }}});
+}
+
+
+TEST_F(EnvironmentVolatileTest, AllTypes3v3_move_any_adjacent_ally) {
+  verify(3, 1, "move_any_adjacent_ally", 
+         {::Action::moveAlly(0, 0), ::Action::moveAlly(0, 2)}, 
+         {
+             {::Action::moveAlly(0, 0), {Actor(0, 0)}},
+             {::Action::moveAlly(0, 2), {Actor(0, 2)}}
+         });
+}
+
+
+TEST_F(EnvironmentVolatileTest, AllTypes3v3_move_any_adjacent_enemy) {
+  verify(3, 1, "move_any_adjacent_enemy", 
+         {::Action::moveEnemy(0, 0), ::Action::moveEnemy(0, 1), ::Action::moveEnemy(0, 2)}, 
+         {
+             {::Action::moveEnemy(0, 0), {Actor(1, 0)}},
+             {::Action::moveEnemy(0, 1), {Actor(1, 1)}},
+             {::Action::moveEnemy(0, 2), {Actor(1, 2)}}
+         });
+}
+
+
+TEST_F(EnvironmentVolatileTest, AllTypes3v3_move_any_adjacent_ally_self) {
+  verify(3, 1, "move_any_adjacent_ally_self", 
+         {::Action::moveAlly(0, 0), ::Action::moveAlly(0, 1), ::Action::moveAlly(0, 2)}, 
+         {
+             {::Action::moveAlly(0, 0), {Actor(0, 0)}},
+             {::Action::moveAlly(0, 1), {Actor(0, 1)}},
+             {::Action::moveAlly(0, 2), {Actor(0, 2)}}
+         });
+}
+
+
+TEST_F(EnvironmentVolatileTest, AllTypes3v3_move_all_adjacent_enemy) {
+  verify(3, 1, "move_all_adjacent_enemy", 
+         {::Action::moveAdjacentEnemy(0)}, 
+         {{::Action::moveAdjacentEnemy(0), {Actor(1, 0), Actor(1, 1), Actor(1, 2)}}});
+}
+
+
+TEST_F(EnvironmentVolatileTest, AllTypes3v3_move_all_adjacent_ally) {
+  verify(3, 1, "move_all_adjacent_ally", 
+         {::Action::moveAdjacentAlly(0)}, 
+         {{::Action::moveAdjacentAlly(0), {Actor(0, 0), Actor(0, 2)}}});
+}
+
+
+TEST_F(EnvironmentVolatileTest, AllTypes3v3_move_all_allies) {
+  verify(3, 1, "move_all_allies", 
+         {::Action::moveAllAllies(0)}, 
+         {{::Action::moveAllAllies(0), {Actor(0, 0), Actor(0, 1), Actor(0, 2), Actor(0, 3), Actor(0, 4), Actor(0, 5)}}});
+}
+
+
+TEST_F(EnvironmentVolatileTest, AllTypes3v3_move_all_enemies) {
+  verify(3, 1, "move_all_enemies", 
+         {::Action::moveAllEnemies(0)}, 
+         {{::Action::moveAllEnemies(0), {Actor(1, 0), Actor(1, 1), Actor(1, 2), Actor(1, 3), Actor(1, 4), Actor(1, 5)}}});
+}
+
+
+TEST_F(EnvironmentVolatileTest, AllTypes3v3_move_side_all) {
+  verify(
+      3,
+      1,
+      "move_side_all",
+      {::Action::moveSideAll(0)},
+      {{::Action::moveSideAll(0), {Actor(1, 1)}}});
 }
