@@ -90,6 +90,7 @@ TEST_F(GameTest, UninitializedCustom) {
   }, std::runtime_error);
 }
 
+
 TEST_F(GameTest, KODetection) {
   auto game =
       Game().setMaxMatches(1).setVerbosity(0).setEnvironment(environment_nv);
@@ -100,4 +101,30 @@ TEST_F(GameTest, KODetection) {
   EXPECT_EQ(result.teams[TEAM_A].pokemon[0].encounters[0].numKOs, 1);
   // Bulbasaur should have 0 KOs
   EXPECT_EQ(result.teams[TEAM_B].pokemon[0].encounters[0].numKOs, 0);
+}
+
+
+TEST_F(GameTest, SetTeamInitialization) {
+  // clang-format off
+  auto team_a = TeamNonVolatile()
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->pokemon("charmander"))
+        .addMove(pokedex_->move("cut"))
+        .setLevel(100));
+  auto team_b = TeamNonVolatile()
+      .addPokemon(PokemonNonVolatile()
+        .setBase(pokedex_->pokemon("bulbasaur"))
+        .addMove(pokedex_->move("cut"))
+        .setLevel(100));
+
+  auto game = Game()
+      .setMaxMatches(1)
+      .setVerbosity(0)
+      .setEngine(PkCU())
+      .setTeam(0, team_a)
+      .setTeam(1, team_b);
+  // clang-format on
+
+  // This should not crash
+  EXPECT_NO_THROW({ game.run(); });
 }

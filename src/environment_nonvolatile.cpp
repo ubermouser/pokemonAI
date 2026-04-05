@@ -27,6 +27,7 @@ void EnvironmentNonvolatile::uninitialize() {
 EnvironmentNonvolatile& EnvironmentNonvolatile::setTeam(size_t iTeam, const TeamNonVolatile& cTeam, bool init) {
   assert(iTeam < 2);
   teams[iTeam] = cTeam;
+  teams[iTeam].team_ = (TEAM)iTeam;
   if (init) { getTeam(iTeam).initialize(); };
 
   return *this;

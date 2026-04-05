@@ -345,9 +345,11 @@ void NeoPkCUEngine::calculateDamage() {
 FixType NeoPkCUEngine::getProbabilityToHit() {
   PokemonVolatile cPKV = getPKV();
   PokemonVolatile tPKV = getTPKV();
-  MoveVolatile mV = getMV();
+  const Move& cMove = getMV().getBase();
 
-  /* probability to hit enemy pokemon */
+  /* Moves with no accuracy component are guaranteed to hit */
+  if (cMove.primaryAccuracy_ <= 0) { return FixType(1); }
+
   // combine accuracy/evasion stages before look-up to ensure precision
   int32_t netBoost = cPKV.getBoost(FV_ACCURACY) - tPKV.getBoost(FV_EVASION);
   netBoost = std::min(std::max(netBoost, -6), 6);
@@ -356,7 +358,7 @@ FixType NeoPkCUEngine::getProbabilityToHit() {
       // map net boost stage to precision look-up table
       PokemonNonVolatile::aFV_base[FV_ACCURACY - 6][netBoost + 6] *
       // lowest is 30% or 30 / 100
-      mV.getBase().getPrimaryAccuracy();
+      cMove.getPrimaryAccuracy();
 
   return probabilityToHit;
 }

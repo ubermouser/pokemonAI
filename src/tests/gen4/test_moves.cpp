@@ -72,7 +72,7 @@ TEST_F(MoveTest, Heal50) {
   // Select state where enemy critically hit for significant damage
   auto pidgey_crit = pidgey_tackled.where1Crit(1);
   auto pidgey_roosted =
-      engine_->updateState(pidgey_crit, Action::move(1), Action::wait());
+      engine_->updateState(pidgey_crit, Action::moveAlly(1, 0), Action::wait());
 
   EXPECT_EQ(pidgey_crit.teammate(0, 0).getHP(), 30);
   EXPECT_EQ(pidgey_roosted.where1Hit(0).teammate(0, 0).getHP(), 125);

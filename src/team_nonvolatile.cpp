@@ -19,11 +19,11 @@ namespace pt = boost::property_tree;
 
 
 TeamNonVolatile::TeamNonVolatile()
-  : Name(),
-  Signature<TeamNonVolatile, TEAM_NONVOLATILE_DIGESTSIZE>(),
-  Serializable<TeamNonVolatile>(),
-  teammates_() {
-}
+    : Name(),
+      Signature<TeamNonVolatile, TEAM_NONVOLATILE_DIGESTSIZE>(),
+      Serializable<TeamNonVolatile>(),
+      teammates_(),
+      team_(TEAM_A) {}
 
 
 PokemonNonVolatile& TeamNonVolatile::teammate(size_t iTeammate) {
