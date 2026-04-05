@@ -31,13 +31,13 @@ class EnvironmentPossibleSearchTest : public Gen4EngineTest {
 
 TEST_F(EnvironmentPossibleSearchTest, SearchWithWhere) {
   // Find states where BOTH hit and crit occurred for team 0:
-  EnvironmentBitfield target = EnvironmentBitfield().actor(0, ActorProxy::ALL_TEAMMATES).setHit().setCrit();
+  EnvironmentBitfield target = EnvironmentBitfield().flagsFor(0, ActorProxy::ALL_TEAMMATES).setHit().setCrit();
   auto states = result.where(target);
 
   EXPECT_GT(states.size(), 0);
   for (const auto& state : states) {
-    EXPECT_TRUE(state.actor(0, ActorProxy::ALL_TEAMMATES).isHit());
-    EXPECT_TRUE(state.actor(0, ActorProxy::ALL_TEAMMATES).isCrit());
+    EXPECT_TRUE(state.flagsFor(0, ActorProxy::ALL_TEAMMATES).isHit());
+    EXPECT_TRUE(state.flagsFor(0, ActorProxy::ALL_TEAMMATES).isCrit());
   }
 }
 
@@ -46,7 +46,7 @@ TEST_F(EnvironmentPossibleSearchTest, WhereHit) {
   auto states = result.whereHit(0);
   EXPECT_GT(states.size(), 0);
   for (const auto& state : states) {
-    EXPECT_TRUE(state.actor(0, ActorProxy::ALL_TEAMMATES).isHit());
+    EXPECT_TRUE(state.flagsFor(0, ActorProxy::ALL_TEAMMATES).isHit());
   }
 }
 
@@ -55,7 +55,7 @@ TEST_F(EnvironmentPossibleSearchTest, WhereCrit) {
   auto states = result.whereCrit(0);
   EXPECT_GT(states.size(), 0);
   for (const auto& state : states) {
-    EXPECT_TRUE(state.actor(0, ActorProxy::ALL_TEAMMATES).isCrit());
+    EXPECT_TRUE(state.flagsFor(0, ActorProxy::ALL_TEAMMATES).isCrit());
   }
 }
 
@@ -65,7 +65,7 @@ TEST_F(EnvironmentPossibleSearchTest, WhereStatus) {
   auto states = result.whereStatus(0);
   EXPECT_GT(states.size(), 0);
   for (const auto& state : states) {
-    EXPECT_TRUE(state.actor(0, ActorProxy::ALL_TEAMMATES).isSecondary());
+    EXPECT_TRUE(state.flagsFor(0, ActorProxy::ALL_TEAMMATES).isSecondary());
   }
 }
 
@@ -73,27 +73,27 @@ TEST_F(EnvironmentPossibleSearchTest, WhereStatus) {
 TEST_F(EnvironmentPossibleSearchTest, Where1Hit) {
   auto best = result.where1Hit(0);
   EXPECT_FALSE(best.isEmpty());
-  EXPECT_TRUE(best.actor(0, ActorProxy::ALL_TEAMMATES).isHit());
+  EXPECT_TRUE(best.flagsFor(0, ActorProxy::ALL_TEAMMATES).isHit());
 }
 
 
 TEST_F(EnvironmentPossibleSearchTest, Where1Crit) {
   auto best = result.where1Crit(0);
   EXPECT_FALSE(best.isEmpty());
-  EXPECT_TRUE(best.actor(0, ActorProxy::ALL_TEAMMATES).isCrit());
+  EXPECT_TRUE(best.flagsFor(0, ActorProxy::ALL_TEAMMATES).isCrit());
 }
 
 
 TEST_F(EnvironmentPossibleSearchTest, Where1Status) {
   auto best = result.where1Status(0);
   EXPECT_FALSE(best.isEmpty());
-  EXPECT_TRUE(best.actor(0, ActorProxy::ALL_TEAMMATES).isSecondary());
+  EXPECT_TRUE(best.flagsFor(0, ActorProxy::ALL_TEAMMATES).isSecondary());
 }
 
 
 TEST_F(EnvironmentPossibleSearchTest, Where1Probabilistic) {
   // Verify where1 actually finds the most probable state
-  EnvironmentBitfield target = EnvironmentBitfield().actor(0, ActorProxy::ALL_TEAMMATES).setHit();
+  EnvironmentBitfield target = EnvironmentBitfield().flagsFor(0, ActorProxy::ALL_TEAMMATES).setHit();
   auto allHits = result.where(target);
   auto expectedBest = *std::max_element(allHits.begin(), allHits.end(), [](const auto& a, const auto& b){
     return a.getProbability() < b.getProbability();
@@ -115,7 +115,7 @@ TEST_F(EnvironmentPossibleSearchTest, Where1Throws) {
 
 TEST_F(EnvironmentPossibleSearchTest, WhereExcludesPruned) {
   // Find a state that is currently returned:
-  EnvironmentBitfield target = EnvironmentBitfield().actor(0, ActorProxy::ALL_TEAMMATES).setHit();
+  EnvironmentBitfield target = EnvironmentBitfield().flagsFor(0, ActorProxy::ALL_TEAMMATES).setHit();
   auto initialCount = result.where(target).size();
   EXPECT_GT(initialCount, 0);
 
@@ -141,16 +141,16 @@ TEST_F(EnvironmentPossibleSearchTest, WhereExcludesPruned) {
 
 TEST_F(EnvironmentPossibleSearchTest, SearchWithNegativeMask) {
   // Find states where team 0 hit but did NOT crit:
-  EnvironmentBitfield mask = EnvironmentBitfield().actor(0, ActorProxy::ALL_TEAMMATES).setHit().setCrit();
+  EnvironmentBitfield mask = EnvironmentBitfield().flagsFor(0, ActorProxy::ALL_TEAMMATES).setHit().setCrit();
   EnvironmentBitfield expected =
-      EnvironmentBitfield().actor(0, ActorProxy::ALL_TEAMMATES).setHit();  // crit = 0
+      EnvironmentBitfield().flagsFor(0, ActorProxy::ALL_TEAMMATES).setHit();  // crit = 0
 
   auto states = result.where(mask, expected);
 
   EXPECT_GT(states.size(), 0);
   for (const auto& state : states) {
-    EXPECT_TRUE(state.actor(0, ActorProxy::ALL_TEAMMATES).isHit());
-    EXPECT_FALSE(state.actor(0, ActorProxy::ALL_TEAMMATES).isCrit());
+    EXPECT_TRUE(state.flagsFor(0, ActorProxy::ALL_TEAMMATES).isHit());
+    EXPECT_FALSE(state.flagsFor(0, ActorProxy::ALL_TEAMMATES).isCrit());
   }
 }
 
@@ -160,11 +160,11 @@ TEST_F(EnvironmentPossibleSearchTest, SearchWithPredicate) {
   // test context but tests the mechanic) Or more simply, find states where team
   // 0 moved first:
   auto states = result.where([](const ConstEnvironmentPossible& state) {
-    return state.actor(0, ActorProxy::ALL_TEAMMATES).isMovedFirst();
+    return state.flagsFor(0, ActorProxy::ALL_TEAMMATES).isMovedFirst();
   });
 
   EXPECT_GT(states.size(), 0);
-  for (const auto& state : states) { EXPECT_TRUE(state.actor(0, ActorProxy::ALL_TEAMMATES).isMovedFirst()); }
+  for (const auto& state : states) { EXPECT_TRUE(state.flagsFor(0, ActorProxy::ALL_TEAMMATES).isMovedFirst()); }
 }
 
 

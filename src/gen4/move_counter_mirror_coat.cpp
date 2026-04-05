@@ -12,10 +12,10 @@ int move_counterMirrorCoat(
   if (cMove != counter_t && cMove != mirrorCoat_t) { return 0; }
 
   // Must move second
-  if (cu.getBase().actor(cu.getICTeam(), ActorProxy::ALL_TEAMMATES).isMovedFirst()) { return 1; }
+  if (cu.getBase().flagsFor(cu.getICTeam(), ActorProxy::ALL_TEAMMATES).isMovedFirst()) { return 1; }
 
   // Opponent must have hit with a move
-  if (!cu.getBase().actor(cu.getIOTeam(), ActorProxy::ALL_TEAMMATES).isHit()) { return 1; }
+  if (!cu.getBase().flagsFor(cu.getIOTeam(), ActorProxy::ALL_TEAMMATES).isHit()) { return 1; }
 
   const DamageComponents_t& oDamage =
       cu.getDamageComponent(cu.getIBase(), cu.getIOTeam());

@@ -60,7 +60,7 @@ class CounterMirrorCoatTest : public Gen4EngineTest {
     env_nv = std::make_shared<EnvironmentNonvolatile>(team_a, team_b, true);
     engine_->setEnvironment(env_nv);
 
-    both_hit = EnvironmentBitfield().actor(0, ActorProxy::ALL_TEAMMATES).setHit().actor(1, ActorProxy::ALL_TEAMMATES).setHit();
+    both_hit = EnvironmentBitfield().flagsFor(0, ActorProxy::ALL_TEAMMATES).setHit().flagsFor(1, ActorProxy::ALL_TEAMMATES).setHit();
 
     // Standard state: Blastoise vs Charmander
     state_standard = PossibleEnvironments();
@@ -99,7 +99,7 @@ class CounterMirrorCoatTest : public Gen4EngineTest {
     // Turn 2: Ambipom uses U-turn, Blastoise uses Counter
     // Ambipom switches to Machamp (index 3)
     uturn_turn2 = engine_->updateState(
-        uturn_turn1.where1(EnvironmentBitfield().actor(1, ActorProxy::ALL_TEAMMATES).setSwitched())
+        uturn_turn1.where1(EnvironmentBitfield().flagsFor(1, ActorProxy::ALL_TEAMMATES).setSwitched())
             .getEnv(),
         Action::move(0),
         Action::moveAlly(0, 3));
@@ -185,7 +185,7 @@ TEST_F(CounterMirrorCoatTest, CounterFailsOnStatus) {
 
 TEST_F(CounterMirrorCoatTest, CounterImmuneGhost) {
   auto result = engine_->updateState(
-      state_ghost.where1(EnvironmentBitfield().actor(1, ActorProxy::ALL_TEAMMATES).setSwitched()).getEnv(),
+      state_ghost.where1(EnvironmentBitfield().flagsFor(1, ActorProxy::ALL_TEAMMATES).setSwitched()).getEnv(),
       Action::move(0),
       Action::move(0));
   auto state = result.where1(both_hit);
@@ -196,7 +196,7 @@ TEST_F(CounterMirrorCoatTest, CounterImmuneGhost) {
 
 TEST_F(CounterMirrorCoatTest, MirrorCoatImmuneDark) {
   auto result = engine_->updateState(
-      state_dark.where1(EnvironmentBitfield().actor(1, ActorProxy::ALL_TEAMMATES).setSwitched()).getEnv(),
+      state_dark.where1(EnvironmentBitfield().flagsFor(1, ActorProxy::ALL_TEAMMATES).setSwitched()).getEnv(),
       Action::move(1),
       Action::move(0));
   auto state = result.where1(both_hit);

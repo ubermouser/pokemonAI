@@ -25,7 +25,7 @@ int move_batonPass(
   }
 
   // Mark as switched
-  cu.getBase().actor(cu.getCActor()).setSwitched();
+  cu.getBase().flagsFor(cu.getCActor()).setSwitched();
 
   // Restore transferrable volatile status
   VolatileStatus& newStatus = tV.getVolatile();

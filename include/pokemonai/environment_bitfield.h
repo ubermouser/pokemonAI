@@ -1,9 +1,10 @@
 #ifndef PKAI_ENVIRONMENT_BITFIELD_H
 #define PKAI_ENVIRONMENT_BITFIELD_H
 
-#include <stdint.h>
 #include <stddef.h>
-#include "pokemonai/actor.h"
+#include <stdint.h>
+
+#include "actor.h"
 
 struct ActorFlags {
   union {
@@ -78,16 +79,16 @@ struct ActorProxyImpl {
 
 
 
-  ActorProxyImpl actor(size_t nextITeam, size_t nextITeammate) {
+  ActorProxyImpl flagsFor(size_t nextITeam, size_t nextITeammate) {
     return ActorProxyImpl<BitfieldType>(b, nextITeam, nextITeammate);
   }
-  ActorProxyImpl actor(const Actor& a) {
+  ActorProxyImpl flagsFor(const Actor& a) {
     return ActorProxyImpl<BitfieldType>(b, a.iTeam(), a.iTeammate());
   }
-  ActorProxyImpl actor(size_t nextITeam, size_t nextITeammate) const {
+  ActorProxyImpl flagsFor(size_t nextITeam, size_t nextITeammate) const {
     return ActorProxyImpl<const BitfieldType>(b, nextITeam, nextITeammate);
   }
-  ActorProxyImpl actor(const Actor& a) const {
+  ActorProxyImpl flagsFor(const Actor& a) const {
     return ActorProxyImpl<const BitfieldType>(b, a.iTeam(), a.iTeammate());
   }
 
@@ -170,10 +171,10 @@ union EnvironmentBitfield {
     bits.team[iTeam][iTeammate] = flags;
   }
 
-  ActorProxy actor(size_t iTeam, size_t iTeammate) { return ActorProxy(*this, iTeam, iTeammate); }
-  ActorProxy actor(const Actor& a) { return ActorProxy(*this, a.iTeam(), a.iTeammate()); }
-  ConstActorProxy actor(size_t iTeam, size_t iTeammate) const { return ConstActorProxy(*this, iTeam, iTeammate); }
-  ConstActorProxy actor(const Actor& a) const { return ConstActorProxy(*this, a.iTeam(), a.iTeammate()); }
+  ActorProxy flagsFor(size_t iTeam, size_t iTeammate) { return ActorProxy(*this, iTeam, iTeammate); }
+  ActorProxy flagsFor(const Actor& a) { return ActorProxy(*this, a.iTeam(), a.iTeammate()); }
+  ConstActorProxy flagsFor(size_t iTeam, size_t iTeammate) const { return ConstActorProxy(*this, iTeam, iTeammate); }
+  ConstActorProxy flagsFor(const Actor& a) const { return ConstActorProxy(*this, a.iTeam(), a.iTeammate()); }
 
   uint8_t getTeamOr(size_t iTeam) const {
     uint8_t result = 0;
@@ -212,7 +213,7 @@ inline bool ActorProxyImpl<T>::getFlag(ActorFlag flag) const {
 template <typename T>
 inline ActorProxyImpl<T>& ActorProxyImpl<T>::setFlag(ActorFlag flag, bool val) {
   if (iTeammate == ALL_TEAMMATES) {
-    for (size_t i = 0; i < 6; ++i) b.actor(iTeam, i).setFlag(flag, val);
+    for (size_t i = 0; i < 6; ++i) b.flagsFor(iTeam, i).setFlag(flag, val);
     return *this;
   }
   ActorFlags f = b.getActorFlags(iTeam, iTeammate);

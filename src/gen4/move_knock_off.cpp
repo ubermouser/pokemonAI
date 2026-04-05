@@ -13,7 +13,7 @@ int move_knockOff(
 
   // Check if move hit
   // If damage is 0 (miss, immunity, etc.), Knock Off fails to remove item.
-  if (!cu.getBase().actor(cu.getICTeam(), ActorProxy::ALL_TEAMMATES).isHit()) { return 1; }
+  if (!cu.getBase().flagsFor(cu.getICTeam(), ActorProxy::ALL_TEAMMATES).isHit()) { return 1; }
 
   // If the target has a substitute, the item is not knocked off.
   if (tPKV.status().cTeammate.substitute > 0) { return 1; }

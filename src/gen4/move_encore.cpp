@@ -11,7 +11,7 @@ int move_encore_set(
 
   // The last move used by the opponent
   uint32_t iLastAction = tPKV.status().cTeammate.iLastAction;
-  bool switched = cu.getBase().actor(cu.getIOTeam(), ActorProxy::ALL_TEAMMATES).isSwitched();
+  bool switched = cu.getBase().flagsFor(cu.getIOTeam(), ActorProxy::ALL_TEAMMATES).isSwitched();
   if (iLastAction == 0 || switched) { return 1; }
 
   // Fails if the target is already under the effects of Encore.

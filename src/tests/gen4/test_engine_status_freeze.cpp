@@ -75,7 +75,7 @@ TEST_F(FreezeStatusTest, Test_FrozenPokemonCannotMove) {
 
     // In most states, Smeargle should be blocked
     auto blocked_states = results.where([](const ConstEnvironmentPossible& env) {
-        return env.actor(0, ActorProxy::ALL_TEAMMATES).isBlocked();
+        return env.flagsFor(0, ActorProxy::ALL_TEAMMATES).isBlocked();
     });
 
     EXPECT_FALSE(blocked_states.empty());

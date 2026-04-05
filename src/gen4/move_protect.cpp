@@ -52,7 +52,7 @@ int move_protect_damage(
   // Check if defender is protected
   if (tPKV.status().cTeammate.protected_flag) {
     // Block damage
-    cu.getBase().actor(cu.getCActor()).setBlocked();
+    cu.getBase().flagsFor(cu.getCActor()).setBlocked();
     damage = 0;
     return 2; // Halt other plugins
   }
@@ -82,7 +82,7 @@ int move_protect_status(
     // Block status moves (damageType == 0)
     // Note: Some moves might bypass Protect (e.g. Feint), but ignoring for now as they are exceptions
     if (mV.getBase().getDamageType() == 0) { // ATK_NODMG
-      cu.getBase().actor(cu.getCActor()).setBlocked();
+      cu.getBase().flagsFor(cu.getCActor()).setBlocked();
       return 2; // Block status move
     }
   }

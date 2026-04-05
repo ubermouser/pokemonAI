@@ -33,7 +33,7 @@ TEST_F(SereneGraceTest, SereneGraceDoublesSecondaryEffectChance) {
   for (size_t i = 0; i < turn1_outcome.size(); ++i) {
     auto env = turn1_outcome.at(i);
     // TEAM_A (0) used the move.
-    if (env.actor(TEAM_A, ActorProxy::ALL_TEAMMATES).isSecondary()) {
+    if (env.flagsFor(TEAM_A, ActorProxy::ALL_TEAMMATES).isSecondary()) {
         secondary_prob_sum += env.getProbability().to_double();
     }
   }
@@ -70,7 +70,7 @@ TEST_F(SereneGraceTest, ControlGroupCheck) {
   double secondary_prob_sum = 0.0;
   for (size_t i = 0; i < turn1_outcome.size(); ++i) {
     auto env = turn1_outcome.at(i);
-    if (env.actor(TEAM_A, ActorProxy::ALL_TEAMMATES).isSecondary()) {
+    if (env.flagsFor(TEAM_A, ActorProxy::ALL_TEAMMATES).isSecondary()) {
         secondary_prob_sum += env.getProbability().to_double();
     }
   }

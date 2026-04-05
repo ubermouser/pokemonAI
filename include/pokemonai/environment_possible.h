@@ -15,14 +15,12 @@
 #include <memory>
 
 #include "actor.h"
+#include "environment_bitfield.h"
 #include "environment_nonvolatile.h"
 #include "environment_volatile.h"
 #include "fixedpoint/fixed_class.h"
 #include "nonvolatile_volatile.h"
 #include "pkai.h"
-
-
-#include "pokemonai/environment_bitfield.h"
 
 
 struct PKAISHARED EnvironmentPossibleData {
@@ -113,11 +111,11 @@ public:
 
   const EnvironmentBitfield& getBitmask() const { return data().getBitmask(); };
 
-  ConstActorProxy actor(const Actor& actor) const {
-    return data().flags.actor(actor);
+  ConstActorProxy flagsFor(const Actor& actor) const {
+    return data().flags.flagsFor(actor);
   }
-  ConstActorProxy actor(size_t iTeam, size_t iTeammate) const {
-    return data().flags.actor(iTeam, iTeammate);
+  ConstActorProxy flagsFor(size_t iTeam, size_t iTeammate) const {
+    return data().flags.flagsFor(iTeam, iTeammate);
   }
 
   bool isMerged() const { return data().isMerged(); }
@@ -161,11 +159,11 @@ public:
 
   EnvironmentBitfield& getBitmask() { return data().getBitmask(); };
 
-  using impl_t::actor;
-
-  ActorProxy actor(const Actor& actor) { return data().flags.actor(actor); }
-  ActorProxy actor(size_t iTeam, size_t iTeammate) {
-    return data().flags.actor(iTeam, iTeammate);
+  using impl_t::flagsFor;
+ 
+  ActorProxy flagsFor(const Actor& actor) { return data().flags.flagsFor(actor); }
+  ActorProxy flagsFor(size_t iTeam, size_t iTeammate) {
+    return data().flags.flagsFor(iTeam, iTeammate);
   }
 
   FixType& getProbability() { return data().getProbability(); };

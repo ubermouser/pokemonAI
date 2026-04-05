@@ -67,7 +67,7 @@ void ENV_POSSIBLE_IMPL::printEnvironment(std::ostream& os) const {
   for (const auto& actor : this->getEnv().yieldActiveActors()) {
     std::string actorLabel =
         fmt::format("{}{}", (actor.iTeam() == TEAM_A ? "A" : "B"), actor.iTeammate());
-    auto proxy = this->actor(actor);
+    auto proxy = this->flagsFor(actor);
     if (proxy.isFreeMove()) { os << fmt::format(" {}-Free", actorLabel); }
     if (proxy.isSwitched()) {
       os << fmt::format(" {}-Switch", actorLabel);

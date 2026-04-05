@@ -49,7 +49,7 @@ TEST_F(ConfusionStatusTest, Test_ConfusionHurtSelf) {
 
     // There should be a 50% total chance to be blocked and take damage
     auto blocked_states = results2.where([](const ConstEnvironmentPossible& env) {
-        return env.actor(1, ActorProxy::ALL_TEAMMATES).isBlocked();
+        return env.flagsFor(1, ActorProxy::ALL_TEAMMATES).isBlocked();
     });
 
     ASSERT_FALSE(blocked_states.empty());
@@ -64,7 +64,7 @@ TEST_F(ConfusionStatusTest, Test_ConfusionHurtSelf) {
 
     // There should also be a 50% total chance to NOT be blocked
     auto not_blocked_states = results2.where([](const ConstEnvironmentPossible& env) {
-        return !env.actor(1, ActorProxy::ALL_TEAMMATES).isBlocked();
+        return !env.flagsFor(1, ActorProxy::ALL_TEAMMATES).isBlocked();
     });
 
     ASSERT_FALSE(not_blocked_states.empty());
@@ -99,7 +99,7 @@ TEST_F(ConfusionStatusTest, Test_ConfusionWearsOff) {
         // We follow the branch where it was blocked because the engine
         // only decrements confusion in the blocked branch currently.
         auto blocked_states = current_results.where([](const ConstEnvironmentPossible& env) {
-            return env.actor(1, ActorProxy::ALL_TEAMMATES).isBlocked();
+            return env.flagsFor(1, ActorProxy::ALL_TEAMMATES).isBlocked();
         });
 
         if (!blocked_states.empty()) {

@@ -52,7 +52,7 @@ int move_taunt_preempt(PkCUEngine& cu, PokemonVolatile cPKV) {
   if (cPKV.status().cTeammate.taunt_duration > 0) {
     MoveVolatile mV = cPKV.getMV(cu.getCAction());
     if (mV.getBase().getDamageType() == ATK_NODMG) {
-      cu.getBase().actor(cu.getCActor()).setBlocked();
+      cu.getBase().flagsFor(cu.getCActor()).setBlocked();
     }
 
     cPKV.status().cTeammate.taunt_duration--;

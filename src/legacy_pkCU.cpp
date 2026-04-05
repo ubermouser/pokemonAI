@@ -305,7 +305,7 @@ void LegacyPkCUEngine::updateState() {
     swapTeamIndexes();
   default:
   case TEAM_A:
-    getBase().actor(priority, ActorProxy::ALL_TEAMMATES).setMovedFirst();
+    getBase().flagsFor(priority, ActorProxy::ALL_TEAMMATES).setMovedFirst();
     updateState_move();
     break;
   case 2: {
@@ -315,13 +315,13 @@ void LegacyPkCUEngine::updateState() {
 
       // first team moves first:
       iBase_ = iStages[0];
-      getBase().actor(TEAM_A, ActorProxy::ALL_TEAMMATES).setMovedFirst();
+      getBase().flagsFor(TEAM_A, ActorProxy::ALL_TEAMMATES).setMovedFirst();
       updateState_move();
 
       // swap indexes:
       iBase_ = iStages[1];
       //swapTeamIndexes(); (updateState_move swaps team indexes but does not swap them back)
-      getBase().actor(TEAM_B, ActorProxy::ALL_TEAMMATES).setMovedFirst();
+      getBase().flagsFor(TEAM_B, ActorProxy::ALL_TEAMMATES).setMovedFirst();
 
       // second team moves first:
       updateState_move();
@@ -449,8 +449,8 @@ void LegacyPkCUEngine::evaluateRound_end() {
     advanceStackStage();
 
     // ignore end of move environments if we're calculating a dummy move, such as a switch in upon death
-    if (getBase().actor(getCActor()).isFreeMove() ||
-        getBase().actor(getOActor()).isFreeMove()) {
+    if (getBase().flagsFor(getCActor()).isFreeMove() ||
+        getBase().flagsFor(getOActor()).isFreeMove()) {
       continue;
     }
 
@@ -497,7 +497,7 @@ void LegacyPkCUEngine::evaluateMove() {
   // if the current pokemon has been switched out, its move should be canceled
   // We skip evaluation entirely to avoid illegal move access and incorrect wait
   // flags.
-  if (getBase().actor(getCActor()).isSwitched() && cAction.isMove()) {
+  if (getBase().flagsFor(getCActor()).isSwitched() && cAction.isMove()) {
     stackStage_[iBase_] = STAGE_POSTTURN;
     evaluateMove_postTurn();
     return;
@@ -519,7 +519,7 @@ void LegacyPkCUEngine::evaluateMove() {
 
       // Set blocked if we want the environment to reflect that the original
       // choice was preempted
-      getBase().actor(getCActor()).setBlocked();
+      getBase().flagsFor(getCActor()).setBlocked();
     }
   }
 
@@ -533,7 +533,7 @@ void LegacyPkCUEngine::evaluateMove() {
     stackStage_[iBase_] = STAGE_POSTSECONDARY;
 
     // set that the current team did nothing this turn:
-    getBase().actor(getCActor()).setWaited();
+    getBase().flagsFor(getCActor()).setWaited();
     // pokemon performs no action, no update to the state is needed
     // end of is Wait type action
   } else if (cAction.isMove()) { // is the pokemon moving normally?
@@ -561,7 +561,7 @@ void LegacyPkCUEngine::evaluateMove() {
 
       // was this move blocked by a status?
       // did this pokemon die from the last pokemon's action?
-      if (getBase().actor(iCTeam, ActorProxy::ALL_TEAMMATES).isBlocked() ||
+      if (getBase().flagsFor(iCTeam, ActorProxy::ALL_TEAMMATES).isBlocked() ||
           !getPKV().isAlive()) {
         stackStage_[iBase_] = STAGE_POSTTURN;
         continue;
@@ -609,11 +609,11 @@ void LegacyPkCUEngine::evaluateMove_switch()
     advanceStackStage();
 
     // set that we are switching this environment:
-    getBase().actor(getCActor()).setSwitched();
+    getBase().flagsFor(getCActor()).setSwitched();
 
     // is the switching out pokemon dead? If so, this is a free move
     if (!getPKV().isAlive()) {
-      getBase().actor(getCActor()).setFreeMove();
+      getBase().flagsFor(getCActor()).setFreeMove();
     } else {
       // pre-move switch scripts:
       int result = 0;
@@ -718,7 +718,7 @@ void LegacyPkCUEngine::evaluateMove_postMove() {
         std::max(std::min(secondaryHitProbability, FixType(1)), FixType(0));
 
     // did the ability hit its target? Is it possible for the secondary ability to miss?
-    if (getBase().actor(getCActor()).isHit() &&
+    if (getBase().flagsFor(getCActor()).isHit() &&
         mostlyGT(secondaryHitProbability, FixType(0))) {
       // if there's a chance the secondary effect will not occur:
       if (mostlyLT(secondaryHitProbability, FixType(1))) {
@@ -727,7 +727,7 @@ void LegacyPkCUEngine::evaluateMove_postMove() {
       }
 
       // modify bitmask as secondary effect occuring:
-      getBase().actor(getCActor()).setSecondary();
+      getBase().flagsFor(getCActor()).setSecondary();
 
     } else {  // end of primary attack hits, and secondary attack is not assured
       // pass-through: no chance to secondary
@@ -743,7 +743,7 @@ void LegacyPkCUEngine::evaluateMove_postMove() {
     advanceStackStage();
 
     // add extra effects to the move, such as secondaries and trigger effects
-    if (!getBase().actor(iCTeam, ActorProxy::ALL_TEAMMATES).isSecondary()) {
+    if (!getBase().flagsFor(iCTeam, ActorProxy::ALL_TEAMMATES).isSecondary()) {
       continue;
     }
 
@@ -848,7 +848,7 @@ void LegacyPkCUEngine::evaluateMove_damage() {
 
       // modify bitmask as the hit effect occuring:
       stack_.at(iHEnv[0])
-          .actor(getICTeam(), ActorProxy::ALL_TEAMMATES)
+          .flagsFor(getICTeam(), ActorProxy::ALL_TEAMMATES)
           .setHit();
 
     } else {  // end of primary attack hits, and secondary attack is not assured
@@ -864,7 +864,7 @@ void LegacyPkCUEngine::evaluateMove_damage() {
     advanceStackStage();
 
     // don't continue to evaluate a stage that will not hit the enemy team:
-    if (!getBase().actor(getICTeam(), ActorProxy::ALL_TEAMMATES).isHit()) {
+    if (!getBase().flagsFor(getICTeam(), ActorProxy::ALL_TEAMMATES).isHit()) {
       stackStage_[iBase_] = STAGE_POSTDAMAGE;
       continue;
     }
@@ -908,7 +908,7 @@ void LegacyPkCUEngine::evaluateMove_damage() {
 
       // modify bitmask as the crit effect occuring:
       stack_.at(iCEnv[1])
-          .actor(getICTeam(), ActorProxy::ALL_TEAMMATES)
+          .flagsFor(getICTeam(), ActorProxy::ALL_TEAMMATES)
           .setCrit();
     }
     // even with no chance to crit there's still the possibility of damage
@@ -997,7 +997,7 @@ void LegacyPkCUEngine::evaluateMove_damage() {
     uint32_t levelModifier = ((cPKV.nv().getLevel() * 2) / 5) + 2;
 
     // has the pokemon crit?
-    if (getBase().actor(getICTeam(), ActorProxy::ALL_TEAMMATES).isCrit()) {
+    if (getBase().flagsFor(getICTeam(), ActorProxy::ALL_TEAMMATES).isCrit()) {
       attackPower = std::max(cPKV.nv().getFV_base(attackType), attackPower);
       defensePower = std::min(tPKV.nv().getFV_base(defenseType), defensePower);
     }
@@ -1014,7 +1014,7 @@ void LegacyPkCUEngine::evaluateMove_damage() {
     advanceStackStage();
 
     // do nothing if the move didn't crit:
-    if (!getBase().actor(getICTeam(), ActorProxy::ALL_TEAMMATES).isCrit()) {
+    if (!getBase().flagsFor(getICTeam(), ActorProxy::ALL_TEAMMATES).isCrit()) {
       continue;
     }
 
@@ -1124,7 +1124,7 @@ void LegacyPkCUEngine::evaluateMove_damage() {
     if (getStackStage() != STAGE_PREDAMAGE) { continue; }
     advanceStackStage();
 
-    if (!getBase().actor(getICTeam(), ActorProxy::ALL_TEAMMATES).isHit()) {
+    if (!getBase().flagsFor(getICTeam(), ActorProxy::ALL_TEAMMATES).isHit()) {
       continue;
     }
 
@@ -1194,7 +1194,7 @@ void LegacyPkCUEngine::evaluateMove_script() {
 
       // modify bitmask as the hit effect occuring:
       stack_.at(iHEnv[0])
-          .actor(getICTeam(), ActorProxy::ALL_TEAMMATES)
+          .flagsFor(getICTeam(), ActorProxy::ALL_TEAMMATES)
           .setHit();
 
     } else {  // end of primary attack hits, and secondary attack is not assured
@@ -1208,7 +1208,7 @@ void LegacyPkCUEngine::evaluateMove_script() {
     if (getStackStage() != STAGE_PREDAMAGE) { continue; }
     advanceStackStage();
 
-    if (!getBase().actor(getICTeam(), ActorProxy::ALL_TEAMMATES).isHit()) {
+    if (!getBase().flagsFor(getICTeam(), ActorProxy::ALL_TEAMMATES).isHit()) {
       continue;
     }
 

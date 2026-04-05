@@ -558,3 +558,13 @@ const Action& NeoPkCUEngine::getCAction() const {
 const Action& NeoPkCUEngine::getOAction() const {
   return actions_.at(getTarget());
 }
+
+
+Actor NeoPkCUEngine::getOActor() const { return getOActor(getIBase()); }
+
+
+Actor NeoPkCUEngine::getOActor(size_t iStack) const {
+  size_t iOTeam = getCActor(iStack).iTeam() == TEAM_A ? TEAM_B : TEAM_A;
+  return Actor(
+      iOTeam, getBase(iStack).getTeam(iOTeam).getICPKV());
+}
