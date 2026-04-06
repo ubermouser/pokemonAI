@@ -29,22 +29,25 @@ NeoPkCUEngine::NeoPkCUEngine(
 
 
 void NeoPkCUEngine::seedStack() {
-  StackFrame firstFrame;
+  stackFrame_.push_back(StackFrame{});
+  StackFrame& firstFrame = stackFrame_.back();
   firstFrame.iStack = 0;
   firstFrame.stage = StageType::SEEDED;
   firstFrame.iActor = 0;
   firstFrame.iTarget = 0;
   firstFrame.actions = actions_;
 
+  // First pass: populate basic frame data
   for (const auto& [actor, action] : actions_) {
     // default ordering is arbitrary until we've calculated speed bracket
     firstFrame.moveOrder.push_back(actor);
-    firstFrame.moveBrackets[actor] = computeMoveBracket(actor);
     firstFrame.targets[actor] =
         computeMoveTarget(stack_.at(0).getEnv(), actor, action);
     firstFrame.damageComponents[actor] = {};
   }
-  stackFrame_.push_back(std::move(firstFrame));
+
+  // Second pass: compute brackets (may trigger plugins that access frame data)
+  firstFrame.moveBrackets = computeMoveBrackets();
 }
 
 
@@ -518,7 +521,8 @@ MoveVolatile NeoPkCUEngine::getMV() { return getMV(iBase_); }
 
 MoveVolatile NeoPkCUEngine::getMV(size_t iState) {
   auto& actor = getCActor(iState);
-  return getBase(iState).teammate(actor).getMV(actions_.at(actor));
+  auto& action = getStackFrame(iState).actions.at(actor);
+  return getBase(iState).teammate(actor).getMV(action);
 }
 
 
@@ -527,7 +531,8 @@ MoveVolatile NeoPkCUEngine::getTMV() { return getTMV(iBase_); }
 
 MoveVolatile NeoPkCUEngine::getTMV(size_t iState) {
   auto& target = getTarget(iState);
-  return getBase(iState).teammate(target).getMV(actions_.at(target));
+  auto& action = getStackFrame(iState).actions.at(target);
+  return getBase(iState).teammate(target).getMV(action);
 }
 
 
