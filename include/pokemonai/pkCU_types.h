@@ -222,6 +222,7 @@ static const char* stageTypeToString(StageType stage) {
     case StageType::POSTSWITCH: return "POSTSWITCH";
     case StageType::ONBEGINNINGOFTURN: return "ONBEGINNINGOFTURN";
     case StageType::MODIFYACTION: return "MODIFYACTION";
+    case StageType::VALIDATEFORCEDACTION: return "VALIDATEFORCEDACTION";
     case StageType::MOVEBASE: return "MOVEBASE";
     case StageType::MODIFYHITCHANCE: return "MODIFYHITCHANCE";
     case StageType::EVALUATEHITCHANCE: return "EVALUATEHITCHANCE";

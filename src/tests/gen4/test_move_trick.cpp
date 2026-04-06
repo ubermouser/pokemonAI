@@ -6,6 +6,7 @@ class TrickTest : public Gen4EngineTest {
   void SetUp() override {
     Gen4EngineTest::SetUp();
 
+    // clang-format off
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->pokemon("kadabra"))
@@ -19,7 +20,7 @@ class TrickTest : public Gen4EngineTest {
     auto team_b = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->pokemon("blissey"))
-          .addMove(pokedex_->move("softboiled"))
+          .addMove(pokedex_->move("seismic toss"))
           .addMove(pokedex_->move("charm"))
           .setInitialItem(pokedex_->item("leftovers"))
           .setLevel(100))
@@ -28,6 +29,7 @@ class TrickTest : public Gen4EngineTest {
           .setAbility(pokedex_->ability("sticky hold"))
           .setInitialItem(pokedex_->item("choice band"))
           .setLevel(100));
+    // clang-format on
     environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
     engine_->setEnvironment(environment_nv);
   }
