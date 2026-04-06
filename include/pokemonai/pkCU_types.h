@@ -163,6 +163,8 @@ enum StageType : int {
   // seed and priority evaluation:
   DNE = 0,                 /**< Stage does not exist. */
   SEEDED,                  /**< Initial environment has been seeded. */
+  COMPUTEBRACKET,          /**< Calculate the move bracket for the current actor. */
+  POSTCOMPUTEBRACKET,      /**< Move to the next actor to compute their bracket. */
   SELECTORDER,             /**< Determine acter order and disambiguate ties. */
   PRETURN,                 /**< Before a Pokemon takes its turn. */
   // switch evaluation:
@@ -216,6 +218,8 @@ static const char* stageTypeToString(StageType stage) {
     // clang-format off
     case StageType::DNE: return "DNE";
     case StageType::SEEDED: return "SEEDED";
+    case StageType::COMPUTEBRACKET: return "COMPUTEBRACKET";
+    case StageType::POSTCOMPUTEBRACKET: return "POSTCOMPUTEBRACKET";
     case StageType::SELECTORDER: return "SELECTORDER";
     case StageType::PRETURN: return "PRETURN";
     case StageType::PRESWITCH: return "PRESWITCH";

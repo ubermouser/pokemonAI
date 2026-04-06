@@ -123,6 +123,8 @@ class NeoPkCUEngine {
    * Engine computation stages:
    */
   void evaluateMove_preturn();
+  void evaluateMove_computeBracket();
+  void evaluateMove_postComputeBracket();
   void evaluateMove_selectOrder();
   void evaluateMove_switch_onSwitchOut();
   void evaluateMove_switch_onSwitchIn();

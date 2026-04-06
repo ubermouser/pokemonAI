@@ -45,9 +45,6 @@ void NeoPkCUEngine::seedStack() {
         computeMoveTarget(stack_.at(0).getEnv(), actor, action);
     firstFrame.damageComponents[actor] = {};
   }
-
-  // Second pass: compute brackets (may trigger plugins that access frame data)
-  firstFrame.moveBrackets = computeMoveBrackets();
 }
 
 

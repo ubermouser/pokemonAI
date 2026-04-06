@@ -43,6 +43,12 @@ void NeoPkCUEngine::evaluateMove() {
     switch (frame.stage) {
     case StageType::SEEDED:
       break;
+    case StageType::COMPUTEBRACKET:
+      evaluateMove_computeBracket();
+      break;
+    case StageType::POSTCOMPUTEBRACKET:
+      evaluateMove_postComputeBracket();
+      break;
     case StageType::SELECTORDER:
       evaluateMove_selectOrder();
       break;
@@ -177,15 +183,29 @@ void NeoPkCUEngine::evaluateMove_preturn() {
 }
 
 
+void NeoPkCUEngine::evaluateMove_computeBracket() {
+  const Actor& actor = getCActor();
+  getStackFrame().moveBrackets[actor] = computeMoveBracket(actor);
+}
+
+
+void NeoPkCUEngine::evaluateMove_postComputeBracket() {
+  StackFrame& frame = getStackFrame();
+  size_t nextActor = frame.iActor += 1;
+  if (nextActor < frame.moveOrder.size()) {
+    frame.iActor = nextActor;
+    gotoStackStage(StageType::COMPUTEBRACKET);
+  } else {
+    frame.iActor = 0;
+    gotoStackStage(StageType::SELECTORDER);
+  }
+}
+
+
 void NeoPkCUEngine::evaluateMove_selectOrder() {
   StackFrame& frame = getStackFrame();
 
-  // 1. Compute MoveBrackets if not already done
-  if (frame.moveBrackets.empty()) {
-    for (const auto& actor : getBase().getEnv().yieldActiveActors()) {
-      frame.moveBrackets[actor] = computeMoveBracket(actor);
-    }
-  }
+  // 1. Brackets are already computed in COMPUTEBRACKET stage
 
   // 2. Identify ties (actors with same actionBracket and speed, and NO
   // tiebreaker)
