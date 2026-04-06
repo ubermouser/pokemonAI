@@ -454,8 +454,7 @@ bool NeoPkCUEngine::isPluginSourceActive(const plugin& p) {
 
   if (checkCurrentTeam) {
     PokemonVolatile pkv = getPKV();
-    if (getStackStage() != StageType::PRESWITCH &&
-        getStackStage() != StageType::POSTSWITCH) {
+    if (getCAction().isMove()) {
       if (p.getSource() == &getMV().getBase()) return true;
     }
     if (pkv.nv().abilityExists()) {

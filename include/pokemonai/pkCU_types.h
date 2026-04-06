@@ -1,11 +1,13 @@
 #ifndef PKCU_TYPES_H
 #define PKCU_TYPES_H
 
-#include "pkai.h"
-#include "pluggable.h"
 #include <array>
 #include <bitset>
+#include <set>
 #include <vector>
+
+#include "pkai.h"
+#include "pluggable.h"
 
 class Type;
 
@@ -241,7 +243,7 @@ static const char* stageTypeToString(StageType stage) {
 }
 
 
-using PluginSet = std::array<std::vector<plugin>, PLUGIN_MAXSIZE>;
+using PluginSet = std::array<std::set<plugin>, PLUGIN_MAXSIZE>;
 using PluginSets = std::array< std::array<PluginSet, 6>, 12>;
 using ValidMoveSet = std::bitset<VALID_MOVE_SIZE>;
 using ValidSwapSet = std::bitset<VALID_SWAP_SIZE>;

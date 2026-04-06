@@ -67,12 +67,9 @@ int move_roar_forceSwitch(
     cu.setCPluginSet();
 
     int result = 0;
-    const std::vector<plugin>& cPlugins =
-        cu.getCPluginSet()[(size_t)PLUGIN_ON_SWITCHIN];
-    for (auto iPlugin = cPlugins.cbegin(), iPSize = cPlugins.cend();
-         iPlugin != iPSize;
-         ++iPlugin) {
-      onSwitch_rawType cPlugin = (onSwitch_rawType)iPlugin->getFunction();
+    const auto& cPlugins = cu.getCPluginSet()[(size_t)PLUGIN_ON_SWITCHIN];
+    for (const auto& plugin : cPlugins) {
+      onSwitch_rawType cPlugin = (onSwitch_rawType)plugin.getFunction();
       result = result | cPlugin(cu, newTPKV);
       if (result > 1) { break; }
     }

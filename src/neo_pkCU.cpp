@@ -189,7 +189,7 @@ void NeoPkCU::initialize() {
       const auto& move = mNV.getBase();
       for (size_t iPlugin = 0; iPlugin < PLUGIN_MAXSIZE; ++iPlugin) {
         plugin p = move.getPlugin(iPlugin);
-        if (p.getFunction()) { pluginSet_[iPlugin].push_back(p); }
+        if (p.getFunction()) { pluginSet_[iPlugin].insert(p); }
       }
     }
 
@@ -198,7 +198,7 @@ void NeoPkCU::initialize() {
       const auto& ability = pokemon.getAbility();
       for (size_t iPlugin = 0; iPlugin < PLUGIN_MAXSIZE; ++iPlugin) {
         plugin p = ability.getPlugin(iPlugin);
-        if (p.getFunction()) { pluginSet_[iPlugin].push_back(p); }
+        if (p.getFunction()) { pluginSet_[iPlugin].insert(p); }
       }
     }
 
@@ -207,7 +207,7 @@ void NeoPkCU::initialize() {
       const auto& item = pokemon.getInitialItem();
       for (size_t iPlugin = 0; iPlugin < PLUGIN_MAXSIZE; ++iPlugin) {
         plugin p = item.getPlugin(iPlugin);
-        if (p.getFunction()) { pluginSet_[iPlugin].push_back(p); }
+        if (p.getFunction()) { pluginSet_[iPlugin].insert(p); }
       }
     }
   }
@@ -217,14 +217,9 @@ void NeoPkCU::initialize() {
     const auto& extensions = pkdex->getExtensions();
     for (size_t iPlugin = 0; iPlugin < PLUGIN_MAXSIZE; ++iPlugin) {
       for (size_t i = 0; i < extensions.getNumPlugins(iPlugin); ++i) {
-        pluginSet_[iPlugin].push_back(extensions.getPlugin(iPlugin, i));
+        pluginSet_[iPlugin].insert(extensions.getPlugin(iPlugin, i));
       }
     }
-  }
-
-  // Sort by priority
-  for (auto& set : pluginSet_) {
-    std::sort(set.begin(), set.end());
   }
 
   initialState_ = createInitialVolatileState();

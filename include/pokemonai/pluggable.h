@@ -148,7 +148,13 @@ public:
 
   bool operator< (const plugin& other) const
   {
-    return priority < other.priority;
+    if (priority != other.priority) {
+      return priority < other.priority;
+    } else if (pFunction != other.pFunction) {
+      return pFunction < other.pFunction;
+    } else {
+      return source < other.source;
+    }
   };
 };
 

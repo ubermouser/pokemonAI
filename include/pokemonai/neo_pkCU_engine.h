@@ -216,7 +216,7 @@ class NeoPkCUEngine {
   template <typename FuncType, typename... Args>
   int callPlugins(pluginType pType, Args&&... args) {
     int retValue = 0;
-    const std::vector<plugin>& cPlugins = getCPluginSet()[(size_t)pType];
+    const auto& cPlugins = getCPluginSet()[(size_t)pType];
 
     for (const auto& plugin : cPlugins) {
       if (plugin.getSource() && !isPluginSourceActive(plugin)) { continue; }
