@@ -34,14 +34,15 @@ void NeoPkCUEngine::seedStack() {
   firstFrame.stage = StageType::SEEDED;
   firstFrame.iActor = 0;
   firstFrame.iTarget = 0;
+  firstFrame.actions = actions_;
 
   for (const auto& [actor, action] : actions_) {
     // default ordering is arbitrary until we've calculated speed bracket
     firstFrame.moveOrder.push_back(actor);
-    firstFrame.damageComponents[actor] = {};
     firstFrame.moveBrackets[actor] = computeMoveBracket(actor);
     firstFrame.targets[actor] =
         computeMoveTarget(stack_.at(0).getEnv(), actor, action);
+    firstFrame.damageComponents[actor] = {};
   }
   stackFrame_.push_back(std::move(firstFrame));
 }
@@ -594,12 +595,12 @@ const Actor& NeoPkCUEngine::getTarget(size_t iStack) const {
 
 
 const Action& NeoPkCUEngine::getCAction() const {
-  return actions_.at(getCActor());
+  return getStackFrame().actions.at(getCActor());
 }
 
 
 const Action& NeoPkCUEngine::getOAction() const {
-  return actions_.at(getTarget());
+  return getStackFrame().actions.at(getTarget());
 }
 
 

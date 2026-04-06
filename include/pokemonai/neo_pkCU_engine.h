@@ -22,14 +22,31 @@ class NeoPkCUEngine {
   };
 
   struct StackFrame {
-    size_t iStack;     // Index into stack_ (same as stackframe index)
-    StageType stage;   // Next stage to execute
-    size_t iActor;     // Index of the teammate currently executing
-    size_t iTarget;    // Index of the target being executed upon
+    // Index into stack_ (same as stackframe index)
+    size_t iStack;
 
-    std::vector<Actor> moveOrder;  // The order in which actors will move.
+    // Next stage to execute
+    StageType stage;
+
+    // Index of the teammate currently executing
+    size_t iActor;
+
+    // Index of the target being executed upon
+    size_t iTarget;
+
+    // The order in which actors will move.
+    std::vector<Actor> moveOrder;
+
+    // The (forced) action each actor will take.
+    std::unordered_map<Actor, Action> actions;
+
+    // The move bracket for each actor.
     std::unordered_map<Actor, MoveBracket> moveBrackets;
-    std::unordered_map<Actor, std::vector<Actor>> targets;  // The targets of each actor's action.
+
+    // The targets of each actor's action.
+    std::unordered_map<Actor, std::vector<Actor>> targets;
+
+    // The damage components for each actor.
     std::unordered_map<Actor, DamageComponents_t> damageComponents;
   };
 

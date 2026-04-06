@@ -29,7 +29,7 @@ void NeoPkCUEngine::evaluateMove() {
           iBase_,
           base.getProbability().to_double(),
           fmt::streamed(actor),
-          fmt::streamed(actions_.at(actor)),
+          fmt::streamed(frame.actions.at(actor)),
           fmt::streamed(frame.targets.at(actor).at(frame.iTarget)),
           stageTypeToString(frame.stage));
     } else {
@@ -520,7 +520,7 @@ void NeoPkCUEngine::evaluateMove_postTurn() {
     // if there are more actors, loop back to pre-turn and execute on the next
     // actor:
     size_t nextActor = frame.iActor += 1;
-    if (nextActor < actions_.size()) {
+    if (nextActor < frame.moveOrder.size()) {
       frame.iActor = nextActor;
       frame.iTarget = 0;
       gotoStackStage(StageType::PRETURN);
@@ -683,8 +683,8 @@ void NeoPkCUEngine::evaluateMove_switch_onSwitchOut() {
 }
 
 void NeoPkCUEngine::evaluateMove_switch_onSwitchIn() {
-  const Actor& switchingActor = getCActor();
-  const Actor& swapTarget = getTarget();
+  Actor switchingActor = getCActor();
+  Actor swapTarget = getTarget();
   getTV().swapPokemon(switchingActor, swapTarget);
   getBase().flagsFor(swapTarget).setSwitched();
 
@@ -697,7 +697,10 @@ void NeoPkCUEngine::evaluateMove_switch_onSwitchIn() {
       if (target == switchingActor) { target = swapTarget; }
     }
   }
-  // TODO: if action is targeted, it needs to change as well
+  // Update the current actor:
+  frame.moveOrder[frame.iActor] = swapTarget;
+  frame.targets[swapTarget] = frame.targets.at(switchingActor);
+  frame.actions[swapTarget] = Action::wait();
 
   int result = 0;
   result = callPlugins<onSwitch_rawType>(PLUGIN_ON_SWITCHIN, *this, getPKV());
