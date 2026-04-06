@@ -257,6 +257,7 @@ void NeoPkCUEngine::evaluateMove_selectOrder() {
   });
 
   frame.moveOrder = std::move(actors);
+  getBase().flagsFor(frame.moveOrder[0]).setMovedFirst();
 }
 
 

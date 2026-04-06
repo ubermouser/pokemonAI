@@ -39,8 +39,10 @@ int move_curse_effect(PkCUEngine& cu, PokemonVolatile cPKV) {
 }
 
 void register_move_curse(const Pokedex& pkAI, std::vector<plugin>& extensions) {
+  // clang-format off
   extensions.push_back(pluginOnEvaluateMove(move, "curse", move_curse_set, 0, current_team));
-  extensions.push_back(pluginOnEndOfRound(move, "curse", move_curse_effect, 0, all_teams));
+  extensions.push_back(pluginOnEndOfRound(engine, "curse_effect", move_curse_effect, 0, all_teams));
+  // clang-format on
 }
 
 } // namespace gen4
