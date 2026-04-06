@@ -127,6 +127,7 @@ class NeoPkCUEngine {
   void evaluateMove_switch_onSwitchOut();
   void evaluateMove_switch_onSwitchIn();
   void evaluateMove_status();
+  void evaluateMove_damage_onBeginningOfTurn();
   void evaluateMove_damage_moveBase();
   void evaluateMove_damage_modifyHitChance();
   void evaluateMove_damage_evaluateHitChance();
@@ -145,6 +146,7 @@ class NeoPkCUEngine {
   void evaluateMove_damage_preDamage();
   void evaluateMove_postMove();
   void evaluateMove_preSecondary();
+  void evaluateMove_modifySecondaryHitChance();
   void evaluateMove_evaluateSecondaryHitChance();
   void evaluateMove_secondary();
   void evaluateMove_postTurn();

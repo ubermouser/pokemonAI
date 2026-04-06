@@ -169,10 +169,13 @@ enum StageType : int {
   PRESWITCH,               /**< Before a Pokemon switches out. */
   POSTSWITCH,              /**< After a Pokemon switches in. */
   // pre move evaluation:
+  ONBEGINNINGOFTURN,       /**< Call beginning of turn plugins (e.g. status) */
   MOVEBASE,                /**< Before a move is executed, for status effects like paralysis. */
   // move damage evaluation:
+  MODIFYHITCHANCE,         /**< Modify the base hit chance using plugins. */
   EVALUATEHITCHANCE,       /**< Evaluate if the move hits. */
   DAMAGINGMOVEBASE,        /**< Base move evaluation for damaging moves. */
+  MODIFYCRITCHANCE,        /**< Modify the base crit chance using plugins. */
   EVALUATECRITCHANCE,      /**< Evaluate if the move crits. */
   SETBASEPOWER,            /**< Set the base power of the move. */
   SETMOVETYPE,             /**< Set the type of the move. */
@@ -188,6 +191,7 @@ enum StageType : int {
   // post move evaluation:
   POSTMOVE,                /**< After a move has been executed. */
   PRESECONDARY,            /**< Before secondary effects are calculated. */
+  MODIFYSECONDARYHITCHANCE,/**< Modify the secondary effect hit chance. */
   EVALSECONDARYHITCHANCE,  /**< Evaluate if the secondary effect hits. */
   SECONDARY,               /**< Secondary effects are being applied. */
   // post turn status
@@ -214,9 +218,12 @@ static const char* stageTypeToString(StageType stage) {
     case StageType::PRETURN: return "PRETURN";
     case StageType::PRESWITCH: return "PRESWITCH";
     case StageType::POSTSWITCH: return "POSTSWITCH";
+    case StageType::ONBEGINNINGOFTURN: return "ONBEGINNINGOFTURN";
     case StageType::MOVEBASE: return "MOVEBASE";
+    case StageType::MODIFYHITCHANCE: return "MODIFYHITCHANCE";
     case StageType::EVALUATEHITCHANCE: return "EVALUATEHITCHANCE";
     case StageType::DAMAGINGMOVEBASE: return "DAMAGINGMOVEBASE";
+    case StageType::MODIFYCRITCHANCE: return "MODIFYCRITCHANCE";
     case StageType::EVALUATECRITCHANCE: return "EVALUATECRITCHANCE";
     case StageType::SETBASEPOWER: return "SETBASEPOWER";
     case StageType::SETMOVETYPE: return "SETMOVETYPE";
@@ -231,6 +238,7 @@ static const char* stageTypeToString(StageType stage) {
     case StageType::POSTDAMAGE: return "POSTDAMAGE";
     case StageType::POSTMOVE: return "POSTMOVE";
     case StageType::PRESECONDARY: return "PRESECONDARY";
+    case StageType::MODIFYSECONDARYHITCHANCE: return "MODIFYSECONDARYHITCHANCE";
     case StageType::EVALSECONDARYHITCHANCE: return "EVALSECONDARYHITCHANCE";
     case StageType::SECONDARY: return "SECONDARY";
     case StageType::POSTTURN: return "POSTTURN";

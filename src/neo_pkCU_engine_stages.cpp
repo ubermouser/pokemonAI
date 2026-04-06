@@ -55,14 +55,23 @@ void NeoPkCUEngine::evaluateMove() {
     case StageType::POSTSWITCH:
       evaluateMove_switch_onSwitchIn();
       break;
+    case StageType::ONBEGINNINGOFTURN:
+      evaluateMove_damage_onBeginningOfTurn();
+      break;
     case StageType::MOVEBASE:
       evaluateMove_damage_moveBase();
+      break;
+    case StageType::MODIFYHITCHANCE:
+      evaluateMove_damage_modifyHitChance();
       break;
     case StageType::EVALUATEHITCHANCE:
       evaluateMove_damage_evaluateHitChance();
       break;
     case StageType::DAMAGINGMOVEBASE:
       evaluateMove_damage_damagingMoveBase();
+      break;
+    case StageType::MODIFYCRITCHANCE:
+      evaluateMove_damage_modifyCritChance();
       break;
     case StageType::EVALUATECRITCHANCE:
       evaluateMove_damage_evaluateCritChance();
@@ -106,6 +115,9 @@ void NeoPkCUEngine::evaluateMove() {
     case StageType::PRESECONDARY:
       evaluateMove_preSecondary();
       break;
+    case StageType::MODIFYSECONDARYHITCHANCE:
+      evaluateMove_modifySecondaryHitChance();
+      break;
     case StageType::EVALSECONDARYHITCHANCE:
       evaluateMove_evaluateSecondaryHitChance();
       break;
@@ -146,7 +158,7 @@ void NeoPkCUEngine::evaluateMove_preturn() {
 
   // dispatch to appropriate stage:
   if (cAction.isMove()) {
-    gotoStackStage(StageType::MOVEBASE);
+    gotoStackStage(StageType::ONBEGINNINGOFTURN);
   } else if (cAction.isSwitch()) {
     gotoStackStage(StageType::PRESWITCH);
   } else if (cAction.isWait()) {
@@ -245,11 +257,14 @@ void NeoPkCUEngine::evaluateMove_selectOrder() {
 void NeoPkCUEngine::evaluateMove_status() {}
 
 
-void NeoPkCUEngine::evaluateMove_damage_moveBase() {
+void NeoPkCUEngine::evaluateMove_damage_onBeginningOfTurn() {
   int result = 0;
   result = callPlugins<onBeginningOfTurn_rawType>(
       PLUGIN_ON_BEGINNINGOFTURN, *this, getPKV());
+}
 
+
+void NeoPkCUEngine::evaluateMove_damage_moveBase() {
   // was this move blocked by a status?
   // did this pokemon die from the last pokemon's action?
   if (getBase().flagsFor(getCActor()).isBlocked() || !getPKV().isAlive()) {
@@ -259,7 +274,7 @@ void NeoPkCUEngine::evaluateMove_damage_moveBase() {
 }
 
 
-void NeoPkCUEngine::evaluateMove_damage_evaluateHitChance() {
+void NeoPkCUEngine::evaluateMove_damage_modifyHitChance() {
   FixType& probabilityToHit = getDamageComponent().tProbability;
   const Move& cMove = getMV().getBase();
   if (cMove.targetsEnemy()) {
@@ -271,6 +286,11 @@ void NeoPkCUEngine::evaluateMove_damage_evaluateHitChance() {
   int result = 0;
   result = callPlugins<onModifyProbability_rawType>(
       PLUGIN_ON_MODIFYHITPROBABILITY, *this, getMV(), getPKV(), getTPKV(), probabilityToHit);
+}
+
+
+void NeoPkCUEngine::evaluateMove_damage_evaluateHitChance() {
+  FixType& probabilityToHit = getDamageComponent().tProbability;
 
   probabilityToHit =
       std::max(std::min(probabilityToHit, FixType(1)), FixType(0));
@@ -314,13 +334,18 @@ void NeoPkCUEngine::evaluateMove_damage_damagingMoveBase() {
 }
 
 
-void NeoPkCUEngine::evaluateMove_damage_evaluateCritChance() {
+void NeoPkCUEngine::evaluateMove_damage_modifyCritChance() {
   FixType& probabilityToCrit = getDamageComponent().tProbability;
   probabilityToCrit = getPKV().getAccuracy_boosted(FV_CRITICALHIT);
 
   int result = 0;
   result = callPlugins<onModifyProbability_rawType>(
       PLUGIN_ON_MODIFYCRITPROBABILITY, *this, getMV(), getPKV(), getTPKV(), probabilityToCrit);
+}
+
+
+void NeoPkCUEngine::evaluateMove_damage_evaluateCritChance() {
+  FixType& probabilityToCrit = getDamageComponent().tProbability;
 
   probabilityToCrit =
       std::max(std::min(probabilityToCrit, FixType(1)), FixType(0));
@@ -458,7 +483,7 @@ void NeoPkCUEngine::evaluateMove_preSecondary() {
 }
 
 
-void NeoPkCUEngine::evaluateMove_evaluateSecondaryHitChance() {
+void NeoPkCUEngine::evaluateMove_modifySecondaryHitChance() {
   assert(getBase().flagsFor(getCActor()).isHit());
 
   const Move& cMove = getMV().getBase();
@@ -468,6 +493,13 @@ void NeoPkCUEngine::evaluateMove_evaluateSecondaryHitChance() {
   int result = 0;
   result = callPlugins<onModifyProbability_rawType>(
       PLUGIN_ON_MODIFYSECONDARYPROBABILITY, *this, getMV(), getPKV(), getTPKV(), probabilityToSecondary);
+}
+
+
+void NeoPkCUEngine::evaluateMove_evaluateSecondaryHitChance() {
+  assert(getBase().flagsFor(getCActor()).isHit());
+
+  FixType& probabilityToSecondary = getDamageComponent().tProbability;
 
   probabilityToSecondary =
       std::max(std::min(probabilityToSecondary, FixType(1)), FixType(0));
