@@ -61,6 +61,12 @@ void NeoPkCUEngine::evaluateMove() {
     case StageType::MOVEBASE:
       evaluateMove_damage_moveBase();
       break;
+    case StageType::MODIFYACTION:
+      evaluateMove_modifyAction();
+      break;
+    case StageType::VALIDATEFORCEDACTION:
+      evaluateMove_validateForcedAction();
+      break;
     case StageType::MODIFYHITCHANCE:
       evaluateMove_damage_modifyHitChance();
       break;
@@ -255,6 +261,36 @@ void NeoPkCUEngine::evaluateMove_selectOrder() {
 
 
 void NeoPkCUEngine::evaluateMove_status() {}
+
+
+void NeoPkCUEngine::evaluateMove_modifyAction() {
+  const Actor& actor = getCActor();
+  Action& action = getStackFrame().actions.at(actor);
+
+  int result = 0;
+  result = callPlugins<onModifyAction_rawType>(
+      PLUGIN_ON_MODIFYACTION, *this, action);
+}
+
+
+void NeoPkCUEngine::evaluateMove_validateForcedAction() {
+  const Actor& actor = getCActor();
+  Action& originalAction = actions_.at(actor);
+  Action& action = getStackFrame().actions.at(actor);
+
+  if (action == originalAction) { return; }
+
+  auto validation = cu_.isValidAction(getBase().getEnv(), actor, action);
+  // forced action is not valid - pokemon must struggle.
+  if (!validation) { action = Action::struggle(); }
+
+  // If the plugin changed the action, we must validate it.
+  getStackFrame().targets[actor] =
+      computeMoveTarget(getBase().getEnv(), actor, action);
+
+  // original action was preempted
+  getBase().flagsFor(actor).setBlocked();
+}
 
 
 void NeoPkCUEngine::evaluateMove_damage_onBeginningOfTurn() {

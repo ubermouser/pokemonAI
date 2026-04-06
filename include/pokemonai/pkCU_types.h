@@ -171,6 +171,8 @@ enum StageType : int {
   // pre move evaluation:
   ONBEGINNINGOFTURN,       /**< Call beginning of turn plugins (e.g. status) */
   MOVEBASE,                /**< Before a move is executed, for status effects like paralysis. */
+  MODIFYACTION,            /**< Modify the action of the actor using plugins. */
+  VALIDATEFORCEDACTION,    /**< Determine if the forced action is valid. */
   // move damage evaluation:
   MODIFYHITCHANCE,         /**< Modify the base hit chance using plugins. */
   EVALUATEHITCHANCE,       /**< Evaluate if the move hits. */
@@ -219,6 +221,7 @@ static const char* stageTypeToString(StageType stage) {
     case StageType::PRESWITCH: return "PRESWITCH";
     case StageType::POSTSWITCH: return "POSTSWITCH";
     case StageType::ONBEGINNINGOFTURN: return "ONBEGINNINGOFTURN";
+    case StageType::MODIFYACTION: return "MODIFYACTION";
     case StageType::MOVEBASE: return "MOVEBASE";
     case StageType::MODIFYHITCHANCE: return "MODIFYHITCHANCE";
     case StageType::EVALUATEHITCHANCE: return "EVALUATEHITCHANCE";
