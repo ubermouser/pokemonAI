@@ -63,62 +63,55 @@ class CounterMirrorCoatTest : public Gen4EngineTest {
     both_hit = EnvironmentBitfield().flagsFor(TEAM_A).setHit().flagsFor(TEAM_B).setHit();
   }
 
-  PossibleEnvironments setupStandard() {
-    // Standard state: Blastoise vs Charmander
-    PossibleEnvironments state;
-    state.setNonvolatileEnvironment(env_nv);
-    state.push_back(
-        EnvironmentPossibleData::create(engine_->initialState().data()));
-    return state;
-  }
-
   PossibleEnvironments setupGhost() {
     // Ghost state: Blastoise vs Gengar (Swap Charmander to Gengar)
     return engine_->updateState(
-        setupStandard().where1().getEnv(), Action::wait(), Action::swap(1));
+        engine_->initialState(), Action::wait(), Action::swap(1));
   }
 
   PossibleEnvironments setupDark() {
     // Dark state: Blastoise vs Umbreon (Swap Charmander to Umbreon)
     return engine_->updateState(
-        setupStandard().where1().getEnv(), Action::wait(), Action::swap(2));
+        engine_->initialState(), Action::wait(), Action::swap(2));
   }
 
   PossibleEnvironments setupSpeed() {
     // Speed state: Mew vs Machamp (Swap Blastoise to Mew, Charmander to
     // Machamp)
     return engine_->updateState(
-        setupStandard().where1().getEnv(), Action::swap(1), Action::swap(3));
+        engine_->initialState(), Action::swap(1), Action::swap(3));
   }
 
   PossibleEnvironments setupSubTurn1() {
     // Substitute sequence: Mew (Fast) vs Machamp (Slow)
     // Turn 1: Mew uses Substitute, Machamp uses Cut
+    auto speed = setupSpeed();
     return engine_->updateState(
-        setupSpeed().where1().getEnv(), Action::moveAlly(1, 1), Action::move(1));
+        speed.where1(), Action::moveAlly(1, 1), Action::move(1));
   }
 
   PossibleEnvironments setupSubTurn2() {
     // Turn 2: Machamp attacks substitute, Mew uses Counter
+    auto sub_turn_1 = setupSubTurn1();
     return engine_->updateState(
-        setupSubTurn1().where1Hit(0).getEnv(), Action::moveAlly(1, 1), Action::move(0));
+        sub_turn_1.where1Hit(0), Action::moveAlly(1, 1), Action::move(0));
   }
 
   PossibleEnvironments setupUTurnTurn1() {
     // U-turn sequence: Blastoise (Slow) vs Ambipom (Fast)
     // Turn 1: Swap Charmander to Ambipom (index 4)
     return engine_->updateState(
-        setupStandard().where1().getEnv(), Action::wait(), Action::swap(4));
+        engine_->initialState(), Action::wait(), Action::swap(4));
   }
 
   PossibleEnvironments setupUTurnTurn2() {
     // Turn 2: Ambipom uses U-turn, Blastoise uses Counter
     // Ambipom switches to Machamp (index 3)
+    auto u_turn_turn_1 = setupUTurnTurn1();
     return engine_->updateState(
-        setupUTurnTurn1()
-            .where1(EnvironmentBitfield().flagsFor(TEAM_B).setSwitched())
-            .getEnv(),
-        Action::move(0), Action::moveAlly(0, 3));
+        u_turn_turn_1.where1Switch(TEAM_B),
+        Action::move(0),
+        Action::moveAlly(0, 3));
   }
 
   EnvironmentBitfield both_hit;
@@ -127,9 +120,8 @@ class CounterMirrorCoatTest : public Gen4EngineTest {
 
 
 TEST_F(CounterMirrorCoatTest, CounterPhysical) {
-  auto standard = setupStandard();
   auto result = engine_->updateState(
-      standard.where1().getEnv(), Action::move(0), Action::move(0));
+      engine_->initialState(), Action::move(0), Action::move(0));
   auto state = result.where1(both_hit);
   
   uint32_t damageToBlastoise = state.teammate(0, 0).getMissingHP();
@@ -141,9 +133,8 @@ TEST_F(CounterMirrorCoatTest, CounterPhysical) {
 
 
 TEST_F(CounterMirrorCoatTest, CounterFailsOnSpecial) {
-  auto standard = setupStandard();
   auto result = engine_->updateState(
-      standard.where1().getEnv(), Action::move(0), Action::move(1));
+      engine_->initialState(), Action::move(0), Action::move(1));
   auto state = result.where1(both_hit);
   
   EXPECT_GT(state.teammate(0, 0).getMissingHP(), 0);
@@ -152,9 +143,8 @@ TEST_F(CounterMirrorCoatTest, CounterFailsOnSpecial) {
 
 
 TEST_F(CounterMirrorCoatTest, MirrorCoatSpecial) {
-  auto standard = setupStandard();
   auto result = engine_->updateState(
-      standard.where1().getEnv(), Action::move(1), Action::move(1));
+      engine_->initialState(), Action::move(1), Action::move(1));
   auto state = result.where1(both_hit);
   
   uint32_t damageToBlastoise = state.teammate(0, 0).getMissingHP();
@@ -166,9 +156,8 @@ TEST_F(CounterMirrorCoatTest, MirrorCoatSpecial) {
 
 
 TEST_F(CounterMirrorCoatTest, MirrorCoatFailsOnPhysical) {
-  auto standard = setupStandard();
   auto result = engine_->updateState(
-      standard.where1().getEnv(), Action::move(1), Action::move(0));
+      engine_->initialState(), Action::move(1), Action::move(0));
   auto state = result.where1(both_hit);
   
   EXPECT_GT(state.teammate(0, 0).getMissingHP(), 0);
@@ -188,9 +177,8 @@ TEST_F(CounterMirrorCoatTest, CounterFailsIfMovingFirst) {
 
 
 TEST_F(CounterMirrorCoatTest, CounterFailsOnStatus) {
-  auto standard = setupStandard();
   auto result = engine_->updateState(
-      standard.where1().getEnv(), Action::move(0), Action::move(2));
+      engine_->initialState(), Action::move(0), Action::move(2));
   auto state = result.where1(both_hit);
   
   EXPECT_EQ(state.teammate(1, 0).getMissingHP(), 0);
