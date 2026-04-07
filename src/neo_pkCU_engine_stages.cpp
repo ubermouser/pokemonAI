@@ -381,13 +381,16 @@ void NeoPkCUEngine::evaluateMove_damage_evaluateHitChance() {
 
 void NeoPkCUEngine::evaluateMove_damage_damagingMoveBase() {
   const Move& cMove = getMV().getBase();
+
+  // Set the damage category for plugins (like Counter/Mirror Coat) to use
+  auto damageType = cMove.getDamageType();
+  getDamageComponent().category = damageType;
+
   // moves that are not physical or special attacks skip all damage computation
   // stages:
-  if (cMove.damageType_ == ATK_PHYSICAL || cMove.damageType_ == ATK_SPECIAL) {
-    return;
+  if (damageType != ATK_PHYSICAL && damageType != ATK_SPECIAL) {
+    gotoStackStage(StageType::PREDAMAGE);
   }
-
-  gotoStackStage(StageType::PREDAMAGE);
 }
 
 

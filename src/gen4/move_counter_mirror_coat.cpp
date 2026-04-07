@@ -14,11 +14,12 @@ int move_counterMirrorCoat(
   // Must move second
   if (cu.getBase().flagsFor((TEAM)cu.getICTeam()).isMovedFirst()) { return 1; }
 
+  // TODO - these automatically target the damage dealer, they aren't targeted
   // Opponent must have hit with a move
   if (!cu.getBase().flagsFor((TEAM)cu.getIOTeam()).isHit()) { return 1; }
 
   const DamageComponents_t& oDamage =
-      cu.getDamageComponent(cu.getIBase(), cu.getIOTeam());
+      cu.getDamageComponent(cu.getIBase(), cu.getTarget());
   uint32_t oCategory = oDamage.category;
 
   if (cMove == counter_t) {
