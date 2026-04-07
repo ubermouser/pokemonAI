@@ -169,7 +169,7 @@ class NeoPkCUEngine {
 
   /**
    * If returnAllStates is false, choose a state at random to keep, discard the
-   * rest
+   * rest. The engine returns a single state at 100% probability.
    */
   void maybeCollapseStages();
   void collapseStages();
@@ -270,36 +270,62 @@ class NeoPkCUEngine {
   void gotoStackStage(size_t iStage, StageType stage);
   void gotoStackStage(StageType stage);
 
+  // shorthand for getTeamVolatile
   TeamVolatile getTV();
-  TeamVolatile getTTV();
   TeamVolatile getTV(size_t iState);
+
+  // shorthand for getTargetTeamVolatile
+  TeamVolatile getTTV();
   TeamVolatile getTTV(size_t iState);
+
+  // shorthand for getPokemonVolatile
   PokemonVolatile getPKV();
-  PokemonVolatile getTPKV();
   PokemonVolatile getPKV(size_t iState);
+
+  // shorthand for getTargetPokemonVolatile
+  PokemonVolatile getTPKV();
   PokemonVolatile getTPKV(size_t iState);
-  MoveVolatile getTMV();
-  MoveVolatile getTMV(size_t iState);
+
+  // shorthand for getMoveVolatile
   MoveVolatile getMV();
   MoveVolatile getMV(size_t iState);
 
+  // shorthand for getTargetMoveVolatile
+  MoveVolatile getTMV();
+  MoveVolatile getTMV(size_t iState);
+
+  // getDamageComponent
   DamageComponents_t& getDamageComponent(size_t iStack);
   DamageComponents_t& getDamageComponent(size_t iStack, const Actor& actor);
+  DamageComponents_t& getDamageComponent();
   [[deprecated]] DamageComponents_t& getDamageComponent(
       size_t iStack, size_t iTeam);
-  DamageComponents_t& getDamageComponent();
 
+  // getIndexCurrentTeam
   size_t getICTeam() const;
+
+  // getIndexOpponentTeam
   size_t getIOTeam() const;
 
+  // getCurrentActor
   const Actor& getCActor() const;
   const Actor& getCActor(size_t iStack) const;
+
+  // getTargetActor
   const Actor& getTarget() const;
   const Actor& getTarget(size_t iStack) const;
-  Actor getOActor() const;
-  Actor getOActor(size_t iStack) const;
+
+  // getOpponentActor (deprecated)
+  [[deprecated]] Actor getOActor() const;
+  [[deprecated]] Actor getOActor(size_t iStack) const;
+
+  // getCurrentAction
   const Action& getCAction() const;
+
+  // getOpponentAction (deprecated)
   [[deprecated]] const Action& getOAction() const;
+
+  // getIndexCurrentBase
   size_t getIBase() const { return iBase_; }
   /** @} */
 

@@ -41,12 +41,13 @@ int engine_clearTrap(PkCUEngine& cu, PokemonVolatile cPKV) {
     cPKV.status().cTeammate.trap = 0;
   }
 
-  // 2. Clear trap on opponent because the trapper (previous pokemon) has left.
-  // Note: We assume that if the opponent is fully trapped (7), it was by us.
-  PokemonVolatile tPKV = cu.getTPKV();
-
-  if (tPKV.isAlive() && tPKV.status().cTeammate.trap == 7) {
-    tPKV.status().cTeammate.trap = 0;
+  // TODO: we should only clear the trap on the pokemon we trapped
+  // 2. Clear trap on all opponent active members
+  auto team = cu.getBase().getTeam(cu.getIOTeam());
+  for (auto [actor, tPKV] : team.yieldActivePokemon()) {
+    if (tPKV.isAlive() && tPKV.status().cTeammate.trap == 7) {
+      tPKV.status().cTeammate.trap = 0;
+    }
   }
 
   return 1;
