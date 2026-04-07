@@ -8,19 +8,24 @@ int ability_intimidate_switch(PkCUEngine& cu, PokemonVolatile cPKV) {
     return 0;
   }
 
-  // affects the opponent:
-  PokemonVolatile tPKV = cu.getTPKV();
-  if (!tPKV.isAlive()) { return 0; }
+  int ret = 0;
+  // affects all active opponents:
+  for (auto [actor, tPKV] :
+       cu.getBase().getTeam(cu.getIOTeam()).yieldActivePokemon()) {
+    if (!tPKV.isAlive()) { continue; }
 
-  // blocked by Clear Body:
-  if (tPKV.nv().abilityExists() && (&(tPKV.nv().getAbility()) == clearBody_t)) {
-    return 0;
+    // blocked by Clear Body:
+    if (tPKV.nv().abilityExists() &&
+        (&(tPKV.nv().getAbility()) == clearBody_t)) {
+      continue;
+    }
+
+    // lowers attack by 1 stage:
+    tPKV.modBoost(FV_ATTACK, -1);
+    ret = 1;
   }
 
-  // lowers attack by 1 stage:
-  tPKV.modBoost(FV_ATTACK, -1);
-
-  return 1;
+  return ret;
 };
 
 void register_ability_intimidate(const Pokedex& pkAI, std::vector<plugin>& extensions) {
