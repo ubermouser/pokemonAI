@@ -95,13 +95,13 @@ class CounterMirrorCoatTest : public Gen4EngineTest {
     // Substitute sequence: Mew (Fast) vs Machamp (Slow)
     // Turn 1: Mew uses Substitute, Machamp uses Cut
     return engine_->updateState(
-        setupSpeed().where1().getEnv(), Action::move(1), Action::move(1));
+        setupSpeed().where1().getEnv(), Action::moveAlly(1, 1), Action::move(1));
   }
 
   PossibleEnvironments setupSubTurn2() {
     // Turn 2: Machamp attacks substitute, Mew uses Counter
     return engine_->updateState(
-        setupSubTurn1().where1Hit(0).getEnv(), Action::move(1), Action::move(0));
+        setupSubTurn1().where1Hit(0).getEnv(), Action::moveAlly(1, 1), Action::move(0));
   }
 
   PossibleEnvironments setupUTurnTurn1() {

@@ -27,7 +27,7 @@ class BellyDrumTest : public Gen4EngineTest {
 TEST_F(BellyDrumTest, Success) {
   // Turn 1: Team A uses Belly Drum (Move 0)
   auto result = engine_->updateState(
-      engine_->initialState(), Action::move(0), Action::wait());
+      engine_->initialState(), Action::moveAlly(0, 0), Action::wait());
 
   auto pkv = result.where1().teammate(0, 0);
 
@@ -55,7 +55,7 @@ TEST_F(BellyDrumTest, FailLowHP) {
   env.teammate(0, 0).setHP(maxHP / 2);
 
   auto result = engine_->updateState(
-      env, Action::move(0), Action::wait());
+      env, Action::moveAlly(0, 0), Action::wait());
 
   auto pkv_result = result.where1().teammate(0, 0);
 
@@ -80,7 +80,7 @@ TEST_F(BellyDrumTest, FailMaxAtk) {
   env.teammate(0, 0).setBoost(FV_ATTACK, 6);
 
   auto result = engine_->updateState(
-      env, Action::move(0), Action::wait());
+      env, Action::moveAlly(0, 0), Action::wait());
 
   auto pkv_result = result.where1().teammate(0, 0);
 

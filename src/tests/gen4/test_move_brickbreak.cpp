@@ -28,11 +28,11 @@ class BrickBreakTest : public Gen4EngineTest {
     environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
     engine_->setEnvironment(environment_nv);
 
-    setup_reflect = engine_->updateState(engine_->initialState(), Action::wait(), Action::move(0));
-    setup_lightscreen = engine_->updateState(engine_->initialState(), Action::wait(), Action::move(1));
+    setup_reflect = engine_->updateState(engine_->initialState(), Action::wait(), Action::moveSideAlly(0));
+    setup_lightscreen = engine_->updateState(engine_->initialState(), Action::wait(), Action::moveSideAlly(1));
     setup_both = engine_->updateState(
-        setup_reflect.where1(), Action::wait(), Action::move(1));
-    setup_friendly_reflect = engine_->updateState(engine_->initialState(), Action::move(2), Action::wait());
+        setup_reflect.where1(), Action::wait(), Action::moveSideAlly(1));
+    setup_friendly_reflect = engine_->updateState(engine_->initialState(), Action::moveSideAlly(2), Action::wait());
     setup_reflect_swapped_to_ghost = engine_->updateState(
         setup_reflect.where1(), Action::wait(), Action::swap(1));
   }
@@ -115,7 +115,7 @@ TEST_F(BrickBreakTest, DoesNotRemoveScreensIfImmune) {
   EXPECT_EQ(setup_env.getTeam(1).getNonVolatile().reflect, 5);
 
   // Team A uses Brick Break on Rotom (Immune)
-  auto result = engine_->updateState(setup_env, Action::move(0), Action::move(0));
+  auto result = engine_->updateState(setup_env, Action::move(0), Action::moveSideAlly(0));
   auto result_env = result.where1().getEnv();
 
   // Reflect should REMAIN (decremented to 3) because Ghost is immune to Fighting

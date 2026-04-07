@@ -36,7 +36,7 @@ class GrudgeTest : public Gen4EngineTest {
 TEST_F(GrudgeTest, DepletesPPOnKnockout) {
   // Misdreavus (fast) uses Grudge. Gardevoir (slow) uses Psychic.
   auto turn = engine_->updateState(
-      engine_->initialState(), Action::move(0), Action::move(0));
+      engine_->initialState(), Action::moveAlly(0, 0), Action::move(0));
 
   auto state = turn.where1Crit(1);
 
@@ -48,7 +48,7 @@ TEST_F(GrudgeTest, DepletesPPOnKnockout) {
 TEST_F(GrudgeTest, WearsOffAfterNextMove) {
   // Turn 1: Misdreavus uses Grudge. Gardevoir uses Calm Mind (non-damaging).
   auto turn1 = engine_->updateState(
-      engine_->initialState(), Action::move(0), Action::move(1));
+      engine_->initialState(), Action::moveAlly(0, 0), Action::moveAlly(1, 0));
 
   auto state1 = turn1.where1Hit(0);
   EXPECT_TRUE(state1.teammate(0, 0).status().cTeammate.grudge);
@@ -69,7 +69,7 @@ TEST_F(GrudgeTest, DISABLED_TriggersOnOHKOMoves) {
   // OHKO moves like Sheer Cold also cause Grudge to trigger if they KO.
   // Misdreavus uses Grudge. Gardevoir uses Sheer Cold.
   auto turn = engine_->updateState(
-      engine_->initialState(), Action::move(0), Action::move(2));
+      engine_->initialState(), Action::moveAlly(0, 0), Action::move(2));
 
   auto state = turn.where1Hit(1);
 

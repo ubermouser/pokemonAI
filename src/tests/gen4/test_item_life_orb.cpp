@@ -28,7 +28,7 @@ class LifeOrbTest : public Gen4EngineTest {
     split_pain = engine_->updateState(
         sp_lifeorb.where1(), Action::move(0), Action::wait());
     calm_mind = engine_->updateState(
-        engine_->initialState(), Action::move(3), Action::wait());
+        engine_->initialState(), Action::moveAlly(3, 0), Action::wait());
   }
 
   PossibleEnvironments sp_lifeorb;

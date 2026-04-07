@@ -208,7 +208,7 @@ TEST_F(TrapTest, TrapClearedOnUserDeath) {
   engine_->setEnvironment(EnvironmentNonvolatile(team_a, team_b, true));
 
   // Turn 1: A uses Mean Look, B uses Roost (to let A live and trap)
-  auto turn1 = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(1));
+  auto turn1 = engine_->updateState(engine_->initialState(), Action::move(0), Action::moveAlly(1, 0));
   auto state1 = turn1.where1();
 
   // Verify trapped

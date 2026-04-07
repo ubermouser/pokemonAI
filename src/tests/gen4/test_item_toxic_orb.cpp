@@ -24,7 +24,7 @@ class ToxicOrbTest : public Gen4EngineTest {
 
     // Both use their moves (index 0)
     target_end_of_turn = engine_->updateState(
-        target_untouched, Action::move(0), Action::move(0));
+        target_untouched, Action::move(0), Action::moveAlly(0, 0));
   }
 
   PossibleEnvironments target_end_of_turn;
@@ -113,7 +113,7 @@ class ToxicOrbOverwriteTest : public Gen4EngineTest {
 
     // Both use their moves (index 0)
     target_end_of_turn =
-        engine_->updateState(env_v, Action::move(0), Action::move(0));
+        engine_->updateState(env_v, Action::move(0), Action::moveAlly(0, 0));
   }
 
   PossibleEnvironments target_end_of_turn;

@@ -27,10 +27,10 @@ class ScreenTest : public Gen4EngineTest {
     environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
     engine_->setEnvironment(environment_nv);
 
-    mew_reflect = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
+    mew_reflect = engine_->updateState(engine_->initialState(), Action::moveSideAlly(0), Action::wait());
     mew_reflect_physdmg = engine_->updateState(
         mew_reflect.where1(), Action::wait(), Action::move(0));
-    mew_lightscreen = engine_->updateState(engine_->initialState(), Action::move(1), Action::wait());
+    mew_lightscreen = engine_->updateState(engine_->initialState(), Action::moveSideAlly(1), Action::wait());
     mew_lightscreen_specdmg = engine_->updateState(
         mew_lightscreen.where1(), Action::wait(), Action::move(1));
     mew_physdmg = engine_->updateState(engine_->initialState(), Action::wait(), Action::move(0));
@@ -120,7 +120,7 @@ TEST_F(ScreenTest, FailsIfAlreadyActive) {
   // Should decrement to 4, then fail to reset to 5.
 
   auto turn2 =
-      engine_->updateState(turn1.where1(), Action::move(0), Action::wait());
+      engine_->updateState(turn1.where1(), Action::moveSideAlly(0), Action::wait());
   EXPECT_EQ(turn2.where1().getTeam(0).getNonVolatile().reflect, 4);
 }
 

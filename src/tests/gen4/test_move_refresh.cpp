@@ -44,28 +44,28 @@ class RefreshTest : public Gen4EngineTest {
 
 TEST_F(RefreshTest, CuresBurn) {
   SetupTest(AIL_NV_BURN);
-  auto result = engine_->updateState(*env_, Action::move(0), Action::wait());
+  auto result = engine_->updateState(*env_, Action::moveAlly(0, 0), Action::wait());
   ASSERT_GT(result.size(), 0);
   EXPECT_EQ(result.where1Hit(0).teammate(0, 0).getStatusAilment(), AIL_NV_NONE);
 }
 
 TEST_F(RefreshTest, CuresParalysis) {
   SetupTest(AIL_NV_PARALYSIS);
-  auto result = engine_->updateState(*env_, Action::move(0), Action::wait());
+  auto result = engine_->updateState(*env_, Action::moveAlly(0, 0), Action::wait());
   ASSERT_GT(result.size(), 0);
   EXPECT_EQ(result.where1Hit(0).teammate(0, 0).getStatusAilment(), AIL_NV_NONE);
 }
 
 TEST_F(RefreshTest, CuresPoison) {
   SetupTest(AIL_NV_POISON);
-  auto result = engine_->updateState(*env_, Action::move(0), Action::wait());
+  auto result = engine_->updateState(*env_, Action::moveAlly(0, 0), Action::wait());
   ASSERT_GT(result.size(), 0);
   EXPECT_EQ(result.where1Hit(0).teammate(0, 0).getStatusAilment(), AIL_NV_NONE);
 }
 
 TEST_F(RefreshTest, CuresToxicPoison) {
   SetupTest(AIL_NV_POISON_TOXIC);
-  auto result = engine_->updateState(*env_, Action::move(0), Action::wait());
+  auto result = engine_->updateState(*env_, Action::moveAlly(0, 0), Action::wait());
   ASSERT_GT(result.size(), 0);
   auto pkv = result.where1Hit(0).teammate(0, 0);
   EXPECT_EQ(pkv.getStatusAilment(), AIL_NV_NONE);

@@ -29,19 +29,19 @@ class FocusSashTest : public Gen4EngineTest {
 
     // 2. Bulbasaur uses Tackle, magikarp survives easily
     auto swap_state = engine_->updateState(
-        target_untouched, Action::swap(1), Action::move(0));
+        target_untouched, Action::swap(1), Action::moveAlly(0, 0));
     target_damaged = engine_->updateState(
-        swap_state.where1(), Action::move(0), Action::move(0));
+        swap_state.where1(), Action::move(0), Action::moveAlly(0, 0));
 
     // Garchomp uses earthquake, magikarp only just survives.
     target_bigdamage = engine_->updateState(
-        target_untouched, Action::move(0), Action::move(0));
+        target_untouched, Action::move(0), Action::moveAlly(0, 0));
 
     // Garchump uses earthquake after bulbasaur uses tackle, magikarp dies.
     auto swap_back_to_garchomp = engine_->updateState(
         target_damaged.where1(), Action::swap(0), Action::wait());
     target_dead = engine_->updateState(
-        swap_back_to_garchomp.where1(), Action::move(0), Action::move(0));
+        swap_back_to_garchomp.where1(), Action::move(0), Action::moveAlly(0, 0));
   }
 
   PossibleEnvironments target_damaged;

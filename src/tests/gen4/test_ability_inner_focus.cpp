@@ -64,7 +64,7 @@ TEST_F(InnerFocusTest, PreventsFlinch) {
 TEST_F(InnerFocusTest, ControlGroupFlinches) {
   bool found_blocked = false;
   auto turn2_outcome = engine_->updateState(
-      swap_starmie.where1(), Action::move(0), Action::move(0));
+      swap_starmie.where1(), Action::moveAlly(0, 1), Action::move(0));
 
   for (size_t j = 0; j < turn2_outcome.size(); ++j) {
     auto env_final = turn2_outcome.at(j);

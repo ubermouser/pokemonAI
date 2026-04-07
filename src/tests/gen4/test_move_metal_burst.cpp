@@ -132,7 +132,7 @@ TEST_F(MetalBurstTest, MetalBurstFailsOnStatus) {
   // Aggron vs Garchomp. Garchomp uses Swords Dance (1).
   // Aggron uses Metal Burst (0).
   auto result = engine_->updateState(
-      state_physical.where1().getEnv(), Action::move(0), Action::move(1));
+      state_physical.where1().getEnv(), Action::move(0), Action::moveAlly(1, 0));
 
   auto state = result.where1(both_hit);
 

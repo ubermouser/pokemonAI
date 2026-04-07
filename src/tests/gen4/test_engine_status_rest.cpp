@@ -29,7 +29,7 @@ TEST_F(RestStatusTest, Test_RestMoveAndTwoTurns) {
     auto initial_state = engine_->initialState();
     
     // Turn 1: Mew is at full HP, Rest should fail
-    auto results_fail = engine_->updateState(initial_state, Action::move(0), Action::wait()); 
+    auto results_fail = engine_->updateState(initial_state, Action::moveAlly(0, 0), Action::wait()); 
     auto env_fail = results_fail.where1();
     EXPECT_EQ((uint32_t)env_fail.teammate(0, 0).getStatusAilment(), 0U);
     EXPECT_EQ(env_fail.teammate(0, 0).getHP(), (uint32_t)env_fail.teammate(0, 0).nv().getMaxHP());
@@ -40,7 +40,7 @@ TEST_F(RestStatusTest, Test_RestMoveAndTwoTurns) {
     EXPECT_LT(setup_state.teammate(0, 0).getHP(), (uint32_t)setup_state.teammate(0, 0).nv().getMaxHP());
 
     // Turn 1: Mew uses Rest
-    auto results1 = engine_->updateState(setup_state, Action::move(0), Action::wait());
+    auto results1 = engine_->updateState(setup_state, Action::moveAlly(0, 0), Action::wait());
     auto env1 = results1.where1();
     
     // Status should be AIL_NV_REST_3T (7)

@@ -35,7 +35,7 @@ class BatonPassTest : public Gen4EngineTest {
 TEST_F(BatonPassTest, PassesBoosts) {
   // Turn 1: Scizor uses Swords Dance (+2 Atk)
   auto turn1 = engine_->updateState(
-      engine_->initialState(), Action::move(1), Action::wait());
+      engine_->initialState(), Action::moveAlly(1, 0), Action::wait());
 
   auto scizor_boosted = turn1.where1Hit(0);
   EXPECT_EQ(scizor_boosted.teammate(0, 0).getBoost(FV_ATTACK), 2);
@@ -59,7 +59,7 @@ TEST_F(BatonPassTest, PassesBoosts) {
 TEST_F(BatonPassTest, PassesSubstitute) {
   // Turn 1: Scizor uses Substitute
   auto turn1 = engine_->updateState(
-      engine_->initialState(), Action::move(2), Action::wait());
+      engine_->initialState(), Action::moveAlly(2, 0), Action::wait());
 
   auto scizor_sub = turn1.where1Hit(0);
   EXPECT_GT(scizor_sub.teammate(0, 0).status().cTeammate.substitute, 0);
@@ -105,7 +105,7 @@ TEST_F(BatonPassTest, DoesNotPassConfusion) {
 TEST_F(BatonPassTest, NormalSwitchResetsBoosts) {
   // Turn 1: Scizor uses Swords Dance (+2 Atk)
   auto turn1 = engine_->updateState(
-      engine_->initialState(), Action::move(1), Action::wait());
+      engine_->initialState(), Action::moveAlly(1, 0), Action::wait());
 
   auto scizor_boosted = turn1.where1Hit(0);
   EXPECT_EQ(scizor_boosted.teammate(0, 0).getBoost(FV_ATTACK), 2);
