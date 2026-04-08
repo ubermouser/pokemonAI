@@ -29,8 +29,9 @@ int move_leechSeed_effect(PkCUEngine& cu, PokemonVolatile cPKV) {
   uint32_t finalHP = cPKV.getHP();
   int32_t hpDrained = (int32_t)initialHP - (int32_t)finalHP;
 
+  // TODO: heal the actor who cast leech seed
   // Heal the opponent
-  PokemonVolatile tPKV = cu.getTPKV();
+  PokemonVolatile tPKV = cu.getTTV().getPKV();
   if (tPKV.isAlive()) {
     tPKV.modHP(hpDrained);
   }

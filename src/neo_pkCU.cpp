@@ -473,21 +473,6 @@ IsValidResult NeoPkCU::isValidAction_move(
       }
     }
   }
-
-  if (result.reason != IsValidResult::VALID) {
-    fmt::print(
-        "isValidAction fail: actor={}, action={}, reason={}, targets=[",
-        fmt::streamed(actor),
-        fmt::streamed(action),
-        invalidActionReasonToString(result.reason));
-    for (size_t i = 0; i < targets.size(); ++i) {
-      fmt::print(
-          "{}{}",
-          fmt::streamed(targets[i]),
-          (i == targets.size() - 1 ? "" : ", "));
-    }
-    fmt::print("]\n");
-  }
   return result;
 }  // endOf isValidAction_move
 
