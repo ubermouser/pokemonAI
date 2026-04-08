@@ -18,88 +18,109 @@ class UTurnTest : public Gen4EngineTest {
           .setLevel(50));
     environment_nv = EnvironmentNonvolatile(team, team, true);
     engine_->setEnvironment(environment_nv);
-
-    setup_swap = engine_->updateState(engine_->initialState(), Action::wait(), Action::swap(1));
-    setup_sr = engine_->updateState(
-        setup_swap.where1(), Action::wait(), Action::move(0));
-    uturn_to_ally = engine_->updateState(
-        setup_swap.where1(), Action::moveAlly(0, 1), Action::wait());
-    uturn_to_ally_with_sr = engine_->updateState(
-        setup_sr.where1(), Action::moveAlly(0, 1), Action::wait());
-    swap_to_scyzor = engine_->updateState(
-        uturn_to_ally.where1(), Action::wait(), Action::swap(0));
-    uturn_no_ally = engine_->updateState(
-        swap_to_scyzor.where1(), Action::wait(), Action::moveAlly(0, 0));
   }
 
-  PossibleEnvironments setup_swap;
-  PossibleEnvironments setup_sr;
-  PossibleEnvironments uturn_to_ally;
-  PossibleEnvironments uturn_to_ally_with_sr;
-  PossibleEnvironments swap_to_scyzor;
-  PossibleEnvironments uturn_no_ally;
+  PossibleEnvironments setupSwap() {
+    return engine_->updateState(
+        engine_->initialState(), Action::wait(), Action::swap(1));
+  }
+
+  PossibleEnvironments setupSR() {
+    auto swap = setupSwap();
+    return engine_->updateState(
+        swap.where1(), Action::wait(), Action::move(0));
+  }
+
+  PossibleEnvironments setupUTurnToAlly() {
+    auto swap = setupSwap();
+    return engine_->updateState(
+        swap.where1(), Action::moveAlly(0, 1), Action::wait());
+  }
+
+  PossibleEnvironments setupUTurnToAllyWithSR() {
+    auto sr = setupSR();
+    return engine_->updateState(
+        sr.where1(), Action::moveAlly(0, 1), Action::wait());
+  }
+
+  PossibleEnvironments setupSwapToScizor() {
+    auto uturn = setupUTurnToAlly();
+    return engine_->updateState(
+        uturn.where1(), Action::wait(), Action::swap(0));
+  }
+
+  PossibleEnvironments setupUTurnNoAlly() {
+    auto scizor = setupSwapToScizor();
+    return engine_->updateState(
+        scizor.where1(), Action::wait(), Action::moveAlly(0, 0));
+  }
 };
 
 
 TEST_F(UTurnTest, requires_pokemon_to_swap_if_ally_exists) {
+  auto sr = setupSR();
   EXPECT_FALSE(
-      engine_->isValidAction(setup_sr.where1().getEnv(), Actor(TEAM_A, 0), Action::move(0)));
+      engine_->isValidAction(sr.where1().getEnv(), Actor(TEAM_A, 0), Action::move(0)));
   EXPECT_TRUE(engine_->isValidAction(
-      setup_sr.where1().getEnv(), Actor(TEAM_A, 0), Action::moveAlly(0, 1)));
+      sr.where1().getEnv(), Actor(TEAM_A, 0), Action::moveAlly(0, 1)));
   EXPECT_FALSE(engine_->isValidAction(
-      setup_sr.where1().getEnv(), Actor(TEAM_A, 0), Action::struggle()));
+      sr.where1().getEnv(), Actor(TEAM_A, 0), Action::struggle()));
 }
 
 
 TEST_F(UTurnTest, can_still_be_used_without_swap_if_no_allies_exist) {
+  auto scizor = setupSwapToScizor();
   EXPECT_FALSE(
-      engine_->isValidAction(swap_to_scyzor.where1().getEnv(), Actor(TEAM_B, 0), Action::move(0)));
+      engine_->isValidAction(scizor.where1().getEnv(), Actor(TEAM_B, 0), Action::move(0)));
   EXPECT_TRUE(engine_->isValidAction(
-      swap_to_scyzor.where1().getEnv(), Actor(TEAM_B, 0), Action::moveAlly(0, 0)));
+      scizor.where1().getEnv(), Actor(TEAM_B, 0), Action::moveAlly(0, 0)));
   EXPECT_FALSE(engine_->isValidAction(
-      swap_to_scyzor.where1().getEnv(), Actor(TEAM_B, 0), Action::moveAlly(0, 1)));
+      scizor.where1().getEnv(), Actor(TEAM_B, 0), Action::moveAlly(0, 1)));
 }
 
 
 TEST_F(UTurnTest, damages_enemy_and_swaps_to_ally) {
+  auto turn = setupUTurnToAlly();
   // pp decremented
-  EXPECT_EQ(uturn_to_ally.where1Hit(0).teammate(0, 0).getMV(0).getPP(), 31);
+  EXPECT_EQ(turn.where1Hit(0).teammate(0, 0).getMV(0).getPP(), 31);
   // item effect (life orb) applies
   EXPECT_NEAR(
-      uturn_to_ally.where1Hit(0).teammate(0, 0).getPercentHP(), 0.9, 0.005);
+      turn.where1Hit(0).teammate(0, 0).getPercentHP(), 0.9, 0.005);
   // ally has swapped out
-  EXPECT_EQ(uturn_to_ally.where1Hit(0).getTeam(0).getICPKV(), 1);
+  EXPECT_EQ(turn.where1Hit(0).getTeam(0).getICPKV(), 1);
   EXPECT_EQ(
-      uturn_to_ally.where1Hit(0).teammate(1, 1).getPercentHP(),
+      turn.where1Hit(0).teammate(1, 1).getPercentHP(),
       0.);  // enemy weakling deleted
 }
 
 
 TEST_F(UTurnTest, damages_enemy_and_swaps_to_ally_with_stealth_rock) {
+  auto turn = setupUTurnToAllyWithSR();
   // life orb applies to attacking teammate
   EXPECT_NEAR(
-      uturn_to_ally_with_sr.where1Hit(0).teammate(0, 0).getPercentHP(),
+      turn.where1Hit(0).teammate(0, 0).getPercentHP(),
       0.9,
       0.005);
   // stealth-rock applies to entering teammate
   EXPECT_NEAR(
-      uturn_to_ally_with_sr.where1Hit(0).teammate(0, 1).getPercentHP(),
+      turn.where1Hit(0).teammate(0, 1).getPercentHP(),
       0.9375,
       0.005);
 }
 
 
 TEST_F(UTurnTest, damages_enemy_but_doesnt_swap_if_no_allies_exist) {
+  auto turn = setupUTurnNoAlly();
   // pp decremented
-  EXPECT_EQ(uturn_no_ally.where1Hit(1).teammate(1, 0).getMV(0).getPP(), 31);
+  EXPECT_EQ(turn.where1Hit(1).teammate(1, 0).getMV(0).getPP(), 31);
   // item effect (life orb) applies
   EXPECT_FLOAT_EQ(
-      uturn_no_ally.where1Hit(1).teammate(1, 0).getPercentHP(), 0.9);
+      turn.where1Hit(1).teammate(1, 0).getPercentHP(), 0.9);
   // item effect (life orb) applies
   EXPECT_FLOAT_EQ(
-      uturn_no_ally.where1Hit(1).teammate(1, 0).getPercentHP(), 0.9);
+      turn.where1Hit(1).teammate(1, 0).getPercentHP(), 0.9);
   // ally NOT swapped out
-  EXPECT_EQ(uturn_no_ally.where1Hit(1).getTeam(1).getICPKV(), 0);
+  EXPECT_EQ(turn.where1Hit(1).getTeam(1).getICPKV(), 0);
 }
 
 
@@ -133,8 +154,10 @@ TEST_F(UTurnTest, NoErroneousStruggleWithChoiceItem) {
 
 TEST_F(UTurnTest, UTurnReported) {
   // Turn 1: Scizor uses U-turn on enemy Torterra and swaps to friendly Torterra
+  auto swap = setupSwap();
+  auto uturn = setupUTurnToAlly();
   auto output = StateTransitionPrinter::printString(
-      setup_swap.where1().getEnv(), uturn_to_ally.where1Hit(0), false);
+      swap.where1().getEnv(), uturn.where1Hit(0), false);
 
   SCOPED_TRACE(output);
   // Verify swap action is reported
