@@ -444,17 +444,20 @@ IsValidResult NeoPkCU::isValidAction_move(
         }
       } else if (!doAllowMove[VALID_MOVE_HAS_PP]) {
         result = IsValidResult::MOVE_NO_PP;
-      } else if (hasSpecificFriendlyTarget) {
-        if (!doAllowMove[VALID_MOVE_FRIENDLY_ALIVE]) {
-          result = IsValidResult::MOVE_FRIENDLY_TARGET_DEAD;
-        } else if (!doAllowMove[VALID_MOVE_FRIENDLY_IS_OTHER]) {
-          result = IsValidResult::MOVE_FRIENDLY_TARGET_SELF;
-        }
+      } else if (
+          hasSpecificFriendlyTarget &&
+          !doAllowMove[VALID_MOVE_FRIENDLY_ALIVE]) {
+        result = IsValidResult::MOVE_FRIENDLY_TARGET_DEAD;
+      } else if (
+          hasSpecificFriendlyTarget &&
+          !doAllowMove[VALID_MOVE_FRIENDLY_IS_OTHER]) {
+        result = IsValidResult::MOVE_FRIENDLY_TARGET_SELF;
       } else if (!doAllowMove[VALID_MOVE_SCRIPT]) {
         result = IsValidResult::MOVE_LOCKED_BY_SCRIPT;
       }
     }
   }
+
   return result;
 }  // endOf isValidAction_move
 

@@ -212,6 +212,27 @@ inline int mock_onTestSwitch(
   return 0;
 }
 
+inline int mock_onTestMove_blockAll(
+    ConstTeamVolatile,
+    ConstPokemonVolatile,
+    ConstMoveVolatile,
+    const Action&,
+    ValidMoveSet& moveAllowed) {
+  SPDLOG_TRACE("PLUGIN_ON_TESTMOVE: mock_onTestMove_blockAll");
+  moveAllowed[VALID_MOVE_SCRIPT] = false;
+  return 0;
+}
+
+inline int mock_onTestSwitch_blockAll(
+    ConstPokemonVolatile,
+    ConstPokemonVolatile,
+    const Action&,
+    ValidSwapSet& swapAllowed) {
+  SPDLOG_TRACE("PLUGIN_ON_TESTSWITCH: mock_onTestSwitch_blockAll");
+  swapAllowed[VALID_SWAP_SCRIPT] = false;
+  return 0;
+}
+
 inline int mock_onModifyAction(PkCUEngine&, Action&) {
   SPDLOG_TRACE("PLUGIN_ON_MODIFYACTION: mock_onModifyAction");
   plugin_calls[PLUGIN_ON_MODIFYACTION]++;
@@ -316,6 +337,19 @@ public:
     ab.setName("test_ability");
     Ability& a = abilities_.insert(ab);
     a.setHasNoPlugins();
+
+    Ability abMove;
+    abMove.setName("ability_block_move");
+    Ability& am = abilities_.insert(abMove);
+
+    Ability abSwap;
+    abSwap.setName("ability_block_swap");
+    Ability& as = abilities_.insert(abSwap);
+
+    // clang-format off
+    abilities_.at("ability_block_move").registerPlugin(pluginOnTestMove(pluginCategory::ability, "block_move", mock_onTestMove_blockAll), true);
+    abilities_.at("ability_block_swap").registerPlugin(pluginOnTestSwitch(pluginCategory::ability, "block_swap", mock_onTestSwitch_blockAll), true);
+    // clang-format on
   }
 
   void setupNatures() {

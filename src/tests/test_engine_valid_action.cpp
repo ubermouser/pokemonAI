@@ -79,6 +79,41 @@ class IsValidAction1v1Test : public MockEngineTest {
     return engine_->updateState(
         engine_->initialState(), Action::move(1), Action::move(1));
   }
+
+  void setup_blockMoveEnv() {
+    auto teamA = TeamNonVolatile()
+        .addPokemon(PokemonNonVolatile()
+            .setBase(pokedex_->pokemon("test_pokemon"))
+            .setAbility(pokedex_->ability("ability_block_move"))
+            .addMove(pokedex_->move("move_any_adjacent")));
+
+    auto teamB = TeamNonVolatile()
+        .addPokemon(PokemonNonVolatile()
+            .setBase(pokedex_->pokemon("test_pokemon3"))
+            .addMove(pokedex_->move("move_any_adjacent")));
+
+    auto env_nv = EnvironmentNonvolatile(teamA, teamB, true);
+    engine_->setEnvironment(env_nv);
+  }
+
+  void setup_blockSwapEnv() {
+    auto teamA = TeamNonVolatile()
+        .addPokemon(PokemonNonVolatile()
+            .setBase(pokedex_->pokemon("test_pokemon"))
+            .setAbility(pokedex_->ability("ability_block_swap"))
+            .addMove(pokedex_->move("move_any_adjacent")))
+        .addPokemon(PokemonNonVolatile()
+            .setBase(pokedex_->pokemon("test_pokemon2"))
+            .addMove(pokedex_->move("move_any_adjacent")));
+
+    auto teamB = TeamNonVolatile()
+        .addPokemon(PokemonNonVolatile()
+            .setBase(pokedex_->pokemon("test_pokemon3"))
+            .addMove(pokedex_->move("move_any_adjacent")));
+
+    auto env_nv = EnvironmentNonvolatile(teamA, teamB, true);
+    engine_->setEnvironment(env_nv);
+  }
 };
 
 // --- Basic Validation Tests ---
@@ -291,4 +326,28 @@ TEST_F(IsValidAction1v1Test, InvalidFriendlyTarget) {
   auto result = engine_->isValidAction(
       engine_->initialState(), Actor(TEAM_A, 0), Action::moveAlly(2, 3));
   EXPECT_EQ(result.reason, IsValidResult::INVALID_FRIENDLY_TARGET);
+}
+
+// --- Script Restriction Tests ---
+
+TEST_F(IsValidAction1v1Test, ScriptRestrictions_MoveBlockedByAbility) {
+  setup_blockMoveEnv();
+  auto state = engine_->initialState();
+  auto result = engine_->isValidAction(state, Actor(TEAM_A, 0), Action::move(0));
+  EXPECT_EQ(result.reason, IsValidResult::MOVE_LOCKED_BY_SCRIPT);
+}
+
+TEST_F(IsValidAction1v1Test, ScriptRestrictions_StruggleAllowedWhenMovesBlocked) {
+  setup_blockMoveEnv();
+  auto state = engine_->initialState();
+  // Struggle should be allowed because the only other move is locked
+  EXPECT_TRUE(engine_->isValidAction(state, Actor(TEAM_A, 0), Action::struggle()));
+}
+
+TEST_F(IsValidAction1v1Test, ScriptRestrictions_SwapBlockedByAbility) {
+  setup_blockSwapEnv();
+  auto state = engine_->initialState();
+  // Test switching from lead to teammate 1
+  auto result = engine_->isValidAction(state, Actor(TEAM_A, 0), Action::swap(1));
+  EXPECT_EQ(result.reason, IsValidResult::SWITCH_LOCKED_BY_SCRIPT);
 }
