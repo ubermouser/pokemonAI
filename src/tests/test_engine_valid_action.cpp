@@ -23,7 +23,10 @@ class IsValidAction1v1Test : public MockEngineTest {
         .addPokemon(PokemonNonVolatile()
             .setBase(pokedex_->pokemon("test_pokemon2"))
             .addMove(pokedex_->move("move_any_adjacent"))  // 0
-            .addMove(pokedex_->move("move_suicide")));     // 1
+            .addMove(pokedex_->move("move_suicide")))      // 1
+        .addPokemon(PokemonNonVolatile()
+            .setBase(pokedex_->pokemon("test_pokemon"))
+            .addMove(pokedex_->move("move_any_ally_self"))); // 0
 
     auto teamB = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
@@ -138,7 +141,7 @@ TEST_F(IsValidAction1v1Test, AllActionsActiveTeammate) {
   auto actions = engine_->getValidActions(engine_->initialState(), {TEAM_A, 0});
 
   fmt::print("{}\n", fmt::streamed(actions));
-  EXPECT_EQ(actions.size(), 5);
+  EXPECT_EQ(actions.size(), 7);  // (5 move actions + 2 swaps)
 }
 
 
@@ -147,7 +150,7 @@ TEST_F(IsValidAction1v1Test, AllMoveActions) {
       engine_->getValidMoveActions(engine_->initialState(), {TEAM_A, 0});
 
   fmt::print("{}\n", fmt::streamed(actions));
-  EXPECT_EQ(actions.size(), 4);
+  EXPECT_EQ(actions.size(), 5);  // (1+1+2+1)
 }
 
 
@@ -156,7 +159,7 @@ TEST_F(IsValidAction1v1Test, AllSwapActions) {
       engine_->getValidSwapActions(engine_->initialState(), {TEAM_A, 0});
 
   fmt::print("{}\n", fmt::streamed(actions));
-  EXPECT_EQ(actions.size(), 1);
+  EXPECT_EQ(actions.size(), 2);
 }
 
 
@@ -168,7 +171,7 @@ TEST_F(IsValidAction1v1Test, AllValidActionMaps) {
     EXPECT_EQ(map.size(), 1);
     EXPECT_TRUE(map.count(Actor(TEAM_A, 0)));
   }
-  EXPECT_EQ(maps.size(), 5); // (4 moves + 1 swap)
+  EXPECT_EQ(maps.size(), 7);  // (5 moves + 2 swaps)
 }
 
 // --- Swap Tests ---
@@ -242,7 +245,7 @@ TEST_F(IsValidAction1v1Test, ValidActionsCount) {
       engine_->getValidActions(active_dead.where1().getEnv(), Actor(TEAM_A, 0));
 
   fmt::print("{}", fmt::streamed(actions));
-  EXPECT_EQ(actions.size(), 1);
+  EXPECT_EQ(actions.size(), 2);  // (can swap to 1 or 2)
 }
 
 TEST_F(IsValidAction1v1Test, MoveTargetDead) {
@@ -277,8 +280,15 @@ TEST_F(IsValidAction1v1Test, MoveFriendlyTargetSelf) {
   EXPECT_EQ(result.reason, IsValidResult::MOVE_FRIENDLY_TARGET_SELF);
 }
 
+TEST_F(IsValidAction1v1Test, MoveFriendlyTargetSelfAllowed) {
+  auto state = engine_->updateState(
+      engine_->initialState(), Action::swap(2), Action::wait());
+  EXPECT_TRUE(engine_->isValidAction(
+      state.where1().getEnv(), Actor(TEAM_A, 2), Action::moveAlly(0, 2)));
+}
+
 TEST_F(IsValidAction1v1Test, InvalidFriendlyTarget) {
   auto result = engine_->isValidAction(
-      engine_->initialState(), Actor(TEAM_A, 0), Action::moveAlly(2, 2));
+      engine_->initialState(), Actor(TEAM_A, 0), Action::moveAlly(2, 3));
   EXPECT_EQ(result.reason, IsValidResult::INVALID_FRIENDLY_TARGET);
 }

@@ -71,6 +71,7 @@ Move::TargetType Move::targetTypeFromString(const std::string& str) {
   if (s == "any_adjacent_ally_self") return ANY_ADJACENT_ALLY_SELF;
   if (s == "any_active") return ANY_ACTIVE;
   if (s == "any_ally") return ANY_ALLY;
+  if (s == "any_ally_self") return ANY_ALLY_SELF;
   if (s == "all_adjacent") return ALL_ADJACENT;
   if (s == "all_adjacent_enemy") return ALL_ADJACENT_ENEMY;
   if (s == "all_adjacent_ally") return ALL_ADJACENT_ALLY;

@@ -67,26 +67,27 @@ public:
 
   // clang-format off
   enum TargetType : int {
-    UNKNOWN = -1,           /* varies / unknown */
-    SELF = 0,               /* may target self only (defense curl, protect) */
-    ANY_ADJACENT = 1,       /* may target an adjacent pokemon (tackle, charm) */
-    ANY_ADJACENT_ALLY = 2,  /* may target an adjacent ally (helping hand) */
-    ANY_ADJACENT_ENEMY = 3, /* may target an adjacent enemy (me first) */
-    ANY_ADJACENT_ALLY_SELF = 4, /* may target an adjacent ally or self (acupressure) */
-    ANY_ACTIVE = 5,         /* may target any active pokemon (gust, peck) */
-    ANY_ALLY = 6,           /* may target any living ally, active or not (baton pass, u-turn) */
-    ALL_ADJACENT = 7,       /* targets all adjacent pokemon (earthquake, explosion) */
-    ALL_ADJACENT_ENEMY = 8, /* targets all adjacent enemy pokemon (growl, blizzard) */
-    ALL_ADJACENT_ALLY = 9,  /* targets all adjacent friendly pokemon */
-    ALL_ACTIVE_ALLIES = 10,  /* targets all active teammates (coaching) */
-    ALL_ACTIVE_ENEMIES = 11, /* targets all active enemies */
-    ALL_ACTIVE = 12,        /* targets all active pokemon (perish song) */
-    SIDE_ALLY = 13,         /* targets the allied side (mist, light screen) */
-    SIDE_ENEMY = 14,        /* targets the enemy side (spikes, stealth rock) */
-    SIDE_ALL = 15,          /* targets the entire battlefield (haze, rain dance) */
-    ALL_ALLIES = 16,        /* targets all living teammates, active or not (heal bell, aromatherapy) */
-    ALL_ENEMIES = 17,       /* targets all living enemies, active or not */
-    ALL_FIELD = 18,         /* targets all living pokemon, including the self, active or not */
+    UNKNOWN = -1,       /* varies / unknown */
+    SELF,               /* may target self only (defense curl, protect) */
+    ANY_ADJACENT,       /* may target an adjacent pokemon (tackle, charm) */
+    ANY_ADJACENT_ALLY,  /* may target an adjacent ally (helping hand) */
+    ANY_ADJACENT_ENEMY, /* may target an adjacent enemy (me first) */
+    ANY_ADJACENT_ALLY_SELF, /* may target an adjacent ally or self (acupressure) */
+    ANY_ACTIVE,         /* may target any active pokemon (gust, peck) */
+    ANY_ALLY,           /* may target any living ally, active or not (baton pass, u-turn) */
+    ANY_ALLY_SELF,      /* may target any living ally (including self), active or not (u-turn) */
+    ALL_ADJACENT,       /* targets all adjacent pokemon (earthquake, explosion) */
+    ALL_ADJACENT_ENEMY, /* targets all adjacent enemy pokemon (growl, blizzard) */
+    ALL_ADJACENT_ALLY,  /* targets all adjacent friendly pokemon */
+    ALL_ACTIVE_ALLIES,  /* targets all active teammates (coaching) */
+    ALL_ACTIVE_ENEMIES, /* targets all active enemies */
+    ALL_ACTIVE,         /* targets all active pokemon (perish song) */
+    SIDE_ALLY,          /* targets the allied side (mist, light screen) */
+    SIDE_ENEMY,         /* targets the enemy side (spikes, stealth rock) */
+    SIDE_ALL,           /* targets the entire battlefield (haze, rain dance) */
+    ALL_ALLIES,         /* targets all living teammates, active or not (heal bell, aromatherapy) */
+    ALL_ENEMIES,        /* targets all living enemies, active or not */
+    ALL_FIELD,          /* targets all living pokemon, including the self, active or not */
   };
   // clang-format on
   static TargetType targetTypeFromString(const std::string& str);
@@ -208,13 +209,36 @@ public:
   bool targetsAlly() const {
     // TODO - set or bitmask operaton
     return target_ == SELF || target_ == ANY_ADJACENT_ALLY ||
-           target_ == ANY_ADJACENT ||
-           target_ == ANY_ADJACENT_ALLY_SELF || target_ == ANY_ACTIVE ||
-           target_ == ANY_ALLY || target_ == ALL_ADJACENT_ALLY ||
+           target_ == ANY_ADJACENT || target_ == ANY_ADJACENT_ALLY_SELF ||
+           target_ == ANY_ACTIVE || target_ == ANY_ALLY ||
+           target_ == ANY_ALLY_SELF || target_ == ALL_ADJACENT_ALLY ||
            target_ == ALL_ADJACENT || target_ == ALL_ACTIVE_ALLIES ||
            target_ == ALL_ACTIVE || target_ == ALL_ALLIES ||
            target_ == ALL_FIELD;
   };
+
+  bool allowsBenchTarget() const {
+    return target_ == ANY_ALLY || target_ == ANY_ALLY_SELF ||
+           target_ == ALL_ALLIES || target_ == ALL_ENEMIES ||
+           target_ == ALL_FIELD;
+  }
+
+  bool isTargetedFriendly() const {
+    return target_ == ANY_ADJACENT_ALLY || target_ == ANY_ADJACENT ||
+           target_ == ANY_ADJACENT_ALLY_SELF || target_ == ANY_ALLY ||
+           target_ == ANY_ALLY_SELF || target_ == SELF ||
+           target_ == ANY_ACTIVE;
+  }
+
+  bool isTargetedHostile() const {
+    return target_ == ANY_ADJACENT_ENEMY || target_ == ANY_ADJACENT ||
+           target_ == ANY_ACTIVE;
+  }
+
+  bool canTargetSelf() const {
+    return target_ == SELF || target_ == ANY_ADJACENT_ALLY_SELF ||
+           target_ == ANY_ALLY_SELF || target_ == ALL_FIELD;
+  }
 
   int32_t getSpeedPriority() const { return priority_; }
 

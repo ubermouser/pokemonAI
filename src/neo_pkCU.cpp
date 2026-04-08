@@ -365,18 +365,9 @@ IsValidResult NeoPkCU::isValidAction_move(
   auto targets = envV.getTargets(actor, action);
 
   // Validate target existence and activity
-  bool allowBench =
-      (cMV.getBase().target_ == Move::ANY_ALLY ||
-       cMV.getBase().target_ == Move::ALL_ALLIES ||
-       cMV.getBase().target_ == Move::ALL_ENEMIES ||
-       cMV.getBase().target_ == Move::ALL_FIELD);
-
-  bool hasSpecificFriendlyTarget =
-      (action.friendlyTarget() >= Action::FRIENDLY_0 &&
-       action.friendlyTarget() <= Action::FRIENDLY_5);
-  bool hasSpecificHostileTarget =
-      (action.enemyTarget() >= Action::HOSTILE_0 &&
-       action.enemyTarget() <= Action::HOSTILE_5);
+  bool allowBench = cMV.getBase().allowsBenchTarget();
+  bool hasSpecificFriendlyTarget = action.targetedFriendly();
+  bool hasSpecificHostileTarget = action.targetedHostile();
 
   IsValidResult result = IsValidResult::VALID;
   for (const auto& t : targets) {
@@ -404,17 +395,8 @@ IsValidResult NeoPkCU::isValidAction_move(
 
   if (result.reason == IsValidResult::VALID) {
     // Check if targeting mode matches move capability
-    bool moveIsTargetedFriendly =
-        (cMV.getBase().target_ == Move::ANY_ADJACENT_ALLY ||
-         cMV.getBase().target_ == Move::ANY_ADJACENT ||
-         cMV.getBase().target_ == Move::ANY_ADJACENT_ALLY_SELF ||
-         cMV.getBase().target_ == Move::ANY_ALLY ||
-         cMV.getBase().target_ == Move::SELF ||
-         cMV.getBase().target_ == Move::ANY_ACTIVE);
-    bool moveIsTargetedHostile =
-        (cMV.getBase().target_ == Move::ANY_ADJACENT_ENEMY ||
-         cMV.getBase().target_ == Move::ANY_ADJACENT ||
-         cMV.getBase().target_ == Move::ANY_ACTIVE);
+    bool moveIsTargetedFriendly = cMV.getBase().isTargetedFriendly();
+    bool moveIsTargetedHostile = cMV.getBase().isTargetedHostile();
 
     if (hasSpecificFriendlyTarget && !moveIsTargetedFriendly) {
       result = IsValidResult::INVALID_FRIENDLY_TARGET;
@@ -586,9 +568,7 @@ ValidMoveSet NeoPkCU::getValidMoveFlags(
   ValidMoveSet doAllowMove((1 << VALID_MOVE_SIZE) - 1);
 
   ConstTeamVolatile cTV = envV.getTeam(actor.iTeam());
-  bool hasSpecificFriendlyTarget =
-      (action.friendlyTarget() >= Action::FRIENDLY_0 &&
-       action.friendlyTarget() <= Action::FRIENDLY_5);
+  bool hasSpecificFriendlyTarget = action.targetedFriendly();
 
   // Filter targets by move capability
   std::vector<Actor> validTargets;
@@ -613,10 +593,7 @@ ValidMoveSet NeoPkCU::getValidMoveFlags(
     size_t fIndex = action.iFriendly();
     ConstPokemonVolatile fPKV = cTV.teammate(fIndex);
     doAllowMove[VALID_MOVE_FRIENDLY_ALIVE] = fPKV.isAlive();
-    bool canTargetSelf =
-        (cMV.getBase().target_ == Move::SELF ||
-         cMV.getBase().target_ == Move::ANY_ADJACENT_ALLY_SELF ||
-         cMV.getBase().target_ == Move::ALL_FIELD);
+    bool canTargetSelf = cMV.getBase().canTargetSelf();
     doAllowMove[VALID_MOVE_FRIENDLY_IS_OTHER] =
         (fIndex != actor.iTeammate()) || canTargetSelf;
   }

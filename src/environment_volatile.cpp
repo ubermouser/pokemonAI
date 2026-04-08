@@ -176,6 +176,8 @@ std::vector<Action> ENV_VOLATILE_IMPL::getActions(
     }
     break;
 
+  case Move::ANY_ADJACENT_ALLY_SELF:
+    actions.push_back(Action::moveTarget(iMove, actor, actor));
   case Move::ANY_ADJACENT_ALLY:
     for (const auto& [other, teammate] :
          getTeam(actor.iTeam()).yieldActivePokemon()) {
@@ -186,21 +188,14 @@ std::vector<Action> ENV_VOLATILE_IMPL::getActions(
     }
     break;
 
-  case Move::ANY_ADJACENT_ALLY_SELF:
-    for (const auto& [other, teammate] :
-         getTeam(actor.iTeam()).yieldActivePokemon()) {
-      if (!current.isAdjacent(teammate)) { continue; }
-
-      actions.push_back(Action::moveTarget(iMove, actor, other));
-    }
-    break;
-
+  case Move::ANY_ALLY_SELF:
+    actions.push_back(Action::moveTarget(iMove, actor, actor));
   case Move::ANY_ALLY:
     for (const auto& [other, teammate] :
          getTeam(actor.iTeam()).yieldPokemon()) {
       if (other == actor) { continue; }
 
-      actions.push_back(Action::moveAlly(iMove, other.iTeammate()));
+      actions.push_back(Action::moveTarget(iMove, actor, other));
     }
     break;
 

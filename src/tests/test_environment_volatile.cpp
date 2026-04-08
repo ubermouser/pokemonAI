@@ -132,6 +132,22 @@ TEST_F(EnvironmentVolatileTest, Targeting1v1_move_any_ally) {
 }
 
 
+TEST_F(EnvironmentVolatileTest, Targeting1v1_move_any_ally_self) {
+  // clang-format off
+  verify(1, 0, "move_any_ally_self",
+         {::Action::moveAlly(0, 0), ::Action::moveAlly(0, 1), ::Action::moveAlly(0, 2), ::Action::moveAlly(0, 3), ::Action::moveAlly(0, 4), ::Action::moveAlly(0, 5)},
+         {
+            {::Action::moveAlly(0, 0), {Actor(0, 0)}},
+            {::Action::moveAlly(0, 1), {Actor(0, 1)}},
+            {::Action::moveAlly(0, 2), {Actor(0, 2)}},
+            {::Action::moveAlly(0, 3), {Actor(0, 3)}},
+            {::Action::moveAlly(0, 4), {Actor(0, 4)}},
+            {::Action::moveAlly(0, 5), {Actor(0, 5)}}
+         });
+  // clang-format on
+}
+
+
 TEST_F(EnvironmentVolatileTest, Targeting1v1_move_all_adjacent) {
   verify(1, 0, "move_all_adjacent", 
          {::Action::moveAdjacent(0)}, 

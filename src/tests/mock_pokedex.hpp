@@ -341,6 +341,7 @@ public:
     moves_.insert(Move("move_any_adjacent_ally_self", t, 100, 0, 20, ATK_NODMG, Move::ANY_ADJACENT_ALLY_SELF, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "any adjacent ally self"));
     moves_.insert(Move("move_any_active", t, 100, 100, 20, ATK_PHYSICAL, Move::ANY_ACTIVE, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "any active"));
     moves_.insert(Move("move_any_ally", t, 100, 0, 20, ATK_NODMG, Move::ANY_ALLY, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "any ally"));
+    moves_.insert(Move("move_any_ally_self", t, 100, 0, 20, ATK_NODMG, Move::ANY_ALLY_SELF, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "any ally self"));
     moves_.insert(Move("move_all_adjacent", t, 100, 100, 20, ATK_PHYSICAL, Move::ALL_ADJACENT, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "all adjacent"));
     moves_.insert(Move("move_all_adjacent_enemy", t, 100, 100, 20, ATK_PHYSICAL, Move::ALL_ADJACENT_ENEMY, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "all adjacent enemy"));
     moves_.insert(Move("move_all_adjacent_ally", t, 100, 0, 20, ATK_NODMG, Move::ALL_ADJACENT_ALLY, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "all adjacent ally"));

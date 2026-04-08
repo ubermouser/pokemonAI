@@ -36,7 +36,7 @@ void Action::print(std::ostream& os) const {
       } else if (friendlyTarget() == FRIENDLY_SIDE) {
         os << fmt::format("-fg");
       } else {
-        os << fmt::format("-f{}", friendlyTarget());
+        os << fmt::format("-f{}", iFriendly() + 1);
       }
     }
     if (enemyTarget() != HOSTILE_NONE) {
@@ -47,7 +47,7 @@ void Action::print(std::ostream& os) const {
       } else if (enemyTarget() == HOSTILE_SIDE) {
         os << fmt::format("-g");
       } else {
-        os << fmt::format("-{}", enemyTarget());
+        os << fmt::format("-{}", iEnemy() + 1);
       }
     }
   } else if (isSwitch()) {
