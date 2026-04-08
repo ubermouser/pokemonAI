@@ -780,19 +780,7 @@ void NeoPkCUEngine::evaluateMove_switch_onSwitchIn() {
   getTV().swapPokemon(switchingActor, swapTarget);
   getBase().flagsFor(swapTarget).setSwitched();
 
-  // Update target lists for all other actors: if they were targeting the
-  // pokemon that just switched out, redirect to the pokemon that switched in.
-  StackFrame& frame = getStackFrame();
-  for (auto& [actor, targetList] : frame.targets) {
-    if (actor == switchingActor) { continue; }
-    for (auto& target : targetList) {
-      if (target == switchingActor) { target = swapTarget; }
-    }
-  }
-  // Update the current actor:
-  frame.moveOrder[frame.iActor] = swapTarget;
-  frame.targets[swapTarget] = frame.targets.at(switchingActor);
-  frame.actions[swapTarget] = Action::wait();
+  handleActorSwitch(switchingActor, swapTarget);
 
   int result = 0;
   result = callPlugins<onSwitch_rawType>(PLUGIN_ON_SWITCHIN, *this, getPKV());

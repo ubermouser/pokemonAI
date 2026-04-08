@@ -481,6 +481,28 @@ bool NeoPkCUEngine::isPluginSourceActive(const plugin& p) {
 }
 
 
+void NeoPkCUEngine::handleActorSwitch(Actor switchingActor, Actor swapTarget) {
+  StackFrame& frame = getStackFrame();
+
+  // Update target lists for all other actors: if they were targeting the
+  // pokemon that just switched out, redirect to the pokemon that switched in.
+  for (auto& [actor, targetList] : frame.targets) {
+    if (actor == switchingActor) { continue; }
+    for (auto& target : targetList) {
+      if (target == switchingActor) { target = swapTarget; }
+    }
+  }
+
+  // Update the current actor:
+  frame.moveOrder[frame.iActor] = swapTarget;
+  frame.targets[swapTarget] = frame.targets.at(switchingActor);
+  frame.actions[swapTarget] = Action::wait();
+  frame.moveBrackets[swapTarget] = frame.moveBrackets.at(switchingActor);
+  frame.damageComponents[swapTarget] =
+      frame.damageComponents.at(switchingActor);
+}
+
+
 TeamVolatile NeoPkCUEngine::getTV() { return getTV(iBase_); }
 
 

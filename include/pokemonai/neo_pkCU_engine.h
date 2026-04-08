@@ -373,6 +373,13 @@ class NeoPkCUEngine {
    */
   size_t lastStackSize_;
 
+  /**
+   * @brief Updates the current StackFrame and target lists when an actor switches.
+   * @param switchingActor The actor (old Pokemon) that is switching out.
+   * @param swapTarget The actor (new Pokemon) that is switching in.
+   */
+  void handleActorSwitch(Actor switchingActor, Actor swapTarget);
+
   const PluginSet& getCPluginSet() const { return *cPlugins_; }
 
   /**
