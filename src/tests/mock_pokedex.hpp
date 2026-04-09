@@ -400,7 +400,7 @@ public:
     moves_.at("status_move").registerPlugin(pluginOnInit(pluginCategory::move, "init", mock_onInitMove), true);
     moves_.at("move_explosion").registerPlugin(pluginOnEvaluateMove(pluginCategory::move, "explosion", mock_onExplosion), true);
     moves_.at("move_faint").registerPlugin(pluginOnEvaluateMove(pluginCategory::move, "faint", mock_onFaint), true);
-    moves_.at("move_suicide").registerPlugin(pluginOnEvaluateMove(pluginCategory::move, "suicide", mock_onSuicide), true);
+    moves_.at("move_suicide").registerPlugin(pluginOnEndOfMove(pluginCategory::move, "suicide", mock_onSuicide), true);
     moves_.at("move_zero_pp").registerPlugin(pluginOnEvaluateMove(pluginCategory::move, "zero_pp", mock_zeroPP), true);
     // clang-format on
   }
@@ -429,35 +429,35 @@ public:
 
   void setupPlugins() {
     // clang-format off
-    engineExtensions_.registerPlugin(pluginOnInit(pluginCategory::engine, "p0", mock_onInitMove, 0, current_team), true);
-    engineExtensions_.registerPlugin(pluginOnReset(pluginCategory::engine, "p1", mock_onReset, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnSetSpeedBracket(pluginCategory::engine, "p2", mock_onSetSpeedBracket, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnModifySpeed(pluginCategory::engine, "p3", mock_onModifySpeed, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnBeginningOfTurn(pluginCategory::engine, "p4", mock_onBeginningOfTurn, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnEvaluateMove(pluginCategory::engine, "p5", mock_onEvaluateMove, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnSetBasePower(pluginCategory::engine, "p6", mock_onSetBasePower, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnModifyBasePower(pluginCategory::engine, "p7", mock_onModifyBasePower, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnModifyAttackPower(pluginCategory::engine, "p8", mock_onModifyAttackPower, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnModifyCriticalPower(pluginCategory::engine, "p9", mock_onModifyCriticalPower, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnModifyRawDamage(pluginCategory::engine, "p10", mock_onModifyRawDamage, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnSetMoveType(pluginCategory::engine, "p11", mock_onSetMoveType, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnModifyStab(pluginCategory::engine, "p12", mock_onModifySTAB, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnSetDefenseType(pluginCategory::engine, "p13", mock_onSetDefenseType, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnModifyItemPower(pluginCategory::engine, "p14", mock_onModifyItemPower, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnModifyHitProbability(pluginCategory::engine, "p15", mock_onModifyHitProbability, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnModifyCritProbability(pluginCategory::engine, "p16", mock_onModifyCritProbability, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnCalculateDamage(pluginCategory::engine, "p17", mock_onCalculateDamage, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnEndOfMove(pluginCategory::engine, "p18", mock_onEndOfMove, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnModifySecondaryProbability(pluginCategory::engine, "p19", mock_onModifySecondaryProbability, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnSecondaryEffect(pluginCategory::engine, "p20", mock_onSecondaryEffect, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnEndOfTurn(pluginCategory::engine, "p21", mock_onEndOfTurn, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnEndOfRound(pluginCategory::engine, "p22", mock_onEndOfRound, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnSwitchOut(pluginCategory::engine, "p23", mock_onSwitchOut, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnSwitchIn(pluginCategory::engine, "p24", mock_onSwitchIn, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnTestMove(pluginCategory::engine, "p25", mock_onTestMove, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnTestSwitch(pluginCategory::engine, "p26", mock_onTestSwitch, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnModifyAction(pluginCategory::engine, "p27", mock_onModifyAction, 0, all_teams), true);
-    engineExtensions_.registerPlugin(pluginOnUninit(pluginCategory::engine, "p28", mock_onUninitMove, 0, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnInit(pluginCategory::engine, "p0", mock_onInitMove, -1, current_team), true);
+    engineExtensions_.registerPlugin(pluginOnReset(pluginCategory::engine, "p1", mock_onReset, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnSetSpeedBracket(pluginCategory::engine, "p2", mock_onSetSpeedBracket, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnModifySpeed(pluginCategory::engine, "p3", mock_onModifySpeed, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnBeginningOfTurn(pluginCategory::engine, "p4", mock_onBeginningOfTurn, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnEvaluateMove(pluginCategory::engine, "p5", mock_onEvaluateMove, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnSetBasePower(pluginCategory::engine, "p6", mock_onSetBasePower, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnModifyBasePower(pluginCategory::engine, "p7", mock_onModifyBasePower, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnModifyAttackPower(pluginCategory::engine, "p8", mock_onModifyAttackPower, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnModifyCriticalPower(pluginCategory::engine, "p9", mock_onModifyCriticalPower, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnModifyRawDamage(pluginCategory::engine, "p10", mock_onModifyRawDamage, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnSetMoveType(pluginCategory::engine, "p11", mock_onSetMoveType, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnModifyStab(pluginCategory::engine, "p12", mock_onModifySTAB, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnSetDefenseType(pluginCategory::engine, "p13", mock_onSetDefenseType, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnModifyItemPower(pluginCategory::engine, "p14", mock_onModifyItemPower, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnModifyHitProbability(pluginCategory::engine, "p15", mock_onModifyHitProbability, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnModifyCritProbability(pluginCategory::engine, "p16", mock_onModifyCritProbability, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnCalculateDamage(pluginCategory::engine, "p17", mock_onCalculateDamage, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnEndOfMove(pluginCategory::engine, "p18", mock_onEndOfMove, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnModifySecondaryProbability(pluginCategory::engine, "p19", mock_onModifySecondaryProbability, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnSecondaryEffect(pluginCategory::engine, "p20", mock_onSecondaryEffect, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnEndOfTurn(pluginCategory::engine, "p21", mock_onEndOfTurn, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnEndOfRound(pluginCategory::engine, "p22", mock_onEndOfRound, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnSwitchOut(pluginCategory::engine, "p23", mock_onSwitchOut, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnSwitchIn(pluginCategory::engine, "p24", mock_onSwitchIn, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnTestMove(pluginCategory::engine, "p25", mock_onTestMove, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnTestSwitch(pluginCategory::engine, "p26", mock_onTestSwitch, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnModifyAction(pluginCategory::engine, "p27", mock_onModifyAction, -1, all_teams), true);
+    engineExtensions_.registerPlugin(pluginOnUninit(pluginCategory::engine, "p28", mock_onUninitMove, -1, all_teams), true);
     // clang-format on
   }
 };

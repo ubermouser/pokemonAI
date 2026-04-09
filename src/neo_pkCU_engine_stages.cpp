@@ -119,7 +119,13 @@ void NeoPkCUEngine::evaluateMove() {
       evaluateMove_damage_preDamage();
       break;
     case StageType::POSTDAMAGE:
-      // evaluateMove_postDamage();
+      evaluateMove_damage_postDamage();
+      break;
+    case StageType::STATUSMOVE:
+      evaluateMove_status_moveBase();
+      break;
+    case StageType::POSTSTATUSMOVE:
+      evaluateMove_status_postMove();
       break;
     case StageType::POSTMOVE:
       evaluateMove_postMove();
@@ -136,8 +142,14 @@ void NeoPkCUEngine::evaluateMove() {
     case StageType::SECONDARY:
       evaluateMove_secondary();
       break;
+    case StageType::ENDOFTURN:
+      evaluateMove_endOfTurn();
+      break;
     case StageType::POSTTURN:
       evaluateMove_postTurn();
+      break;
+    case StageType::ENDOFROUND:
+      evaluateMove_endOfRound();
       break;
     case StageType::POSTROUND:
       evaluateMove_postRound();
@@ -281,9 +293,6 @@ void NeoPkCUEngine::evaluateMove_selectOrder() {
 }
 
 
-void NeoPkCUEngine::evaluateMove_status() {}
-
-
 void NeoPkCUEngine::evaluateMove_modifyAction() {
   const Actor& actor = getCActor();
   Action& action = getStackFrame().actions.at(actor);
@@ -323,10 +332,11 @@ void NeoPkCUEngine::evaluateMove_damage_onBeginningOfTurn() {
 
 void NeoPkCUEngine::evaluateMove_damage_moveBase() {
   // was this move blocked by a status?
-  // did this pokemon die from the last pokemon's action?
-  if (getBase().flagsFor(getCActor()).isBlocked() || !getPKV().isAlive()) {
+  if (getBase().flagsFor(getCActor()).isBlocked()) {
+    gotoStackStage(StageType::ENDOFTURN);
+    // did this pokemon die from the last pokemon's action?
+  } else if (!getPKV().isAlive()) {
     gotoStackStage(StageType::POSTTURN);
-    return;
   }
 }
 
@@ -368,13 +378,13 @@ void NeoPkCUEngine::evaluateMove_damage_evaluateHitChance() {
       auto& missFrame = getStackFrame(iHEnv[1]);
 
       hitEnv.flagsFor(getCActor()).setHit();
-      gotoStackStage(missFrame.iStack, StageType::POSTTURN);
+      gotoStackStage(missFrame.iStack, StageType::ENDOFTURN);
     } else {  // hits 100% of the time
       getBase().flagsFor(getCActor()).setHit();
     }
   } else {
     // misses 100% of the time
-    gotoStackStage(StageType::POSTTURN);
+    gotoStackStage(StageType::ENDOFTURN);
   }
 }
 
@@ -389,8 +399,24 @@ void NeoPkCUEngine::evaluateMove_damage_damagingMoveBase() {
   // moves that are not physical or special attacks skip all damage computation
   // stages:
   if (damageType != ATK_PHYSICAL && damageType != ATK_SPECIAL) {
-    gotoStackStage(StageType::PREDAMAGE);
+    gotoStackStage(StageType::STATUSMOVE);
   }
+  // else, follow-through:
+}
+
+
+void NeoPkCUEngine::evaluateMove_status_moveBase() {
+  assert(getBase().flagsFor(getCActor()).isHit());
+  const Move& cMove = getMV().getBase();
+
+  int result = cMove.isImplemented() ? 1 : 0;
+  result = callPlugins<onEvaluateMove_rawType>(
+      PLUGIN_ON_EVALUATEMOVE, *this, getMV(), getPKV(), getTPKV());
+}
+
+
+void NeoPkCUEngine::evaluateMove_status_postMove() {
+  gotoStackStage(StageType::POSTMOVE);
 }
 
 
@@ -515,30 +541,36 @@ void NeoPkCUEngine::evaluateMove_damage_modifyCriticalPower() {
 
 void NeoPkCUEngine::evaluateMove_damage_preDamage() {
   assert(getBase().flagsFor(getCActor()).isHit());
-  const Move& cMove = getMV().getBase();
-  if (cMove.damageType_ == ATK_PHYSICAL || cMove.damageType_ == ATK_SPECIAL) {
-    calculateDamage();
-  } else {
-    // TODO - move to different stage
-    int result = cMove.isImplemented() ? 1 : 0;
-    result = callPlugins<onEvaluateMove_rawType>(
-        PLUGIN_ON_EVALUATEMOVE, *this, getMV(), getPKV(), getTPKV());
-  }
+
+  calculateDamage();
+}
+
+
+void NeoPkCUEngine::evaluateMove_damage_postDamage() {
+  gotoStackStage(StageType::POSTMOVE);
 }
 
 
 void NeoPkCUEngine::evaluateMove_postMove() {
-  int result = 0;
-  result = callPlugins<onEvaluateMove_rawType>(
+  // skip rest of turn if pokemon has fainted
+  if (!getPKV().isAlive()) {
+    gotoStackStage(StageType::POSTTURN);
+    return;
+  }
+
+  callPlugins<onEvaluateMove_rawType>(
       PLUGIN_ON_ENDOFMOVE, *this, getMV(), getPKV(), getTPKV());
 }
 
 
 void NeoPkCUEngine::evaluateMove_preSecondary() {
   const Move& cMove = getMV().getBase();
-  if (!getPKV().isAlive() || !(cMove.getSecondaryAccuracy() > FixType(0))) {
+  // skip end-of-turn action, pokemon fainted:
+  if (!getPKV().isAlive()) {
     gotoStackStage(StageType::POSTTURN);
-    return;
+    // no secondary effect occurs:
+  } else if (!(cMove.getSecondaryAccuracy() > FixType(0))) {
+    gotoStackStage(StageType::ENDOFTURN);
   }
 }
 
@@ -575,12 +607,12 @@ void NeoPkCUEngine::evaluateMove_evaluateSecondaryHitChance() {
     if (mostlyLT(probabilityToSecondary, FixType(1))) {
       std::array<size_t, 2> iREnv =
           duplicateState((FixType(1) - probabilityToSecondary));
-      gotoStackStage(iREnv[1], StageType::POSTTURN);
+      gotoStackStage(iREnv[1], StageType::ENDOFTURN);
     }
     // secondary occurs 100% of the time:
     getBase().flagsFor(getCActor()).setSecondary();
   } else {  // secondary occurs 0% of the time:
-    gotoStackStage(StageType::POSTTURN);
+    gotoStackStage(StageType::ENDOFTURN);
   }
 }
 
@@ -594,13 +626,18 @@ void NeoPkCUEngine::evaluateMove_secondary() {
 }
 
 
-void NeoPkCUEngine::evaluateMove_postTurn() {
-  int result = 0;
-  result = callPlugins<onEndOfTurn_rawType>(
-      PLUGIN_ON_ENDOFTURN, *this, getPKV());
+void NeoPkCUEngine::evaluateMove_endOfTurn() {
+  // post-turn action:
+  callPlugins<onEndOfTurn_rawType>(PLUGIN_ON_ENDOFTURN, *this, getPKV());
+}
 
+
+void NeoPkCUEngine::evaluateMove_postTurn() {
   StackFrame& frame = getStackFrame();
   std::vector<Actor>& targets = frame.targets[frame.moveOrder[frame.iActor]];
+
+  // if the actor is dead, skip all remaining targets. Move to next actor
+  if (!getPKV().isAlive()) { frame.iTarget = targets.size(); }
 
   // if there are more targets, loop back to pre-turn and execute on the next
   // target:
@@ -626,12 +663,16 @@ void NeoPkCUEngine::evaluateMove_postTurn() {
 }
 
 
-void NeoPkCUEngine::evaluateMove_postRound() {
-  // post-round action for current actor:
-  int result = 0;
-  result = callPlugins<onEndOfRound_rawType>(
-      PLUGIN_ON_ENDOFROUND, *this, getPKV());
+void NeoPkCUEngine::evaluateMove_endOfRound() {
+  // do nothing if current actor is not alive, skip to next actor.
+  if (!getPKV().isAlive()) { return; }
 
+  // post-round action for current actor:
+  callPlugins<onEndOfRound_rawType>(PLUGIN_ON_ENDOFROUND, *this, getPKV());
+}
+
+
+void NeoPkCUEngine::evaluateMove_postRound() {
   // test if other pkmn need to perform their post-round action:
   StackFrame& frame = getStackFrame();
   size_t nextActor = frame.iActor += 1;
@@ -785,5 +826,5 @@ void NeoPkCUEngine::evaluateMove_switch_onSwitchIn() {
   int result = 0;
   result = callPlugins<onSwitch_rawType>(PLUGIN_ON_SWITCHIN, *this, getPKV());
 
-  gotoStackStage(StageType::POSTTURN);
+  gotoStackStage(StageType::ENDOFTURN);
 }

@@ -192,6 +192,9 @@ enum StageType : int {
   MODIFYITEMPOWER,         /**< Modify the power based on items. */
   PREDAMAGE,               /**< Before damage is applied. */
   POSTDAMAGE,              /**< After damage is applied. */
+  // status move evaluation:
+  STATUSMOVE,              /**< Trigger status move effects. */
+  POSTSTATUSMOVE,          /**< After STATUSMOVE triggers have fired. */
   // post move evaluation:
   POSTMOVE,                /**< After a move has been executed. */
   PRESECONDARY,            /**< Before secondary effects are calculated. */
@@ -199,9 +202,11 @@ enum StageType : int {
   EVALSECONDARYHITCHANCE,  /**< Evaluate if the secondary effect hits. */
   SECONDARY,               /**< Secondary effects are being applied. */
   // post turn status
-  POSTTURN,                /**< After a Pokemon has completed its turn. */
+  ENDOFTURN,               /**< After a Pokemon has completed its turn. */
+  POSTTURN,                /**< After ENDOFTURN triggers have fired. */
   // post round status
-  POSTROUND,               /**< After all Pokemon have completed their turns. */
+  ENDOFROUND,              /**< After all Pokemon have completed their turns. */ 
+  POSTROUND,               /**< After ENDOFROUND triggers have fired. */
   HASH,                    /**< The resulting environment is being hashed. */
   FINAL,                   /**< The final stage of the round. */
   // clang-format on
@@ -244,12 +249,16 @@ static const char* stageTypeToString(StageType stage) {
     case StageType::MODIFYITEMPOWER: return "MODIFYITEMPOWER";
     case StageType::PREDAMAGE: return "PREDAMAGE";
     case StageType::POSTDAMAGE: return "POSTDAMAGE";
+    case StageType::STATUSMOVE: return "STATUSMOVE";
+    case StageType::POSTSTATUSMOVE: return "POSTSTATUSMOVE";
     case StageType::POSTMOVE: return "POSTMOVE";
     case StageType::PRESECONDARY: return "PRESECONDARY";
     case StageType::MODIFYSECONDARYHITCHANCE: return "MODIFYSECONDARYHITCHANCE";
     case StageType::EVALSECONDARYHITCHANCE: return "EVALSECONDARYHITCHANCE";
     case StageType::SECONDARY: return "SECONDARY";
+    case StageType::ENDOFTURN: return "ENDOFTURN";
     case StageType::POSTTURN: return "POSTTURN";
+    case StageType::ENDOFROUND: return "ENDOFROUND";
     case StageType::POSTROUND: return "POSTROUND";
     case StageType::HASH: return "HASH";
     case StageType::FINAL: return "FINAL";
