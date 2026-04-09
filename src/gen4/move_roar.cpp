@@ -6,11 +6,6 @@ namespace gen4 {
 class RoarEngine : public PkCUEngine {
  public:
   void setIBase(size_t i) { iBase_ = i; }
-  void setOAction(const Action& action) {
-#if USE_LEGACY_ENGINE
-    actions_[1] = action;  // TODO: doesn't work in NeoEngine!
-#endif
-  }
 };
 
 int move_roar_forceSwitch(
@@ -57,7 +52,6 @@ int move_roar_forceSwitch(
     cu.getTTV(envIndex).swapPokemon(validSwitchIns[i]);
     cu.getStack().at(envIndex).flagsFor(cu.getOActor()).setSwitched();
     rEngine.setIBase(envIndex);
-    rEngine.setOAction(Action::swap(validSwitchIns[i]));
     PokemonVolatile newTPKV = cu.getTTV(envIndex).getPKV();
 
     // TODO(@drendleman): add support in PkCU for changing the stackstage via a

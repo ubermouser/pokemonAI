@@ -13,9 +13,6 @@ using ::testing::UnorderedElementsAreArray;
 class EnvironmentVolatileTest : public MockEngineTest {
  protected:
   void SetUp() override {
-#if USE_LEGACY_ENGINE
-    GTEST_SKIP() << "Neo-Engine test";
-#endif
 
     MockEngineTest::SetUp();
   }

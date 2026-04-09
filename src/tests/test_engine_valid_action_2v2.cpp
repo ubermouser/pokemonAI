@@ -11,9 +11,6 @@
 class IsValidAction2v2Test : public MockEngineTest {
  protected:
   void SetUp() override {
-#if USE_LEGACY_ENGINE
-    GTEST_SKIP() << "Neo-Engine test";
-#endif
 
     MockEngineTest::SetUp();
     // clang-format off

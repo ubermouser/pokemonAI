@@ -48,5 +48,6 @@ PlyResult PlannerRandom::generateSolutionAtLeaf(
     result.agentAction = valid[iAction];
   }
 
+  assert(!result.agentAction.isUndefined());
   return result;
 };

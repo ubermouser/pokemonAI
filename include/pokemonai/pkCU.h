@@ -8,13 +8,6 @@
 #ifndef PKAI_CU_H
 #define PKAI_CU_H
 
-#if USE_LEGACY_ENGINE
-#include "legacy_pkCU.h"
-
-using PkCU = LegacyPkCU;
-using PkCUEngine = LegacyPkCUEngine;
-
-#else
 #include "neo_pkCU.h"
 
 /**
@@ -28,6 +21,5 @@ using PkCU = NeoPkCU;
  * @brief Typedef for the active battle engine's state machine.
  */
 using PkCUEngine = NeoPkCUEngine;
-#endif
 
 #endif /* PKAI_CU_H */

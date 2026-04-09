@@ -7,9 +7,6 @@
 class BasicEngine2v2Test : public Gen4EngineTest {
  protected:
   void SetUp() override {
-#if USE_LEGACY_ENGINE
-    GTEST_SKIP() << "Neo-Engine test";
-#endif
 
     Gen4EngineTest::SetUp();
     pokedex_->setAllowInvalidPokemon(true);

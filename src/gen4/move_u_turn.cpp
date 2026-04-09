@@ -17,26 +17,11 @@ int move_uTurn_swapOnTurnEnd(
   // if no valid swap targets exist)
   if (action.iFriendly() == actor.iTeammate()) { return 1; }
 
-#if USE_LEGACY_ENGINE
-  cu.getBase().flagsFor(cu.getCActor()).setSwitched();
-  tV.swapPokemon(action.iFriendly());
-  cu.setCPluginSet();
-
-  int result = 0;
-  const auto& cPlugins = cu.getCPluginSet()[(size_t)PLUGIN_ON_SWITCHIN];
-  for (const auto& plugin : cPlugins) {
-    onSwitch_rawType cPlugin = (onSwitch_rawType)plugin.getFunction();
-    result = result | cPlugin(cu, cu.getPKV());
-    if (result > 1) { break; }
-  }
-#else
-
   auto& frame = cu.getStackFrame();
 
   frame.actions[actor] = Action::swap(action.iFriendly());
   frame.targets[actor] = {Actor(actor.iTeam(), action.iFriendly())};
   cu.gotoStackStage(StageType::PRESWITCH);
-#endif
 
   return 2;
 }

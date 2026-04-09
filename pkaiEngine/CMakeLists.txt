@@ -1,11 +1,4 @@
-# option(USE_LEGACY_ENGINE ...) is now in global CMakeLists.txt
-
-set(ENGINE_SOURCES "")
-if(USE_LEGACY_ENGINE)
-    list(APPEND ENGINE_SOURCES ../src/legacy_pkCU.cpp)
-else()
-    list(APPEND ENGINE_SOURCES ../src/neo_pkCU.cpp ../src/neo_pkCU_engine.cpp ../src/neo_pkCU_engine_stages.cpp)
-endif()
+set(ENGINE_SOURCES ../src/neo_pkCU.cpp ../src/neo_pkCU_engine.cpp ../src/neo_pkCU_engine_stages.cpp)
 
 add_library(pkaiEngine SHARED
     ../src/ability.cpp
@@ -44,7 +37,6 @@ set_target_properties(pkaiEngine PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 target_compile_definitions(pkaiEngine PUBLIC
     FORCE_INLINE=
-    USE_LEGACY_ENGINE=$<BOOL:${USE_LEGACY_ENGINE}>
 )
 
 target_link_libraries(pkaiEngine
