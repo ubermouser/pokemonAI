@@ -90,7 +90,7 @@ Mist	Ice	30	---	---	0	SIDE_ALLY	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	
 Night Shade	Ghost	15	100	---	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Inflicts damage equal to user's level.
 Pay Day	Normal	20	100	40	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Money is earned after the battle.
 Peck	Flying	35	100	35	1	ANY_ACTIVE	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
-Petal Dance	Grass	10	100	120	2	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User attacks for 2-3 turns but then becomes confused.
+Petal Dance	Grass	10	100	120	2	ANY_ADJACENT_ENEMY	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User attacks for 2-3 turns but then becomes confused.
 Pin Missile	Bug	20	95	25	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Hits 2-5 times in one turn.
 Poison Gas	Poison	40	90	---	0	ALL_ADJACENT_ENEMY	0	0	0	0	0	0	0	0	0	0	55	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	---	Poisons opponent.
 Poison Powder	Poison	35	75	---	0	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	75	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	---	Poisons opponent.
@@ -134,7 +134,7 @@ Spore	Grass	15	100	---	0	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	
 Stomp	Normal	20	100	65	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	---	May cause flinching.
 Strength	Normal	15	100	80	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	---
 String Shot	Bug	40	95	---	0	ALL_ADJACENT_ENEMY	0	0	0	0	0	0	0	0	0	0	95	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Sharply lowers opponent's Speed.
-Struggle	Normal	5	100	50	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Only usable when all PP are gone. Hurts the user.
+Struggle	Normal	5	100	50	1	ANY_ADJACENT_ENEMY	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Only usable when all PP are gone. Hurts the user.
 Stun Spore	Grass	30	75	---	0	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	75	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	Paralyzes opponent.
 Submission	Fighting	20	80	80	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User receives recoil damage.
 Substitute	Normal	10	---	---	0	SELF	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Uses HP to creates a decoy that takes hits.
@@ -147,7 +147,7 @@ Tackle	Normal	35	95	35	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	
 Tail Whip	Normal	30	100	---	0	ALL_ADJACENT_ENEMY	0	0	0	0	0	0	0	0	0	0	100	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	Lowers opponent's Defense.
 Take Down	Normal	20	85	90	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User receives recoil damage.
 Teleport	Psychic	20	---	---	0	SELF	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	Allows user to flee wild battles; also warps player to last PokeCenter.
-Thrash	Normal	10	100	120	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User attacks for 2-3 turns but then becomes confused.
+Thrash	Normal	10	100	120	1	ANY_ADJACENT_ENEMY	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	SCRIPT	User attacks for 2-3 turns but then becomes confused.
 Thunder	Electric	10	70	110	2	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	May paralyze opponent.
 Thunder Punch	Electric	15	100	75	2	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	May paralyze opponent.
 Thunder Shock	Electric	30	100	40	2	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	---	May paralyze opponent.

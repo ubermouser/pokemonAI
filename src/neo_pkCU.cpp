@@ -480,10 +480,12 @@ IsValidResult NeoPkCU::isValidAction_switch(
   ConstPokemonVolatile fPKV = cTV.teammate(action.iFriendly());
 
   // Are we locked out of switching?
-  for (const auto& cPlugin : pluginSet_[PLUGIN_ON_TESTSWITCH]) {
-    onTestSwitch_rawType pFunction =
-        (onTestSwitch_rawType)cPlugin.getFunction();
-    if (pFunction(cPKV, fPKV, action, doAllowSwitch) > 1) { break; }
+  if (cPKV.isAlive()) {
+    for (const auto& cPlugin : pluginSet_[PLUGIN_ON_TESTSWITCH]) {
+      onTestSwitch_rawType pFunction =
+          (onTestSwitch_rawType)cPlugin.getFunction();
+      if (pFunction(cPKV, fPKV, action, doAllowSwitch) > 1) { break; }
+    }
   }
 
   if (!doAllowSwitch[VALID_SWAP_FRIENDLY_IS_OTHER]) {

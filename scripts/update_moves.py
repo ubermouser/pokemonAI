@@ -34,6 +34,10 @@ ANY_ADJACENT_ENEMY = {
     'Max Phantasm', 'Max Hailstorm', 'Max Ooze', 'Max Geyser', 'Max Airstream', 
     'Max Starfall', 'Max Wyrmwind', 'Max Mindstorm', 'Max Rockfall', 'Max Quake', 
     'Max Darkness', 'Max Overgrowth', 'Max Steelspike', 'Doodle',
+    # Outrage moves:
+    'Outrage', 'Thrash', 'Petal Dance',
+    # Default moves:
+    'Struggle',
 }
 ANY_ACTIVE = {
     'Gust', 'Wing Attack', 'Fly', 'Peck', 'Drill Peck', 'Sky Attack', 'Aeroblast', 
@@ -42,7 +46,10 @@ ANY_ACTIVE = {
     'Acrobatics', 'Hurricane', 'Flying Press', 'Oblivion Wing', 'Dragon Ascent',
 }
 ANY_ALLY = {
-    'Baton Pass', 'U-turn',
+    'Baton Pass'
+}
+ANY_ALLY_SELF = {
+    'U-turn',
 }
 ALL_ADJACENT = {
     'Surf', 'Earthquake', 'SelfDestruct', 'Explosion', 'Magnitude', 'Teeter Dance', 
@@ -97,6 +104,7 @@ TARGET_TYPE_MAP = {
     'ANY_ADJACENT_ALLY_SELF': ANY_ADJACENT_ALLY_SELF,
     'ANY_ACTIVE': ANY_ACTIVE,
     'ANY_ALLY': ANY_ALLY,
+    'ANY_ALLY_SELF': ANY_ALLY_SELF,
     'ALL_ADJACENT': ALL_ADJACENT,
     'ALL_ADJACENT_ENEMY': ALL_ADJACENT_ENEMY,
     'ALL_ALLIES': ALL_ALLIES,
