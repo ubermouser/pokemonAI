@@ -176,6 +176,32 @@ TEST_F(BasicEngineTest, StatusHitAndMiss) {
 }
 
 
+TEST_F(BasicEngineTest, ReturnAllStates_Random) {
+  engine_->setStateSelectMethod(NeoPkCU::StateSelectMethod::RANDOM);
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(), Action::move(1), Action::wait());  // fire blast
+
+  // resulting state is random
+  EXPECT_EQ(result.size(), 1);
+  EXPECT_EQ(result.at(0).getProbability(), FixType(1));
+}
+
+
+TEST_F(BasicEngineTest, ReturnAllStates_MostLikely) {
+  // fire blast has 85% accuracy. Hit is more likely than miss.
+  engine_->setStateSelectMethod(NeoPkCU::StateSelectMethod::MOST_LIKELY);
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(), Action::move(1), Action::wait());  // fire blast
+
+  // hit no-crit no-status state is most likely
+  EXPECT_EQ(result.size(), 1);
+  EXPECT_EQ(result.at(0).getProbability(), FixType(1));
+  EXPECT_TRUE(result.at(0).flagsFor(TEAM_A).isHit());
+  EXPECT_FALSE(result.at(0).flagsFor(TEAM_A).isCrit());
+  EXPECT_FALSE(result.at(0).flagsFor(TEAM_A).isSecondary());
+}
+
+
 TEST_F(BasicEngineTest, HighEngineAccuracyWithSpeedTie) {
   spdlog::set_level(spdlog::level::warn);
   engine_->setAccuracy(16);

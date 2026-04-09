@@ -202,6 +202,13 @@ public:
   }
   ConstEnvironmentPossible stateSelect_roulette(size_t& indexState) const;
 
+  /* selects the single most likely state deterministically */
+  ConstEnvironmentPossible stateSelect_mostLikely() const {
+    size_t indexState;
+    return stateSelect_mostLikely(indexState);
+  }
+  ConstEnvironmentPossible stateSelect_mostLikely(size_t& indexState) const;
+
   std::vector<ConstEnvironmentPossible> getValidEnvironments(bool sort=false) const;
 
   EnvironmentPossible at(size_t index) {
@@ -323,8 +330,16 @@ public:
     base_t::clear();
     numMerged_ = 0;
   }
-  
-protected:
+
+  /**
+   * Returns the index of the single most probable state matching the predicate.
+   * Throws std::runtime_error if no state matches.
+   */
+  size_t mostProbableIndex(
+      const std::function<bool(const ConstEnvironmentPossible&)>& predicate =
+          nullptr) const;
+
+ protected:
   std::shared_ptr<const EnvironmentNonvolatile> nv_;
   size_t numMerged_ = 0;
 };

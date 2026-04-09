@@ -65,8 +65,8 @@ NeoPkCU& NeoPkCU::setNumActivePokemon(size_t numActivePokemon) {
 }
 
 
-NeoPkCU& NeoPkCU::setReturnAllStates(bool returnAllStates) {
-  cfg_.returnAllStates = returnAllStates;
+NeoPkCU& NeoPkCU::setStateSelectMethod(StateSelectMethod method) {
+  cfg_.stateSelectMethod = method;
   return *this;
 }
 

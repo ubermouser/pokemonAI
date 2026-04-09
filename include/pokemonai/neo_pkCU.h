@@ -25,6 +25,16 @@ class NeoPkCUEngine;
 class PKAISHARED NeoPkCU {
  public:
   /**
+   * @enum StateSelectMethod
+   * @brief Defines how the engine selects resulting environments.
+   */
+  enum class StateSelectMethod {
+    RANDOM,      /**< Select a single state at random (roulette). */
+    MOST_LIKELY, /**< Select the single most probable state. */
+    ALL          /**< Return all possible states. */
+  };
+
+  /**
    * @struct Config
    * @brief Configuration options for the NeoPkCU engine.
    */
@@ -56,13 +66,13 @@ class PKAISHARED NeoPkCU {
     size_t numActivePokemon = 1;
 
     /**
-     * @brief If `true`, the engine will return all probabilistic environments.
+     * @brief The method used to select resulting environments.
      *
-     * If `false`, the engine will return an environment chosen at random from
-     * the set of possible environments. 'false' behavior is similar to the
-     * actual game engine.
+     * - RANDOM: returns a single environment chosen at random (roulette).
+     * - MOST_LIKELY: returns the single most likely environment.
+     * - ALL: returns all probabilistic environments.
      */
-    bool returnAllStates = true;
+    StateSelectMethod stateSelectMethod = StateSelectMethod::ALL;
 
 
     /**
@@ -105,7 +115,7 @@ class PKAISHARED NeoPkCU {
 
   NeoPkCU& setAccuracy(size_t engineAccuracy);
   NeoPkCU& setNumActivePokemon(size_t numActivePokemon);
-  NeoPkCU& setReturnAllStates(bool returnAllStates);
+  NeoPkCU& setStateSelectMethod(StateSelectMethod method);
   NeoPkCU& setAllowInvalidMoves(bool allow = true);
 
   /**

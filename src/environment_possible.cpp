@@ -117,6 +117,39 @@ ConstEnvironmentPossible PossibleEnvironments::stateSelect_roulette(size_t& inde
 };
 
 
+ConstEnvironmentPossible PossibleEnvironments::stateSelect_mostLikely(
+    size_t& indexState) const {
+  indexState = mostProbableIndex();
+  return at(indexState);
+}
+
+
+size_t PossibleEnvironments::mostProbableIndex(
+    const std::function<bool(const ConstEnvironmentPossible&)>& predicate)
+    const {
+  size_t bestIndex = SIZE_MAX;
+  FixType maxProb = FixType(0);
+
+  for (size_t i = 0; i < size(); ++i) {
+    auto state = at(i);
+    if (state.isPruned()) continue;
+    if (predicate && !predicate(state)) continue;
+
+    if (bestIndex == SIZE_MAX || state.getProbability() > maxProb) {
+      maxProb = state.getProbability();
+      bestIndex = i;
+    }
+  }
+
+  if (bestIndex == SIZE_MAX) {
+    throw std::runtime_error(
+        "PossibleEnvironments::mostProbableIndex: No matching state found");
+  }
+
+  return bestIndex;
+}
+
+
 ConstEnvironmentPossible PossibleEnvironments::stateSelect_index(size_t& indexResult) const {
   std::string input;
   int32_t indexState;
@@ -358,20 +391,8 @@ template <typename ResultType, typename ThisType>
 static ResultType where1Impl(
     ThisType& self,
     const std::function<bool(const ConstEnvironmentPossible&)>& predicate) {
-  std::vector<ResultType> results = self.where(predicate);
-  if (results.empty()) {
-    throw std::runtime_error(
-        "PossibleEnvironments::where1: No matching state found");
-  }
-
-  auto best = std::max_element(
-      results.begin(),
-      results.end(),
-      [](const ResultType& a, const ResultType& b) {
-        return a.getProbability() < b.getProbability();
-      });
-
-  return *best;
+  size_t index = self.mostProbableIndex(predicate);
+  return self.at(index);
 }
 
 
