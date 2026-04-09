@@ -150,5 +150,5 @@ TEST_F(EnginePluginTest, SkipEndOfTurnIfFainted) {
   EXPECT_EQ(plugin_calls[PLUGIN_ON_BEGINNINGOFTURN], 1);
   EXPECT_EQ(plugin_calls[PLUGIN_ON_ENDOFMOVE], 1);
   EXPECT_EQ(plugin_calls[PLUGIN_ON_ENDOFTURN], 0);
-  EXPECT_EQ(plugin_calls[PLUGIN_ON_ENDOFROUND], 0);
+  EXPECT_EQ(plugin_calls[PLUGIN_ON_ENDOFROUND], 1);
 }

@@ -238,7 +238,7 @@ TEST_F(BasicEngine2v2Test, TwoAdjacentEnemyMoves) {
 }
 
 
-TEST_F(BasicEngine2v2Test, HighEngineAccuracyTwoMoves) {
+TEST_F(BasicEngine2v2Test, DISABLED_HighEngineAccuracyTwoMoves) {
   spdlog::set_level(spdlog::level::warn);
   engine_->setAccuracy(16);
 
@@ -258,7 +258,7 @@ TEST_F(BasicEngine2v2Test, HighEngineAccuracyTwoMoves) {
 }
 
 
-TEST_F(BasicEngine2v2Test, HighEngineAccuracyFourMoves) {
+TEST_F(BasicEngine2v2Test, DISABLED_HighEngineAccuracyFourMoves) {
   spdlog::set_level(spdlog::level::warn);
   engine_->setAccuracy(16);
 

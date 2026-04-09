@@ -676,9 +676,9 @@ void NeoPkCUEngine::evaluateMove_postRound() {
   // test if other pkmn need to perform their post-round action:
   StackFrame& frame = getStackFrame();
   size_t nextActor = frame.iActor += 1;
-  if (nextActor < actions_.size()) {
+  if (nextActor < frame.moveOrder.size()) {
     frame.iActor = nextActor;
-    gotoStackStage(StageType::POSTROUND);
+    gotoStackStage(StageType::ENDOFROUND);
   } else {
     frame.iActor = 0;
     // allow stackStage to increment at end of postRound
