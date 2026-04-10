@@ -160,7 +160,7 @@ public:
 
 class PKAISHARED PluggableInterface
 {
-public:
+ public:
   virtual bool registerPlugin(const plugin& cPlugin, bool setImp = true) = 0;
 };
 

@@ -246,7 +246,6 @@ bool PokedexStatic::registerPlugin(
     if (element != NULL)
     {
       const Pluggable* pluggable = dynamic_cast<const Pluggable*>(element);
-      if (pluggable) { cCPlugin.setSource(pluggable); }
       overwritten = element->registerPlugin(cCPlugin);
     }
 

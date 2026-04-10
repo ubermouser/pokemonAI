@@ -18,6 +18,7 @@ class BasicEngineTest : public MockEngineTest {
         .addPokemon(PokemonNonVolatile()
             .setBase(pokedex_->pokemon("test_pokemon2"))
             .addMove(pokedex_->move("move_any_adjacent_debuff"))   // index 0
+            .addMove(pokedex_->move("move_faint"))                 // index 1
             .setLevel(100));
     // clang-format on
     auto environment = EnvironmentNonvolatile(team, team, true);
@@ -42,9 +43,7 @@ TEST_F(BasicEngineTest, PrimaryHitAndCrit) {
 
 TEST_F(BasicEngineTest, PrimaryHitAgainstSwap) {
   PossibleEnvironments result = engine_->updateState(
-      engine_->initialState(),
-      Action::move(0),
-      Action::swap(1));
+      engine_->initialState(), Action::move(0), Action::swap(1));
 
   result.printStates();
   auto state = result.where1Hit(0);
@@ -85,6 +84,23 @@ TEST_F(BasicEngineTest, PrimaryHitStatusAndCrit) {
 }
 
 
+TEST_F(BasicEngineTest, ZeroesStatusUponFainting) {
+  auto setupSwap = engine_->updateState(
+      engine_->initialState(), Action::move(2), Action::swap(1));
+  auto firstPkmnFaints = engine_->updateState(
+      setupSwap.where1(), Action::move(2), Action::move(1));
+
+  firstPkmnFaints.printStates();
+  // speed tie: first pokemon may go before being fainted
+  EXPECT_EQ(firstPkmnFaints.size(), 2);
+  // both states collapse into one due to zeroing status
+  EXPECT_EQ(firstPkmnFaints.getNumUnique(), 1);
+  EXPECT_EQ(setupSwap.where1().teammate(TEAM_A, 0).getBoost(FV_ATTACK), 1);
+  EXPECT_EQ(
+      firstPkmnFaints.where1().teammate(TEAM_A, 0).getBoost(FV_ATTACK), 0);
+}
+
+
 TEST_F(BasicEngineTest, SpeedTie) {
   PossibleEnvironments result = engine_->updateState(
       engine_->initialState(), Action::move(0), Action::move(0));
@@ -120,10 +136,9 @@ TEST_F(BasicEngineTest, HighEngineAccuracy_WithSpeedTie) {
   spdlog::set_level(spdlog::level::warn);
   engine_->setAccuracy(16);
 
+  // Two targeted moves with secondary effect
   PossibleEnvironments result = engine_->updateState(
-      engine_->initialState(),
-      Action::move(1),
-      Action::move(1));  // two targeted moves with secondary effect
+      engine_->initialState(), Action::move(1), Action::move(1));
 
   result.printStates();
 
@@ -137,9 +152,7 @@ TEST_F(BasicEngineTest, HighEngineAccuracy_SingleMove) {
   engine_->setAccuracy(16);
 
   PossibleEnvironments result = engine_->updateState(
-      engine_->initialState(),
-      Action::move(1),
-      Action::wait());  // fire blast
+      engine_->initialState(), Action::move(1), Action::wait());
 
   result.printStates();
 

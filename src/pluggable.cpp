@@ -24,18 +24,20 @@ bool Pluggable::registerPlugin_void(
 };
 
 
-bool Pluggable::registerPlugin(const plugin& cPlugin, bool setImp)
-{
+bool Pluggable::registerPlugin(const plugin& cPlugin, bool setImp) {
   bool existed = (plugins[(size_t)cPlugin.getType()].getFunction() != NULL);
   plugins[(size_t)cPlugin.getType()] = cPlugin;
+  plugins[(size_t)cPlugin.getType()].setSource(this);
+
   if (setImp) { implemented = true; }
   return existed;
 }
 
 
-bool EnginePlugins::registerPlugin(const plugin& cPlugin, bool setImp)
-{
-  plugins[(size_t)cPlugin.getType()].push_back(cPlugin);
+bool EnginePlugins::registerPlugin(const plugin& cPlugin, bool setImp) {
+  auto& pluginSet = plugins[(size_t)cPlugin.getType()];
+  pluginSet.push_back(cPlugin);
+  pluginSet.back().setSource(nullptr);
   return false;
 }
 
