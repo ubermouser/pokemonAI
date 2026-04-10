@@ -286,6 +286,37 @@ inline int mock_zeroPP(
   return 0;
 }
 
+inline int mock_applySelfBuff(
+    PkCUEngine&, MoveVolatile mV, PokemonVolatile user, PokemonVolatile) {
+  SPDLOG_TRACE("PLUGIN_ON_EVALUATEMOVE: mock_applySelfBuff");
+  for (size_t i = 0; i < 9; ++i) {
+    if (mV.getBase().getSelfBuff(i) != 0) {
+      user.modBoost(i, mV.getBase().getSelfBuff(i));
+    }
+  }
+  return 0;
+}
+
+inline int mock_applyTargetDebuff(
+    PkCUEngine&, MoveVolatile mV, PokemonVolatile, PokemonVolatile target) {
+  SPDLOG_TRACE("PLUGIN_ON_SECONDARYEFFECT: mock_applyTargetDebuff");
+  for (size_t i = 0; i < 9; ++i) {
+    if (mV.getBase().getTargetDebuff(i) != 0) {
+      target.modBoost(i, -mV.getBase().getTargetDebuff(i));
+    }
+  }
+  return 0;
+}
+
+inline int mock_applyTargetStatus(
+    PkCUEngine&, MoveVolatile mV, PokemonVolatile, PokemonVolatile target) {
+  SPDLOG_TRACE("PLUGIN_ON_SECONDARYEFFECT: mock_applyTargetStatus");
+  if (mV.getBase().getTargetAilment() != AIL_NV_NONE) {
+    target.setStatusAilment(mV.getBase().getTargetAilment());
+  }
+  return 0;
+}
+
 class MockPokedex : public PokedexStatic {
 public:
   MockPokedex() : PokedexStatic(Config(), false) {
@@ -362,6 +393,14 @@ public:
     Move::BuffModArray zeroBuff;
     zeroBuff.fill(0);
 
+    Move::BuffModArray atkBuff;
+    atkBuff.fill(0);
+    atkBuff[FV_ATTACK] = 1;
+
+    Move::BuffModArray atkDebuff;
+    atkDebuff.fill(0);
+    atkDebuff[FV_ATTACK] = 1;
+
     // clang-format off
     // Standard moves for plugin tests
     moves_.insert(Move("test_move", t, 100, 100, 20, ATK_PHYSICAL, Move::ANY_ADJACENT, 0, 10, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, true, "test move"));
@@ -369,15 +408,15 @@ public:
 
     // Moves for every TargetType
     moves_.insert(Move("move_self", t, 100, 0, 20, ATK_NODMG, Move::SELF, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "self"));
-    moves_.insert(Move("move_any_adjacent", t, 100, 100, 20, ATK_PHYSICAL, Move::ANY_ADJACENT, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "any adjacent"));
+    moves_.insert(Move("move_any_adjacent", t, 75, 40, 20, ATK_PHYSICAL, Move::ANY_ADJACENT, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "any adjacent"));
     moves_.insert(Move("move_any_adjacent_ally", t, 100, 0, 20, ATK_NODMG, Move::ANY_ADJACENT_ALLY, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "any adjacent ally"));
-    moves_.insert(Move("move_any_adjacent_enemy", t, 100, 100, 20, ATK_PHYSICAL, Move::ANY_ADJACENT_ENEMY, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "any adjacent enemy"));
+    moves_.insert(Move("move_any_adjacent_enemy", t, 75, 40, 20, ATK_PHYSICAL, Move::ANY_ADJACENT_ENEMY, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "any adjacent enemy"));
     moves_.insert(Move("move_any_adjacent_ally_self", t, 100, 0, 20, ATK_NODMG, Move::ANY_ADJACENT_ALLY_SELF, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "any adjacent ally self"));
-    moves_.insert(Move("move_any_active", t, 100, 100, 20, ATK_PHYSICAL, Move::ANY_ACTIVE, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "any active"));
+    moves_.insert(Move("move_any_active", t, 75, 40, 20, ATK_PHYSICAL, Move::ANY_ACTIVE, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "any active"));
     moves_.insert(Move("move_any_ally", t, 100, 0, 20, ATK_NODMG, Move::ANY_ALLY, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "any ally"));
     moves_.insert(Move("move_any_ally_self", t, 100, 0, 20, ATK_NODMG, Move::ANY_ALLY_SELF, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "any ally self"));
-    moves_.insert(Move("move_all_adjacent", t, 100, 100, 20, ATK_PHYSICAL, Move::ALL_ADJACENT, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "all adjacent"));
-    moves_.insert(Move("move_all_adjacent_enemy", t, 100, 100, 20, ATK_PHYSICAL, Move::ALL_ADJACENT_ENEMY, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "all adjacent enemy"));
+    moves_.insert(Move("move_all_adjacent", t, 75, 40, 20, ATK_PHYSICAL, Move::ALL_ADJACENT, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "all adjacent"));
+    moves_.insert(Move("move_all_adjacent_enemy", t, 75, 40, 20, ATK_PHYSICAL, Move::ALL_ADJACENT_ENEMY, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "all adjacent enemy"));
     moves_.insert(Move("move_all_adjacent_ally", t, 100, 0, 20, ATK_NODMG, Move::ALL_ADJACENT_ALLY, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "all adjacent ally"));
     moves_.insert(Move("move_all_active_allies", t, 100, 0, 20, ATK_NODMG, Move::ALL_ACTIVE_ALLIES, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "all active allies"));
     moves_.insert(Move("move_all_active_enemies", t, 100, 0, 20, ATK_NODMG, Move::ALL_ACTIVE_ENEMIES, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "all active enemies"));
@@ -388,6 +427,11 @@ public:
     moves_.insert(Move("move_all_allies", t, 100, 0, 20, ATK_NODMG, Move::ALL_ALLIES, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "all allies"));
     moves_.insert(Move("move_all_enemies", t, 100, 0, 20, ATK_NODMG, Move::ALL_ENEMIES, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "all enemies"));
     moves_.insert(Move("move_all_field", t, 100, 0, 20, ATK_NODMG, Move::ALL_FIELD, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "all field"));
+
+    // Moves with secondary efects:
+    moves_.insert(Move("move_self_buff", t, 100, 0, 20, ATK_NODMG, Move::SELF, 0, 0, atkBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "self buff"));
+    moves_.insert(Move("move_any_adjacent_secondary", t, 75, 40, 20, ATK_PHYSICAL, Move::ANY_ADJACENT, 0, 50, zeroBuff, zeroBuff, AIL_NV_POISON, AIL_V_NONE, false, "any adjacent secondary"));
+    moves_.insert(Move("move_any_adjacent_debuff", t, 75, 40, 20, ATK_PHYSICAL, Move::ANY_ADJACENT, 0, 50, zeroBuff, atkDebuff, AIL_NV_NONE, AIL_V_NONE, false, "any adjacent debuff"));
 
     // Fainting moves
     moves_.insert(Move("move_explosion", t, 100, 0, 20, ATK_NODMG, Move::ALL_ADJACENT, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, true, "explosion"));
@@ -402,6 +446,10 @@ public:
     moves_.at("move_faint").registerPlugin(pluginOnEvaluateMove(pluginCategory::move, "faint", mock_onFaint), true);
     moves_.at("move_suicide").registerPlugin(pluginOnEndOfMove(pluginCategory::move, "suicide", mock_onSuicide), true);
     moves_.at("move_zero_pp").registerPlugin(pluginOnEvaluateMove(pluginCategory::move, "zero_pp", mock_zeroPP), true);
+
+    moves_.at("move_self_buff").registerPlugin(pluginOnEvaluateMove(pluginCategory::move, "self_buff", mock_applySelfBuff), true);
+    moves_.at("move_any_adjacent_secondary").registerPlugin(pluginOnSecondaryEffect(pluginCategory::move, "status", mock_applyTargetStatus), true);
+    moves_.at("move_any_adjacent_debuff").registerPlugin(pluginOnSecondaryEffect(pluginCategory::move, "debuff", mock_applyTargetDebuff), true);
     // clang-format on
   }
 

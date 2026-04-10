@@ -13,6 +13,8 @@ class MockEngineTest : public ::testing::Test {
   static void resetPluginCalls() { plugin_calls.fill(0); }
 
   void SetUp() override {
+    spdlog::set_level(spdlog::level::trace);
+
     resetPluginCalls();
     pokedex_ = std::make_shared<MockPokedex>();
     pokedex_->setAllowInvalidPokemon(true);

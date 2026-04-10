@@ -1,37 +1,36 @@
-#include <stdexcept>
-
-#include "engine_test.hpp"
-#include "pokemonai/pkai.h"
+#include "mock_engine_test.hpp"
 
 
-class BasicEngine2v2Test : public Gen4EngineTest {
+class BasicEngine2v2Test : public MockEngineTest {
  protected:
   void SetUp() override {
-
-    Gen4EngineTest::SetUp();
-    pokedex_->setAllowInvalidPokemon(true);
+    MockEngineTest::SetUp();
+    plugin_calls.fill(0);
 
     // clang-format off
-    auto team = TeamNonVolatile()
+    auto teamA = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
-            .setBase(pokedex_->pokemon("charmander"))
-            .addMove(pokedex_->move("cut"))  // targeted attack
-            .addMove(pokedex_->move("heat wave"))  // adjacent-enemy attack
-            .addMove(pokedex_->move("earthquake"))  // all-adjacent attack
-            .addMove(pokedex_->move("swords dance"))  // self target
+            .setBase(pokedex_->pokemon("test_pokemon"))
+            .addMove(pokedex_->move("move_any_adjacent"))
+            .addMove(pokedex_->move("move_all_adjacent_enemy"))
+            .addMove(pokedex_->move("move_all_adjacent"))
+            .addMove(pokedex_->move("move_self_buff"))
             .setLevel(100))
         .addPokemon(PokemonNonVolatile()
-            .setBase(pokedex_->pokemon("squirtle"))
-            .addMove(pokedex_->move("aqua tail"))  // targeted attack
-            .addMove(pokedex_->move("icy wind"))  // adjacent-enemy attack
-            .addMove(pokedex_->move("surf"))  // all-adjacent attack
+            .setBase(pokedex_->pokemon("test_pokemon2"))
+            .setIV(FV_SPEED, 10)  // enforce no speed tie
+            .addMove(pokedex_->move("move_any_adjacent"))
+            .addMove(pokedex_->move("move_all_adjacent_enemy"))
+            .addMove(pokedex_->move("move_all_adjacent"))
             .setLevel(100))
         .addPokemon(PokemonNonVolatile()
-            .setBase(pokedex_->pokemon("bulbasaur"))
-            .addMove(pokedex_->move("cut"))
+            .setBase(pokedex_->pokemon("test_pokemon3"))
             .setLevel(100));
+    auto teamB = teamA;
+    teamB.teammate(0).setIV(FV_SPEED, 5);
+    teamB.teammate(1).setIV(FV_SPEED, 15);
     // clang-format on
-    auto environment = EnvironmentNonvolatile(team, team, true);
+    auto environment = EnvironmentNonvolatile(teamA, teamB, true);
     engine_->setNumActivePokemon(2);
     engine_->setEnvironment(environment);
   }
@@ -62,7 +61,10 @@ TEST_F(BasicEngine2v2Test, TargetAdjacentEnemy) {
   EXPECT_EQ(result.getNumUnique(), 3);
 
   auto state = result.where1Hit(0);
+  EXPECT_EQ(state.teammate(TEAM_B, 0).getMissingHP(), 0);
   EXPECT_GT(state.teammate(TEAM_B, 1).getMissingHP(), 0);
+  EXPECT_EQ(state.teammate(TEAM_A, 0).getMissingHP(), 0);
+  EXPECT_EQ(state.teammate(TEAM_A, 1).getMissingHP(), 0);
 }
 
 
@@ -82,7 +84,9 @@ TEST_F(BasicEngine2v2Test, TargetAdjacentAlly) {
   EXPECT_EQ(result.getNumUnique(), 3);
 
   auto state = result.where1Hit(0);
+  EXPECT_EQ(state.teammate(TEAM_B, 0).getMissingHP(), 0);
   EXPECT_EQ(state.teammate(TEAM_B, 1).getMissingHP(), 0);
+  EXPECT_EQ(state.teammate(TEAM_A, 0).getMissingHP(), 0);
   EXPECT_GT(state.teammate(TEAM_A, 1).getMissingHP(), 0);
 }
 
@@ -98,9 +102,9 @@ TEST_F(BasicEngine2v2Test, AdjacentEnemy) {
   );
   // clang-format on
 
-  // pkmn does damage to 2 enemies, 5 outcomes each
+  // move_all_adjacent_enemy hits 2. each can hit/miss/crit. 9 outcomes.
   result.printStates();
-  EXPECT_EQ(result.size(), 25);
+  EXPECT_EQ(result.size(), 9);
 
   auto state = result.where1Hit(0);
   EXPECT_EQ(state.teammate(TEAM_A, 0).getMissingHP(), 0);
@@ -122,8 +126,8 @@ TEST_F(BasicEngine2v2Test, AdjacentAll) {
   // clang-format on
 
   result.printStates();
-  EXPECT_EQ(result.size(), 8);  // hits 3 pkmn, may hit or crit
-
+  // hits 3 pkmn. 3^3 = 27.
+  EXPECT_EQ(result.size(), 27);
   auto state = result.where1Hit(0);
   EXPECT_GT(state.teammate(TEAM_A, 0).getMissingHP(), 0);
   EXPECT_EQ(state.teammate(TEAM_A, 1).getMissingHP(), 0);
@@ -183,7 +187,7 @@ TEST_F(BasicEngine2v2Test, TwoTargetedMoves) {
   // clang-format on
 
   result.printStates();
-  EXPECT_EQ(result.size(), 9);  // each pkmn can miss, hit, and crit
+  EXPECT_EQ(result.size(), 3 * 3);  // each pkmn can miss, hit, and crit
 
   auto state = result.where1Hit(0);
   EXPECT_EQ(state.teammate(TEAM_A, 0).getMissingHP(), 0);
@@ -205,11 +209,13 @@ TEST_F(BasicEngine2v2Test, TwoTargetedDefaultMoves) {
   // clang-format on
 
   result.printStates();
-  EXPECT_EQ(result.size(), 9);  // each pkmn can miss, hit, and crit
+  EXPECT_EQ(result.size(), 3 * 3);  // each pkmn can miss, hit, and crit
 
   auto state = result.where1Hit(0);
   EXPECT_GT(state.teammate(TEAM_B, 0).getMissingHP(), 0);
   EXPECT_GT(state.teammate(TEAM_B, 1).getMissingHP(), 0);
+  EXPECT_EQ(state.teammate(TEAM_A, 0).getMissingHP(), 0);
+  EXPECT_EQ(state.teammate(TEAM_A, 1).getMissingHP(), 0);
 }
 
 
@@ -225,11 +231,7 @@ TEST_F(BasicEngine2v2Test, TwoAdjacentEnemyMoves) {
   // clang-format on
 
   result.printStates();
-  // each pkmn is hit twice.
-  // First move can [miss, hit, crit, status, status-crit]
-  // Second move can [miss, status, status-crit]
-  EXPECT_EQ(result.size(), 5 * 3 * 5 * 3);
-
+  EXPECT_EQ(result.size(), 3 * 3 * 3 * 3);
   auto state = result.where1Hit(0);
   EXPECT_EQ(state.teammate(TEAM_A, 0).getMissingHP(), 0);
   EXPECT_EQ(state.teammate(TEAM_A, 1).getMissingHP(), 0);
@@ -238,9 +240,10 @@ TEST_F(BasicEngine2v2Test, TwoAdjacentEnemyMoves) {
 }
 
 
-TEST_F(BasicEngine2v2Test, DISABLED_HighEngineAccuracyTwoMoves) {
+TEST_F(BasicEngine2v2Test, HighEngineAccuracy_TwoMoves) {
   spdlog::set_level(spdlog::level::warn);
   engine_->setAccuracy(16);
+  engine_->setStateSelectMethod(PkCU::StateSelectMethod::RANDOM);
 
   // clang-format off
   PossibleEnvironments result = engine_->updateState(
@@ -253,14 +256,14 @@ TEST_F(BasicEngine2v2Test, DISABLED_HighEngineAccuracyTwoMoves) {
   // clang-format on
 
   result.printStates();
-  EXPECT_EQ(result.size(), 110);         // count is incorrect!
-  EXPECT_EQ(result.getNumUnique(), 14);  // count is incorrect!
+  EXPECT_EQ(result.size(), 1);
 }
 
 
-TEST_F(BasicEngine2v2Test, DISABLED_HighEngineAccuracyFourMoves) {
+TEST_F(BasicEngine2v2Test, HighEngineAccuracy_FourMoves) {
   spdlog::set_level(spdlog::level::warn);
   engine_->setAccuracy(16);
+  engine_->setStateSelectMethod(PkCU::StateSelectMethod::RANDOM);
 
   // clang-format off
   PossibleEnvironments result = engine_->updateState(
@@ -273,6 +276,5 @@ TEST_F(BasicEngine2v2Test, DISABLED_HighEngineAccuracyFourMoves) {
   // clang-format on
 
   result.printStates();
-  EXPECT_EQ(result.size(), 16900);       // count is incorrect!
-  EXPECT_EQ(result.getNumUnique(), 49);  // count is incorrect!
+  EXPECT_EQ(result.size(), 1);
 }

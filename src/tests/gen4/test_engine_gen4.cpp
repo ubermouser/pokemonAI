@@ -3,9 +3,7 @@
 #include "engine_test.hpp"
 
 
-
-
-class BasicEngineTest : public Gen4EngineTest {
+class Gen4BasicEngineTest : public Gen4EngineTest {
  protected:
   void SetUp() override {
     Gen4EngineTest::SetUp();
@@ -27,77 +25,7 @@ class BasicEngineTest : public Gen4EngineTest {
 };
 
 
-TEST_F(BasicEngineTest, PrimaryHitAndCrit) {
-  PossibleEnvironments result = engine_->updateState(
-      engine_->initialState(), Action::move(0), Action::wait());  // cut
-
-  result.printStates();
-  EXPECT_EQ(result.size(), 3);
-  EXPECT_EQ(result.where1Hit(0).flagsFor(TEAM_A).isHit(), true);
-  EXPECT_EQ(result.where1Miss(0).flagsFor(TEAM_A).isHit(), false);
-  EXPECT_EQ(result.where1Crit(0).flagsFor(TEAM_A).isCrit(), true);
-}
-
-
-TEST_F(BasicEngineTest, PrimaryHitAgainstSwap) {
-  PossibleEnvironments result = engine_->updateState(
-      engine_->initialState(),
-      Action::move(0),
-      Action::swap(1));  // cut vs swap
-
-  result.printStates();
-  auto state = result.where1Hit(0);
-  // swapped-out pokemon takes no damage
-  EXPECT_EQ(state.teammate(TEAM_B, 0).getPercentHP(), 1.);
-  // swapped-in pokemon takes damage
-  EXPECT_LT(state.teammate(TEAM_B, 1).getPercentHP(), 1.);
-  // swapped-in pokemon is active
-  EXPECT_TRUE(state.teammate(TEAM_B, 1).isActive());
-  EXPECT_FALSE(state.teammate(TEAM_B, 0).isActive());
-}
-
-
-TEST_F(BasicEngineTest, Swap) {
-  PossibleEnvironments result = engine_->updateState(
-      engine_->initialState(), Action::swap(1), Action::wait());
-
-  result.printStates();
-  auto state = result.where1Switch(0);
-  // swapped-in pokemon is active
-  EXPECT_TRUE(state.teammate(TEAM_A, 1).isActive());
-  EXPECT_FALSE(state.teammate(TEAM_A, 0).isActive());
-}
-
-
-TEST_F(BasicEngineTest, PrimaryHitStatusAndCrit) {
-  PossibleEnvironments result = engine_->updateState(
-      engine_->initialState(), Action::move(1), Action::wait());  // fire blast
-
-  result.printStates();
-  EXPECT_EQ(result.size(), 5);
-  EXPECT_EQ(result.whereMiss(0).size(), 1);
-  EXPECT_EQ(result.whereHit(0).size(), 4);
-  EXPECT_EQ(result.whereHitNoCrit(0).size(), 2);
-  EXPECT_EQ(result.whereHitNoStatus(0).size(), 2);
-  EXPECT_EQ(result.whereCrit(0).size(), 2);
-  EXPECT_EQ(result.whereStatus(0).size(), 2);
-}
-
-
-TEST_F(BasicEngineTest, SpeedTie) {
-  PossibleEnvironments result = engine_->updateState(
-      engine_->initialState(), Action::move(0), Action::move(0));  // cut vs cut
-
-  result.printStates();
-  EXPECT_EQ(result.size(), 18);
-  EXPECT_EQ(result.getNumUnique(), 9);
-  EXPECT_EQ(result.whereHit(0).size(), 6);
-  EXPECT_EQ(result.whereMiss(0).size(), 3);
-  EXPECT_EQ(result.whereCrit(0).size(), 3);
-}
-
-
-TEST_F(BasicEngineTest, BuffStat) {
+TEST_F(Gen4BasicEngineTest, BuffStat) {
   PossibleEnvironments result = engine_->updateState(
       engine_->initialState(),
       Action::move(2),  // swords dance
@@ -113,7 +41,7 @@ TEST_F(BasicEngineTest, BuffStat) {
 }
 
 
-TEST_F(BasicEngineTest, DebuffStat) {
+TEST_F(Gen4BasicEngineTest, DebuffStat) {
   auto team_a = TeamNonVolatile().addPokemon(
       PokemonNonVolatile()
           .setBase(pokedex_->pokemon("aipom"))
@@ -147,7 +75,7 @@ TEST_F(BasicEngineTest, DebuffStat) {
 }
 
 
-TEST_F(BasicEngineTest, StatusHitAndMiss) {
+TEST_F(Gen4BasicEngineTest, StatusHitAndMiss) {
   auto team_a = TeamNonVolatile().addPokemon(
       PokemonNonVolatile()
           .setBase(pokedex_->pokemon("arbok"))
@@ -176,63 +104,7 @@ TEST_F(BasicEngineTest, StatusHitAndMiss) {
 }
 
 
-TEST_F(BasicEngineTest, ReturnAllStates_Random) {
-  engine_->setStateSelectMethod(NeoPkCU::StateSelectMethod::RANDOM);
-  PossibleEnvironments result = engine_->updateState(
-      engine_->initialState(), Action::move(1), Action::wait());  // fire blast
-
-  // resulting state is random
-  EXPECT_EQ(result.size(), 1);
-  EXPECT_EQ(result.at(0).getProbability(), FixType(1));
-}
-
-
-TEST_F(BasicEngineTest, ReturnAllStates_MostLikely) {
-  // fire blast has 85% accuracy. Hit is more likely than miss.
-  engine_->setStateSelectMethod(NeoPkCU::StateSelectMethod::MOST_LIKELY);
-  PossibleEnvironments result = engine_->updateState(
-      engine_->initialState(), Action::move(1), Action::wait());  // fire blast
-
-  // hit no-crit no-status state is most likely
-  EXPECT_EQ(result.size(), 1);
-  EXPECT_EQ(result.at(0).getProbability(), FixType(1));
-  EXPECT_TRUE(result.at(0).flagsFor(TEAM_A).isHit());
-  EXPECT_FALSE(result.at(0).flagsFor(TEAM_A).isCrit());
-  EXPECT_FALSE(result.at(0).flagsFor(TEAM_A).isSecondary());
-}
-
-
-TEST_F(BasicEngineTest, HighEngineAccuracyWithSpeedTie) {
-  spdlog::set_level(spdlog::level::warn);
-  engine_->setAccuracy(16);
-
-  PossibleEnvironments result = engine_->updateState(
-      engine_->initialState(),
-      Action::move(1),
-      Action::move(1));  // two fire blasts
-
-  EXPECT_EQ(result.size(), 8450);
-  EXPECT_EQ(result.getNumUnique(), 49);
-  result.printStates();
-}
-
-
-TEST_F(BasicEngineTest, HighEngineAccuracySingleMove) {
-  spdlog::set_level(spdlog::level::warn);
-  engine_->setAccuracy(16);
-
-  PossibleEnvironments result = engine_->updateState(
-      engine_->initialState(),
-      Action::move(1),
-      Action::wait());  // fire blast
-
-  EXPECT_EQ(result.size(), 65);
-  EXPECT_EQ(result.getNumUnique(), 7);
-  result.printStates();
-}
-
-
-TEST_F(BasicEngineTest, HighEvasionAndAccuracy) {
+TEST_F(Gen4BasicEngineTest, HighEvasionAndAccuracy) {
   spdlog::set_level(spdlog::level::warn);
   // Reproduce branchProbability > FixType(0) assertion failure
   engine_->setAccuracy(16);
