@@ -174,9 +174,11 @@ class NeoPkCUEngine {
   /**
    * If returnAllStates is false, choose a state at random to keep, discard the
    * rest. The engine returns a single state at 100% probability.
+   *
+   * @return The number of removed stages.
    */
-  void maybeCollapseStages();
-  void collapseStages();
+  size_t maybeCollapseStages();
+  size_t collapseStages();
 
   template <size_t numEnvironments>
   void nPlicateState(

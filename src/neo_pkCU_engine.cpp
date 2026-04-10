@@ -157,15 +157,17 @@ std::vector<Actor> NeoPkCUEngine::computeActorOrder() {
   return std::move(actors);
 }
 
-void NeoPkCUEngine::maybeCollapseStages() {
-  if (cu_.cfg_.stateSelectMethod == NeoPkCU::StateSelectMethod::ALL) { return; }
+size_t NeoPkCUEngine::maybeCollapseStages() {
+  if (cu_.cfg_.stateSelectMethod == NeoPkCU::StateSelectMethod::ALL) {
+    return 0;
+  }
 
-  collapseStages();
+  return collapseStages();
 }
 
 
-void NeoPkCUEngine::collapseStages() {
-  if (stack_.size() <= 1) { return; }
+size_t NeoPkCUEngine::collapseStages() {
+  if (stack_.size() <= 1) { return 0; }
 
   size_t indexState;
   switch (cu_.cfg_.stateSelectMethod) {
@@ -180,6 +182,7 @@ void NeoPkCUEngine::collapseStages() {
         "NeoPkCUEngine::collapseStages: invalid stateSelectMethod");
   }
 
+  size_t stack_size = stack_.size();
   SPDLOG_TRACE(
       "Collapsing ({}) to iSTACK={:4d} of {:4d} with P={:.5f}",
       (cu_.cfg_.stateSelectMethod == NeoPkCU::StateSelectMethod::RANDOM
@@ -200,6 +203,7 @@ void NeoPkCUEngine::collapseStages() {
   stackFrame_.front().iStack = 0;
   lastStackSize_ = 1;
   getBase().getProbability() = FixType(1);
+  return stack_size - 1;
 }
 
 

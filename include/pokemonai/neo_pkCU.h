@@ -84,6 +84,12 @@ class PKAISHARED NeoPkCU {
      */
     bool allowInvalidMoves = false;
 
+    /**
+     * @brief The maximum number of states the engine should return when
+     * StateSelectMethod is RANDOM or MOST_LIKELY.
+     */
+    size_t maxNumStates = 1;
+
     Config(){};
 
     /**
@@ -116,6 +122,7 @@ class PKAISHARED NeoPkCU {
   NeoPkCU& setAccuracy(size_t engineAccuracy);
   NeoPkCU& setNumActivePokemon(size_t numActivePokemon);
   NeoPkCU& setStateSelectMethod(StateSelectMethod method);
+  NeoPkCU& setMaxNumStates(size_t maxNumStates);
   NeoPkCU& setAllowInvalidMoves(bool allow = true);
 
   /**
