@@ -20,7 +20,7 @@ endif()
 find_package(Boost REQUIRED COMPONENTS program_options filesystem)
 
 # Set C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Include directories

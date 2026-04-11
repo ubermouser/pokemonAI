@@ -351,7 +351,7 @@ Turn Game::digestTurn(
     }
     // sum of all nodes evaluated:
     turn.numNodesEvaluated = std::accumulate(
-        std::begin(action.atDepth), std::end(action.atDepth), 0U, [](auto& a, auto& b) {
+        std::begin(action.atDepth), std::end(action.atDepth), 0U, [](auto a, auto& b) {
       return a + b.numNodes;
     });
     // active pokemon at the END of the turn:
