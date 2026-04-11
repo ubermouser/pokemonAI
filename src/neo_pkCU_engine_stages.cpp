@@ -729,7 +729,7 @@ void NeoPkCUEngine::evaluateMove_round_hash() {
   existEnv.getProbability() += cEnv.getProbability();
 
   // merge status flags for visualization
-  existEnv.getBitmask() &= cEnv.getBitmask();
+  existEnv.getBitmask() |= cEnv.getBitmask();
 
   // flag the destination environment as merged
   existEnv.setMerged();

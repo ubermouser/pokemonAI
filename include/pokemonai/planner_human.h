@@ -40,8 +40,8 @@ protected:
   virtual size_t maxImplDepth() const override { return 0; }
   virtual bool isEvaluatorRequired() const override { return false; }
 
-  virtual PlyResult generateSolutionAtDepth(
-      const ConstEnvironmentPossible& origin, size_t maxPly) const override;
+  virtual PlyResult generateSolutionAtLeaf(
+      const ConstEnvironmentPossible& origin) const override;
 };
 
 #endif /* PLANNER_HUMAN_H */

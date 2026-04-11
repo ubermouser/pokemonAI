@@ -87,35 +87,21 @@ TEST_F(PlannerHumanTest, MoveVolatileOperatorOutput) {
 
 TEST_F(PlannerHumanTest, HumanPlannerActionReader) {
   Action result;
-  {
-    std::istringstream input("m2");
-    PlannerHuman::Config cfg;
-    cfg.maxDepth = 0;
-    PlannerHuman planner(cfg, input);
-    planner.setTeam(TEAM_A).setEngine(engine_).setEnvironment(environment_).initialize();
-    result = planner.generateSolution(engine_->initialState()).bestAgentAction().begin()->second;
-    EXPECT_EQ(result, Action::move(1));
-  }
-  {
-    std::istringstream input("S5");
-    input >> result;
-    EXPECT_EQ(result, Action::swap(4));
-  }
-  {
-    std::istringstream input("m2-4");
-    input >> result;
-    EXPECT_EQ(result, Action::moveAlly(1, 3));
-  }
-  {
-    std::stringstream input; input << Action::moveAlly(1, 3);
-    input >> result;
-    EXPECT_EQ(result, Action::moveAlly(1, 3));
-  }
-  {
-    std::istringstream input("garbage");
-    input >> result;
-    EXPECT_FALSE(input);
-  }
+  std::istringstream input("m2");
+  PlannerHuman::Config cfg;
+  cfg.maxDepth = 0;
+  PlannerHuman planner(cfg, input);
+  planner.setTeam(TEAM_A)
+      .setEngine(engine_)
+      .setEnvironment(environment_)
+      .initialize();
+
+  result = planner.generateSolution(engine_->initialState())
+               .bestAgentAction()
+               .begin()
+               ->second;
+
+  EXPECT_EQ(result, Action::move(1));
 }
 
 

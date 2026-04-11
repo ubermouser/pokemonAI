@@ -31,6 +31,8 @@ TEST_F(FlinchStatusTest, Test_IronHeadCausesFlinch) {
     // Mew is faster and moves first.
     auto results = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(0));
 
+    results.printStates();
+
     // Pick the state where the flinch (secondary effect) occurred.
     auto flinch_state = results.where1Status(TEAM_A);
 

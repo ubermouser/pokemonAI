@@ -16,8 +16,8 @@
 PlannerHuman::PlannerHuman(const Config& cfg) : PlannerHuman(cfg, std::cin) {};
 
 
-PlyResult PlannerHuman::generateSolutionAtDepth(
-    const ConstEnvironmentPossible& origin, size_t maxPly) const {
+PlyResult PlannerHuman::generateSolutionAtLeaf(
+    const ConstEnvironmentPossible& origin) const {
   fmt::print("{}", fmt::streamed(origin));
   printActions(origin);
 

@@ -69,7 +69,7 @@ std::ostream& operator <<(std::ostream& os, const Action& action) {
 
 
 std::istream& operator >>(std::istream& is, Action& action) {
-  static const std::regex moveExpr("m(\\d)(?:-(\\d))?");
+  static const std::regex moveExpr("m(\\d)(?:-([f]?)([asg\\d]+))?(?:-([asg\\d]+))?");
   static const std::regex swapExpr("s(\\d)");
 
   // read input into string:
@@ -84,13 +84,39 @@ std::istream& operator >>(std::istream& is, Action& action) {
     success = true;
   } else if (input[0] == 'm') {
     if (std::regex_match(input, match, moveExpr)) {
-      if (match[2].matched) {
-        action = Action::moveAlly(std::stoi(match[1].str()) - 1, std::stoi(match[2].str()) - 1);
-        success = true;
-      } else {
-        action = Action::move(std::stoi(match[1].str()) - 1);
-        success = true;
+      size_t iMove = std::stoi(match[1].str()) - 1;
+      size_t friendly = Action::FRIENDLY_NONE;
+      size_t hostile = Action::HOSTILE_NONE;
+
+      auto parseTarget = [&](const std::string& prefix, const std::string& target, size_t& friendlyOut, size_t& hostileOut) {
+        if (prefix == "f") {
+          if (target == "a") friendlyOut = Action::FRIENDLY_ADJACENT;
+          else if (target == "s") friendlyOut = Action::FRIENDLY_ALL;
+          else if (target == "g") friendlyOut = Action::FRIENDLY_SIDE;
+          else friendlyOut = Action::FRIENDLY_0 + std::stoi(target) - 1;
+        } else {
+          if (target == "a") hostileOut = Action::HOSTILE_ADJACENT;
+          else if (target == "s") hostileOut = Action::HOSTILE_ALL;
+          else if (target == "g") hostileOut = Action::HOSTILE_SIDE;
+          else hostileOut = Action::HOSTILE_0 + std::stoi(target) - 1;
+        }
+      };
+
+      if (match[3].matched) {
+        parseTarget(match[2].str(), match[3].str(), friendly, hostile);
       }
+      if (match[4].matched) {
+        // if there's a second target, it MUST be hostile (since we already matched first as possibly friendly)
+        parseTarget("", match[4].str(), friendly, hostile);
+      }
+
+      // if neither was set, default to HOSTILE_ANY
+      if (friendly == Action::FRIENDLY_NONE && hostile == Action::HOSTILE_NONE) {
+        hostile = Action::HOSTILE_ANY;
+      }
+
+      action = Action(Action::MOVE_0 + iMove, friendly, hostile);
+      success = true;
     }
   } else if (input[0] == 's') {
     if (std::regex_match(input, match, swapExpr)) {
