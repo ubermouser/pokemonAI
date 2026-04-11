@@ -656,3 +656,15 @@ Actor NeoPkCUEngine::getOActor(size_t iStack) const {
   return Actor(
       iOTeam, getBase(iStack).getTeam(iOTeam).getICPKV());
 }
+
+
+size_t NeoPkCUEngine::getActorIndex(const Actor& actor, size_t iStack) const {
+  if (iStack == SIZE_MAX) { iStack = iBase_; }
+  const auto& moveOrder = getStackFrame(iStack).moveOrder;
+
+  for (size_t i = 0; i < moveOrder.size(); ++i) {
+    if (moveOrder[i] == actor) { return i; }
+  }
+
+  throw std::runtime_error(fmt::format("Actor {} not found in move ordering", fmt::streamed(actor)));
+}

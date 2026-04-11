@@ -333,6 +333,15 @@ class NeoPkCUEngine {
 
   // getIndexCurrentBase
   size_t getIBase() const { return iBase_; }
+
+  /**
+   * @brief Finds the index of an actor within the move ordering of a stack frame.
+   * @param actor The actor to find.
+   * @param iStack The index of the stack frame. Defaults to the current base.
+   * @return The index of the actor in the moveOrder vector.
+   * @throws std::runtime_error if the actor is not found in the moveOrder.
+   */
+  size_t getActorIndex(const Actor& actor, size_t iStack = SIZE_MAX) const;
   /** @} */
 
  protected:

@@ -2,11 +2,6 @@
 
 namespace gen4 {
 
-// Subclass PkCUEngine to access protected members
-class RoarEngine : public PkCUEngine {
- public:
-  void setIBase(size_t i) { iBase_ = i; }
-};
 
 int move_roar_forceSwitch(
     PkCUEngine& cu,
@@ -14,26 +9,27 @@ int move_roar_forceSwitch(
     PokemonVolatile cPKV,
     PokemonVolatile tPKV) {
   const Move* cMove = &mV.getBase();
-  if (cMove != whirlwind_t && cMove != roar_t) { return 0; }
-  if (!cu.getBase().flagsFor((TEAM)cu.getICTeam()).isHit()) { return 0; }
-
   TeamVolatile tTV = cu.getTTV();
 
   // Find all valid switch-ins
-  std::array<size_t, 6> validSwitchIns;
-  size_t numOptions = 0;
+  std::vector<size_t> validSwitchIns;
   for (size_t i = 0; i < tTV.nv().getNumTeammates(); ++i) {
-    if (i == tTV.getICPKV()) continue; // Current pokemon
-    if (tTV.teammate(i).isAlive()) { validSwitchIns[numOptions++] = i; }
+    if (i == tTV.data().status.nonvolatile.iCPokemon) continue; // Current pokemon
+    if (tTV.teammate(i).isAlive()) { validSwitchIns.push_back(i); }
   }
 
-  if (numOptions == 0) {
+  if (validSwitchIns.empty()) {
     // Move fails if no one to switch to
     return 0;
   }
 
-  RoarEngine& rEngine = (RoarEngine&)cu;
-  const size_t originalIBase = cu.getIBase();
+  auto targetActor = cu.getTarget();
+  auto actor = cu.getCActor();
+  auto& frame = cu.getStackFrame();
+
+  size_t iTargetActor = cu.getActorIndex(targetActor);
+  size_t numOptions = validSwitchIns.size();
+  size_t originalIBase = cu.getIBase();
   size_t currentEnvIndex = originalIBase;
 
   for (size_t i = 0; i < numOptions; ++i) {
@@ -48,29 +44,18 @@ int move_roar_forceSwitch(
       envIndex = currentEnvIndex;
     }
 
-    // Perform switch
-    cu.getTTV(envIndex).swapPokemon(validSwitchIns[i]);
-    cu.getStack().at(envIndex).flagsFor(cu.getOActor()).setSwitched();
-    rEngine.setIBase(envIndex);
-    PokemonVolatile newTPKV = cu.getTTV(envIndex).getPKV();
+    auto& branchFrame = cu.getStackFrame(envIndex);
+    branchFrame.iActor = iTargetActor;
+    branchFrame.actions[targetActor] = Action::swap(validSwitchIns[i]);
+    branchFrame.targets[targetActor] = {
+        Actor(targetActor.iTeam(), validSwitchIns[i])};
 
-    // TODO(@drendleman): add support in PkCU for changing the stackstage via a
-    // plugin call
-    // Run PLUGIN_ON_SWITCHIN for the new state
-    rEngine.setIBase(envIndex);
-    cu.setCPluginSet();
+    // Mark that the original actor has finished their turn to avoid re-execution
+    // if targetActor context swap loops back.
+    branchFrame.actions[actor] = Action::wait();
 
-    int result = 0;
-    const auto& cPlugins = cu.getCPluginSet()[(size_t)PLUGIN_ON_SWITCHIN];
-    for (const auto& plugin : cPlugins) {
-      onSwitch_rawType cPlugin = (onSwitch_rawType)plugin.getFunction();
-      result = result | cPlugin(cu, newTPKV);
-      if (result > 1) { break; }
-    }
+    cu.gotoStackStage(envIndex, StageType::PRESWITCH);
   }
-
-  rEngine.setIBase(originalIBase);
-  cu.setCPluginSet();  // Restore
 
   return 2;
 }
