@@ -179,15 +179,41 @@ void NeoPkCUEngine::evaluateMove() {
 
 void NeoPkCUEngine::evaluateMove_preturn() {
   const Action& cAction = getCAction();
+  const Actor& actor = getCActor();
+  auto base = getBase();
 
-  // dispatch to appropriate stage:
+  // actions that are allowed if the pokemon has fainted:
+  if (cAction.isSwitch()) {
+    gotoStackStage(StageType::PRESWITCH);
+    return;
+  }
+
+  // all subsequent actions require the actor to be alive:
+  if (!base.teammate(actor).isAlive()) {
+    gotoStackStage(StageType::POSTTURN);
+    return;
+  }
+
+  if (cAction.isWait()) {
+    base.flagsFor(actor).setWaited();
+    gotoStackStage(StageType::POSTTURN);
+    return;
+  }
+
+  // all subsequent actions require the target to be alive:
+  const Actor& target = getTarget();
+  if (!base.teammate(target).isAlive()) {
+    gotoStackStage(StageType::POSTTURN);
+    return;
+  }
+
+  // dispatch move/swap to appropriate stage:
   if (cAction.isMove()) {
     gotoStackStage(StageType::ONBEGINNINGOFTURN);
+    return;
   } else if (cAction.isSwitch()) {
     gotoStackStage(StageType::PRESWITCH);
-  } else if (cAction.isWait()) {
-    getBase().flagsFor(getCActor()).setWaited();
-    gotoStackStage(StageType::POSTTURN);
+    return;
   } else {
     throw std::runtime_error(fmt::format(
         "Unhandled move type {}!", fmt::streamed(cAction)));
