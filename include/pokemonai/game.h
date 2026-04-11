@@ -25,8 +25,7 @@ struct Turn {
     double simpleFitness = 0;
     double depth0Fitness = 0;
     double depthMaxFitness = 0;
-    size_t activePokemon = 0;
-    Action action;
+    ActionMap action;
   };
 
   EnvironmentPossibleData env;
@@ -231,7 +230,8 @@ protected:
 
   HeatResult digestMatch(std::vector<GameResult>& gLog) const;
 
-  std::string getPokemonIdentifier(const ConstTeamVolatile& cTeam, size_t iTeam) const;
+  std::string getPokemonIdentifier(
+      const ConstEnvironmentVolatile& env, const Actor& actor) const;
   std::string getGameIdentifier(size_t iMatch) const;
   std::string getTeamIdentifier(size_t iTeam) const;
 
@@ -239,7 +239,8 @@ protected:
 
   /* prints the current action */
   void printAction(
-      const ConstTeamVolatile& currentTeam, const Action& indexAction, unsigned int iTeam) const;
+      const ConstEnvironmentVolatile& env,
+      const ActionMap& actionMap) const;
 
   void printStateTransition(
       const EnvironmentVolatileData& oldState,

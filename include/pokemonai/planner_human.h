@@ -26,14 +26,9 @@ protected:
 
   bool shouldEval() const { return eval_ != nullptr; }
 
-  /* Returns a valid action as per the user's choice
-   * AT_MOVE_0-3: pokemon's move
-   * AT_MOVE_STRUGGLE  : struggle
-   * AT_MOVE_NOTHING  : do nothing
-   * AT_SWITCH_0-5: pokemon switches out for pokemon n-6
-   * AT_ITEM_USE: pokemon uses an item (not implemented)
+  /* Returns a valid ActionMap as per the user's choice
    */
-  Action actionSelect(const ConstEnvironmentVolatile& env) const;
+  ActionMap actionSelect(const ConstEnvironmentVolatile& env) const;
 
   /*
    * Prints all possible actions a given pokemon may take to stdout
@@ -45,8 +40,8 @@ protected:
   virtual size_t maxImplDepth() const override { return 0; }
   virtual bool isEvaluatorRequired() const override { return false; }
 
-  virtual PlyResult generateSolutionAtLeaf(
-      const ConstEnvironmentPossible& origin) const override;
+  virtual PlyResult generateSolutionAtDepth(
+      const ConstEnvironmentPossible& origin, size_t maxPly) const override;
 };
 
 #endif /* PLANNER_HUMAN_H */

@@ -154,21 +154,23 @@ PlyResult Planner::generateSolutionAtLeaf(const ConstEnvironmentPossible& origin
 
 PossibleEnvironments Planner::generateStates(
     const ConstEnvironmentPossible& origin,
-    const Action& agentAction,
-    const Action& otherAction) const {
+    const ActionMap& agentAction,
+    const ActionMap& otherAction) const {
   // produce the resulting state of iAction:
-  const Action& team_a_action = agentTeam_==TEAM_A?agentAction:otherAction;
-  const Action& team_b_action = agentTeam_==TEAM_B?agentAction:otherAction;
-  PossibleEnvironments rEnvP = cu_->updateState(origin, team_a_action, team_b_action);
+  const ActionMap& team_a_action =
+      agentTeam_ == TEAM_A ? agentAction : otherAction;
+  const ActionMap& team_b_action =
+      agentTeam_ == TEAM_B ? agentAction : otherAction;
+  PossibleEnvironments rEnvP =
+      cu_->updateState(origin.getEnv(), team_a_action, team_b_action);
 
   return rEnvP;
 }
 
 
-ActionVector Planner::getValidActions(
-    const ConstEnvironmentPossible& origin,
-    TEAM iTeam) const {
-  return cu_->getValidActions(origin, iTeam);
+std::vector<ActionMap> Planner::getValidActions(
+    const ConstEnvironmentPossible& origin, TEAM iTeam) const {
+  return cu_->getAllValidActions(origin.getEnv(), iTeam);
 }
 
 
@@ -212,7 +214,7 @@ EvalResult Planner::recurse_alphabeta(
 
 EvalResult Planner::recurse_beta(
     const ConstEnvironmentPossible& origin,
-    const Action& agentAction,
+    const ActionMap& agentAction,
     size_t searchDepth,
     const FitnessDepth& lowCutoff,
     const FitnessDepth& _highCutoff,
@@ -253,13 +255,13 @@ EvalResult Planner::recurse_beta(
 
 
 EvalResult Planner::recurse_gamma(
-      const ConstEnvironmentPossible& origin,
-      const Action& agentAction,
-      const Action& otherAction,
-      size_t searchDepth,
-      const FitnessDepth& lowCutoff,
-      const FitnessDepth& highCutoff,
-      size_t* nodesEvaluated) const {
+    const ConstEnvironmentPossible& origin,
+    const ActionMap& agentAction,
+    const ActionMap& otherAction,
+    size_t searchDepth,
+    const FitnessDepth& lowCutoff,
+    const FitnessDepth& highCutoff,
+    size_t* nodesEvaluated) const {
   assert(searchDepth <= MAXTRIES && searchDepth >= 0);
   size_t numNodes = 0;
   // average fitness of all states combined:

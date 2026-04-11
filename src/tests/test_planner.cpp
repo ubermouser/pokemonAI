@@ -73,11 +73,11 @@ TEST_F(PlannerTest, MaxPlannerChoosesGreedyOption) {
   auto agent_result = planners[TEAM_A].generateSolution(engine_->initialState());
   auto other_result = planners[TEAM_B].generateSolution(engine_->initialState());
 
-  EXPECT_EQ(agent_result.bestAgentAction(), Action::moveEnemy(1, 0));
+  EXPECT_EQ(agent_result.bestAgentAction().begin()->second, Action::moveEnemy(1, 0));
   EXPECT_LE(agent_result.best().numNodes, 7);
   EXPECT_EQ(agent_result.best().depth, 1);
 
-  EXPECT_EQ(other_result.bestAgentAction(), Action::moveEnemy(1, 0));
+  EXPECT_EQ(other_result.bestAgentAction().begin()->second, Action::moveEnemy(1, 0));
   EXPECT_LE(other_result.best().numNodes, 3);
   EXPECT_EQ(other_result.best().depth, 1);
   // agents do not take into account the enemy's move
@@ -103,7 +103,7 @@ TEST_F(PlannerTest, MaximinPlannerChooses1PlyOption) {
   auto agent_result = planners[TEAM_A].generateSolution(engine_->initialState());
   auto other_result = planners[TEAM_B].generateSolution(engine_->initialState());
 
-  EXPECT_EQ(agent_result.bestAgentAction(), Action::moveAdjacent(0));
+  EXPECT_EQ(agent_result.bestAgentAction().begin()->second, Action::moveAdjacent(0));
   EXPECT_LE(agent_result.best().numNodes, 21);
   EXPECT_EQ(agent_result.best().depth, 1);
   EXPECT_FLOAT_EQ(agent_result.bestFitness() + other_result.bestFitness(), 1.0);
@@ -130,7 +130,7 @@ TEST_F(PlannerTest, MaximinPlannerChooses2PlyOption) {
   auto agent_result = planners[TEAM_A].generateSolution(engine_->initialState());
   auto other_result = planners[TEAM_B].generateSolution(engine_->initialState());
 
-  EXPECT_EQ(agent_result.bestAgentAction(), Action::swap(1));
+  EXPECT_EQ(agent_result.bestAgentAction().begin()->second, Action::swap(1));
   EXPECT_LE(agent_result.best().numNodes, 243);
   EXPECT_EQ(agent_result.best().depth, 2);
   EXPECT_FLOAT_EQ(agent_result.bestFitness() + other_result.bestFitness(), 1.0);
@@ -187,7 +187,7 @@ protected:
 TEST_F(PlannerMaximinTest, planner_chooses_n_ply_option) {
   auto agent_result = planner_->generateSolution(engine_->initialState());
 
-  EXPECT_EQ(agent_result.bestAgentAction(), Action::moveEnemy(1, 0));
+  EXPECT_EQ(agent_result.bestAgentAction().begin()->second, Action::moveEnemy(1, 0));
   // TODO: not enough opportunities to cutoff moves in the contrived example
   EXPECT_EQ(agent_result.best().numNodes, 114);
   EXPECT_FLOAT_EQ(agent_result.bestFitness(), 1.0);
@@ -219,7 +219,7 @@ class PlannerMinimaxTest : public PlannerNPlyTest {
 TEST_F(PlannerMinimaxTest, planner_chooses_n_ply_option) {
   auto agent_result = planner_->generateSolution(engine_->initialState());
 
-  EXPECT_EQ(agent_result.bestAgentAction(), Action::moveEnemy(1, 0));
+  EXPECT_EQ(agent_result.bestAgentAction().begin()->second, Action::moveEnemy(1, 0));
   EXPECT_EQ(agent_result.best().numNodes, 114);
   EXPECT_FLOAT_EQ(agent_result.bestFitness(), 1.0);
 }
@@ -251,7 +251,7 @@ class PlannerNegamaxTest : public PlannerNPlyTest {
 TEST_F(PlannerNegamaxTest, planner_chooses_n_ply_option) {
   auto agent_result = planner_->generateSolution(engine_->initialState());
 
-  EXPECT_EQ(agent_result.bestAgentAction(), Action::moveEnemy(1, 0));
+  EXPECT_EQ(agent_result.bestAgentAction().begin()->second, Action::moveEnemy(1, 0));
   EXPECT_EQ(agent_result.best().numNodes, 57);
   EXPECT_FLOAT_EQ(agent_result.bestFitness(), 1.0);
 }
@@ -305,7 +305,7 @@ TEST_F(PlannerSoftmaxTest, TemperatureZeroFallbacksToMaximin) {
   auto maximin_result =
       maximin_planner_->generateSolution(engine_->initialState());
 
-  EXPECT_EQ(softmax_result.bestAgentAction(), maximin_result.bestAgentAction());
+  EXPECT_EQ(softmax_result.bestAgentAction().begin()->second, maximin_result.bestAgentAction().begin()->second);
 }
 
 
@@ -316,7 +316,7 @@ TEST_F(PlannerSoftmaxTest, HighTemperatureDiversifiesActions) {
   for (int i = 0; i < 50; ++i) {
     auto result =
         softmax_planner_high_temp_->generateSolution(engine_->initialState());
-    chosen_actions.insert(result.bestAgentAction());
+    chosen_actions.insert(result.bestAgentAction().begin()->second);
   }
 
   // We should see both moves being picked at least once

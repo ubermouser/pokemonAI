@@ -34,7 +34,7 @@ struct PlannerResult {
 
   bool hasSolution() const {
     if (atDepth.empty()) { return false; }
-    if (bestAgentAction().isUndefined()) { return false; }
+    if (bestAgentAction().empty()) { return false; }
     return true;
   }
 
@@ -42,11 +42,11 @@ struct PlannerResult {
     return atDepth.back();
   }
 
-  const Action& bestAgentAction() const {
+  const ActionMap& bestAgentAction() const {
     return best().agentAction;
   }
 
-  const Action& bestOtherAction() const {
+  const ActionMap& bestOtherAction() const {
     return best().otherAction;
   }
 
@@ -173,7 +173,7 @@ protected:
    *  */
   virtual EvalResult recurse_beta(
       const ConstEnvironmentPossible& origin,
-      const Action& agentAction,
+      const ActionMap& agentAction,
       size_t searchDepth,
       const FitnessDepth& lowCutoff = FitnessDepth::worst(),
       const FitnessDepth& highCutoff = FitnessDepth::best(),
@@ -190,8 +190,8 @@ protected:
    */
   virtual EvalResult recurse_gamma(
       const ConstEnvironmentPossible& origin,
-      const Action& agentAction,
-      const Action& otherAction,
+      const ActionMap& agentAction,
+      const ActionMap& otherAction,
       size_t searchDepth,
       const FitnessDepth& lowCutoff = FitnessDepth::worst(),
       const FitnessDepth& highCutoff = FitnessDepth::best(),
@@ -200,10 +200,10 @@ protected:
   /* generate all possible environments from a given origin, agent and other action pair. */
   virtual PossibleEnvironments generateStates(
       const ConstEnvironmentPossible& origin,
-      const Action& agentAction,
-      const Action& otherAction) const;
+      const ActionMap& agentAction,
+      const ActionMap& otherAction) const;
 
-  virtual ActionVector getValidActions(const ConstEnvironmentPossible& origin, TEAM iTeam) const;
+  virtual std::vector<ActionMap> getValidActions(const ConstEnvironmentPossible& origin, TEAM iTeam) const;
 
   /* test if another previously seen action always better than the current */
   virtual bool testGammaCutoff(

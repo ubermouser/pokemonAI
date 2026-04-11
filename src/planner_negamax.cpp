@@ -38,22 +38,31 @@ PlannerNegamax& PlannerNegamax::initialize() {
 }
 
 
-ActionVector PlannerNegamax::getValidActions(
+std::vector<ActionMap> PlannerNegamax::getValidActions(
     const ConstEnvironmentPossible& origin,
     TEAM iTeam) const {
   // if this state has been evaluated at a shallower depth, immediately consider the shallower
   //  depth's best move first. Odds are, it will still be quite good.
+  // TODO(@drendleman) Support multi-action search in heuristics.
   Action killerMove;
   if (transpositionTable_.exists(origin.getHash())) {
     auto probe = transpositionTable_.get(origin.getHash());
-    killerMove = (iTeam==agentTeam_)?probe.agentAction:probe.otherAction;
+    const ActionMap& map = (iTeam==agentTeam_)?probe.agentAction:probe.otherAction;
+    if (!map.empty()) { killerMove = map.begin()->second; }
   }
 
   // order the remaining moves as per the butterfly heuristic:
-  auto actions = cu_->getValidActions(origin, iTeam);
-  orderHeuristic_.order(origin, iTeam, actions, killerMove);
+  // TODO(@drendleman) Use a more robust multi-action ordering heuristic.
+  auto actions = cu_->getValidActions(origin.getEnv(), iTeam);
+  orderHeuristic_.order(origin.getEnv(), iTeam, actions, killerMove);
 
-  return actions;
+  std::vector<ActionMap> results;
+  results.reserve(actions.size());
+  for (const auto& action : actions) {
+    results.push_back(ActionMap{{{iTeam, origin.getEnv().getTeam(iTeam).getICPKV()}, action}});
+  }
+
+  return results;
 }
 
 
@@ -65,7 +74,10 @@ bool PlannerNegamax::testAgentSelection(
   bool cutoff =
       base_t::testAgentSelection(bestOfWorst, worst, highCutoff, origin);
   if (cutoff) { 
-    orderHeuristic_.increment(origin, agentTeam_, worst.agentAction);
+    // TODO(@drendleman) Support multi-action search in order heuristic.
+    if (!worst.agentAction.empty()) {
+      orderHeuristic_.increment(origin.getEnv(), agentTeam_, worst.agentAction.begin()->second);
+    }
   }
 
   return cutoff;
@@ -79,7 +91,10 @@ bool PlannerNegamax::testOtherSelection(
     const ConstEnvironmentPossible& origin) const {
   bool cutoff = base_t::testOtherSelection(worst, current, lowCutoff, origin);
   if (cutoff) { 
-    orderHeuristic_.increment(origin, otherTeam_, current.otherAction);
+    // TODO(@drendleman) Support multi-action search in order heuristic.
+    if (!current.otherAction.empty()) {
+      orderHeuristic_.increment(origin.getEnv(), otherTeam_, current.otherAction.begin()->second);
+    }
   }
 
   return cutoff;

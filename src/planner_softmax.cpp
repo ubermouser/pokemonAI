@@ -49,16 +49,17 @@ PlyResult PlannerSoftmax::generateSolutionAtDepth(
   size_t totalNodes = 0;
 
   // For each agent action, find the worst-case (negamax) outcome
-  for (const auto& agentAction : agentActions) {
+  for (const auto& action : cu_->getAllValidActions(origin.getEnv(), agentTeam_)) {
     size_t nodesEvaluated = 0;
     EvalResult worst = recurse_beta(
         origin,
-        agentAction,
+        action,
         maxPly,
         FitnessDepth::worst(),
         FitnessDepth::best(),
         &nodesEvaluated);
     totalNodes += nodesEvaluated;
+    worst.agentAction = action;
     actionValues.push_back(worst);
   }
 

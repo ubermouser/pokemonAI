@@ -29,10 +29,24 @@ PlyResult PlannerMax::generateSolutionAtDepth(
   // a count of the number of nodes evaluated:
   PlyResult result;
 
+  ActionMap otherAction;
+  for (const auto& actor :
+       origin.getEnv().getOtherTeam(agentTeam_).yieldActiveActors()) {
+    otherAction[actor] = Action::wait();
+  }
+
   // determine the best action based upon the evaluator's prediction:
-  for (const auto& action: cu_->getValidActions(origin, agentTeam_)) {
+  // TODO(@drendleman) Support multi-action search in PlannerMax.
+  for (const auto& action :
+       cu_->getAllValidActions(origin.getEnv(), agentTeam_)) {
     EvalResult child = recurse_gamma(
-        origin, action, Action::wait(), maxPly - 1, result.fitness, FitnessDepth::best(), &result.numNodes);
+        origin,
+        action,
+        otherAction,
+        maxPly - 1,
+        result.fitness,
+        FitnessDepth::best(),
+        &result.numNodes);
 
     // is the returned fitness better than the current best fitness:
     if (child > result) {

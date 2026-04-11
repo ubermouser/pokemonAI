@@ -65,7 +65,7 @@ curse	Ghost	10	100	---	0	UNKNOWN	0	0	0	0	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0
 cut	Normal	30	95	50	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The foe is cut with a scythe or a claw. It can also be used to cut down thin trees.
 dark pulse	Dark	15	100	80	2	ANY_ACTIVE	0	0	0	0	0	0	0	0	0	0	20	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	---	The user releases a horrible aura imbued with dark thoughts. It may also make the target flinch.
 defend order	Bug	10	---	---	0	SELF	0	0	0	1	1	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user calls out its underlings to make a living shield, raising its Defense and Sp. Def stats.
-defense curl	Normal	40	---	---	0	SELF	0	0	0	1	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	PowerUp(Ice Ball|Rollout,200%,Infinite)	The user curls up to conceal weak spots and raise its Defense stat.
+defense curl	Normal	40	---	---	0	SELF	0	0	0	1	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user curls up to conceal weak spots and raise its Defense stat.
 destiny bond	Ghost	5	100	---	0	SELF	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	FailIf(!self.HP=0);ModHP(target,-1*target.HP)	When this move is used, if the user faints, the foe that landed the knockout hit also faints.
 detect	Fighting	5	100	---	0	SELF	3	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	!DETECT;dr	It enables the user to evade all attacks. Its chance of failing rises if it is used in succession.
 dig	Ground	10	100	80	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	delay(dig,1)	The user burrows, then attacks on the second turn. It can also be used to exit dungeons.

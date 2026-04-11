@@ -30,11 +30,66 @@ NeoPkCU* NeoPkCU::clone() const {
 }
 
 
+std::istream& operator>>(std::istream& in, NeoPkCU::StateSelectMethod& method) {
+  std::string token;
+  in >> token;
+  if (token == "RANDOM") {
+    method = NeoPkCU::StateSelectMethod::RANDOM;
+  } else if (token == "MOST_LIKELY") {
+    method = NeoPkCU::StateSelectMethod::MOST_LIKELY;
+  } else if (token == "ALL") {
+    method = NeoPkCU::StateSelectMethod::ALL;
+  } else {
+    throw po::validation_error(
+        po::validation_error::invalid_option_value,
+        "state-select-method",
+        token);
+  }
+  return in;
+}
+
+
+std::ostream& operator<<(
+    std::ostream& out, const NeoPkCU::StateSelectMethod& method) {
+  switch (method) {
+    case NeoPkCU::StateSelectMethod::RANDOM: out << "RANDOM"; break;
+    case NeoPkCU::StateSelectMethod::MOST_LIKELY: out << "MOST_LIKELY"; break;
+    case NeoPkCU::StateSelectMethod::ALL: out << "ALL"; break;
+  }
+  return out;
+}
+
+
 boost::program_options::options_description NeoPkCU::Config::options(
     const std::string& category, std::string prefix) {
-    po::options_description desc{category};
-    // Add stub options if needed
-    return desc;
+  Config defaults{};
+  po::options_description desc{category};
+
+  if (prefix.size() > 0) { prefix.append("-"); }
+  // clang-format off
+  desc.add_options()
+      ((prefix + "engine-verbosity").c_str(),
+      po::value<int>(&verbosity)->default_value(defaults.verbosity),
+      "verbosity level, controls status printing.")
+      ((prefix + "engine-accuracy").c_str(),
+      po::value<size_t>(&numRandomEnvironments)->default_value(defaults.numRandomEnvironments),
+      "number of random environments to create per hit/crit 1-16.")
+      ((prefix + "num-active-pokemon").c_str(),
+      po::value<size_t>(&numActivePokemon)->default_value(defaults.numActivePokemon),
+      "number of active Pokemon on each team.")
+      ((prefix + "state-select-method").c_str(),
+      po::value<StateSelectMethod>(&stateSelectMethod)->default_value(defaults.stateSelectMethod),
+      "method used to select resulting environments: RANDOM, MOST_LIKELY, ALL.")
+      ((prefix + "allow-invalid-moves").c_str(),
+      po::value<bool>(&allowInvalidMoves)->default_value(defaults.allowInvalidMoves),
+      "if true, the engine will not throw an exception for invalid moves.")
+      ((prefix + "max-num-states").c_str(),
+      po::value<size_t>(&maxNumStates)->default_value(defaults.maxNumStates),
+      "maximum number of states the engine should return when StateSelectMethod is RANDOM or MOST_LIKELY.");
+
+  // clang-format on
+
+  return desc;
 }
 
 
@@ -73,6 +128,12 @@ NeoPkCU& NeoPkCU::setStateSelectMethod(StateSelectMethod method) {
 
 NeoPkCU& NeoPkCU::setAllowInvalidMoves(bool allow) {
   cfg_.allowInvalidMoves = allow;
+  return *this;
+}
+
+
+NeoPkCU& NeoPkCU::setMaxNumStates(size_t maxNumStates) {
+  cfg_.maxNumStates = maxNumStates;
   return *this;
 }
 

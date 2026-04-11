@@ -93,7 +93,7 @@ TEST_F(PlannerHumanTest, HumanPlannerActionReader) {
     cfg.maxDepth = 0;
     PlannerHuman planner(cfg, input);
     planner.setTeam(TEAM_A).setEngine(engine_).setEnvironment(environment_).initialize();
-    result = planner.generateSolution(engine_->initialState()).bestAgentAction();
+    result = planner.generateSolution(engine_->initialState()).bestAgentAction().begin()->second;
     EXPECT_EQ(result, Action::move(1));
   }
   {

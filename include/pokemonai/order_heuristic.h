@@ -16,6 +16,7 @@
 
 class OrderHeuristic {
 public:
+ // TODO(@drendleman) Supporting multibattles here requires hashing ActionMap.
  using ActionCounts = std::unordered_map<Action, uint64_t>;
 
  void increment(

@@ -257,8 +257,7 @@ GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_
     // print out the agent's moves:
     if (cfg_.verbosity >= 3) {
       for (size_t iTeam = 0; iTeam != 2; ++iTeam) {
-        printAction(
-            envP.getTeam(iTeam), actions[iTeam].bestAgentAction(), iTeam);
+        printAction(envP.getEnv(), actions[iTeam].bestAgentAction());
       }
     }
 
@@ -316,9 +315,6 @@ GameResult Game::rollout_game(const EnvironmentVolatileData& initialState, size_
 Turn Game::digestInitialState(const ConstEnvironmentPossible& envP) const {
   Turn initialTurn{};
   initialTurn.env = envP.data();
-  for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
-    initialTurn.teams[iTeam].activePokemon = envP.getTeam(iTeam).getICPKV();
-  }
   return initialTurn;
 }
 
@@ -351,11 +347,10 @@ Turn Game::digestTurn(
     }
     // sum of all nodes evaluated:
     turn.numNodesEvaluated = std::accumulate(
-        std::begin(action.atDepth), std::end(action.atDepth), 0U, [](auto a, auto& b) {
-      return a + b.numNodes;
-    });
-    // active pokemon at the END of the turn:
-    turn.activePokemon = envP.getTeam(iTeam).getICPKV();
+        std::begin(action.atDepth),
+        std::end(action.atDepth),
+        0U,
+        [](auto a, auto& b) { return a + b.numNodes; });
     // action taken by each team to transition the previous turn to the current turn:
     turn.action = actions[iTeam].bestAgentAction();
   } // endOf foreach team
@@ -386,15 +381,17 @@ GameResult Game::digestGame(
     // for each turn:
     for (const auto& turn : cLog) {
       const auto& tTurn = turn.teams[iTeam];
-      auto& pokemon = team.pokemon[tTurn.activePokemon];
       // increment turns evaluated and time spent:
       team.numNodesEvaluated += tTurn.numNodesEvaluated;
       team.timeSpent += tTurn.timeSpent;
-      // for every turn a pokemon is in play, this increases a counter for that pokemon by 1:
-      pokemon.participation += 1;
-      // add a move increment for the current pokemon's move:
-      if (tTurn.action.isMove()) {
-        pokemon.moveUse[tTurn.action.iMove()] += 1;
+
+      for (const auto& [actor, action] : tTurn.action) {
+        auto& pokemon = team.pokemon[actor.iTeammate()];
+        // for every turn a pokemon is in play, this increases a counter for
+        // that pokemon by 1:
+        pokemon.participation += 1;
+        // add a move increment for the current pokemon's move:
+        if (action.isMove()) { pokemon.moveUse[action.iMove()] += 1; }
       }
     }
   }
@@ -410,12 +407,15 @@ GameResult Game::digestGame(
       const auto& pTTurn = cLog[iPly - 1].teams[iTeam];
       // the current turn. Used for updating delta
       const auto& cTTurn = cLog[iPly].teams[iTeam];
-      auto& pokemon = team.pokemon[pTTurn.activePokemon];
-
       // increase contribution fractionals:
-      pokemon.simpleContribution += cTTurn.simpleFitness - pTTurn.simpleFitness;
-      pokemon.d0Contribution += cTTurn.depth0Fitness - pTTurn.depth0Fitness;
-      pokemon.dMaxContribution += cTTurn.depthMaxFitness - pTTurn.depthMaxFitness;
+      for (const auto& [actor, action] : pTTurn.action) {
+        auto& pokemon = team.pokemon[actor.iTeammate()];
+        pokemon.simpleContribution +=
+            cTTurn.simpleFitness - pTTurn.simpleFitness;
+        pokemon.d0Contribution += cTTurn.depth0Fitness - pTTurn.depth0Fitness;
+        pokemon.dMaxContribution +=
+            cTTurn.depthMaxFitness - pTTurn.depthMaxFitness;
+      }
     }
   }
 
@@ -470,35 +470,58 @@ void Game::digestGameEncounters(
     GameResult& cResult,
     const Turn& previousTurn,
     const Turn& currentTurn) const {
-  size_t pkA_start = previousTurn.teams[TEAM_A].activePokemon;
-  size_t pkB_start = previousTurn.teams[TEAM_B].activePokemon;
-  size_t pkA_end = currentTurn.teams[TEAM_A].activePokemon;
-  size_t pkB_end = currentTurn.teams[TEAM_B].activePokemon;
-
-  // both were active at start of turn:
-  cResult.teams[TEAM_A].pokemon[pkA_start].encounters[pkB_start].numTotal++;
-  cResult.teams[TEAM_B].pokemon[pkB_start].encounters[pkA_start].numTotal++;
+  auto updateEncounters =
+      [&](const ActionMap& actions, const ActionMap& oppActions, size_t iTeam) {
+        for (const auto& [actor, action] : actions) {
+          for (const auto& [oppActor, oppAction] : oppActions) {
+            cResult.teams[iTeam]
+                .pokemon[actor.iTeammate()]
+                .encounters[oppActor.iTeammate()]
+                .numTotal++;
+          }
+        }
+      };
+  updateEncounters(
+      previousTurn.teams[TEAM_A].action,
+      previousTurn.teams[TEAM_B].action,
+      TEAM_A);
+  updateEncounters(
+      previousTurn.teams[TEAM_B].action,
+      previousTurn.teams[TEAM_A].action,
+      TEAM_B);
 
   ConstEnvironmentPossible env_prev{*nv_, previousTurn.env};
   ConstEnvironmentPossible env_curr{*nv_, currentTurn.env};
 
-  auto updateStats = [&](size_t iTeam,
-                         size_t pk_start,
-                         size_t pk_end,
-                         size_t pk_opp) {
-    bool wasAlive = env_prev.getTeam(iTeam).teammate(pk_start).isAlive();
-    bool isAlive = env_curr.getTeam(iTeam).teammate(pk_start).isAlive();
+  auto updateStats = [&](size_t iTeam) {
+    for (const auto& [actor, action] : currentTurn.teams[iTeam].action) {
+      size_t pk_start = actor.iTeammate();
+      bool wasAlive = env_prev.getTeam(iTeam).teammate(pk_start).isAlive();
+      bool isAlive = env_curr.getTeam(iTeam).teammate(pk_start).isAlive();
 
-    if (wasAlive && !isAlive) {
-      cResult.teams[1 - iTeam].pokemon[pk_opp].encounters[pk_start].numKOs++;
-    } else if (
-        pk_start != pk_end && currentTurn.teams[iTeam].action.isSwitch()) {
-      cResult.teams[iTeam].pokemon[pk_start].encounters[pk_opp].numSwitches++;
+      if (wasAlive && !isAlive) {
+        // Find which opponent KO'd this pokemon? For now just say all active
+        // opponents.
+        for (const auto& [oppActor, oppAction] :
+             currentTurn.teams[1 - iTeam].action) {
+          cResult.teams[1 - iTeam]
+              .pokemon[oppActor.iTeammate()]
+              .encounters[pk_start]
+              .numKOs++;
+        }
+      } else if (action.isSwitch()) {
+        // This is a bit simplified, but if ANY action for this actor was a
+        // switch, count it.
+        cResult.teams[iTeam]
+            .pokemon[pk_start]
+            .encounters[0]
+            .numSwitches++;  // simplified opp index
+      }
     }
   };
 
-  updateStats(TEAM_A, pkA_start, pkA_end, pkB_start);
-  updateStats(TEAM_B, pkB_start, pkB_end, pkA_start);
+  updateStats(TEAM_A);
+  updateStats(TEAM_B);
 }
 
 
@@ -633,49 +656,53 @@ std::string Game::getTeamIdentifier(size_t iTeam) const {
 }
 
 
-std::string Game::getPokemonIdentifier(const ConstTeamVolatile& cTeam, size_t iTeam) const {
+std::string Game::getPokemonIdentifier(
+    const ConstEnvironmentVolatile& env, const Actor& actor) const {
   return fmt::format(
-      "T{}: {} - {}: {}",
-      (iTeam == TEAM_A ? "A" : "B"),
-      cTeam.nv().getName(),
-      cTeam.getICPKV(),
-      cTeam.getPKV().nv().getName());
+      "{}: {} - {}",
+      fmt::streamed(actor),
+      env.getTeam(actor.iTeam()).nv().getName(),
+      env.teammate(actor).nv().getName());
 }
 
 
 void Game::printAction(
-    const ConstTeamVolatile& cTeam, const Action& action, unsigned int iTeam) const {
-  std::string result;
-  if (action.isMove()) {
-    result = fmt::format(
-        "{} used {}-{}!\n",
-        getPokemonIdentifier(cTeam, iTeam),
-        action.iMove() + 1,
-        fmt::streamed(cTeam.getPKV().getMV(action)));
-  } else if (action.isSwitch()) {
-    result = fmt::format(
-        "{} is switching out with {}: {}!\n",
-        getPokemonIdentifier(cTeam, iTeam),
-        action.friendlyTarget() + 1,
-        cTeam.teammate(action.friendlyTarget() - Action::FRIENDLY_0)
-            .nv()
-            .getName());
-  } else if (action.isWait()) {
-    result = fmt::format(
-        "{} waited for a turn!\n", getPokemonIdentifier(cTeam, iTeam));
-  } else {
-    result = fmt::format(
-        "{} chose unknown action {}!\n",
-        getPokemonIdentifier(cTeam, iTeam),
-        fmt::streamed(action));
+    const ConstEnvironmentVolatile& env,
+    const ActionMap& actionMap) const {
+  for (const auto& [actor, action] : actionMap) {
+    std::string result;
+    if (action.isMove()) {
+      result = fmt::format(
+          "{} used {}-{}!\n",
+          getPokemonIdentifier(env, actor),
+          action.iMove() + 1,
+          fmt::streamed(env.teammate(actor).getMV(action)));
+    } else if (action.isSwitch()) {
+      result = fmt::format(
+          "{} is switching out with {}: {}!\n",
+          getPokemonIdentifier(env, actor),
+          action.friendlyTarget() + 1,
+          env.teammate(actor.iTeam(), action.iFriendly())
+              .nv()
+              .getName());
+    } else if (action.isWait()) {
+      result = fmt::format(
+          "{} waited for a turn!\n",
+          getPokemonIdentifier(env, actor));
+    } else {
+      result = fmt::format(
+          "{} chose unknown action {}!\n",
+          getPokemonIdentifier(env, actor),
+          fmt::streamed(action));
+    }
+    // if the current pokemon is dead and switching out, print their team:
+    if (!env.teammate(actor).isAlive()) {
+      std::ostringstream team_out;
+      env.getTeam(actor.iTeam()).printTeam(team_out, "    ");
+      result += team_out.str();
+    }
+    fmt::print("{}", result);
   }
-  // if the current pokemon is dead and switching out, print their team:
-  if (!cTeam.getPKV().isAlive()) {
-    std::ostringstream team_out;
-    cTeam.printTeam(team_out, "    ");
-    result += team_out.str();
-  }
-  fmt::print("{}", result);
 }
 
 

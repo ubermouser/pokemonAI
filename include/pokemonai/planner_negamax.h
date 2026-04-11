@@ -36,7 +36,7 @@ class PlannerNegamax : public PlannerMinimax {
 
   virtual PlannerNegamax* clone() const override { return new PlannerNegamax(*this); }
 protected:
-  virtual ActionVector getValidActions(
+  virtual std::vector<ActionMap> getValidActions(
       const ConstEnvironmentPossible& origin, TEAM iTeam) const override;
 
   virtual EvalResult recurse_alphabeta(

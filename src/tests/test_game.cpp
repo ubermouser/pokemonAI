@@ -3,6 +3,7 @@
 
 #include "gen4/engine_test.hpp"
 #include "pokemonai/game.h"
+#include "pokemonai/pkai.h"
 #include "pokemonai/planner_max.h"
 #include "pokemonai/planner_random.h"
 
@@ -11,21 +12,48 @@ class GameTest : public Gen4EngineTest {
   void SetUp() override {
     Gen4EngineTest::SetUp();
 
+    // clang-format off
+    auto team = TeamNonVolatile()
+        .addPokemon(PokemonNonVolatile()
+          .setBase(pokedex_->pokemon("squirtle"))
+          .addMove(pokedex_->move("tackle"))
+          .addMove(pokedex_->move("tail whip"))
+          .setLevel(100))
+        .addPokemon(PokemonNonVolatile()
+          .setBase(pokedex_->pokemon("bulbasaur"))
+          .addMove(pokedex_->move("tackle"))
+          .addMove(pokedex_->move("growl"))
+          .setLevel(100))
+        .addPokemon(PokemonNonVolatile()
+          .setBase(pokedex_->pokemon("charmander"))
+          .addMove(pokedex_->move("cut"))
+          .addMove(pokedex_->move("defense curl"))
+          .setLevel(100))
+        .addPokemon(PokemonNonVolatile()
+          .setBase(pokedex_->pokemon("pikachu"))
+          .addMove(pokedex_->move("strength"))
+          .addMove(pokedex_->move("flash"))
+          .setLevel(100));
+    // clang-format on
+    environment_nv = EnvironmentNonvolatile(team, team, true);
+
+    spdlog::set_level(spdlog::level::debug);
+  }
+
+  EnvironmentNonvolatile oneSidedTeam() {
+    // clang-format off
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->pokemon("charmander"))
           .addMove(pokedex_->move("cut"))
-          .addMove(pokedex_->move("swords dance"))
           .setLevel(100));
     auto team_b = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->pokemon("bulbasaur"))
-          .addMove(pokedex_->move("cut"))
-          .addMove(pokedex_->move("charm"))
+          .addMove(pokedex_->move("growl"))
           .setLevel(100));
-    environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
-
-    spdlog::set_level(spdlog::level::debug);
+    // clang-format on
+    return EnvironmentNonvolatile(team_a, team_b, true);
   }
 
   void validateContribution(const HeatResult& result) {
@@ -93,7 +121,7 @@ TEST_F(GameTest, UninitializedCustom) {
 
 TEST_F(GameTest, KODetection) {
   auto game =
-      Game().setMaxMatches(1).setVerbosity(0).setEnvironment(environment_nv);
+      Game().setMaxMatches(1).setVerbosity(0).setEnvironment(oneSidedTeam());
   auto result = game.run();
 
   // Charmander (TEAM_A, Pokemon 0) should have exactly 1 KO against Bulbasaur
@@ -127,4 +155,32 @@ TEST_F(GameTest, SetTeamInitialization) {
 
   // This should not crash
   EXPECT_NO_THROW({ game.run(); });
+}
+
+
+TEST_F(GameTest, Supports2v2) {
+  engine_->setNumActivePokemon(2);
+  auto game = Game()
+                  .setMaxMatches(1)
+                  .setEnvironment(environment_nv)
+                  .setEngine(engine_)
+                  .setVerbosity(3);
+  auto result = game.run();
+
+  EXPECT_EQ(result.matchesPlayed, 1);
+  validateContribution(result);
+}
+
+
+TEST_F(GameTest, DISABLED_Supports3v3) {
+  engine_->setNumActivePokemon(3);
+  auto game = Game()
+                  .setMaxMatches(1)
+                  .setEnvironment(environment_nv)
+                  .setEngine(engine_)
+                  .setVerbosity(3);
+  auto result = game.run();
+
+  EXPECT_EQ(result.matchesPlayed, 1);
+  validateContribution(result);
 }

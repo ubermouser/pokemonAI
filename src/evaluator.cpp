@@ -74,7 +74,7 @@ EvalResult Evaluator::evaluate(const ConstEnvironmentVolatile& env, size_t iTeam
       gameState==iTeam ? Fitness{1.0} : Fitness{0.0};
 
   // evaluation occurs at terminal depth:
-  return EvalResult{fitness, Action{}, Action{}, 0};
+  return EvalResult{fitness, ActionMap{}, ActionMap{}, 0};
 }
 
 

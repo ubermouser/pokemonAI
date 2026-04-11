@@ -50,20 +50,20 @@ struct FitnessDepth {
 
 
 struct EvalResult : public FitnessDepth {
-  Action agentAction;
-  Action otherAction;
+  ActionMap agentAction;
+  ActionMap otherAction;
 
   EvalResult(
       const FitnessDepth& fitnessDepth_,
-      const Action& agent = Action{},
-      const Action& other = Action{}) :
+      const ActionMap& agent = ActionMap{},
+      const ActionMap& other = ActionMap{}) :
       FitnessDepth(fitnessDepth_),
       agentAction(agent),
       otherAction(other) { }
   EvalResult(
       const Fitness& fitness_ = Fitness::worst(),
-      const Action& agent = Action{},
-      const Action& other = Action{},
+      const ActionMap& agent = ActionMap{},
+      const ActionMap& other = ActionMap{},
       const size_t depth_ = 0) :
       FitnessDepth(fitness_, depth_),
       agentAction(agent),

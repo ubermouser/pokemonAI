@@ -34,20 +34,16 @@ void PlannerRandom::resetName() {
 PlyResult PlannerRandom::generateSolutionAtLeaf(
     const ConstEnvironmentPossible& origin) const {
   PlyResult result;
-  // determine if we want to perform moves only:
-  bool doMove = (rand() % RAND_MAX) <= (cfg_.moveChance*RAND_MAX);
-  // determine the set of all valid actions:
-  auto validMoves = cu_->getValidMoveActions(origin.getEnv(), agentTeam_);
-  auto validActions = cu_->getValidActions(origin.getEnv(), agentTeam_);
-  auto& valid = (doMove && !validMoves.empty())?validMoves:validActions;
+  auto validActions = cu_->getAllValidActions(origin.getEnv(), agentTeam_);
 
+  // TODO: choose move actions at a higher probability than switch actions
   // are there ANY valid actions?
-  if (!valid.empty()) {
+  if (!validActions.empty()) {
     // choose a completely random action to return:
-    size_t iAction = rand() % valid.size();
-    result.agentAction = valid[iAction];
+    size_t iAction = rand() % validActions.size();
+    result.agentAction = validActions[iAction];
   }
 
-  assert(!result.agentAction.isUndefined());
+  assert(!result.agentAction.empty());
   return result;
 };
