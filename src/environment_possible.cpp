@@ -65,8 +65,7 @@ void ENV_POSSIBLE_IMPL::printEnvironment(std::ostream& os) const {
   os << fmt::format("p={:.4f}", getProbability().to_double());
   // print status tokens:
   for (const auto& actor : this->getEnv().yieldActiveActors()) {
-    std::string actorLabel =
-        fmt::format("{}{}", (actor.iTeam() == TEAM_A ? "A" : "B"), actor.iTeammate());
+    std::string actorLabel = fmt::format("{}", fmt::streamed(actor));
     auto proxy = this->flagsFor(actor);
     if (proxy.isFreeMove()) { os << fmt::format(" {}-Free", actorLabel); }
     if (proxy.isSwitched()) {

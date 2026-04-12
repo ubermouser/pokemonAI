@@ -681,10 +681,14 @@ void Game::printAction(
       result = fmt::format(
           "{} is switching out with {}: {}!\n",
           getPokemonIdentifier(env, actor),
-          action.friendlyTarget() + 1,
-          env.teammate(actor.iTeam(), action.iFriendly())
-              .nv()
-              .getName());
+          fmt::streamed(action),
+          env.teammate(actor).nv().getName());
+    } else if (action.isActivate()) {
+      result = fmt::format(
+          "{} brought out {}: {}!\n",
+          getTeamIdentifier(actor.iTeam()),
+          fmt::streamed(actor),
+          env.teammate(actor).nv().getName());
     } else if (action.isWait()) {
       result = fmt::format(
           "{} waited for a turn!\n",

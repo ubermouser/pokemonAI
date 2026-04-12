@@ -1,4 +1,4 @@
-PKAIM	388							Buff, self										Debuff, Enemy									Ailment					Ailment, Volatile
+PKAIM	389							Buff, self										Debuff, Enemy									Ailment					Ailment, Volatile								
 Name	Type	PP	P.Accuracy	Power	Damage	ANY_ADJACENT	Priority	Atk	SpA	Def	SpD	Spe	Hitpoints	Evasion	Accuracy	Critical	S.Accuracy	Atk	SpA	Def	SpD	Spe	Hitpoints	Evasion	Accuracy	Critical	Burn	Freeze	Paralysis	Poison	Sleep	Confusion	Flinch	Identify	Infatuation	Lock On	Nightmare	P. Trap	Other	Description
 absorb	Grass	25	100	20	2	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	ModHP(self,.50*dmgInflicted)	A nutrient-draining attack. The user's HP is restored by half the damage taken by the target.
 acid armor	Poison	40	---	---	0	SELF	0	0	0	2	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user alters its cellular structure to liquefy itself, sharply raising its Defense stat.
@@ -240,6 +240,7 @@ poison fang	Poison	15	100	50	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0
 poison gas	Poison	40	100	---	0	ALL_ADJACENT_ENEMY	0	0	0	0	0	0	0	0	0	0	55	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	---	A cloud of poison gas is sprayed in the foe's face. It may poison the target.
 poison jab	Poison	20	100	80	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	---	The foe is stabbed with a tentacle or arm steeped in poison. It may also poison the foe.
 poison sting	Poison	35	100	15	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	30	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	---	The foe is stabbed with a poisonous barb of some sort. It may also poison the target.
+pound	Normal	35	100	40	1	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The foe is physically pounded with a long tail or a foreleg, etc.
 poisonpowder	Poison	35	100	---	0	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	75	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	---	A cloud of poisonous dust is scattered on the foe. It may poison the target.
 powder snow	Ice	25	100	40	2	ALL_ADJACENT_ENEMY	0	0	0	0	0	0	0	0	0	0	10	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	---	The user attacks with a chilling gust of powdery snow. It may also freeze the target.
 power gem	Rock	20	100	70	2	ANY_ADJACENT	0	0	0	0	0	0	0	0	0	0	---	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	---	The user attacks with a ray of light that sparkles as if it were made of gemstones.
