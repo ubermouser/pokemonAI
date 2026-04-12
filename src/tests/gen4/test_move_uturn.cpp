@@ -20,19 +20,19 @@ class UTurnTest : public Gen4EngineTest {
     engine_->setEnvironment(environment_nv);
   }
 
-  PossibleEnvironments setupSwap() {
+  PossibleEnvironments setup_TA0_vs_TB1() {
     return engine_->updateState(
         engine_->initialState(), Action::wait(), Action::swap(1));
   }
 
   PossibleEnvironments setupSR() {
-    auto swap = setupSwap();
+    auto swap = setup_TA0_vs_TB1();
     return engine_->updateState(
         swap.where1(), Action::wait(), Action::move(0));
   }
 
-  PossibleEnvironments setupUTurnToAlly() {
-    auto swap = setupSwap();
+  PossibleEnvironments setup_TA1_vs_TB1_UTurn() {
+    auto swap = setup_TA0_vs_TB1();
     return engine_->updateState(
         swap.where1(), Action::moveAlly(0, 1), Action::wait());
   }
@@ -44,7 +44,7 @@ class UTurnTest : public Gen4EngineTest {
   }
 
   PossibleEnvironments setupSwapToScizor() {
-    auto uturn = setupUTurnToAlly();
+    auto uturn = setup_TA1_vs_TB1_UTurn();
     return engine_->updateState(
         uturn.where1(), Action::wait(), Action::swap(0));
   }
@@ -80,7 +80,7 @@ TEST_F(UTurnTest, can_still_be_used_without_swap_if_no_allies_exist) {
 
 
 TEST_F(UTurnTest, damages_enemy_and_swaps_to_ally) {
-  auto turn = setupUTurnToAlly();
+  auto turn = setup_TA1_vs_TB1_UTurn();
   // pp decremented
   EXPECT_EQ(turn.where1Hit(0).teammate(0, 0).getMV(0).getPP(), 31);
   // item effect (life orb) applies
@@ -154,8 +154,8 @@ TEST_F(UTurnTest, NoErroneousStruggleWithChoiceItem) {
 
 TEST_F(UTurnTest, UTurnReported) {
   // Turn 1: Scizor uses U-turn on enemy Torterra and swaps to friendly Torterra
-  auto swap = setupSwap();
-  auto uturn = setupUTurnToAlly();
+  auto swap = setup_TA0_vs_TB1();
+  auto uturn = setup_TA1_vs_TB1_UTurn();
   auto output = StateTransitionPrinter::printString(
       swap.where1().getEnv(), uturn.where1Hit(0), false);
 

@@ -8,7 +8,7 @@ class EvaluatorTest : public Gen4EngineTest {
  protected:
   void SetUp() override {
     Gen4EngineTest::SetUp();
-    engine_->setAllowInvalidMoves(false);
+    engine_->setAllowInvalidMoves(NeoPkCU::ActionValidationMethod::FULL);
 
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()

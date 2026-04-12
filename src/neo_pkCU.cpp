@@ -60,6 +60,37 @@ std::ostream& operator<<(
 }
 
 
+std::istream& operator>>(
+    std::istream& in, NeoPkCU::ActionValidationMethod& method) {
+  std::string token;
+  in >> token;
+  if (token == "FULL") {
+    method = NeoPkCU::ActionValidationMethod::FULL;
+  } else if (token == "WAIT_ONLY") {
+    method = NeoPkCU::ActionValidationMethod::WAIT_ONLY;
+  } else if (token == "NONE") {
+    method = NeoPkCU::ActionValidationMethod::NONE;
+  } else {
+    throw po::validation_error(
+        po::validation_error::invalid_option_value,
+        "allow-invalid-moves",
+        token);
+  }
+  return in;
+}
+
+
+std::ostream& operator<<(
+    std::ostream& out, const NeoPkCU::ActionValidationMethod& method) {
+  switch (method) {
+    case NeoPkCU::ActionValidationMethod::FULL: out << "FULL"; break;
+    case NeoPkCU::ActionValidationMethod::WAIT_ONLY: out << "WAIT_ONLY"; break;
+    case NeoPkCU::ActionValidationMethod::NONE: out << "NONE"; break;
+  }
+  return out;
+}
+
+
 boost::program_options::options_description NeoPkCU::Config::options(
     const std::string& category, std::string prefix) {
   Config defaults{};
@@ -81,8 +112,8 @@ boost::program_options::options_description NeoPkCU::Config::options(
       po::value<StateSelectMethod>(&stateSelectMethod)->default_value(defaults.stateSelectMethod),
       "method used to select resulting environments: RANDOM, MOST_LIKELY, ALL.")
       ((prefix + "allow-invalid-moves").c_str(),
-      po::value<bool>(&allowInvalidMoves)->default_value(defaults.allowInvalidMoves),
-      "if true, the engine will not throw an exception for invalid moves.")
+      po::value<ActionValidationMethod>(&allowInvalidMoves)->default_value(defaults.allowInvalidMoves),
+      "method used to validate actions: FULL, WAIT_ONLY, NONE.")
       ((prefix + "max-num-states").c_str(),
       po::value<size_t>(&maxNumStates)->default_value(defaults.maxNumStates),
       "maximum number of states the engine should return when StateSelectMethod is RANDOM or MOST_LIKELY.");
@@ -126,7 +157,7 @@ NeoPkCU& NeoPkCU::setStateSelectMethod(StateSelectMethod method) {
 }
 
 
-NeoPkCU& NeoPkCU::setAllowInvalidMoves(bool allow) {
+NeoPkCU& NeoPkCU::setAllowInvalidMoves(ActionValidationMethod allow) {
   cfg_.allowInvalidMoves = allow;
   return *this;
 }
@@ -162,17 +193,52 @@ void NeoPkCU::guardCorrectActionCount(
 
 void NeoPkCU::guardInvalidActions(
     const ConstEnvironmentVolatile& cEnv, const ActionMap& actions) const {
-  if (cfg_.allowInvalidMoves) { return; }
-  for (auto& action : actions) {
-    auto reason = isValidAction(cEnv, action.first, action.second);
-    if (!reason) {
-      throw std::invalid_argument(fmt::format(
-          "Invalid Action {} for {} : {}",
-          fmt::streamed(action.second),
-          fmt::streamed(action.first),
-          invalidActionReasonToString(reason)));
+  for (const auto& [actor, action] : actions) {
+    switch (cfg_.allowInvalidMoves) {
+    case ActionValidationMethod::FULL:
+      guardInvalidActions_full(cEnv, actor, action);
+      break;
+    case ActionValidationMethod::WAIT_ONLY:
+      guardInvalidActions_waitOnly(cEnv, actor, action);
+      break;
+    default:
+    case ActionValidationMethod::NONE:
+      break;
     }
   }
+}
+
+
+void NeoPkCU::guardInvalidActions_full(
+    const ConstEnvironmentVolatile& cEnv,
+    const Actor& actor,
+    const Action& action) const {
+  auto result = isValidAction(cEnv, actor, action);
+  if (result) { return; }
+
+  throw std::invalid_argument(fmt::format(
+      "Invalid Action {} for {} : {}",
+      fmt::streamed(action),
+      fmt::streamed(actor),
+      invalidActionReasonToString(result)));
+}
+
+
+void NeoPkCU::guardInvalidActions_waitOnly(
+    const ConstEnvironmentVolatile& cEnv,
+    const Actor& actor,
+    const Action& action) const {
+  auto result = isValidAction(cEnv, actor, action);
+  if (result) { return; }
+  if (action.isWait() and result.reason == IsValidResult::WAIT_NOT_ALLOWED) {
+    return;
+  }
+
+  throw std::invalid_argument(fmt::format(
+      "Invalid Action {} for {} : {}",
+      fmt::streamed(action),
+      fmt::streamed(actor),
+      invalidActionReasonToString(result)));
 }
 
 
@@ -618,13 +684,12 @@ IsValidResult NeoPkCU::isValidAction_wait(
   ConstTeamVolatile cTV = envV.getTeam(actor.iTeam());
   ConstPokemonVolatile cPKV = cTV.teammate(actor.iTeammate());
 
-  if (!cPKV.isAlive()) { return IsValidResult::MOVE_ACTOR_NOT_ACTIVE; }
+  if (!cPKV.isActive()) { return IsValidResult::MOVE_ACTOR_NOT_ACTIVE; }
 
   // in most cases, do not allow not moving
   if (numRequiredToActivate(envV) == 0) {
     return IsValidResult::WAIT_NOT_ALLOWED;
   }
-
 
   // are we waiting for the other team to take its free move?
   // We should wait if any active pokemon is dead (until replacement)

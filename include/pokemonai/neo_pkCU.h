@@ -35,6 +35,16 @@ class PKAISHARED NeoPkCU {
   };
 
   /**
+   * @enum ActionValidationMethod
+   * @brief Defines how the engine validates actions.
+   */
+  enum class ActionValidationMethod {
+    FULL, /**< All actions must be valid. */
+    WAIT_ONLY, /**< Invalid WAIT actions are permitted unless the team MUST activate. */
+    NONE /**< No action validation is performed. */
+  };
+
+  /**
    * @struct Config
    * @brief Configuration options for the NeoPkCU engine.
    */
@@ -76,13 +86,14 @@ class PKAISHARED NeoPkCU {
 
 
     /**
-     * @brief If `true`, the engine will not throw an exception for invalid
-     * moves.
+     * @brief The method used to validate actions.
      *
-     * This is useful for scenarios where you want to handle invalid moves
-     * gracefully, rather than catching exceptions.
+     * - FULL: All actions must be valid.
+     * - WAIT_ONLY: Invalid WAIT actions are permitted unless the team MUST
+     * activate.
+     * - NONE: No action validation is performed.
      */
-    bool allowInvalidMoves = false;
+    ActionValidationMethod allowInvalidMoves = ActionValidationMethod::FULL;
 
     /**
      * @brief The maximum number of states the engine should return when
@@ -123,7 +134,7 @@ class PKAISHARED NeoPkCU {
   NeoPkCU& setNumActivePokemon(size_t numActivePokemon);
   NeoPkCU& setStateSelectMethod(StateSelectMethod method);
   NeoPkCU& setMaxNumStates(size_t maxNumStates);
-  NeoPkCU& setAllowInvalidMoves(bool allow = true);
+  NeoPkCU& setAllowInvalidMoves(ActionValidationMethod allow = ActionValidationMethod::NONE);
 
   /**
    * @brief Simulates a single turn of a Pokemon battle.
@@ -300,12 +311,35 @@ class PKAISHARED NeoPkCU {
    */
   void guardNonvolatileState(const ConstEnvironmentVolatile& cEnv) const;
 
+  /**
+   * @brief Throws an exception if the provided action map does not have the
+   * correct number of actions for the given environment.
+   * @param cEnv The environment to check.
+   * @param actions The action map to check.
+   */
   void guardCorrectActionCount(
       const ConstEnvironmentVolatile& cEnv, const ActionMap& actions) const;
 
+  /**
+   * @brief Throws an exception if the provided action map contains invalid
+   * actions for the given environment.
+   * @param cEnv The environment to check.
+   * @param actions The action map to check.
+   */
   void guardInvalidActions(
       const ConstEnvironmentVolatile& cEnv, const ActionMap& actions) const;
+  void guardInvalidActions_full(
+      const ConstEnvironmentVolatile& cEnv,
+      const Actor& actor,
+      const Action& action) const;
+  void guardInvalidActions_waitOnly(
+      const ConstEnvironmentVolatile& cEnv,
+      const Actor& actor,
+      const Action& action) const;
 
+  /**
+   * @brief Throws an exception if the engine has not been initialized.
+   */
   void guardInitialized() const;
 
   /**

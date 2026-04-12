@@ -211,6 +211,16 @@ TEST_F(IsValidAction1v1Test, AllValidActionMaps) {
   EXPECT_EQ(maps.size(), 7);  // (5 moves + 2 swaps)
 }
 
+
+TEST_F(IsValidAction1v1Test, AllValidActionMapsWhenSwapping) {
+  auto state = setup_TA0_dead();
+  auto maps = engine_->getAllValidActions(state.where1(), TEAM_A);
+
+  fmt::print("{}\n", fmt::streamed(maps));
+  for (const auto& map : maps) { EXPECT_EQ(map.size(), 1); }
+  EXPECT_EQ(maps.size(), 2);  // 2 activations
+}
+
 // --- Swap Tests ---
 
 TEST_F(IsValidAction1v1Test, SwitchInvalidPokemon) {
@@ -282,6 +292,15 @@ TEST_F(IsValidAction1v1Test, CanOnlyWaitWhenReplacementNeeded) {
       active_dead.where1().getEnv(), Actor(TEAM_B, 0), Action::swap(1)).reason,
       IsValidResult::REPLACEMENT_NEEDED);
   // clang-format on
+}
+
+
+TEST_F(IsValidAction1v1Test, CannotWaitWhenMustReplace) {
+  auto active_dead = setup_TA0_dead();
+
+  auto result = engine_->isValidAction(
+      active_dead.where1().getEnv(), Actor(TEAM_A, 0), Action::wait());
+  EXPECT_EQ(result.reason, IsValidResult::MOVE_ACTOR_NOT_ACTIVE);
 }
 
 
@@ -389,4 +408,68 @@ TEST_F(IsValidAction1v1Test, ScriptRestrictions_SwapBlockedByAbility) {
   // Test switching from lead to teammate 1
   auto result = engine_->isValidAction(state, Actor(TEAM_A, 0), Action::swap(1));
   EXPECT_EQ(result.reason, IsValidResult::SWITCH_LOCKED_BY_SCRIPT);
+}
+
+// --- Action Validation Mode Tests ---
+
+
+TEST_F(IsValidAction1v1Test, ActionValidation_FULL_ThrowsOnInvalidWait) {
+  engine_->setAllowInvalidMoves(NeoPkCU::ActionValidationMethod::FULL);
+  ActionMap actions = {
+      {Actor(TEAM_A, 0), Action::wait()}, {Actor(TEAM_B, 0), Action::wait()}};
+  EXPECT_THROW(
+      engine_->updateState(engine_->initialState(), actions),
+      std::invalid_argument);
+}
+
+
+TEST_F(IsValidAction1v1Test, ActionValidation_NONE_PermitsInvalidWait) {
+  engine_->setAllowInvalidMoves(NeoPkCU::ActionValidationMethod::NONE);
+  // A2 and B1 aren't even active, so their actions can't be valid
+  ActionMap actions = {
+      {Actor(TEAM_A, 2), Action::wait()}, {Actor(TEAM_B, 1), Action::wait()}};
+  EXPECT_NO_THROW(engine_->updateState(engine_->initialState(), actions));
+}
+
+
+TEST_F(IsValidAction1v1Test, ActionValidation_WAIT_PermitsWaitWhenMidgame) {
+  engine_->setAllowInvalidMoves(NeoPkCU::ActionValidationMethod::WAIT_ONLY);
+  ActionMap actions = {
+      {Actor(TEAM_A, 0), Action::wait()}, {Actor(TEAM_B, 0), Action::wait()}};
+  EXPECT_NO_THROW(engine_->updateState(engine_->initialState(), actions));
+}
+
+
+TEST_F(IsValidAction1v1Test, ActionValidation_WAIT_PermitsWaitWhenEnemyDead) {
+  engine_->setAllowInvalidMoves(NeoPkCU::ActionValidationMethod::WAIT_ONLY);
+  auto state = setup_TA0_dead();  // TA0 is dead
+  // Team B is fine, they can wait normally anyway, but let's be explicit
+  ActionMap actions = {
+      {Actor(TEAM_A, 1), Action::activate()},
+      {Actor(TEAM_B, 0), Action::wait()}};
+  EXPECT_NO_THROW(engine_->updateState(state.where1().getEnv(), actions));
+}
+
+
+TEST_F(IsValidAction1v1Test, ActionValidation_WAIT_ThrowsOnWaitWhenSelfDead) {
+  engine_->setAllowInvalidMoves(NeoPkCU::ActionValidationMethod::WAIT_ONLY);
+  auto state = setup_TA0_dead();  // TA0 is dead, Team A MUST activate 1 or 2
+  // If Team A tries to WAIT instead of activate
+  ActionMap actions = {
+      {Actor(TEAM_A, 1), Action::wait()}, {Actor(TEAM_B, 0), Action::wait()}};
+  EXPECT_THROW(
+      engine_->updateState(state.where1().getEnv(), actions),
+      std::invalid_argument);
+}
+
+
+TEST_F(IsValidAction1v1Test, ActionValidation_WAIT_ThrowsOnOtherInvalidMoves) {
+  engine_->setAllowInvalidMoves(NeoPkCU::ActionValidationMethod::WAIT_ONLY);
+  auto zero_pp_result = setup_TA0_zeroPP();
+  // Actor 0 has 0 PP on move 0. Trying to MOVE(0) should still throw.
+  ActionMap actions = {
+      {Actor(TEAM_A, 0), Action::move(0)}, {Actor(TEAM_B, 0), Action::wait()}};
+  EXPECT_THROW(
+      engine_->updateState(zero_pp_result.where1().getEnv(), actions),
+      std::invalid_argument);
 }
