@@ -39,7 +39,7 @@ int move_uTurn_testMoveSwap(
   // pokemon is dead. But
   //  u-turn is allowed when there are no friendly pokemon.
   if (cTV.numTeammatesAlive() == 1) {
-    moveAllowed[VALID_MOVE_FRIENDLY_IS_OTHER] = true;
+    moveAllowed[VALID_MOVE_TARGET_IS_OTHER] = true;
   }
 
   return 1;

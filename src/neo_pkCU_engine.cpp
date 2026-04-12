@@ -85,7 +85,7 @@ NeoPkCUEngine::MoveBracket NeoPkCUEngine::computeMoveBracket(
   uint32_t tiebreaker = 0;
 
 
-  if (action.isSwitch()) {
+  if (action.isSwitch() || action.isActivate()) {
     actionBracket = 6;
   } else if (action.isMove()) {
     PokemonVolatile pkv = getBase().teammate(actor);

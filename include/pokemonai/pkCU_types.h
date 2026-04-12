@@ -21,21 +21,17 @@ class Type;
  * @{
  */
 // clang-format off
-#define VALID_MOVE_SELF_ALIVE 0        /**< The user is alive. */
-#define VALID_MOVE_TARGET_ALIVE 1      /**< The target is alive. */
-#define VALID_MOVE_HAS_PP 2            /**< The move has remaining PP. */
-#define VALID_MOVE_FRIENDLY_ALIVE 3    /**< A friendly target is alive. */
-#define VALID_MOVE_FRIENDLY_IS_OTHER 4 /**< A friendly target is not the user. */
-#define VALID_MOVE_SCRIPT 5            /**< The move is not locked by a script. */
-#define VALID_MOVE_ACTOR_ACTIVE 6      /**< The user is currently active on the field. */
-#define VALID_MOVE_SIZE 7              /**< The total number of move validity flags. */
+#define VALID_MOVE_HAS_PP 0            /**< The move has remaining PP. */
+#define VALID_MOVE_TARGET_IS_OTHER 1   /**< A friendly target is not the user. */
+#define VALID_MOVE_SCRIPT 2            /**< The move is not locked by a script. */
+#define VALID_MOVE_ACTOR_ACTIVE 3      /**< The user is currently active on the field. */
+#define VALID_MOVE_SIZE 4              /**< The total number of move validity flags. */
 
-#define VALID_SWAP_FRIENDLY_ALIVE 0    /**< The Pokemon to switch to is alive. */
-#define VALID_SWAP_FRIENDLY_IS_OTHER 1 /**< The Pokemon to switch to is not the active Pokemon. */
-#define VALID_SWAP_MUST_WAIT 2         /**< A switch is allowed (not during an opponent's free move). */
-#define VALID_SWAP_SCRIPT 3            /**< The switch is not locked by a script. */
-#define VALID_SWAP_TARGET_INACTIVE 4   /**< The switch target is currently not active on the field */
-#define VALID_SWAP_SIZE 5              /**< The total number of swap validity flags. */
+#define VALID_SWAP_FRIENDLY_IS_OTHER 0 /**< The Pokemon to switch to is not the active Pokemon. */
+#define VALID_SWAP_MUST_WAIT 1         /**< A switch is allowed (not during an opponent's free move). */
+#define VALID_SWAP_SCRIPT 2            /**< The switch is not locked by a script. */
+#define VALID_SWAP_TARGET_INACTIVE 3   /**< The switch target is currently not active on the field */
+#define VALID_SWAP_SIZE 4              /**< The total number of swap validity flags. */
 // clang-format on
 /** @} */
 
@@ -49,31 +45,33 @@ class Type;
  */
 struct IsValidResult {
   /**
-   * @enum InvalidActionReason
+   * @enum InvalidActionReason.
    * @brief Enumerates the possible reasons for an action being invalid.
+
+   * See Reason descriptions below.
    */
   enum InvalidActionReason {
     VALID,
     MOVE_ACTOR_NOT_ACTIVE,
     MOVE_TARGET_NOT_ACTIVE,
     MOVE_INVALID,
-    MOVE_TARGET_DEAD,
-    MOVE_SELF_DEAD,
+    MOVE_TARGET_FAINTED,
     MOVE_NO_PP,
-    MOVE_FRIENDLY_TARGET_DEAD,
     MOVE_FRIENDLY_TARGET_SELF,
     MOVE_LOCKED_BY_SCRIPT,
+    MOVE_DOES_NOT_TARGET_FRIENDLY,
+    MOVE_DOES_NOT_TARGET_HOSTILE,
     SWITCH_INVALID_POKEMON,
     SWITCH_TO_SELF,
+    SWITCH_ACTOR_NOT_ACTIVE,
     SWITCH_ACTIVE_POKEMON,
-    SWITCH_POKEMON_DEAD,
-    SWITCH_MUST_WAIT,
+    SWITCH_POKEMON_FAINTED,
     SWITCH_LOCKED_BY_SCRIPT,
     WAIT_NOT_ALLOWED,
     STRUGGLE_NOT_ALLOWED,
-    ACTION_TYPE_DISABLED,    /**< The action type is disabled (e.g., using an
-                                item). */
-    INVALID_FRIENDLY_TARGET, /**< The target for a friendly move is invalid. */
+    ACTION_TYPE_DISABLED,
+    INVALID_TARGET,
+    REPLACEMENT_NEEDED,
   };
 
   InvalidActionReason reason;  /**< The reason for the invalid action. */
@@ -103,22 +101,23 @@ static const char* invalidActionReasonToString(IsValidResult result) {
     case IsValidResult::MOVE_ACTOR_NOT_ACTIVE: return "Actor is currently not in play";
     case IsValidResult::MOVE_TARGET_NOT_ACTIVE: return "Target is currently not in play";
     case IsValidResult::MOVE_INVALID: return "Move index out of bounds";
-    case IsValidResult::MOVE_TARGET_DEAD: return "Target is dead";
-    case IsValidResult::MOVE_SELF_DEAD: return "Current pokemon is dead";
+    case IsValidResult::MOVE_TARGET_FAINTED: return "Target has fainted";
     case IsValidResult::MOVE_NO_PP: return "Move has no PP left";
-    case IsValidResult::MOVE_FRIENDLY_TARGET_DEAD: return "Friendly target is dead";
     case IsValidResult::MOVE_FRIENDLY_TARGET_SELF: return "Cannot target self with this move";
     case IsValidResult::MOVE_LOCKED_BY_SCRIPT: return "Move locked by script";
+    case IsValidResult::MOVE_DOES_NOT_TARGET_FRIENDLY: return "Move does not target friendly pokemon";
+    case IsValidResult::MOVE_DOES_NOT_TARGET_HOSTILE: return "Move does not target hostile pokemon";
     case IsValidResult::SWITCH_INVALID_POKEMON: return "Teammate index is out of bounds";
     case IsValidResult::SWITCH_TO_SELF: return "Cannot switch to self";
+    case IsValidResult::SWITCH_ACTOR_NOT_ACTIVE: return "Actor is currently not in play, and cannot enter play";
     case IsValidResult::SWITCH_ACTIVE_POKEMON: return "Cannot switch to an already active teammate";
-    case IsValidResult::SWITCH_POKEMON_DEAD: return "Cannot switch to a dead pokemon";
-    case IsValidResult::SWITCH_MUST_WAIT: return "Must wait for opponent's free move";
+    case IsValidResult::SWITCH_POKEMON_FAINTED: return "Cannot switch to a fainted pokemon";
     case IsValidResult::SWITCH_LOCKED_BY_SCRIPT: return "Switch locked by script";
     case IsValidResult::WAIT_NOT_ALLOWED: return "Wait is not allowed unless opponent has a free move";
     case IsValidResult::STRUGGLE_NOT_ALLOWED: return "Struggle is not a valid action";
     case IsValidResult::ACTION_TYPE_DISABLED: return "Action type disabled";
-    case IsValidResult::INVALID_FRIENDLY_TARGET: return "Invalid friendly target";
+    case IsValidResult::INVALID_TARGET: return "Target index out of bounds";
+    case IsValidResult::REPLACEMENT_NEEDED: return "A pokemon has fainted and must be replaced first";
     default: return "Unknown invalid action reason";
   }
   // clang-format on

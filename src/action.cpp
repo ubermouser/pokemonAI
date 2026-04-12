@@ -52,11 +52,13 @@ void Action::print(std::ostream& os) const {
     }
   } else if (isSwitch()) {
     os << fmt::format("s{}", iFriendly() + 1);
+  } else if (isActivate()) {
+    os << "a";
   } else if (isWait()) {
     os << "w";
   } else if (isUndefined()) {
     os << "??";
-  } else { // unknown move!
+  } else {  // unknown move!
     os << *data();
   }
 }
@@ -128,6 +130,9 @@ std::istream& operator >>(std::istream& is, Action& action) {
   } else if (input[0] == 'w') {
     action = Action::wait();
     success = true;
+  } else if (input[0] == 'a') {
+    action = Action::activate();
+    success = true;
   }
 
   if (!success) { is.setstate(std::ios::failbit); }
@@ -169,6 +174,20 @@ std::ostream& operator<<(
     os << fmt::format("i{}: {}", iActionMap, fmt::streamed(actionMap));
     iActionMap++;
   }
+  return os;
+}
+
+
+std::ostream& operator<<(
+    std::ostream& os, const ActorActionVector& actorActionVector) {
+  size_t iActionMap = 0;
+  os << "[";
+  for (const auto& [actor, action] : actorActionVector) {
+    if (iActionMap > 0) { os << ", "; }
+    os << fmt::format("{}:{}", fmt::streamed(actor), fmt::streamed(action));
+    iActionMap++;
+  }
+  os << "]";
   return os;
 }
 

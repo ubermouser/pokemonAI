@@ -182,14 +182,14 @@ void NeoPkCUEngine::evaluateMove_preturn() {
   const Actor& actor = getCActor();
   auto base = getBase();
 
-  // actions that are allowed if the pokemon has fainted:
-  if (cAction.isSwitch()) {
-    gotoStackStage(StageType::PRESWITCH);
+  // actions that are allowed if the pokemon is inactive:
+  if (cAction.isActivate()) {
+    gotoStackStage(StageType::POSTSWITCH);
     return;
   }
 
-  // all subsequent actions require the actor to be alive:
-  if (!base.teammate(actor).isAlive()) {
+  // all subsequent actions require the actor to be active:
+  if (!base.teammate(actor).isActive()) {
     gotoStackStage(StageType::POSTTURN);
     return;
   }
@@ -837,20 +837,31 @@ void NeoPkCUEngine::evaluateMove_damage_modifyItemPower() {
 
 
 void NeoPkCUEngine::evaluateMove_switch_onSwitchOut() {
-  int result = 0;
-  result = callPlugins<onSwitch_rawType>(PLUGIN_ON_SWITCHOUT, *this, getPKV());
+  // do nothing if the pokemon is not active
+  if (!getPKV().isActive()) { return; }
+
+  callPlugins<onSwitch_rawType>(PLUGIN_ON_SWITCHOUT, *this, getPKV());
 }
 
 void NeoPkCUEngine::evaluateMove_switch_onSwitchIn() {
   Actor switchingActor = getCActor();
   Actor swapTarget = getTarget();
-  getTV().swapPokemon(switchingActor, swapTarget);
+  Action action = getCAction();
+  auto team = getTV();
+
+  // Pokémon is entering from the bench into an empty slot.
+  if (action.isActivate()) {
+    size_t position = team.activatePokemon(swapTarget);
+    assert(position < cu_.cfg_.numActivePokemon);
+  } else {  // must be a switch action:
+    assert(team.teammate(switchingActor).isActive());
+    team.swapPokemon(switchingActor, swapTarget);
+    handleActorSwitch(switchingActor, swapTarget);
+  }
+
   getBase().flagsFor(swapTarget).setSwitched();
 
-  handleActorSwitch(switchingActor, swapTarget);
-
-  int result = 0;
-  result = callPlugins<onSwitch_rawType>(PLUGIN_ON_SWITCHIN, *this, getPKV());
+  callPlugins<onSwitch_rawType>(PLUGIN_ON_SWITCHIN, *this, getPKV());
 
   gotoStackStage(StageType::ENDOFTURN);
 }

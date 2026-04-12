@@ -44,7 +44,7 @@ class IsValidAction1v1Test : public MockEngineTest {
     engine_->setEnvironment(environment);
   }
 
-  PossibleEnvironments setup_zeroPP() {
+  PossibleEnvironments setup_TA0_zeroPP() {
     // Setup zero-PP state: Team B uses move_zero_pp (index 3) on Team A's
     // active Use move(3) for both to avoid killing the opponent before PP is
     // zeroed.
@@ -52,26 +52,28 @@ class IsValidAction1v1Test : public MockEngineTest {
         engine_->initialState(), Action::wait(), Action::move(3));
   }
 
-  PossibleEnvironments setup_swap_teammate() {
+  PossibleEnvironments setup_TA1_vs_TB0() {
     // Setup swapped teammate state
     return engine_->updateState(
         engine_->initialState(), Action::swap(1), Action::wait());
   }
 
-  PossibleEnvironments setup_active_dead() {
+  PossibleEnvironments setup_TA0_dead() {
     // Setup dead active using move_suicide (move index 3)
     return engine_->updateState(
         engine_->initialState(), Action::move(3), Action::wait());
   }
 
-  PossibleEnvironments setup_bench_dead() {
+  PossibleEnvironments setup_TA0_active_TA1_dead() {
     // Setup dead on bench: switch to 1, suicide 1, replace with 0
     // Pkmn 1 has suicide at index 1
-    auto state1 = setup_swap_teammate();
+    auto state1 = setup_TA1_vs_TB0();
     auto state2 = engine_->updateState(
         state1.where1().getEnv(), Action::move(1), Action::wait());
     return engine_->updateState(
-        state2.where1().getEnv(), Action::swap(0), Action::wait());
+        state2.where1().getEnv(),
+        {{Actor(TEAM_A, 0), Action::activate()},
+         {Actor(TEAM_B, 0), Action::wait()}});
   }
 
   PossibleEnvironments setup_both_dead() {
@@ -133,7 +135,7 @@ TEST_F(IsValidAction1v1Test, MoveInvalid) {
 }
 
 TEST_F(IsValidAction1v1Test, MoveNoPP) {
-  auto zero_pp_result = setup_zeroPP();
+  auto zero_pp_result = setup_TA0_zeroPP();
   EXPECT_EQ(engine_->isValidAction(zero_pp_result.where1().getEnv(), Actor(TEAM_A, 0), Action::move(0)).reason, IsValidResult::MOVE_NO_PP);
 }
 
@@ -148,7 +150,7 @@ TEST_F(IsValidAction1v1Test, StruggleNotAllowed) {
 }
 
 TEST_F(IsValidAction1v1Test, StruggleAllowed) {
-  auto zero_pp_result = setup_zeroPP();
+  auto zero_pp_result = setup_TA0_zeroPP();
   EXPECT_TRUE(engine_->isValidAction(zero_pp_result.where1().getEnv(), Actor(TEAM_A, 0), Action::struggle()));
   EXPECT_EQ(engine_->getValidMoveActions(zero_pp_result.where1().getEnv(), Actor(TEAM_A, 0)).size(), 1);
 }
@@ -216,48 +218,75 @@ TEST_F(IsValidAction1v1Test, SwitchInvalidPokemon) {
             IsValidResult::SWITCH_INVALID_POKEMON);
 }
 
+
 TEST_F(IsValidAction1v1Test, SwitchPokemonDead) {
   // Try switching to pkmn 1 which is dead on bench in bench_dead state
-  auto bench_dead = setup_bench_dead();
+  auto bench_dead = setup_TA0_active_TA1_dead();
 
   auto result = engine_->isValidAction(
       bench_dead.where1().getEnv(), Actor(TEAM_A, 0), Action::swap(1));
-  EXPECT_EQ(result.reason, IsValidResult::SWITCH_POKEMON_DEAD);
+  EXPECT_EQ(result.reason, IsValidResult::SWITCH_POKEMON_FAINTED);
 }
+
 
 TEST_F(IsValidAction1v1Test, SwitchActivePokemon) {
   auto result = engine_->isValidAction(
       engine_->initialState(), Actor(TEAM_A, 1), Action::swap(0));
-  EXPECT_EQ(result.reason, IsValidResult::SWITCH_ACTIVE_POKEMON);
+  EXPECT_EQ(result.reason, IsValidResult::SWITCH_ACTOR_NOT_ACTIVE);
 }
+
 
 TEST_F(IsValidAction1v1Test, ActivePokemonChanged) {
   EXPECT_TRUE(engine_->initialState().teammate(TEAM_A, 0).isActive());
   EXPECT_FALSE(engine_->initialState().teammate(TEAM_A, 1).isActive());
 
-  auto swap_teammate = setup_swap_teammate();
+  auto swap_teammate = setup_TA1_vs_TB0();
   EXPECT_FALSE(swap_teammate.where1().teammate(TEAM_A, 0).isActive());
   EXPECT_TRUE(swap_teammate.where1().teammate(TEAM_A, 1).isActive());
 }
 
+
 TEST_F(IsValidAction1v1Test, SwapSelf) {
   EXPECT_FALSE(engine_->isValidAction(engine_->initialState(), Actor(TEAM_A, 0), Action::swap(0)));
 }
+
 
 TEST_F(IsValidAction1v1Test, SwapLiving) {
   EXPECT_TRUE(engine_->isValidAction(engine_->initialState(), Actor(TEAM_A, 0), Action::swap(1)));
   EXPECT_TRUE(engine_->isValidAction(engine_->initialState(), Actor(TEAM_B, 0), Action::swap(1)));
 }
 
-TEST_F(IsValidAction1v1Test, SwapFromDeadActive) {
-  auto active_dead = setup_active_dead();
 
+TEST_F(IsValidAction1v1Test, ActivateWhenReplacementNeeded) {
+  auto active_dead = setup_TA0_dead();
+
+  // Actor 0 is dead and deactivated. Actor 1 must activate itself.
   EXPECT_TRUE(engine_->isValidAction(
-      active_dead.where1().getEnv(), Actor(TEAM_A, 0), Action::swap(1)));
+      active_dead.where1().getEnv(), Actor(TEAM_A, 1), Action::activate()));
 }
 
+
+TEST_F(IsValidAction1v1Test, CanOnlyWaitWhenReplacementNeeded) {
+  auto active_dead = setup_TA0_dead();
+
+  // clang-format off
+  EXPECT_TRUE(engine_->isValidAction(
+      active_dead.where1().getEnv(), Actor(TEAM_B, 0), Action::wait()));
+  EXPECT_EQ(engine_->isValidAction(
+      active_dead.where1().getEnv(), Actor(TEAM_B, 0), Action::move(0)).reason,
+      IsValidResult::REPLACEMENT_NEEDED);
+  EXPECT_EQ(engine_->isValidAction(
+      active_dead.where1().getEnv(), Actor(TEAM_B, 0), Action::struggle()).reason,
+      IsValidResult::REPLACEMENT_NEEDED);
+  EXPECT_EQ(engine_->isValidAction(
+      active_dead.where1().getEnv(), Actor(TEAM_B, 0), Action::swap(1)).reason,
+      IsValidResult::REPLACEMENT_NEEDED);
+  // clang-format on
+}
+
+
 TEST_F(IsValidAction1v1Test, SwapEnemyDead) {
-  auto active_dead = setup_active_dead();
+  auto active_dead = setup_TA0_dead();
 
   EXPECT_FALSE(engine_->isValidAction(
       active_dead.where1().getEnv(), Actor(TEAM_B, 0), Action::swap(1)));
@@ -265,55 +294,62 @@ TEST_F(IsValidAction1v1Test, SwapEnemyDead) {
       active_dead.where1().getEnv(), Actor(TEAM_B, 0), Action::wait()));
 }
 
+
 TEST_F(IsValidAction1v1Test, SwapBothDead) {
   auto both_dead = setup_both_dead();
 
+  // Both teams have deactivated actors. Replacements must activate themselves.
   EXPECT_TRUE(engine_->isValidAction(
-      both_dead.where1().getEnv(), Actor(TEAM_A, 0), Action::swap(1)));
+      both_dead.where1().getEnv(), Actor(TEAM_A, 1), Action::activate()));
   EXPECT_TRUE(engine_->isValidAction(
-      both_dead.where1().getEnv(), Actor(TEAM_B, 0), Action::swap(1)));
+      both_dead.where1().getEnv(), Actor(TEAM_B, 1), Action::activate()));
 }
 
-TEST_F(IsValidAction1v1Test, ValidActionsCount) {
-  auto active_dead = setup_active_dead();
+
+TEST_F(IsValidAction1v1Test, ValidEntryActionsCount) {
+  auto active_dead = setup_TA0_dead();
   auto actions =
-      engine_->getValidActions(active_dead.where1().getEnv(), Actor(TEAM_A, 0));
+      engine_->getValidEntryActions(active_dead.where1().getEnv(), TEAM_A);
 
   fmt::print("{}", fmt::streamed(actions));
-  EXPECT_EQ(actions.size(), 2);  // (can swap to 1 or 2)
+  EXPECT_EQ(actions.size(), 2);  // (both pkmn 1 and 2 can enter play)
 }
+
 
 TEST_F(IsValidAction1v1Test, MoveTargetDead) {
-  auto active_dead = setup_active_dead();
+  auto active_dead = setup_TA0_active_TA1_dead();
 
   auto result = engine_->isValidAction(
-      active_dead.where1().getEnv(), Actor(TEAM_B, 0), Action::move(0));
-  EXPECT_EQ(result.reason, IsValidResult::MOVE_TARGET_DEAD);
+      active_dead.where1().getEnv(), Actor(TEAM_B, 0), Action::moveEnemy(0, 1));
+  EXPECT_EQ(result.reason, IsValidResult::MOVE_TARGET_NOT_ACTIVE);
 }
 
+
 TEST_F(IsValidAction1v1Test, MoveSelfDead) {
-  auto active_dead = setup_active_dead();
+  auto active_dead = setup_TA0_active_TA1_dead();
 
   auto result = engine_->isValidAction(
-      active_dead.where1().getEnv(), Actor(TEAM_A, 0), Action::move(0));
-  EXPECT_EQ(result.reason, IsValidResult::MOVE_SELF_DEAD);
+      active_dead.where1().getEnv(), Actor(TEAM_A, 1), Action::move(0));
+  EXPECT_EQ(result.reason, IsValidResult::MOVE_ACTOR_NOT_ACTIVE);
 }
 
 // --- Ally Tests ---
 
 TEST_F(IsValidAction1v1Test, MoveFriendlyTargetDead) {
-  auto bench_dead = setup_bench_dead();
-
+  auto bench_dead = setup_TA0_active_TA1_dead();
   auto result = engine_->isValidAction(
       bench_dead.where1().getEnv(), Actor(TEAM_A, 0), Action::moveAlly(2, 1));
-  EXPECT_EQ(result.reason, IsValidResult::MOVE_FRIENDLY_TARGET_DEAD);
+  // Pkmn 1 is dead on bench.
+  EXPECT_EQ(result.reason, IsValidResult::MOVE_TARGET_FAINTED);
 }
+
 
 TEST_F(IsValidAction1v1Test, MoveFriendlyTargetSelf) {
   auto result = engine_->isValidAction(
       engine_->initialState(), Actor(TEAM_A, 0), Action::moveAlly(2, 0));
   EXPECT_EQ(result.reason, IsValidResult::MOVE_FRIENDLY_TARGET_SELF);
 }
+
 
 TEST_F(IsValidAction1v1Test, MoveFriendlyTargetSelfAllowed) {
   auto state = engine_->updateState(
@@ -322,10 +358,11 @@ TEST_F(IsValidAction1v1Test, MoveFriendlyTargetSelfAllowed) {
       state.where1().getEnv(), Actor(TEAM_A, 2), Action::moveAlly(0, 2)));
 }
 
+
 TEST_F(IsValidAction1v1Test, InvalidFriendlyTarget) {
   auto result = engine_->isValidAction(
       engine_->initialState(), Actor(TEAM_A, 0), Action::moveAlly(2, 3));
-  EXPECT_EQ(result.reason, IsValidResult::INVALID_FRIENDLY_TARGET);
+  EXPECT_EQ(result.reason, IsValidResult::INVALID_TARGET);
 }
 
 // --- Script Restriction Tests ---
@@ -337,12 +374,14 @@ TEST_F(IsValidAction1v1Test, ScriptRestrictions_MoveBlockedByAbility) {
   EXPECT_EQ(result.reason, IsValidResult::MOVE_LOCKED_BY_SCRIPT);
 }
 
+
 TEST_F(IsValidAction1v1Test, ScriptRestrictions_StruggleAllowedWhenMovesBlocked) {
   setup_blockMoveEnv();
   auto state = engine_->initialState();
   // Struggle should be allowed because the only other move is locked
   EXPECT_TRUE(engine_->isValidAction(state, Actor(TEAM_A, 0), Action::struggle()));
 }
+
 
 TEST_F(IsValidAction1v1Test, ScriptRestrictions_SwapBlockedByAbility) {
   setup_blockSwapEnv();

@@ -149,11 +149,12 @@ void NeoPkCU::guardNonvolatileState(
 
 void NeoPkCU::guardCorrectActionCount(
     const ConstEnvironmentVolatile& cEnv, const ActionMap& actions) const {
-  size_t numActivePokemon = cEnv.getNumActivePokemon();
-  if (numActivePokemon != actions.size()) {
+  size_t expected = numPossibleActive(cEnv.getTeam(TEAM_A)) +
+                    numPossibleActive(cEnv.getTeam(TEAM_B));
+  if (expected != actions.size()) {
     throw std::invalid_argument(fmt::format(
         "wrong number of actions: expected {}, got {}",
-        numActivePokemon,
+        expected,
         actions.size()));
   }
 }
@@ -339,15 +340,17 @@ ActionVector NeoPkCU::getValidSwapActions(
 std::vector<ActionMap> NeoPkCU::getAllValidActions(
     const ConstEnvironmentVolatile& envV, TEAM agentTeam) const {
   guardNonvolatileState(envV);
+  auto team = envV.getTeam(agentTeam);
 
   std::vector<std::pair<Actor, ActionVector>> actorActions;
-  for (const Actor& actor : envV.getTeam(agentTeam).yieldActiveActors()) {
+  for (const Actor& actor : team.yieldActiveActors()) {
     actorActions.push_back({actor, getValidActions(envV, actor)});
   }
 
   std::vector<ActionMap> result;
   result.push_back({});
 
+  // 1. Handle currently active actors
   for (const auto& [actor, actions] : actorActions) {
     std::vector<ActionMap> expanded;
     for (const auto& partial : result) {
@@ -358,6 +361,28 @@ std::vector<ActionMap> NeoPkCU::getAllValidActions(
       }
     }
     result = std::move(expanded);
+  }
+
+  // 2. Handle empty slots (entries from bench)
+  size_t numToFill = numRequiredToActivate(team);
+  if (numToFill > 0) {
+    ActorActionVector entryActions = getValidEntryActions(envV, agentTeam);
+
+    for (size_t iFill = 0; iFill < numToFill; ++iFill) {
+      std::vector<ActionMap> expanded;
+      for (const auto& partial : result) {
+        for (const auto& [actor, action] : entryActions) {
+          // must not have picked this pokemon already for this team in this
+          // turn
+          if (partial.count(actor)) { continue; }
+
+          ActionMap combined = partial;
+          combined[actor] = action;
+          expanded.push_back(std::move(combined));
+        }
+      }
+      result = std::move(expanded);
+    }
   }
 
   return result;
@@ -390,6 +415,8 @@ IsValidResult NeoPkCU::isValidAction(
     const Action& action) const {
   guardNonvolatileState(envV);
 
+  bool actorIsActive = envV.teammate(actor).isActive();
+
   switch (action.type()) {
   case Action::MOVE_0:
   case Action::MOVE_1:
@@ -398,6 +425,8 @@ IsValidResult NeoPkCU::isValidAction(
     return isValidAction_move(envV, actor, action);
   case Action::MOVE_SWITCH:
     return isValidAction_switch(envV, actor, action);
+  case Action::MOVE_ACTIVATE:
+    return isValidAction_activate(envV, actor, action);
   case Action::MOVE_WAIT:
     return isValidAction_wait(envV, actor, action);
   case Action::MOVE_STRUGGLE:
@@ -412,6 +441,7 @@ IsValidResult NeoPkCU::isValidAction_move(
     const ConstEnvironmentVolatile& envV,
     const Actor& actor,
     const Action& action) const {
+  assert(action.isMove());
   ConstTeamVolatile cTV = envV.getTeam(actor.iTeam());
   ConstPokemonVolatile cPKV = cTV.teammate(actor.iTeammate());
 
@@ -421,6 +451,11 @@ IsValidResult NeoPkCU::isValidAction_move(
   }
 
   ConstMoveVolatile cMV = cPKV.getMV(action);
+
+  // cannot move if any pokemon on the field has fainted:
+  if (numRequiredToActivate(envV) > 0) {
+    return IsValidResult::REPLACEMENT_NEEDED;
+  }
 
   // Resolve the actual targets of this action
   auto targets = envV.getTargets(actor, action);
@@ -432,24 +467,21 @@ IsValidResult NeoPkCU::isValidAction_move(
 
   IsValidResult result = IsValidResult::VALID;
   for (const auto& t : targets) {
-    bool isAlly = (t.iTeam() == actor.iTeam());
     size_t teamSize = envV.getTeam(t.iTeam()).nv().getNumTeammates();
 
     if (t.iTeammate() >= teamSize) {
-      if (isAlly) {
-        result = IsValidResult::INVALID_FRIENDLY_TARGET;
-      } else {
-        result = IsValidResult::MOVE_TARGET_NOT_ACTIVE;
-      }
+      result = IsValidResult::INVALID_TARGET;
       break;
     }
 
-    if (!allowBench && !envV.teammate(t).isActive()) {
-      if (isAlly && hasSpecificFriendlyTarget) {
-        result = IsValidResult::INVALID_FRIENDLY_TARGET;
-      } else {
-        result = IsValidResult::MOVE_TARGET_NOT_ACTIVE;
-      }
+    auto tPKV = envV.teammate(t);
+    if (!allowBench && !tPKV.isActive()) {
+      result = IsValidResult::MOVE_TARGET_NOT_ACTIVE;
+      break;
+    }
+
+    if (!tPKV.isAlive()) {
+      result = IsValidResult::MOVE_TARGET_FAINTED;
       break;
     }
   }
@@ -460,9 +492,9 @@ IsValidResult NeoPkCU::isValidAction_move(
     bool moveIsTargetedHostile = cMV.getBase().isTargetedHostile();
 
     if (hasSpecificFriendlyTarget && !moveIsTargetedFriendly) {
-      result = IsValidResult::INVALID_FRIENDLY_TARGET;
+      result = IsValidResult::MOVE_DOES_NOT_TARGET_FRIENDLY;
     } else if (hasSpecificHostileTarget && !moveIsTargetedHostile) {
-      result = IsValidResult::MOVE_TARGET_NOT_ACTIVE;
+      result = IsValidResult::MOVE_DOES_NOT_TARGET_HOSTILE;
     }
 
     if (result.reason == IsValidResult::VALID) {
@@ -477,41 +509,11 @@ IsValidResult NeoPkCU::isValidAction_move(
 
       if (!doAllowMove[VALID_MOVE_ACTOR_ACTIVE]) {
         result = IsValidResult::MOVE_ACTOR_NOT_ACTIVE;
-      } else if (!doAllowMove[VALID_MOVE_SELF_ALIVE]) {
-        result = IsValidResult::MOVE_SELF_DEAD;
-      } else if (!doAllowMove[VALID_MOVE_TARGET_ALIVE]) {
-        // Filter targets by move capability to determine failure reason
-        std::vector<Actor> validTargets;
-        for (const auto& t : targets) {
-          bool isAlly = (t.iTeam() == actor.iTeam());
-          if (isAlly ? cMV.getBase().targetsAlly()
-                     : cMV.getBase().targetsEnemy()) {
-            validTargets.push_back(t);
-          }
-        }
-        // If the move hits both sides, check if it's an ally death.
-        bool canHitEnemy = std::any_of(
-            validTargets.begin(), validTargets.end(), [&](const Actor& t) {
-              return t.iTeam() != actor.iTeam();
-            });
-        bool canHitAlly = std::any_of(
-            validTargets.begin(), validTargets.end(), [&](const Actor& t) {
-              return t.iTeam() == actor.iTeam();
-            });
-        if (canHitAlly && !canHitEnemy) {
-          result = IsValidResult::MOVE_FRIENDLY_TARGET_DEAD;
-        } else {
-          result = IsValidResult::MOVE_TARGET_DEAD;
-        }
       } else if (!doAllowMove[VALID_MOVE_HAS_PP]) {
         result = IsValidResult::MOVE_NO_PP;
       } else if (
           hasSpecificFriendlyTarget &&
-          !doAllowMove[VALID_MOVE_FRIENDLY_ALIVE]) {
-        result = IsValidResult::MOVE_FRIENDLY_TARGET_DEAD;
-      } else if (
-          hasSpecificFriendlyTarget &&
-          !doAllowMove[VALID_MOVE_FRIENDLY_IS_OTHER]) {
+          !doAllowMove[VALID_MOVE_TARGET_IS_OTHER]) {
         result = IsValidResult::MOVE_FRIENDLY_TARGET_SELF;
       } else if (!doAllowMove[VALID_MOVE_SCRIPT]) {
         result = IsValidResult::MOVE_LOCKED_BY_SCRIPT;
@@ -527,6 +529,7 @@ IsValidResult NeoPkCU::isValidAction_switch(
     const ConstEnvironmentVolatile& envV,
     const Actor& actor,
     const Action& action) const {
+  assert(action.isSwitch());
   ConstTeamVolatile cTV = envV.getTeam(actor.iTeam());
   ConstPokemonVolatile cPKV = cTV.teammate(actor.iTeammate());
 
@@ -535,18 +538,20 @@ IsValidResult NeoPkCU::isValidAction_switch(
     return IsValidResult::SWITCH_INVALID_POKEMON;
   }
 
+  if (!cPKV.isActive()) { return IsValidResult::SWITCH_ACTOR_NOT_ACTIVE; }
+
   // Build validation flags
   ValidSwapSet doAllowSwitch = getValidSwapFlags(envV, actor, action, cPKV);
 
   ConstPokemonVolatile fPKV = cTV.teammate(action.iFriendly());
 
+  if (!fPKV.isAlive()) { return IsValidResult::SWITCH_POKEMON_FAINTED; }
+
   // Are we locked out of switching?
-  if (cPKV.isAlive()) {
-    for (const auto& cPlugin : pluginSet_[PLUGIN_ON_TESTSWITCH]) {
-      onTestSwitch_rawType pFunction =
-          (onTestSwitch_rawType)cPlugin.getFunction();
-      if (pFunction(cPKV, fPKV, action, doAllowSwitch) > 1) { break; }
-    }
+  for (const auto& cPlugin : pluginSet_[PLUGIN_ON_TESTSWITCH]) {
+    onTestSwitch_rawType pFunction =
+        (onTestSwitch_rawType)cPlugin.getFunction();
+    if (pFunction(cPKV, fPKV, action, doAllowSwitch) > 1) { break; }
   }
 
   if (!doAllowSwitch[VALID_SWAP_FRIENDLY_IS_OTHER]) {
@@ -555,11 +560,8 @@ IsValidResult NeoPkCU::isValidAction_switch(
   if (!doAllowSwitch[VALID_SWAP_TARGET_INACTIVE]) {
     return IsValidResult::SWITCH_ACTIVE_POKEMON;
   }
-  if (!doAllowSwitch[VALID_SWAP_FRIENDLY_ALIVE]) {
-    return IsValidResult::SWITCH_POKEMON_DEAD;
-  }
   if (!doAllowSwitch[VALID_SWAP_MUST_WAIT]) {
-    return IsValidResult::SWITCH_MUST_WAIT;
+    return IsValidResult::REPLACEMENT_NEEDED;
   }
   if (!doAllowSwitch[VALID_SWAP_SCRIPT]) {
     return IsValidResult::SWITCH_LOCKED_BY_SCRIPT;
@@ -569,29 +571,86 @@ IsValidResult NeoPkCU::isValidAction_switch(
 }  // endOf isValidAction_switch
 
 
+IsValidResult NeoPkCU::isValidAction_activate(
+    const ConstEnvironmentVolatile& envV,
+    const Actor& actor,
+    const Action& action) const {
+  assert(action.isActivate());
+  ConstTeamVolatile cTV = envV.getTeam(actor.iTeam());
+
+  // is the pokemon we're activating a valid teammate?
+  if (actor.iTeammate() >= cTV.nv().getNumTeammates()) {
+    return IsValidResult::SWITCH_INVALID_POKEMON;
+  }
+
+  ConstPokemonVolatile cPKV = envV.teammate(actor);
+
+  if (cPKV.isActive()) { return IsValidResult::SWITCH_ACTIVE_POKEMON; }
+  if (!cPKV.isAlive()) { return IsValidResult::SWITCH_POKEMON_FAINTED; }
+
+  if (numRequiredToActivate(envV.getTeam(actor.iTeam())) == 0) {
+    return IsValidResult::SWITCH_ACTOR_NOT_ACTIVE;
+  }
+
+  return IsValidResult::VALID;
+}  // endOf isValidAction_activate
+
+
+ActorActionVector NeoPkCU::getValidEntryActions(
+    const ConstEnvironmentVolatile& envV, size_t iTeam) const {
+  ActorActionVector result;
+  ConstTeamVolatile cTV = envV.getTeam(iTeam);
+  if (numRequiredToActivate(cTV) == 0) { return result; }
+
+  for (const auto& [actor, pkv] : cTV.yieldInactivePokemon()) {
+    Action action = Action::activate();
+    if (isValidAction_activate(envV, actor, action)) {
+      result.push_back(std::make_pair(actor, action));
+    }
+  }
+  return result;
+}
+
+
+size_t NeoPkCU::numPossibleActive(const ConstTeamVolatile& team) const {
+  return std::min((size_t)team.numTeammatesAlive(), cfg_.numActivePokemon);
+}
+
+
+size_t NeoPkCU::numRequiredToActivate(const ConstTeamVolatile& team) const {
+  int numPossible = (int)numPossibleActive(team);
+  int numActive = (int)team.getNumActivePokemon();
+
+  return (size_t)std::max(0, numPossible - numActive);
+}
+
+
+size_t NeoPkCU::numRequiredToActivate(
+    const ConstEnvironmentVolatile& envV) const {
+  return numRequiredToActivate(envV.getTeam(TEAM_A)) +
+         numRequiredToActivate(envV.getTeam(TEAM_B));
+}
+
+
 IsValidResult NeoPkCU::isValidAction_wait(
     const ConstEnvironmentVolatile& envV,
     const Actor& actor,
     const Action& action) const {
+  assert(action.isWait());
   ConstTeamVolatile cTV = envV.getTeam(actor.iTeam());
   ConstPokemonVolatile cPKV = cTV.teammate(actor.iTeammate());
 
-  // are we waiting for the other team to take its free move?
-  // We should wait if all of the opponent's active pokemon are dead (until
-  // replacement)
-  bool anyEnemyActiveAlive = false;
-  for (const auto& [oActor, oPKV] :
-       envV.getOtherTeam(actor.iTeam()).yieldActivePokemon()) {
-    if (oPKV.isAlive()) {
-      anyEnemyActiveAlive = true;
-      break;
-    }
-  }
-
-  if (!anyEnemyActiveAlive && cPKV.isAlive()) { return IsValidResult::VALID; }
+  if (!cPKV.isAlive()) { return IsValidResult::MOVE_ACTOR_NOT_ACTIVE; }
 
   // in most cases, do not allow not moving
-  return IsValidResult::WAIT_NOT_ALLOWED;
+  if (numRequiredToActivate(envV) == 0) {
+    return IsValidResult::WAIT_NOT_ALLOWED;
+  }
+
+
+  // are we waiting for the other team to take its free move?
+  // We should wait if any active pokemon is dead (until replacement)
+  return IsValidResult::VALID;
 }  // endOf isValidAction_wait
 
 
@@ -599,16 +658,14 @@ IsValidResult NeoPkCU::isValidAction_struggle(
     const ConstEnvironmentVolatile& envV,
     const Actor& actor,
     const Action& action) const {
+  assert(action.isStruggle());
   ConstTeamVolatile cTV = envV.getTeam(actor.iTeam());
   ConstPokemonVolatile cPKV = cTV.teammate(actor.iTeammate());
 
-  // is the other team alive?
-  if (!(envV.getOtherTeam(actor.iTeam()).isAlive())) {
-    return IsValidResult::MOVE_TARGET_DEAD;
+  // cannot move if any pokemon on the field has fainted:
+  if (numRequiredToActivate(envV) > 0) {
+    return IsValidResult::REPLACEMENT_NEEDED;
   }
-
-  // is the pokemon we're currently using alive?
-  if (!cPKV.isAlive()) { return IsValidResult::MOVE_SELF_DEAD; }
 
   // are all other moves unusable?
   for (const auto& [iMove, mNV] : cPKV.nv().yieldMoves()) {
@@ -634,7 +691,6 @@ ValidMoveSet NeoPkCU::getValidMoveFlags(
   ValidMoveSet doAllowMove((1 << VALID_MOVE_SIZE) - 1);
 
   ConstTeamVolatile cTV = envV.getTeam(actor.iTeam());
-  bool hasSpecificFriendlyTarget = action.targetedFriendly();
 
   // Filter targets by move capability
   std::vector<Actor> validTargets;
@@ -645,22 +701,13 @@ ValidMoveSet NeoPkCU::getValidMoveFlags(
     }
   }
 
-  // is at least one target alive?
-  bool anyTargetAlive = std::any_of(
-      validTargets.begin(), validTargets.end(), [&](const Actor& t) {
-        return envV.teammate(t).isAlive();
-      });
-  doAllowMove[VALID_MOVE_TARGET_ALIVE] = anyTargetAlive;
-  doAllowMove[VALID_MOVE_SELF_ALIVE] = cPKV.isAlive();
   doAllowMove[VALID_MOVE_ACTOR_ACTIVE] = cPKV.isActive();
   doAllowMove[VALID_MOVE_HAS_PP] = cMV.hasPP();
 
-  if (hasSpecificFriendlyTarget) {
+  if (action.targetedFriendly()) {
     size_t fIndex = action.iFriendly();
-    ConstPokemonVolatile fPKV = cTV.teammate(fIndex);
-    doAllowMove[VALID_MOVE_FRIENDLY_ALIVE] = fPKV.isAlive();
     bool canTargetSelf = cMV.getBase().canTargetSelf();
-    doAllowMove[VALID_MOVE_FRIENDLY_IS_OTHER] =
+    doAllowMove[VALID_MOVE_TARGET_IS_OTHER] =
         (fIndex != actor.iTeammate()) || canTargetSelf;
   }
 
@@ -683,24 +730,15 @@ ValidSwapSet NeoPkCU::getValidSwapFlags(
 
   // is the pokemon we're switching to even alive?
   ConstPokemonVolatile fPKV = cTV.teammate(action.iFriendly());
-  doAllowSwitch[VALID_SWAP_FRIENDLY_ALIVE] = fPKV.isAlive();
 
   // is the pokemon we're switching to already on the field?
   doAllowSwitch[VALID_SWAP_TARGET_INACTIVE] = !fPKV.isActive();
 
-  // are we trying to move during the other team's free move?
-  // Can swap if all enemies on the field are alive, AND we ourselves are dead
-  // (replacement)
-  bool anyEnemyActiveAlive = false;
-  for (const auto& [oActor, oPKV] :
-       envV.getOtherTeam(actor.iTeam()).yieldActivePokemon()) {
-    if (oPKV.isAlive()) {
-      anyEnemyActiveAlive = true;
-      break;
-    }
+  if (!cPKV.isAlive()) {  // if a pokemon is active but fainted, it must swap:
+    doAllowSwitch[VALID_SWAP_MUST_WAIT] = true;
+  } else {  // otherwise, we can swap if no pokemon on the field has fainted:
+    doAllowSwitch[VALID_SWAP_MUST_WAIT] = numRequiredToActivate(envV) == 0;
   }
-
-  doAllowSwitch[VALID_SWAP_MUST_WAIT] = anyEnemyActiveAlive || !cPKV.isAlive();
 
   return doAllowSwitch;
 }

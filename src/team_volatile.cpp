@@ -3,6 +3,8 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
+#include <bit>
+#include <bitset>
 #include <boost/static_assert.hpp>
 #include <cstring>
 #include <ostream>
@@ -107,12 +109,34 @@ bool TeamVolatile::swapPokemon(
   // rewrite swap pokemon value:
   auto oPkmn = teammate(actor);
   auto nPkmn = teammate(target);
+
+  assert(oPkmn.isActive());
+
   data_->status.nonvolatile.iCPokemon = (uint8_t)target.iTeammate();
+
+  // cannot use std::swap because this is a bitfield
   auto nPkmnActive = nPkmn.data().active;
   nPkmn.data().active = oPkmn.data().active;
   oPkmn.data().active = nPkmnActive;
 
   return true;
+}
+
+
+size_t TeamVolatile::activatePokemon(const Actor& actor) {
+  assert(actor.iTeam() == nv().iTeam());
+  auto pkmn = teammate(actor);
+  assert(!pkmn.isActive());
+
+  // find the first empty slot for the active pokemon to enter:
+  std::bitset<6> occupied;
+  for (const auto& [actor, pkmn] : yieldActivePokemon()) {
+    occupied.set(pkmn.data().active - 1);
+  }
+
+  size_t firstEmptySlot = std::countl_one(occupied.to_ulong());
+  pkmn.data().active = (uint8_t)firstEmptySlot + 1;
+  return firstEmptySlot;
 }
 
 

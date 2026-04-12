@@ -141,6 +141,12 @@ public:
     return boost::join(teamA, teamB);
   }
 
+  size_t numActivePokemon() const {
+    size_t numActive = 0;
+    for (const auto& actor : yieldActiveActors()) { numActive++; }
+    return numActive;
+  }
+
   void printActivePokemon(std::ostream& os, size_t firstTeam=0) const;
 };
 

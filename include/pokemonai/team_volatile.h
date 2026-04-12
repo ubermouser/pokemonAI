@@ -92,8 +92,23 @@ public:
            });
   }
 
+
+  auto yieldInactiveActors(size_t iCurrent = 0) const {
+    return yieldActors(iCurrent) |
+           boost::adaptors::filtered([*this](const auto& actor) {
+             return !teammate(actor).isActive();
+           });
+  }
+
   auto yieldActivePokemon(size_t iCurrent = 0) const {
     return yieldActiveActors(iCurrent) |
+           boost::adaptors::transformed([*this](const auto& actor) {
+             return std::make_tuple(actor, teammate(actor));
+           });
+  }
+
+  auto yieldInactivePokemon(size_t iCurrent = 0) const {
+    return yieldInactiveActors(iCurrent) |
            boost::adaptors::transformed([*this](const auto& actor) {
              return std::make_tuple(actor, teammate(actor));
            });
@@ -148,6 +163,9 @@ public:
 
   bool swapPokemon(
       const Actor& actor, const Actor& target, bool preserveVolatile = false);
+
+  /* Activates a currently sidelined pokemon, returning their position */
+  size_t activatePokemon(const Actor& actor);
 };
 
 PKAISHARED std::ostream& operator <<(std::ostream& os, const ConstTeamVolatile& team);

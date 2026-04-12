@@ -4,6 +4,8 @@
 
 #include "mock_engine_test.hpp"
 #include "pokemonai/engine.h"
+#include "pokemonai/environment_nonvolatile.h"
+#include "pokemonai/environment_possible.h"
 #include "pokemonai/pkCU.h"
 
 
@@ -25,16 +27,58 @@ class IsValidAction2v2Test : public MockEngineTest {
             .setBase(pokedex_->pokemon("test_pokemon2"))
             .addMove(pokedex_->move("move_any_adjacent"))       // 0
             .addMove(pokedex_->move("move_all_adjacent_enemy")) // 1
-            .addMove(pokedex_->move("move_all_active")))        // 2
+            .addMove(pokedex_->move("move_all_active"))         // 2
+            .addMove(pokedex_->move("move_suicide")))           // 3
         .addPokemon(PokemonNonVolatile()
             .setBase(pokedex_->pokemon("test_pokemon3")))
         .addPokemon(PokemonNonVolatile()
             .setBase(pokedex_->pokemon("test_pokemon4")));
     // clang-format on
 
-    auto environment = EnvironmentNonvolatile(team, team, true);
+    environment_nv = EnvironmentNonvolatile(team, team, true);
     engine_->setNumActivePokemon(2);
-    engine_->setEnvironment(environment);
+    engine_->setEnvironment(environment_nv);
+  }
+
+  PossibleEnvironments setup_faintedTA1() {
+    // clang-format off
+    // TEAM_A 1 (test_pokemon2) uses move_suicide (move index 3)
+    return engine_->updateState(
+        engine_->initialState(),
+        {{Actor(TEAM_A, 0), Action::wait()},
+        {Actor(TEAM_A, 1), Action::move(3)},
+        {Actor(TEAM_B, 0), Action::wait()},
+        {Actor(TEAM_B, 1), Action::wait()}}
+    );
+    // clang-format on
+  }
+
+  ConstEnvironmentVolatile setup_2v2() {
+    // clang-format off
+    auto team = TeamNonVolatile()
+        .addPokemon(environment_nv.teammate(TEAM_A, 0))
+        .addPokemon(environment_nv.teammate(TEAM_A, 1));
+    // clang-format on
+
+    auto environment_2v2 = EnvironmentNonvolatile(team, team, true);
+    engine_->setEnvironment(environment_2v2);
+
+    return engine_->initialState();
+  }
+
+  PossibleEnvironments setup_2v2_faintedTA1() {
+    auto state_2v2 = setup_2v2();
+
+    // clang-format off
+    // TEAM_A 1 (test_pokemon2) uses move_suicide (move index 3)
+    return engine_->updateState(
+        state_2v2,
+        {{Actor(TEAM_A, 0), Action::wait()},
+        {Actor(TEAM_A, 1), Action::move(3)},
+        {Actor(TEAM_B, 0), Action::wait()},
+        {Actor(TEAM_B, 1), Action::wait()}}
+    );
+    // clang-format on
   }
 };
 
@@ -122,8 +166,71 @@ TEST_F(IsValidAction2v2Test, AllValidActionMaps) {
     EXPECT_TRUE(map.count(Actor(TEAM_A, 0)));
     EXPECT_TRUE(map.count(Actor(TEAM_A, 1)));
   }
-  
+
   // Pkmn 0: 6 moves + 2 swaps = 8 actions
-  // Pkmn 1: 5 moves + 2 swaps = 7 actions
-  EXPECT_EQ(maps.size(), 8 * 7); // 56
+  // Pkmn 1: 6 moves + 2 swaps = 8 actions
+  EXPECT_EQ(maps.size(), 64);  // 8 * 8
+}
+
+TEST_F(IsValidAction2v2Test, FaintedActiveRequiresWaitAndSwap) {
+  auto fainted = setup_faintedTA1();
+  auto faintedState = fainted.where1();
+
+  // clang-format off
+  // no pokemon can move if at least one pokemon has fainted:
+  EXPECT_FALSE(
+      engine_->isValidAction(faintedState, Actor(TEAM_A, 0), Action::move(0)));
+  EXPECT_FALSE(
+      engine_->isValidAction(faintedState, Actor(TEAM_A, 1), Action::move(0)));
+  EXPECT_FALSE(
+      engine_->isValidAction(faintedState, Actor(TEAM_B, 0), Action::move(0)));
+  EXPECT_FALSE(
+      engine_->isValidAction(faintedState, Actor(TEAM_B, 1), Action::move(0)));
+
+  // Inactive pokemon are permitted to enter.
+  EXPECT_FALSE(  // currenty in play
+      engine_->isValidAction(faintedState, Actor(TEAM_A, 0), Action::activate()));
+  EXPECT_FALSE(  // self, fainted
+      engine_->isValidAction(faintedState, Actor(TEAM_A, 1), Action::activate()));
+  EXPECT_TRUE(
+      engine_->isValidAction(faintedState, Actor(TEAM_A, 2), Action::activate()));
+  EXPECT_TRUE(
+      engine_->isValidAction(faintedState, Actor(TEAM_A, 3), Action::activate()));
+
+  // All other pokemon must wait.
+  EXPECT_TRUE(
+      engine_->isValidAction(faintedState, Actor(TEAM_A, 0), Action::wait()));
+  EXPECT_FALSE(
+      engine_->isValidAction(faintedState, Actor(TEAM_A, 1), Action::wait()));
+  EXPECT_TRUE(
+      engine_->isValidAction(faintedState, Actor(TEAM_B, 0), Action::wait()));
+  EXPECT_TRUE(
+      engine_->isValidAction(faintedState, Actor(TEAM_B, 1), Action::wait()));
+
+  // no pokemon can swap swap.
+  EXPECT_FALSE(
+      engine_->isValidAction(faintedState, Actor(TEAM_A, 0), Action::swap(2)));
+  EXPECT_FALSE(
+      engine_->isValidAction(faintedState, Actor(TEAM_A, 1), Action::swap(2)));
+  EXPECT_FALSE(
+      engine_->isValidAction(faintedState, Actor(TEAM_B, 0), Action::swap(2)));
+  EXPECT_FALSE(
+      engine_->isValidAction(faintedState, Actor(TEAM_B, 1), Action::swap(2)));
+  // clang-format on
+}
+
+
+TEST_F(IsValidAction2v2Test, FaintedActiveButCannotSwap) {
+  auto fainted = setup_2v2_faintedTA1();
+  auto faintedState = fainted.where1();
+
+  // Actor(TEAM_A, 1) is fainted but cannot swap.
+  EXPECT_FALSE(
+      engine_->isValidAction(faintedState, Actor(TEAM_A, 1), Action::swap(0)));
+  EXPECT_FALSE(
+      engine_->isValidAction(faintedState, Actor(TEAM_A, 1), Action::swap(1)));
+  EXPECT_FALSE(
+      engine_->isValidAction(faintedState, Actor(TEAM_A, 1), Action::swap(2)));
+  EXPECT_FALSE(
+      engine_->isValidAction(faintedState, Actor(TEAM_A, 1), Action::swap(3)));
 }

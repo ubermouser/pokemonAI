@@ -22,6 +22,7 @@ class BasicEngine2v2Test : public MockEngineTest {
             .addMove(pokedex_->move("move_any_adjacent"))
             .addMove(pokedex_->move("move_all_adjacent_enemy"))
             .addMove(pokedex_->move("move_all_adjacent"))
+            .addMove(pokedex_->move("move_suicide"))
             .setLevel(100))
         .addPokemon(PokemonNonVolatile()
             .setBase(pokedex_->pokemon("test_pokemon3"))
@@ -30,9 +31,40 @@ class BasicEngine2v2Test : public MockEngineTest {
     teamB.teammate(0).setIV(FV_SPEED, 5);
     teamB.teammate(1).setIV(FV_SPEED, 15);
     // clang-format on
-    auto environment = EnvironmentNonvolatile(teamA, teamB, true);
+    environment_nv = EnvironmentNonvolatile(teamA, teamB, true);
     engine_->setNumActivePokemon(2);
-    engine_->setEnvironment(environment);
+    engine_->setEnvironment(environment_nv);
+  }
+
+  ConstEnvironmentVolatile setup_2v2() {
+    // clang-format off
+    auto teamA = TeamNonVolatile()
+        .addPokemon(environment_nv.teammate(TEAM_A, 0))
+        .addPokemon(environment_nv.teammate(TEAM_A, 1));
+    auto teamB = TeamNonVolatile()
+        .addPokemon(environment_nv.teammate(TEAM_B, 0))
+        .addPokemon(environment_nv.teammate(TEAM_B, 1));
+    // clang-format on
+
+    auto environment_2v2 = EnvironmentNonvolatile(teamA, teamB, true);
+    engine_->setEnvironment(environment_2v2);
+
+    return engine_->initialState();
+  }
+
+  PossibleEnvironments setup_2v2_faintedTA1() {
+    auto state_2v2 = setup_2v2();
+
+    // clang-format off
+    // TEAM_A 1 (test_pokemon2) uses move_suicide (move index 3)
+    return engine_->updateState(
+        state_2v2,
+        {{Actor(TEAM_A, 0), Action::wait()},
+        {Actor(TEAM_A, 1), Action::move(3)},
+        {Actor(TEAM_B, 0), Action::wait()},
+        {Actor(TEAM_B, 1), Action::wait()}}
+    );
+    // clang-format on
   }
 };
 
@@ -237,6 +269,38 @@ TEST_F(BasicEngine2v2Test, TwoAdjacentEnemyMoves) {
   EXPECT_EQ(state.teammate(TEAM_A, 1).getMissingHP(), 0);
   EXPECT_GT(state.teammate(TEAM_B, 0).getMissingHP(), 0);
   EXPECT_GT(state.teammate(TEAM_B, 1).getMissingHP(), 0);
+}
+
+
+TEST_F(BasicEngine2v2Test, SecondToLastPokemonFaints) {
+  auto state_2v2 = setup_2v2();
+
+  auto result = engine_->updateState(
+      state_2v2,
+      {{Actor(TEAM_A, 0), Action::wait()},
+       {Actor(TEAM_A, 1), Action::move(3)},
+       {Actor(TEAM_B, 0), Action::wait()},
+       {Actor(TEAM_B, 1), Action::wait()}});
+
+  result.printStates();
+  auto result_state = result.where1().getEnv();
+
+  EXPECT_EQ(result_state.numActivePokemon(), 3);
+}
+
+
+TEST_F(BasicEngine2v2Test, FaintedPokemonAcceptsNoAction) {
+  auto fainted = setup_2v2_faintedTA1();
+  auto faintedState = fainted.where1();
+
+  // Team A now only has 1 active pokemon (Pkmn 0).
+  // Team B still has 2 active pokemon.
+  // Total expected actions: 3.
+  EXPECT_NO_THROW(engine_->updateState(
+      faintedState.getEnv(),
+      {{Actor(TEAM_A, 0), Action::move(0)},
+       {Actor(TEAM_B, 0), Action::move(0)},
+       {Actor(TEAM_B, 1), Action::move(0)}}));
 }
 
 

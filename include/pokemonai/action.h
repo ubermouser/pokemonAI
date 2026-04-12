@@ -28,7 +28,8 @@ public:
   static constexpr size_t MOVE_STRUGGLE = 5;
   static constexpr size_t MOVE_WAIT = 6;
   static constexpr size_t MOVE_SWITCH = 7;
-  static constexpr size_t MOVE_LAST = 8;
+  static constexpr size_t MOVE_ACTIVATE = 8;
+  static constexpr size_t MOVE_LAST = 9;
 
   /**
    * FRIENDLY/HOSTILE_x - refers to a specific pokemon on the team
@@ -158,6 +159,11 @@ public:
     assert(iPokemon < 6);
     return Action{MOVE_SWITCH, FRIENDLY_0 + iPokemon, HOSTILE_NONE};
   }
+
+  static Action activate() {
+    return Action{MOVE_ACTIVATE, FRIENDLY_NONE, HOSTILE_NONE};
+  }
+
   static Action struggle() {
     return Action{MOVE_STRUGGLE, FRIENDLY_NONE, HOSTILE_ANY};
   }
@@ -207,6 +213,7 @@ public:
   }
 
   bool isSwitch() const { return type() == MOVE_SWITCH; }
+  bool isActivate() const { return type() == MOVE_ACTIVATE; }
   bool isMove() const { return type() >= MOVE_0 && type_ <= MOVE_STRUGGLE; }
   bool isStruggle() const { return type() == MOVE_STRUGGLE; }
   bool isWait() const { return type() == MOVE_WAIT; }
@@ -232,6 +239,7 @@ protected:
 
 using ActionMap = std::unordered_map<Actor, Action>;
 using ActionVector = std::vector<Action>;
+using ActorActionVector = std::vector<std::pair<Actor, Action> >;
 using ActionPairVector = std::vector<std::array<Action, 2> >;
 
 std::ostream& operator<<(std::ostream& os, const Action& action);
@@ -239,6 +247,8 @@ std::ostream& operator<<(std::ostream& os, const ActionVector& actionVector);
 std::ostream& operator<<(std::ostream& os, const ActionMap& actionMap);
 std::ostream& operator<<(
     std::ostream& os, const std::vector<ActionMap>& actionMapVector);
+std::ostream& operator<<(
+    std::ostream& os, const ActorActionVector& actorActionVector);
 std::istream& operator>>(std::istream& is, Action& action);
 
 namespace std { template<> struct hash<Action> { 

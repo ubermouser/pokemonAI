@@ -173,6 +173,8 @@ class PKAISHARED NeoPkCU {
       const ConstEnvironmentVolatile& envV, const Actor& actor) const;
   ActionVector getValidSwapActions(
       const ConstEnvironmentVolatile& envV, const Actor& actor) const;
+  ActorActionVector getValidEntryActions(
+      const ConstEnvironmentVolatile& envV, size_t iTeam) const;
   [[deprecated]] ActionVector getValidActions(
       const ConstEnvironmentVolatile& envV, TEAM iTeam) const;
   [[deprecated]] ActionVector getValidMoveActions(
@@ -210,6 +212,10 @@ class PKAISHARED NeoPkCU {
       const Actor& actor,
       const Action& action) const;
   IsValidResult isValidAction_switch(
+      const ConstEnvironmentVolatile& envV,
+      const Actor& actor,
+      const Action& action) const;
+  IsValidResult isValidAction_activate(
       const ConstEnvironmentVolatile& envV,
       const Actor& actor,
       const Action& action) const;
@@ -257,8 +263,22 @@ class PKAISHARED NeoPkCU {
   MatchState getGameState(const ConstEnvironmentVolatile& envV) const;
   MatchState getGameState(const ConstEnvironmentPossible& envV) const;
 
-protected:
+  /**
+   * @brief Returns the number of pokemon that are able to be brought into play.
+   * @param team The team to check.
+   */
+  size_t numPossibleActive(const ConstTeamVolatile& team) const;
+
+  /**
+   * @brief Returns the number of pokemon that must be brought into play.
+   * @param team The team to check.
+   */
+  size_t numRequiredToActivate(const ConstTeamVolatile& team) const;
+  size_t numRequiredToActivate(const ConstEnvironmentVolatile& envV) const;
+
+ protected:
   Config cfg_;
+
 
   /**
    * @brief The non-volatile environment for the current battle.

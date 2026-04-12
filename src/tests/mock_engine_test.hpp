@@ -26,6 +26,7 @@ class MockEngineTest : public ::testing::Test {
 
   std::shared_ptr<MockPokedex> pokedex_;
   std::shared_ptr<PkCU> engine_;
+  EnvironmentNonvolatile environment_nv;
 };
 
 #endif // MOCK_ENGINE_TEST_HPP
