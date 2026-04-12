@@ -22,8 +22,9 @@ typedef double fpType;
 typedef float fpType;
 #define FP_EPSILON 0.00001
 #endif
-typedef fixedpoint::fixed_point<27> FixType;
-typedef FixType fixType;
+typedef fixedpoint::fixed_point<27, int32_t> LowPrecFixType;
+typedef fixedpoint::fixed_point<60, int64_t> HighPrecFixType;
+typedef HighPrecFixType FixType;
 
 // teams:
 enum TEAM {

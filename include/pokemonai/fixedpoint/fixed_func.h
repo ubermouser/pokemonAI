@@ -48,29 +48,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace fixedpoint {
 
-// The template argument p in all of the following functions refers to the 
-// fixed point precision (e.g. p = 8 gives 24.8 fixed point functions).
+template <typename T> struct intermediate_type;
+template <> struct intermediate_type<int32_t> { typedef int64_t type; };
+#if defined(__SIZEOF_INT128__) || defined(__GNUC__)
+template <> struct intermediate_type<int64_t> { typedef __int128_t type; };
+#endif
 
-// Perform a fixed point multiplication without a 64-bit intermediate result.
+template <typename T> struct identity { typedef T type; };
+
+// Perform a fixed point multiplication without a 64-bit/128-bit intermediate result.
 // This is fast but beware of overflow!
-template <int p> 
-inline int32_t fixmulf(int32_t a, int32_t b)
+template <int p, typename T = int32_t> 
+inline T fixmulf(T a, typename identity<T>::type b)
 {
   return (a * b) >> p;
 }
 
-// Perform a fixed point multiplication using a 64-bit intermediate result to
+// Perform a fixed point multiplication using a larger intermediate result to
 // prevent overflow problems.
-template <int p>
-inline int32_t fixmul(int32_t a, int32_t b)
+template <int p, typename T = int32_t>
+inline T fixmul(T a, typename identity<T>::type b)
 {
-  return (int32_t)(((int64_t)a * b) >> p);
+  typedef typename intermediate_type<T>::type I;
+  return (T)(((I)a * b) >> p);
 }
 
 // Fixed point division
-template <int p>
-inline int32_t fixdiv(int32_t a, int32_t b) {
-  return (int32_t)((((int64_t)a) << p) / b);
+template <int p, typename T = int32_t>
+inline T fixdiv(T a, typename identity<T>::type b) {
+  typedef typename intermediate_type<T>::type I;
+  return (T)((((I)a) << p) / b);
 }
 
 namespace detail {
@@ -108,8 +115,9 @@ namespace detail {
 
 // q is the precision of the input
 // output has 32-q bits of fraction
+// Restricted to int32_t as per user request
 template <int q>
-inline int fixinv(int32_t a)
+inline int32_t fixinv(int32_t a)
 {
   int32_t x;
 
@@ -134,8 +142,8 @@ inline int fixinv(int32_t a)
     x <<= exp;
 
   /* two iterations of newton-raphson  x = x(2-ax) */
-  x = fixmul<(32-q)>(x,((2<<(32-q)) - fixmul<q>(a,x)));
-  x = fixmul<(32-q)>(x,((2<<(32-q)) - fixmul<q>(a,x)));
+  x = fixmul<(32-q), int32_t>(x,((2<<(32-q)) - fixmul<q, int32_t>(a,x)));
+  x = fixmul<(32-q), int32_t>(x,((2<<(32-q)) - fixmul<q, int32_t>(a,x)));
 
   if (sign)
     return -x;
@@ -145,24 +153,24 @@ inline int fixinv(int32_t a)
 
 // Conversion from and to float
 
-template <int p>
-float fix2float(int32_t f) {
-  return (float)f / (1 << p);
+template <int p, typename T = int32_t>
+float fix2float(T f) {
+  return (float)f / (float)((T)1 << p);
 }
 
-template <int p>
-double fix2double(int32_t f) {
-  return (double)f / (1 << p);
+template <int p, typename T = int32_t>
+double fix2double(T f) {
+  return (double)f / (double)((T)1 << p);
 }
 
-template <int p>
-int32_t float2fix(float f) {
-  return (int32_t)(f * (1 << p));
+template <int p, typename T = int32_t>
+T float2fix(float f) {
+  return (T)(f * (float)((T)1 << p));
 }
 
-template <int p>
-int32_t double2fix(double f) {
-  return (int32_t)(f * (1 << p));
+template <int p, typename T = int32_t>
+T double2fix(double f) {
+  return (T)(f * (double)((T)1 << p));
 }
 
 int32_t fixcos16(int32_t a);

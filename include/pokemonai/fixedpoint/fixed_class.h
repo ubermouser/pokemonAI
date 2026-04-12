@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 #endif
 
+#include <concepts>
 #include "fixed_func.h"
 
 namespace fixedpoint {
@@ -44,17 +45,22 @@ namespace fixedpoint {
 // The template argument p in all of the following functions refers to the 
 // fixed point precision (e.g. p = 8 gives 24.8 fixed point functions).
 
-template <int p>
+template <int p, typename BaseT = int32_t>
 struct fixed_point {
-  int32_t intValue;
+  BaseT intValue;
 
   fixed_point() {}
-  explicit fixed_point(int32_t i) : intValue(i << p) {}
-  explicit fixed_point(int32_t n, int32_t d) : intValue(fixdiv<p>(n, d)) {}
-  explicit fixed_point(float f) : intValue(float2fix<p>(f)) {}
-  explicit fixed_point(double f) : intValue(double2fix<p>(f)) {}
 
-  double to_double() const { return fix2double<p>(this->intValue); };
+  template <std::integral T>
+  explicit fixed_point(T i) : intValue(static_cast<BaseT>(i) << p) {}
+
+  template <std::integral T1, std::integral T2>
+  explicit fixed_point(T1 n, T2 d) : intValue(fixdiv<p, BaseT>(static_cast<BaseT>(n), static_cast<BaseT>(d))) {}
+
+  template <std::floating_point T>
+  explicit fixed_point(T f) : intValue(double2fix<p, BaseT>(static_cast<double>(f))) {}
+
+  double to_double() const { return fix2double<p, BaseT>(this->intValue); };
   explicit operator double() const { return to_double(); }
   explicit operator float() const { return static_cast<float>(to_double()); }
 
@@ -67,27 +73,27 @@ struct fixed_point {
     return *this;
   }
   fixed_point& operator*=(fixed_point r) {
-    intValue = fixmul<p>(intValue, r.intValue);
+    intValue = fixmul<p, BaseT>(intValue, r.intValue);
     return *this;
   }
   fixed_point& operator/=(fixed_point r) {
-    intValue = fixdiv<p>(intValue, r.intValue);
+    intValue = fixdiv<p, BaseT>(intValue, r.intValue);
     return *this;
   }
 
-  fixed_point& operator+=(int32_t r) {
+  fixed_point& operator+=(BaseT r) {
     intValue += r;
     return *this;
   }
-  fixed_point& operator-=(int32_t r) {
+  fixed_point& operator-=(BaseT r) {
     intValue -= r;
     return *this;
   }
-  fixed_point& operator*=(int32_t r) {
+  fixed_point& operator*=(BaseT r) {
     intValue *= r;
     return *this;
   }
-  fixed_point& operator/=(int32_t r) {
+  fixed_point& operator/=(BaseT r) {
     intValue /= r;
     return *this;
   }
@@ -126,72 +132,72 @@ struct fixed_point {
   bool operator <= (fixed_point r) const { return intValue <= r.intValue; }
   bool operator >= (fixed_point r) const { return intValue >= r.intValue; }
 
-  fixed_point operator+(int32_t r) const {
+  fixed_point operator+(BaseT r) const {
     fixed_point x = *this;
     x += r;
     return x;
   }
-  fixed_point operator-(int32_t r) const {
+  fixed_point operator-(BaseT r) const {
     fixed_point x = *this;
     x -= r;
     return x;
   }
-  fixed_point operator*(int32_t r) const {
+  fixed_point operator*(BaseT r) const {
     fixed_point x = *this;
     x *= r;
     return x;
   }
-  fixed_point operator/(int32_t r) const {
+  fixed_point operator/(BaseT r) const {
     fixed_point x = *this;
     x /= r;
     return x;
   }
 };
 
-template <int p>
-static fixed_point<p> create(double f) {
-  return fixed_point<p>(double2fix<p>(f));
+template <int p, typename BaseT = int32_t>
+static fixed_point<p, BaseT> create(double f) {
+  return fixed_point<p, BaseT>(double2fix<p, BaseT>(f));
 };
 
 // Specializations for use with plain integers
-template <int p>
-inline fixed_point<p> operator + (int32_t a, fixed_point<p> b)
+template <int p, typename BaseT>
+inline fixed_point<p, BaseT> operator + (BaseT a, fixed_point<p, BaseT> b)
 { return b + a; }
 
-template <int p>
-inline fixed_point<p> operator - (int32_t a, fixed_point<p> b)
+template <int p, typename BaseT>
+inline fixed_point<p, BaseT> operator - (BaseT a, fixed_point<p, BaseT> b)
 { return -b + a; }
 
-template <int p>
-inline fixed_point<p> operator * (int32_t a, fixed_point<p> b)
+template <int p, typename BaseT>
+inline fixed_point<p, BaseT> operator * (BaseT a, fixed_point<p, BaseT> b)
 { return b * a; }
 
-template <int p>
-inline fixed_point<p> operator / (int32_t a, fixed_point<p> b)
-{ fixed_point<p> r(a); r /= b; return r; }
+template <int p, typename BaseT>
+inline fixed_point<p, BaseT> operator / (BaseT a, fixed_point<p, BaseT> b)
+{ fixed_point<p, BaseT> r(a); r /= b; return r; }
 
 // math functions
 // no default implementation
 
-template <int p>
-inline fixed_point<p> sin(fixed_point<p> a);
+template <int p, typename BaseT = int32_t>
+inline fixed_point<p, BaseT> sin(fixed_point<p, BaseT> a);
 
-template <int p>
-inline fixed_point<p> cos(fixed_point<p> a);
+template <int p, typename BaseT = int32_t>
+inline fixed_point<p, BaseT> cos(fixed_point<p, BaseT> a);
 
-template <int p>
-inline fixed_point<p> sqrt(fixed_point<p> a);
+template <int p, typename BaseT = int32_t>
+inline fixed_point<p, BaseT> sqrt(fixed_point<p, BaseT> a);
 
-template <int p>
-inline fixed_point<p> rsqrt(fixed_point<p> a);
+template <int p, typename BaseT = int32_t>
+inline fixed_point<p, BaseT> rsqrt(fixed_point<p, BaseT> a);
 
-template <int p>
-inline fixed_point<p> inv(fixed_point<p> a);
+template <int p, typename BaseT = int32_t>
+inline fixed_point<p, BaseT> inv(fixed_point<p, BaseT> a);
 
-template <int p>
-inline fixed_point<p> abs(fixed_point<p> a)
+template <int p, typename BaseT = int32_t>
+inline fixed_point<p, BaseT> abs(fixed_point<p, BaseT> a)
 { 
-  fixed_point<p> r;
+  fixed_point<p, BaseT> r;
   r.intValue = a.intValue > 0 ? a.intValue : -a.intValue; 
   return r; 
 }
@@ -199,58 +205,59 @@ inline fixed_point<p> abs(fixed_point<p> a)
 // specializations for 16.16 format
 
 template <>
-inline fixed_point<16> sin(fixed_point<16> a)
+inline fixed_point<16, int32_t> sin(fixed_point<16, int32_t> a)
 {
-  fixed_point<16> r;
+  fixed_point<16, int32_t> r;
   r.intValue = fixsin16(a.intValue);
   return r;
 }
 
 template <>
-inline fixed_point<16> cos(fixed_point<16> a)
+inline fixed_point<16, int32_t> cos(fixed_point<16, int32_t> a)
 {
-  fixed_point<16> r;
+  fixed_point<16, int32_t> r;
   r.intValue = fixcos16(a.intValue);
   return r;
 }
 
 
 template <>
-inline fixed_point<16> sqrt(fixed_point<16> a)
+inline fixed_point<16, int32_t> sqrt(fixed_point<16, int32_t> a)
 {
-  fixed_point<16> r;
+  fixed_point<16, int32_t> r;
   r.intValue = fixsqrt16(a.intValue);
   return r;
 }
 
 template <>
-inline fixed_point<16> rsqrt(fixed_point<16> a)
+inline fixed_point<16, int32_t> rsqrt(fixed_point<16, int32_t> a)
 {
-  fixed_point<16> r;
+  fixed_point<16, int32_t> r;
   r.intValue = fixrsqrt16(a.intValue);
   return r;
 }
 
 template <>
-inline fixed_point<16> inv(fixed_point<16> a)
+inline fixed_point<16, int32_t> inv(fixed_point<16, int32_t> a)
 {
-  fixed_point<16> r;
+  fixed_point<16, int32_t> r;
   r.intValue = fixinv<16>(a.intValue);
   return r;
 }
 
 // The multiply accumulate case can be optimized.
-template <int p>
-inline fixed_point<p> multiply_accumulate(
+template <int p, typename BaseT = int32_t>
+inline fixed_point<p, BaseT> multiply_accumulate(
   int count, 
-  const fixed_point<p> *a,
-  const fixed_point<p> *b)
+  const fixed_point<p, BaseT> *a,
+  const fixed_point<p, BaseT> *b)
 {
-  long long result = 0;
+  typedef typename intermediate_type<BaseT>::type I;
+  I result = 0;
   for (int i = 0; i < count; ++i)
-    result += static_cast<long long>(a[i].intValue) * b[i].intValue;
-  fixed_point<p> r;
-  r.intValue = static_cast<int>(result >> p);
+    result += static_cast<I>(a[i].intValue) * b[i].intValue;
+  fixed_point<p, BaseT> r;
+  r.intValue = static_cast<BaseT>(result >> p);
   return r;
 }
 
