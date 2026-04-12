@@ -161,7 +161,7 @@ class PKAISHARED EnvironmentVolatile: public EnvironmentVolatileImpl<TeamVolatil
 public:
   using impl_t::impl_t;
 
-  operator ConstEnvironmentVolatile() { return ConstEnvironmentVolatile{nv(), data()}; };
+  operator ConstEnvironmentVolatile() const { return ConstEnvironmentVolatile{nv(), data()}; };
   void initialize(size_t numActivePokemon = 1);
 };
 

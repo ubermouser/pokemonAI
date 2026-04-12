@@ -136,6 +136,12 @@ size_t TeamVolatile::activatePokemon(const Actor& actor) {
 
   size_t firstEmptySlot = std::countl_one(occupied.to_ulong());
   pkmn.data().active = (uint8_t)firstEmptySlot + 1;
+
+  // TODO: remove ICPokemon!
+  if (firstEmptySlot == 0) {
+    data_->status.nonvolatile.iCPokemon = (uint8_t)actor.iTeammate();
+  }
+
   return firstEmptySlot;
 }
 

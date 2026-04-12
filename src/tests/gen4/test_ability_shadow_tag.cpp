@@ -101,7 +101,8 @@ TEST_F(ShadowTagTest, FaintedPokemonCanSwitch) {
   EnvironmentVolatile envV(state.nv(), envData);
   envV.teammate(TEAM_A, 0).setHP(0);
 
-  // Team A should be able to switch because Squirtle is fainted, even though
-  // Wobbuffet has Shadow Tag
-  EXPECT_TRUE(engine_->isValidAction(envV, Actor(TEAM_A, 0), Action::swap(1)));
+  // The bench pokemon should be able to activate itself because Squirtle is
+  // fainted, even though Wobbuffet has Shadow Tag
+  EXPECT_TRUE(
+      engine_->isValidAction(envV, Actor(TEAM_A, 1), Action::activate()));
 }

@@ -138,12 +138,8 @@ class PKAISHARED NeoPkCU {
    * @param actionB The action of the first active pokemon of team B.
    * @return A `PossibleEnvironments` object containing all possible outcomes.
    */
-  PossibleEnvironments updateState(
+  [[deprecated]] PossibleEnvironments updateState(
       const ConstEnvironmentVolatile& cEnv,
-      const Action& actionA,
-      const Action& actionB) const;
-  PossibleEnvironments updateState(
-      const ConstEnvironmentPossible& cEnvP,
       const Action& actionA,
       const Action& actionB) const;
   PossibleEnvironments updateState(
@@ -193,16 +189,8 @@ class PKAISHARED NeoPkCU {
       const ConstEnvironmentVolatile& envV,
       const TEAM iTeam,
       const Action& action) const;
-  [[deprecated]] IsValidResult isValidAction(
-      const ConstEnvironmentPossible& envV,
-      const TEAM iTeam,
-      const Action& action) const;
   IsValidResult isValidAction(
       const ConstEnvironmentVolatile& envV,
-      const Actor& actor,
-      const Action& action) const;
-  IsValidResult isValidAction(
-      const ConstEnvironmentPossible& envP,
       const Actor& actor,
       const Action& action) const;
 
@@ -252,7 +240,6 @@ class PKAISHARED NeoPkCU {
    * @param envV The current environment.
    * @return `true` if the game is over, `false` otherwise.
    */
-  bool isGameOver(const ConstEnvironmentPossible& envV) const;
   bool isGameOver(const ConstEnvironmentVolatile& envV) const;
 
   /**
@@ -261,7 +248,6 @@ class PKAISHARED NeoPkCU {
    * @return A `MatchState` enum value indicating the game's status.
    */
   MatchState getGameState(const ConstEnvironmentVolatile& envV) const;
-  MatchState getGameState(const ConstEnvironmentPossible& envV) const;
 
   /**
    * @brief Returns the number of pokemon that are able to be brought into play.

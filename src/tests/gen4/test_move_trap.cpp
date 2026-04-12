@@ -222,7 +222,10 @@ TEST_F(TrapTest, TrapClearedOnUserDeath) {
   EXPECT_FALSE(state2.teammate(TEAM_A, 0).isAlive());
 
   // A is dead. We must switch in.
-  auto turn3 = engine_->updateState(state2, Action::swap(1), Action::wait());
+  auto turn3 = engine_->updateState(
+      state2.getEnv(),
+      {{Actor(TEAM_A, 1), Action::activate()},
+       {Actor(TEAM_B, 0), Action::wait()}});
   auto state3 = turn3.where1();
 
   EXPECT_EQ(state3.getTeam(TEAM_A).getICPKV(), 1); // Bulbasaur in

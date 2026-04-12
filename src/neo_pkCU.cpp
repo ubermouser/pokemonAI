@@ -199,14 +199,6 @@ PossibleEnvironments NeoPkCU::updateState(
 
 
 PossibleEnvironments NeoPkCU::updateState(
-    const ConstEnvironmentPossible& cEnvP,
-    const Action& actionA,
-    const Action& actionB) const {
-  return updateState(cEnvP.getEnv(), actionA, actionB);
-}
-
-
-PossibleEnvironments NeoPkCU::updateState(
     const ConstEnvironmentVolatile& cEnv,
     const ActionMap& actionsA,
     const ActionMap& actionsB) const {
@@ -392,20 +384,6 @@ std::vector<ActionMap> NeoPkCU::getAllValidActions(
 IsValidResult NeoPkCU::isValidAction(
     const ConstEnvironmentVolatile& envV, TEAM iTeam, const Action& action) const {
   return isValidAction(envV, Actor(iTeam, envV.getTeam(iTeam).getICPKV()), action);
-}
-
-
-IsValidResult NeoPkCU::isValidAction(
-    const ConstEnvironmentPossible& envV, TEAM iTeam, const Action& action) const {
-  return isValidAction(envV.getEnv(), iTeam, action);
-}
-
-
-IsValidResult NeoPkCU::isValidAction(
-    const ConstEnvironmentPossible& envP,
-    const Actor& actor,
-    const Action& action) const {
-  return isValidAction(envP.getEnv(), actor, action);
 }
 
 
@@ -744,11 +722,6 @@ ValidSwapSet NeoPkCU::getValidSwapFlags(
 }
 
 
-bool NeoPkCU::isGameOver(const ConstEnvironmentPossible& envV) const {
-  return isGameOver(envV.getEnv());
-}
-
-
 bool NeoPkCU::isGameOver(const ConstEnvironmentVolatile& envV) const {
   return getGameState(envV) != MATCH_MIDGAME;
 }
@@ -772,9 +745,4 @@ MatchState NeoPkCU::getGameState(const ConstEnvironmentVolatile& envV) const {
   case 3:  // game is over, tie
     return MATCH_TIE;
   };
-}
-
-
-MatchState NeoPkCU::getGameState(const ConstEnvironmentPossible& envV) const {
-  return getGameState(envV.getEnv());
 }

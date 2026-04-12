@@ -202,11 +202,13 @@ TEST_F(RampageTest, OutrageDoesNotPreventFreeSwitch) {
   auto result = setupRampageInterruptedByDeath(0);
   auto state2 = result.where1Hit(TEAM_B);
 
-  // The fainted pokemon should not be prevented from switching (re-replacement)
+  // The fainted pokemon is deactivated. The bench pokemon should activate.
   EXPECT_TRUE(engine_->isValidAction(
-      state2.getEnv(), Actor(TEAM_A, 0), Action::swap(1)));
+      state2.getEnv(), Actor(TEAM_A, 1), Action::activate()));
 
-  // The fainted pokemon should not be able to move
+  // The fainted pokemon should not be able to move or swap
+  EXPECT_FALSE(engine_->isValidAction(
+      state2.getEnv(), Actor(TEAM_A, 0), Action::swap(1)));
   EXPECT_FALSE(engine_->isValidAction(
       state2.getEnv(), Actor(TEAM_A, 0), Action::move(0)));
 }

@@ -159,6 +159,8 @@ public:
   using impl_t::impl_t;
 
   operator ConstEnvironmentPossible() const { return ConstEnvironmentPossible{nv(), data()}; };
+  operator ConstEnvironmentVolatile() const { return ConstEnvironmentVolatile{nv(), data().env}; };
+
 
   EnvironmentBitfield& getBitmask() { return data().getBitmask(); };
 

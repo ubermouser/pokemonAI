@@ -33,6 +33,16 @@ int move_rampage_endLockOn(PkCUEngine& cu, PokemonVolatile cPKV) {
   // if the enemy team has a free move, do not decrement lock-on counter
   if (cu.getBase().flagsFor((TEAM)cu.getICTeam()).isWaited()) { return 0; }
 
+  // if the move was unsuccessful (blocked, missed, or immune/dealt no damage),
+  // end the rampage immediately without confusion.
+  auto flags = cu.getBase().flagsFor(cu.getCActor());
+  if (flags.isBlocked() || !flags.isHit() ||
+      cu.getDamageComponent().damage == 0) {
+    status.cTeammate.lockIn_duration = 0;
+    status.cTeammate.lockIn_action = 0;
+    return 1;
+  }
+
   // 50% chance to end at stage 1:
   if (status.cTeammate.lockIn_duration == 2) {
     std::array<size_t, 2> iREnv;
