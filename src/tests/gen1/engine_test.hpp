@@ -23,7 +23,7 @@ class Gen1EngineTest : public ::testing::Test {
 
     pokedex_ = std::make_shared<PokedexDynamic>(cfg);
     engine_ = std::make_shared<PkCU>();
-    engine_->setAllowInvalidMoves(NeoPkCU::ActionValidationMethod::NONE);
+    engine_->setAllowInvalidMoves(NeoPkCU::ActionValidationMethod::WAIT_ONLY);
 
     spdlog::set_level(spdlog::level::trace);
   }

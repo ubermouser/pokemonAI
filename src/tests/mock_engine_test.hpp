@@ -21,7 +21,7 @@ class MockEngineTest : public ::testing::Test {
     pokedex_->setAllowInvalidTeams(true);
 
     engine_ = std::make_shared<PkCU>();
-    engine_->setAllowInvalidMoves(NeoPkCU::ActionValidationMethod::NONE);
+    engine_->setAllowInvalidMoves(NeoPkCU::ActionValidationMethod::WAIT_ONLY);
   }
 
   std::shared_ptr<MockPokedex> pokedex_;

@@ -43,10 +43,11 @@ class EncoreTest : public Gen4EngineTest {
     return res_encored_seismic;
   }
 
-  PossibleEnvironments setupAfterEncored() {
-    auto encored_seismic = setupEncoredSeismic();
+  PossibleEnvironments setupAlreadyEncored() {
+    // Turn 3: Blissey encored into Soft-Boiled, but already encored after pound
+    auto results = setupEncoredSeismic();
     auto res_after_encored = engine_->updateState(
-        encored_seismic.where1(), Action::move(1), Action::move(0));
+        results.where1(), Action::move(0), Action::move(1));
     return res_after_encored;
   }
 
@@ -72,21 +73,57 @@ class EncoreTest : public Gen4EngineTest {
   }
 
   PossibleEnvironments setupEncoreTaunt() {
+    // Encored Blissey is taunted while using softboiled. It must struggle
     auto res_encore_wait = setupEncoreWait();
     auto res_encore_taunt = engine_->updateState(
-        res_encore_wait.where1(), Action::move(2), Action::wait());
+        res_encore_wait.where1(), Action::move(2), Action::move(1));
     return res_encore_taunt;
   }
 
-  PossibleEnvironments setupEncoreTauntStruggle() {
-    auto res_encore_taunt = setupEncoreTaunt();
-    auto res_encore_taunt_struggle = engine_->updateState(
-        res_encore_taunt.where1(), Action::wait(), Action::move(1));
-    return res_encore_taunt_struggle;
+  PossibleEnvironments setupProbabilisticTurn3() {
+    return engine_->updateState(
+        setupAppliesEffect().where1().getEnv(),
+        Action::move(1),
+        Action::move(1));
+  }
+
+  PossibleEnvironments setupProbabilisticTurn4() {
+    return engine_->updateState(
+        setupProbabilisticTurn3().where1().getEnv(),
+        Action::move(1),
+        Action::move(1));
+  }
+
+  PossibleEnvironments setupProbabilisticTurn5() {
+    return engine_->updateState(
+        setupProbabilisticTurn4().where1().getEnv(),
+        Action::move(1),
+        Action::move(1));
+  }
+
+  PossibleEnvironments setupProbabilisticTurn6(
+      const ConstEnvironmentPossible& state5) {
+    return engine_->updateState(
+        state5.getEnv(), Action::move(1), Action::move(1));
+  }
+
+  PossibleEnvironments setupPPDepletion() {
+    auto results1 = setupWaitSeismic();
+    auto state_pp_mod = results1.where1();
+    state_pp_mod.teammate(1, 0).getMV(Action::move(0)).setPP(1);
+    return engine_->updateState(
+        state_pp_mod.getEnv(), Action::move(0), Action::wait());
+  }
+
+  PossibleEnvironments setupPPDepleted() {
+    auto results_depletion = setupPPDepletion();
+    return engine_->updateState(
+        results_depletion.where1().getEnv(), Action::wait(), Action::move(0));
   }
 
   std::shared_ptr<const EnvironmentNonvolatile> env_nv;
 };
+
 
 TEST_F(EncoreTest, FailsIfNoMoveUsed) {
   // Turn 1: Alakazam uses Encore, Blissey uses Seismic Toss.
@@ -98,6 +135,7 @@ TEST_F(EncoreTest, FailsIfNoMoveUsed) {
   EXPECT_EQ(env.teammate(1, 0).status().cTeammate.encore_duration, 0);
   EXPECT_EQ(env.teammate(1, 0).status().cTeammate.encore_action, 0);
 }
+
 
 TEST_F(EncoreTest, PreemptsChoiceIfMoveIsForbidden) {
   // If Blissey is encored in the same turn as another move is selected, the
@@ -120,7 +158,8 @@ TEST_F(EncoreTest, PreemptsChoiceIfMoveIsForbidden) {
   EXPECT_EQ(teamStatus.cTeammate.encore_action, 1);
 }
 
-TEST_F(EncoreTest, FailsIfAlreadyEncored) {
+
+TEST_F(EncoreTest, FailsIfAlreadyEncored_DoesNotResetDuration) {
   // If Blissey is already encored, using Encore again should fail and not
   // reset the duration.
 
@@ -133,13 +172,14 @@ TEST_F(EncoreTest, FailsIfAlreadyEncored) {
   // Turn 3: Blissey encored into Soft-Boiled.
   // duration should decrement due to the turn end, but NOT be reset by the
   // second Encore attempt.
-  auto results3 = setupAfterEncored();
+  auto results3 = setupAlreadyEncored();
   auto state3 = results3.where1();
 
   auto teamStatus = state3.teammate(1, 0).status();
   // Duration should be durationAfterTurn2 - 1
   EXPECT_EQ(teamStatus.cTeammate.encore_duration, durationAfterTurn2 - 1);
 }
+
 
 TEST_F(EncoreTest, AppliesEffect) {
   // Turn 1: Blissey uses Soft-Boiled, Alakazam uses Psychic
@@ -154,61 +194,57 @@ TEST_F(EncoreTest, AppliesEffect) {
   EXPECT_EQ(teamStatus.cTeammate.encore_action, 1);
 }
 
-TEST_F(EncoreTest, RestrictsMoves) {
-  // Turn 1: Blissey uses Seismic Toss (Move 0)
-  // Turn 2: Alakazam uses Encore
-  // Blissey should be Encored into Seismic Toss (Move 0)
 
+TEST_F(EncoreTest, RestrictsMoves_DisallowsNonEncoredMoves) {
   auto results = setupRestrictsMoves();
   auto state = results.where1();
 
   // Blissey tries to use Soft-Boiled (Move 1) - Should be invalid
   EXPECT_FALSE(engine_->isValidAction(state, Actor(TEAM_B, 0), Action::move(1)));
+}
+
+
+TEST_F(EncoreTest, RestrictsMoves_AllowsEncoredMove) {
+  auto results = setupRestrictsMoves();
+  auto state = results.where1();
 
   // Blissey tries to use Seismic Toss (Move 0) - Should be valid
   EXPECT_TRUE(engine_->isValidAction(state, Actor(TEAM_B, 0), Action::move(0)));
 }
 
-TEST_F(EncoreTest, ProbabilisticDuration) {
-  // Turn 1: Blissey uses Soft-Boiled, Alakazam uses Psychic
-  // Turn 2: Alakazam uses Encore, Blissey uses Soft-Boiled
-  // Turn 3: Alakazam uses Psychic, Blissey uses Soft-Boiled (BOT: 6 -> 5)
-  // Note: duration was 6 at end of Turn 2 because Alakazam encores fast and
-  // Blissey moves after.
 
-  auto state_prob_3 = engine_->updateState(
-      setupAppliesEffect().where1().getEnv(), Action::move(1), Action::move(1));
-  auto state3 = state_prob_3.where1();
+TEST_F(EncoreTest, ProbabilisticDuration_DecrementsBeforeBranching) {
+  auto results3 = setupProbabilisticTurn3();
+  auto state3 = results3.where1();
   EXPECT_EQ(state3.teammate(1, 0).status().cTeammate.encore_duration, 5);
 
-  // Turn 4: BOT 5 -> 4
-  auto state_prob_4 =
-      engine_->updateState(state3.getEnv(), Action::move(1), Action::move(1));
-  auto state4 = state_prob_4.where1();
+  auto results4 = setupProbabilisticTurn4();
+  auto state4 = results4.where1();
   EXPECT_EQ(state4.teammate(1, 0).status().cTeammate.encore_duration, 4);
+}
 
-  // Turn 5: BOT 4 -> 1/4 chance to end.
-  // Turn 5 might have branched!
-  auto state_prob_5 =
-      engine_->updateState(state4.getEnv(), Action::move(1), Action::move(1));
+
+TEST_F(EncoreTest, ProbabilisticDuration_BranchesByTurn5) {
+  auto state_prob_5 = setupProbabilisticTurn5();
   EXPECT_GE(state_prob_5.size(), 2);
+}
 
-  // Turn 6: BOT 3 -> 1/3 chance to end.
+
+TEST_F(EncoreTest, ProbabilisticDuration_BranchesByTurn6) {
+  auto state_prob_5 = setupProbabilisticTurn5();
   auto state5_filtered =
       state_prob_5.where1([](const ConstEnvironmentPossible& res) {
         return res.teammate(1, 0).status().cTeammate.encore_duration == 3;
       });
 
-  auto turn6 = engine_->updateState(
-      state5_filtered.getEnv(), Action::move(1), Action::move(1));
-
-  EXPECT_GE(turn6.size(), 2);
+  auto results6 = setupProbabilisticTurn6(state5_filtered);
+  EXPECT_GE(results6.size(), 2);
 
   bool foundEnded = false;
   bool foundContinued = false;
 
-  for (size_t i = 0; i < turn6.size(); ++i) {
-    auto res = turn6.at(i);
+  for (size_t i = 0; i < results6.size(); ++i) {
+    auto res = results6.at(i);
     if (res.teammate(1, 0).status().cTeammate.encore_duration == 0) {
       foundEnded = true;
     } else {
@@ -221,14 +257,8 @@ TEST_F(EncoreTest, ProbabilisticDuration) {
   EXPECT_TRUE(foundContinued);
 }
 
-TEST_F(EncoreTest, EncoreAndTaunt) {
-  // Alakazam has Encore (Move 0)
-  // Blissey has Seismic Toss (Move 0), Soft-Boiled (Move 1), Toxic (Move 2)
 
-  // Turn 1: Blissey uses Soft-Boiled (Move 1), Alakazam uses Psychic
-  // Turn 2: Alakazam uses Encore, Blissey uses Soft-Boiled
-  // Now Alakazam uses Taunt on Turn 3.
-
+TEST_F(EncoreTest, EncoreAndTaunt_DisallowsAllMoves) {
   auto results3 = setupEncoreTaunt();
   auto env3 = results3.where1();
   EXPECT_GT(env3.teammate(1, 0).status().cTeammate.encore_duration, 0);
@@ -241,33 +271,40 @@ TEST_F(EncoreTest, EncoreAndTaunt) {
   EXPECT_FALSE(engine_->isValidAction(env3, Actor(TEAM_B, 0), Action::move(0)));
   EXPECT_FALSE(engine_->isValidAction(env3, Actor(TEAM_B, 0), Action::move(1)));
   EXPECT_FALSE(engine_->isValidAction(env3, Actor(TEAM_B, 0), Action::move(2)));
-
-  // Check for Struggle
-  EXPECT_TRUE(engine_->isValidAction(env3, Actor(TEAM_B, 0), Action::struggle()));
-
-  // Verify that updateState results in Struggle (or is blocked)
-  auto results4 = setupEncoreTauntStruggle();
-  auto env4 = results4.where1();
-
-  // Blissey should have been blocked (from Move 1 because of Taunt)
-  EXPECT_TRUE(env4.flagsFor(Actor(TEAM_B, 0)).isBlocked());
 }
 
-TEST_F(EncoreTest, EndsOnPPDepletion) {
-  // Setup Blissey with 1 PP for Seismic Toss (Move 0)
-  auto results1 = setupWaitSeismic();
-  auto state_pp_mod = results1.where1();
-  state_pp_mod.teammate(1, 0).getMV(Action::move(0)).setPP(1);
 
-  auto state_pp_encored = engine_->updateState(
-      state_pp_mod.getEnv(), Action::move(0), Action::wait());
-  auto state2 = state_pp_encored.where1();
+TEST_F(EncoreTest, EncoreAndTaunt_AllowsStatusMoveBeforeTaunt) {
+  auto resultsBefore = setupEncoreWait();
+  auto stateBefore = resultsBefore.where1();
 
-  EXPECT_GT(state2.teammate(1, 0).status().cTeammate.encore_duration, 0);
+  // At this point, Blissey is encored but NOT taunted.
+  // Softboiled (Move 1) should be valid.
+  EXPECT_TRUE(
+      engine_->isValidAction(stateBefore, Actor(TEAM_B, 0), Action::move(1)));
+}
 
-  // Blissey uses Seismic Toss (Move 0), using up its last PP
-  auto results_pp_depletion =
-      engine_->updateState(state2.getEnv(), Action::wait(), Action::move(0));
+
+TEST_F(EncoreTest, EncoreAndTaunt_AllowsStruggle) {
+  auto resultsAfter = setupEncoreTaunt();
+  auto envAfter = resultsAfter.where1();
+  EXPECT_TRUE(
+      engine_->isValidAction(envAfter, Actor(TEAM_B, 0), Action::struggle()));
+}
+
+
+TEST_F(EncoreTest, EncoreAndTaunt_TriggersStruggle) {
+  auto resultsAfter = setupEncoreTaunt();
+  auto envAfter = resultsAfter.where1();
+
+  // Blissey should have been blocked (from Move 1 because of Taunt applied this
+  // turn) and used Struggle
+  EXPECT_TRUE(envAfter.flagsFor(Actor(TEAM_B, 0)).isBlocked());
+}
+
+
+TEST_F(EncoreTest, EndsOnPPDepletion_EndsDuration) {
+  auto results_pp_depletion = setupPPDepleted();
   auto state3 = results_pp_depletion.where1();
 
   // Encore should end because PP is 0
