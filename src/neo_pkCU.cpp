@@ -93,29 +93,28 @@ std::ostream& operator<<(
 
 boost::program_options::options_description NeoPkCU::Config::options(
     const std::string& category, std::string prefix) {
-  Config defaults{};
   po::options_description desc{category};
 
   if (prefix.size() > 0) { prefix.append("-"); }
   // clang-format off
   desc.add_options()
       ((prefix + "engine-verbosity").c_str(),
-      po::value<int>(&verbosity)->default_value(defaults.verbosity),
+      po::value<int>(&verbosity)->default_value(verbosity),
       "verbosity level, controls status printing.")
       ((prefix + "engine-accuracy").c_str(),
-      po::value<size_t>(&numRandomEnvironments)->default_value(defaults.numRandomEnvironments),
+      po::value<size_t>(&numRandomEnvironments)->default_value(numRandomEnvironments),
       "number of random environments to create per hit/crit 1-16.")
       ((prefix + "num-active-pokemon").c_str(),
-      po::value<size_t>(&numActivePokemon)->default_value(defaults.numActivePokemon),
+      po::value<size_t>(&numActivePokemon)->default_value(numActivePokemon),
       "number of active Pokemon on each team.")
       ((prefix + "state-select-method").c_str(),
-      po::value<StateSelectMethod>(&stateSelectMethod)->default_value(defaults.stateSelectMethod),
+      po::value<StateSelectMethod>(&stateSelectMethod)->default_value(stateSelectMethod),
       "method used to select resulting environments: RANDOM, MOST_LIKELY, ALL.")
       ((prefix + "allow-invalid-moves").c_str(),
-      po::value<ActionValidationMethod>(&allowInvalidMoves)->default_value(defaults.allowInvalidMoves),
+      po::value<ActionValidationMethod>(&allowInvalidMoves)->default_value(allowInvalidMoves),
       "method used to validate actions: FULL, WAIT_ONLY, NONE.")
       ((prefix + "max-num-states").c_str(),
-      po::value<size_t>(&maxNumStates)->default_value(defaults.maxNumStates),
+      po::value<size_t>(&maxNumStates)->default_value(maxNumStates),
       "maximum number of states the engine should return when StateSelectMethod is RANDOM or MOST_LIKELY.");
 
   // clang-format on

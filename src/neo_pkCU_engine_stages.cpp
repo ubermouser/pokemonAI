@@ -268,6 +268,7 @@ void NeoPkCUEngine::evaluateMove_selectOrder() {
 
       FixType baseProb = getBase().getProbability();
       FixType outcomeProb = baseProb / (int32_t)numOutcomes;
+      FixType accumulatedProb = FixType(0);
 
       // Ensure stable sorting for permutation
       std::sort(
@@ -279,7 +280,15 @@ void NeoPkCUEngine::evaluateMove_selectOrder() {
       size_t iPerm = 0;
       do {
         size_t iIdx = indices[iPerm++];
-        getBase(iIdx).getProbability() = outcomeProb;
+
+        if (iPerm == numOutcomes) {
+          // exclude remainder on last permuted outcome:
+          getBase(iIdx).getProbability() = baseProb - accumulatedProb;
+        } else {
+          getBase(iIdx).getProbability() = outcomeProb;
+          accumulatedProb += outcomeProb;
+        }
+
         for (size_t i = 0; i < N; ++i) {
           stackFrame_[iIdx].moveBrackets[tiedActors[i]].tiebreaker =
               static_cast<uint32_t>(N - i);

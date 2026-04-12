@@ -33,6 +33,7 @@ struct Config {
 
   static Config create(const Config& prototype) {
     Config result = prototype;
+    result.agentEngine = result.engine;
     for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
       result.agent[iTeam] = planners::config(result.planner[iTeam]);
       result.agenteval[iTeam] = evaluators::config(result.evaluator[iTeam]);
@@ -77,7 +78,7 @@ struct Config {
     desc.add(pokedex.options());
     desc.add(game.options());
     desc.add(engine.options("engine configuration"));
-    desc.add(engine.options("agent-engine configuration", "agent"));
+    desc.add(agentEngine.options("agent-engine configuration", "agent"));
 
     // TODO(@drendleman) - Config should default to base-class, then be specified if valid
     desc.add(agent[TEAM_A]->options("agent-a planner configuration", "a"));
