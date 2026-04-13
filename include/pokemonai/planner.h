@@ -161,6 +161,25 @@ protected:
       const FitnessDepth& highCutoff = FitnessDepth::best(),
       size_t* nodesEvaluated=NULL) const;
 
+  /**
+   * @brief Generates a baseline action map for a team.
+   *
+   * The resulting ActionMap will contain defaultAction for every currently
+   * active actor on the team. If pokemon activations are necessary, the
+   * first available pokemon will be activated with the defaultAction.
+   *
+   * @param team The team to generate actions for.
+   * @param defaultAction The action to use for each active actor.
+   * @return An ActionMap containing default actions for all active actors.
+   */
+  virtual ActionMap getBaselineActionMap(
+      const ConstTeamVolatile& team,
+      const Action& defaultAction = Action::wait()) const;
+  virtual void fillRemainingActionsWithDefaults(
+      const ConstTeamVolatile& team,
+      ActionMap& actionMap,
+      const Action& defaultAction = Action::wait()) const;
+
   /* Recurse through other actions, pruning nodes above high and below low.
    *
    * @param origin - the state to be recursed upon

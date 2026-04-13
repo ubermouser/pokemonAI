@@ -43,6 +43,7 @@ class Actor {
 };
 
 std::ostream& operator<<(std::ostream& os, const Actor& actor);
+std::istream& operator>>(std::istream& is, Actor& actor);
 
 namespace std {
 template <>

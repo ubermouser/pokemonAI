@@ -135,6 +135,7 @@ class PKAISHARED NeoPkCU {
   NeoPkCU& setStateSelectMethod(StateSelectMethod method);
   NeoPkCU& setMaxNumStates(size_t maxNumStates);
   NeoPkCU& setAllowInvalidMoves(ActionValidationMethod allow = ActionValidationMethod::NONE);
+  Config getConfig() const { return cfg_; }
 
   /**
    * @brief Simulates a single turn of a Pokemon battle.
@@ -149,7 +150,7 @@ class PKAISHARED NeoPkCU {
    * @param actionB The action of the first active pokemon of team B.
    * @return A `PossibleEnvironments` object containing all possible outcomes.
    */
-  [[deprecated]] PossibleEnvironments updateState(
+  PossibleEnvironments updateState(
       const ConstEnvironmentVolatile& cEnv,
       const Action& actionA,
       const Action& actionB) const;
@@ -180,15 +181,31 @@ class PKAISHARED NeoPkCU {
       const ConstEnvironmentVolatile& envV, const Actor& actor) const;
   ActionVector getValidSwapActions(
       const ConstEnvironmentVolatile& envV, const Actor& actor) const;
-  ActorActionVector getValidEntryActions(
-      const ConstEnvironmentVolatile& envV, TEAM iTeam) const;
-  [[deprecated]] ActionVector getValidActions(
-      const ConstEnvironmentVolatile& envV, TEAM iTeam) const;
-  [[deprecated]] ActionVector getValidMoveActions(
-      const ConstEnvironmentVolatile& envV, TEAM iTeam) const;
-  [[deprecated]] ActionVector getValidSwapActions(
-      const ConstEnvironmentVolatile& envV, TEAM iTeam) const;
 
+  /**
+   * @brief Returns a list of all valid entry actions for both teams.
+   * @param envV The current volatile environment.
+   * @return An `ActorActionVector` containing all valid entry actions.
+   */
+  ActorActionVector getValidEntryActions(
+      const ConstEnvironmentVolatile& envV) const;
+  /**
+   * @brief Returns a list of all valid entry actions for a team.
+   * @param team The current team.
+   * @return An `ActorActionVector` containing all valid entry actions.
+   */
+  ActorActionVector getValidEntryActions(const ConstTeamVolatile& team) const;
+
+
+  /**
+   * @brief Checks if a set of actions are valid for a given team.
+   * @param envV The current volatile environment.
+   * @param actions The actions to check.
+   * @return IsValidResult::VALID if all actions are valid, or the first reason
+   *         why any action within the map is invalid.
+   */
+  IsValidResult isValidAction(
+      const ConstEnvironmentVolatile& envV, const ActionMap& actions) const;
   /**
    * @brief Checks if a given action is valid for a team in the current state.
    * @param envV The current volatile environment.
@@ -196,10 +213,6 @@ class PKAISHARED NeoPkCU {
    * @param action The action to check.
    * @return An `IsValidResult` object indicating if the action is valid.
    */
-  [[deprecated]] IsValidResult isValidAction(
-      const ConstEnvironmentVolatile& envV,
-      const TEAM iTeam,
-      const Action& action) const;
   IsValidResult isValidAction(
       const ConstEnvironmentVolatile& envV,
       const Actor& actor,
@@ -216,6 +229,10 @@ class PKAISHARED NeoPkCU {
       const Action& action) const;
   IsValidResult isValidAction_activate(
       const ConstEnvironmentVolatile& envV,
+      const Actor& actor,
+      const Action& action) const;
+  IsValidResult isValidAction_activate(
+      const ConstTeamVolatile& team,
       const Actor& actor,
       const Action& action) const;
   IsValidResult isValidAction_wait(

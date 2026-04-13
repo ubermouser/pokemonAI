@@ -21,6 +21,11 @@ public:
 
   virtual PlannerHuman* clone() const override { return new PlannerHuman(*this); }
 
+  virtual PlannerHuman& setEngine(const std::shared_ptr<PkCU>& cu) override;
+  virtual PlannerHuman& setEngine(const PkCU& cu) override {
+    return setEngine(std::make_shared<PkCU>(cu));
+  }
+
 protected:
   std::reference_wrapper<std::istream> in_;
 
@@ -34,6 +39,48 @@ protected:
    * Prints all possible actions a given pokemon may take to stdout
    */
   void printActions(const ConstEnvironmentPossible& env) const;
+
+  /**
+   * Collects actions for a given actor, grouped by move type
+   */
+  std::unordered_map<size_t, ActionVector> actionsPerMoveType(
+      const ConstEnvironmentVolatile& env, const Actor& actor) const;
+
+  /**
+   * Prints all possible move actions for a given team
+   */
+  void printActions_moves(
+      const ConstEnvironmentPossible& env,
+      const ConstTeamVolatile& cTeam,
+      const std::vector<Actor>& actors,
+      double currentFitness) const;
+
+  /**
+   * Prints all possible swap actions for a given team
+   */
+  void printActions_swaps(
+      const ConstEnvironmentPossible& env,
+      const ConstTeamVolatile& cTeam,
+      const std::vector<Actor>& actors,
+      double currentFitness) const;
+
+  /**
+   * Prints all possible new-teammate activations
+   */
+  void printActions_activations(
+      const ConstEnvironmentPossible& env,
+      const ConstTeamVolatile& cTeam,
+      double currentFitness) const;
+
+  /**
+   * Calculates the change in fitness for a given action
+   */
+  std::string getFitnessDelta(
+      const ConstEnvironmentPossible& env,
+      const ConstTeamVolatile& cTeam,
+      double currentFitness,
+      const Actor& actor,
+      const Action& action) const;
 
   virtual std::string baseName() const override { return "Human"; }
 

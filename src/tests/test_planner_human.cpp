@@ -85,7 +85,7 @@ TEST_F(PlannerHumanTest, MoveVolatileOperatorOutput) {
 }
 
 
-TEST_F(PlannerHumanTest, HumanPlannerActionReader) {
+TEST_F(PlannerHumanTest, ActionReader_1v1) {
   Action result;
   std::istringstream input("m2");
   PlannerHuman::Config cfg;
@@ -288,4 +288,37 @@ TEST_F(PlannerHumanTest, StateTransitionPrinterDamageOnSwitch) {
   SCOPED_TRACE(output);
   EXPECT_TRUE(output.find("metagross lost") != std::string::npos)
       << "Expected to find 'metagross lost ... HP' in output";
+}
+
+
+TEST_F(PlannerHumanTest, ActionReader_2v2) {
+  // Setup 2v2 environment
+  engine_->setNumActivePokemon(2);
+  auto state = engine_->initialState();
+
+  // Input m1 for first actor, m1 for second actor
+  std::istringstream input("m1\nm1\n");
+  PlannerHuman::Config cfg;
+  cfg.maxDepth = 0;
+  PlannerHuman planner(cfg, input);
+  planner.setTeam(TEAM_A)
+      .setEngine(engine_)
+      .setEnvironment(environment_)
+      .initialize();
+
+  auto solution = planner.generateSolution(state);
+  auto actions = solution.bestAgentAction();
+
+  // Should have 2 actions
+  EXPECT_EQ(actions.size(), 2);
+
+  // Verify actors
+  auto teamA = state.getTeam(TEAM_A);
+  auto actors = teamA.getActiveActors();
+  ASSERT_EQ(actors.size(), 2);
+
+  EXPECT_TRUE(actions.count(actors[0]));
+  EXPECT_TRUE(actions.count(actors[1]));
+  EXPECT_EQ(actions[actors[0]], Action::move(0));
+  EXPECT_EQ(actions[actors[1]], Action::move(0));
 }

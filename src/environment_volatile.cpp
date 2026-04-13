@@ -73,8 +73,8 @@ size_t ENV_VOLATILE_IMPL::getNumActivePokemon() const {
 
 
 ENV_VOLATILE_IMPL_TEMPLATE
-void ENV_VOLATILE_IMPL::printActivePokemon(std::ostream& os, size_t first) const {
-  // TODO: print actor id, only print agent/other once
+void ENV_VOLATILE_IMPL::printActivePokemon(
+    std::ostream& os, size_t first) const {
   for (const auto& [actor, teammate] : yieldActivePokemon((TEAM)first)) {
     os << fmt::format("\t{}: {}\n", fmt::streamed(actor), fmt::streamed(teammate));
   }

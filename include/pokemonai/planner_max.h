@@ -15,7 +15,6 @@ public:
 
   virtual PlannerMax& setEngine(const std::shared_ptr<PkCU>& cu) override;
   virtual PlannerMax& setEngine(const PkCU& cu) override {
-    // TODO(@drendleman) why do we need to override this?
     return setEngine(std::make_shared<PkCU>(cu));
   }
 

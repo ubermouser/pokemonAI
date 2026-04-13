@@ -256,9 +256,19 @@ PossibleEnvironments NeoPkCU::updateState(
     const ConstEnvironmentVolatile& cEnv,
     const Action& actionA,
     const Action& actionB) const {
+  auto guessActorForAction = [&](TEAM team) {
+    auto possibleActors = cEnv.getTeam(team).getActiveActors();
+    if (possibleActors.size() == 1) { return possibleActors[0]; }
+    throw std::runtime_error(fmt::format(
+        "UpdateState call is ambiguous for team {}: {} possible actors!", 
+        (size_t)team, 
+        possibleActors.size()
+    ));
+  };
+
   ActionMap actions{
-      {{TEAM_A, cEnv.getTeam(0).getICPKV()}, actionA},
-      {{TEAM_B, cEnv.getTeam(1).getICPKV()}, actionB}};
+      {guessActorForAction(TEAM_A), actionA},
+      {guessActorForAction(TEAM_B), actionB}};
   return updateState(cEnv, actions);
 }
 
@@ -356,12 +366,6 @@ ActionVector NeoPkCU::getValidActions(
 }
 
 
-ActionVector NeoPkCU::getValidActions(
-    const ConstEnvironmentVolatile& envV, TEAM iTeam) const {
-  return getValidActions(envV, Actor(iTeam, envV.getTeam(iTeam).getICPKV()));
-}
-
-
 ActionVector NeoPkCU::getValidMoveActions(
     const ConstEnvironmentVolatile& envV, const Actor& actor) const {
   ActionVector result;
@@ -372,12 +376,6 @@ ActionVector NeoPkCU::getValidMoveActions(
 }
 
 
-ActionVector NeoPkCU::getValidMoveActions(
-    const ConstEnvironmentVolatile& envV, TEAM iTeam) const {
-  return getValidMoveActions(envV, Actor(iTeam, envV.getTeam(iTeam).getICPKV()));
-}
-
-
 ActionVector NeoPkCU::getValidSwapActions(
     const ConstEnvironmentVolatile& envV, const Actor& actor) const {
   ActionVector result;
@@ -385,12 +383,6 @@ ActionVector NeoPkCU::getValidSwapActions(
     if (isValidAction(envV, actor, action)) { result.push_back(action); }
   }
   return result;
-}
-
-
-ActionVector NeoPkCU::getValidSwapActions(
-    const ConstEnvironmentVolatile& envV, TEAM iTeam) const {
-  return getValidSwapActions(envV, Actor(iTeam, envV.getTeam(iTeam).getICPKV()));
 }
 
 
@@ -423,7 +415,7 @@ std::vector<ActionMap> NeoPkCU::getAllValidActions(
   // 2. Handle empty slots (entries from bench)
   size_t numToFill = numRequiredToActivate(team);
   if (numToFill > 0) {
-    ActorActionVector entryActions = getValidEntryActions(envV, agentTeam);
+    ActorActionVector entryActions = getValidEntryActions(team);
 
     for (size_t iFill = 0; iFill < numToFill; ++iFill) {
       std::vector<ActionMap> expanded;
@@ -447,8 +439,16 @@ std::vector<ActionMap> NeoPkCU::getAllValidActions(
 
 
 IsValidResult NeoPkCU::isValidAction(
-    const ConstEnvironmentVolatile& envV, TEAM iTeam, const Action& action) const {
-  return isValidAction(envV, Actor(iTeam, envV.getTeam(iTeam).getICPKV()), action);
+    const ConstEnvironmentVolatile& envV, const ActionMap& actions) const {
+  guardNonvolatileState(envV);
+  guardCorrectActionCount(envV, actions);
+
+  for (const auto& [actor, action] : actions) {
+    IsValidResult result = isValidAction(envV, actor, action);
+    if (!result) { return result; }
+  }
+
+  return IsValidResult::VALID;
 }
 
 
@@ -619,19 +619,29 @@ IsValidResult NeoPkCU::isValidAction_activate(
     const Actor& actor,
     const Action& action) const {
   assert(action.isActivate());
-  ConstTeamVolatile cTV = envV.getTeam(actor.iTeam());
+
+  return isValidAction_activate(envV.getTeam(actor.iTeam()), actor, action);
+}
+
+
+IsValidResult NeoPkCU::isValidAction_activate(
+    const ConstTeamVolatile& cTV,
+    const Actor& actor,
+    const Action& action) const {
+  assert(action.isActivate());
+  assert(actor.iTeam() == cTV.nv().iTeam());
 
   // is the pokemon we're activating a valid teammate?
   if (actor.iTeammate() >= cTV.nv().getNumTeammates()) {
     return IsValidResult::SWITCH_INVALID_POKEMON;
   }
 
-  ConstPokemonVolatile cPKV = envV.teammate(actor);
+  ConstPokemonVolatile cPKV = cTV.teammate(actor);
 
   if (cPKV.isActive()) { return IsValidResult::SWITCH_ACTIVE_POKEMON; }
   if (!cPKV.isAlive()) { return IsValidResult::SWITCH_POKEMON_FAINTED; }
 
-  if (numRequiredToActivate(envV.getTeam(actor.iTeam())) == 0) {
+  if (numRequiredToActivate(cTV) == 0) {
     return IsValidResult::SWITCH_ACTOR_NOT_ACTIVE;
   }
 
@@ -640,15 +650,27 @@ IsValidResult NeoPkCU::isValidAction_activate(
 
 
 ActorActionVector NeoPkCU::getValidEntryActions(
-    const ConstEnvironmentVolatile& envV, TEAM iTeam) const {
+    const ConstTeamVolatile& cTV) const {
   ActorActionVector result;
-  ConstTeamVolatile cTV = envV.getTeam(iTeam);
   if (numRequiredToActivate(cTV) == 0) { return result; }
 
   for (const auto& [actor, pkv] : cTV.yieldInactivePokemon()) {
     Action action = Action::activate();
-    if (isValidAction_activate(envV, actor, action)) {
+    if (isValidAction_activate(cTV, actor, action)) {
       result.push_back(std::make_pair(actor, action));
+    }
+  }
+  return result;
+}
+
+
+ActorActionVector NeoPkCU::getValidEntryActions(
+    const ConstEnvironmentVolatile& envV) const {
+  ActorActionVector result;
+  for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
+    const auto& team = envV.getTeam(iTeam);
+    for (const auto& actorActionPair : getValidEntryActions(team)) {
+      result.push_back(actorActionPair);
     }
   }
   return result;

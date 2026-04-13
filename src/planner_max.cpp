@@ -19,7 +19,7 @@
 PlannerMax& PlannerMax::setEngine(const std::shared_ptr<PkCU>& cu) {
   // copy, rather than share
   Planner::setEngine(std::make_shared<PkCU>(*cu));
-  cu_->setAllowInvalidMoves();
+  cu_->setAllowInvalidMoves(PkCU::ActionValidationMethod::WAIT_ONLY);
   return *this;
 }
 
@@ -29,25 +29,9 @@ PlyResult PlannerMax::generateSolutionAtDepth(
   // a count of the number of nodes evaluated:
   PlyResult result;
 
-  ActionMap otherAction;
   TEAM otherTeam = (agentTeam_ == TEAM_A) ? TEAM_B : TEAM_A;
   const auto& teamV = origin.getEnv().getTeam(otherTeam);
-
-  // 1. Fill in wait() for all currently active actors.
-  for (const auto& actor : teamV.yieldActiveActors()) {
-    otherAction[actor] = Action::wait();
-  }
-
-  // 2. If replacements are needed, use getValidEntryActions.
-  size_t numToFill = cu_->numRequiredToActivate(teamV);
-  if (numToFill > 0) {
-    auto entryActions = cu_->getValidEntryActions(origin.getEnv(), otherTeam);
-    for (size_t i = 0; i < numToFill && i < entryActions.size(); ++i) {
-      if (otherAction.find(entryActions[i].first) == otherAction.end()) {
-        otherAction[entryActions[i].first] = entryActions[i].second;
-      }
-    }
-  }
+  ActionMap otherAction = getBaselineActionMap(teamV);
 
   // determine the best action based upon the evaluator's prediction:
   for (const auto& action :

@@ -327,8 +327,7 @@ TEST_F(IsValidAction1v1Test, SwapBothDead) {
 
 TEST_F(IsValidAction1v1Test, ValidEntryActionsCount) {
   auto active_dead = setup_TA0_dead();
-  auto actions =
-      engine_->getValidEntryActions(active_dead.where1().getEnv(), TEAM_A);
+  auto actions = engine_->getValidEntryActions(active_dead.where1().getEnv());
 
   fmt::print("{}", fmt::streamed(actions));
   EXPECT_EQ(actions.size(), 2);  // (both pkmn 1 and 2 can enter play)

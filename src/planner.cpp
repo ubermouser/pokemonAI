@@ -254,6 +254,49 @@ EvalResult Planner::recurse_beta(
 }
 
 
+ActionMap Planner::getBaselineActionMap(
+    const ConstTeamVolatile& team, const Action& defaultAction) const {
+  ActionMap baseline;
+  for (const auto& actor : team.getActiveActors()) {
+    baseline[actor] = defaultAction;
+  }
+
+  fillRemainingActionsWithDefaults(team, baseline, defaultAction);
+
+  return baseline;
+}
+
+
+void Planner::fillRemainingActionsWithDefaults(
+    const ConstTeamVolatile& team,
+    ActionMap& actionMap,
+    const Action& defaultAction) const {
+  // assign default action for every known actor without an action:
+  for (const auto& actor : team.yieldActiveActors()) {
+    if (actionMap.find(actor) == actionMap.end()) {
+      actionMap[actor] = defaultAction;
+    }
+  }
+  // count how many activations the user has already assigned:
+  size_t numActivations = 0;
+  for (const auto& [actor, action] : actionMap) {
+    if (action.isActivate()) { numActivations++; }
+  }
+  // determine how many more activations are required:
+  size_t numToFill =
+      std::max((int)cu_->numRequiredToActivate(team) - (int)numActivations, 0);
+  // insert the first valid activation action for each actor without an action:
+  for (const auto& [actor, action] : cu_->getValidEntryActions(team)) {
+    if (actionMap.count(actor)) { continue; }
+    actionMap[actor] = action;
+
+    if (--numToFill == 0) { break; }
+  }
+
+  assert(numToFill == 0);
+}
+
+
 EvalResult Planner::recurse_gamma(
     const ConstEnvironmentPossible& origin,
     const ActionMap& agentAction,
