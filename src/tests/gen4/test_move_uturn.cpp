@@ -43,14 +43,16 @@ class UTurnTest : public Gen4EngineTest {
         sr.where1(), Action::moveAlly(0, 1), Action::wait());
   }
 
-  PossibleEnvironments setupSwapToScizor() {
+  PossibleEnvironments setup_TA1_vs_TB0_TB1_fainted() {
     auto uturn = setup_TA1_vs_TB1_UTurn();
-    return engine_->updateState(
-        uturn.where1(), Action::wait(), Action::swap(0));
+    // Team B's Torterra (index 1) has fainted. Scizor (index 0) must enter.
+    ActionMap actionsA = {{{TEAM_A, 1}, Action::wait()}};
+    ActionMap actionsB = {{{TEAM_B, 0}, Action::activate()}};
+    return engine_->updateState(uturn.where1(), actionsA, actionsB);
   }
 
   PossibleEnvironments setupUTurnNoAlly() {
-    auto scizor = setupSwapToScizor();
+    auto scizor = setup_TA1_vs_TB0_TB1_fainted();
     return engine_->updateState(
         scizor.where1(), Action::wait(), Action::moveAlly(0, 0));
   }
@@ -69,7 +71,7 @@ TEST_F(UTurnTest, requires_pokemon_to_swap_if_ally_exists) {
 
 
 TEST_F(UTurnTest, can_still_be_used_without_swap_if_no_allies_exist) {
-  auto scizor = setupSwapToScizor();
+  auto scizor = setup_TA1_vs_TB0_TB1_fainted();
   EXPECT_FALSE(
       engine_->isValidAction(scizor.where1().getEnv(), Actor(TEAM_B, 0), Action::move(0)));
   EXPECT_TRUE(engine_->isValidAction(

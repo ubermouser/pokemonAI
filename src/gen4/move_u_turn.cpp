@@ -13,9 +13,12 @@ int move_uTurn_swapOnTurnEnd(
   auto action = cu.getCAction();
   TeamVolatile tV = cu.getTV();
 
-  // u-turn performs no swap when the actor is the swap target (acceptable only
-  // if no valid swap targets exist)
-  if (action.iFriendly() == actor.iTeammate()) { return 1; }
+  // u-turn performs no swap when the actor has no friendly target specified,
+  // or when the actor is the swap target (acceptable only if no valid swap
+  // targets exist)
+  if (!action.targetedFriendly() || action.iFriendly() == actor.iTeammate()) {
+    return 1;
+  }
 
   auto& frame = cu.getStackFrame();
 
@@ -35,14 +38,14 @@ int move_uTurn_testMoveSwap(
     ValidMoveSet& moveAllowed) {
   if (&mV.getBase() != uTurn_t) { return 0; }
 
-  // normally, a friendly targeting move is disallowed when target friendly
-  // pokemon is dead. But
-  //  u-turn is allowed when there are no friendly pokemon.
-  if (cTV.numTeammatesAlive() == 1) {
-    moveAllowed[VALID_MOVE_TARGET_IS_OTHER] = true;
+  if (!action.targetedFriendly()) {
+    moveAllowed[VALID_MOVE_SCRIPT] = false;
   }
 
-  return 1;
+  // Allow self-targeting for U-turn as it handles its own swap logic.
+  moveAllowed[VALID_MOVE_TARGET_IS_OTHER] = true;
+
+  return 2;
 }
 
 
