@@ -4,42 +4,47 @@
 #include <unordered_map>
 
 
-void OrderHeuristic::initialize() { major_counts_.fill(ActionCounts{}); }
+void OrderHeuristic::initialize() { counts_.clear(); }
 
 
-size_t OrderHeuristic::getBin(const ConstEnvironmentVolatile& env, size_t iTeam) const {
-  return (iTeam * 36) + (env.getTeam(iTeam).getICPKV() * 6) + env.getOtherTeam(iTeam).getICPKV();
-}
-
-void OrderHeuristic::increment(
-    const ConstEnvironmentVolatile& env, size_t iTeam, const Action& action) {
-  major_counts_[getBin(env, iTeam)][action] += 1;
+void OrderHeuristic::increment(const Actor& actor, const Action& action) {
+  counts_[{actor, action}] += 1;
 }
 
 
-ActionVector& OrderHeuristic::order(
-    const ConstEnvironmentVolatile& env, size_t iTeam, ActionVector& actions, const Action& killer) const {
+void OrderHeuristic::increment(const ActionMap& actionMap) {
+  for (const auto& [actor, action] : actionMap) { increment(actor, action); }
+}
 
-  auto getCount = [&](const Action& a){
-    uint64_t count = 0;
-    const ActionCounts& counts = major_counts_[getBin(env, iTeam)];
-    auto countIterator = counts.find(a);
-    if (countIterator != counts.end()) {
-      count = countIterator->second;
+
+std::vector<ActionMap>& OrderHeuristic::order(
+    const ConstEnvironmentVolatile& env,
+    std::vector<ActionMap>& actions,
+    const ActionMap& killer) const {
+  auto getMapCount = [&](const ActionMap& map) {
+    uint64_t total = 0;
+    for (const auto& [actor, action] : map) {
+      auto it = counts_.find({actor, action});
+      if (it != counts_.end()) { total += it->second; }
     }
-    return count;
+    return total;
   };
 
   // sort actions in the ActionVector in order of their cutoff counts
-  std::sort(std::begin(actions), std::end(actions), [&](auto& a, auto& b){
-    if (a == killer) { return true; }
-    else if (b == killer) { return false; }
-    else {
-      auto count_a = getCount(a);
-      auto count_b = getCount(b);
-      return count_a > count_b;
-    }
-  });
+  std::sort(
+      std::begin(actions),
+      std::end(actions),
+      [&](const auto& a, const auto& b) {
+        if (a == killer) {
+          return true;
+        } else if (b == killer) {
+          return false;
+        } else {
+          auto count_a = getMapCount(a);
+          auto count_b = getMapCount(b);
+          return count_a > count_b;
+        }
+      });
 
   return actions;
 }

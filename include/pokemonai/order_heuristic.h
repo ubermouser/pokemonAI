@@ -10,29 +10,37 @@
 
 #include <array>
 #include <unordered_map>
+#include <vector>
 
 #include "action.h"
+#include "actor.h"
 #include "environment_volatile.h"
 
 class OrderHeuristic {
-public:
- // TODO(@drendleman) Supporting multibattles here requires hashing ActionMap.
- using ActionCounts = std::unordered_map<Action, uint64_t>;
+ public:
+  struct PairHash {
+    size_t operator()(const std::pair<Actor, Action>& p) const {
+      auto h1 = std::hash<Actor>{}(p.first);
+      auto h2 = std::hash<Action>{}(p.second);
+      return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2));
+    }
+  };
 
- void increment(
-     const ConstEnvironmentVolatile& env, size_t iTeam, const Action& action);
+  using ActionCounts =
+      std::unordered_map<std::pair<Actor, Action>, uint64_t, PairHash>;
 
- ActionVector& order(
-     const ConstEnvironmentVolatile& env,
-     size_t iTeam,
-     ActionVector& actions,
-     const Action& killer = Action{}) const;
+  void increment(const Actor& actor, const Action& action);
+  void increment(const ActionMap& actionMap);
 
- void initialize();
-protected:
-  size_t getBin(const ConstEnvironmentVolatile& env, size_t iTeam) const;
+  std::vector<ActionMap>& order(
+      const ConstEnvironmentVolatile& env,
+      std::vector<ActionMap>& actions,
+      const ActionMap& killer = ActionMap{}) const;
 
-  std::array<ActionCounts, (6 * 6 * 2)> major_counts_;
+  void initialize();
+
+ protected:
+  ActionCounts counts_;
 };
 
 #endif
