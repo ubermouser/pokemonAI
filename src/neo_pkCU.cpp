@@ -640,7 +640,7 @@ IsValidResult NeoPkCU::isValidAction_activate(
 
 
 ActorActionVector NeoPkCU::getValidEntryActions(
-    const ConstEnvironmentVolatile& envV, size_t iTeam) const {
+    const ConstEnvironmentVolatile& envV, TEAM iTeam) const {
   ActorActionVector result;
   ConstTeamVolatile cTV = envV.getTeam(iTeam);
   if (numRequiredToActivate(cTV) == 0) { return result; }

@@ -181,7 +181,7 @@ class PKAISHARED NeoPkCU {
   ActionVector getValidSwapActions(
       const ConstEnvironmentVolatile& envV, const Actor& actor) const;
   ActorActionVector getValidEntryActions(
-      const ConstEnvironmentVolatile& envV, size_t iTeam) const;
+      const ConstEnvironmentVolatile& envV, TEAM iTeam) const;
   [[deprecated]] ActionVector getValidActions(
       const ConstEnvironmentVolatile& envV, TEAM iTeam) const;
   [[deprecated]] ActionVector getValidMoveActions(

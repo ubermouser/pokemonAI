@@ -30,13 +30,26 @@ PlyResult PlannerMax::generateSolutionAtDepth(
   PlyResult result;
 
   ActionMap otherAction;
-  for (const auto& actor :
-       origin.getEnv().getOtherTeam(agentTeam_).yieldActiveActors()) {
+  TEAM otherTeam = (agentTeam_ == TEAM_A) ? TEAM_B : TEAM_A;
+  const auto& teamV = origin.getEnv().getTeam(otherTeam);
+
+  // 1. Fill in wait() for all currently active actors.
+  for (const auto& actor : teamV.yieldActiveActors()) {
     otherAction[actor] = Action::wait();
   }
 
+  // 2. If replacements are needed, use getValidEntryActions.
+  size_t numToFill = cu_->numRequiredToActivate(teamV);
+  if (numToFill > 0) {
+    auto entryActions = cu_->getValidEntryActions(origin.getEnv(), otherTeam);
+    for (size_t i = 0; i < numToFill && i < entryActions.size(); ++i) {
+      if (otherAction.find(entryActions[i].first) == otherAction.end()) {
+        otherAction[entryActions[i].first] = entryActions[i].second;
+      }
+    }
+  }
+
   // determine the best action based upon the evaluator's prediction:
-  // TODO(@drendleman) Support multi-action search in PlannerMax.
   for (const auto& action :
        cu_->getAllValidActions(origin.getEnv(), agentTeam_)) {
     EvalResult child = recurse_gamma(
