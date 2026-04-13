@@ -62,20 +62,21 @@ int move_disable_update(PkCUEngine& cu, PokemonVolatile cPKV) {
   } else {
     std::array<size_t, 2> iREnv;
     // Probability to end: 1/duration
-    cu.duplicateState(iREnv, FixType(1.0f / duration));
+    cu.duplicateState(iREnv, FixType(1, duration));
 
-    // Case 1: Disable ends
+    // Case 1: Disable continues
     {
       auto& newStatus = cu.getPKV(iREnv[0]).status().cTeammate;
-      newStatus.disable_duration = 0;
-      newStatus.disable_action = 0;
-    }
-    // Case 2: Disable continues
-    {
-      auto& newStatus = cu.getPKV(iREnv[1]).status().cTeammate;
       uint32_t new_duration = std::max((int32_t)duration - 1, 0);
       newStatus.disable_duration = new_duration;
-      newStatus.disable_action = new_duration == 0 ? 0 : teamStatus.disable_action;
+      newStatus.disable_action =
+          new_duration == 0 ? 0 : teamStatus.disable_action;
+    }
+    // Case 2: Disable ends
+    {
+      auto& newStatus = cu.getPKV(iREnv[1]).status().cTeammate;
+      newStatus.disable_duration = 0;
+      newStatus.disable_action = 0;
     }
   }
 

@@ -203,6 +203,7 @@ public:
     return stateSelect_roulette(indexState);
   }
   ConstEnvironmentPossible stateSelect_roulette(size_t& indexState) const;
+  std::vector<size_t> stateSelect_rouletteN(size_t n) const;
 
   /* selects the single most likely state deterministically */
   ConstEnvironmentPossible stateSelect_mostLikely() const {
@@ -210,6 +211,7 @@ public:
     return stateSelect_mostLikely(indexState);
   }
   ConstEnvironmentPossible stateSelect_mostLikely(size_t& indexState) const;
+  std::vector<size_t> stateSelect_mostLikelyN(size_t n) const;
 
   std::vector<ConstEnvironmentPossible> getValidEnvironments(bool sort=false) const;
 

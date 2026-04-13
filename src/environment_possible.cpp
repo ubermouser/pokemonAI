@@ -123,6 +123,32 @@ ConstEnvironmentPossible PossibleEnvironments::stateSelect_mostLikely(
 }
 
 
+std::vector<size_t> PossibleEnvironments::stateSelect_rouletteN(size_t n) const {
+  return roulette<EnvironmentPossibleData, SortByProbability>::selectDynamic(
+      *this, n, SortByProbability());
+}
+
+
+std::vector<size_t> PossibleEnvironments::stateSelect_mostLikelyN(size_t n) const {
+  std::vector<size_t> indices;
+  for (size_t i = 0; i < size(); ++i) {
+    if (!at(i).isPruned()) {
+      indices.push_back(i);
+    }
+  }
+
+  std::stable_sort(indices.begin(), indices.end(), [&](size_t a, size_t b) {
+    return at(a).getProbability() > at(b).getProbability();
+  });
+
+  if (indices.size() > n) {
+    indices.resize(n);
+  }
+
+  return indices;
+}
+
+
 size_t PossibleEnvironments::mostProbableIndex(
     const std::function<bool(const ConstEnvironmentPossible&)>& predicate)
     const {

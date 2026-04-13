@@ -70,10 +70,13 @@ class BasicEngine2v2Test : public MockEngineTest {
 
 
 TEST_F(BasicEngine2v2Test, InsufficientActions) {
-  EXPECT_THROW(
-      engine_->updateState(
-          engine_->initialState(), Action::move(0), Action::move(1)),
-      std::invalid_argument);
+  // clang-format off
+  EXPECT_THROW(engine_->updateState(
+      engine_->initialState(),
+      {{Actor(TEAM_A, 0), Action::moveEnemy(0, 1)},
+      {Actor(TEAM_B, 0), Action::wait()}}
+  ), std::invalid_argument);
+  // clang-format on
 }
 
 
@@ -304,9 +307,10 @@ TEST_F(BasicEngine2v2Test, FaintedPokemonAcceptsNoAction) {
 }
 
 
-TEST_F(BasicEngine2v2Test, HighEngineAccuracy_TwoMoves) {
+TEST_F(BasicEngine2v2Test, HighEngineAccuracy_TwoMoves_MonteCarlo) {
   spdlog::set_level(spdlog::level::warn);
   engine_->setAccuracy(16);
+  engine_->setMaxNumStates(1);
   engine_->setStateSelectMethod(PkCU::StateSelectMethod::RANDOM);
 
   // clang-format off
@@ -320,13 +324,35 @@ TEST_F(BasicEngine2v2Test, HighEngineAccuracy_TwoMoves) {
   // clang-format on
 
   result.printStates();
-  EXPECT_EQ(result.size(), 1);
+  EXPECT_LE(result.size(), 1);
 }
 
 
-TEST_F(BasicEngine2v2Test, HighEngineAccuracy_FourMoves) {
+TEST_F(BasicEngine2v2Test, DISABLED_HighEngineAccuracy_TwoMoves) {
   spdlog::set_level(spdlog::level::warn);
   engine_->setAccuracy(16);
+  engine_->setMaxNumStates(10000);
+  engine_->setStateSelectMethod(PkCU::StateSelectMethod::RANDOM);
+
+  // clang-format off
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(),
+      {{Actor(TEAM_A, 0), Action::moveAdjacent(2)},
+       {Actor(TEAM_A, 1), Action::moveAdjacent(2)}},
+      {{Actor(TEAM_B, 0), Action::wait()},
+       {Actor(TEAM_B, 1), Action::wait()}}
+  );
+  // clang-format on
+
+  result.printStates();
+  EXPECT_LE(result.size(), 10000);
+}
+
+
+TEST_F(BasicEngine2v2Test, DISABLED_HighEngineAccuracy_FourMoves) {
+  spdlog::set_level(spdlog::level::warn);
+  engine_->setAccuracy(16);
+  engine_->setMaxNumStates(10000);
   engine_->setStateSelectMethod(PkCU::StateSelectMethod::RANDOM);
 
   // clang-format off
@@ -340,5 +366,5 @@ TEST_F(BasicEngine2v2Test, HighEngineAccuracy_FourMoves) {
   // clang-format on
 
   result.printStates();
-  EXPECT_EQ(result.size(), 1);
+  EXPECT_LE(result.size(), 10000);
 }

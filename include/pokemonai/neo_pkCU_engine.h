@@ -402,6 +402,12 @@ class NeoPkCUEngine {
    * the stack is equal to 1.
    */
   bool saneStackProbability() const;
+
+  /**
+   * @brief Re-normalizes the probabilities of all environments on the stack
+   * so that they sum to exactly 1.
+   */
+  void renormalizeStackProbabilities();
 };
 
 #endif /* NEO_PKCU_ENGINE_H */

@@ -33,7 +33,8 @@ class DisableTest : public Gen4EngineTest {
 
   PossibleEnvironments setupPsychicSoftboiled() {
     // T1: Alakazam(Psychic), Blissey(Softboiled/Move 1)
-    return engine_->updateState(engine_->initialState(), Action::move(1), Action::move(1));
+    return engine_->updateState(
+        engine_->initialState(), Action::move(1), Action::move(1));
   }
 
   PossibleEnvironments setupAppliesEffect() {
@@ -48,25 +49,21 @@ class DisableTest : public Gen4EngineTest {
     return engine_->updateState(applies.where1(), Action::move(0), Action::move(2));
   }
 
-  PossibleEnvironments setupT3() {
-    auto applies = setupAppliesEffect();
-    return engine_->updateState(applies.where1(), Action::move(1), Action::move(0));
-  }
-
-  PossibleEnvironments setupT4() {
-    return engine_->updateState(setupT3().where1(), Action::move(1), Action::move(0));
-  }
-
-  PossibleEnvironments setupT5() {
-    return engine_->updateState(setupT4().where1(), Action::move(1), Action::move(0));
-  }
-
-  PossibleEnvironments setupT6() {
-    auto t5 = setupT5();
-    auto state5_filtered = t5.where1([](const ConstEnvironmentPossible& res) {
-        return res.teammate(1, 0).status().cTeammate.disable_duration == 3;
+  PossibleEnvironments setupTurnN(int n) {
+    if (n <= 2) return setupAppliesEffect();
+    auto prev = setupTurnN(n - 1);
+    auto state = prev.where1([](const ConstEnvironmentPossible& res) {
+        return res.teammate(1, 0).status().cTeammate.disable_duration > 0;
     });
-    return engine_->updateState(state5_filtered, Action::move(1), Action::move(0));
+    return engine_->updateState(state, Action::move(2), Action::wait());
+  }
+
+  FixType accumulateProbability(
+      const PossibleEnvironments& results,
+      std::function<bool(const ConstEnvironmentPossible&)> predicate) {
+    FixType sum(0);
+    for (auto env : results.where(predicate)) { sum += env.getProbability(); }
+    return sum;
   }
 };
 
@@ -114,42 +111,77 @@ TEST_F(DisableTest, FailsIfAlreadyDisabled) {
   EXPECT_EQ(state3.teammate(1, 0).status().cTeammate.disable_duration, durationAfterTurn2 - 1);
 }
 
-TEST_F(DisableTest, ProbabilisticDuration) {
-  // Similar logic to Encore logic
 
-  // T2 end: 6 (setupAppliesEffect)
-  auto applies = setupAppliesEffect();
-  EXPECT_EQ(applies.where1().teammate(1, 0).status().cTeammate.disable_duration, 6);
+TEST_F(DisableTest, Duration6) {
+  auto res = setupTurnN(2);
+  FixType prob = accumulateProbability(res, [](auto env) {
+    return env.teammate(1, 0).status().cTeammate.disable_duration == 6;
+  });
+  EXPECT_NEAR(prob.to_double(), 0.8, 1e-5);  // disable has a 20% chance to miss
+}
 
-  // T3 end: 5
-  auto t3 = setupT3();
-  EXPECT_EQ(t3.where1().teammate(1, 0).status().cTeammate.disable_duration, 5);
 
-  // T4 end: 4
-  auto t4 = setupT4();
-  EXPECT_EQ(t4.where1().teammate(1, 0).status().cTeammate.disable_duration, 4);
+TEST_F(DisableTest, Duration5) {
+  auto res = setupTurnN(3);
+  FixType prob = accumulateProbability(res, [](auto env) {
+    return env.teammate(1, 0).status().cTeammate.disable_duration == 5;
+  });
+  EXPECT_EQ(prob.to_double(), 1.0);
+}
 
+
+TEST_F(DisableTest, Duration4) {
+  auto res = setupTurnN(4);
+  FixType prob = accumulateProbability(res, [](auto env) {
+    return env.teammate(1, 0).status().cTeammate.disable_duration == 4;
+  });
+  EXPECT_EQ(prob.to_double(), 1.0);
+}
+
+
+TEST_F(DisableTest, Duration3) {
   // T5 end: 3 (75%) or 0 (25%)
-  auto t5 = setupT5();
-  EXPECT_GE(t5.size(), 2);
+  auto results = setupTurnN(5);
 
+  FixType probContinued = accumulateProbability(results, [](auto env) {
+    return env.teammate(1, 0).status().cTeammate.disable_duration == 3;
+  });
+  FixType probEnded = accumulateProbability(results, [](auto env) {
+    return env.teammate(1, 0).status().cTeammate.disable_duration == 0;
+  });
+
+  EXPECT_NEAR(probContinued.to_double(), (3.0 / 4.0), 1e-5);
+  EXPECT_NEAR(probEnded.to_double(), (1.0 / 4.0), 1e-5);
+}
+
+
+TEST_F(DisableTest, Duration2) {
   // T6 end from state5_filtered (dur 3): 2 (66%) or 0 (33%)
-  auto t6 = setupT6();
-  EXPECT_GE(t6.size(), 2);
+  auto results = setupTurnN(6);
 
-  bool foundEnded = false;
-  bool foundContinued = false;
+  FixType probContinued = accumulateProbability(results, [](auto env) {
+    return env.teammate(1, 0).status().cTeammate.disable_duration == 2;
+  });
+  FixType probEnded = accumulateProbability(results, [](auto env) {
+    return env.teammate(1, 0).status().cTeammate.disable_duration == 0;
+  });
 
-  for (size_t i = 0; i < t6.size(); ++i) {
-    auto res = t6.at(i);
-    if (res.teammate(1, 0).status().cTeammate.disable_duration == 0) {
-      foundEnded = true;
-    } else {
-      foundContinued = true;
-      EXPECT_EQ(res.teammate(1, 0).status().cTeammate.disable_duration, 2);
-    }
-  }
+  EXPECT_NEAR(probContinued.to_double(), (2.0 / 3.0), 1e-5);
+  EXPECT_NEAR(probEnded.to_double(), (1.0 / 3.0), 1e-5);
+}
 
-  EXPECT_TRUE(foundEnded);
-  EXPECT_TRUE(foundContinued);
+
+TEST_F(DisableTest, Duration1) {
+  // T7 end from state6_filtered (dur 2): 1 (50%) or 0 (50%)
+  auto results = setupTurnN(7);
+
+  FixType probContinued = accumulateProbability(results, [](auto env) {
+    return env.teammate(1, 0).status().cTeammate.disable_duration == 1;
+  });
+  FixType probEnded = accumulateProbability(results, [](auto env) {
+    return env.teammate(1, 0).status().cTeammate.disable_duration == 0;
+  });
+
+  EXPECT_NEAR(probContinued.to_double(), (1.0 / 2.0), 1e-5);
+  EXPECT_NEAR(probEnded.to_double(), (1.0 / 2.0), 1e-5);
 }

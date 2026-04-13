@@ -169,6 +169,7 @@ size_t NeoPkCUEngine::maybeCollapseStages() {
 size_t NeoPkCUEngine::collapseStages() {
   if (stack_.size() <= 1) { return 0; }
 
+  // TODO: collapseStages must be able to collapse to N states, not just 1!
   size_t indexState;
   switch (cu_.cfg_.stateSelectMethod) {
   case NeoPkCU::StateSelectMethod::RANDOM:
@@ -204,6 +205,23 @@ size_t NeoPkCUEngine::collapseStages() {
   lastStackSize_ = 1;
   getBase().getProbability() = FixType(1);
   return stack_size - 1;
+}
+
+
+void NeoPkCUEngine::renormalizeStackProbabilities() {
+  FixType probabilitySum = FixType(0);
+  for (const auto& env : stack_) { probabilitySum += env.getProbability(); }
+
+  FixType accumulated = FixType(0);
+  for (size_t i = 0; i < stack_.size() - 1; ++i) {
+    stack_[i].getProbability() = stack_[i].getProbability() / probabilitySum;
+    accumulated += stack_[i].getProbability();
+    stackFrame_[i].iStack = i;
+  }
+  if (stack_.size() > 0) {
+    stack_.back().getProbability() = FixType(1) - accumulated;
+    stackFrame_.back().iStack = stack_.size() - 1;
+  }
 }
 
 
