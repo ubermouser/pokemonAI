@@ -1,0 +1,198 @@
+{
+  "header": "PKAIE0",
+  "name": "cb-chomp",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "Empoleon",
+      "species": "Empoleon",
+      "level": 100,
+      "item": "Chople Berry",
+      "sex": 2,
+      "ability": "Torrent",
+      "nature": "Modest",
+      "moves": [
+        "Stealth Rock",
+        "Hydro Pump",
+        "Ice Beam",
+        "Protect"
+      ],
+      "iv": {
+        "atk": 0,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 252,
+        "atk": 0,
+        "def": 0,
+        "spa": 244,
+        "spd": 0,
+        "spe": 12
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Hitmontop",
+      "species": "Hitmontop",
+      "level": 100,
+      "item": "Sitrus Berry",
+      "sex": 0,
+      "ability": "Intimidate",
+      "nature": "Adamant",
+      "moves": [
+        "Fake Out",
+        "Close Combat",
+        "Sucker Punch",
+        "Detect"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 248,
+        "atk": 252,
+        "def": 0,
+        "spa": 0,
+        "spd": 8,
+        "spe": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Tyranitar",
+      "species": "Tyranitar",
+      "level": 100,
+      "item": "Lum Berry",
+      "sex": 2,
+      "ability": "Sand Stream",
+      "nature": "Adamant",
+      "moves": [
+        "Stone Edge",
+        "Pursuit",
+        "Superpower",
+        "Crunch"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 252,
+        "atk": 220,
+        "def": 0,
+        "spa": 0,
+        "spd": 0,
+        "spe": 36
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Garchomp",
+      "species": "Garchomp",
+      "level": 100,
+      "item": "Choice Band",
+      "sex": 2,
+      "ability": "Sand Veil",
+      "nature": "Jolly",
+      "moves": [
+        "Outrage",
+        "Dragon Claw",
+        "Earthquake",
+        "Sleep Talk"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 0,
+        "atk": 252,
+        "def": 0,
+        "spa": 0,
+        "spd": 4,
+        "spe": 252
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Rotom-H",
+      "species": "Rotom-H",
+      "level": 100,
+      "item": "Sitrus Berry",
+      "sex": 2,
+      "ability": "Levitate",
+      "nature": "Calm",
+      "moves": [
+        "Thunderbolt",
+        "Shadow Ball",
+        "Will-O-Wisp",
+        "Protect"
+      ],
+      "iv": {
+        "atk": 0,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 252,
+        "atk": 0,
+        "def": 0,
+        "spa": 108,
+        "spd": 148,
+        "spe": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Latios",
+      "species": "Latios",
+      "level": 100,
+      "item": "Choice Specs",
+      "sex": 0,
+      "ability": "Levitate",
+      "nature": "Timid",
+      "moves": [
+        "Draco Meteor",
+        "Psychic",
+        "Dragon Pulse",
+        "Hidden Power"
+      ],
+      "iv": {
+        "atk": 3,
+        "spa": 30,
+        "def": 31,
+        "spd": 30,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 0,
+        "atk": 0,
+        "def": 0,
+        "spa": 252,
+        "spd": 4,
+        "spe": 252
+      }
+    }
+  ]
+}

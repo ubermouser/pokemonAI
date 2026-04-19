@@ -1,0 +1,198 @@
+{
+  "header": "PKAIE0",
+  "name": "mimi",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "A Place of Solace",
+      "species": "Heatran",
+      "level": 100,
+      "item": "Chople Berry",
+      "sex": 2,
+      "ability": "Flash Fire",
+      "nature": "Timid",
+      "moves": [
+        "Heat Wave",
+        "Hidden Power",
+        "Earth Power",
+        "Will-O-Wisp"
+      ],
+      "iv": {
+        "atk": 2,
+        "spa": 30,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 4,
+        "atk": 0,
+        "def": 0,
+        "spa": 252,
+        "spd": 0,
+        "spe": 252
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "The Wind Shifts",
+      "species": "Zapdos",
+      "level": 100,
+      "item": "Sitrus Berry",
+      "sex": 2,
+      "ability": "Pressure",
+      "nature": "Timid",
+      "moves": [
+        "Thunderbolt",
+        "Hidden Power",
+        "Roost",
+        "Protect"
+      ],
+      "iv": {
+        "atk": 2,
+        "spa": 30,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 248,
+        "atk": 0,
+        "def": 0,
+        "spa": 28,
+        "spd": 128,
+        "spe": 104
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "In Silent Seas",
+      "species": "Gyarados",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 1,
+      "ability": "Intimidate",
+      "nature": "Adamant",
+      "moves": [
+        "Dragon Dance",
+        "Waterfall",
+        "Stone Edge",
+        "Protect"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 156,
+        "atk": 72,
+        "def": 96,
+        "spa": 0,
+        "spd": 0,
+        "spe": 184
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "StandAmidTheRoar",
+      "species": "Kangaskhan",
+      "level": 100,
+      "item": "Silk Scarf",
+      "sex": 1,
+      "ability": "Scrappy",
+      "nature": "Adamant",
+      "moves": [
+        "Fake Out",
+        "Return",
+        "Low Kick",
+        "Sucker Punch"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 152,
+        "atk": 252,
+        "def": 0,
+        "spa": 0,
+        "spd": 0,
+        "spe": 104
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "On Brave Mountains",
+      "species": "Tyranitar",
+      "level": 100,
+      "item": "Choice Scarf",
+      "sex": 2,
+      "ability": "Sand Stream",
+      "nature": "Jolly",
+      "moves": [
+        "Rock Slide",
+        "Crunch",
+        "Pursuit",
+        "Superpower"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 8,
+        "atk": 248,
+        "def": 0,
+        "spa": 0,
+        "spd": 0,
+        "spe": 252
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "California",
+      "species": "Metagross",
+      "level": 100,
+      "item": "Metal Coat",
+      "sex": 2,
+      "ability": "Clear Body",
+      "nature": "Adamant",
+      "moves": [
+        "Meteor Mash",
+        "Bullet Punch",
+        "Explosion",
+        "Thunder Punch"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 232,
+        "atk": 252,
+        "def": 0,
+        "spa": 0,
+        "spd": 0,
+        "spe": 24
+      }
+    }
+  ]
+}

@@ -1,0 +1,198 @@
+{
+  "header": "PKAIE0",
+  "name": "fast-suicune",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "Suicune",
+      "species": "Suicune",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 2,
+      "ability": "Pressure",
+      "nature": "Modest",
+      "moves": [
+        "Hydro Pump",
+        "Ice Beam",
+        "Calm Mind",
+        "Protect"
+      ],
+      "iv": {
+        "atk": 0,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 28,
+        "atk": 0,
+        "def": 0,
+        "spa": 252,
+        "spd": 0,
+        "spe": 228
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Kangaskhan",
+      "species": "Kangaskhan",
+      "level": 100,
+      "item": "Silk Scarf",
+      "sex": 1,
+      "ability": "Scrappy",
+      "nature": "Adamant",
+      "moves": [
+        "Fake Out",
+        "Return",
+        "Low Kick",
+        "Sucker Punch"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 160,
+        "atk": 252,
+        "def": 0,
+        "spa": 0,
+        "spd": 0,
+        "spe": 96
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Rhyperior",
+      "species": "Rhyperior",
+      "level": 100,
+      "item": "Sitrus Berry",
+      "sex": 2,
+      "ability": "Lightning Rod",
+      "nature": "Adamant",
+      "moves": [
+        "Earthquake",
+        "Rock Slide",
+        "Stealth Rock",
+        "Protect"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 252,
+        "atk": 4,
+        "def": 0,
+        "spa": 0,
+        "spd": 252,
+        "spe": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Heatran",
+      "species": "Heatran",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 2,
+      "ability": "Flash Fire",
+      "nature": "Timid",
+      "moves": [
+        "Heat Wave",
+        "Earth Power",
+        "Substitute",
+        "Protect"
+      ],
+      "iv": {
+        "atk": 0,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 0,
+        "atk": 0,
+        "def": 0,
+        "spa": 252,
+        "spd": 4,
+        "spe": 252
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Latias",
+      "species": "Latias",
+      "level": 100,
+      "item": "Choice Scarf",
+      "sex": 1,
+      "ability": "Levitate",
+      "nature": "Timid",
+      "moves": [
+        "Draco Meteor",
+        "Thunderbolt",
+        "Grass Knot",
+        "Trick"
+      ],
+      "iv": {
+        "atk": 0,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 0,
+        "atk": 0,
+        "def": 0,
+        "spa": 252,
+        "spd": 4,
+        "spe": 252
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Gyarados",
+      "species": "Gyarados",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 2,
+      "ability": "Intimidate",
+      "nature": "Adamant",
+      "moves": [
+        "Waterfall",
+        "Stone Edge",
+        "Dragon Dance",
+        "Protect"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 0,
+        "atk": 252,
+        "def": 0,
+        "spa": 0,
+        "spd": 4,
+        "spe": 252
+      }
+    }
+  ]
+}

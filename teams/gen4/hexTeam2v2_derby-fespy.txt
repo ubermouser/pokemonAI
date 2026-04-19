@@ -1,0 +1,198 @@
+{
+  "header": "PKAIE0",
+  "name": "derby",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "Metagross",
+      "species": "Metagross",
+      "level": 100,
+      "item": "Custap Berry",
+      "sex": 2,
+      "ability": "Clear Body",
+      "nature": "Adamant",
+      "moves": [
+        "Stealth Rock",
+        "Meteor Mash",
+        "Explosion",
+        "Thunder Punch"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 232,
+        "atk": 252,
+        "def": 0,
+        "spa": 0,
+        "spd": 0,
+        "spe": 24
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Salamence",
+      "species": "Salamence",
+      "level": 100,
+      "item": "Life Orb",
+      "sex": 2,
+      "ability": "Intimidate",
+      "nature": "Modest",
+      "moves": [
+        "Draco Meteor",
+        "Flamethrower",
+        "Hidden Power",
+        "Protect"
+      ],
+      "iv": {
+        "atk": 2,
+        "spa": 30,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 0,
+        "atk": 0,
+        "def": 0,
+        "spa": 252,
+        "spd": 4,
+        "spe": 252
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Tyranitar",
+      "species": "Tyranitar",
+      "level": 100,
+      "item": "Choice Band",
+      "sex": 2,
+      "ability": "Sand Stream",
+      "nature": "Adamant",
+      "moves": [
+        "Superpower",
+        "Rock Slide",
+        "Crunch",
+        "Earthquake"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 252,
+        "atk": 252,
+        "def": 0,
+        "spa": 0,
+        "spd": 4,
+        "spe": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Swampert",
+      "species": "Swampert",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 2,
+      "ability": "Torrent",
+      "nature": "Modest",
+      "moves": [
+        "Earth Power",
+        "Ice Beam",
+        "Hydro Pump",
+        "Protect"
+      ],
+      "iv": {
+        "atk": 0,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 252,
+        "atk": 0,
+        "def": 0,
+        "spa": 252,
+        "spd": 4,
+        "spe": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Bronzong",
+      "species": "Bronzong",
+      "level": 100,
+      "item": "Sitrus Berry",
+      "sex": 2,
+      "ability": "Levitate",
+      "nature": "Sassy",
+      "moves": [
+        "Trick Room",
+        "Gyro Ball",
+        "Earthquake",
+        "Explosion"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 0,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 252,
+        "atk": 40,
+        "def": 152,
+        "spa": 0,
+        "spd": 60,
+        "spe": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Rotom-H",
+      "species": "Rotom-H",
+      "level": 100,
+      "item": "Choice Specs",
+      "sex": 2,
+      "ability": "Levitate",
+      "nature": "Modest",
+      "moves": [
+        "Overheat",
+        "Thunderbolt",
+        "Shadow Ball",
+        "Trick"
+      ],
+      "iv": {
+        "atk": 0,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 252,
+        "atk": 0,
+        "def": 4,
+        "spa": 252,
+        "spd": 0,
+        "spe": 0
+      }
+    }
+  ]
+}

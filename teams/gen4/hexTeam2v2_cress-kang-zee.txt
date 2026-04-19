@@ -1,0 +1,198 @@
+{
+  "header": "PKAIE0",
+  "name": "cress-kang",
+  "pokemon": [
+    {
+      "header": "PKAIP0",
+      "name": "Cresselia",
+      "species": "Cresselia",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 1,
+      "ability": "Levitate",
+      "nature": "Bold",
+      "moves": [
+        "Psychic",
+        "Icy Wind",
+        "Moonlight",
+        "Toxic"
+      ],
+      "iv": {
+        "atk": 0,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 252,
+        "atk": 0,
+        "def": 84,
+        "spa": 0,
+        "spd": 120,
+        "spe": 52
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Kangaskhan",
+      "species": "Kangaskhan",
+      "level": 100,
+      "item": "Silk Scarf",
+      "sex": 1,
+      "ability": "Scrappy",
+      "nature": "Jolly",
+      "moves": [
+        "Fake Out",
+        "Return",
+        "Low Kick",
+        "Sucker Punch"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 0,
+        "atk": 252,
+        "def": 0,
+        "spa": 0,
+        "spd": 4,
+        "spe": 252
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Zapdos",
+      "species": "Zapdos",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 2,
+      "ability": "Pressure",
+      "nature": "Modest",
+      "moves": [
+        "Thunderbolt",
+        "Heat Wave",
+        "Protect",
+        "Roost"
+      ],
+      "iv": {
+        "atk": 0,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 248,
+        "atk": 0,
+        "def": 68,
+        "spa": 0,
+        "spd": 120,
+        "spe": 72
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Scizor",
+      "species": "Scizor",
+      "level": 100,
+      "item": "Metal Coat",
+      "sex": 2,
+      "ability": "Technician",
+      "nature": "Adamant",
+      "moves": [
+        "Swords Dance",
+        "Bug Bite",
+        "Bullet Punch",
+        "Protect"
+      ],
+      "iv": {
+        "atk": 31,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 252,
+        "atk": 252,
+        "def": 0,
+        "spa": 0,
+        "spd": 4,
+        "spe": 0
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Swampert",
+      "species": "Swampert",
+      "level": 100,
+      "item": "Sitrus Berry",
+      "sex": 2,
+      "ability": "Torrent",
+      "nature": "Calm",
+      "moves": [
+        "Earth Power",
+        "Toxic",
+        "Hydro Pump",
+        "Protect"
+      ],
+      "iv": {
+        "atk": 0,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 252,
+        "atk": 0,
+        "def": 0,
+        "spa": 168,
+        "spd": 72,
+        "spe": 16
+      }
+    },
+    {
+      "header": "PKAIP0",
+      "name": "Suicune",
+      "species": "Suicune",
+      "level": 100,
+      "item": "Leftovers",
+      "sex": 2,
+      "ability": "Pressure",
+      "nature": "Modest",
+      "moves": [
+        "Hydro Pump",
+        "Ice Beam",
+        "Calm Mind",
+        "Protect"
+      ],
+      "iv": {
+        "atk": 0,
+        "spa": 31,
+        "def": 31,
+        "spd": 31,
+        "spe": 31,
+        "hp": 31
+      },
+      "ev": {
+        "hp": 28,
+        "atk": 0,
+        "def": 0,
+        "spa": 252,
+        "spd": 0,
+        "spe": 228
+      }
+    }
+  ]
+}
