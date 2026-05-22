@@ -9,28 +9,13 @@ int move_taunt_set(
     PokemonVolatile tPKV) {
   if (&mV.getBase() != taunt_t) { return 0; }
 
-  std::array<size_t, 3> iREnv;
-  // equal probability for 3, 4, and 5 turns
-  cu.triplicateState(iREnv, FixType(1.0f / 3.0f), FixType(1.0f / 3.0f));
+  // Fails if the target is already taunted.
+  if (tPKV.status().cTeammate.taunt_duration > 0) { return 1; }
 
-  // case 1: 3 turns
-  {
-    PokemonVolatile tPKV = cu.getTPKV(iREnv[0]);
-    tPKV.status().cTeammate.taunt_duration = 3;
-  }
-  // case 2: 4 turns
-  {
-    PokemonVolatile tPKV = cu.getTPKV(iREnv[1]);
-    tPKV.status().cTeammate.taunt_duration = 4;
-  }
-  // case 3: 5 turns
-  {
-    PokemonVolatile tPKV = cu.getTPKV(iREnv[2]);
-    tPKV.status().cTeammate.taunt_duration = 5;
-  }
+  tPKV.status().cTeammate.taunt_duration = 5;
 
   return 1;
-};
+}
 
 int move_taunt_test(
     ConstTeamVolatile cTV,
@@ -49,12 +34,37 @@ int move_taunt_test(
 }
 
 int move_taunt_preempt(PkCUEngine& cu, PokemonVolatile cPKV) {
-  if (cPKV.status().cTeammate.taunt_duration > 0) {
+  auto& teamStatus = cPKV.status().cTeammate;
+  if (teamStatus.taunt_duration == 0) { return 0; }
+
+  uint32_t duration = teamStatus.taunt_duration;
+
+  if (duration == 2 || duration == 1) {
+    std::array<size_t, 2> iREnv;
+    cu.duplicateState(iREnv, FixType(1, duration + 1)); // probability to end early: 1 / (duration + 1)
+
+    // Case 1: Taunt continues
+    {
+      auto& newStatus = cu.getPKV(iREnv[0]).status().cTeammate;
+      newStatus.taunt_duration = duration - 1;
+
+      // Block status move if chosen
+      if (cu.getMV(iREnv[0]).getBase().getDamageType() == ATK_NODMG) {
+        cu.getBase(iREnv[0]).flagsFor(cu.getCActor(iREnv[0])).setBlocked();
+      }
+    }
+    // Case 2: Taunt ends
+    {
+      auto& newStatus = cu.getPKV(iREnv[1]).status().cTeammate;
+      newStatus.taunt_duration = 0;
+    }
+  } else {
+    // duration > 2 (i.e. 5, 4, 3)
+    teamStatus.taunt_duration = duration - 1;
+    // Block status move if chosen
     if (cu.getMV().getBase().getDamageType() == ATK_NODMG) {
       cu.getBase().flagsFor(cu.getCActor()).setBlocked();
     }
-
-    cPKV.status().cTeammate.taunt_duration--;
   }
 
   return 1;
