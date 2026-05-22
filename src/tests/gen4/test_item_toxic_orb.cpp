@@ -91,9 +91,9 @@ class ToxicOrbOverwriteTest : public Gen4EngineTest {
 
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->pokemon("bulbasaur"))
-          .addMove(pokedex_->move("growl"))
-          .setLevel(5));
+          .setBase(pokedex_->pokemon("mew"))
+          .addMove(pokedex_->move("will-o-wisp"))
+          .setLevel(100));
     auto team_b = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->pokemon("magikarp"))
@@ -104,22 +104,18 @@ class ToxicOrbOverwriteTest : public Gen4EngineTest {
     environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
     engine_->setEnvironment(environment_nv);
 
-    auto c_env_v = engine_->initialState();
-    EnvironmentVolatileData env_data = c_env_v.data();
-    EnvironmentVolatile env_v(c_env_v.nv(), env_data);
+    auto target_untouched = engine_->initialState();
 
-    // Set initial status to Burn
-    env_v.teammate(1, 0).setStatusAilment(AIL_NV_BURN);
-
-    // Both use their moves (index 0)
-    target_end_of_turn =
-        engine_->updateState(env_v, Action::move(0), Action::moveAlly(0, 0));
+    // Mew uses Will-O-Wisp (index 0). Magikarp uses Splash (index 0).
+    auto turn_result = engine_->updateState(
+        target_untouched, Action::move(0), Action::moveAlly(0, 0));
+    target_end_of_turn = turn_result;
   }
 
   PossibleEnvironments target_end_of_turn;
 };
 
-TEST_F(ToxicOrbOverwriteTest, OverwritesBurn) {
-  // Magikarp should be badly poisoned at the end of the turn, overwriting Burn
-  ASSERT_EQ(target_end_of_turn.where1().teammate(1, 0).getStatusAilment(), AIL_NV_POISON_TOXIC);
+TEST_F(ToxicOrbOverwriteTest, DoesNotOverwriteBurn) {
+  // Magikarp should be burned and NOT badly poisoned at the end of the turn
+  ASSERT_EQ(target_end_of_turn.where1Status(0).teammate(1, 0).getStatusAilment(), AIL_NV_BURN);
 }

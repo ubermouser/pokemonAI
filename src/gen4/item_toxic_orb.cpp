@@ -10,7 +10,12 @@ int item_toxic_orb(PkCUEngine& cu, PokemonVolatile cPKV) {
         return 0;
     }
 
-    // Toxic Orb induces Bad Poison at the end of the turn, overwriting any existing status.
+    // Toxic Orb does not activate if the pokemon already has a non-volatile status ailment.
+    if (cPKV.getStatusAilment() != AIL_NV_NONE) {
+        return 0;
+    }
+
+    // Toxic Orb induces Bad Poison at the end of the turn.
     cPKV.setStatusAilment(AIL_NV_POISON_TOXIC);
     return 1;
   }
