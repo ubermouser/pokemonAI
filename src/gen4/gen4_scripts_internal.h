@@ -128,6 +128,7 @@ extern const Item* leftovers_t;
 extern const Item* lifeOrb_t;
 extern const Item* lumBerry_t;
 extern const Item* shedShell_t;
+extern const Item* sitrusBerry_t;
 extern const Item* toxicOrb_t;
 
 extern const Ability* blaze_t;
@@ -239,6 +240,7 @@ void register_item_leftovers(const Pokedex& pkAI, std::vector<plugin>& extension
 void register_item_life_orb(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_item_lum_berry(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_item_shed_shell(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_item_sitrus_berry(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_item_toxic_orb(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_item_type_resisting_berry(const Pokedex& pkAI, std::vector<plugin>& extensions);
 

@@ -1,11 +1,11 @@
 ---
 trigger: model_decision
-description: Writing pokemon engine tests
+description: Writing tests for pokemon moves, abilities, items, and engine effects
 ---
 
-# Engine Move Testing Patterns
+# Engine Testing Patterns
 
-When writing or updating move tests for the game engine (e.g., Gen 4 Engine tests), follow these patterns to keep the tests simple, clean, and compartmentalized.
+When writing or updating move/ability/item/engine effect tests for the game engine (e.g., Gen 4 Engine tests), follow these patterns to keep the tests simple, clean, and compartmentalized.
 
 ### 1. Test Fixture Setup
 - Inherit from the generation-specific test fixture (e.g., `Gen4EngineTest`).

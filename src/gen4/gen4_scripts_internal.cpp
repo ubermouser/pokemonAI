@@ -111,6 +111,7 @@ const Item* leftovers_t;
 const Item* lifeOrb_t;
 const Item* lumBerry_t;
 const Item* shedShell_t;
+const Item* sitrusBerry_t;
 const Item* toxicOrb_t;
 
 const Ability* blaze_t;
@@ -261,6 +262,7 @@ void initializePointers(const Pokedex& pkAI) {
   lifeOrb_t = orphan::orphanCheck(items, "life orb");
   lumBerry_t = orphan::orphanCheck(items, "lum berry");
   shedShell_t = orphan::orphanCheck(items, "shed shell");
+  sitrusBerry_t = orphan::orphanCheck(items, "sitrus berry");
   toxicOrb_t = orphan::orphanCheck(items, "toxic orb");
   // abilities:
   const Abilities& abilities = dex->getAbilities();
@@ -377,6 +379,7 @@ void registerGen4Extensions(
   register_item_life_orb(pkAI, extensions);
   register_item_lum_berry(pkAI, extensions);
   register_item_shed_shell(pkAI, extensions);
+  register_item_sitrus_berry(pkAI, extensions);
   register_item_toxic_orb(pkAI, extensions);
   register_item_type_resisting_berry(pkAI, extensions);
 

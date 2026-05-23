@@ -21,7 +21,3 @@ trigger: always_on
 
 ### Development Patterns and Quirks
 - **Test Logic**: Generation specific code is dynamically linked and not recompiled with the test. You must rebuild it separately with `cmake --build --preset conan-debug --target gen4_scripts`.
-- **Test State**: When developing GenXEngineTests, try not to modify the state directly. To setup the test:
-    - Extend `Gen4EngineTest` (or your generation's test fixture).
-    - Use multi-turn engine transitions (`engine_->updateState`) to set up the state. Transitions should be generated in the test fixture rather than the test itself.
-    - If necessary, reconstruct an `EnvironmentVolatile` from `initialState().nv()` and `initialState().data()`.
