@@ -172,7 +172,7 @@ TEST_F(TrapTest, TrapClearedOnUTurn) {
   auto state2 = turn2.where1();
 
   // Team A should have switched (Crobat -> Bulbasaur).
-  EXPECT_EQ(state2.getTeam(TEAM_A).getICPKV(), 1);
+  EXPECT_TRUE(state2.teammate(TEAM_A, 1).isActive());
 
   // Trap should be cleared. Team B can switch now.
   EXPECT_TRUE(engine_->isValidAction(state2.getEnv(), Actor(TEAM_B, 0), Action::swap(1)));
@@ -228,7 +228,7 @@ TEST_F(TrapTest, TrapClearedOnUserDeath) {
        {Actor(TEAM_B, 0), Action::wait()}});
   auto state3 = turn3.where1();
 
-  EXPECT_EQ(state3.getTeam(TEAM_A).getICPKV(), 1); // Bulbasaur in
+  EXPECT_TRUE(state3.teammate(TEAM_A, 1).isActive()); // Bulbasaur in
 
   // Trap should be cleared. Team B can switch now.
   EXPECT_TRUE(engine_->isValidAction(state3.getEnv(), Actor(TEAM_B, 0), Action::swap(1)));

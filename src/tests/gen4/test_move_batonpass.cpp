@@ -48,7 +48,6 @@ TEST_F(BatonPassTest, PassesBoosts) {
   auto torterra_switched_in = turn2.where1Hit(0);
 
   // Verify switch happened
-  EXPECT_EQ(torterra_switched_in.getTeam(0).getICPKV(), 1);
   EXPECT_TRUE(torterra_switched_in.teammate(0, 1).isActive());
   EXPECT_FALSE(torterra_switched_in.teammate(0, 0).isActive());
 
@@ -71,10 +70,12 @@ TEST_F(BatonPassTest, PassesSubstitute) {
   auto torterra_switched_in = turn2.where1Hit(0);
 
   // Verify switch
-  EXPECT_EQ(torterra_switched_in.getTeam(0).getICPKV(), 1);
+  EXPECT_TRUE(torterra_switched_in.teammate(0, 1).isActive());
+  EXPECT_FALSE(torterra_switched_in.teammate(0, 0).isActive());
 
   // Verify Substitute passed
-  EXPECT_GT(torterra_switched_in.teammate(0, 1).status().cTeammate.substitute, 0);
+  EXPECT_GT(
+      torterra_switched_in.teammate(0, 1).status().cTeammate.substitute, 0);
 }
 
 TEST_F(BatonPassTest, DoesNotPassConfusion) {
@@ -82,7 +83,7 @@ TEST_F(BatonPassTest, DoesNotPassConfusion) {
   auto turn1 = engine_->updateState(
       engine_->initialState(), Action::wait(), Action::move(0));
 
-  auto scizor_confused = turn1.where1Hit(1); // Gengar (Team 1) hits
+  auto scizor_confused = turn1.where1Hit(1);  // Gengar (Team 1) hits
 
   // Verify Scizor (Team 0) is confused
   EXPECT_GT(scizor_confused.teammate(0, 0).status().cTeammate.confused, 0);
@@ -111,13 +112,14 @@ TEST_F(BatonPassTest, NormalSwitchResetsBoosts) {
   EXPECT_EQ(scizor_boosted.teammate(0, 0).getBoost(FV_ATTACK), 2);
 
   // Turn 2: Scizor switches manually to Torterra (Swap 1)
-  auto turn2 = engine_->updateState(
-      turn1.where1(), Action::swap(1), Action::wait());
+  auto turn2 =
+      engine_->updateState(turn1.where1(), Action::swap(1), Action::wait());
 
   auto torterra_switched_in = turn2.where1();
 
   // Verify switch
-  EXPECT_EQ(torterra_switched_in.getTeam(0).getICPKV(), 1);
+  EXPECT_TRUE(torterra_switched_in.teammate(0, 1).isActive());
+  EXPECT_FALSE(torterra_switched_in.teammate(0, 0).isActive());
 
   // Verify Boosts RESET (0 Atk)
   EXPECT_EQ(torterra_switched_in.teammate(0, 1).getBoost(FV_ATTACK), 0);

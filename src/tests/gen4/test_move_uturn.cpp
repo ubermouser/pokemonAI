@@ -89,7 +89,8 @@ TEST_F(UTurnTest, damages_enemy_and_swaps_to_ally) {
   EXPECT_NEAR(
       turn.where1Hit(0).teammate(0, 0).getPercentHP(), 0.9, 0.005);
   // ally has swapped out
-  EXPECT_EQ(turn.where1Hit(0).getTeam(0).getICPKV(), 1);
+  EXPECT_FALSE(turn.where1Hit(0).teammate(0, 0).isActive());
+  EXPECT_TRUE(turn.where1Hit(0).teammate(0, 1).isActive());
   EXPECT_EQ(
       turn.where1Hit(0).teammate(1, 1).getPercentHP(),
       0.);  // enemy weakling deleted
@@ -122,7 +123,7 @@ TEST_F(UTurnTest, damages_enemy_but_doesnt_swap_if_no_allies_exist) {
   EXPECT_FLOAT_EQ(
       turn.where1Hit(1).teammate(1, 0).getPercentHP(), 0.9);
   // ally NOT swapped out
-  EXPECT_EQ(turn.where1Hit(1).getTeam(1).getICPKV(), 0);
+  EXPECT_TRUE(turn.where1Hit(1).teammate(1, 0).isActive());
 }
 
 
@@ -189,7 +190,7 @@ TEST_F(UTurnTest, SwappedInPokemonShouldNotBeEncored) {
   auto state = turn1.where1Hit(0);
 
   // Torterra (Team A, index 1) is now active.
-  EXPECT_EQ(state.getTeam(0).getICPKV(), 1);
+  EXPECT_TRUE(state.teammate(0, 1).isActive());
 
   // Verify Torterra is NOT encored.
   EXPECT_EQ(state.teammate(0, 1).status().cTeammate.encore_duration, 0)

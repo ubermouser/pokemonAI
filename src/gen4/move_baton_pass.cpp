@@ -11,7 +11,8 @@ int move_batonPass(
 
   auto action = cu.getCAction();
   TeamVolatile tV = cu.getTV();
-  size_t currentPokemon = tV.getICPKV();
+  const Actor& currentActor = cu.getCActor();
+  size_t currentPokemon = currentActor.iTeammate();
   size_t targetPokemon = action.iFriendly();
 
   if (targetPokemon >= 6 || targetPokemon == currentPokemon) { return 1; }
@@ -20,7 +21,8 @@ int move_batonPass(
   VolatileStatus savedStatus = tV.getVolatile();
 
   // Perform Swap (reseting volatile)
-  if (!tV.swapPokemon(targetPokemon, false)) {
+  Actor targetActor(currentActor.iTeam(), targetPokemon);
+  if (!tV.swapPokemon(currentActor, targetActor, false)) {
     return 0; // Failed to swap
   }
 
