@@ -40,12 +40,7 @@ TEST_F(PaybackTest, normal_power_when_moving_first) {
       setup_payback.where1(), Action::move(0), Action::move(0));
 
   EXPECT_EQ(
-      payback_normal_power.where1Hit(0)
-          .getEnv()
-          .getTeam(1)
-          .getPKV()
-          .getMissingHP(),
-      31);
+      payback_normal_power.where1Hit(0).teammate(1, 1).getMissingHP(), 31);
 }
 
 
@@ -56,12 +51,7 @@ TEST_F(PaybackTest, normal_power_when_enemy_switching) {
       setup_payback.where1(), Action::move(0), Action::swap(0));
 
   EXPECT_EQ(
-      payback_normal_power.where1Hit(0)
-          .getEnv()
-          .getTeam(1)
-          .getPKV()
-          .getMissingHP(),
-      31);
+      payback_normal_power.where1Hit(0).teammate(1, 0).getMissingHP(), 31);
 }
 
 
@@ -71,10 +61,5 @@ TEST_F(PaybackTest, double_power_when_moving_second) {
       setup_payback.where1(), Action::move(0), Action::move(1));
 
   EXPECT_EQ(
-      payback_doubled_power.where1Hit(0)
-          .getEnv()
-          .getTeam(1)
-          .getPKV()
-          .getMissingHP(),
-      63);
+      payback_doubled_power.where1Hit(0).teammate(1, 1).getMissingHP(), 63);
 }

@@ -26,15 +26,9 @@ int move_haze(
       }
   };
 
-  // Reset stats for current team's active pokemon
-  TeamVolatile cTV = cu.getTV();
-  PokemonVolatile currentActive = cTV.getPKV();
-  reset_stats(currentActive);
-
-  // Reset stats for target team's active pokemon
-  TeamVolatile tTV = cu.getTTV();
-  PokemonVolatile targetActive = tTV.getPKV();
-  reset_stats(targetActive);
+  // Reset stats for current and target team's active pokemon
+  reset_stats(cPKV);
+  reset_stats(tPKV);
 
   return 1;
 };

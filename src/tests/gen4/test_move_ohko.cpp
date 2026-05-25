@@ -150,7 +150,7 @@ TEST_F(OHKOTest, IdentifyBypassesGhostImmunity) {
   state.getOtherTeam(TEAM_A).swapPokemon(2);
 
   // Set identify on Gengar
-  state.getOtherTeam(TEAM_A).getPKV().status().cTeammate.identify = 1;
+  state.teammate(TEAM_B, 2).status().cTeammate.identify = 1;
 
   // Horn Drill should now have 30% accuracy
   auto results = engine_->updateState(state, Action::move(0), Action::wait());
