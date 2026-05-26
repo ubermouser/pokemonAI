@@ -71,7 +71,7 @@ uint32_t NeoPkCUEngine::computeSpeed(const Actor& actor) {
 
   int result = 0;
   result = callPlugins<onModifySpeed_rawType>(
-      PLUGIN_ON_MODIFYSPEED, *this, pkv, speed);
+      PLUGIN_ON_MODIFYSPEED, *this, actor, speed);
 
   return speed;
 }
@@ -99,8 +99,8 @@ NeoPkCUEngine::MoveBracket NeoPkCUEngine::computeMoveBracket(
       result = callPlugins<onModifyBracket_rawType>(
           PLUGIN_ON_SETSPEEDBRACKET,
           *this,
-          mv,
-          pkv,
+          actor,
+          action,
           actionBracket);
     }
 
@@ -366,9 +366,9 @@ void NeoPkCUEngine::calculateDamage() {
     result = callPlugins<onSetPower_rawType>(
         PLUGIN_ON_CALCULATEDAMAGE,
         *this,
-        getMV(),
-        getPKV(),
-        getTPKV(),
+        getCActor(),
+        getCAction(),
+        getTarget(),
         actualDamage);
 
     // inflict damage caused upon the targetPokemon:
@@ -568,6 +568,14 @@ PokemonVolatile NeoPkCUEngine::getPKV(size_t iState) {
 }
 
 
+PokemonVolatile NeoPkCUEngine::getPKV(const Actor& actor) { return getPKV(actor, iBase_); }
+
+
+PokemonVolatile NeoPkCUEngine::getPKV(const Actor& actor, size_t iState) {
+  return getBase(iState).teammate(actor);
+}
+
+
 PokemonVolatile NeoPkCUEngine::getTPKV(size_t iState) {
   return getBase(iState).teammate(getTarget(iState));
 }
@@ -578,6 +586,15 @@ MoveVolatile NeoPkCUEngine::getMV() { return getMV(iBase_); }
 
 MoveVolatile NeoPkCUEngine::getMV(size_t iState) {
   auto& actor = getCActor(iState);
+  auto& action = getStackFrame(iState).actions.at(actor);
+  return getBase(iState).teammate(actor).getMV(action);
+}
+
+
+MoveVolatile NeoPkCUEngine::getMV(const Actor& actor) { return getMV(actor, iBase_); }
+
+
+MoveVolatile NeoPkCUEngine::getMV(const Actor& actor, size_t iState) {
   auto& action = getStackFrame(iState).actions.at(actor);
   return getBase(iState).teammate(actor).getMV(action);
 }

@@ -2,7 +2,10 @@
 
 namespace gen4 {
 
-int item_leftovers(PkCUEngine& cu, PokemonVolatile cPKV) {
+int item_leftovers(
+    PkCUEngine& cu,
+    const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   if (cPKV.hasItem() && (&cPKV.getItem() == leftovers_t)) {
     cPKV.modPercentHP(0.0625);
     return 1;

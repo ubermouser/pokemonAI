@@ -4,9 +4,11 @@ namespace gen4 {
 
 int move_belly_drum(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != bellyDrum_t) { return 0; }
 
   // Fails if HP is not enough (<= 50%)
@@ -23,10 +25,11 @@ int move_belly_drum(
 
 int move_belly_drum_secondary_probability(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     FixType& probability) {
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != bellyDrum_t) { return 0; }
 
   probability = FixType(0);

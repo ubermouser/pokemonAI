@@ -4,9 +4,11 @@ namespace gen4 {
 
 int move_leechSeed_set(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile tPKV = cu.getPKV(target);
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != leechSeed_t) { return 0; }
 
   // Fails against Grass types
@@ -20,7 +22,8 @@ int move_leechSeed_set(
   return 1;
 }
 
-int move_leechSeed_effect(PkCUEngine& cu, PokemonVolatile cPKV) {
+int move_leechSeed_effect(PkCUEngine& cu, const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   if (!cPKV.status().cTeammate.leechSeed) { return 0; }
 
   // Leech Seed deals 1/8 max HP damage

@@ -4,11 +4,13 @@ namespace gen4 {
 
 int move_leveledDamage(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  PokemonVolatile tPKV = cu.getPKV(target);
   const Type* resistedType;
-  const Move* tMove = &mV.getBase();
+  const Move* tMove = &cu.getMV(actor).getBase();
   if (tMove == seismicToss_t) {
     resistedType = ghost_t;
   } else if (tMove == nightShade_t) {

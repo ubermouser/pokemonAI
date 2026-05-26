@@ -4,10 +4,12 @@ namespace gen4 {
 
 int ability_noGuard(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     FixType& probabilityToHit) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  PokemonVolatile tPKV = cu.getPKV(target);
   bool doNoGuard = false;
   if ((cPKV.nv().abilityExists() && (&(cPKV.nv().getAbility()) == noGuard_t)) ||
       (tPKV.nv().abilityExists() && (&(tPKV.nv().getAbility()) == noGuard_t))) {

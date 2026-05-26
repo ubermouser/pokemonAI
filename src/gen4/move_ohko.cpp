@@ -4,11 +4,13 @@ namespace gen4 {
 
 int move_ohko_accuracy(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     FixType& probabilityToHit) {
-  const Move* cMove = &mV.getBase();
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  PokemonVolatile tPKV = cu.getPKV(target);
+  const Move* cMove = &cu.getMV(actor).getBase();
   if (cMove != fissure_t && cMove != guillotine_t && cMove != hornDrill_t &&
       cMove != sheerCold_t) {
     return 0;
@@ -58,10 +60,11 @@ int move_ohko_accuracy(
 
 int move_ohko_effect(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
-  const Move* cMove = &mV.getBase();
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile tPKV = cu.getPKV(target);
+  const Move* cMove = &cu.getMV(actor).getBase();
   if (cMove != fissure_t && cMove != guillotine_t && cMove != hornDrill_t &&
       cMove != sheerCold_t) {
     return 0;

@@ -5,10 +5,11 @@ namespace gen4 {
 
 int move_counterMirrorCoat(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
-  const Move* cMove = &mV.getBase();
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile tPKV = cu.getPKV(target);
+  const Move* cMove = &cu.getMV(actor).getBase();
   if (cMove != counter_t && cMove != mirrorCoat_t) { return 0; }
 
   // Must move second

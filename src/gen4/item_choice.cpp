@@ -3,7 +3,8 @@
 namespace gen4 {
 
 int item_choiceScarf_modSpeed(
-    PkCUEngine& cu, PokemonVolatile cPKV, uint32_t& speed) {
+    PkCUEngine& cu, const Actor& actor, uint32_t& speed) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   if (!cPKV.hasItem() || !(&cPKV.getItem() == choiceScarf_t)) { return 0; }
 
   speed = (speed * 3) / 2;  // increase speed by 50%
@@ -12,10 +13,12 @@ int item_choiceScarf_modSpeed(
 
 int item_choiceItem_modPower(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     fpType& modifier) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  MoveVolatile mV = cu.getMV(actor);
   if (!cPKV.hasItem()) { return 0; }
 
   const Item* cItem = &cPKV.getItem();
@@ -30,7 +33,8 @@ int item_choiceItem_modPower(
   return 1;
 };
 
-int item_choiceItem_lockMove(PkCUEngine& cu, PokemonVolatile cPKV) {
+int item_choiceItem_lockMove(PkCUEngine& cu, const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   if (!cPKV.hasItem()) { return 0; }
 
   const Item* cItem = &cPKV.getItem();

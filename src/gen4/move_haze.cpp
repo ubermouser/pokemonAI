@@ -4,10 +4,12 @@ namespace gen4 {
 
 int move_haze(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
-  const Move* tMove = &mV.getBase();
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  PokemonVolatile tPKV = cu.getPKV(target);
+  const Move* tMove = &cu.getMV(actor).getBase();
   if (tMove != haze_t) {
     return 0;
   }

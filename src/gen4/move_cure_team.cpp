@@ -4,10 +4,10 @@ namespace gen4 {
 
 int move_cureNonVolatile_team(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
-  const Move* tMove = &mV.getBase();
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  const Move* tMove = &cu.getMV(actor).getBase();
   if ((tMove != aromatherapy_t) && (tMove != healBell_t)) { return 0; }
 
   // clear nonvolatile:

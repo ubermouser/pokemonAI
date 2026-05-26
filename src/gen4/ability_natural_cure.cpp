@@ -2,7 +2,10 @@
 
 namespace gen4 {
 
-int ability_naturalCure(PkCUEngine& cu, PokemonVolatile cPKV) {
+int ability_naturalCure(
+    PkCUEngine& cu,
+    const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   if (!cPKV.nv().abilityExists() ||
       (&(cPKV.nv().getAbility()) != naturalCure_t)) {
     return 0;

@@ -4,11 +4,11 @@ namespace gen4 {
 
 int move_alwaysHits(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     FixType& probabilityToHit) {
-  const Move* cMove = &mV.getBase();
+  const Move* cMove = &cu.getMV(actor).getBase();
   if ((cMove != auraSphere_t) && (cMove != shockWave_t) &&
       (cMove != magnetBomb_t) && (cMove != shadowPunch_t) &&
       (cMove != magicalLeaf_t) && (cMove != aerialAce_t) &&

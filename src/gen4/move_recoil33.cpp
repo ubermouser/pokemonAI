@@ -5,13 +5,14 @@ namespace gen4 {
 
 int move_recoil33(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   // this plugin_t only triggered if primary has hit
   if (!cu.getBase().flagsFor((TEAM)cu.getICTeam()).isHit()) { return 0; }
 
-  const Move* cMove = &mV.getBase();
+  const Move* cMove = &cu.getMV(actor).getBase();
   if ((cMove != doubleEdge_t) && (cMove != woodHammer_t) &&
       (cMove != flareBlitz_t) && (cMove != braveBird_t) &&
       (cMove != voltTackle_t)) {

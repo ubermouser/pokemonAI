@@ -4,11 +4,11 @@ namespace gen4 {
 
 int ability_sturdy(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     FixType& probabilityToHit) {
-  const Move* cMove = &mV.getBase();
+  const Move* cMove = &cu.getMV(actor).getBase();
   if (cMove == fissure_t || cMove == guillotine_t || cMove == hornDrill_t ||
       cMove == sheerCold_t) {
     probabilityToHit = FixType(0.0);

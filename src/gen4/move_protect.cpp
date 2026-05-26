@@ -4,9 +4,11 @@ namespace gen4 {
 
 int move_protect(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != protect_t) { return 0; }
 
   // Increment counter (capped at 7 to prevent overflow/unnecessary growth)
@@ -45,10 +47,11 @@ int move_protect(
 
 int move_protect_damage(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     uint32_t& damage) {
+  PokemonVolatile tPKV = cu.getPKV(target);
   // Check if defender is protected
   if (tPKV.status().cTeammate.protected_flag) {
     // Block damage
@@ -61,9 +64,10 @@ int move_protect_damage(
 
 int move_protect_secondary(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile tPKV = cu.getPKV(target);
   if (tPKV.status().cTeammate.protected_flag) {
     return 2; // Block secondary effects
   }
@@ -72,9 +76,12 @@ int move_protect_secondary(
 
 int move_protect_status(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  PokemonVolatile tPKV = cu.getPKV(target);
+  MoveVolatile mV = cu.getMV(actor);
   if (tPKV.status().cTeammate.protected_flag) {
     // Don't block self-targeting moves
     if (&cPKV.nv() == &tPKV.nv()) { return 0; }
@@ -89,7 +96,8 @@ int move_protect_status(
   return 0;
 }
 
-int move_protect_cleanup_end(PkCUEngine& cu, PokemonVolatile cPKV) {
+int move_protect_cleanup_end(PkCUEngine& cu, const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   // Clear protected status at end of round
   cPKV.status().cTeammate.protected_flag = 0;
 

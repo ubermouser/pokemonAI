@@ -91,10 +91,11 @@ int move_hiddenPower_calculate(
 
 int move_hiddenPower_setPower(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     uint32_t& basePower) {
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != hiddenPower_t) { return 0; }
 
   basePower = mV.nv().getScriptVal_b();
@@ -103,10 +104,11 @@ int move_hiddenPower_setPower(
 
 int move_hiddenPower_setType(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     const Type*& cType) {
+  MoveVolatile mV = cu.getMV(actor);
   if (&(mV.getBase()) != hiddenPower_t) { return 0; }
 
   cType = dex->getTypes().atByIndex(mV.nv().getScriptVal_a());

@@ -4,12 +4,12 @@ namespace gen4 {
 
 int move_suicide_modLife(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   // suicide occurs regardless of hit or miss. No hasHit check.
-
-  const Move* cMove = &mV.getBase();
+  const Move* cMove = &cu.getMV(actor).getBase();
   if ((cMove != explosion_t) && (cMove != selfDestruct_t) &&
       (cMove != memento_t)) {
     return 0;
@@ -24,10 +24,11 @@ int move_suicide_modLife(
 
 int move_suicide_modPower(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     fpType& modifier) {
+  MoveVolatile mV = cu.getMV(actor);
   if ((&mV.getBase() != explosion_t) && (&mV.getBase() != selfDestruct_t)) {
     return 0;
   }

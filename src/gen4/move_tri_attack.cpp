@@ -4,9 +4,11 @@ namespace gen4 {
 
 int move_tri_attack_secondary(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile tPKV = cu.getPKV(target);
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != triAttack_t) { return 0; }
 
   // Check if target already has status

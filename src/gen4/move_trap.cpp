@@ -5,10 +5,11 @@ namespace gen4 {
 
 int move_trap_set(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
-  const Move& cMove = mV.getBase();
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile tPKV = cu.getPKV(target);
+  const Move& cMove = cu.getMV(actor).getBase();
   if ((&cMove != block_t) && (&cMove != meanLook_t) &&
       (&cMove != spiderWeb_t)) {
     return 0;
@@ -33,7 +34,8 @@ int engine_checkTrapped(
   return 0;
 }
 
-int engine_clearTrap(PkCUEngine& cu, PokemonVolatile cPKV) {
+int engine_clearTrap(PkCUEngine& cu, const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   // cPKV is the pokemon switching in (or just switched in).
 
   // 1. Clear trap on self to ensure new arrivals aren't trapped

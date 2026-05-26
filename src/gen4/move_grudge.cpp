@@ -4,9 +4,11 @@ namespace gen4 {
 
 int move_grudge(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != grudge_t) { return 0; }
 
   // Set grudge to active for the user
@@ -15,17 +17,19 @@ int move_grudge(
   return 1;
 }
 
-int move_grudge_clear(PkCUEngine& cu, PokemonVolatile cPKV) {
+int move_grudge_clear(PkCUEngine& cu, const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   cPKV.status().cTeammate.grudge = 0;
   return 0;  // Does not consume action
 }
 
 int move_grudge_trigger(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     uint32_t& damage) {
+  PokemonVolatile tPKV = cu.getPKV(target);
   // If the target (the one being attacked) has Grudge active
   if (!tPKV.status().cTeammate.grudge) { return 0; }
 

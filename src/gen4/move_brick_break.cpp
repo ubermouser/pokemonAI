@@ -4,10 +4,12 @@ namespace gen4 {
 
 int move_brickBreak_removeScreens(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     fpType& modifier) {
+  PokemonVolatile tPKV = cu.getPKV(target);
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != brickBreak_t) { return 0; }
 
   // if the target is immune to fighting type moves, the screens are not removed

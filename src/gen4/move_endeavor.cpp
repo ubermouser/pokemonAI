@@ -4,9 +4,12 @@ namespace gen4 {
 
 int move_endeavor(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  PokemonVolatile tPKV = cu.getPKV(target);
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != endeavor_t) { return 0; }
 
   // Check Type Immunity (Normal vs Ghost)

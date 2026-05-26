@@ -4,9 +4,11 @@ namespace gen4 {
 
 int move_destinyBond(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != destinyBond_t) { return 0; }
 
   // Fails if used consecutively in Gen 4
@@ -21,17 +23,20 @@ int move_destinyBond(
   return 1;
 }
 
-int move_destinyBond_clear(PkCUEngine& cu, PokemonVolatile cPKV) {
+int move_destinyBond_clear(PkCUEngine& cu, const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   cPKV.status().cTeammate.destinyBond = 0;
   return 0;  // Does not consume action
 }
 
 int move_destinyBond_trigger(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     uint32_t& damage) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  PokemonVolatile tPKV = cu.getPKV(target);
   // If the target has Destiny Bond active
   if (tPKV.status().cTeammate.destinyBond) {
     // If the damage will kill the target

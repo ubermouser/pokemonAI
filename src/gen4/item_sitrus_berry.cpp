@@ -19,24 +19,29 @@ bool checkAndTriggerSitrusBerry(PokemonVolatile pkv) {
 
 int item_sitrusBerry_endOfMove(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  PokemonVolatile tPKV = cu.getPKV(target);
   int result = 0;
   if (checkAndTriggerSitrusBerry(cPKV)) { result = 1; }
   if (checkAndTriggerSitrusBerry(tPKV)) { result = 1; }
   return result;
 }
 
-int item_sitrusBerry_onEndOfTurn(PkCUEngine& cu, PokemonVolatile cPKV) {
+int item_sitrusBerry_onEndOfTurn(PkCUEngine& cu, const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   return checkAndTriggerSitrusBerry(cPKV) ? 1 : 0;
 }
 
-int item_sitrusBerry_onEndOfRound(PkCUEngine& cu, PokemonVolatile cPKV) {
+int item_sitrusBerry_onEndOfRound(PkCUEngine& cu, const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   return checkAndTriggerSitrusBerry(cPKV) ? 1 : 0;
 }
 
-int item_sitrusBerry_onSwitchIn(PkCUEngine& cu, PokemonVolatile cPKV) {
+int item_sitrusBerry_onSwitchIn(PkCUEngine& cu, const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   return checkAndTriggerSitrusBerry(cPKV) ? 1 : 0;
 }
 

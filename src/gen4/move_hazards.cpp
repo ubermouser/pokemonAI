@@ -5,9 +5,11 @@ namespace gen4 {
 
 int move_spikes_set(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile tPKV = cu.getPKV(target);
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != spikes_t) { return 0; }
 
   uint32_t initial_spikes = tPKV.status().nonvolatile.spikes;
@@ -18,9 +20,11 @@ int move_spikes_set(
 
 int move_toxicSpikes_set(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile tPKV = cu.getPKV(target);
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != toxicSpikes_t) { return 0; }
 
   uint32_t initial_toxic = tPKV.status().nonvolatile.toxicSpikes;
@@ -31,9 +35,11 @@ int move_toxicSpikes_set(
 
 int move_stealthRock_set(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile tPKV = cu.getPKV(target);
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != stealthRock_t) { return 0; }
 
   tPKV.status().nonvolatile.stealthRock = 1;
@@ -41,7 +47,8 @@ int move_stealthRock_set(
   return 1;
 };
 
-int move_spikes_switch(PkCUEngine& cu, PokemonVolatile cPKV) {
+int move_spikes_switch(PkCUEngine& cu, const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   // spikes deals no damage if the pokemon is flying type:
   if (cPKV.getBase().hasType(flying_t)) { return 0; }
 
@@ -61,7 +68,8 @@ int move_spikes_switch(PkCUEngine& cu, PokemonVolatile cPKV) {
   }
 };
 
-int move_toxicSpikes_switch(PkCUEngine& cu, PokemonVolatile cPKV) {
+int move_toxicSpikes_switch(PkCUEngine& cu, const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   if (cPKV.getStatusAilment() != AIL_NV_NONE) { return 0; }
   switch (cPKV.status().nonvolatile.toxicSpikes) {
   case 2:  // inflict a type of poison based on tier:
@@ -76,7 +84,8 @@ int move_toxicSpikes_switch(PkCUEngine& cu, PokemonVolatile cPKV) {
   }
 };
 
-int move_stealthRock_switch(PkCUEngine& cu, PokemonVolatile cPKV) {
+int move_stealthRock_switch(PkCUEngine& cu, const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   if (cPKV.status().nonvolatile.stealthRock > 0) {
     // deal damage:
     fpType damage =

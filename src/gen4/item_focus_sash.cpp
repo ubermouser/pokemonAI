@@ -5,10 +5,11 @@ namespace gen4 {
 
 int item_focusSash(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     uint32_t& raw_damage) {
+  PokemonVolatile tPKV = cu.getPKV(target);
   if (!tPKV.hasItem() || (&tPKV.getItem() != focusSash_t)) { return 0; }
 
   // Focus Sash only works if HP is full

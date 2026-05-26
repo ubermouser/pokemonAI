@@ -4,9 +4,10 @@ namespace gen4 {
 
 int ability_pressure(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  MoveVolatile mV = cu.getMV(actor);
   // this plugin_t only triggered if primary has hit
   if (!cu.getBase().flagsFor((TEAM)cu.getICTeam()).isHit()) { return 0; }
 

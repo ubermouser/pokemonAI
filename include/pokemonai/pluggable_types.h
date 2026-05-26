@@ -8,83 +8,86 @@
 #include "engine.h"
 #include "pkCU.h"
 
+class Actor;
+class Action;
+
 // script types:
 
 typedef int (*onSwitch_rawType)
   (
   PkCUEngine&,
-  PokemonVolatile);
+  const Actor&);
 
 typedef int (*onEvaluateMove_rawType)
   (
   PkCUEngine&,
-  MoveVolatile,
-  PokemonVolatile,
-  PokemonVolatile);
+  const Actor&,
+  const Action&,
+  const Actor&);
 
 typedef int (*onModifyBracket_rawType)
   (PkCUEngine&,
-  MoveVolatile,
-  PokemonVolatile,
+  const Actor&,
+  const Action&,
   int32_t&);
 
 typedef int (*onModifySpeed_rawType)
   (PkCUEngine&,
-  PokemonVolatile,
+  const Actor&,
   uint32_t&);
 
 typedef int (*onEndOfRound_rawType)
   (PkCUEngine&,
-  PokemonVolatile
+  const Actor&
   );
 
 typedef int (*onBeginningOfTurn_rawType)
   (PkCUEngine&,
-  PokemonVolatile
+  const Actor&
   );
 
 typedef int (*onSetPower_rawType)
   (PkCUEngine&,
-  MoveVolatile,
-  PokemonVolatile,
-  PokemonVolatile,
+  const Actor&,
+  const Action&,
+  const Actor&,
   uint32_t&);
 
 typedef int (*onModifyBasePower_rawType)
   (PkCUEngine&,
-  MoveVolatile,
-  PokemonVolatile,
-  PokemonVolatile,
+  const Actor&,
+  const Action&,
+  const Actor&,
   uint32_t&);
 
 typedef int (*onModifyPower_rawType)
   (PkCUEngine&,
-  MoveVolatile,
-  PokemonVolatile,
-  PokemonVolatile,
+  const Actor&,
+  const Action&,
+  const Actor&,
   fpType&);
 
 typedef int (*onModifyTypePower_rawType)
   (PkCUEngine&,
   const Type&,
-  MoveVolatile,
-  PokemonVolatile,
-  PokemonVolatile,
+  const Actor&,
+  const Action&,
+  const Actor&,
   fpType&);
 
 typedef int (*onModifyProbability_rawType)(
-    PkCUEngine&, MoveVolatile, PokemonVolatile, PokemonVolatile, FixType&);
+    PkCUEngine&, const Actor&, const Action&, const Actor&, FixType&);
 
 typedef int (*onModifyMoveType_rawType)
   (PkCUEngine&,
-  MoveVolatile,
-  PokemonVolatile,
-  PokemonVolatile,
+  const Actor&,
+  const Action&,
+  const Actor&,
   const Type*&);
 
 typedef int (*onEndOfTurn_rawType)
   (PkCUEngine&,
-  PokemonVolatile
+  const Actor&
   );
 
 typedef int (*onInitMove_rawType)
@@ -104,7 +107,7 @@ typedef int (*onTestSwitch_rawType)
   const Action&,
   ValidSwapSet&);
 
-typedef int (*onModifyAction_rawType)(PkCUEngine&, Action&);
+typedef int (*onModifyAction_rawType)(PkCUEngine&, const Actor&, Action&);
 typedef int (*onReset_rawType)(PkCUEngine&, void*);
 
 // Plugin Signature Mapping

@@ -5,12 +5,11 @@ namespace gen4 {
 
 int move_uTurn_swapOnTurnEnd(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != uTurn_t) { return 0; }
-  auto actor = cu.getCActor();
-  auto action = cu.getCAction();
   TeamVolatile tV = cu.getTV();
 
   // u-turn performs no swap when the actor has no friendly target specified,
@@ -49,8 +48,8 @@ int move_uTurn_testMoveSwap(
 }
 
 
-int move_uTurn_modifyTarget(PkCUEngine& cu, Action& action) {
-  auto actor = cu.getCActor();
+int move_uTurn_modifyTarget(
+    PkCUEngine& cu, const Actor& actor, Action& action) {
   auto& frame = cu.getStackFrame();
   Action attackAction = Action::move(action.iMove());
   frame.targets[actor] = {

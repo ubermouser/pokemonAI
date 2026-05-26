@@ -4,9 +4,12 @@ namespace gen4 {
 
 int move_trick(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  PokemonVolatile tPKV = cu.getPKV(target);
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != trick_t && &mV.getBase() != switcheroo_t) { return 0; }
 
   // TODO: Trick fails if the target is behind a substitute.

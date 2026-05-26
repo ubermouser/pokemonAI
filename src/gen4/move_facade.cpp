@@ -4,10 +4,12 @@ namespace gen4 {
 
 int move_facade_modPower(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     fpType& modifier) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != facade_t) { return 0; }
 
   uint32_t status = cPKV.getStatusAilment();

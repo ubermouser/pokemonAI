@@ -4,9 +4,12 @@ namespace gen4 {
 
 int move_curse_set(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  PokemonVolatile tPKV = cu.getPKV(target);
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != curse_t) { return 0; }
 
   // Check if user is Ghost type
@@ -29,7 +32,10 @@ int move_curse_set(
   return 1;
 }
 
-int move_curse_effect(PkCUEngine& cu, PokemonVolatile cPKV) {
+int move_curse_effect(
+    PkCUEngine& cu,
+    const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   if (!cPKV.status().cTeammate.curse) { return 0; }
 
   // Cursed pokemon loses 1/4 of max HP

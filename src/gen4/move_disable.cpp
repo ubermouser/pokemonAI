@@ -4,9 +4,11 @@ namespace gen4 {
 
 int move_disable_set(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile tPKV = cu.getPKV(target);
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != disable_t) { return 0; }
 
   // The last move used by the opponent
@@ -47,7 +49,8 @@ int move_disable_test(
   return 1;
 }
 
-int move_disable_update(PkCUEngine& cu, PokemonVolatile cPKV) {
+int move_disable_update(PkCUEngine& cu, const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   auto& teamStatus = cPKV.status().cTeammate;
   if (teamStatus.disable_duration == 0) { return 0; }
 

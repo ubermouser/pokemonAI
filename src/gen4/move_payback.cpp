@@ -5,10 +5,11 @@ namespace gen4 {
 
 int move_payback_modPower(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     fpType& modifier) {
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != payback_t) { return 0; }
 
   // if the enemy's move is NOT a damaging move:

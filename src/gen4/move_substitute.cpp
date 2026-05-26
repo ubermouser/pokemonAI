@@ -6,9 +6,11 @@ static const uint32_t BROKEN_SUB_FLAG = 255;
 
 int move_substitute(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != substitute_t) { return 0; }
 
   // Fails if a substitute already exists
@@ -28,10 +30,11 @@ int move_substitute(
 
 int move_substitute_damage(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     uint32_t& raw_damage) {
+  PokemonVolatile tPKV = cu.getPKV(target);
   // Check for flag or 0
   if (tPKV.status().cTeammate.substitute == 0 || tPKV.status().cTeammate.substitute == BROKEN_SUB_FLAG) { return 0; }
 
@@ -48,9 +51,11 @@ int move_substitute_damage(
 
 int move_substitute_block_secondary(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  PokemonVolatile tPKV = cu.getPKV(target);
   // substitute > 0 includes BROKEN_SUB_FLAG (255)
   if (tPKV.status().cTeammate.substitute > 0) {
     // Does not block self-targeting secondary effects
@@ -63,9 +68,12 @@ int move_substitute_block_secondary(
 
 int move_substitute_block_status(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  PokemonVolatile tPKV = cu.getPKV(target);
+  MoveVolatile mV = cu.getMV(actor);
   if (tPKV.status().cTeammate.substitute > 0) {
     if (mV.getBase().getDamageType() == ATK_NODMG) {
       // Gen 4 exceptions: Taunt bypasses Substitute
@@ -80,7 +88,8 @@ int move_substitute_block_status(
   return 0;
 };
 
-int move_substitute_cleanup_preturn(PkCUEngine& cu, Action& action) {
+int move_substitute_cleanup_preturn(
+    PkCUEngine& cu, const Actor& actor, Action& action) {
   PokemonVolatile cPKV = cu.getPKV();
   if (cPKV.status().cTeammate.substitute == BROKEN_SUB_FLAG) {
     cPKV.status().cTeammate.substitute = 0;
@@ -88,7 +97,8 @@ int move_substitute_cleanup_preturn(PkCUEngine& cu, Action& action) {
   return 1;
 }
 
-int move_substitute_cleanup_end(PkCUEngine& cu, PokemonVolatile cPKV) {
+int move_substitute_cleanup_end(PkCUEngine& cu, const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   // cPKV is the attacker.
   // We want to clean up the defender (tPKV) if they have a broken substitute.
   // Also checking cPKV just in case.

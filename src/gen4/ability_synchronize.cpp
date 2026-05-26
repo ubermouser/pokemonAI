@@ -4,9 +4,11 @@ namespace gen4 {
 
 int ability_synchronize(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  PokemonVolatile tPKV = cu.getPKV(target);
   // Only run if tPKV has Synchronize (guaranteed by registration as other_team)
   if (!tPKV.nv().abilityExists() ||
       &tPKV.nv().getAbility() != synchronize_t) {
@@ -16,7 +18,7 @@ int ability_synchronize(
   // Check if tPKV has the status inflicted by the move
   // This plugin runs AFTER the engine (priority -1), so status should be applied by now
 
-  const Move& cMove = mV.getBase();
+  const Move& cMove = cu.getMV(actor).getBase();
   uint32_t targetAilment = cMove.getTargetAilment();
 
   if (tPKV.getStatusAilment() != targetAilment) { return 0; }

@@ -4,10 +4,11 @@ namespace gen4 {
 
 int ability_technician(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     fpType& basePowerModifier) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   if (!cPKV.nv().abilityExists() ||
       (&(cPKV.nv().getAbility()) != technician_t)) {
     return 0;

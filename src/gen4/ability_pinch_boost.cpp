@@ -4,10 +4,12 @@ namespace gen4 {
 
 int ability_pinch_type_boost(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     fpType& basePowerModifier) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  MoveVolatile mV = cu.getMV(actor);
   if (!cPKV.nv().abilityExists()) { return 0; }
   const Ability* ability = &cPKV.nv().getAbility();
 

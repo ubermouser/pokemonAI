@@ -4,12 +4,12 @@ namespace gen4 {
 
 int move_batonPass(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != batonPass_t) { return 0; }
 
-  auto action = cu.getCAction();
   TeamVolatile tV = cu.getTV();
   const Actor& currentActor = cu.getCActor();
   size_t currentPokemon = currentActor.iTeammate();
@@ -51,7 +51,7 @@ int move_batonPass(
   const auto& cPlugins = cu.getCPluginSet()[(size_t)PLUGIN_ON_SWITCHIN];
   for (const auto& plugin : cPlugins) {
     onSwitch_rawType cPlugin = (onSwitch_rawType)plugin.getFunction();
-    result = result | cPlugin(cu, cu.getPKV());
+    result = result | cPlugin(cu, cu.getCActor());
     if (result > 1) { break; }
   }
 

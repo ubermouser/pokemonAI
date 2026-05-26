@@ -3,7 +3,11 @@
 namespace gen4 {
 
 int move_pursuit_modBracket(
-    PkCUEngine& cu, MoveVolatile mV, PokemonVolatile cPKV, int32_t& bracket) {
+    PkCUEngine& cu,
+    const Actor& actor,
+    const Action& action,
+    int32_t& bracket) {
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != pursuit_t) { return 0; }
 
   // if the enemy's move is a swap move:
@@ -16,10 +20,11 @@ int move_pursuit_modBracket(
 
 int move_pursuit_modPower(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     fpType& modifier) {
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != pursuit_t) { return 0; }
 
   // if the enemy's move is a swap move:
@@ -32,10 +37,11 @@ int move_pursuit_modPower(
 
 int move_pursuit_modAccuracy(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     FixType& probabilityToHit) {
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != pursuit_t) { return 0; }
 
   // if the enemy's move is a swap move:

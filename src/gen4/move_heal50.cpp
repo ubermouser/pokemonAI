@@ -4,10 +4,11 @@ namespace gen4 {
 
 int move_heal50(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
-  const Move* tMove = &mV.getBase();
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  const Move* tMove = &cu.getMV(actor).getBase();
   if ((tMove != recover_t) && (tMove != milkDrink_t) && (tMove != slackOff_t) &&
       (tMove != softBoiled_t) && (tMove != healOrder_t) && (tMove != roost_t)) {
     return 0;

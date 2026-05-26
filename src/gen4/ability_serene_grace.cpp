@@ -4,10 +4,12 @@ namespace gen4 {
 
 int ability_sereneGrace(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     FixType& probabilityToSecondary) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  MoveVolatile mV = cu.getMV(actor);
   if (!cPKV.nv().abilityExists() ||
       (&(cPKV.nv().getAbility()) != sereneGrace_t)) {
     return 0;

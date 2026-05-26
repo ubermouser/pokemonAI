@@ -5,10 +5,12 @@ namespace gen4 {
 
 int item_typeResistingBerry(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     fpType& typeModifier) {
+  PokemonVolatile tPKV = cu.getPKV(target);
+  MoveVolatile mV = cu.getMV(actor);
   if (!tPKV.hasItem()) { return 0; }
 
   const Type* cType = &mV.getBase().getType();

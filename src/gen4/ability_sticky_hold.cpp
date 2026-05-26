@@ -3,7 +3,10 @@
 namespace gen4 {
 
 // Needed to show that this ability is registered (through Trick)
-int ability_doNothing(PkCUEngine& cu, PokemonVolatile cPKV) { return 0; };
+int ability_doNothing(
+    PkCUEngine& cu,
+    const Actor& actor) {
+   return 0; };
 
 void register_ability_sticky_hold(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   // clang-format off

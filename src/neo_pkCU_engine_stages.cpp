@@ -334,7 +334,7 @@ void NeoPkCUEngine::evaluateMove_modifyAction() {
 
   int result = 0;
   result = callPlugins<onModifyAction_rawType>(
-      PLUGIN_ON_MODIFYACTION, *this, action);
+      PLUGIN_ON_MODIFYACTION, *this, actor, action);
 }
 
 
@@ -361,7 +361,7 @@ void NeoPkCUEngine::evaluateMove_validateForcedAction() {
 void NeoPkCUEngine::evaluateMove_damage_onBeginningOfTurn() {
   int result = 0;
   result = callPlugins<onBeginningOfTurn_rawType>(
-      PLUGIN_ON_BEGINNINGOFTURN, *this, getPKV());
+      PLUGIN_ON_BEGINNINGOFTURN, *this, getCActor());
 }
 
 
@@ -387,7 +387,7 @@ void NeoPkCUEngine::evaluateMove_damage_modifyHitChance() {
 
   int result = 0;
   result = callPlugins<onModifyProbability_rawType>(
-      PLUGIN_ON_MODIFYHITPROBABILITY, *this, getMV(), getPKV(), getTPKV(), probabilityToHit);
+      PLUGIN_ON_MODIFYHITPROBABILITY, *this, getCActor(), getCAction(), getTarget(), probabilityToHit);
 }
 
 
@@ -446,7 +446,7 @@ void NeoPkCUEngine::evaluateMove_status_moveBase() {
 
   int result = cMove.isImplemented() ? 1 : 0;
   result = callPlugins<onEvaluateMove_rawType>(
-      PLUGIN_ON_EVALUATEMOVE, *this, getMV(), getPKV(), getTPKV());
+      PLUGIN_ON_EVALUATEMOVE, *this, getCActor(), getCAction(), getTarget());
 }
 
 
@@ -461,7 +461,7 @@ void NeoPkCUEngine::evaluateMove_damage_modifyCritChance() {
 
   int result = 0;
   result = callPlugins<onModifyProbability_rawType>(
-      PLUGIN_ON_MODIFYCRITPROBABILITY, *this, getMV(), getPKV(), getTPKV(), probabilityToCrit);
+      PLUGIN_ON_MODIFYCRITPROBABILITY, *this, getCActor(), getCAction(), getTarget(), probabilityToCrit);
 }
 
 
@@ -500,7 +500,7 @@ void NeoPkCUEngine::evaluateMove_damage_setBasePower() {
 
   int result = (basePower != UINT8_MAX) ? 1 : 0;
   result = callPlugins<onSetPower_rawType>(
-      PLUGIN_ON_SETBASEPOWER, *this, getMV(), getPKV(), getTPKV(), basePower);
+      PLUGIN_ON_SETBASEPOWER, *this, getCActor(), getCAction(), getTarget(), basePower);
 }
 
 
@@ -510,7 +510,7 @@ void NeoPkCUEngine::evaluateMove_damage_setMoveType() {
 
   int result = 0;
   result = callPlugins<onModifyMoveType_rawType>(
-      PLUGIN_ON_SETMOVETYPE, *this, getMV(), getPKV(), getTPKV(), cType);
+      PLUGIN_ON_SETMOVETYPE, *this, getCActor(), getCAction(), getTarget(), cType);
 }
 
 
@@ -520,7 +520,7 @@ void NeoPkCUEngine::evaluateMove_damage_modifyBasePower() {
 
   int result = 0;
   result = callPlugins<onModifyPower_rawType>(
-      PLUGIN_ON_MODIFYBASEPOWER, *this, getMV(), getPKV(), getTPKV(), baseModifier);
+      PLUGIN_ON_MODIFYBASEPOWER, *this, getCActor(), getCAction(), getTarget(), baseModifier);
 
   basePower = (uint32_t)(basePower * baseModifier);
 }
@@ -544,7 +544,7 @@ void NeoPkCUEngine::evaluateMove_damage_modifyAttackPower() {
   fpType attackPowerModifier = 1.0;
   int result = 0;
   result = callPlugins<onModifyPower_rawType>(
-      PLUGIN_ON_MODIFYATTACKPOWER, *this, getMV(), cPKV, tPKV, attackPowerModifier);
+      PLUGIN_ON_MODIFYATTACKPOWER, *this, getCActor(), getCAction(), getTarget(), attackPowerModifier);
 
   uint32_t attackPower = cPKV.getFV_boosted(attackType);
   uint32_t defensePower = tPKV.getFV_boosted(defenseType);
@@ -567,7 +567,7 @@ void NeoPkCUEngine::evaluateMove_damage_modifyCriticalPower() {
     fpType criticalHitModifier = 2.0;
     int result = 0;
     result = callPlugins<onModifyPower_rawType>(
-        PLUGIN_ON_MODIFYCRITICALPOWER, *this, getMV(), getPKV(), getTPKV(), criticalHitModifier);
+        PLUGIN_ON_MODIFYCRITICALPOWER, *this, getCActor(), getCAction(), getTarget(), criticalHitModifier);
     getDamageComponent().damage =
         (uint32_t)(getDamageComponent().damage * criticalHitModifier);
   }
@@ -594,7 +594,7 @@ void NeoPkCUEngine::evaluateMove_postMove() {
   }
 
   callPlugins<onEvaluateMove_rawType>(
-      PLUGIN_ON_ENDOFMOVE, *this, getMV(), getPKV(), getTPKV());
+      PLUGIN_ON_ENDOFMOVE, *this, getCActor(), getCAction(), getTarget());
 }
 
 
@@ -619,7 +619,7 @@ void NeoPkCUEngine::evaluateMove_modifySecondaryHitChance() {
 
   int result = 0;
   result = callPlugins<onModifyProbability_rawType>(
-      PLUGIN_ON_MODIFYSECONDARYPROBABILITY, *this, getMV(), getPKV(), getTPKV(), probabilityToSecondary);
+      PLUGIN_ON_MODIFYSECONDARYPROBABILITY, *this, getCActor(), getCAction(), getTarget(), probabilityToSecondary);
 }
 
 
@@ -656,14 +656,14 @@ void NeoPkCUEngine::evaluateMove_secondary() {
   if (getBase().flagsFor(getCActor()).isSecondary()) {
     int result = 0;
     result = callPlugins<onEvaluateMove_rawType>(
-        PLUGIN_ON_SECONDARYEFFECT, *this, getMV(), getPKV(), getTPKV());
+        PLUGIN_ON_SECONDARYEFFECT, *this, getCActor(), getCAction(), getTarget());
   }
 }
 
 
 void NeoPkCUEngine::evaluateMove_endOfTurn() {
   // post-turn action:
-  callPlugins<onEndOfTurn_rawType>(PLUGIN_ON_ENDOFTURN, *this, getPKV());
+  callPlugins<onEndOfTurn_rawType>(PLUGIN_ON_ENDOFTURN, *this, getCActor());
 }
 
 
@@ -703,7 +703,7 @@ void NeoPkCUEngine::evaluateMove_endOfRound() {
   if (!getPKV().isAlive()) { return; }
 
   // post-round action for current actor:
-  callPlugins<onEndOfRound_rawType>(PLUGIN_ON_ENDOFROUND, *this, getPKV());
+  callPlugins<onEndOfRound_rawType>(PLUGIN_ON_ENDOFROUND, *this, getCActor());
 }
 
 
@@ -761,16 +761,13 @@ void NeoPkCUEngine::evaluateMove_damage_modifyRawDamage() {
     BEHAVIOR with life orb / metronome!) 1 else
     */
   fpType rawDamageMultiplier = 1.0;
-  auto mv = getMV();
-  auto pkv = getPKV();
-  auto tpkv = getTPKV();
   int result = 0;
   result = callPlugins<onModifyPower_rawType>(
       PLUGIN_ON_MODIFYRAWDAMAGE,
       *this,
-      mv,
-      pkv,
-      tpkv,
+      getCActor(),
+      getCAction(),
+      getTarget(),
       rawDamageMultiplier);
 
   // incorporate raw damage modifier:
@@ -790,9 +787,9 @@ void NeoPkCUEngine::evaluateMove_damage_modifySTAB() {
   result = callPlugins<onModifyPower_rawType>(
       PLUGIN_ON_MODIFYSTAB,
       *this,
-      getMV(),
-      cPKV,
-      getTPKV(),
+      getCActor(),
+      getCAction(),
+      getTarget(),
       STABMultiplier);
 
   // incorporate STAB modifier:
@@ -816,9 +813,9 @@ void NeoPkCUEngine::evaluateMove_damage_modifyTypeResistance() {
       PLUGIN_ON_SETDEFENSETYPE,
       *this,
       *cDamage.mType,
-      getMV(),
-      getPKV(),
-      getTPKV(),
+      getCActor(),
+      getCAction(),
+      getTarget(),
       typeModifier);
 
   // incorporate type modifier:
@@ -835,9 +832,9 @@ void NeoPkCUEngine::evaluateMove_damage_modifyItemPower() {
   result = callPlugins<onModifyPower_rawType>(
       PLUGIN_ON_MODIFYITEMPOWER,
       *this,
-      getMV(),
-      getPKV(),
-      getTPKV(),
+      getCActor(),
+      getCAction(),
+      getTarget(),
       itemModifier);
 
   // incorporate item modifier:
@@ -849,7 +846,7 @@ void NeoPkCUEngine::evaluateMove_switch_onSwitchOut() {
   // do nothing if the pokemon is not active
   if (!getPKV().isActive()) { return; }
 
-  callPlugins<onSwitch_rawType>(PLUGIN_ON_SWITCHOUT, *this, getPKV());
+  callPlugins<onSwitch_rawType>(PLUGIN_ON_SWITCHOUT, *this, getCActor());
 }
 
 void NeoPkCUEngine::evaluateMove_switch_onSwitchIn() {
@@ -870,7 +867,7 @@ void NeoPkCUEngine::evaluateMove_switch_onSwitchIn() {
 
   getBase().flagsFor(swapTarget).setSwitched();
 
-  callPlugins<onSwitch_rawType>(PLUGIN_ON_SWITCHIN, *this, getPKV());
+  callPlugins<onSwitch_rawType>(PLUGIN_ON_SWITCHIN, *this, getCActor());
 
   gotoStackStage(StageType::ENDOFTURN);
 }

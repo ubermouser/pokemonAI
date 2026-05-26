@@ -4,10 +4,12 @@ namespace gen1 {
 
 int engine_modifyAttackPower_burn(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     fpType& modifier) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  MoveVolatile mV = cu.getMV(actor);
   modifier *= ((cPKV.getStatusAilment() == AIL_NV_BURN) &&
                (mV.getBase().getDamageType() == ATK_PHYSICAL))
                   ? 0.5
@@ -17,14 +19,16 @@ int engine_modifyAttackPower_burn(
 };
 
 int engine_onModifySpeed_paralyze(
-    PkCUEngine&, PokemonVolatile cPKV, uint32_t& speed) {
+    PkCUEngine& cu, const Actor& actor, uint32_t& speed) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   // divide by 4 if pokemon is paralyzed
   speed /= (cPKV.getStatusAilment() == AIL_NV_PARALYSIS) ? 4 : 1;
 
   return 1;
 };
 
-int engine_endRoundDamageEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
+int engine_endRoundDamageEffect(PkCUEngine& cu, const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   // nonvolatile:
   uint32_t condition = cPKV.getStatusAilment();
   if (condition == AIL_NV_POISON || condition == AIL_NV_BURN) {
@@ -47,7 +51,8 @@ int engine_endRoundDamageEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
   return (cPKV.isAlive() ? 1 : 2);
 };
 
-int engine_beginTurnNonvolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
+int engine_beginTurnNonvolatileEffect(PkCUEngine& cu, const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   // Does this pokemon have a non-volatile condition?
   uint32_t cStatus = cPKV.getStatusAilment();
   switch (cStatus) {
@@ -110,7 +115,8 @@ int engine_beginTurnNonvolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
   return 1;
 }  // endOf begin turn nonvolatile effect
 
-int engine_beginTurnVolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
+int engine_beginTurnVolatileEffect(PkCUEngine& cu, const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   // Does this pokemon have a volatile condition?
   if (cPKV.status().cTeammate.flinch > 0) {
     // set user blocked 100% of the time
@@ -162,10 +168,12 @@ int engine_beginTurnVolatileEffect(PkCUEngine& cu, PokemonVolatile cPKV) {
 
 int engine_secondaryBoostEffect(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
-  const Move& cMove = mV.getBase();
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  PokemonVolatile tPKV = cu.getPKV(target);
+  const Move& cMove = cu.getMV(actor).getBase();
 
   // apply buffs to the current pokemon, and debuffs to the other pokemon:
   for (size_t iBuff = 0; iBuff != 9; ++iBuff) {
@@ -186,10 +194,11 @@ int engine_secondaryBoostEffect(
 
 int engine_secondaryNonvolatileEffect(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
-  const Move& cMove = mV.getBase();
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile tPKV = cu.getPKV(target);
+  const Move& cMove = cu.getMV(actor).getBase();
 
   if (tPKV.getStatusAilment() != AIL_NV_NONE) { return 0; }
 
@@ -216,9 +225,11 @@ int engine_secondaryNonvolatileEffect(
 
 int engine_secondaryVolatileEffect(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile tPKV = cu.getPKV(target);
+  MoveVolatile mV = cu.getMV(actor);
   // apply volatile status conditions to the other pokemon:
   switch (mV.getBase().getTargetVolatileAilment()) {
   case AIL_V_CONFUSED:
@@ -238,9 +249,10 @@ int engine_secondaryVolatileEffect(
 
 int engine_decrementPP(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  MoveVolatile mV = cu.getMV(actor);
   // don't decrement PP if this move is struggle_t or the move did not hit
   if (!cu.getBase().flagsFor(cu.getCActor()).isHit() || (&mV.getBase() == struggle_t)) {
     return 0;

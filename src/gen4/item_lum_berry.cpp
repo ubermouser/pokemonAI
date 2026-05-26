@@ -2,7 +2,7 @@
 
 namespace gen4 {
 
-int item_lumBerry(PkCUEngine& cu, PokemonVolatile cPKV) {
+int item_lumBerry(PkCUEngine& cu, const Actor& actor) {
   // TODO(@drendleman) - why does this affect target pokemon and not current
   // pokemon?
   PokemonVolatile tPKV = cu.getTPKV();

@@ -5,10 +5,11 @@ namespace gen4 {
 int ability_levitate(
     PkCUEngine& cu,
     const Type& cType,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     fpType& typeModifier) {
+  PokemonVolatile tPKV = cu.getPKV(target);
   if (!tPKV.nv().abilityExists() || (&(tPKV.nv().getAbility()) != levitate_t)) {
     return 0;
   }
@@ -22,7 +23,10 @@ int ability_levitate(
   return 1;
 };
 
-int ability_levitate_switch(PkCUEngine& cu, PokemonVolatile cPKV) {
+int ability_levitate_switch(
+    PkCUEngine& cu,
+    const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   if (!cPKV.nv().abilityExists() || (&(cPKV.nv().getAbility()) != levitate_t)) {
     return 0;
   }

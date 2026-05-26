@@ -4,13 +4,14 @@ namespace gen4 {
 
 int move_lifeLeech50(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   // this plugin_t only triggered if primary has hit
   if (!cu.getBase().flagsFor((TEAM)cu.getICTeam()).isHit()) { return 0; }
 
-  const Move* cMove = &mV.getBase();
+  const Move* cMove = &cu.getMV(actor).getBase();
   if ((cMove != absorb_t) && (cMove != leechLife_t) && (cMove != gigaDrain_t) &&
       (cMove != megaDrain_t) && (cMove != drainPunch_t)) {
     return 0;

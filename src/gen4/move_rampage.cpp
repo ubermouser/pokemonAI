@@ -6,7 +6,10 @@ bool is_rampage_move(const Move* move) {
   return move == outrage_t || move == petalDance_t || move == thrash_t;
 }
 
-int move_rampage_lockMove(PkCUEngine& cu, PokemonVolatile cPKV) {
+int move_rampage_lockMove(
+    PkCUEngine& cu,
+    const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   // action is guaranteed to be a move action:
   MoveVolatile mV = cu.getMV();
   auto& status = cPKV.status();
@@ -22,7 +25,10 @@ int move_rampage_lockMove(PkCUEngine& cu, PokemonVolatile cPKV) {
   return 1;
 }
 
-int move_rampage_endLockOn(PkCUEngine& cu, PokemonVolatile cPKV) {
+int move_rampage_endLockOn(
+    PkCUEngine& cu,
+    const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   // are we locked in to a rampage move?
   auto& status = cPKV.status();
   if (status.cTeammate.lockIn_duration == 0) { return 0; }

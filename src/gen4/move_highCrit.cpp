@@ -5,11 +5,12 @@ namespace gen4 {
 
 int move_highCrit(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     FixType& probabilityToCrit) {
-  const Move* tMove = &mV.getBase();
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  const Move* tMove = &cu.getMV(actor).getBase();
   if ((tMove != airCutter_t) && (tMove != attackOrder_t) &&
       (tMove != blazeKick_t) && (tMove != crabHammer_t) &&
       (tMove != crossChop_t) && (tMove != crossPoison_t) &&

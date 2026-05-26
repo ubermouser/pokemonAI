@@ -2,7 +2,10 @@
 
 namespace gen4 {
 
-int ability_intimidate_switch(PkCUEngine& cu, PokemonVolatile cPKV) {
+int ability_intimidate_switch(
+    PkCUEngine& cu,
+    const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   if (!cPKV.nv().abilityExists() ||
       (&(cPKV.nv().getAbility()) != intimidate_t)) {
     return 0;

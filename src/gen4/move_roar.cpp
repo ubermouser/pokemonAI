@@ -5,10 +5,9 @@ namespace gen4 {
 
 int move_roar_forceSwitch(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
-  const Move* cMove = &mV.getBase();
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
   TeamVolatile tTV = cu.getTTV();
 
   // Find all valid switch-ins
@@ -24,7 +23,6 @@ int move_roar_forceSwitch(
   }
 
   auto targetActor = cu.getTarget();
-  auto actor = cu.getCActor();
   auto& frame = cu.getStackFrame();
 
   size_t iTargetActor = cu.getActorIndex(targetActor);

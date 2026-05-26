@@ -4,10 +4,11 @@ namespace gen4 {
 
 int move_suckerPunch_noDamageOnCondition(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV,
+    const Actor& actor,
+    const Action& action,
+    const Actor& target,
     uint32_t& raw_damage) {
+  MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != suckerPunch_t) { return 0; }
 
   // if the enemy's move is NOT a damaging move:

@@ -2,7 +2,10 @@
 
 namespace gen4 {
 
-int ability_poison_heal_endOfRound(PkCUEngine& cu, PokemonVolatile cPKV) {
+int ability_poison_heal_endOfRound(
+    PkCUEngine& cu,
+    const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
   if (!cPKV.nv().abilityExists() || (&cPKV.nv().getAbility() != poisonHeal_t)) {
     return 0;
   }

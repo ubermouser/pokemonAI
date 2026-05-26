@@ -4,10 +4,11 @@ namespace gen4 {
 
 int ability_restoreStats(
     PkCUEngine& cu,
-    MoveVolatile mV,
-    PokemonVolatile cPKV,
-    PokemonVolatile tPKV) {
-  const Move& cMove = mV.getBase();
+    const Actor& actor,
+    const Action& action,
+    const Actor& target) {
+  PokemonVolatile tPKV = cu.getPKV(target);
+  const Move& cMove = cu.getMV(actor).getBase();
   for (size_t iBuff = 0; iBuff != 9; ++iBuff) {
     uint32_t debuff = cMove.getTargetDebuff(iBuff);
     if (debuff > 0) {

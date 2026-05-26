@@ -33,75 +33,75 @@ inline int mock_onReset(PkCUEngine&, void*) {
 }
 
 inline int mock_onSetSpeedBracket(
-    PkCUEngine&, MoveVolatile, PokemonVolatile, int32_t&) {
+    PkCUEngine&, const Actor&, const Action&, int32_t&) {
   SPDLOG_TRACE("PLUGIN_ON_SETSPEEDBRACKET: mock_onSetSpeedBracket");
   plugin_calls[PLUGIN_ON_SETSPEEDBRACKET]++;
   return 0;
 }
 
-inline int mock_onModifySpeed(PkCUEngine&, PokemonVolatile, uint32_t&) {
+inline int mock_onModifySpeed(PkCUEngine&, const Actor&, uint32_t&) {
   SPDLOG_TRACE("PLUGIN_ON_MODIFYSPEED: mock_onModifySpeed");
   plugin_calls[PLUGIN_ON_MODIFYSPEED]++;
   return 0;
 }
 
-inline int mock_onBeginningOfTurn(PkCUEngine&, PokemonVolatile) {
+inline int mock_onBeginningOfTurn(PkCUEngine&, const Actor&) {
   SPDLOG_TRACE("PLUGIN_ON_BEGINNINGOFTURN: mock_onBeginningOfTurn");
   plugin_calls[PLUGIN_ON_BEGINNINGOFTURN]++;
   return 0;
 }
 
 inline int mock_onEvaluateMove(
-    PkCUEngine&, MoveVolatile, PokemonVolatile, PokemonVolatile) {
+    PkCUEngine&, const Actor&, const Action&, const Actor&) {
   SPDLOG_TRACE("PLUGIN_ON_EVALUATEMOVE: mock_onEvaluateMove");
   plugin_calls[PLUGIN_ON_EVALUATEMOVE]++;
   return 0;
 }
 
 inline int mock_onSetBasePower(
-    PkCUEngine&, MoveVolatile, PokemonVolatile, PokemonVolatile, uint32_t&) {
+    PkCUEngine&, const Actor&, const Action&, const Actor&, uint32_t&) {
   SPDLOG_TRACE("PLUGIN_ON_SETBASEPOWER: mock_onSetBasePower");
   plugin_calls[PLUGIN_ON_SETBASEPOWER]++;
   return 0;
 }
 
 inline int mock_onModifyBasePower(
-    PkCUEngine&, MoveVolatile, PokemonVolatile, PokemonVolatile, fpType&) {
+    PkCUEngine&, const Actor&, const Action&, const Actor&, fpType&) {
   SPDLOG_TRACE("PLUGIN_ON_MODIFYBASEPOWER: mock_onModifyBasePower");
   plugin_calls[PLUGIN_ON_MODIFYBASEPOWER]++;
   return 0;
 }
 
 inline int mock_onModifyAttackPower(
-    PkCUEngine&, MoveVolatile, PokemonVolatile, PokemonVolatile, fpType&) {
+    PkCUEngine&, const Actor&, const Action&, const Actor&, fpType&) {
   SPDLOG_TRACE("PLUGIN_ON_MODIFYATTACKPOWER: mock_onModifyAttackPower");
   plugin_calls[PLUGIN_ON_MODIFYATTACKPOWER]++;
   return 0;
 }
 
 inline int mock_onModifyCriticalPower(
-    PkCUEngine&, MoveVolatile, PokemonVolatile, PokemonVolatile, fpType&) {
+    PkCUEngine&, const Actor&, const Action&, const Actor&, fpType&) {
   SPDLOG_TRACE("PLUGIN_ON_MODIFYCRITICALPOWER: mock_onModifyCriticalPower");
   plugin_calls[PLUGIN_ON_MODIFYCRITICALPOWER]++;
   return 0;
 }
 
 inline int mock_onModifyRawDamage(
-    PkCUEngine&, MoveVolatile, PokemonVolatile, PokemonVolatile, fpType&) {
+    PkCUEngine&, const Actor&, const Action&, const Actor&, fpType&) {
   SPDLOG_TRACE("PLUGIN_ON_MODIFYRAWDAMAGE: mock_onModifyRawDamage");
   plugin_calls[PLUGIN_ON_MODIFYRAWDAMAGE]++;
   return 0;
 }
 
 inline int mock_onSetMoveType(
-    PkCUEngine&, MoveVolatile, PokemonVolatile, PokemonVolatile, const Type*&) {
+    PkCUEngine&, const Actor&, const Action&, const Actor&, const Type*&) {
   SPDLOG_TRACE("PLUGIN_ON_SETMOVETYPE: mock_onSetMoveType");
   plugin_calls[PLUGIN_ON_SETMOVETYPE]++;
   return 0;
 }
 
 inline int mock_onModifySTAB(
-    PkCUEngine&, MoveVolatile, PokemonVolatile, PokemonVolatile, fpType&) {
+    PkCUEngine&, const Actor&, const Action&, const Actor&, fpType&) {
   SPDLOG_TRACE("PLUGIN_ON_MODIFYSTAB: mock_onModifySTAB");
   plugin_calls[PLUGIN_ON_MODIFYSTAB]++;
   return 0;
@@ -110,9 +110,9 @@ inline int mock_onModifySTAB(
 inline int mock_onSetDefenseType(
     PkCUEngine&,
     const Type&,
-    MoveVolatile,
-    PokemonVolatile,
-    PokemonVolatile,
+    const Actor&,
+    const Action&,
+    const Actor&,
     fpType&) {
   SPDLOG_TRACE("PLUGIN_ON_SETDEFENSETYPE: mock_onSetDefenseType");
   plugin_calls[PLUGIN_ON_SETDEFENSETYPE]++;
@@ -120,42 +120,42 @@ inline int mock_onSetDefenseType(
 }
 
 inline int mock_onModifyItemPower(
-    PkCUEngine&, MoveVolatile, PokemonVolatile, PokemonVolatile, fpType&) {
+    PkCUEngine&, const Actor&, const Action&, const Actor&, fpType&) {
   SPDLOG_TRACE("PLUGIN_ON_MODIFYITEMPOWER: mock_onModifyItemPower");
   plugin_calls[PLUGIN_ON_MODIFYITEMPOWER]++;
   return 0;
 }
 
 inline int mock_onModifyHitProbability(
-    PkCUEngine&, MoveVolatile, PokemonVolatile, PokemonVolatile, FixType&) {
+    PkCUEngine&, const Actor&, const Action&, const Actor&, FixType&) {
   SPDLOG_TRACE("PLUGIN_ON_MODIFYHITPROBABILITY: mock_onModifyHitProbability");
   plugin_calls[PLUGIN_ON_MODIFYHITPROBABILITY]++;
   return 0;
 }
 
 inline int mock_onModifyCritProbability(
-    PkCUEngine&, MoveVolatile, PokemonVolatile, PokemonVolatile, FixType&) {
+    PkCUEngine&, const Actor&, const Action&, const Actor&, FixType&) {
   SPDLOG_TRACE("PLUGIN_ON_MODIFYCRITPROBABILITY: mock_onModifyCritProbability");
   plugin_calls[PLUGIN_ON_MODIFYCRITPROBABILITY]++;
   return 0;
 }
 
 inline int mock_onCalculateDamage(
-    PkCUEngine&, MoveVolatile, PokemonVolatile, PokemonVolatile, uint32_t&) {
+    PkCUEngine&, const Actor&, const Action&, const Actor&, uint32_t&) {
   SPDLOG_TRACE("PLUGIN_ON_CALCULATEDAMAGE: mock_onCalculateDamage");
   plugin_calls[PLUGIN_ON_CALCULATEDAMAGE]++;
   return 0;
 }
 
 inline int mock_onEndOfMove(
-    PkCUEngine&, MoveVolatile, PokemonVolatile, PokemonVolatile) {
+    PkCUEngine&, const Actor&, const Action&, const Actor&) {
   SPDLOG_TRACE("PLUGIN_ON_ENDOFMOVE: mock_onEndOfMove");
   plugin_calls[PLUGIN_ON_ENDOFMOVE]++;
   return 0;
 }
 
 inline int mock_onModifySecondaryProbability(
-    PkCUEngine&, MoveVolatile, PokemonVolatile, PokemonVolatile, FixType&) {
+    PkCUEngine&, const Actor&, const Action&, const Actor&, FixType&) {
   SPDLOG_TRACE(
       "PLUGIN_ON_MODIFYSECONDARYPROBABILITY: "
       "mock_onModifySecondaryProbability");
@@ -164,31 +164,31 @@ inline int mock_onModifySecondaryProbability(
 }
 
 inline int mock_onSecondaryEffect(
-    PkCUEngine&, MoveVolatile, PokemonVolatile, PokemonVolatile) {
+    PkCUEngine&, const Actor&, const Action&, const Actor&) {
   SPDLOG_TRACE("PLUGIN_ON_SECONDARYEFFECT: mock_onSecondaryEffect");
   plugin_calls[PLUGIN_ON_SECONDARYEFFECT]++;
   return 0;
 }
 
-inline int mock_onEndOfTurn(PkCUEngine&, PokemonVolatile) {
+inline int mock_onEndOfTurn(PkCUEngine&, const Actor&) {
   SPDLOG_TRACE("PLUGIN_ON_ENDOFTURN: mock_onEndOfTurn");
   plugin_calls[PLUGIN_ON_ENDOFTURN]++;
   return 0;
 }
 
-inline int mock_onEndOfRound(PkCUEngine&, PokemonVolatile) {
+inline int mock_onEndOfRound(PkCUEngine&, const Actor&) {
   SPDLOG_TRACE("PLUGIN_ON_ENDOFROUND: mock_onEndOfRound");
   plugin_calls[PLUGIN_ON_ENDOFROUND]++;
   return 0;
 }
 
-inline int mock_onSwitchOut(PkCUEngine&, PokemonVolatile) {
+inline int mock_onSwitchOut(PkCUEngine&, const Actor&) {
   SPDLOG_TRACE("PLUGIN_ON_SWITCHOUT: mock_onSwitchOut");
   plugin_calls[PLUGIN_ON_SWITCHOUT]++;
   return 0;
 }
 
-inline int mock_onSwitchIn(PkCUEngine&, PokemonVolatile) {
+inline int mock_onSwitchIn(PkCUEngine&, const Actor&) {
   SPDLOG_TRACE("PLUGIN_ON_SWITCHIN: mock_onSwitchIn");
   plugin_calls[PLUGIN_ON_SWITCHIN]++;
   return 0;
@@ -233,7 +233,7 @@ inline int mock_onTestSwitch_blockAll(
   return 0;
 }
 
-inline int mock_onModifyAction(PkCUEngine&, Action&) {
+inline int mock_onModifyAction(PkCUEngine&, const Actor&, Action&) {
   SPDLOG_TRACE("PLUGIN_ON_MODIFYACTION: mock_onModifyAction");
   plugin_calls[PLUGIN_ON_MODIFYACTION]++;
   return 0;
@@ -247,7 +247,10 @@ inline int mock_onUninitMove(PokemonNonVolatile&, MoveNonVolatile&) {
 
 // Special testing plugins
 inline int mock_onExplosion(
-    PkCUEngine&, MoveVolatile mV, PokemonVolatile user, PokemonVolatile target) {
+    PkCUEngine& cu, const Actor& user_act, const Action&, const Actor& target_act) {
+  auto user = cu.getPKV(user_act);
+  auto target = cu.getPKV(target_act);
+  auto mV = cu.getMV(user_act);
   if (&mV.getBase() != &pkdex->move("move_explosion")) { return 0; }
 
   SPDLOG_TRACE(
@@ -260,34 +263,42 @@ inline int mock_onExplosion(
 }
 
 inline int mock_onFaint(
-    PkCUEngine&, MoveVolatile mV, PokemonVolatile, PokemonVolatile target) {
+    PkCUEngine& cu, const Actor& user_act, const Action&, const Actor& target_act) {
+  auto mV = cu.getMV(user_act);
   if (&mV.getBase() != &pkdex->move("move_faint")) { return 0; }
 
+  auto target = cu.getPKV(target_act);
   SPDLOG_TRACE("Fainting target {}", target.nv().getName());
   target.setHP(0);
   return 2;
 }
 
 inline int mock_onSuicide(
-    PkCUEngine&, MoveVolatile mV, PokemonVolatile user, PokemonVolatile) {
+    PkCUEngine& cu, const Actor& user_act, const Action&, const Actor&) {
+  auto mV = cu.getMV(user_act);
   if (&mV.getBase() != &pkdex->move("move_suicide")) { return 0; }
 
+  auto user = cu.getPKV(user_act);
   SPDLOG_TRACE("Fainting user {}", user.nv().getName());
   user.setHP(0);
   return 2;
 }
 
 inline int mock_zeroPP(
-    PkCUEngine&, MoveVolatile mV, PokemonVolatile, PokemonVolatile target) {
+    PkCUEngine& cu, const Actor& user_act, const Action&, const Actor& target_act) {
+  auto mV = cu.getMV(user_act);
   if (&mV.getBase() != &pkdex->move("move_zero_pp")) { return 0; }
 
+  auto target = cu.getPKV(target_act);
   SPDLOG_TRACE("Zeroing PP of target {}", target.nv().getName());
   for (auto [iMove, move] : target.yieldMoves()) { move.setPP(0); }
   return 0;
 }
 
 inline int mock_applySelfBuff(
-    PkCUEngine&, MoveVolatile mV, PokemonVolatile user, PokemonVolatile) {
+    PkCUEngine& cu, const Actor& user_act, const Action&, const Actor&) {
+  auto user = cu.getPKV(user_act);
+  auto mV = cu.getMV(user_act);
   SPDLOG_TRACE("PLUGIN_ON_EVALUATEMOVE: mock_applySelfBuff");
   for (size_t i = 0; i < 9; ++i) {
     if (mV.getBase().getSelfBuff(i) != 0) {
@@ -298,7 +309,9 @@ inline int mock_applySelfBuff(
 }
 
 inline int mock_applyTargetDebuff(
-    PkCUEngine&, MoveVolatile mV, PokemonVolatile, PokemonVolatile target) {
+    PkCUEngine& cu, const Actor& user_act, const Action&, const Actor& target_act) {
+  auto target = cu.getPKV(target_act);
+  auto mV = cu.getMV(user_act);
   SPDLOG_TRACE("PLUGIN_ON_SECONDARYEFFECT: mock_applyTargetDebuff");
   for (size_t i = 0; i < 9; ++i) {
     if (mV.getBase().getTargetDebuff(i) != 0) {
@@ -309,7 +322,9 @@ inline int mock_applyTargetDebuff(
 }
 
 inline int mock_applyTargetStatus(
-    PkCUEngine&, MoveVolatile mV, PokemonVolatile, PokemonVolatile target) {
+    PkCUEngine& cu, const Actor& user_act, const Action&, const Actor& target_act) {
+  auto target = cu.getPKV(target_act);
+  auto mV = cu.getMV(user_act);
   SPDLOG_TRACE("PLUGIN_ON_SECONDARYEFFECT: mock_applyTargetStatus");
   if (mV.getBase().getTargetAilment() != AIL_NV_NONE) {
     target.setStatusAilment(mV.getBase().getTargetAilment());

@@ -287,6 +287,8 @@ class NeoPkCUEngine {
   // shorthand for getPokemonVolatile
   PokemonVolatile getPKV();
   PokemonVolatile getPKV(size_t iState);
+  PokemonVolatile getPKV(const Actor& actor);
+  PokemonVolatile getPKV(const Actor& actor, size_t iState);
 
   // shorthand for getTargetPokemonVolatile
   PokemonVolatile getTPKV();
@@ -295,6 +297,8 @@ class NeoPkCUEngine {
   // shorthand for getMoveVolatile
   MoveVolatile getMV();
   MoveVolatile getMV(size_t iState);
+  MoveVolatile getMV(const Actor& actor);
+  MoveVolatile getMV(const Actor& actor, size_t iState);
 
   // shorthand for getTargetMoveVolatile
   MoveVolatile getTMV();
