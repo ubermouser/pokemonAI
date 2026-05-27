@@ -6,7 +6,7 @@ int item_toxic_orb(
     PkCUEngine& cu,
     const Actor& actor) {
   PokemonVolatile cPKV = cu.getPKV(actor);
-  if (cPKV.hasItem() && (&cPKV.getItem() == toxicOrb_t)) {
+  if (&cPKV.getItem() == toxicOrb_t) {
     // Toxic Orb does not affect Poison or Steel types
     const PokemonBase& base = cPKV.getBase();
     if (base.hasType(poison_t) || base.hasType(steel_t)) {

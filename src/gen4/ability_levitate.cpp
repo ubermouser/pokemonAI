@@ -10,9 +10,7 @@ int ability_levitate(
     const Actor& target,
     fpType& typeModifier) {
   PokemonVolatile tPKV = cu.getPKV(target);
-  if (!tPKV.nv().abilityExists() || (&(tPKV.nv().getAbility()) != levitate_t)) {
-    return 0;
-  }
+  if (&(tPKV.nv().getAbility()) != levitate_t) { return 0; }
 
   // no effect if attack type isn't ground
   if (&cType != ground_t) { return 0; }
@@ -27,9 +25,7 @@ int ability_levitate_switch(
     PkCUEngine& cu,
     const Actor& actor) {
   PokemonVolatile cPKV = cu.getPKV(actor);
-  if (!cPKV.nv().abilityExists() || (&(cPKV.nv().getAbility()) != levitate_t)) {
-    return 0;
-  }
+  if (&(cPKV.nv().getAbility()) != levitate_t) { return 0; }
 
   // preempt scripts which deal damage on switchin
   return 2;

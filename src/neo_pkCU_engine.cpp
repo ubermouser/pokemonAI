@@ -496,21 +496,16 @@ bool NeoPkCUEngine::isPluginSourceActive(const plugin& p) {
     if (getCAction().isMove()) {
       if (p.getSource() == &getMV().getBase()) return true;
     }
-    if (pkv.nv().abilityExists()) {
-      if (p.getSource() == &pkv.nv().getAbility()) return true;
-    }
-    if (pkv.nv().hasInitialItem()) {
-      if (p.getSource() == &pkv.nv().getInitialItem()) return true;
-    }
+    if (p.getSource() == &pkv.nv().getAbility()) return true;
+    if (p.getSource() == &pkv.nv().getInitialItem()) return true;
   }
 
   if (checkOtherTeam) {
     PokemonVolatile tpkv = getTPKV();
     if (tpkv.isAlive()) {  // Ensure target is valid to check
-      if (tpkv.nv().abilityExists() && p.getSource() == &tpkv.nv().getAbility())
+      if (p.getSource() == &tpkv.nv().getAbility())
         return true;
-      if (tpkv.nv().hasInitialItem() &&
-          p.getSource() == &tpkv.nv().getInitialItem())
+      if (p.getSource() == &tpkv.nv().getInitialItem())
         return true;
     }
   }

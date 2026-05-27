@@ -46,6 +46,10 @@ PokemonNonVolatile::PokemonNonVolatile()
     FV_base_[iFV].fill(0);
   }
 
+  assert(base_ != nullptr);
+  assert(initialItem_ != nullptr);
+  assert(chosenAbility_ != nullptr);
+  assert(chosenNature_ != nullptr);
 }
 
 
@@ -230,7 +234,7 @@ PokemonNonVolatile& PokemonNonVolatile::setEV(size_t type, unsigned int value) {
 
 
 bool PokemonNonVolatile::abilityExists() const {
-  return (chosenAbility_!=Ability::no_ability)?true:false;
+  return chosenAbility_ != Ability::no_ability;
 };
 
 

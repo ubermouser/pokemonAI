@@ -10,7 +10,6 @@ int ability_pinch_type_boost(
     fpType& basePowerModifier) {
   PokemonVolatile cPKV = cu.getPKV(actor);
   MoveVolatile mV = cu.getMV(actor);
-  if (!cPKV.nv().abilityExists()) { return 0; }
   const Ability* ability = &cPKV.nv().getAbility();
 
   if (cPKV.getPercentHP() > (1.0 / 3.0)) { return 0; }

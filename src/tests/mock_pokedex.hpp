@@ -336,6 +336,10 @@ class MockPokedex : public PokedexStatic {
 public:
   MockPokedex() : PokedexStatic(Config(), false) {
     pkdex = this;
+    initialize();
+  }
+
+  bool initialize() override {
     setupTypes();
     setupItems();
     setupAbilities();
@@ -343,9 +347,8 @@ public:
     setupMoves();
     setupPokemon();
     setupPlugins();
+    return true;
   }
-
-  bool initialize() override { return true; }
 
  protected:
   void setupTypes() {
@@ -469,6 +472,11 @@ public:
   }
 
   void setupPokemon() {
+    PokemonBase pbNone;
+    pbNone.setName("none");
+    pbNone.lostChild_ = false;
+    PokemonBase::no_base = &pokemon_.insert(pbNone);
+
     const Type* t = &types_.at("normal");
     const Ability* a = &abilities_.at("test_ability");
     

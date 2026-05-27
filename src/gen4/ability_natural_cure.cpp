@@ -6,10 +6,7 @@ int ability_naturalCure(
     PkCUEngine& cu,
     const Actor& actor) {
   PokemonVolatile cPKV = cu.getPKV(actor);
-  if (!cPKV.nv().abilityExists() ||
-      (&(cPKV.nv().getAbility()) != naturalCure_t)) {
-    return 0;
-  }
+  if (&(cPKV.nv().getAbility()) != naturalCure_t) { return 0; }
 
   // clear status ailment on switchout
   cPKV.clearStatusAilment();

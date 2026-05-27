@@ -8,9 +8,7 @@ int item_shedShell_allowSwitch(
     ConstPokemonVolatile fPKV,
     const Action& action,
     ValidSwapSet& switchAllowed) {
-  if (cPKV.hasItem() && (&cPKV.getItem() == shedShell_t)) {
-    return 2;
-  }
+  if (&cPKV.getItem() == shedShell_t) { return 2; }
 
   return 0;
 }

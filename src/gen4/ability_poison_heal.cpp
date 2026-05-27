@@ -6,9 +6,7 @@ int ability_poison_heal_endOfRound(
     PkCUEngine& cu,
     const Actor& actor) {
   PokemonVolatile cPKV = cu.getPKV(actor);
-  if (!cPKV.nv().abilityExists() || (&cPKV.nv().getAbility() != poisonHeal_t)) {
-    return 0;
-  }
+  if (&cPKV.nv().getAbility() != poisonHeal_t) { return 0; }
 
   uint32_t condition = cPKV.getStatusAilment();
   if (condition == AIL_NV_POISON || condition == AIL_NV_POISON_TOXIC) {

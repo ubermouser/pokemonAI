@@ -169,7 +169,7 @@ uint32_t POKEMON_VOLATILE_IMPL::getHP() const {
 
 POKEMON_VOLATILE_IMPL_TEMPLATE
 const Item& POKEMON_VOLATILE_IMPL::getItem() const {
-  assert(hasItem());
+  if (!hasItem()) { return *Item::no_item; }
   return *pkdex->getItems().atByIndex(data().iHeldItem);
 }
 

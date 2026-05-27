@@ -9,7 +9,7 @@ int item_lifeOrb_modPower(
     const Actor& target,
     fpType& modifier) {
   PokemonVolatile cPKV = cu.getPKV(actor);
-  if (!cPKV.hasItem() || !(&cPKV.getItem() == lifeOrb_t)) { return 0; }
+  if (&cPKV.getItem() != lifeOrb_t) { return 0; }
 
   modifier *= 1.3;
 
@@ -24,8 +24,8 @@ int item_lifeOrb_modLife(
   PokemonVolatile cPKV = cu.getPKV(actor);
   MoveVolatile mV = cu.getMV(actor);
   // must have hit, must have life orb item
-  if (!cu.getBase().flagsFor((TEAM)cu.getICTeam()).isHit() || !cPKV.hasItem() ||
-      !(&cPKV.getItem() == lifeOrb_t)) {
+  if (!cu.getBase().flagsFor((TEAM)cu.getICTeam()).isHit() ||
+      (&cPKV.getItem() != lifeOrb_t)) {
     return 0;
   }
 

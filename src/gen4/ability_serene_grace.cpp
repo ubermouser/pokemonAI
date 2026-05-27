@@ -10,10 +10,7 @@ int ability_sereneGrace(
     FixType& probabilityToSecondary) {
   PokemonVolatile cPKV = cu.getPKV(actor);
   MoveVolatile mV = cu.getMV(actor);
-  if (!cPKV.nv().abilityExists() ||
-      (&(cPKV.nv().getAbility()) != sereneGrace_t)) {
-    return 0;
-  }
+  if (&(cPKV.nv().getAbility()) != sereneGrace_t) { return 0; }
 
   uint8_t dType = mV.getBase().getDamageType();
   // must have used a physical or special attack move

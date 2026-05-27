@@ -7,9 +7,7 @@ int ability_shadowTag(
     ConstPokemonVolatile fPKV,
     const Action& action,
     ValidSwapSet& switchAllowed) {
-  if (cPKV.nv().abilityExists() && (&cPKV.nv().getAbility() == shadowTag_t)) {
-    return 0;
-  }
+  if (&cPKV.nv().getAbility() == shadowTag_t) { return 0; }
 
   // Shadow Tag does not affect fainted pokemon
   if (!cPKV.isAlive()) { return 0; }

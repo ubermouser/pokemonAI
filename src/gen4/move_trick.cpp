@@ -13,28 +13,13 @@ int move_trick(
   if (&mV.getBase() != trick_t && &mV.getBase() != switcheroo_t) { return 0; }
 
   // TODO: Trick fails if the target is behind a substitute.
-  if (tPKV.nv().abilityExists()) {
-    const auto& ability = tPKV.nv().getAbility();
-    if (&ability == stickyHold_t) { return 1; }
-  }
+  if (&tPKV.nv().getAbility() == stickyHold_t) { return 1; }
 
-  const bool cHasItem = cPKV.hasItem();
-  const bool tHasItem = tPKV.hasItem();
+  const Item& cItem = cPKV.getItem();
+  const Item& tItem = tPKV.getItem();
 
-  const Item* cItem = cHasItem ? &cPKV.getItem() : nullptr;
-  const Item* tItem = tHasItem ? &tPKV.getItem() : nullptr;
-
-  if (tHasItem) {
-    cPKV.setItem(*tItem);
-  } else {
-    cPKV.setNoItem();
-  }
-
-  if (cHasItem) {
-    tPKV.setItem(*cItem);
-  } else {
-    tPKV.setNoItem();
-  }
+  cPKV.setItem(tItem);
+  tPKV.setItem(cItem);
 
   return 1;
 };

@@ -5,7 +5,7 @@ namespace gen4 {
 namespace {
 
 bool checkAndTriggerSitrusBerry(PokemonVolatile pkv) {
-  if (pkv.isAlive() && pkv.hasItem() && (&pkv.getItem() == sitrusBerry_t)) {
+  if (pkv.isAlive() && (&pkv.getItem() == sitrusBerry_t)) {
     if (pkv.getHP() <= pkv.nv().getMaxHP() / 2) {
       pkv.modPercentHP(0.25);
       pkv.setNoItem();

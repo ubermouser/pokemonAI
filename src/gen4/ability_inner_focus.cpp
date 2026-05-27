@@ -6,9 +6,7 @@ int ability_innerFocus(
     PkCUEngine& cu,
     const Actor& actor) {
   PokemonVolatile cPKV = cu.getPKV(actor);
-  if (!cPKV.nv().abilityExists() || (&cPKV.nv().getAbility() != innerFocus_t)) {
-    return 0;
-  }
+  if (&cPKV.nv().getAbility() != innerFocus_t) { return 0; }
   cPKV.status().cTeammate.flinch = 0;
   return 1;
 }

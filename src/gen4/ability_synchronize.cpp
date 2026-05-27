@@ -10,10 +10,7 @@ int ability_synchronize(
   PokemonVolatile cPKV = cu.getPKV(actor);
   PokemonVolatile tPKV = cu.getPKV(target);
   // Only run if tPKV has Synchronize (guaranteed by registration as other_team)
-  if (!tPKV.nv().abilityExists() ||
-      &tPKV.nv().getAbility() != synchronize_t) {
-    return 0;
-  }
+  if (&tPKV.nv().getAbility() != synchronize_t) { return 0; }
 
   // Check if tPKV has the status inflicted by the move
   // This plugin runs AFTER the engine (priority -1), so status should be applied by now

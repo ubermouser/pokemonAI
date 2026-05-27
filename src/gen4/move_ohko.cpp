@@ -39,7 +39,7 @@ int move_ohko_accuracy(
         &tPKV.getBase().getType(1) == flying_t) {
       isImmune = true;
     }
-    if (tPKV.nv().abilityExists() && (&(tPKV.nv().getAbility()) == levitate_t)) {
+    if (&(tPKV.nv().getAbility()) == levitate_t) {
       isImmune = true;
     }
 

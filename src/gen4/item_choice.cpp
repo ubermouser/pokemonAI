@@ -5,7 +5,7 @@ namespace gen4 {
 int item_choiceScarf_modSpeed(
     PkCUEngine& cu, const Actor& actor, uint32_t& speed) {
   PokemonVolatile cPKV = cu.getPKV(actor);
-  if (!cPKV.hasItem() || !(&cPKV.getItem() == choiceScarf_t)) { return 0; }
+  if (&cPKV.getItem() != choiceScarf_t) { return 0; }
 
   speed = (speed * 3) / 2;  // increase speed by 50%
   return 1;
@@ -19,8 +19,6 @@ int item_choiceItem_modPower(
     fpType& modifier) {
   PokemonVolatile cPKV = cu.getPKV(actor);
   MoveVolatile mV = cu.getMV(actor);
-  if (!cPKV.hasItem()) { return 0; }
-
   const Item* cItem = &cPKV.getItem();
   if ((cItem != choiceBand_t) && (cItem != choiceSpecs_t)) { return 0; }
 
@@ -35,8 +33,6 @@ int item_choiceItem_modPower(
 
 int item_choiceItem_lockMove(PkCUEngine& cu, const Actor& actor) {
   PokemonVolatile cPKV = cu.getPKV(actor);
-  if (!cPKV.hasItem()) { return 0; }
-
   const Item* cItem = &cPKV.getItem();
   if ((cItem != choiceBand_t) && (cItem != choiceScarf_t) &&
       (cItem != choiceSpecs_t)) {
@@ -57,8 +53,6 @@ int item_choiceItem_testLockedMove(
     ConstMoveVolatile mV,
     const Action& action,
     ValidMoveSet& moveAllowed) {
-  if (!cPKV.hasItem()) { return 0; }
-
   const Item* cItem = &cPKV.getItem();
   if ((cItem != choiceBand_t) && (cItem != choiceScarf_t) &&
       (cItem != choiceSpecs_t)) {

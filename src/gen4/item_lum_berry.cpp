@@ -8,7 +8,7 @@ int item_lumBerry(PkCUEngine& cu, const Actor& actor) {
   PokemonVolatile tPKV = cu.getTPKV();
 
   // only affect targeted pokemon that have a lum berry
-  if (!tPKV.hasItem() || (&tPKV.getItem() != lumBerry_t)) { return 0; }
+  if (&tPKV.getItem() != lumBerry_t) { return 0; }
 
   // only affect living pokemon
   if (!tPKV.isAlive()) { return 0; }

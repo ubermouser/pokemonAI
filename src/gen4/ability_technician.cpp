@@ -9,10 +9,7 @@ int ability_technician(
     const Actor& target,
     fpType& basePowerModifier) {
   PokemonVolatile cPKV = cu.getPKV(actor);
-  if (!cPKV.nv().abilityExists() ||
-      (&(cPKV.nv().getAbility()) != technician_t)) {
-    return 0;
-  }
+  if (&(cPKV.nv().getAbility()) != technician_t) { return 0; }
 
   // no effect if base power above 60
   if (cu.getDamageComponent().damage > 60) { return 0; }

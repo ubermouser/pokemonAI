@@ -10,7 +10,7 @@ int item_focusSash(
     const Actor& target,
     uint32_t& raw_damage) {
   PokemonVolatile tPKV = cu.getPKV(target);
-  if (!tPKV.hasItem() || (&tPKV.getItem() != focusSash_t)) { return 0; }
+  if (&tPKV.getItem() != focusSash_t) { return 0; }
 
   // Focus Sash only works if HP is full
   if (tPKV.getHP() != tPKV.nv().getMaxHP()) { return 0; }

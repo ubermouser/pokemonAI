@@ -23,10 +23,7 @@ int move_knockOff(
   // Target must be alive to lose item
   if (!tPKV.isAlive()) { return 1; }
 
-  if (tPKV.nv().abilityExists()) {
-    const auto& ability = tPKV.nv().getAbility();
-    if (&ability == stickyHold_t) { return 1; }
-  }
+  if (&tPKV.nv().getAbility() == stickyHold_t) { return 1; }
 
   if (tPKV.hasItem()) {
     tPKV.setNoItem();

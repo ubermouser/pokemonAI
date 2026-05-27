@@ -6,10 +6,7 @@ int ability_intimidate_switch(
     PkCUEngine& cu,
     const Actor& actor) {
   PokemonVolatile cPKV = cu.getPKV(actor);
-  if (!cPKV.nv().abilityExists() ||
-      (&(cPKV.nv().getAbility()) != intimidate_t)) {
-    return 0;
-  }
+  if (&(cPKV.nv().getAbility()) != intimidate_t) { return 0; }
 
   int ret = 0;
   // affects all active opponents:
@@ -18,10 +15,7 @@ int ability_intimidate_switch(
     if (!tPKV.isAlive()) { continue; }
 
     // blocked by Clear Body:
-    if (tPKV.nv().abilityExists() &&
-        (&(tPKV.nv().getAbility()) == clearBody_t)) {
-      continue;
-    }
+    if (&(tPKV.nv().getAbility()) == clearBody_t) { continue; }
 
     // lowers attack by 1 stage:
     tPKV.modBoost(FV_ATTACK, -1);
