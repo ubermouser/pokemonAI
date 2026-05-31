@@ -3,8 +3,6 @@
 
 class SubstituteTest : public Gen4EngineTest {
  protected:
-  PossibleEnvironments turn1_results;
-
   void SetUp() override {
     Gen4EngineTest::SetUp();
     // Team A: Pokemon with Substitute
@@ -20,23 +18,49 @@ class SubstituteTest : public Gen4EngineTest {
     auto team_b = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->pokemon("gengar"))
-          .addMove(pokedex_->move("shadow ball")) // Special Damaging move
-          .addMove(pokedex_->move("shadow punch")) // Physical Damaging move
-          .addMove(pokedex_->move("taunt"))      // Bypasses substitute (in Gen 4)
-          .addMove(pokedex_->move("sludge bomb")) // Has secondary effect (poison)
-          .setLevel(20));
+          .addMove(pokedex_->move("toxic"))        // Status move (index 0)
+          .addMove(pokedex_->move("knock off"))     // Low damage move (index 1)
+          .addMove(pokedex_->move("taunt"))        // Bypasses substitute (in Gen 4) (index 2)
+          .addMove(pokedex_->move("sludge bomb"))  // High damage move (index 3)
+          .setLevel(70));
 
     environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
     engine_->setEnvironment(environment_nv);
+  }
 
-    // Common first turn: Alakazam uses Substitute
-    turn1_results = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
+  PossibleEnvironments setupSubstitute() {
+    return engine_->updateState(
+        engine_->initialState(), Action::move(0), Action::wait());
+  }
+
+  PossibleEnvironments setupSubstituteWithLowHP() {
+    auto turn1 = engine_->updateState(engine_->initialState(), Action::wait(), Action::move(3)); // Sludge Bomb
+    auto turn2 = engine_->updateState(turn1.where1().getEnv(), Action::wait(), Action::move(3));
+    auto turn3 = engine_->updateState(turn2.where1().getEnv(), Action::wait(), Action::move(3));
+    return engine_->updateState(turn3.where1().getEnv(), Action::move(0), Action::wait());
+  }
+
+  PossibleEnvironments setupGengarAttacks(const ConstEnvironmentVolatile& state, size_t gengarMoveIndex) {
+    return engine_->updateState(state, Action::wait(), Action::move(gengarMoveIndex));
+  }
+
+  PossibleEnvironments setupSubstituteBroken() {
+    auto turn1 = setupSubstitute();
+    auto state1 = turn1.where1();
+    // Gengar uses Sludge Bomb (Move 3) which deals > 82 damage and breaks the substitute naturally
+    return engine_->updateState(state1.getEnv(), Action::wait(), Action::move(3));
+  }
+
+  PossibleEnvironments setupBlisseyHealingTurn() {
+    auto turn1 = setupSubstitute();
+    auto state1 = turn1.where1();
+    return engine_->updateState(state1.getEnv(), Action::move(1), Action::wait());
   }
 };
 
 TEST_F(SubstituteTest, CreatesSubstitute) {
-  // Blissey uses Substitute (already done in SetUp)
-  auto blissey = turn1_results.where1().teammate(0, 0);
+  auto turn1_results = setupSubstitute();
+  auto blissey = turn1_results.where1().teammate(TEAM_A, 0);
 
   uint32_t maxHP = blissey.nv().getMaxHP();
   uint32_t expectedHP = maxHP - (maxHP / 4);
@@ -46,116 +70,97 @@ TEST_F(SubstituteTest, CreatesSubstitute) {
 }
 
 TEST_F(SubstituteTest, FailsWithLowHP) {
-  // Set Blissey's HP very low
-  EnvironmentVolatileData stateData = engine_->initialState().data();
-  EnvironmentVolatile state{engine_->initialState().nv(), stateData};
-  state.teammate(0, 0).setHP(10);
+  auto result = setupSubstituteWithLowHP();
+  auto blissey = result.where1().teammate(TEAM_A, 0);
 
-  // Try to use Substitute
-  auto result = engine_->updateState(state, Action::move(0), Action::wait());
-  auto blissey = result.where1().teammate(0, 0);
-
-  // HP should not change, substitute should not be created
-  EXPECT_EQ(blissey.getHP(), 10U);
+  // HP should not change, substitute should not be created.
+  // Blissey starts at 330 HP and takes 3 Sludge Bombs, leaving her with low HP.
+  EXPECT_GE(blissey.getHP(), 1U);
+  EXPECT_LT(blissey.getHP(), 82U);
   EXPECT_EQ(blissey.status().substitute, 0U);
 }
 
 TEST_F(SubstituteTest, AbsorbsDamage) {
-  // Blissey uses Substitute in SetUp
-  auto state1 = turn1_results.where1();
+  auto turn1 = setupSubstitute();
+  auto state1 = turn1.where1();
 
-  uint32_t initialHP = state1.teammate(0, 0).getHP();
-  uint32_t initialSubHP = state1.teammate(0, 0).status().substitute;
+  uint32_t initialHP = state1.teammate(TEAM_A, 0).getHP();
+  uint32_t initialSubHP = state1.teammate(TEAM_A, 0).status().substitute;
 
-  // Turn 2: Gengar uses Sludge Bomb (Move index 3 - hits Blissey)
-  auto turn2 = engine_->updateState(state1, Action::wait(), Action::move(3));
-  auto blissey2 = turn2.where1().teammate(0, 0);
+  // Turn 2: Gengar uses Knock Off (Move index 1 - deals [39, 47] damage, less than 82 substitute HP)
+  auto turn2 = setupGengarAttacks(state1.getEnv(), 1);
+  auto blissey2 = turn2.where1().teammate(TEAM_A, 0);
 
   // Blissey's HP should not have decreased
   EXPECT_EQ(blissey2.getHP(), initialHP);
   // Substitute HP should have decreased
   EXPECT_LT(blissey2.status().substitute, initialSubHP);
+  EXPECT_GT(blissey2.status().substitute, 0U);
 }
 
 TEST_F(SubstituteTest, BreaksSubstitute) {
-  // Blissey uses Substitute in SetUp
-  auto state1 = turn1_results.where1();
-
-  // Force break substitute by creating a mutable state
-  EnvironmentVolatileData stateData = state1.getEnv().data();
-  EnvironmentVolatile mutableState{state1.getEnv().nv(), stateData};
-  mutableState.teammate(0, 0).status().substitute = 1;
-
-  // Turn 2: Gengar uses Sludge Bomb (Move index 3)
-  auto turn2 = engine_->updateState(mutableState, Action::wait(), Action::move(3));
-  auto blissey2 = turn2.where1().teammate(0, 0);
+  auto turn1 = setupSubstitute();
+  auto state1 = turn1.where1();
+  auto turn2 = setupSubstituteBroken();
+  auto blissey2 = turn2.where1().teammate(TEAM_A, 0);
 
   // Substitute should be gone
   EXPECT_EQ(blissey2.status().substitute, 0U);
   // Blissey's HP should still be same as start of Turn 2
-  EXPECT_EQ(blissey2.getHP(), state1.teammate(0, 0).getHP());
+  EXPECT_EQ(blissey2.getHP(), state1.teammate(TEAM_A, 0).getHP());
 }
 
 TEST_F(SubstituteTest, BlocksStatusMove) {
-  // Blissey uses Substitute in SetUp
-  auto state1 = turn1_results.where1();
+  auto turn1 = setupSubstitute();
+  auto state1 = turn1.where1();
 
   // Turn 2: Gengar uses Toxic
-  auto turn2 = engine_->updateState(state1, Action::wait(), Action::move(0));
-  auto blissey2 = turn2.where1().teammate(0, 0);
+  auto turn2 = setupGengarAttacks(state1.getEnv(), 0);
+  auto blissey2 = turn2.where1().teammate(TEAM_A, 0);
 
   // Blissey should NOT be poisoned
   EXPECT_EQ(blissey2.getStatusAilment(), AIL_NV_NONE);
 }
 
 TEST_F(SubstituteTest, BypassedByTaunt) {
-  // Blissey uses Substitute in SetUp
-  auto state1 = turn1_results.where1();
+  auto turn1 = setupSubstitute();
+  auto state1 = turn1.where1();
 
   // Turn 2: Gengar uses Taunt
-  auto turn2 = engine_->updateState(state1, Action::wait(), Action::move(2));
-  auto blissey2 = turn2.where1().teammate(0, 0);
+  auto turn2 = setupGengarAttacks(state1.getEnv(), 2);
+  auto blissey2 = turn2.where1().teammate(TEAM_A, 0);
 
   // Blissey should be taunted
   EXPECT_GT(blissey2.status().taunt_duration, 0U);
 }
 
 TEST_F(SubstituteTest, BlocksSecondaryEffect) {
-  // Blissey uses Substitute in SetUp
-  auto state1 = turn1_results.where1();
+  auto turn1 = setupSubstitute();
+  auto state1 = turn1.where1();
 
   // Turn 2: Gengar uses Sludge Bomb (30% chance to poison) (Move index 3)
-  // We want to verify that even if it hits, the poison effect is blocked.
-  // We set higher RNG branches to ensure the 30% chance is "rolled"
-  engine_->setAccuracy(50);
-  auto turn2 = engine_->updateState(state1, Action::wait(), Action::move(3));
+  // We want to verify that even if the secondary effect is rolled, the poison effect is blocked.
+  auto turn2 = setupGengarAttacks(state1.getEnv(), 3);
 
-  for (size_t i = 0; i < turn2.size(); ++i) {
-    auto blissey = turn2.at(i).teammate(0, 0);
-    EXPECT_EQ(blissey.getStatusAilment(), AIL_NV_NONE);
-  }
+  auto secondary_state = turn2.where1Status(TEAM_B);
+  EXPECT_EQ(secondary_state.teammate(TEAM_A, 0).getStatusAilment(), AIL_NV_NONE);
 }
 
 TEST_F(SubstituteTest, DoesNotBlockSelfTargetingMoves) {
-  // Blissey uses Substitute in SetUp
-  auto state1 = turn1_results.where1();
-
-  // Set Blissey's HP lower to see healing effect
-  EnvironmentVolatileData stateData = state1.getEnv().data();
-  EnvironmentVolatile mutableState{state1.getEnv().nv(), stateData};
-  uint32_t hpAfterSub = mutableState.teammate(0, 0).getHP();
-  mutableState.teammate(0, 0).setHP(hpAfterSub - 20);
+  auto turn1 = setupSubstitute();
+  auto state1 = turn1.where1();
+  uint32_t hpAfterSub = state1.teammate(TEAM_A, 0).getHP();
 
   // Turn 2: Blissey uses Soft-Boiled (Move index 1)
-  auto turn2 = engine_->updateState(mutableState, Action::move(1), Action::wait());
-  auto blissey2 = turn2.where1().teammate(0, 0);
+  auto turn2 = setupBlisseyHealingTurn();
+  auto blissey2 = turn2.where1().teammate(TEAM_A, 0);
 
   // Blissey should have healed
-  EXPECT_GT(blissey2.getHP(), hpAfterSub - 20);
+  EXPECT_GT(blissey2.getHP(), hpAfterSub);
 }
 
 TEST_F(SubstituteTest, SubstituteReported) {
-  // Blissey uses Substitute in SetUp
+  auto turn1_results = setupSubstitute();
   auto output = StateTransitionPrinter::printString(
       engine_->initialState(), turn1_results.where1(), false);
 

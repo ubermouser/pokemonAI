@@ -45,6 +45,19 @@ When writing or updating move/ability/item/engine effect tests for the game engi
   });
   ```
 
-### 4. Custom Move and Test Logic
- - Do not modify values within the EnvironmentVolatileData structure directly. Instead, generate the needed state by constructing a sequence of turn setup helpers.
- - If the test requires custom logic, implement this as a non-standard scripted action within `mock_pokedex.hpp`. Add a pokemon that uses the non-standard action to the team, and invoke the move using updateState.
+ ### 4. Custom Move and Test Logic
+  - Do not modify values within the EnvironmentVolatileData structure directly. Instead, generate the needed state by constructing a sequence of turn setup helpers.
+  - If the test requires custom logic, implement this as a non-standard scripted action within `mock_pokedex.hpp`. Add a pokemon that uses the non-standard action to the team, and invoke the move using updateState.
+
+### 5. Memory Safety & PossibleEnvironments Lifetimes
+- **Avoid Heap-Use-After-Free**: The container returned by `engine_->updateState` (`PossibleEnvironments`) must remain in scope for the entire duration that any `ConstEnvironmentVolatile` (from `where1()`) or references to its internal structures are used.
+- Avoid passing inline chained results like `engine_->updateState(setupSomething().where1().getEnv(), ...)` directly if the temporary container returned by `setupSomething()` is destroyed, as this leaves a dangling reference to the underlying environment. Store intermediate results in local variables.
+  ```cpp
+  // Safe pattern:
+  auto turn1 = setupPreviousState();
+  auto turn2 = engine_->updateState(turn1.where1(), Action::wait(), Action::move(3));
+  ```
+
+### 6. Movelist and Engine Pipeline Quirks
+  - **Pokedex Movelist Validation**: Moves added to a Pokémon using `.addMove(pokedex_->move("move-name"))` must exist in that species' database movelist (in `movelist.csv`). Otherwise, the engine throws a validation exception. Check `movelist.csv` for allowed moves. 
+  - The pokemon `smeargle` learns every possible move, and can be used to test nonstandard movesets.
