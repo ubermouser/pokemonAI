@@ -44,4 +44,7 @@ Create a dedicated source file in `src/genX/` (e.g., `src/gen4/item_sitrus_berry
 - Plugins may trigger on either the current_team, the other_team, or all_teams. Use all_teams plugins sparingly as they can trigger many times per state transition.
 
 ### 5. Testing your extension
-- Refer to `engine-testing.md` for best patterns on how to test your new engine extension.
+- Every engine extension must be tested heavily to prevent regressions. Refer to `engine-testing.md` for best patterns on how to test your new engine extension.
+
+### 6. Manual Verification
+- Use the newly developed engine effect in a real game and verify that the effect behaves as expected. Do this with the battler CLI - see `interactive-debugging.md` for how to do this.

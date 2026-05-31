@@ -285,6 +285,9 @@ void Planner::fillRemainingActionsWithDefaults(
   // determine how many more activations are required:
   size_t numToFill =
       std::max((int)cu_->numRequiredToActivate(team) - (int)numActivations, 0);
+  // if none are required:
+  if (numToFill == 0) { return; }
+
   // insert the first valid activation action for each actor without an action:
   for (const auto& [actor, action] : cu_->getValidEntryActions(team)) {
     if (actionMap.count(actor)) { continue; }
