@@ -21,3 +21,5 @@ trigger: always_on
 
 ### Development Patterns and Quirks
 - **Test Logic**: Generation specific code is dynamically linked and not recompiled with the test. You must rebuild it separately with `cmake --build --preset conan-debug --target gen4_scripts`.
+- For in-depth help writing engine tests, see `.agent/rules/engine-testing.md`
+- For in-depth help extending the engine with new actions, see `.agent/rules/engine-plugins.md`.

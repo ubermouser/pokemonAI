@@ -2,6 +2,35 @@
 
 namespace gen4 {
 
+void clearNonBatonPassVolatiles(VolatileStatus& status) {
+  status.confused = 0;
+  status.disable_duration = 0;
+  status.disable_action = 0;
+  status.healBlock = 0;
+  status.encore_action = 0;
+  status.encore_duration = 0;
+  status.iLastAction = 0;
+  status.flinch = 0;
+  status.mudSport = 0;
+  status.torment = 0;
+  status.trap = 0;
+  status.nightmare = 0;
+  status.waterSport = 0;
+  status.itemScratch = 0;
+  status.numRoundsInPlay = 0;
+  status.toxicPoison_tier = 0;
+  status.lockIn_action = 0;
+  status.lockIn_duration = 0;
+  status.defensiveCurl = 0;
+  status.imprison = 0;
+  status.infatuate = 0;
+  status.taunt_duration = 0;
+  status.destinyBond = 0;
+  status.grudge = 0;
+  status.protect_counter = 0;
+  status.protected_flag = 0;
+}
+
 int move_batonPass(
     PkCUEngine& cu,
     const Actor& actor,
@@ -10,56 +39,51 @@ int move_batonPass(
   MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != batonPass_t) { return 0; }
 
-  TeamVolatile tV = cu.getTV();
-  const Actor& currentActor = cu.getCActor();
-  size_t currentPokemon = currentActor.iTeammate();
+  size_t currentPokemon = actor.iTeammate();
   size_t targetPokemon = action.iFriendly();
 
   if (targetPokemon >= 6 || targetPokemon == currentPokemon) { return 1; }
+  if (!cu.getPKV(target).isAlive()) { return 1; }
 
-  // Save Volatile Status
-  VolatileStatus savedStatus = tV.getVolatile();
+  // Mark the actor as performing Baton Pass
+  cu.getPKV(actor).status().batonPass = 1;
 
-  // Perform Swap (reseting volatile)
-  Actor targetActor(currentActor.iTeam(), targetPokemon);
-  if (!tV.swapPokemon(currentActor, targetActor, false)) {
-    return 0; // Failed to swap
-  }
-
-  // Mark as switched
-  cu.getBase().flagsFor(cu.getCActor()).setSwitched();
-
-  // Restore transferrable volatile status
-  VolatileStatus& newStatus = tV.getVolatile();
-
-  // Boosts
-  newStatus.boosts = savedStatus.boosts;
-
-  // Other transferrables
-  newStatus.substitute = savedStatus.substitute;
-  newStatus.leechSeed = savedStatus.leechSeed;
-  newStatus.perishSong = savedStatus.perishSong;
-  newStatus.curse = savedStatus.curse;
-  newStatus.lockOn = savedStatus.lockOn;
-  newStatus.identify = savedStatus.identify;
-  newStatus.focusEnergy = savedStatus.focusEnergy;
-  // Ensure toxicPoison_tier is reset (already 0 from swapPokemon)
-
-  // Trigger OnSwitchIn plugins
-  cu.setCPluginSet();
-  int result = 0;
-  const auto& cPlugins = cu.getCPluginSet()[(size_t)PLUGIN_ON_SWITCHIN];
-  for (const auto& plugin : cPlugins) {
-    onSwitch_rawType cPlugin = (onSwitch_rawType)plugin.getFunction();
-    result = result | cPlugin(cu, cu.getCActor());
-    if (result > 1) { break; }
-  }
+  // Schedule swap via the engine
+  auto& frame = cu.getStackFrame();
+  frame.actions[actor] = Action::swap(targetPokemon);
+  frame.targets[actor] = {Actor(actor.iTeam(), targetPokemon)};
+  cu.gotoStackStage(StageType::PRESWITCH);
 
   return 2;
 }
 
+int move_batonPass_onExecuteSwitch(
+    PkCUEngine& cu,
+    const Actor& actor,
+    const Actor& target,
+    bool& preserveVolatile) {
+  PokemonVolatile pkv = cu.getPKV(actor);
+  VolatileStatus& status = pkv.status();
+
+  if (status.batonPass == 1) {
+    // Clear batonPass flag to avoid leaking
+    status.batonPass = 0;
+
+    // Keep only transferable volatile status fields
+    clearNonBatonPassVolatiles(status);
+
+    // Tell the engine to preserve the status during swap
+    preserveVolatile = true;
+    return 2;  // handled
+  }
+
+  return 0;  // not handled
+}
+
 void register_move_baton_pass(const Pokedex& pkAI, std::vector<plugin>& extensions) {
   extensions.push_back(pluginOnEndOfMove(move, "baton pass", move_batonPass, 1, current_team));
+  extensions.push_back(pluginOnExecuteSwitch(
+      engine, "baton pass swap", move_batonPass_onExecuteSwitch, 0, all_teams));
 }
 
 } // namespace gen4

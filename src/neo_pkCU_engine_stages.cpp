@@ -861,7 +861,10 @@ void NeoPkCUEngine::evaluateMove_switch_onSwitchIn() {
     assert(position < cu_.cfg_.numActivePokemon);
   } else {  // must be a switch action:
     assert(team.teammate(switchingActor).isActive());
-    team.swapPokemon(switchingActor, swapTarget);
+    bool preserveVolatile = false;
+    callPlugins<onExecuteSwitch_rawType>(
+        PLUGIN_ON_EXECUTESWITCH, *this, switchingActor, swapTarget, preserveVolatile);
+    team.swapPokemon(switchingActor, swapTarget, preserveVolatile);
     handleActorSwitch(switchingActor, swapTarget);
   }
 

@@ -130,6 +130,8 @@ const char* pluginTypeToString(pluginType type) {
     return "PLUGIN_ON_TESTSWITCH";
   case PLUGIN_ON_MODIFYACTION:
     return "PLUGIN_ON_MODIFYACTION";
+  case PLUGIN_ON_EXECUTESWITCH:
+    return "PLUGIN_ON_EXECUTESWITCH";
   case PLUGIN_ON_UNINIT:
     return "PLUGIN_ON_UNINIT";
   default:

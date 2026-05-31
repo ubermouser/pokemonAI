@@ -108,6 +108,7 @@ typedef int (*onTestSwitch_rawType)
   ValidSwapSet&);
 
 typedef int (*onModifyAction_rawType)(PkCUEngine&, const Actor&, Action&);
+typedef int (*onExecuteSwitch_rawType)(PkCUEngine&, const Actor&, const Actor&, bool&);
 typedef int (*onReset_rawType)(PkCUEngine&, void*);
 
 // Plugin Signature Mapping
@@ -142,6 +143,7 @@ template <> struct PluginSignature<PLUGIN_ON_SWITCHIN> { using type = onSwitch_r
 template <> struct PluginSignature<PLUGIN_ON_TESTMOVE> { using type = onTestMove_rawType; };
 template <> struct PluginSignature<PLUGIN_ON_TESTSWITCH> { using type = onTestSwitch_rawType; };
 template <> struct PluginSignature<PLUGIN_ON_MODIFYACTION> { using type = onModifyAction_rawType; };
+template <> struct PluginSignature<PLUGIN_ON_EXECUTESWITCH> { using type = onExecuteSwitch_rawType; };
 template <> struct PluginSignature<PLUGIN_ON_UNINIT> { using type = onInitMove_rawType; };
 
 // Convenience functions
@@ -182,6 +184,7 @@ PLUGIN_FACTORY(OnSwitchIn, PLUGIN_ON_SWITCHIN, onSwitch_rawType)
 PLUGIN_FACTORY(OnTestMove, PLUGIN_ON_TESTMOVE, onTestMove_rawType)
 PLUGIN_FACTORY(OnTestSwitch, PLUGIN_ON_TESTSWITCH, onTestSwitch_rawType)
 PLUGIN_FACTORY(OnModifyAction, PLUGIN_ON_MODIFYACTION, onModifyAction_rawType)
+PLUGIN_FACTORY(OnExecuteSwitch, PLUGIN_ON_EXECUTESWITCH, onExecuteSwitch_rawType)
 PLUGIN_FACTORY(OnUninit, PLUGIN_ON_UNINIT, onInitMove_rawType)
 
 #undef PLUGIN_FACTORY

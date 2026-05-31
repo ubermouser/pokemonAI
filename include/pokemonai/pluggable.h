@@ -11,7 +11,7 @@
 class plugin;
 typedef void (*voidFunction_rawType)(void*);
 
-#define PLUGIN_MAXSIZE 29
+#define PLUGIN_MAXSIZE 30
 
 enum pluginTarget {
   current_team = 0,
@@ -48,7 +48,8 @@ enum pluginType {
   PLUGIN_ON_TESTMOVE = 25,
   PLUGIN_ON_TESTSWITCH = 26,
   PLUGIN_ON_MODIFYACTION = 27,
-  PLUGIN_ON_UNINIT = 28
+  PLUGIN_ON_EXECUTESWITCH = 28,
+  PLUGIN_ON_UNINIT = 29
 };
 
 enum pluginCategory {

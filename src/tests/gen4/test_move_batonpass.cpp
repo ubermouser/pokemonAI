@@ -30,21 +30,49 @@ class BatonPassTest : public Gen4EngineTest {
     environment_nv = EnvironmentNonvolatile(teamA, teamB, true);
     engine_->setEnvironment(environment_nv);
   }
+
+  PossibleEnvironments useSwordsDance() {
+    return engine_->updateState(
+        engine_->initialState(), Action::moveAlly(1, 0), Action::wait());
+  }
+
+  PossibleEnvironments useBatonPassAfterSwordsDance(const PossibleEnvironments& turn1) {
+    return engine_->updateState(
+        turn1.where1(), Action::moveAlly(0, 1), Action::wait());
+  }
+
+  PossibleEnvironments useSubstitute() {
+    return engine_->updateState(
+        engine_->initialState(), Action::moveAlly(2, 0), Action::wait());
+  }
+
+  PossibleEnvironments useBatonPassAfterSubstitute(const PossibleEnvironments& turn1) {
+    return engine_->updateState(
+        turn1.where1(), Action::moveAlly(0, 1), Action::wait());
+  }
+
+  PossibleEnvironments receiveConfuseRay() {
+    return engine_->updateState(
+        engine_->initialState(), Action::wait(), Action::move(0));
+  }
+
+  PossibleEnvironments useBatonPassAfterConfuseRay(const PossibleEnvironments& turn1) {
+    return engine_->updateState(
+        turn1.where1(), Action::moveAlly(0, 1), Action::wait());
+  }
+
+  PossibleEnvironments manualSwitchAfterSwordsDance(const PossibleEnvironments& turn1) {
+    return engine_->updateState(
+        turn1.where1(), Action::swap(1), Action::wait());
+  }
 };
 
 TEST_F(BatonPassTest, PassesBoosts) {
-  // Turn 1: Scizor uses Swords Dance (+2 Atk)
-  auto turn1 = engine_->updateState(
-      engine_->initialState(), Action::moveAlly(1, 0), Action::wait());
-
+  auto turn1 = useSwordsDance();
   auto scizor_boosted = turn1.where1Hit(0);
   EXPECT_EQ(scizor_boosted.teammate(0, 0).getBoost(FV_ATTACK), 2);
 
-  // Turn 2: Scizor uses Baton Pass to Torterra (Friendly 1)
-  // Baton Pass is index 0. Torterra is Friendly 1.
-  auto turn2 = engine_->updateState(
-      turn1.where1(), Action::moveAlly(0, 1), Action::wait());
-
+  auto turn2 = useBatonPassAfterSwordsDance(turn1);
   auto torterra_switched_in = turn2.where1Hit(0);
 
   // Verify switch happened
@@ -56,17 +84,11 @@ TEST_F(BatonPassTest, PassesBoosts) {
 }
 
 TEST_F(BatonPassTest, PassesSubstitute) {
-  // Turn 1: Scizor uses Substitute
-  auto turn1 = engine_->updateState(
-      engine_->initialState(), Action::moveAlly(2, 0), Action::wait());
-
+  auto turn1 = useSubstitute();
   auto scizor_sub = turn1.where1Hit(0);
   EXPECT_GT(scizor_sub.teammate(0, 0).status().substitute, 0);
 
-  // Turn 2: Scizor uses Baton Pass to Torterra
-  auto turn2 = engine_->updateState(
-      turn1.where1(), Action::moveAlly(0, 1), Action::wait());
-
+  auto turn2 = useBatonPassAfterSubstitute(turn1);
   auto torterra_switched_in = turn2.where1Hit(0);
 
   // Verify switch
@@ -74,24 +96,17 @@ TEST_F(BatonPassTest, PassesSubstitute) {
   EXPECT_FALSE(torterra_switched_in.teammate(0, 0).isActive());
 
   // Verify Substitute passed
-  EXPECT_GT(
-      torterra_switched_in.teammate(0, 1).status().substitute, 0);
+  EXPECT_GT(torterra_switched_in.teammate(0, 1).status().substitute, 0);
 }
 
 TEST_F(BatonPassTest, DoesNotPassConfusion) {
-  // Turn 1: Gengar uses Confuse Ray on Scizor
-  auto turn1 = engine_->updateState(
-      engine_->initialState(), Action::wait(), Action::move(0));
-
+  auto turn1 = receiveConfuseRay();
   auto scizor_confused = turn1.where1Hit(1);  // Gengar (Team 1) hits
 
   // Verify Scizor (Team 0) is confused
   EXPECT_GT(scizor_confused.teammate(0, 0).status().confused, 0);
 
-  // Turn 2: Scizor uses Baton Pass to Torterra
-  auto turn2 = engine_->updateState(
-      turn1.where1(), Action::moveAlly(0, 1), Action::wait());
-
+  auto turn2 = useBatonPassAfterConfuseRay(turn1);
   auto switched_states = turn2.whereSwitch(0);
   ASSERT_FALSE(switched_states.empty())
       << "Scizor never managed to Baton Pass (confusion blocked all?)";
@@ -104,17 +119,11 @@ TEST_F(BatonPassTest, DoesNotPassConfusion) {
 }
 
 TEST_F(BatonPassTest, NormalSwitchResetsBoosts) {
-  // Turn 1: Scizor uses Swords Dance (+2 Atk)
-  auto turn1 = engine_->updateState(
-      engine_->initialState(), Action::moveAlly(1, 0), Action::wait());
-
+  auto turn1 = useSwordsDance();
   auto scizor_boosted = turn1.where1Hit(0);
   EXPECT_EQ(scizor_boosted.teammate(0, 0).getBoost(FV_ATTACK), 2);
 
-  // Turn 2: Scizor switches manually to Torterra (Swap 1)
-  auto turn2 =
-      engine_->updateState(turn1.where1(), Action::swap(1), Action::wait());
-
+  auto turn2 = manualSwitchAfterSwordsDance(turn1);
   auto torterra_switched_in = turn2.where1();
 
   // Verify switch
