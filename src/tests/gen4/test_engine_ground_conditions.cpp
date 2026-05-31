@@ -1,5 +1,6 @@
 #include "engine_test.hpp"
 
+
 class GroundConditionsTest : public Gen4EngineTest {
  protected:
   void SetUp() override {
@@ -49,6 +50,7 @@ class GroundConditionsTest : public Gen4EngineTest {
   std::shared_ptr<const EnvironmentNonvolatile> env_nv;
 };
 
+
 TEST_F(GroundConditionsTest, RapidSpinRemovesSpikes) {
   auto spikes = setupSpikes();
   auto spikes_removed =
@@ -59,6 +61,7 @@ TEST_F(GroundConditionsTest, RapidSpinRemovesSpikes) {
   EXPECT_EQ(removed_vs_spikes.where1().teammate(1, 1).getPercentHP(), 1.);
 }
 
+
 TEST_F(GroundConditionsTest, SpikesHurtNormal) {
   auto spikes = setupSpikes();
   auto result =
@@ -66,6 +69,7 @@ TEST_F(GroundConditionsTest, SpikesHurtNormal) {
 
   EXPECT_NEAR(result.where1().teammate(1, 1).getPercentHP(), 0.875, 0.005);
 }
+
 
 TEST_F(GroundConditionsTest, ToxicSpikesHurtAndPoisonNormal) {
   auto toxic_spikes = setupToxicSpikes();
@@ -76,6 +80,7 @@ TEST_F(GroundConditionsTest, ToxicSpikesHurtAndPoisonNormal) {
   EXPECT_EQ(result.where1().teammate(1, 1).getStatusAilment(), AIL_NV_POISON);
 }
 
+
 TEST_F(GroundConditionsTest, SpikesDoNotHurtLevitate) {
   auto spikes = setupSpikes();
   auto result =
@@ -83,6 +88,7 @@ TEST_F(GroundConditionsTest, SpikesDoNotHurtLevitate) {
 
   EXPECT_EQ(result.where1().teammate(1, 2).getPercentHP(), 1.);
 }
+
 
 TEST_F(GroundConditionsTest, ToxicSpikesDoNotHurtLevitate) {
   auto toxic_spikes = setupToxicSpikes();
@@ -92,6 +98,7 @@ TEST_F(GroundConditionsTest, ToxicSpikesDoNotHurtLevitate) {
   EXPECT_EQ(result.where1().teammate(1, 2).getPercentHP(), 1.);
 }
 
+
 TEST_F(GroundConditionsTest, StealthRockHurtsLevitate) {
   auto stealth_rock = setupStealthRock();
   auto result = engine_->updateState(
@@ -99,6 +106,7 @@ TEST_F(GroundConditionsTest, StealthRockHurtsLevitate) {
 
   EXPECT_NEAR(result.where1().teammate(1, 2).getPercentHP(), 0.875, 0.005);
 }
+
 
 TEST_F(GroundConditionsTest, SpikesDoNotHurtFlying) {
   auto spikes = setupSpikes();
@@ -108,10 +116,47 @@ TEST_F(GroundConditionsTest, SpikesDoNotHurtFlying) {
   EXPECT_EQ(result.where1().teammate(1, 3).getPercentHP(), 1.);
 }
 
+
 TEST_F(GroundConditionsTest, StealthRockHurtsFlying) {
   auto stealth_rock = setupStealthRock();
   auto result = engine_->updateState(
       stealth_rock.where1(), Action::wait(), Action::swap(3));
 
   EXPECT_NEAR(result.where1().teammate(1, 3).getPercentHP(), 0.75, 0.005);
+}
+
+
+TEST_F(GroundConditionsTest, StealthRockReported) {
+  auto result = setupStealthRock();
+  auto output = StateTransitionPrinter::printString(
+      engine_->initialState(), result.where1(), false);
+
+  SCOPED_TRACE(output);
+  EXPECT_TRUE(
+      output.find("Pointed stones float in the air around forretress") !=
+      std::string::npos);
+}
+
+
+TEST_F(GroundConditionsTest, SpikesReported) {
+  auto result = setupSpikes();
+  auto output = StateTransitionPrinter::printString(
+      engine_->initialState(), result.where1(), false);
+
+  SCOPED_TRACE(output);
+  EXPECT_TRUE(
+      output.find("Spikes were scattered around forretress's feet") !=
+      std::string::npos);
+}
+
+
+TEST_F(GroundConditionsTest, ToxicSpikesReported) {
+  auto result = setupToxicSpikes();
+  auto output = StateTransitionPrinter::printString(
+      engine_->initialState(), result.where1(), false);
+
+  SCOPED_TRACE(output);
+  EXPECT_TRUE(
+      output.find("Toxic spikes were scattered around forretress's feet") !=
+      std::string::npos);
 }

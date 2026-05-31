@@ -290,6 +290,9 @@ void StateTransitionPrinter::reportTeamVolatileStatusChange(
   if (nvNew.stealthRock > 0 && nvOld.stealthRock == 0) {
     fmt::print(os, "Pointed stones float in the air around {}!\n", teamId);
   }
+  if (nvNew.spikes > nvOld.spikes) {
+    fmt::print(os, "Spikes were scattered around {}'s feet!\n", teamId);
+  }
   if (nvNew.toxicSpikes > nvOld.toxicSpikes) {
     fmt::print(os, "Toxic spikes were scattered around {}'s feet!\n", teamId);
   }
