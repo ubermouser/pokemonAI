@@ -38,12 +38,12 @@ class StateTransitionPrinter {
 
  protected:
   static void reportSwitch(
-      std::ostream& os, const ConstEnvironmentPossible& nsP, size_t iTeam);
+      std::ostream& os, const ConstEnvironmentPossible& nsP, const Actor& actor);
   static void reportHitResult(
       std::ostream& os,
       const ConstEnvironmentVolatile& osP,
       const ConstEnvironmentPossible& nsP,
-      size_t iTeam);
+      const Actor& actor);
   static void reportFainting(
       std::ostream& os,
       const ConstEnvironmentVolatile& osP,
@@ -74,9 +74,6 @@ class StateTransitionPrinter {
       std::ostream& os,
       const ConstPokemonVolatile& pkOld,
       const ConstPokemonVolatile& pkNew);
-  static size_t getSwitchedInIndex(
-      const ConstEnvironmentPossible& nsP,
-      size_t iTeam);
   static std::string pokemonName(const ConstPokemonVolatile& pk);
 };
 

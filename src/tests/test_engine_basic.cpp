@@ -159,3 +159,87 @@ TEST_F(BasicEngineTest, HighEngineAccuracy_SingleMove) {
   EXPECT_EQ(result.size(), 65);
   EXPECT_EQ(result.getNumUnique(), 49);
 }
+
+
+TEST_F(BasicEngineTest, StateTransitionPrinterMiss) {
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(), Action::move(0), Action::wait());
+
+  auto miss_state = result.where1Miss(0);
+  auto output = StateTransitionPrinter::printString(
+      engine_->initialState(), miss_state, false);
+  EXPECT_TRUE(
+      output.find("test_pokemon's attack missed!") != std::string::npos);
+}
+
+
+TEST_F(BasicEngineTest, StateTransitionPrinterDamage) {
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(), Action::wait(), Action::move(0));
+
+  auto state = result.where1Hit(TEAM_B);
+  auto output = StateTransitionPrinter::printString(
+      engine_->initialState(), state, false);
+
+  SCOPED_TRACE(output);
+  EXPECT_TRUE(
+      output.find("test_pokemon lost 48 HP (15.5%)!") != std::string::npos);
+}
+
+
+TEST_F(BasicEngineTest, StateTransitionPrinterCritAndStatus) {
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(), Action::move(1), Action::wait());
+
+  auto state = result.where1([](const ConstEnvironmentPossible& res) {
+    return res.flagsFor(TEAM_A, 0).isCrit() &&
+           res.teammate(TEAM_B, 0).getStatusAilment() == AIL_NV_POISON;
+  });
+
+  auto output = StateTransitionPrinter::printString(
+      engine_->initialState(), state, false);
+
+  SCOPED_TRACE(output);
+  EXPECT_TRUE(
+      output.find("test_pokemon scored a critical hit!") != std::string::npos);
+  EXPECT_TRUE(
+      output.find("test_pokemon lost 97 HP (31.3%)!") != std::string::npos);
+  EXPECT_TRUE(output.find("test_pokemon was poisoned!") != std::string::npos);
+}
+
+
+TEST_F(BasicEngineTest, StateTransitionPrinterFaintAndSwitch) {
+  auto turn1 = engine_->updateState(
+      engine_->initialState(), Action::wait(), Action::swap(1));
+
+  auto turn2 =
+      engine_->updateState(turn1.where1(), Action::wait(), Action::move(1));
+
+  ActionMap actionsA = {{{TEAM_A, 1}, Action::activate()}};
+  ActionMap actionsB = {{{TEAM_B, 1}, Action::wait()}};
+  auto turn3 = engine_->updateState(turn2.where1(), actionsA, actionsB);
+
+  auto output = StateTransitionPrinter::printString(
+      turn1.where1().getEnv(), turn3.where1(), false);
+
+  SCOPED_TRACE(output);
+  EXPECT_TRUE(
+      output.find("test_pokemon lost 310 HP (100.0%)!") != std::string::npos);
+  EXPECT_TRUE(output.find("test_pokemon fainted!") != std::string::npos);
+  EXPECT_TRUE(
+      output.find("Team A sent out test_pokemon2!") != std::string::npos);
+}
+
+
+TEST_F(BasicEngineTest, StateTransitionPrinterDamageOnSwitch) {
+  auto switch_and_attack = engine_->updateState(
+      engine_->initialState(), Action::swap(1), Action::move(0));
+
+  auto state = switch_and_attack.where1Hit(TEAM_B);
+  auto output = StateTransitionPrinter::printString(
+      engine_->initialState(), state, false);
+
+  SCOPED_TRACE(output);
+  EXPECT_TRUE(
+      output.find("test_pokemon2 lost 48 HP (15.5%)!") != std::string::npos);
+}

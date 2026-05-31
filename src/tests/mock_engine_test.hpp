@@ -7,6 +7,8 @@
 
 #include "mock_pokedex.hpp"
 #include "pokemonai/engine.h"
+#include "pokemonai/state_transition_printer.h"
+
 
 class MockEngineTest : public ::testing::Test {
  protected:
