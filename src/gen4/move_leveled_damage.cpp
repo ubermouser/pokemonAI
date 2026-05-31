@@ -26,7 +26,18 @@ int move_leveledDamage(
     return 1;
   }
 
-  tPKV.modHP(-1 * (int)cPKV.nv().getLevel());
+  uint32_t damage = cPKV.nv().getLevel();
+  // SPECIAL CASE: leveled damage against substitute
+  if (tPKV.status().substitute > 0 && tPKV.status().substitute != 255) {
+    uint32_t subHP = tPKV.status().substitute;
+    if (damage >= subHP) {
+      tPKV.status().substitute = 255;  // BROKEN_SUB_FLAG
+    } else {
+      tPKV.status().substitute -= damage;
+    }
+  } else {
+    tPKV.modHP(-1 * (int)damage);
+  }
 
   return 1;
 };

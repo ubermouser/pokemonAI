@@ -5,6 +5,7 @@ class SubstituteTest : public Gen4EngineTest {
  protected:
   void SetUp() override {
     Gen4EngineTest::SetUp();
+    // clang-format off
     // Team A: Pokemon with Substitute
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
@@ -22,7 +23,12 @@ class SubstituteTest : public Gen4EngineTest {
           .addMove(pokedex_->move("knock off"))     // Low damage move (index 1)
           .addMove(pokedex_->move("taunt"))        // Bypasses substitute (in Gen 4) (index 2)
           .addMove(pokedex_->move("sludge bomb"))  // High damage move (index 3)
+          .setLevel(70))
+        .addPokemon(PokemonNonVolatile()
+          .setBase(pokedex_->pokemon("smeargle"))
+          .addMove(pokedex_->move("seismic toss"))
           .setLevel(70));
+    // clang-format on 
 
     environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
     engine_->setEnvironment(environment_nv);
@@ -56,7 +62,12 @@ class SubstituteTest : public Gen4EngineTest {
     auto state1 = turn1.where1();
     return engine_->updateState(state1.getEnv(), Action::move(1), Action::wait());
   }
+
+  PossibleEnvironments setupSubstituteWithSmeargle() {
+    return engine_->updateState(engine_->initialState(), Action::move(0), Action::swap(1));
+  }
 };
+
 
 TEST_F(SubstituteTest, CreatesSubstitute) {
   auto turn1_results = setupSubstitute();
@@ -69,6 +80,7 @@ TEST_F(SubstituteTest, CreatesSubstitute) {
   EXPECT_EQ(blissey.status().substitute, expectedSubHP);
 }
 
+
 TEST_F(SubstituteTest, FailsWithLowHP) {
   auto result = setupSubstituteWithLowHP();
   auto blissey = result.where1().teammate(TEAM_A, 0);
@@ -79,6 +91,7 @@ TEST_F(SubstituteTest, FailsWithLowHP) {
   EXPECT_LT(blissey.getHP(), 82U);
   EXPECT_EQ(blissey.status().substitute, 0U);
 }
+
 
 TEST_F(SubstituteTest, AbsorbsDamage) {
   auto turn1 = setupSubstitute();
@@ -98,6 +111,7 @@ TEST_F(SubstituteTest, AbsorbsDamage) {
   EXPECT_GT(blissey2.status().substitute, 0U);
 }
 
+
 TEST_F(SubstituteTest, BreaksSubstitute) {
   auto turn1 = setupSubstitute();
   auto state1 = turn1.where1();
@@ -109,6 +123,7 @@ TEST_F(SubstituteTest, BreaksSubstitute) {
   // Blissey's HP should still be same as start of Turn 2
   EXPECT_EQ(blissey2.getHP(), state1.teammate(TEAM_A, 0).getHP());
 }
+
 
 TEST_F(SubstituteTest, BlocksStatusMove) {
   auto turn1 = setupSubstitute();
@@ -122,6 +137,7 @@ TEST_F(SubstituteTest, BlocksStatusMove) {
   EXPECT_EQ(blissey2.getStatusAilment(), AIL_NV_NONE);
 }
 
+
 TEST_F(SubstituteTest, BypassedByTaunt) {
   auto turn1 = setupSubstitute();
   auto state1 = turn1.where1();
@@ -134,6 +150,7 @@ TEST_F(SubstituteTest, BypassedByTaunt) {
   EXPECT_GT(blissey2.status().taunt_duration, 0U);
 }
 
+
 TEST_F(SubstituteTest, BlocksSecondaryEffect) {
   auto turn1 = setupSubstitute();
   auto state1 = turn1.where1();
@@ -145,6 +162,7 @@ TEST_F(SubstituteTest, BlocksSecondaryEffect) {
   auto secondary_state = turn2.where1Status(TEAM_B);
   EXPECT_EQ(secondary_state.teammate(TEAM_A, 0).getStatusAilment(), AIL_NV_NONE);
 }
+
 
 TEST_F(SubstituteTest, DoesNotBlockSelfTargetingMoves) {
   auto turn1 = setupSubstitute();
@@ -159,6 +177,7 @@ TEST_F(SubstituteTest, DoesNotBlockSelfTargetingMoves) {
   EXPECT_GT(blissey2.getHP(), hpAfterSub);
 }
 
+
 TEST_F(SubstituteTest, SubstituteReported) {
   auto turn1_results = setupSubstitute();
   auto output = StateTransitionPrinter::printString(
@@ -166,4 +185,38 @@ TEST_F(SubstituteTest, SubstituteReported) {
 
   SCOPED_TRACE(output);
   EXPECT_TRUE(output.find("blissey put up a substitute") != std::string::npos);
+}
+
+
+TEST_F(SubstituteTest, SubstituteFadedReported) {
+  auto turn1 = setupSubstitute();
+  auto state1 = turn1.where1();
+  auto turn2 = setupSubstituteBroken();
+  auto state2 = turn2.where1();
+
+  auto output = StateTransitionPrinter::printString(
+      state1.getEnv(), state2, false);
+
+  SCOPED_TRACE(output);
+  EXPECT_TRUE(output.find("blissey's substitute faded") != std::string::npos);
+}
+
+
+
+TEST_F(SubstituteTest, BlocksLeveledDamageMoves) {
+  auto turn2 = setupSubstituteWithSmeargle();
+  auto state2 = turn2.where1();
+
+  uint32_t initialHP = state2.teammate(TEAM_A, 0).getHP();
+  uint32_t initialSubHP = state2.teammate(TEAM_A, 0).status().substitute;
+
+  // Smeargle uses Seismic Toss
+  auto turn3 = engine_->updateState(
+      state2.getEnv(), Action::wait(), Action::move(0));
+  auto blissey3 = turn3.where1().teammate(TEAM_A, 0);
+
+  // Blissey's HP should not have decreased
+  EXPECT_EQ(blissey3.getHP(), initialHP);
+  // Substitute HP should have decreased by Smeargle's level (70)
+  EXPECT_EQ(blissey3.status().substitute, initialSubHP - 70U);
 }
