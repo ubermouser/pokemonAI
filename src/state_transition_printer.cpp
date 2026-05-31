@@ -201,6 +201,9 @@ void StateTransitionPrinter::reportStatusChange(
     case AIL_NV_SLEEP_2T:
     case AIL_NV_SLEEP_3T:
     case AIL_NV_SLEEP_4T:
+    case AIL_NV_REST_1T:
+    case AIL_NV_REST_2T:
+    case AIL_NV_REST_3T:
       statusMsg = "fell asleep!";
       col = fmt::color::light_gray;
       break;

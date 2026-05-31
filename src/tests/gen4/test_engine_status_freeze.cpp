@@ -4,58 +4,55 @@ class FreezeStatusTest : public Gen4EngineTest {
  protected:
   void SetUp() override {
     Gen4EngineTest::SetUp();
-  }
 
-  void SetupFrozenPokemon(size_t teamIndex, size_t teammateIndex) {
-      auto team_a = TeamNonVolatile()
-          .addPokemon(PokemonNonVolatile()
-              .setBase(pokedex_->pokemon("smeargle"))
-              .addMove(pokedex_->move("ice beam"))
-              .addMove(pokedex_->move("flame wheel"))
-              .setLevel(100));
-
-      auto team_b = TeamNonVolatile()
-          .addPokemon(PokemonNonVolatile()
-              .setBase(pokedex_->pokemon("smeargle"))
-              .addMove(pokedex_->move("tackle"))
-              .addMove(pokedex_->move("flamethrower"))
-              .setLevel(100));
-
-      engine_->setEnvironment(EnvironmentNonvolatile(team_a, team_b, true));
-
-      auto initialEnv = engine_->initialState();
-      mutableData = initialEnv.data();
-
-      // Set Freeze Ailment
-      mutableData.teams[teamIndex].teammates[teammateIndex].status_nonvolatile = AIL_NV_FREEZE;
-
-      // Important: Use initialEnv.nv() so pointers match
-      frozen_env = std::make_shared<EnvironmentVolatile>(initialEnv.nv(), mutableData);
-  }
-
-  EnvironmentVolatileData mutableData;
-  std::shared_ptr<EnvironmentVolatile> frozen_env;
-};
-
-TEST_F(FreezeStatusTest, Test_AppliesFreeze) {
-    // Team A: Smeargle with Ice Beam
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->pokemon("smeargle"))
           .addMove(pokedex_->move("ice beam"))
+          .addMove(pokedex_->move("flame wheel"))
+          .addMove(pokedex_->move("tackle"))
           .setLevel(100));
 
-    // Team B: Smeargle
     auto team_b = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->pokemon("smeargle"))
+          .addMove(pokedex_->move("ice beam"))
+          .addMove(pokedex_->move("flamethrower"))
           .addMove(pokedex_->move("tackle"))
           .setLevel(100));
 
     engine_->setEnvironment(EnvironmentNonvolatile(team_a, team_b, true));
+  }
 
-    // Smeargle uses Ice Beam (Move 0) against Smeargle
-    auto results = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
+  PossibleEnvironments setupFreezeTeamB() {
+    return engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
+  }
+
+  PossibleEnvironments setupFreezeTeamA() {
+    return engine_->updateState(engine_->initialState(), Action::wait(), Action::move(0));
+  }
+
+  PossibleEnvironments setupFrozenCannotMove() {
+    auto results = setupFreezeTeamA();
+    auto frozen_state = results.whereStatus(1).front();
+    return engine_->updateState(frozen_state.getEnv(), Action::move(0), Action::wait());
+  }
+
+  PossibleEnvironments setupThawByUsingFireMove() {
+    auto results = setupFreezeTeamA();
+    auto frozen_state = results.whereStatus(1).front();
+    return engine_->updateState(frozen_state.getEnv(), Action::move(1), Action::wait());
+  }
+
+  PossibleEnvironments setupThawByBeingHitByFireMove() {
+    auto results = setupFreezeTeamB();
+    auto frozen_state = results.whereStatus(0).front();
+    return engine_->updateState(frozen_state.getEnv(), Action::move(1), Action::wait());
+  }
+};
+
+TEST_F(FreezeStatusTest, Test_AppliesFreeze) {
+    auto results = setupFreezeTeamB();
 
     // Filter states where secondary effect occurred for Team A (index 0)
     auto status_states = results.whereStatus(0);
@@ -68,10 +65,7 @@ TEST_F(FreezeStatusTest, Test_AppliesFreeze) {
 }
 
 TEST_F(FreezeStatusTest, Test_FrozenPokemonCannotMove) {
-    SetupFrozenPokemon(0, 0); // Team A Smeargle is frozen
-
-    // Smeargle tries to use Ice Beam, Team B waits
-    auto results = engine_->updateState(*frozen_env, Action::move(0), Action::wait());
+    auto results = setupFrozenCannotMove();
 
     // In most states, Smeargle should be blocked
     auto blocked_states = results.where([](const ConstEnvironmentPossible& env) {
@@ -87,12 +81,9 @@ TEST_F(FreezeStatusTest, Test_FrozenPokemonCannotMove) {
 }
 
 TEST_F(FreezeStatusTest, Test_ThawProbabilistic) {
-    SetupFrozenPokemon(0, 0); // Team A Smeargle is frozen
+    auto results = setupFrozenCannotMove();
 
-    // Smeargle tries to move
-    auto results = engine_->updateState(*frozen_env, Action::move(0), Action::wait());
-
-    // There should be a 20% chance to thaw?
+    // There should be a 20% chance to thaw
     auto thaw_states = results.where([](const ConstEnvironmentPossible& env) {
         return env.teammate(0, 0).getStatusAilment() == AIL_NV_NONE;
     });
@@ -102,10 +93,7 @@ TEST_F(FreezeStatusTest, Test_ThawProbabilistic) {
 }
 
 TEST_F(FreezeStatusTest, Test_ThawByUsingFireMove) {
-    SetupFrozenPokemon(0, 0); // Team A Smeargle is frozen
-
-    // Smeargle uses Flame Wheel (Move 1), which is Fire-type and thaws the user
-    auto results = engine_->updateState(*frozen_env, Action::move(1), Action::wait());
+    auto results = setupThawByUsingFireMove();
 
     // It should thaw and move
     auto thaw_states = results.where([](const ConstEnvironmentPossible& env) {
@@ -121,10 +109,7 @@ TEST_F(FreezeStatusTest, Test_ThawByUsingFireMove) {
 }
 
 TEST_F(FreezeStatusTest, Test_ThawByBeingHitByFireMove) {
-    SetupFrozenPokemon(1, 0); // Team B Smeargle is frozen
-
-    // Team A Smeargle uses Flame Wheel (Move 1) on Team B Smeargle
-    auto results = engine_->updateState(*frozen_env, Action::move(1), Action::wait());
+    auto results = setupThawByBeingHitByFireMove();
 
     // Team B Smeargle should thaw after being hit
     auto thaw_states = results.where([](const ConstEnvironmentPossible& env) {
@@ -132,4 +117,17 @@ TEST_F(FreezeStatusTest, Test_ThawByBeingHitByFireMove) {
     });
 
     EXPECT_FALSE(thaw_states.empty()) << "Pokemon should thaw after being hit by a Fire-type move";
+}
+
+TEST_F(FreezeStatusTest, Test_StateTransitionPrinterFreeze) {
+    auto results = setupFreezeTeamB();
+    auto status_states = results.whereStatus(0);
+    ASSERT_FALSE(status_states.empty());
+
+    std::string output = StateTransitionPrinter::printString(
+        engine_->initialState(),
+        status_states.front(),
+        /*withStyle=*/false);
+    EXPECT_TRUE(output.find("was frozen solid!") != std::string::npos)
+        << "Expected 'was frozen solid!' in printer output: " << output;
 }

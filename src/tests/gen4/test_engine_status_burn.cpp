@@ -23,45 +23,49 @@ class BurnStatusTest : public Gen4EngineTest {
 
     environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
     engine_->setEnvironment(environment_nv);
-
-    // Initialize states
-    burn_state = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(0));
-    baseline_special_state = engine_->updateState(
-        engine_->initialState(), Action::wait(), Action::move(1));
-    baseline_physical_state = engine_->updateState(
-        engine_->initialState(), Action::wait(), Action::move(0));
-    // Use where1Status to find the state where burn was applied (secondary
-    // effect)
-    auto burned_state = burn_state.where1Status(0);
-    burned_physical_state =
-        engine_->updateState(burned_state, Action::move(0), Action::move(0));
-    burned_special_state =
-        engine_->updateState(burned_state, Action::move(0), Action::move(1));
-
-    burn_state_missing_hp = burned_state.teammate(1, 0).getMissingHP();
-    damage_on_mew_setup = burned_state.teammate(0, 0).getMissingHP();
   }
 
-  PossibleEnvironments burn_state;
-  PossibleEnvironments baseline_physical_state;
-  PossibleEnvironments burned_physical_state;
-  PossibleEnvironments baseline_special_state;
-  PossibleEnvironments burned_special_state;
+  PossibleEnvironments setupBurnApplied() {
+    return engine_->updateState(engine_->initialState(), Action::move(0), Action::move(0));
+  }
 
-  uint32_t burn_state_missing_hp;
-  uint32_t damage_on_mew_setup;
+  PossibleEnvironments setupBaselinePhysical() {
+    return engine_->updateState(engine_->initialState(), Action::wait(), Action::move(0));
+  }
+
+  PossibleEnvironments setupBaselineSpecial() {
+    return engine_->updateState(engine_->initialState(), Action::wait(), Action::move(1));
+  }
+
+  PossibleEnvironments setupBurnedPhysical() {
+    auto results = setupBurnApplied();
+    return engine_->updateState(
+        results.where1Status(0).getEnv(),
+        Action::move(0),
+        Action::move(0));
+  }
+
+  PossibleEnvironments setupBurnedSpecial() {
+    auto results = setupBurnApplied();
+    return engine_->updateState(
+        results.where1Status(0).getEnv(),
+        Action::move(0),
+        Action::move(1));
+  }
 };
 
 TEST_F(BurnStatusTest, Test_AppliesBurn) {
     // Mew uses Will-o-wisp on Snorlax
-    auto result_env = burn_state.where1Status(0).getEnv();
+    auto results = setupBurnApplied();
+    auto result_env = results.where1Status(0).getEnv();
 
     // Snorlax should be burned
     EXPECT_EQ(result_env.teammate(1, 0).getStatusAilment(), AIL_NV_BURN);
 }
 
 TEST_F(BurnStatusTest, Test_BurnDamage) {
-  auto burned_env = burn_state.where1Status(0).getEnv();
+  auto results = setupBurnApplied();
+  auto burned_env = results.where1Status(0).getEnv();
 
   // Verify initial full HP for Snorlax before burn damage trigger
   EXPECT_NEAR(burned_env.teammate(1, 0).getPercentHP(), 0.875, 0.005);
@@ -69,12 +73,18 @@ TEST_F(BurnStatusTest, Test_BurnDamage) {
 
 TEST_F(BurnStatusTest, Test_BurnReducesPhysicalDamage) {
     // Baseline: Snorlax uses Tackle on Mew (Clean state)
+    auto baseline = setupBaselinePhysical();
     uint32_t damage_baseline =
-        baseline_physical_state.where1Hit(1).teammate(0, 0).getMissingHP();
+        baseline.where1Hit(1).teammate(0, 0).getMissingHP();
 
     // Burned: Mew uses Will-o-wisp, Snorlax uses Tackle
+    auto burn_results = setupBurnApplied();
+    auto burned_state = burn_results.where1Status(0);
+    uint32_t damage_on_mew_setup = burned_state.teammate(0, 0).getMissingHP();
+
+    auto burned = setupBurnedPhysical();
     uint32_t damage_burned_total =
-        burned_physical_state.where1Hit(1).teammate(0, 0).getMissingHP();
+        burned.where1Hit(1).teammate(0, 0).getMissingHP();
     uint32_t damage_burned = damage_burned_total - damage_on_mew_setup;
 
     // Burn reduces physical damage by 50%
@@ -84,14 +94,31 @@ TEST_F(BurnStatusTest, Test_BurnReducesPhysicalDamage) {
 
 TEST_F(BurnStatusTest, Test_BurnDoesNotReduceSpecialDamage) {
     // Baseline: Snorlax uses Psychic on Mew (Clean state)
+    auto baseline = setupBaselineSpecial();
     uint32_t damage_baseline =
-        baseline_special_state.where1Hit(1).teammate(0, 0).getMissingHP();
+        baseline.where1Hit(1).teammate(0, 0).getMissingHP();
 
     // Burned: Mew uses Will-o-wisp, Snorlax uses Psychic
+    auto burn_results = setupBurnApplied();
+    auto burned_state = burn_results.where1Status(0);
+    uint32_t damage_on_mew_setup = burned_state.teammate(0, 0).getMissingHP();
+
+    auto burned = setupBurnedSpecial();
     uint32_t damage_burned_total =
-        burned_special_state.where1Hit(1).teammate(0, 0).getMissingHP();
+        burned.where1Hit(1).teammate(0, 0).getMissingHP();
     uint32_t damage_burned = damage_burned_total - damage_on_mew_setup;
 
     // Burn does NOT reduce special damage
     EXPECT_EQ(damage_burned, damage_baseline);
+}
+
+TEST_F(BurnStatusTest, Test_StateTransitionPrinterBurn) {
+    auto results = setupBurnApplied();
+    auto burned_state = results.where1Status(0);
+    std::string output = StateTransitionPrinter::printString(
+        engine_->initialState(),
+        burned_state,
+        /*withStyle=*/false);
+    EXPECT_TRUE(output.find("was burned!") != std::string::npos)
+        << "Expected 'was burned!' in printer output: " << output;
 }

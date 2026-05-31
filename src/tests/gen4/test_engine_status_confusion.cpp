@@ -23,11 +23,32 @@ class ConfusionStatusTest : public Gen4EngineTest {
     environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
     engine_->setEnvironment(environment_nv);
   }
+
+  PossibleEnvironments setupConfusionApplied() {
+    return engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
+  }
+
+  PossibleEnvironments setupConfusionTurn2() {
+    auto results = setupConfusionApplied();
+    return engine_->updateState(
+        results.where1Status(0).getEnv(),
+        Action::wait(),
+        Action::move(0));
+  }
+
+  ConstEnvironmentPossible advanceConfusion(const ConstEnvironmentPossible& state, std::list<PossibleEnvironments>& history) {
+    history.push_back(engine_->updateState(state.getEnv(), Action::wait(), Action::move(0)));
+    auto& results = history.back();
+    auto blocked_states = results.where([](const ConstEnvironmentPossible& env) {
+        return env.flagsFor(TEAM_B).isBlocked();
+    });
+    return !blocked_states.empty() ? blocked_states.front() : results.where1();
+  }
 };
 
 TEST_F(ConfusionStatusTest, Test_AppliesConfusion) {
     // Team A uses Confuse Ray (Move 0), Team B waits
-    auto results = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
+    auto results = setupConfusionApplied();
 
     // Filter states where secondary effect occurred for Team A (index 0)
     // Confuse Ray sets the secondary flag when it successfully confuses
@@ -39,13 +60,12 @@ TEST_F(ConfusionStatusTest, Test_AppliesConfusion) {
 
 TEST_F(ConfusionStatusTest, Test_ConfusionHurtSelf) {
     // Setup: Get to a state where Team B is confused
-    auto results1 = engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
-    auto confused_state = results1.where1Status(0);
-
+    auto confused_results = setupConfusionApplied();
+    auto confused_state = confused_results.where1Status(0);
     uint32_t initial_hp = confused_state.teammate(1, 0).getHP();
 
     // Turn 2: Team B tries to move (Tackle), Team A waits
-    auto results2 = engine_->updateState(confused_state, Action::wait(), Action::move(0));
+    auto results2 = setupConfusionTurn2();
 
     // There should be a 50% total chance to be blocked and take damage
     auto blocked_states = results2.where([](const ConstEnvironmentPossible& env) {
@@ -77,10 +97,8 @@ TEST_F(ConfusionStatusTest, Test_ConfusionHurtSelf) {
 
 TEST_F(ConfusionStatusTest, Test_ConfusionWearsOff) {
     // Setup: Get to a state where Team B is confused
-    // We use a list to store results of each turn to keep them alive,
-    // as ConstEnvironmentPossible holds pointers into these results.
     std::list<PossibleEnvironments> history;
-    history.push_back(engine_->updateState(engine_->initialState(), Action::move(0), Action::wait()));
+    history.push_back(setupConfusionApplied());
 
     ConstEnvironmentPossible state = history.back().where1Status(0);
 
@@ -92,22 +110,19 @@ TEST_F(ConfusionStatusTest, Test_ConfusionWearsOff) {
             break;
         }
 
-        history.push_back(engine_->updateState(state, Action::wait(), Action::move(0)));
-        auto& current_results = history.back();
-
-        // Pick the most probable state for next turn.
-        // We follow the branch where it was blocked because the engine
-        // only decrements confusion in the blocked branch currently.
-        auto blocked_states = current_results.where([](const ConstEnvironmentPossible& env) {
-            return env.flagsFor(TEAM_B).isBlocked();
-        });
-
-        if (!blocked_states.empty()) {
-            state = blocked_states.front();
-        } else {
-            state = current_results.where1();
-        }
+        state = advanceConfusion(state, history);
     }
 
     EXPECT_TRUE(eventually_wore_off);
+}
+
+TEST_F(ConfusionStatusTest, Test_StateTransitionPrinterConfusion) {
+    auto results = setupConfusionApplied();
+    auto confused_state = results.where1Status(0);
+    std::string output = StateTransitionPrinter::printString(
+        engine_->initialState(),
+        confused_state,
+        /*withStyle=*/false);
+    EXPECT_TRUE(output.find("became confused!") != std::string::npos)
+        << "Expected 'became confused!' in printer output: " << output;
 }

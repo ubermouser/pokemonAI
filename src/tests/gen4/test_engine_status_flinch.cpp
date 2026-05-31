@@ -24,12 +24,27 @@ class FlinchStatusTest : public Gen4EngineTest {
     environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
     engine_->setEnvironment(environment_nv);
   }
+
+  PossibleEnvironments setupFlinchApplied() {
+    return engine_->updateState(engine_->initialState(), Action::move(0), Action::move(0));
+  }
+
+  PossibleEnvironments setupFlinchTurn2() {
+    return engine_->updateState(
+        setupFlinchApplied().where1Status(TEAM_A).getEnv(),
+        Action::move(1),
+        Action::move(0));
+  }
+
+  PossibleEnvironments setupSlowFlinch() {
+    return engine_->updateState(engine_->initialState(), Action::move(1), Action::move(1));
+  }
 };
 
 TEST_F(FlinchStatusTest, Test_IronHeadCausesFlinch) {
     // Mew uses Iron Head on Snorlax. Snorlax uses Tackle.
     // Mew is faster and moves first.
-    auto results = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(0));
+    auto results = setupFlinchApplied();
 
     results.printStates();
 
@@ -45,13 +60,13 @@ TEST_F(FlinchStatusTest, Test_IronHeadCausesFlinch) {
 
 TEST_F(FlinchStatusTest, Test_FlinchWearsOff) {
     // Turn 1: Mew uses Iron Head, Snorlax flinches
-    auto results1 = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(0));
+    auto results1 = setupFlinchApplied();
     auto flinch_state1 = results1.where1Status(TEAM_A);
     EXPECT_TRUE(flinch_state1.flagsFor(TEAM_B).isBlocked());
 
     // Turn 2: Mew uses Psychic, Snorlax uses Tackle
     // Snorlax should NOT be flinching anymore.
-    auto results2 = engine_->updateState(flinch_state1.getEnv(), Action::move(1), Action::move(0));
+    auto results2 = setupFlinchTurn2();
     auto env2 = results2.where1();
 
     // Snorlax should NOT be blocked
@@ -64,13 +79,13 @@ TEST_F(FlinchStatusTest, Test_FlinchWearsOff) {
 TEST_F(FlinchStatusTest, Test_SlowFlinchMoveDoesNotBlock) {
     // Mew (fast) uses Psychic, Snorlax (slow) uses Iron Head.
     // Mew moves first.
-    auto results = engine_->updateState(engine_->initialState(), Action::move(1), Action::move(1));
+    auto results = setupSlowFlinch();
 
     // In all states, Mew should NOT be blocked because it already moved.
-    // Note: where1Status(TEAM_B) may fail here because states where flinch has no effect are merged.
-    for (size_t i = 0; i < results.size(); ++i) {
-        EXPECT_FALSE(results.at(i).flagsFor(TEAM_A).isBlocked());
-    }
+    auto blocked_states = results.where([](const ConstEnvironmentPossible& env) {
+        return env.flagsFor(TEAM_A).isBlocked();
+    });
+    EXPECT_TRUE(blocked_states.empty());
 
     // Pick a state where Mew hit Snorlax
     auto hit_state = results.where1Hit(TEAM_A);
@@ -84,7 +99,7 @@ TEST_F(FlinchStatusTest, Test_SlowFlinchMoveDoesNotBlock) {
 
 TEST_F(FlinchStatusTest, Test_FlinchReported) {
     // Mew uses Iron Head on Snorlax
-    auto results = engine_->updateState(engine_->initialState(), Action::move(0), Action::move(0));
+    auto results = setupFlinchApplied();
     auto flinch_state = results.where1Status(TEAM_A);
     auto output = StateTransitionPrinter::printString(
       engine_->initialState(), flinch_state, false);

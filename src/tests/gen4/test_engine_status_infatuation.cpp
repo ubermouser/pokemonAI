@@ -25,13 +25,22 @@ class InfatuationStatusTest : public Gen4EngineTest {
     environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
     engine_->setEnvironment(environment_nv);
   }
+
+  PossibleEnvironments setupInfatuationApplied() {
+    return engine_->updateState(engine_->initialState(), Action::move(0), Action::wait());
+  }
+
+  PossibleEnvironments setupInfatuationTurn2() {
+    auto results = setupInfatuationApplied();
+    return engine_->updateState(
+        results.where1Status(0).getEnv(),
+        Action::wait(),
+        Action::move(0));
+  }
 };
 
 TEST_F(InfatuationStatusTest, Test_AppliesInfatuation) {
-  auto initial_state = engine_->initialState();
-  // Mew uses Attract, Snorlax uses Strength
-  // Since Attract is a status move with 100% accuracy, and genders are opposite, it should hit.
-  auto results = engine_->updateState(initial_state, Action::move(0), Action::move(0));
+  auto results = setupInfatuationApplied();
 
   // Snorlax should be infatuated in the state where Attract hit
   auto infatuated_state = results.where1Status(0);
@@ -39,28 +48,35 @@ TEST_F(InfatuationStatusTest, Test_AppliesInfatuation) {
 }
 
 TEST_F(InfatuationStatusTest, Test_InfatuationBlocksMove) {
-  auto initial_state = engine_->initialState();
-
-  // Turn 1: Mew uses Attract, Snorlax waits
-  auto results1 = engine_->updateState(initial_state, Action::move(0), Action::wait());
-  auto infatuated_state = results1.where1Status(0);
-  EXPECT_EQ(infatuated_state.teammate(1, 0).status().infatuate, 1);
-
-  // Turn 2: Snorlax tries to move (Strength), Mew waits
-  auto results2 = engine_->updateState(infatuated_state, Action::wait(), Action::move(0));
+  auto results2 = setupInfatuationTurn2();
 
   // There should be a state where Snorlax is blocked (50% chance)
-  bool found_blocked = false;
-  FixType prob_not_blocked = FixType(0);
-  for (size_t i = 0; i < results2.size(); ++i) {
-    auto env = results2.at(i);
-    if (env.flagsFor(TEAM_B).isBlocked()) {
-      found_blocked = true;
-      EXPECT_NEAR(env.getProbability().to_double(), 0.5, 0.01);
-    } else if (env.flagsFor(TEAM_B).isHit()) {
-      prob_not_blocked = prob_not_blocked + env.getProbability();
-    }
+  auto blocked_states = results2.where([](const ConstEnvironmentPossible& env) {
+    return env.flagsFor(TEAM_B).isBlocked();
+  });
+  EXPECT_FALSE(blocked_states.empty());
+  for (const auto& env : blocked_states) {
+    EXPECT_NEAR(env.getProbability().to_double(), 0.5, 0.01);
   }
-  EXPECT_TRUE(found_blocked);
-  EXPECT_NEAR(prob_not_blocked.to_double(), 0.5, 0.01);
+
+  auto hit_states = results2.where([](const ConstEnvironmentPossible& env) {
+    return env.flagsFor(TEAM_B).isHit();
+  });
+  EXPECT_FALSE(hit_states.empty());
+  double prob_not_blocked = 0.0;
+  for (const auto& env : hit_states) {
+    prob_not_blocked += env.getProbability().to_double();
+  }
+  EXPECT_NEAR(prob_not_blocked, 0.5, 0.01);
+}
+
+TEST_F(InfatuationStatusTest, Test_StateTransitionPrinterInfatuation) {
+  auto results = setupInfatuationApplied();
+  auto infatuated_state = results.where1Status(0);
+  std::string output = StateTransitionPrinter::printString(
+      engine_->initialState(),
+      infatuated_state,
+      /*withStyle=*/false);
+  EXPECT_TRUE(output.find("fell in love!") != std::string::npos)
+      << "Expected 'fell in love!' in printer output: " << output;
 }
