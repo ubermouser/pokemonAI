@@ -123,7 +123,7 @@ void evaluator_network64_impl<Base>::seed(
         cInput, cInput + NEURONSPERTEAMMATE * (6 - numTeammatesAlive), 0.0f);
     cInput += NEURONSPERTEAMMATE * (6 - numTeammatesAlive);
     cInput[0] = (float)((cTV.getVolatile().confused | cTV.getVolatile().infatuate) > AIL_V_NONE);
-    cInput[1] = scale((float)((cTV.getNonVolatile().spikes>0) + (cTV.getNonVolatile().stealthRock>0)), 2.0f, 0.0f);
+    cInput[1] = scale((float)((cTV.status().spikes>0) + (cTV.status().stealthRock>0)), 2.0f, 0.0f);
     cInput += NEURONSPERSTATUS;
   }
 }

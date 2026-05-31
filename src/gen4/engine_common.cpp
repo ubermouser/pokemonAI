@@ -35,10 +35,10 @@ int engine_endRoundDamageEffect(PkCUEngine& cu, const Actor& actor) {
     // reduce HP of pokemon by (1/8) or .125
     cPKV.modPercentHP(-0.125);
   } else if (condition == AIL_NV_POISON_TOXIC) {
-    uint32_t toxicTier = cPKV.status().cTeammate.toxicPoison_tier;
+    uint32_t toxicTier = cPKV.status().toxicPoison_tier;
 
     // increment toxic tier, more added damage per round
-    if (toxicTier < 15) { cPKV.status().cTeammate.toxicPoison_tier++; }
+    if (toxicTier < 15) { cPKV.status().toxicPoison_tier++; }
 
     cPKV.modPercentHP(-0.0625 * (fpType)(toxicTier + 1));
   }
@@ -46,7 +46,7 @@ int engine_endRoundDamageEffect(PkCUEngine& cu, const Actor& actor) {
   // volatile:
   // flinch only lasts for the current round. Only a pokemon moving first can
   // flinch the other pokemon
-  cPKV.status().cTeammate.flinch = 0;
+  cPKV.status().flinch = 0;
 
   return (cPKV.isAlive() ? 1 : 2);
 };
@@ -135,11 +135,11 @@ int engine_beginTurnNonvolatileEffect(PkCUEngine& cu, const Actor& actor) {
 int engine_beginTurnVolatileEffect(PkCUEngine& cu, const Actor& actor) {
   PokemonVolatile cPKV = cu.getPKV(actor);
   // Does this pokemon have a volatile condition?
-  if (cPKV.status().cTeammate.flinch > 0) {
+  if (cPKV.status().flinch > 0) {
     // set user blocked 100% of the time
     cu.getBase().flagsFor(cu.getCActor()).setBlocked();
   }
-  if (cPKV.status().cTeammate.infatuate > 0) {
+  if (cPKV.status().infatuate > 0) {
     // 50% chance to move:
     std::array<size_t, 2> iREnv;
     cu.duplicateState(iREnv, FixType(0.5));
@@ -149,8 +149,8 @@ int engine_beginTurnVolatileEffect(PkCUEngine& cu, const Actor& actor) {
       cu.getStack().at(iREnv[1]).flagsFor(cu.getCActor()).setBlocked();
     }
   }
-  if (cPKV.status().cTeammate.confused > 0) {
-    uint32_t iConfused = cPKV.status().cTeammate.confused;
+  if (cPKV.status().confused > 0) {
+    uint32_t iConfused = cPKV.status().confused;
     if (iConfused != AIL_V_CONFUSED_0T) {
       // 50% chance to move:
       std::array<size_t, 2> iREnv;
@@ -161,7 +161,7 @@ int engine_beginTurnVolatileEffect(PkCUEngine& cu, const Actor& actor) {
       // 50% chance to not move:
       {
         cu.getStack().at(iREnv[1]).flagsFor(cu.getCActor()).setBlocked();
-        cConfusedPKV.status().cTeammate.confused--;
+        cConfusedPKV.status().confused--;
         // TODO: actual damage calculation
         cConfusedPKV.modHP(-40);
       }
@@ -179,13 +179,13 @@ int engine_beginTurnVolatileEffect(PkCUEngine& cu, const Actor& actor) {
           cu.duplicateState(iTEnv, terminalProbability, iREnv[1]);
 
           // variable % chance for this env to be the last environment confused:
-          cConfusedPKV.status().cTeammate.confused = 0;
+          cConfusedPKV.status().confused = 0;
         }
       }
     } else /* equals AIL_V_CONFUSED_0T */
     {
       // pokemon breaks out of confusion this round
-      cPKV.status().cTeammate.confused = 0;
+      cPKV.status().confused = 0;
     }
   }  // end of confused
 
@@ -239,7 +239,7 @@ int engine_secondaryNonvolatileEffect(
   case AIL_NV_POISON:
   default:
     // reset toxic tier:
-    tPKV.status().cTeammate.toxicPoison_tier = 0;
+    tPKV.status().toxicPoison_tier = 0;
     // apply generic status condition
     tPKV.setStatusAilment(cMove.getTargetAilment());
     // implicitly push back bEnv status condition (already on array)
@@ -261,14 +261,14 @@ int engine_secondaryVolatileEffect(
   switch (mV.getBase().getTargetVolatileAilment()) {
   case AIL_V_CONFUSED:
     // confused for (at most) 5 turns, and (at least) 2 turns:
-    tPKV.status().cTeammate.confused = AIL_V_CONFUSED_5T;
+    tPKV.status().confused = AIL_V_CONFUSED_5T;
     // implicitly push back bEnv
     break;
   case AIL_V_FLINCH:
-    tPKV.status().cTeammate.flinch = 1;
+    tPKV.status().flinch = 1;
     break;
   case AIL_V_INFATUATED:
-    tPKV.status().cTeammate.infatuate = 1;
+    tPKV.status().infatuate = 1;
     break;
   default:
   case AIL_V_NONE:
@@ -300,10 +300,10 @@ int engine_updateLastAction(PkCUEngine& cu, const Actor& actor) {
   const auto& lastAction = cu.getCAction();
   bool switched = cu.getBase().flagsFor(cu.getCActor()).isSwitched();
   if (lastAction.isMove() && !switched) {
-    cPKV.status().cTeammate.iLastAction = lastAction.iMove() + 1;
+    cPKV.status().iLastAction = lastAction.iMove() + 1;
     return 1;
   } else {
-    cPKV.status().cTeammate.iLastAction = 0;
+    cPKV.status().iLastAction = 0;
     return 0;
   }
 };

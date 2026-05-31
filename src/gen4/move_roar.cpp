@@ -13,7 +13,7 @@ int move_roar_forceSwitch(
   // Find all valid switch-ins
   std::vector<size_t> validSwitchIns;
   for (size_t i = 0; i < tTV.nv().getNumTeammates(); ++i) {
-    if (i == tTV.data().status.nonvolatile.iCPokemon) continue; // Current pokemon
+    if (i == tTV.getICPKV()) continue; // Current pokemon
     if (tTV.teammate(i).isAlive()) { validSwitchIns.push_back(i); }
   }
 

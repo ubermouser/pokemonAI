@@ -47,14 +47,14 @@ class BrickBreakTest : public Gen4EngineTest {
 TEST_F(BrickBreakTest, RemovesReflect) {
   auto setup_env = setup_reflect.where1().getEnv();
 
-  EXPECT_EQ(setup_reflect.where1().getTeam(1).getNonVolatile().reflect, 5);
+  EXPECT_EQ(setup_reflect.where1().getTeam(1).status().reflect, 5);
 
   // Test: Team A uses Brick Break
   auto result = engine_->updateState(setup_env, Action::move(0), Action::wait());
   auto result_env = result.where1().getEnv();
 
   // Reflect should be removed (set to 0)
-  EXPECT_EQ(result_env.getTeam(1).getNonVolatile().reflect, 0);
+  EXPECT_EQ(result_env.getTeam(1).status().reflect, 0);
   // Damage should be dealt
   EXPECT_LT(result_env.teammate(1, 0).getPercentHP(), 1.0);
 }
@@ -62,14 +62,14 @@ TEST_F(BrickBreakTest, RemovesReflect) {
 TEST_F(BrickBreakTest, RemovesLightScreen) {
   auto setup_env = setup_lightscreen.where1().getEnv();
 
-  EXPECT_EQ(setup_env.getTeam(1).getNonVolatile().lightScreen, 5);
+  EXPECT_EQ(setup_env.getTeam(1).status().lightScreen, 5);
 
   // Test: Team A uses Brick Break
   auto result = engine_->updateState(setup_env, Action::move(0), Action::wait());
   auto result_env = result.where1().getEnv();
 
   // Light Screen should be removed
-  EXPECT_EQ(result_env.getTeam(1).getNonVolatile().lightScreen, 0);
+  EXPECT_EQ(result_env.getTeam(1).status().lightScreen, 0);
   // Damage should be dealt
   EXPECT_LT(result_env.teammate(1, 0).getPercentHP(), 1.0);
 }
@@ -77,15 +77,15 @@ TEST_F(BrickBreakTest, RemovesLightScreen) {
 TEST_F(BrickBreakTest, RemovesBothScreens) {
   auto setup_env = setup_both.where1().getEnv();
 
-  EXPECT_EQ(setup_env.getTeam(1).getNonVolatile().reflect, 4); // decremented once
-  EXPECT_EQ(setup_env.getTeam(1).getNonVolatile().lightScreen, 5);
+  EXPECT_EQ(setup_env.getTeam(1).status().reflect, 4); // decremented once
+  EXPECT_EQ(setup_env.getTeam(1).status().lightScreen, 5);
 
   // Test: Team A uses Brick Break
   auto result = engine_->updateState(setup_env, Action::move(0), Action::wait());
   auto result_env = result.where1().getEnv();
 
-  EXPECT_EQ(result_env.getTeam(1).getNonVolatile().reflect, 0);
-  EXPECT_EQ(result_env.getTeam(1).getNonVolatile().lightScreen, 0);
+  EXPECT_EQ(result_env.getTeam(1).status().reflect, 0);
+  EXPECT_EQ(result_env.getTeam(1).status().lightScreen, 0);
 }
 
 TEST_F(BrickBreakTest, WorksWithoutScreens) {
@@ -99,27 +99,27 @@ TEST_F(BrickBreakTest, WorksWithoutScreens) {
 
 TEST_F(BrickBreakTest, DoesNotRemoveUserScreens) {
   auto setup_env = setup_friendly_reflect.where1().getEnv();
-  EXPECT_EQ(setup_env.getTeam(0).getNonVolatile().reflect, 5);
+  EXPECT_EQ(setup_env.getTeam(0).status().reflect, 5);
 
   // Team A uses Brick Break
   auto result = engine_->updateState(setup_env, Action::move(0), Action::wait());
   auto result_env = result.where1().getEnv();
 
   // Team A's Reflect should remain (decremented to 4)
-  EXPECT_EQ(result_env.getTeam(0).getNonVolatile().reflect, 4);
+  EXPECT_EQ(result_env.getTeam(0).status().reflect, 4);
 }
 
 TEST_F(BrickBreakTest, DoesNotRemoveScreensIfImmune) {
   auto setup_env = setup_reflect_swapped_to_ghost.where1().getEnv();
   // TODO(@drendleman) once lightscreen counter bug is solved, should be 4
-  EXPECT_EQ(setup_env.getTeam(1).getNonVolatile().reflect, 5);
+  EXPECT_EQ(setup_env.getTeam(1).status().reflect, 5);
 
   // Team A uses Brick Break on Rotom (Immune)
   auto result = engine_->updateState(setup_env, Action::move(0), Action::moveSideAlly(0));
   auto result_env = result.where1().getEnv();
 
   // Reflect should REMAIN (decremented to 3) because Ghost is immune to Fighting
-  EXPECT_EQ(result_env.getTeam(1).getNonVolatile().reflect, 4);
+  EXPECT_EQ(result_env.getTeam(1).status().reflect, 4);
   // No damage dealt
   EXPECT_EQ(result_env.teammate(1, 1).getPercentHP(), 1.0);
 }

@@ -308,6 +308,14 @@ inline int mock_applySelfBuff(
   return 0;
 }
 
+inline int mock_confuseSelf(
+    PkCUEngine& cu, const Actor& user_act, const Action&, const Actor&) {
+  auto user = cu.getPKV(user_act);
+  SPDLOG_TRACE("PLUGIN_ON_EVALUATEMOVE: mock_confuseSelf");
+  user.status().confused = 3;
+  return 0;
+}
+
 inline int mock_applyTargetDebuff(
     PkCUEngine& cu, const Actor& user_act, const Action&, const Actor& target_act) {
   auto target = cu.getPKV(target_act);
@@ -456,6 +464,7 @@ public:
     moves_.insert(Move("move_faint", t, 100, 0, 20, ATK_NODMG, Move::ANY_ADJACENT, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, true, "faint"));
     moves_.insert(Move("move_suicide", t, 100, 0, 20, ATK_NODMG, Move::SELF, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, true, "suicide"));
     moves_.insert(Move("move_zero_pp", t, 100, 0, 20, ATK_NODMG, Move::ANY_ADJACENT, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, true, "zero pp"));
+    moves_.insert(Move("move_confuse_self", t, 100, 0, 20, ATK_NODMG, Move::SELF, 0, 0, zeroBuff, zeroBuff, AIL_NV_NONE, AIL_V_NONE, false, "confuse self"));
 
     // Move plugins
     moves_.at("test_move").registerPlugin(pluginOnInit(pluginCategory::move, "init", mock_onInitMove), true);
@@ -468,6 +477,7 @@ public:
     moves_.at("move_self_buff").registerPlugin(pluginOnEvaluateMove(pluginCategory::move, "self_buff", mock_applySelfBuff), true);
     moves_.at("move_any_adjacent_secondary").registerPlugin(pluginOnSecondaryEffect(pluginCategory::move, "status", mock_applyTargetStatus), true);
     moves_.at("move_any_adjacent_debuff").registerPlugin(pluginOnSecondaryEffect(pluginCategory::move, "debuff", mock_applyTargetDebuff), true);
+    moves_.at("move_confuse_self").registerPlugin(pluginOnEvaluateMove(pluginCategory::move, "confuse_self", mock_confuseSelf), true);
     // clang-format on
   }
 

@@ -12,9 +12,9 @@ int move_torment_set(
   if (&mV.getBase() != torment_t) { return 0; }
 
   // Fails if the target is already tormented.
-  if (tPKV.status().cTeammate.torment) { return 1; }
+  if (tPKV.status().torment) { return 1; }
 
-  tPKV.status().cTeammate.torment = 1;
+  tPKV.status().torment = 1;
   return 1;
 }
 
@@ -24,7 +24,7 @@ int move_torment_test(
     ConstMoveVolatile mV,
     const Action& action,
     ValidMoveSet& moveAllowed) {
-  if (!cPKV.status().cTeammate.torment) { return 0; }
+  if (!cPKV.status().torment) { return 0; }
 
   // no effect if not a move:
   if (!action.isMove()) { return 0; }
@@ -34,8 +34,8 @@ int move_torment_test(
 
   // Check last action
   // iLastAction is 1-based index of the move in the list + 1, so 0 means no action.
-  // See engine_common.cpp: cPKV.status().cTeammate.iLastAction = lastAction.iMove() + 1;
-  uint32_t iLastAction = cPKV.status().cTeammate.iLastAction;
+  // See engine_common.cpp: cPKV.status().iLastAction = lastAction.iMove() + 1;
+  uint32_t iLastAction = cPKV.status().iLastAction;
 
   if (iLastAction > 0) {
       uint32_t lastMoveIndex = iLastAction - 1;

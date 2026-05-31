@@ -53,13 +53,13 @@ class RampageTest : public Gen4EngineTest {
     auto turn2 = advanceRampage(
         turn1
             .where1([](const ConstEnvironmentPossible& p) {
-              return p.teammate(TEAM_A, 0).status().cTeammate.lockIn_duration ==
+              return p.teammate(TEAM_A, 0).status().lockIn_duration ==
                      2;
             })
             .getEnv(),
         moveIdx);
     auto state2 = turn2.where1([](const ConstEnvironmentPossible& p) {
-      return p.teammate(TEAM_A, 0).status().cTeammate.lockIn_duration == 1;
+      return p.teammate(TEAM_A, 0).status().lockIn_duration == 1;
     });
     return advanceRampage(state2.getEnv(), moveIdx);
   }
@@ -100,7 +100,7 @@ class RampageTest : public Gen4EngineTest {
 
     // Turn 2: Metagross uses Tackle (move 0?), Smeargle uses Outrage (locked
     // in) We need Metagross to be faster.
-    state1.teammate(TEAM_B, 0).status().cTeammate.boosts.B_SPE = 6;
+    state1.teammate(TEAM_B, 0).status().boosts.B_SPE = 6;
 
     return engine_->updateState(
         state1.getEnv(), Action::move(moveIdx), Action::move(0));
@@ -127,7 +127,7 @@ TEST_F(RampageTest, OutrageLockIn) {
 
   // lockIn_duration should be > 0 (it was set to 3 at start of turn, then
   // decremented to 2 at end of turn)
-  EXPECT_EQ(state.teammate(TEAM_A, 0).status().cTeammate.lockIn_duration, 2);
+  EXPECT_EQ(state.teammate(TEAM_A, 0).status().lockIn_duration, 2);
 }
 
 
@@ -135,9 +135,9 @@ TEST_F(RampageTest, OutrageConfusion) {
   auto result = setupRampage3Turns(0);
   auto state3 = result.where1();
 
-  EXPECT_EQ(state3.teammate(TEAM_A, 0).status().cTeammate.lockIn_duration, 0);
+  EXPECT_EQ(state3.teammate(TEAM_A, 0).status().lockIn_duration, 0);
   EXPECT_EQ(
-      state3.teammate(TEAM_A, 0).status().cTeammate.confused,
+      state3.teammate(TEAM_A, 0).status().confused,
       AIL_V_CONFUSED_5T);
 
   // Now other moves are valid again
@@ -154,22 +154,22 @@ TEST_F(RampageTest, ThrashInterruptedByImmunity) {
 
   // In Gen 4: If a rampage move hits an immune target, it should end
   // immediately and NOT cause confusion.
-  EXPECT_EQ(state1.teammate(TEAM_A, 0).status().cTeammate.lockIn_duration, 0);
-  EXPECT_EQ(state1.teammate(TEAM_A, 0).status().cTeammate.confused, 0);
+  EXPECT_EQ(state1.teammate(TEAM_A, 0).status().lockIn_duration, 0);
+  EXPECT_EQ(state1.teammate(TEAM_A, 0).status().confused, 0);
 }
 
 
 TEST_F(RampageTest, PetalDanceMinimal) {
   auto turn1 = setupRampage(1);
   auto state = turn1.where1().getEnv();
-  EXPECT_EQ(state.teammate(TEAM_A, 0).status().cTeammate.lockIn_duration, 2);
+  EXPECT_EQ(state.teammate(TEAM_A, 0).status().lockIn_duration, 2);
 }
 
 
 TEST_F(RampageTest, ThrashMinimal) {
   auto turn1 = setupRampage(2);
   auto state = turn1.where1().getEnv();
-  EXPECT_EQ(state.teammate(TEAM_A, 0).status().cTeammate.lockIn_duration, 2);
+  EXPECT_EQ(state.teammate(TEAM_A, 0).status().lockIn_duration, 2);
 }
 
 
@@ -179,8 +179,8 @@ TEST_F(RampageTest, OutrageInterruptedByParalysis) {
 
   // NOTE: If the engine currently doesn't implement lock-in clearing on
   // paralysis, this will reveal it.
-  EXPECT_EQ(state2.teammate(TEAM_A, 0).status().cTeammate.lockIn_duration, 0);
-  EXPECT_EQ(state2.teammate(TEAM_A, 0).status().cTeammate.confused, 0);
+  EXPECT_EQ(state2.teammate(TEAM_A, 0).status().lockIn_duration, 0);
+  EXPECT_EQ(state2.teammate(TEAM_A, 0).status().confused, 0);
 }
 
 
@@ -193,8 +193,8 @@ TEST_F(RampageTest, OutrageInterruptedbyFaint) {
   EXPECT_FALSE(smeargle.isAlive());
 
   // Rampage should be cleared
-  EXPECT_EQ(smeargle.status().cTeammate.lockIn_duration, 0);
-  EXPECT_EQ(smeargle.status().cTeammate.lockIn_action, 0);
+  EXPECT_EQ(smeargle.status().lockIn_duration, 0);
+  EXPECT_EQ(smeargle.status().lockIn_action, 0);
 }
 
 

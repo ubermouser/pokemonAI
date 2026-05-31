@@ -16,7 +16,7 @@ int move_trap_set(
   }
 
   // Set fully trapped status
-  tPKV.status().cTeammate.trap = 7;
+  tPKV.status().trap = 7;
 
   return 1;
 }
@@ -27,7 +27,7 @@ int engine_checkTrapped(
     const Action& action,
     ValidSwapSet& switchAllowed) {
   // If fully trapped (trap == 7), prevent switching
-  if (cPKV.status().cTeammate.trap == 7) {
+  if (cPKV.status().trap == 7) {
     switchAllowed[VALID_SWAP_SCRIPT] = false;
     return 1;
   }
@@ -39,16 +39,16 @@ int engine_clearTrap(PkCUEngine& cu, const Actor& actor) {
   // cPKV is the pokemon switching in (or just switched in).
 
   // 1. Clear trap on self to ensure new arrivals aren't trapped
-  if (cPKV.status().cTeammate.trap == 7) {
-    cPKV.status().cTeammate.trap = 0;
+  if (cPKV.status().trap == 7) {
+    cPKV.status().trap = 0;
   }
 
   // TODO: we should only clear the trap on the pokemon we trapped
   // 2. Clear trap on all opponent active members
   auto team = cu.getBase().getTeam(cu.getIOTeam());
   for (auto [actor, tPKV] : team.yieldActivePokemon()) {
-    if (tPKV.isAlive() && tPKV.status().cTeammate.trap == 7) {
-      tPKV.status().cTeammate.trap = 0;
+    if (tPKV.isAlive() && tPKV.status().trap == 7) {
+      tPKV.status().trap = 0;
     }
   }
 

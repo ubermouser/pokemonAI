@@ -17,7 +17,7 @@ int move_refresh(
     cPKV.clearStatusAilment();
     // Reset toxic counter if it was toxic poison
     if (status == AIL_NV_POISON_TOXIC) {
-      cPKV.status().cTeammate.toxicPoison_tier = 0;
+      cPKV.status().toxicPoison_tier = 0;
     }
     return 1;
   }

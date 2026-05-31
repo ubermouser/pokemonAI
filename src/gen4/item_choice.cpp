@@ -42,7 +42,7 @@ int item_choiceItem_lockMove(PkCUEngine& cu, const Actor& actor) {
   // action is guaranteed to be a move action:
   size_t action_idx = cu.getCAction().iMove() + 1;
   // the pokemon may not use another move until it switches out:
-  cPKV.status().cTeammate.itemScratch = action_idx;
+  cPKV.status().itemScratch = action_idx;
 
   return 1;
 }
@@ -59,7 +59,7 @@ int item_choiceItem_testLockedMove(
     return 0;
   }
 
-  size_t choice_item_idx = cPKV.status().cTeammate.itemScratch;
+  size_t choice_item_idx = cPKV.status().itemScratch;
 
   // if the user has not used a move with their choice item yet:
   if (choice_item_idx == 0) { return 1; }

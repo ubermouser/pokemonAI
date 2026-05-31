@@ -193,6 +193,6 @@ TEST_F(UTurnTest, SwappedInPokemonShouldNotBeEncored) {
   EXPECT_TRUE(state.teammate(0, 1).isActive());
 
   // Verify Torterra is NOT encored.
-  EXPECT_EQ(state.teammate(0, 1).status().cTeammate.encore_duration, 0)
+  EXPECT_EQ(state.teammate(0, 1).status().encore_duration, 0)
       << "Torterra should not be encored as it has not used a move yet.";
 }

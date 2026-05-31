@@ -74,7 +74,7 @@ TEST_F(PoisonHealTest, PoisonHealPreventsToxicCounterIncrease) {
     EnvironmentVolatile env_v(engine_->initialState().nv(), env_data);
 
     // Check initial toxic tier (should be 0)
-    EXPECT_EQ(env_v.getTeam(TEAM_A).teammate(0).status().cTeammate.toxicPoison_tier, 0);
+    EXPECT_EQ(env_v.getTeam(TEAM_A).teammate(0).status().toxicPoison_tier, 0);
 
     // Wait turn
     auto turn1 = engine_->updateState(env_v, Action::wait(), Action::wait());
@@ -83,7 +83,7 @@ TEST_F(PoisonHealTest, PoisonHealPreventsToxicCounterIncrease) {
     auto pkv = turn1.where1().getTeam(TEAM_A).teammate(0);
 
     // Toxic tier should NOT increase (should remain 0)
-    EXPECT_EQ(pkv.status().cTeammate.toxicPoison_tier, 0);
+    EXPECT_EQ(pkv.status().toxicPoison_tier, 0);
 }
 
 TEST_F(PoisonHealTest, NormalPoisonDamageWithoutAbility) {

@@ -62,9 +62,9 @@ TEST_F(TauntTest, AppliesEffect) {
   auto env = results.where1().getEnv();
 
   // Shuckle should have taunt duration
-  EXPECT_GT(env.teammate(1, 0).status().cTeammate.taunt_duration, 0);
+  EXPECT_GT(env.teammate(1, 0).status().taunt_duration, 0);
   // Steelix should not
-  EXPECT_EQ(env.teammate(0, 0).status().cTeammate.taunt_duration, 0);
+  EXPECT_EQ(env.teammate(0, 0).status().taunt_duration, 0);
 }
 
 TEST_F(TauntTest, PreventsStatusMoves) {
@@ -85,7 +85,7 @@ TEST_F(TauntTest, PreemptsStatusMoveSameTurn) {
   auto final_env = results.where1().getEnv();
 
   // 1. Shuckle should be taunted
-  EXPECT_GT(final_env.teammate(1, 0).status().cTeammate.taunt_duration, 0);
+  EXPECT_GT(final_env.teammate(1, 0).status().taunt_duration, 0);
 
   // 2. Steelix should NOT be poisoned (Toxic should have failed)
   EXPECT_EQ(final_env.teammate(0, 0).getStatusAilment(), AIL_NV_NONE);
@@ -103,19 +103,19 @@ TEST_F(TauntTest, TauntReported) {
 TEST_F(TauntTest, ProbabilisticDuration_DecrementsBeforeBranching) {
   auto results1 = setupTauntApplied();
   auto state1 = results1.where1();
-  EXPECT_EQ(state1.teammate(1, 0).status().cTeammate.taunt_duration, 5);
+  EXPECT_EQ(state1.teammate(1, 0).status().taunt_duration, 5);
 
   auto results2 = setupTauntTurn2();
   auto state2 = results2.where1();
-  EXPECT_EQ(state2.teammate(1, 0).status().cTeammate.taunt_duration, 4);
+  EXPECT_EQ(state2.teammate(1, 0).status().taunt_duration, 4);
 
   auto results3 = setupTauntTurn3();
   auto state3 = results3.where1();
-  EXPECT_EQ(state3.teammate(1, 0).status().cTeammate.taunt_duration, 3);
+  EXPECT_EQ(state3.teammate(1, 0).status().taunt_duration, 3);
 
   auto results4 = setupTauntTurn4();
   auto state4 = results4.where1();
-  EXPECT_EQ(state4.teammate(1, 0).status().cTeammate.taunt_duration, 2);
+  EXPECT_EQ(state4.teammate(1, 0).status().taunt_duration, 2);
 }
 
 TEST_F(TauntTest, ProbabilisticDuration_BranchesByTurn5) {
@@ -125,24 +125,24 @@ TEST_F(TauntTest, ProbabilisticDuration_BranchesByTurn5) {
   EXPECT_GE(results5.size(), 2);
 
   auto state5_ended = results5.where1([](const ConstEnvironmentPossible& res) {
-    return res.teammate(1, 0).status().cTeammate.taunt_duration == 0;
+    return res.teammate(1, 0).status().taunt_duration == 0;
   });
   auto state5_continued = results5.where1([](const ConstEnvironmentPossible& res) {
-    return res.teammate(1, 0).status().cTeammate.taunt_duration != 0;
+    return res.teammate(1, 0).status().taunt_duration != 0;
   });
 
-  EXPECT_EQ(state5_ended.teammate(1, 0).status().cTeammate.taunt_duration, 0);
-  EXPECT_EQ(state5_continued.teammate(1, 0).status().cTeammate.taunt_duration, 1);
+  EXPECT_EQ(state5_ended.teammate(1, 0).status().taunt_duration, 0);
+  EXPECT_EQ(state5_continued.teammate(1, 0).status().taunt_duration, 1);
 }
 
 TEST_F(TauntTest, ProbabilisticDuration_ExpiresByTurn6) {
   auto results5 = setupTauntTurn5();
   auto state5_filtered = results5.where1([](const ConstEnvironmentPossible& res) {
-    return res.teammate(1, 0).status().cTeammate.taunt_duration == 1;
+    return res.teammate(1, 0).status().taunt_duration == 1;
   });
 
   // At Turn 6: Shuckle uses Strength (Move 1). Taunt duration should expire to 0.
   auto results6 = engine_->updateState(state5_filtered.getEnv(), Action::move(1), Action::move(1));
   auto state6 = results6.where1();
-  EXPECT_EQ(state6.teammate(1, 0).status().cTeammate.taunt_duration, 0);
+  EXPECT_EQ(state6.teammate(1, 0).status().taunt_duration, 0);
 }

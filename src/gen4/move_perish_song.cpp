@@ -17,13 +17,13 @@ int move_perishSong_set(
   // Note: Soundproof ability blocks this, but we skip it as per plan/constraints.
 
   // Set for user
-  if (cPKV.status().cTeammate.perishSong == 0) {
-    cPKV.status().cTeammate.perishSong = 3;
+  if (cPKV.status().perishSong == 0) {
+    cPKV.status().perishSong = 3;
   }
 
   // Set for target
-  if (tPKV.status().cTeammate.perishSong == 0) {
-    tPKV.status().cTeammate.perishSong = 3;
+  if (tPKV.status().perishSong == 0) {
+    tPKV.status().perishSong = 3;
   }
 
   return 1;
@@ -33,7 +33,7 @@ int move_perishSong_update(
     PkCUEngine& cu,
     const Actor& actor) {
   PokemonVolatile cPKV = cu.getPKV(actor);
-  auto& teamStatus = cPKV.status().cTeammate;
+  auto& teamStatus = cPKV.status();
   if (teamStatus.perishSong == 0) { return 0; }
 
   // Decrement counter

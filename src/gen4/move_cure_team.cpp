@@ -29,7 +29,9 @@ int move_cureNonVolatile_team(
   };
 
   // clear volatile confusion:
-  cTMV.status().cTeammate.confused = 0;
+  for (size_t i = 0; i < cTMV.nv().getNumTeammates(); ++i) {
+    cTMV.teammate(i).status().confused = 0;
+  }
 
   return 1;
 };

@@ -14,7 +14,7 @@ int move_substitute(
   if (&mV.getBase() != substitute_t) { return 0; }
 
   // Fails if a substitute already exists
-  if (cPKV.status().cTeammate.substitute > 0) { return 1; }
+  if (cPKV.status().substitute > 0) { return 1; }
 
   uint32_t cost = cPKV.nv().getMaxHP() / 4;
   // Fails if HP is not enough to create a substitute
@@ -23,7 +23,7 @@ int move_substitute(
   if (cost >= 255) { cost = 254; }
 
   cPKV.modHP(-(int32_t)cost);
-  cPKV.status().cTeammate.substitute = cost;
+  cPKV.status().substitute = cost;
 
   return 1;
 };
@@ -36,13 +36,13 @@ int move_substitute_damage(
     uint32_t& raw_damage) {
   PokemonVolatile tPKV = cu.getPKV(target);
   // Check for flag or 0
-  if (tPKV.status().cTeammate.substitute == 0 || tPKV.status().cTeammate.substitute == BROKEN_SUB_FLAG) { return 0; }
+  if (tPKV.status().substitute == 0 || tPKV.status().substitute == BROKEN_SUB_FLAG) { return 0; }
 
-  uint32_t subHP = tPKV.status().cTeammate.substitute;
+  uint32_t subHP = tPKV.status().substitute;
   if (raw_damage >= subHP) {
-    tPKV.status().cTeammate.substitute = BROKEN_SUB_FLAG;
+    tPKV.status().substitute = BROKEN_SUB_FLAG;
   } else {
-    tPKV.status().cTeammate.substitute -= raw_damage;
+    tPKV.status().substitute -= raw_damage;
   }
 
   raw_damage = 0;
@@ -57,7 +57,7 @@ int move_substitute_block_secondary(
   PokemonVolatile cPKV = cu.getPKV(actor);
   PokemonVolatile tPKV = cu.getPKV(target);
   // substitute > 0 includes BROKEN_SUB_FLAG (255)
-  if (tPKV.status().cTeammate.substitute > 0) {
+  if (tPKV.status().substitute > 0) {
     // Does not block self-targeting secondary effects
     if (&cPKV.nv() == &tPKV.nv()) { return 0; }
 
@@ -74,7 +74,7 @@ int move_substitute_block_status(
   PokemonVolatile cPKV = cu.getPKV(actor);
   PokemonVolatile tPKV = cu.getPKV(target);
   MoveVolatile mV = cu.getMV(actor);
-  if (tPKV.status().cTeammate.substitute > 0) {
+  if (tPKV.status().substitute > 0) {
     if (mV.getBase().getDamageType() == ATK_NODMG) {
       // Gen 4 exceptions: Taunt bypasses Substitute
       if (&mV.getBase() == taunt_t) { return 0; }
@@ -91,8 +91,8 @@ int move_substitute_block_status(
 int move_substitute_cleanup_preturn(
     PkCUEngine& cu, const Actor& actor, Action& action) {
   PokemonVolatile cPKV = cu.getPKV();
-  if (cPKV.status().cTeammate.substitute == BROKEN_SUB_FLAG) {
-    cPKV.status().cTeammate.substitute = 0;
+  if (cPKV.status().substitute == BROKEN_SUB_FLAG) {
+    cPKV.status().substitute = 0;
   }
   return 1;
 }
@@ -102,13 +102,13 @@ int move_substitute_cleanup_end(PkCUEngine& cu, const Actor& actor) {
   // cPKV is the attacker.
   // We want to clean up the defender (tPKV) if they have a broken substitute.
   // Also checking cPKV just in case.
-  if (cPKV.isAlive() && (cPKV.status().cTeammate.substitute == BROKEN_SUB_FLAG)) {
-    cPKV.status().cTeammate.substitute = 0;
+  if (cPKV.isAlive() && (cPKV.status().substitute == BROKEN_SUB_FLAG)) {
+    cPKV.status().substitute = 0;
   }
 
   PokemonVolatile tPKV = cu.getTPKV();
-  if (tPKV.isAlive() && (tPKV.status().cTeammate.substitute == BROKEN_SUB_FLAG)) {
-    tPKV.status().cTeammate.substitute = 0;
+  if (tPKV.isAlive() && (tPKV.status().substitute == BROKEN_SUB_FLAG)) {
+    tPKV.status().substitute = 0;
   }
   return 1;
 }

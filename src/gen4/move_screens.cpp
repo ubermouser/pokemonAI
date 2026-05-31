@@ -7,13 +7,13 @@ int move_reflect_set(
     const Actor& actor,
     const Action& action,
     const Actor& target) {
-  PokemonVolatile cPKV = cu.getPKV(actor);
   MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != reflect_t) { return 0; }
 
-  if (cPKV.status().nonvolatile.reflect > 0) { return 1; }
+  TeamVolatile tV = cu.getTV();
+  if (tV.status().reflect > 0) { return 1; }
 
-  cPKV.status().nonvolatile.reflect = 5;
+  tV.status().reflect = 5;
   return 1;
 }
 
@@ -22,13 +22,13 @@ int move_lightScreen_set(
     const Actor& actor,
     const Action& action,
     const Actor& target) {
-  PokemonVolatile cPKV = cu.getPKV(actor);
   MoveVolatile mV = cu.getMV(actor);
   if (&mV.getBase() != lightScreen_t) { return 0; }
 
-  if (cPKV.status().nonvolatile.lightScreen > 0) { return 1; }
+  TeamVolatile tV = cu.getTV();
+  if (tV.status().lightScreen > 0) { return 1; }
 
-  cPKV.status().nonvolatile.lightScreen = 5;
+  tV.status().lightScreen = 5;
   return 1;
 }
 
@@ -38,9 +38,9 @@ int move_reflect_damage(
     const Action& action,
     const Actor& target,
     fpType& modifier) {
-  PokemonVolatile tPKV = cu.getPKV(target);
   MoveVolatile mV = cu.getMV(actor);
-  if (tPKV.status().nonvolatile.reflect > 0) {
+  TeamVolatile tTV = cu.getTTV();
+  if (tTV.status().reflect > 0) {
     if (mV.getBase().getDamageType() == ATK_PHYSICAL) { modifier *= 0.5; }
   }
   return 1;
@@ -52,27 +52,27 @@ int move_lightScreen_damage(
     const Action& action,
     const Actor& target,
     fpType& modifier) {
-  PokemonVolatile tPKV = cu.getPKV(target);
   MoveVolatile mV = cu.getMV(actor);
-  if (tPKV.status().nonvolatile.lightScreen > 0) {
+  TeamVolatile tTV = cu.getTTV();
+  if (tTV.status().lightScreen > 0) {
     if (mV.getBase().getDamageType() == ATK_SPECIAL) { modifier *= 0.5; }
   }
   return 1;
 }
 
 int engine_reflect_decrement(PkCUEngine& cu, const Actor& actor) {
-  PokemonVolatile cPKV = cu.getPKV(actor);
-  if (cPKV.status().nonvolatile.reflect > 0) {
-    cPKV.status().nonvolatile.reflect--;
+  TeamVolatile tV = cu.getTV();
+  if (actor.iTeammate() == tV.getICPKV() && tV.status().reflect > 0) {
+    tV.status().reflect--;
   }
 
   return 1;
 }
 
 int engine_lightScreen_decrement(PkCUEngine& cu, const Actor& actor) {
-  PokemonVolatile cPKV = cu.getPKV(actor);
-  if (cPKV.status().nonvolatile.lightScreen > 0) {
-    cPKV.status().nonvolatile.lightScreen--;
+  TeamVolatile tV = cu.getTV();
+  if (actor.iTeammate() == tV.getICPKV() && tV.status().lightScreen > 0) {
+    tV.status().lightScreen--;
   }
 
   return 1;

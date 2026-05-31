@@ -10,7 +10,7 @@
 #include "pokemonai/environment_nonvolatile.h"
 #include "pokemonai/roulette.h"
 
-BOOST_STATIC_ASSERT(sizeof(EnvironmentPossibleData) == (sizeof(uint64_t)*21));
+BOOST_STATIC_ASSERT(sizeof(EnvironmentPossibleData) == (sizeof(uint64_t)*29));
 
 
 EnvironmentPossibleData EnvironmentPossibleData::create(

@@ -61,7 +61,7 @@ TEST_F(BatonPassTest, PassesSubstitute) {
       engine_->initialState(), Action::moveAlly(2, 0), Action::wait());
 
   auto scizor_sub = turn1.where1Hit(0);
-  EXPECT_GT(scizor_sub.teammate(0, 0).status().cTeammate.substitute, 0);
+  EXPECT_GT(scizor_sub.teammate(0, 0).status().substitute, 0);
 
   // Turn 2: Scizor uses Baton Pass to Torterra
   auto turn2 = engine_->updateState(
@@ -75,7 +75,7 @@ TEST_F(BatonPassTest, PassesSubstitute) {
 
   // Verify Substitute passed
   EXPECT_GT(
-      torterra_switched_in.teammate(0, 1).status().cTeammate.substitute, 0);
+      torterra_switched_in.teammate(0, 1).status().substitute, 0);
 }
 
 TEST_F(BatonPassTest, DoesNotPassConfusion) {
@@ -86,7 +86,7 @@ TEST_F(BatonPassTest, DoesNotPassConfusion) {
   auto scizor_confused = turn1.where1Hit(1);  // Gengar (Team 1) hits
 
   // Verify Scizor (Team 0) is confused
-  EXPECT_GT(scizor_confused.teammate(0, 0).status().cTeammate.confused, 0);
+  EXPECT_GT(scizor_confused.teammate(0, 0).status().confused, 0);
 
   // Turn 2: Scizor uses Baton Pass to Torterra
   auto turn2 = engine_->updateState(
@@ -99,7 +99,7 @@ TEST_F(BatonPassTest, DoesNotPassConfusion) {
   for (const auto& state : switched_states) {
     auto torterra = state.teammate(0, 1);
     // Verify Confusion NOT passed
-    EXPECT_EQ(torterra.status().cTeammate.confused, 0);
+    EXPECT_EQ(torterra.status().confused, 0);
   }
 }
 

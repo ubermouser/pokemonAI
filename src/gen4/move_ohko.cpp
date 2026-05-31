@@ -28,7 +28,7 @@ int move_ohko_accuracy(
   if (cMove == hornDrill_t || cMove == guillotine_t) {
     if (&tPKV.getBase().getType(0) == ghost_t ||
         &tPKV.getBase().getType(1) == ghost_t) {
-      if (!tPKV.status().cTeammate.identify) {
+      if (!tPKV.status().identify) {
         probabilityToHit = FixType(0.0);
         return 2;
       }
@@ -49,7 +49,7 @@ int move_ohko_accuracy(
     }
   }
 
-  if (cPKV.status().cTeammate.lockOn) {
+  if (cPKV.status().lockOn) {
     probabilityToHit = FixType(1.0);
   } else {
     probabilityToHit = FixType((float)((userLevel - targetLevel) + 30) / 100.0f);

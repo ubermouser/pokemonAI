@@ -12,12 +12,12 @@ int move_encore_set(
   if (&mV.getBase() != encore_t) { return 0; }
 
   // The last move used by the opponent
-  uint32_t iLastAction = tPKV.status().cTeammate.iLastAction;
+  uint32_t iLastAction = tPKV.status().iLastAction;
   bool switched = cu.getBase().flagsFor((TEAM)cu.getIOTeam()).isSwitched();
   if (iLastAction == 0 || switched) { return 1; }
 
   // Fails if the target is already under the effects of Encore.
-  if (tPKV.status().cTeammate.encore_duration > 0) { return 1; }
+  if (tPKV.status().encore_duration > 0) { return 1; }
 
   // iMove is 0-indexed index of the move in the pokemon's movelist
   const Move& oMove = tPKV.getMV(iLastAction - 1).getBase();
@@ -26,8 +26,8 @@ int move_encore_set(
   // Encore, Mirror Move, Sketch, Mimic, Transform, Struggle.
   if (&oMove == encore_t || &oMove == struggle_t) { return 1; }
 
-  tPKV.status().cTeammate.encore_action = iLastAction - 1;
-  tPKV.status().cTeammate.encore_duration = 7;
+  tPKV.status().encore_action = iLastAction - 1;
+  tPKV.status().encore_duration = 7;
 
   return 1;
 }
@@ -38,13 +38,13 @@ int move_encore_test(
     ConstMoveVolatile mV,
     const Action& action,
     ValidMoveSet& moveAllowed) {
-  if (cPKV.status().cTeammate.encore_duration == 0) { return 0; }
+  if (cPKV.status().encore_duration == 0) { return 0; }
 
   // no effect if not a move:
   if (!action.isMove()) { return 0; }
 
   // only the encored move is allowed:
-  uint32_t encAction = cPKV.status().cTeammate.encore_action;
+  uint32_t encAction = cPKV.status().encore_action;
   if (action.iMove() != encAction) { moveAllowed[VALID_MOVE_SCRIPT] = false; }
 
   return 1;
@@ -52,7 +52,7 @@ int move_encore_test(
 
 int move_encore_update(PkCUEngine& cu, const Actor& actor) {
   PokemonVolatile cPKV = cu.getPKV(actor);
-  auto& teamStatus = cPKV.status().cTeammate;
+  auto& teamStatus = cPKV.status();
   if (teamStatus.encore_duration == 0) { return 0; }
 
   uint32_t duration = teamStatus.encore_duration;
@@ -78,13 +78,13 @@ int move_encore_update(PkCUEngine& cu, const Actor& actor) {
 
     // Case 1: Encore ends
     {
-      auto& newStatus = cu.getPKV(iREnv[0]).status().cTeammate;
+      auto& newStatus = cu.getPKV(iREnv[0]).status();
       newStatus.encore_duration = 0;
       newStatus.encore_action = 0;
     }
     // Case 2: Encore continues
     {
-      auto& newStatus = cu.getPKV(iREnv[1]).status().cTeammate;
+      auto& newStatus = cu.getPKV(iREnv[1]).status();
       uint32_t new_duration = std::max((int32_t)duration - 1, 0);
       newStatus.encore_duration = new_duration;
       newStatus.encore_action = new_duration == 0 ? 0 : encAction;
@@ -96,7 +96,7 @@ int move_encore_update(PkCUEngine& cu, const Actor& actor) {
 
 int move_encore_preempt(PkCUEngine& cu, const Actor& actor, Action& action) {
   PokemonVolatile cPKV = cu.getPKV();
-  auto& teamStatus = cPKV.status().cTeammate;
+  auto& teamStatus = cPKV.status();
   if (teamStatus.encore_duration == 0) { return 0; }
 
   uint32_t encAction = teamStatus.encore_action;

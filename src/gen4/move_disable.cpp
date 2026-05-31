@@ -12,11 +12,11 @@ int move_disable_set(
   if (&mV.getBase() != disable_t) { return 0; }
 
   // The last move used by the opponent
-  uint32_t iLastAction = tPKV.status().cTeammate.iLastAction;
+  uint32_t iLastAction = tPKV.status().iLastAction;
   if (iLastAction == 0) { return 1; }
 
   // Fails if the target is already disabled
-  if (tPKV.status().cTeammate.disable_duration > 0) { return 1; }
+  if (tPKV.status().disable_duration > 0) { return 1; }
 
   // iMove is 0-indexed index of the move in the pokemon's movelist
   const Move& oMove = tPKV.getMV(iLastAction - 1).getBase();
@@ -25,8 +25,8 @@ int move_disable_set(
   // Struggle.
   if (&oMove == struggle_t) { return 1; }
 
-  tPKV.status().cTeammate.disable_action = iLastAction - 1;
-  tPKV.status().cTeammate.disable_duration = 7;
+  tPKV.status().disable_action = iLastAction - 1;
+  tPKV.status().disable_duration = 7;
 
   return 1;
 }
@@ -37,13 +37,13 @@ int move_disable_test(
     ConstMoveVolatile mV,
     const Action& action,
     ValidMoveSet& moveAllowed) {
-  if (cPKV.status().cTeammate.disable_duration == 0) { return 0; }
+  if (cPKV.status().disable_duration == 0) { return 0; }
 
   // no effect if not a move:
   if (!action.isMove()) { return 0; }
 
   // if the move is the disabled move, forbid it
-  uint32_t disAction = cPKV.status().cTeammate.disable_action;
+  uint32_t disAction = cPKV.status().disable_action;
   if (action.iMove() == disAction) { moveAllowed[VALID_MOVE_SCRIPT] = false; }
 
   return 1;
@@ -51,7 +51,7 @@ int move_disable_test(
 
 int move_disable_update(PkCUEngine& cu, const Actor& actor) {
   PokemonVolatile cPKV = cu.getPKV(actor);
-  auto& teamStatus = cPKV.status().cTeammate;
+  auto& teamStatus = cPKV.status();
   if (teamStatus.disable_duration == 0) { return 0; }
 
   uint32_t duration = teamStatus.disable_duration;
@@ -69,7 +69,7 @@ int move_disable_update(PkCUEngine& cu, const Actor& actor) {
 
     // Case 1: Disable continues
     {
-      auto& newStatus = cu.getPKV(iREnv[0]).status().cTeammate;
+      auto& newStatus = cu.getPKV(iREnv[0]).status();
       uint32_t new_duration = std::max((int32_t)duration - 1, 0);
       newStatus.disable_duration = new_duration;
       newStatus.disable_action =
@@ -77,7 +77,7 @@ int move_disable_update(PkCUEngine& cu, const Actor& actor) {
     }
     // Case 2: Disable ends
     {
-      auto& newStatus = cu.getPKV(iREnv[1]).status().cTeammate;
+      auto& newStatus = cu.getPKV(iREnv[1]).status();
       newStatus.disable_duration = 0;
       newStatus.disable_action = 0;
     }

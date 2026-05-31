@@ -14,7 +14,7 @@ class BasicEngine2v2Test : public MockEngineTest {
             .addMove(pokedex_->move("move_any_adjacent"))
             .addMove(pokedex_->move("move_all_adjacent_enemy"))
             .addMove(pokedex_->move("move_all_adjacent"))
-            .addMove(pokedex_->move("move_self_buff"))
+            .addMove(pokedex_->move("move_confuse_self"))
             .setLevel(100))
         .addPokemon(PokemonNonVolatile()
             .setBase(pokedex_->pokemon("test_pokemon2"))
@@ -367,4 +367,27 @@ TEST_F(BasicEngine2v2Test, DISABLED_HighEngineAccuracy_FourMoves) {
 
   result.printStates();
   EXPECT_LE(result.size(), 10000);
+}
+
+
+TEST_F(BasicEngine2v2Test, VolatileStatusIsolation) {
+  // TEAM_A 0 (test_pokemon) uses move_confuse_self (move index 3)
+  // TEAM_A 1 (test_pokemon2) waits
+  // TEAM_B 0 & 1 wait
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(),
+      {{Actor(TEAM_A, 0), Action::move(3)},
+       {Actor(TEAM_A, 1), Action::wait()}},
+      {{Actor(TEAM_B, 0), Action::wait()},
+       {Actor(TEAM_B, 1), Action::wait()}}
+  );
+
+  result.printStates();
+  EXPECT_EQ(result.size(), 1);
+
+  auto state = result.where1().getEnv();
+  // Actor(TEAM_A, 0) should be confused
+  EXPECT_GT(state.teammate(TEAM_A, 0).status().confused, 0);
+  // Actor(TEAM_A, 1) should NOT be confused
+  EXPECT_EQ(state.teammate(TEAM_A, 1).status().confused, 0);
 }

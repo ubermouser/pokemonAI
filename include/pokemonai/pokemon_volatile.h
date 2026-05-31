@@ -164,7 +164,7 @@ class PokemonVolatileImpl : public NonvolatileVolatilePair<
 
 class PKAISHARED ConstPokemonVolatile: public PokemonVolatileImpl<ConstMoveVolatile,
                                                                   const PokemonVolatileData,
-                                                                  const TeamStatus> {
+                                                                  const VolatileStatus> {
 public:
   using impl_t::impl_t;
 };
@@ -172,7 +172,7 @@ public:
 
 class PKAISHARED PokemonVolatile: public PokemonVolatileImpl<MoveVolatile,
                                                              PokemonVolatileData,
-                                                             TeamStatus> {
+                                                             VolatileStatus> {
 public:
   using impl_t::impl_t;
 

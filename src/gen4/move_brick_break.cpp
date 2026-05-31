@@ -18,8 +18,9 @@ int move_brickBreak_removeScreens(
   if (effectiveness == 0.0) { return 1; }
 
   // remove Reflect and Light Screen from the target's team
-  tPKV.status().nonvolatile.reflect = 0;
-  tPKV.status().nonvolatile.lightScreen = 0;
+  TeamVolatile tTV = cu.getTTV();
+  tTV.status().reflect = 0;
+  tTV.status().lightScreen = 0;
 
   return 1;
 }

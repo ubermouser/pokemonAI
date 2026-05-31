@@ -115,7 +115,7 @@ TEST_F(PlannerHumanTest, PokemonVolatilePrettyPrint) {
   data.status_nonvolatile = AIL_NV_NONE;
   data.iHeldItem = Item::no_item->index_;
 
-  TeamStatus status{};
+  VolatileStatus status{};
   
   PokemonVolatile gengarV(gengarNV, data, status);
   
@@ -153,7 +153,7 @@ TEST_F(PlannerHumanTest, PokemonVolatilePrettyPrintWithStatusAndItem) {
   const Item& lifeOrb = items.at("life orb");
   data.iHeldItem = lifeOrb.index_;
 
-  TeamStatus status{};
+  VolatileStatus status{};
   
   PokemonVolatile gengarV(gengarNV, data, status);
   
@@ -178,8 +178,8 @@ TEST_F(PlannerHumanTest, PokemonVolatileOperatorOutput) {
   data.active = 1;
   data.status_nonvolatile = AIL_NV_PARALYSIS;
 
-  TeamStatus status{};
-  status.cTeammate.boosts.B_SPA = 2; // +2 SpA
+  VolatileStatus status{};
+  status.boosts.B_SPA = 2; // +2 SpA
   
   ConstPokemonVolatile gengarV(gengarNV, data, status);
   
@@ -257,8 +257,9 @@ TEST_F(PlannerHumanTest, StateTransitionPrinterFaintAndSwitch) {
   newState.env.teams[TEAM_A].teammates[0].HPcurrent = 0;
 
   // Team A switches to metagross
-  newState.flags.bits.team0[0].switched = 1;
-  newState.env.teams[TEAM_A].status.nonvolatile.iCPokemon = 1;
+  newState.flags.bits.team0[1].switched = 1;
+  newState.env.teams[TEAM_A].teammates[0].active = 0;
+  newState.env.teams[TEAM_A].teammates[1].active = 1;
 
   testing::internal::CaptureStdout();
   StateTransitionPrinter::print(

@@ -15,16 +15,16 @@ int move_leechSeed_set(
   if (tPKV.getBase().hasType(grass_t)) { return 0; }
 
   // Fails if already seeded
-  if (tPKV.status().cTeammate.leechSeed) { return 0; }
+  if (tPKV.status().leechSeed) { return 0; }
 
-  tPKV.status().cTeammate.leechSeed = 1;
+  tPKV.status().leechSeed = 1;
 
   return 1;
 }
 
 int move_leechSeed_effect(PkCUEngine& cu, const Actor& actor) {
   PokemonVolatile cPKV = cu.getPKV(actor);
-  if (!cPKV.status().cTeammate.leechSeed) { return 0; }
+  if (!cPKV.status().leechSeed) { return 0; }
 
   // Leech Seed deals 1/8 max HP damage
   uint32_t initialHP = cPKV.getHP();

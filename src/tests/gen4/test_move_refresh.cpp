@@ -31,7 +31,7 @@ class RefreshTest : public Gen4EngineTest {
 
       // If toxic, set tier
       if (ailment == AIL_NV_POISON_TOXIC) {
-          mutableData_.teams[0].status.cTeammate.toxicPoison_tier = 1;
+          mutableData_.teams[0].activeVolatiles[0].toxicPoison_tier = 1;
       }
 
       // Important: Use initialEnv.nv() so pointers match
@@ -69,7 +69,7 @@ TEST_F(RefreshTest, CuresToxicPoison) {
   ASSERT_GT(result.size(), 0);
   auto pkv = result.where1Hit(0).teammate(0, 0);
   EXPECT_EQ(pkv.getStatusAilment(), AIL_NV_NONE);
-  EXPECT_EQ(pkv.status().cTeammate.toxicPoison_tier, 0);
+  EXPECT_EQ(pkv.status().toxicPoison_tier, 0);
 }
 
 TEST_F(RefreshTest, FailsWhenHealthy) {

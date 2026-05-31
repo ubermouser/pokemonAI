@@ -12,9 +12,9 @@ int move_taunt_set(
   if (&mV.getBase() != taunt_t) { return 0; }
 
   // Fails if the target is already taunted.
-  if (tPKV.status().cTeammate.taunt_duration > 0) { return 1; }
+  if (tPKV.status().taunt_duration > 0) { return 1; }
 
-  tPKV.status().cTeammate.taunt_duration = 5;
+  tPKV.status().taunt_duration = 5;
 
   return 1;
 }
@@ -25,7 +25,7 @@ int move_taunt_test(
     ConstMoveVolatile mV,
     const Action& action,
     ValidMoveSet& moveAllowed) {
-  if (cPKV.status().cTeammate.taunt_duration == 0) { return 0; }
+  if (cPKV.status().taunt_duration == 0) { return 0; }
 
   // if taunted, cannot use status moves
   if (mV.getBase().getDamageType() == ATK_NODMG) {
@@ -37,7 +37,7 @@ int move_taunt_test(
 
 int move_taunt_preempt(PkCUEngine& cu, const Actor& actor) {
   PokemonVolatile cPKV = cu.getPKV(actor);
-  auto& teamStatus = cPKV.status().cTeammate;
+  auto& teamStatus = cPKV.status();
   if (teamStatus.taunt_duration == 0) { return 0; }
 
   uint32_t duration = teamStatus.taunt_duration;
@@ -48,7 +48,7 @@ int move_taunt_preempt(PkCUEngine& cu, const Actor& actor) {
 
     // Case 1: Taunt continues
     {
-      auto& newStatus = cu.getPKV(iREnv[0]).status().cTeammate;
+      auto& newStatus = cu.getPKV(iREnv[0]).status();
       newStatus.taunt_duration = duration - 1;
 
       // Block status move if chosen
@@ -58,7 +58,7 @@ int move_taunt_preempt(PkCUEngine& cu, const Actor& actor) {
     }
     // Case 2: Taunt ends
     {
-      auto& newStatus = cu.getPKV(iREnv[1]).status().cTeammate;
+      auto& newStatus = cu.getPKV(iREnv[1]).status();
       newStatus.taunt_duration = 0;
     }
   } else {

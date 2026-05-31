@@ -15,10 +15,10 @@ int move_curse_set(
   // Check if user is Ghost type
   if (cPKV.getBase().hasType(ghost_t)) {
     // Fails if target already cursed
-    if (tPKV.status().cTeammate.curse) { return 0; }
+    if (tPKV.status().curse) { return 0; }
 
     // Apply Curse status to target
-    tPKV.status().cTeammate.curse = 1;
+    tPKV.status().curse = 1;
 
     // User loses 1/2 of max HP
     cPKV.modPercentHP(-0.5);
@@ -36,7 +36,7 @@ int move_curse_effect(
     PkCUEngine& cu,
     const Actor& actor) {
   PokemonVolatile cPKV = cu.getPKV(actor);
-  if (!cPKV.status().cTeammate.curse) { return 0; }
+  if (!cPKV.status().curse) { return 0; }
 
   // Cursed pokemon loses 1/4 of max HP
   cPKV.modPercentHP(-0.25);

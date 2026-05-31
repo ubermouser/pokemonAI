@@ -34,7 +34,7 @@ TEST_F(ConfusionStatusTest, Test_AppliesConfusion) {
     auto status_state = results.where1Status(0);
 
     // Team B (index 1) should be confused
-    EXPECT_GT(status_state.teammate(1, 0).status().cTeammate.confused, 0U);
+    EXPECT_GT(status_state.teammate(1, 0).status().confused, 0U);
 }
 
 TEST_F(ConfusionStatusTest, Test_ConfusionHurtSelf) {
@@ -87,7 +87,7 @@ TEST_F(ConfusionStatusTest, Test_ConfusionWearsOff) {
     // Step through turns until confusion wears off
     bool eventually_wore_off = false;
     for (int i = 0; i < 10; ++i) {
-        if (state.teammate(1, 0).status().cTeammate.confused == 0) {
+        if (state.teammate(1, 0).status().confused == 0) {
             eventually_wore_off = true;
             break;
         }

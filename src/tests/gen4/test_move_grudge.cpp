@@ -51,7 +51,7 @@ TEST_F(GrudgeTest, WearsOffAfterNextMove) {
       engine_->initialState(), Action::moveAlly(0, 0), Action::moveAlly(1, 0));
 
   auto state1 = turn1.where1Hit(0);
-  EXPECT_TRUE(state1.teammate(0, 0).status().cTeammate.grudge);
+  EXPECT_TRUE(state1.teammate(0, 0).status().grudge);
 
   // Turn 2: Misdreavus uses Shadow Sneak (priority). Gardevoir uses Psychic.
   // Grudge should clear at the start of Turn 2 for Misdreavus.

@@ -71,9 +71,8 @@ void PokemonVolatile::modHP(int32_t quantity) {
   // this pokemon has died, standardize its stats so comparisons work better - they're not important anymore
   if (!isAlive())
   {
-    // completely zero the pokemon
+    if (isActive()) { status() = VolatileStatus(); }
     data() = PokemonVolatileData();
-    status().cTeammate = VolatileStatus();
   }
 }
 
@@ -84,9 +83,8 @@ void PokemonVolatile::setHP(uint32_t _HP) {
   // this pokemon has died, standardize its stats so comparisons work better - they're not important anymore
   if (!isAlive())
   {
-    // completely zero the pokemon and teammate status
+    if (isActive()) { status() = VolatileStatus(); }
     data() = PokemonVolatileData();
-    status().cTeammate = VolatileStatus();
   }
 }
 
@@ -178,7 +176,7 @@ void PokemonVolatile::setNoItem(bool resetVolatile) {
   // TODO(@drendleman) index_ of no_item can be greater than the largest possible iHeldItem!
   data().iHeldItem = Item::no_item->index_;
   // item state is reset when the item is swapped out:
-  if (resetVolatile) { status().cTeammate.itemScratch = 0; }
+  if (resetVolatile && isActive()) { status().itemScratch = 0; }
   assert(!hasItem()); // may not be true because of narrowing
 }
 
@@ -186,7 +184,7 @@ void PokemonVolatile::setNoItem(bool resetVolatile) {
 void PokemonVolatile::setItem(const Item& newItem, bool resetVolatile) {
   data().iHeldItem = newItem.index_;
   // item state is reset when the item is swapped out:
-  if (resetVolatile) { status().cTeammate.itemScratch = 0; }
+  if (resetVolatile && isActive()) { status().itemScratch = 0; }
 }
 
 
@@ -298,21 +296,21 @@ int32_t POKEMON_VOLATILE_IMPL::getBoost(size_t type) const
   switch(type)
   {
   case FV_ATTACK:
-    return status_->cTeammate.boosts.B_ATK;
+    return status_->boosts.B_ATK;
   case FV_DEFENSE:
-    return status_->cTeammate.boosts.B_DEF;
+    return status_->boosts.B_DEF;
   case FV_SPATTACK:
-    return status_->cTeammate.boosts.B_SPA;
+    return status_->boosts.B_SPA;
   case FV_SPDEFENSE:
-    return status_->cTeammate.boosts.B_SPD;
+    return status_->boosts.B_SPD;
   case FV_SPEED:
-    return status_->cTeammate.boosts.B_SPE;
+    return status_->boosts.B_SPE;
   case FV_ACCURACY:
-    return status_->cTeammate.boosts.B_ACC;
+    return status_->boosts.B_ACC;
   case FV_EVASION:
-    return status_->cTeammate.boosts.B_EVA;
+    return status_->boosts.B_EVA;
   case FV_CRITICALHIT:
-    return status_->cTeammate.boosts.B_CHT;
+    return status_->boosts.B_CHT;
   default:
   case FV_HITPOINTS:
     return 0;
@@ -325,21 +323,21 @@ void PokemonVolatile::setBoost(size_t type, int32_t value)
   switch(type)
   {
   case FV_ATTACK:
-    status_->cTeammate.boosts.B_ATK = value; return;
+    status_->boosts.B_ATK = value; return;
   case FV_DEFENSE:
-    status_->cTeammate.boosts.B_DEF = value; return;
+    status_->boosts.B_DEF = value; return;
   case FV_SPATTACK:
-    status_->cTeammate.boosts.B_SPA = value; return;
+    status_->boosts.B_SPA = value; return;
   case FV_SPDEFENSE:
-    status_->cTeammate.boosts.B_SPD = value; return;
+    status_->boosts.B_SPD = value; return;
   case FV_SPEED:
-    status_->cTeammate.boosts.B_SPE = value; return;
+    status_->boosts.B_SPE = value; return;
   case FV_ACCURACY:
-    status_->cTeammate.boosts.B_ACC = value; return;
+    status_->boosts.B_ACC = value; return;
   case FV_EVASION:
-    status_->cTeammate.boosts.B_EVA = value; return;
+    status_->boosts.B_EVA = value; return;
   case FV_CRITICALHIT:
-    status_->cTeammate.boosts.B_CHT = value; return;
+    status_->boosts.B_CHT = value; return;
   default:
   case FV_HITPOINTS:
     return;
@@ -422,53 +420,32 @@ std::ostream& operator<<(std::ostream& os, const ConstPokemonVolatile& pkmn) {
   if (pkmn.isActive()) {
     // volatile ailments:
     // target confused:
-    if (pkmn.status().cTeammate.confused > 0) {
-      os << fmt::format(" (CNFSD-{})", pkmn.status().cTeammate.confused);
+    if (pkmn.status().confused > 0) {
+      os << fmt::format(" (CNFSD-{})", pkmn.status().confused);
     }
     // target infatuated:
-    if (pkmn.status().cTeammate.infatuate > 0) {
+    if (pkmn.status().infatuate > 0) {
       os << " (INFAT)";
     }
     // target has leech seed:
-    if (pkmn.status().cTeammate.leechSeed > 0) { os << " (LEECH)"; }
+    if (pkmn.status().leechSeed > 0) { os << " (LEECH)"; }
     // target taunted:
-    if (pkmn.status().cTeammate.taunt_duration > 0) {
-      os << fmt::format(" (TAUNT-{})", pkmn.status().cTeammate.taunt_duration);
+    if (pkmn.status().taunt_duration > 0) {
+      os << fmt::format(" (TAUNT-{})", pkmn.status().taunt_duration);
     }
     // target is locked-n to a certain move
-    if (pkmn.status().cTeammate.lockIn_duration > 0) {
+    if (pkmn.status().lockIn_duration > 0) {
       os << fmt::format(
-          " (LOCKIN-{})", pkmn.status().cTeammate.lockIn_duration);
+          " (LOCKIN-{})", pkmn.status().lockIn_duration);
     }
     // target is encored
-    if (pkmn.status().cTeammate.encore_duration > 0) {
+    if (pkmn.status().encore_duration > 0) {
       os << fmt::format(
-          " (ENCORE-{})", pkmn.status().cTeammate.encore_duration);
+          " (ENCORE-{})", pkmn.status().encore_duration);
     }
     // target has a substitute:
-    if (pkmn.status().cTeammate.substitute > 0) {
-      os << fmt::format(" (SUB-{})", pkmn.status().cTeammate.substitute);
-    }
-    // spikes in the ground:
-    if (pkmn.status().nonvolatile.spikes > 0) {
-      os << fmt::format(" (SPIKES-{})", pkmn.status().nonvolatile.spikes);
-    }
-    // stealth-rock on the ground:
-    if (pkmn.status().nonvolatile.stealthRock > 0) {
-      os << " (STLTH_ROCK)";
-    }
-    // toxic spikes in the ground:
-    if (pkmn.status().nonvolatile.toxicSpikes > 0) {
-      os << fmt::format(
-          " (T-SPIKES-{})", pkmn.status().nonvolatile.toxicSpikes);
-    }
-    // light screen:
-    if (pkmn.status().nonvolatile.lightScreen > 0) {
-      os << fmt::format(" (L-SCRN-{})", pkmn.status().nonvolatile.lightScreen);
-    }
-    // reflect:
-    if (pkmn.status().nonvolatile.reflect > 0) {
-      os << fmt::format(" (REFLECT-{})", pkmn.status().nonvolatile.reflect);
+    if (pkmn.status().substitute > 0) {
+      os << fmt::format(" (SUB-{})", pkmn.status().substitute);
     }
 
     // boosts:
@@ -501,5 +478,5 @@ std::ostream& operator<<(std::ostream& os, const ConstPokemonVolatile& pkmn) {
   return os;
 }
 
-template class PokemonVolatileImpl<ConstMoveVolatile, const PokemonVolatileData, const TeamStatus>;
-template class PokemonVolatileImpl<MoveVolatile, PokemonVolatileData, TeamStatus>;
+template class PokemonVolatileImpl<ConstMoveVolatile, const PokemonVolatileData, const VolatileStatus>;
+template class PokemonVolatileImpl<MoveVolatile, PokemonVolatileData, VolatileStatus>;

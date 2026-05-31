@@ -65,7 +65,7 @@ TEST_F(KnockOffTest, substitute_active) {
     swap_gengar.where1(), Action::wait(), Action::move(0));
 
   // Verify substitute is up
-  EXPECT_GT(substitute_up.where1().teammate(1, 2).status().cTeammate.substitute, 0);
+  EXPECT_GT(substitute_up.where1().teammate(1, 2).status().substitute, 0);
 
   // Alakazam uses Knock Off
   auto knock_off = engine_->updateState(

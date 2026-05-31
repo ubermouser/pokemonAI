@@ -119,7 +119,7 @@ void evaluator_network32_impl<Base>::seed(
     cInput[0] = scale((float)cPKV.getStatusAilment(), (float)AIL_NV_POISON_TOXIC, (float)AIL_NV_NONE);
     cInput[1] = std::max(0.0f, std::min(1.0f, (float)(cPKV.getAccuracy_boosted(FV_ACCURACY) * tPKV.getAccuracy_boosted(FV_EVASION))));
     cInput[2] = (float)((cTV.getVolatile().confused | cTV.getVolatile().infatuate) > AIL_V_NONE);
-    cInput[3] = scale((float)((cTV.getNonVolatile().spikes>0) + (cTV.getNonVolatile().stealthRock>0)), 2.0f, 0.0f);
+    cInput[3] = scale((float)((cTV.status().spikes>0) + (cTV.status().stealthRock>0)), 2.0f, 0.0f);
     // clang-format on
     cInput += NEURONSPERSTATUS;
   }

@@ -16,11 +16,11 @@ int move_rampage_lockMove(
   // if not a rampage move, ignore:
   if (!is_rampage_move(&mV.getBase())) { return 0; }
   // rampage cannot be re-locked if it is currently locked in:
-  if (status.cTeammate.lockIn_duration > 0) { return 0; }
+  if (status.lockIn_duration > 0) { return 0; }
 
   size_t action_idx = cu.getCAction().iMove() + 1;
-  status.cTeammate.lockIn_duration = 3;
-  status.cTeammate.lockIn_action = action_idx;
+  status.lockIn_duration = 3;
+  status.lockIn_action = action_idx;
 
   return 1;
 }
@@ -31,10 +31,10 @@ int move_rampage_endLockOn(
   PokemonVolatile cPKV = cu.getPKV(actor);
   // are we locked in to a rampage move?
   auto& status = cPKV.status();
-  if (status.cTeammate.lockIn_duration == 0) { return 0; }
-  assert(status.cTeammate.lockIn_action > 0);
+  if (status.lockIn_duration == 0) { return 0; }
+  assert(status.lockIn_action > 0);
 
-  MoveVolatile mV = cPKV.getMV(status.cTeammate.lockIn_action - 1);
+  MoveVolatile mV = cPKV.getMV(status.lockIn_action - 1);
   if (!is_rampage_move(&mV.getBase())) { return 0; }
   // if the enemy team has a free move, do not decrement lock-on counter
   if (cu.getBase().flagsFor((TEAM)cu.getICTeam()).isWaited()) { return 0; }
@@ -44,29 +44,29 @@ int move_rampage_endLockOn(
   auto flags = cu.getBase().flagsFor(cu.getCActor());
   if (flags.isBlocked() || !flags.isHit() ||
       cu.getDamageComponent().damage == 0) {
-    status.cTeammate.lockIn_duration = 0;
-    status.cTeammate.lockIn_action = 0;
+    status.lockIn_duration = 0;
+    status.lockIn_action = 0;
     return 1;
   }
 
   // 50% chance to end at stage 1:
-  if (status.cTeammate.lockIn_duration == 2) {
+  if (status.lockIn_duration == 2) {
     std::array<size_t, 2> iREnv;
     cu.duplicateState(iREnv, FixType(0.5f));
 
     PokemonVolatile rPKV = cu.getPKV(iREnv[1]);
     // state #1: pokemon snaps out of rampage immediately and becomes confused:
-    rPKV.status().cTeammate.lockIn_duration = 0;
-    rPKV.status().cTeammate.lockIn_action = 0;
-    rPKV.status().cTeammate.confused = AIL_V_CONFUSED_5T;
+    rPKV.status().lockIn_duration = 0;
+    rPKV.status().lockIn_action = 0;
+    rPKV.status().confused = AIL_V_CONFUSED_5T;
   }
   // state #2 / else: rampage counts down for another turn:
-  status.cTeammate.lockIn_duration--;
+  status.lockIn_duration--;
 
   // if this was the last rampage stage, confuse the pokemon:
-  if (status.cTeammate.lockIn_duration == 0) {
-    status.cTeammate.confused = AIL_V_CONFUSED_5T;
-    status.cTeammate.lockIn_action = 0;
+  if (status.lockIn_duration == 0) {
+    status.confused = AIL_V_CONFUSED_5T;
+    status.lockIn_action = 0;
   }
   return 1;
 }
@@ -78,10 +78,10 @@ int move_rampage_testLockedIn(
     const Action& action,
     ValidMoveSet& moveAllowed) {
   auto& status = cPKV.status();
-  if (status.cTeammate.lockIn_duration == 0) { return 0; }
-  assert(status.cTeammate.lockIn_action > 0);
+  if (status.lockIn_duration == 0) { return 0; }
+  assert(status.lockIn_action > 0);
 
-  ConstMoveVolatile lockmV = cPKV.getMV(status.cTeammate.lockIn_action - 1);
+  ConstMoveVolatile lockmV = cPKV.getMV(status.lockIn_action - 1);
   if (!is_rampage_move(&lockmV.getBase())) { return 0; }
 
   // if locked in, only the locked-in move may be used. Other move actions are
@@ -90,7 +90,7 @@ int move_rampage_testLockedIn(
   size_t action_idx = action.iMove() + 1;
   moveAllowed[VALID_MOVE_SCRIPT] =
       moveAllowed[VALID_MOVE_SCRIPT] &
-      (cPKV.status().cTeammate.lockIn_action == action_idx);
+      (cPKV.status().lockIn_action == action_idx);
 
   return 1;
 }
@@ -101,10 +101,10 @@ int move_rampage_testLockedSwitch(
     const Action& action,
     ValidSwapSet& switchAllowed) {
   auto& status = cPKV.status();
-  if (status.cTeammate.lockIn_duration == 0) { return 0; }
-  assert(status.cTeammate.lockIn_action > 0);
+  if (status.lockIn_duration == 0) { return 0; }
+  assert(status.lockIn_action > 0);
 
-  ConstMoveVolatile lockmV = cPKV.getMV(status.cTeammate.lockIn_action - 1);
+  ConstMoveVolatile lockmV = cPKV.getMV(status.lockIn_action - 1);
   if (!is_rampage_move(&lockmV.getBase())) { return 0; }
 
   // if locked in, only the locked-in move may be used. Switch actions are not

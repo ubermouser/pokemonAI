@@ -66,13 +66,11 @@ struct VolatileStatus
   uint32_t protected_flag : 1;
   // END OF FOURTH WORD
 
-  void reset();
+  void reset() { *this = {}; }
 };
 
-struct NonVolatileStatus
+struct TeamStatus
 {
-  // index of the current pokemon
-  uint32_t iCPokemon : 3;
   // weather effects:
   uint32_t weather_duration : 3;
   uint32_t weather_type : 3;
@@ -89,11 +87,6 @@ struct NonVolatileStatus
   uint32_t reflect : 3;
   uint32_t safeguard : 3;
   uint32_t mist : 1;
-};
-
-struct TeamStatus {
-  VolatileStatus cTeammate;
-  NonVolatileStatus nonvolatile;
 };
 
 #endif /* TEAM_STATUS_H */

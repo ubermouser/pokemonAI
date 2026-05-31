@@ -36,12 +36,12 @@ struct FVec_VolatileStatus {
   float hasSubstitute;
   ToxicPoisonEmbedding toxicPoison;
 
-  void seed(const TeamStatus& status) {
-    isConfused = status.cTeammate.confused > 0 ? 1.0 : 0.0;
-    isTrapped = status.cTeammate.trap > 0 ? 1.0 : 0.0;
-    isLeechSeed = status.cTeammate.leechSeed > 0 ? 1.0 : 0.0;
-    hasSubstitute = status.cTeammate.substitute > 0 ? 1.0 : 0.0;
-    toxicPoison = ToxicPoisonEmbedding{status.cTeammate.toxicPoison_tier};
+  void seed(const VolatileStatus& status) {
+    isConfused = status.confused > 0 ? 1.0 : 0.0;
+    isTrapped = status.trap > 0 ? 1.0 : 0.0;
+    isLeechSeed = status.leechSeed > 0 ? 1.0 : 0.0;
+    hasSubstitute = status.substitute > 0 ? 1.0 : 0.0;
+    toxicPoison = ToxicPoisonEmbedding{status.toxicPoison_tier};
   }
 };
 
@@ -133,7 +133,7 @@ struct FVec_TeamVolatile {
 
   void seed(const ConstTeamVolatile& teamV) {
     activePokemon = ActivePokemonEmbedding{teamV.getICPKV()};
-    volatileStatus.seed(teamV.status());
+    volatileStatus.seed(teamV.getVolatile());
     for (size_t iTeammate = 0; iTeammate != teamV.nv().getNumTeammates();
          ++iTeammate) {
       teammates[iTeammate].seed(teamV.teammate(iTeammate));

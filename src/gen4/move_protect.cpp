@@ -12,11 +12,11 @@ int move_protect(
   if (&mV.getBase() != protect_t) { return 0; }
 
   // Increment counter (capped at 7 to prevent overflow/unnecessary growth)
-  uint32_t counter = cPKV.status().cTeammate.protect_counter;
+  uint32_t counter = cPKV.status().protect_counter;
   if (counter < 7) {
     counter++;
   }
-  cPKV.status().cTeammate.protect_counter = counter;
+  cPKV.status().protect_counter = counter;
 
   // Calculate success probability: 1 / (2^(counter-1))
   // 1st use (1) -> 100%
@@ -33,13 +33,13 @@ int move_protect(
     cu.duplicateState(result, FixType(1) - probability);
 
     // Success branch
-    cu.getPKV(result[0]).status().cTeammate.protected_flag = 1;
+    cu.getPKV(result[0]).status().protected_flag = 1;
 
     // Failure branch
-    cu.getPKV(result[1]).status().cTeammate.protected_flag = 0;
+    cu.getPKV(result[1]).status().protected_flag = 0;
   } else {
     // 100% Success
-    cPKV.status().cTeammate.protected_flag = 1;
+    cPKV.status().protected_flag = 1;
   }
 
   return 1;
@@ -53,7 +53,7 @@ int move_protect_damage(
     uint32_t& damage) {
   PokemonVolatile tPKV = cu.getPKV(target);
   // Check if defender is protected
-  if (tPKV.status().cTeammate.protected_flag) {
+  if (tPKV.status().protected_flag) {
     // Block damage
     cu.getBase().flagsFor(cu.getCActor()).setBlocked();
     damage = 0;
@@ -68,7 +68,7 @@ int move_protect_secondary(
     const Action& action,
     const Actor& target) {
   PokemonVolatile tPKV = cu.getPKV(target);
-  if (tPKV.status().cTeammate.protected_flag) {
+  if (tPKV.status().protected_flag) {
     return 2; // Block secondary effects
   }
   return 0;
@@ -82,7 +82,7 @@ int move_protect_status(
   PokemonVolatile cPKV = cu.getPKV(actor);
   PokemonVolatile tPKV = cu.getPKV(target);
   MoveVolatile mV = cu.getMV(actor);
-  if (tPKV.status().cTeammate.protected_flag) {
+  if (tPKV.status().protected_flag) {
     // Don't block self-targeting moves
     if (&cPKV.nv() == &tPKV.nv()) { return 0; }
 
@@ -99,7 +99,7 @@ int move_protect_status(
 int move_protect_cleanup_end(PkCUEngine& cu, const Actor& actor) {
   PokemonVolatile cPKV = cu.getPKV(actor);
   // Clear protected status at end of round
-  cPKV.status().cTeammate.protected_flag = 0;
+  cPKV.status().protected_flag = 0;
 
   // Check if the move used this turn was Protect.
   // If NOT, reset protect_counter.
@@ -115,7 +115,7 @@ int move_protect_cleanup_end(PkCUEngine& cu, const Actor& actor) {
   }
 
   if (!usedProtect) {
-    cPKV.status().cTeammate.protect_counter = 0;
+    cPKV.status().protect_counter = 0;
   }
 
   return 1;

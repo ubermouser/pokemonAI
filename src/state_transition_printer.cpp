@@ -43,7 +43,7 @@ void StateTransitionPrinter::print(
 
   for (size_t iTeam : order) {
     reportSwitch(os, nsP, iTeam);
-    reportHitResult(os, nsP, iTeam);
+    reportHitResult(os, osP, nsP, iTeam);
 
     if (nsP.flagsFor(static_cast<TEAM>(iTeam)).isSwitched()) {
       size_t activeOld = osP.getTeam(iTeam).getICPKV();
@@ -58,24 +58,30 @@ void StateTransitionPrinter::print(
   for (size_t iTeam = 0; iTeam < 2; ++iTeam) {
     const auto& teamOld = osP.getTeam(iTeam);
     const auto& teamNew = nsP.getTeam(iTeam);
-    const auto& pkOld = teamOld.getPKV();
-    const auto& pkNew = teamNew.getPKV();
 
     reportFainting(os, osP, nsP, iTeam);
 
-    if (teamOld.getICPKV() == teamNew.getICPKV()) {
+    // TODO - there may be multiple new actives per team
+    size_t activeOld = teamOld.getICPKV();
+    size_t activeNew = activeOld;
+    if (nsP.flagsFor(static_cast<TEAM>(iTeam)).isSwitched()) {
+      activeNew = getSwitchedInIndex(nsP, iTeam);
+    }
+
+    if (activeOld == activeNew) {
+      const auto& pkOld = teamOld.teammate(activeOld);
+      const auto& pkNew = teamNew.teammate(activeOld);
       reportDamage(os, pkOld, pkNew);
       reportItemUsage(os, pkOld, pkNew);
       reportStatusChange(os, pkOld, pkNew);
-      reportTeamVolatileStatusChange(os, teamOld, teamNew);
-      reportVolatileStatusChange(os, teamOld, teamNew);
-      reportStatBoosts(os, teamOld, teamNew);
+      reportTeamVolatileStatusChange(os, teamOld, teamNew, activeOld);
+      reportVolatileStatusChange(os, pkOld, pkNew);
+      reportStatBoosts(os, pkOld, pkNew);
     } else {
       // A switch occurred - check for damage to the newly switched-in Pokemon
       // This can happen from entry hazards or the opponent attacking
-      size_t newActive = teamNew.getICPKV();
-      const auto& pkOldNewActive = teamOld.teammate(newActive);
-      const auto& pkNewNewActive = teamNew.teammate(newActive);
+      const auto& pkOldNewActive = teamOld.teammate(activeNew);
+      const auto& pkNewNewActive = teamNew.teammate(activeNew);
       reportDamage(os, pkOldNewActive, pkNewNewActive);
     }
   }
@@ -85,18 +91,23 @@ void StateTransitionPrinter::print(
 void StateTransitionPrinter::reportSwitch(
     std::ostream& os, const ConstEnvironmentPossible& nsP, size_t iTeam) {
   if (nsP.flagsFor(static_cast<TEAM>(iTeam)).isSwitched()) {
+    // TODO - there may be multiple new actives per team
+    size_t switchedIn = getSwitchedInIndex(nsP, iTeam);
     fmt::print(
         os,
         "Team {} sent out {}!\n",
         (iTeam == 0 ? "A" : "B"),
-        pokemonName(nsP.getTeam(iTeam).getPKV()));
+        pokemonName(nsP.teammate(iTeam, switchedIn)));
   }
 }
 
 
 void StateTransitionPrinter::reportHitResult(
-    std::ostream& os, const ConstEnvironmentPossible& nsP, size_t iTeam) {
-  auto pkName = pokemonName(nsP.getTeam(iTeam).getPKV());
+    std::ostream& os,
+    const ConstEnvironmentVolatile& osP,
+    const ConstEnvironmentPossible& nsP,
+    size_t iTeam) {
+  auto pkName = pokemonName(osP.getTeam(iTeam).getPKV());
 
   auto pkProxy = nsP.flagsFor(static_cast<TEAM>(iTeam));
 
@@ -130,16 +141,15 @@ void StateTransitionPrinter::reportFainting(
     size_t iTeam) {
   const auto& teamOld = osP.getTeam(iTeam);
   const auto& teamNew = nsP.getTeam(iTeam);
-  size_t activeOld = teamOld.getICPKV();
-
-  const auto& pkOldActive = teamOld.getPKV();
-  const auto& pkNewOldActive = teamNew.teammate(activeOld);
-
-  if (!pkNewOldActive.isAlive() && pkOldActive.isAlive()) {
-    os << fmt::format(
-        fmt::fg(fmt::color::red) | fmt::emphasis::bold,
-        "{} fainted!\n",
-        pkOldActive.nv().getName());
+  for (size_t i = 0; i < teamOld.nv().getNumTeammates(); ++i) {
+    const auto& pkOld = teamOld.teammate(i);
+    const auto& pkNew = teamNew.teammate(i);
+    if (!pkNew.isAlive() && pkOld.isAlive()) {
+      os << fmt::format(
+          fmt::fg(fmt::color::red) | fmt::emphasis::bold,
+          "{} fainted!\n",
+          pkOld.nv().getName());
+    }
   }
 }
 
@@ -210,11 +220,11 @@ void StateTransitionPrinter::reportStatusChange(
 
 void StateTransitionPrinter::reportStatBoosts(
     std::ostream& os,
-    const ConstTeamVolatile& teamOld,
-    const ConstTeamVolatile& teamNew) {
-  const auto& bOld = teamOld.getVolatile().boosts;
-  const auto& bNew = teamNew.getVolatile().boosts;
-  auto pkName = pokemonName(teamNew.getPKV());
+    const ConstPokemonVolatile& pkOld,
+    const ConstPokemonVolatile& pkNew) {
+  const auto& bOld = pkOld.status().boosts;
+  const auto& bNew = pkNew.status().boosts;
+  auto pkName = pokemonName(pkNew);
 
   auto reportBoost = [&](int8_t oldB, int8_t newB, const char* name) {
     if (newB > oldB) {
@@ -235,11 +245,11 @@ void StateTransitionPrinter::reportStatBoosts(
 
 void StateTransitionPrinter::reportVolatileStatusChange(
     std::ostream& os,
-    const ConstTeamVolatile& teamOld,
-    const ConstTeamVolatile& teamNew) {
-  const auto& vOld = teamOld.getVolatile();
-  const auto& vNew = teamNew.getVolatile();
-  auto pkName = pokemonName(teamNew.getPKV());
+    const ConstPokemonVolatile& pkOld,
+    const ConstPokemonVolatile& pkNew) {
+  const auto& vOld = pkOld.status();
+  const auto& vNew = pkNew.status();
+  auto pkName = pokemonName(pkNew);
 
   // Pokemon-specific Volatile statuses
   if (vNew.confused > 0 && vOld.confused == 0) {
@@ -268,10 +278,11 @@ void StateTransitionPrinter::reportVolatileStatusChange(
 void StateTransitionPrinter::reportTeamVolatileStatusChange(
     std::ostream& os,
     const ConstTeamVolatile& teamOld,
-    const ConstTeamVolatile& teamNew) {
-  const auto& nvOld = teamOld.getNonVolatile();
-  const auto& nvNew = teamNew.getNonVolatile();
-  auto teamId = pokemonName(teamNew.getPKV());
+    const ConstTeamVolatile& teamNew,
+    size_t activeIndex) {
+  const auto& nvOld = teamOld.status();
+  const auto& nvNew = teamNew.status();
+  auto teamId = pokemonName(teamNew.teammate(activeIndex));
 
   if (nvNew.stealthRock > 0 && nvOld.stealthRock == 0) {
     fmt::print(os, "Pointed stones float in the air around {}!\n", teamId);
@@ -291,6 +302,17 @@ void StateTransitionPrinter::reportTeamVolatileStatusChange(
         "Reflect made {}'s team stronger against physical attacks!\n",
         teamId);
   }
+}
+
+
+size_t StateTransitionPrinter::getSwitchedInIndex(
+    const ConstEnvironmentPossible& nsP, size_t iTeam) {
+  for (size_t i = 0; i < nsP.nv().getTeam(iTeam).getNumTeammates(); ++i) {
+    if (nsP.flagsFor(iTeam, i).isSwitched()) {
+      return i;
+    }
+  }
+  return 0;
 }
 
 

@@ -26,14 +26,14 @@ class HazeTest : public Gen4EngineTest {
     EnvironmentVolatileData mutableData = initialEnv.data();
 
     // Set boosts for Team A (Crobat)
-    mutableData.teams[0].status.cTeammate.boosts.B_ATK = 2;
-    mutableData.teams[0].status.cTeammate.boosts.B_DEF = -2;
-    mutableData.teams[0].status.cTeammate.boosts.B_ACC = 1;
-    mutableData.teams[0].status.cTeammate.boosts.B_CHT = 1;
+    mutableData.teams[0].activeVolatiles[0].boosts.B_ATK = 2;
+    mutableData.teams[0].activeVolatiles[0].boosts.B_DEF = -2;
+    mutableData.teams[0].activeVolatiles[0].boosts.B_ACC = 1;
+    mutableData.teams[0].activeVolatiles[0].boosts.B_CHT = 1;
 
     // Set boosts for Team B (Charmander)
-    mutableData.teams[1].status.cTeammate.boosts.B_SPA = 3;
-    mutableData.teams[1].status.cTeammate.boosts.B_SPE = -1;
+    mutableData.teams[1].activeVolatiles[0].boosts.B_SPA = 3;
+    mutableData.teams[1].activeVolatiles[0].boosts.B_SPE = -1;
 
     // Create new environment with modified data
     EnvironmentVolatile modifiedEnv(initialEnv.nv(), mutableData);

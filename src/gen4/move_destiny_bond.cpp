@@ -12,20 +12,20 @@ int move_destinyBond(
   if (&mV.getBase() != destinyBond_t) { return 0; }
 
   // Fails if used consecutively in Gen 4
-  uint32_t iLastAction = cPKV.status().cTeammate.iLastAction;
+  uint32_t iLastAction = cPKV.status().iLastAction;
   if (iLastAction > 0) {
     const Move& lastMove = cPKV.getMV(iLastAction - 1).getBase();
     if (&lastMove == destinyBond_t) { return 1; }
   }
 
-  cPKV.status().cTeammate.destinyBond = 1;
+  cPKV.status().destinyBond = 1;
 
   return 1;
 }
 
 int move_destinyBond_clear(PkCUEngine& cu, const Actor& actor) {
   PokemonVolatile cPKV = cu.getPKV(actor);
-  cPKV.status().cTeammate.destinyBond = 0;
+  cPKV.status().destinyBond = 0;
   return 0;  // Does not consume action
 }
 
@@ -38,7 +38,7 @@ int move_destinyBond_trigger(
   PokemonVolatile cPKV = cu.getPKV(actor);
   PokemonVolatile tPKV = cu.getPKV(target);
   // If the target has Destiny Bond active
-  if (tPKV.status().cTeammate.destinyBond) {
+  if (tPKV.status().destinyBond) {
     // If the damage will kill the target
     if (damage >= tPKV.getHP()) {
       // The attacker faints too

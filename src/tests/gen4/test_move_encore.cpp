@@ -132,8 +132,8 @@ TEST_F(EncoreTest, FailsIfNoMoveUsed) {
       engine_->initialState(), Action::move(0), Action::move(0));
   auto env = results.where1().getEnv();
 
-  EXPECT_EQ(env.teammate(1, 0).status().cTeammate.encore_duration, 0);
-  EXPECT_EQ(env.teammate(1, 0).status().cTeammate.encore_action, 0);
+  EXPECT_EQ(env.teammate(1, 0).status().encore_duration, 0);
+  EXPECT_EQ(env.teammate(1, 0).status().encore_action, 0);
 }
 
 
@@ -154,8 +154,8 @@ TEST_F(EncoreTest, PreemptsChoiceIfMoveIsForbidden) {
 
   // Check that Blissey is now encored into Soft-Boiled (Move 1)
   auto teamStatus = state2.teammate(1, 0).status();
-  EXPECT_GT(teamStatus.cTeammate.encore_duration, 0);
-  EXPECT_EQ(teamStatus.cTeammate.encore_action, 1);
+  EXPECT_GT(teamStatus.encore_duration, 0);
+  EXPECT_EQ(teamStatus.encore_action, 1);
 }
 
 
@@ -166,7 +166,7 @@ TEST_F(EncoreTest, FailsIfAlreadyEncored_DoesNotResetDuration) {
   auto results2 = setupEncoredSeismic();
   auto state2 = results2.where1();
   auto durationAfterTurn2 =
-      state2.teammate(1, 0).status().cTeammate.encore_duration;
+      state2.teammate(1, 0).status().encore_duration;
   EXPECT_GT(durationAfterTurn2, 0);
 
   // Turn 3: Blissey encored into Soft-Boiled.
@@ -177,7 +177,7 @@ TEST_F(EncoreTest, FailsIfAlreadyEncored_DoesNotResetDuration) {
 
   auto teamStatus = state3.teammate(1, 0).status();
   // Duration should be durationAfterTurn2 - 1
-  EXPECT_EQ(teamStatus.cTeammate.encore_duration, durationAfterTurn2 - 1);
+  EXPECT_EQ(teamStatus.encore_duration, durationAfterTurn2 - 1);
 }
 
 
@@ -190,8 +190,8 @@ TEST_F(EncoreTest, AppliesEffect) {
   auto teamStatus = env.teammate(1, 0).status();
 
   // Blissey should be encored into Soft-Boiled (Move 1)
-  EXPECT_GT(teamStatus.cTeammate.encore_duration, 0);
-  EXPECT_EQ(teamStatus.cTeammate.encore_action, 1);
+  EXPECT_GT(teamStatus.encore_duration, 0);
+  EXPECT_EQ(teamStatus.encore_action, 1);
 }
 
 
@@ -216,11 +216,11 @@ TEST_F(EncoreTest, RestrictsMoves_AllowsEncoredMove) {
 TEST_F(EncoreTest, ProbabilisticDuration_DecrementsBeforeBranching) {
   auto results3 = setupProbabilisticTurn3();
   auto state3 = results3.where1();
-  EXPECT_EQ(state3.teammate(1, 0).status().cTeammate.encore_duration, 5);
+  EXPECT_EQ(state3.teammate(1, 0).status().encore_duration, 5);
 
   auto results4 = setupProbabilisticTurn4();
   auto state4 = results4.where1();
-  EXPECT_EQ(state4.teammate(1, 0).status().cTeammate.encore_duration, 4);
+  EXPECT_EQ(state4.teammate(1, 0).status().encore_duration, 4);
 }
 
 
@@ -234,7 +234,7 @@ TEST_F(EncoreTest, ProbabilisticDuration_BranchesByTurn6) {
   auto state_prob_5 = setupProbabilisticTurn5();
   auto state5_filtered =
       state_prob_5.where1([](const ConstEnvironmentPossible& res) {
-        return res.teammate(1, 0).status().cTeammate.encore_duration == 3;
+        return res.teammate(1, 0).status().encore_duration == 3;
       });
 
   auto results6 = setupProbabilisticTurn6(state5_filtered);
@@ -245,11 +245,11 @@ TEST_F(EncoreTest, ProbabilisticDuration_BranchesByTurn6) {
 
   for (size_t i = 0; i < results6.size(); ++i) {
     auto res = results6.at(i);
-    if (res.teammate(1, 0).status().cTeammate.encore_duration == 0) {
+    if (res.teammate(1, 0).status().encore_duration == 0) {
       foundEnded = true;
     } else {
       foundContinued = true;
-      EXPECT_EQ(res.teammate(1, 0).status().cTeammate.encore_duration, 2);
+      EXPECT_EQ(res.teammate(1, 0).status().encore_duration, 2);
     }
   }
 
@@ -261,7 +261,7 @@ TEST_F(EncoreTest, ProbabilisticDuration_BranchesByTurn6) {
 TEST_F(EncoreTest, EncoreAndTaunt_DisallowsAllMoves) {
   auto results3 = setupEncoreTaunt();
   auto env3 = results3.where1();
-  EXPECT_GT(env3.teammate(1, 0).status().cTeammate.encore_duration, 0);
+  EXPECT_GT(env3.teammate(1, 0).status().encore_duration, 0);
 
   // Now Blissey is Encored into Soft-Boiled (Move 1) AND Taunted.
   // Move 0: Seismic Toss (Damage) - Blocked by Encore (not Move 1)
@@ -308,5 +308,5 @@ TEST_F(EncoreTest, EndsOnPPDepletion_EndsDuration) {
   auto state3 = results_pp_depletion.where1();
 
   // Encore should end because PP is 0
-  EXPECT_EQ(state3.teammate(1, 0).status().cTeammate.encore_duration, 0);
+  EXPECT_EQ(state3.teammate(1, 0).status().encore_duration, 0);
 }

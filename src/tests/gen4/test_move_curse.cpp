@@ -47,7 +47,7 @@ TEST_F(CurseTest, GhostCurse_AppliesStatusAndCutsHP) {
   EXPECT_NEAR(r1_env.teammate(0, 0).getPercentHP(), 0.5, 0.01);
 
   // Snorlax should have Curse status
-  EXPECT_TRUE(r1_env.teammate(1, 0).status().cTeammate.curse);
+  EXPECT_TRUE(r1_env.teammate(1, 0).status().curse);
 
   // Snorlax should have taken 1/4 max HP damage at end of round 1
   EXPECT_NEAR(r1_env.teammate(1, 0).getPercentHP(), 0.75, 0.01);
@@ -82,7 +82,7 @@ TEST_F(CurseTest, NonGhostCurse_BoostsStats) {
   EXPECT_EQ(r1_env.teammate(0, 0).getBoost(FV_DEFENSE), 1);
 
   // Target should NOT have Curse status
-  EXPECT_FALSE(r1_env.teammate(1, 0).status().cTeammate.curse);
+  EXPECT_FALSE(r1_env.teammate(1, 0).status().curse);
 }
 
 TEST_F(CurseTest, GhostCurse_FailsIfTargetAlreadyCursed) {

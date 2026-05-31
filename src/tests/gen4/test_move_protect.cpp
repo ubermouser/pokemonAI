@@ -57,7 +57,7 @@ TEST_F(ProtectTest, ConsecutiveUseChance) {
 
   auto state1 = turn1.where1();
   // Verify counter is 1.
-  EXPECT_EQ(state1.teammate(0,0).status().cTeammate.protect_counter, 1U);
+  EXPECT_EQ(state1.teammate(0,0).status().protect_counter, 1U);
 
   // Turn 2: Protect vs Sludge Bomb.
   // Should split into Success (Block) and Failure (Damage).
@@ -88,12 +88,12 @@ TEST_F(ProtectTest, CounterResetsOnOtherMove) {
   // Turn 1: Protect. Counter -> 1.
   auto turn1 = engine_->updateState(engine_->initialState(), Action::moveAlly(0, 0), Action::wait());
   auto state1 = turn1.where1();
-  EXPECT_EQ(state1.teammate(0,0).status().cTeammate.protect_counter, 1U);
+  EXPECT_EQ(state1.teammate(0,0).status().protect_counter, 1U);
 
   // Turn 2: Softboiled (Move 1). Counter -> 0.
   auto turn2 = engine_->updateState(state1, Action::moveAlly(1, 0), Action::wait());
   auto state2 = turn2.where1();
-  EXPECT_EQ(state2.teammate(0,0).status().cTeammate.protect_counter, 0U);
+  EXPECT_EQ(state2.teammate(0,0).status().protect_counter, 0U);
 
   // Turn 3: Protect. Should be 100% success (Counter -> 1).
   auto turn3 = engine_->updateState(state2, Action::moveAlly(0, 0), Action::move(0)); // Against Sludge Bomb

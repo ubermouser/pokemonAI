@@ -18,7 +18,7 @@ int move_knockOff(
   if (!cu.getBase().flagsFor((TEAM)cu.getICTeam()).isHit()) { return 1; }
 
   // If the target has a substitute, the item is not knocked off.
-  if (tPKV.status().cTeammate.substitute > 0) { return 1; }
+  if (tPKV.status().substitute > 0) { return 1; }
 
   // Target must be alive to lose item
   if (!tPKV.isAlive()) { return 1; }

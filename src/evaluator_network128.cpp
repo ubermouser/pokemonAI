@@ -133,7 +133,7 @@ void evaluator_network128_impl<Base>::seed(
     cInput[0] = (float)(cTV.getPKV().getFV_boosted(FV_SPEED) > tTV.getPKV().getFV_boosted(FV_SPEED));
     cInput[1] = std::max(0.0f, std::min(1.0f, (float)(cTV.getPKV().getAccuracy_boosted(FV_ACCURACY) * tTV.getPKV().getAccuracy_boosted(FV_EVASION))));
     cInput[2] = (float)((cTV.getVolatile().confused | cTV.getVolatile().infatuate) > AIL_V_NONE);
-    cInput[3] = scale((float)((cTV.getNonVolatile().spikes>0) + (cTV.getNonVolatile().stealthRock>0)), 2.0f, 0.0f);
+    cInput[3] = scale((float)((cTV.status().spikes>0) + (cTV.status().stealthRock>0)), 2.0f, 0.0f);
     // clang-format on
     cInput += NEURONSPERSTATUS;
   }

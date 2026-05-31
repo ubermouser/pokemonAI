@@ -34,6 +34,8 @@ struct PKAISHARED TeamVolatileData
 
   TeamStatus status;
 
+  std::array<VolatileStatus, 3> activeVolatiles;
+
 
   /* Compares values of selected team. Base values are compared by
     * pointer, volatile values are compared by value */
@@ -56,8 +58,9 @@ public:
   using base_t::data;
   using base_t::nv;
 
-  const VolatileStatus& getVolatile() const { return data().status.cTeammate; };
-  const NonVolatileStatus& getNonVolatile() const { return data().status.nonvolatile; };
+  [[deprecated]] const VolatileStatus& getVolatile() const {
+    return data().activeVolatiles[0];
+  };
 
   pokemonvolatile_t teammate(const Actor& actor) const {
     return teammate(actor.iTeammate());
@@ -124,7 +127,9 @@ public:
 
   /* gets current index of pokemon volatile on this team */
   [[deprecated]] size_t getICPKV() const {
-    return data().status.nonvolatile.iCPokemon;
+    for (auto actor : yieldActiveActors()) { return actor.iTeammate(); }
+    // no active pokemon! Fallback
+    return 0;
   };
 
   status_t& status() const { return data().status; }
@@ -147,12 +152,13 @@ public:
 
   void resetVolatile();
 
-  
-  VolatileStatus& getVolatile() { return data().status.cTeammate; };
-  const VolatileStatus& getVolatile() const { return data().status.cTeammate; };
 
-  NonVolatileStatus& getNonVolatile() { return data().status.nonvolatile; };
-  const NonVolatileStatus& getNonVolatile() const { return data().status.nonvolatile; };
+  [[deprecated]] VolatileStatus& getVolatile() {
+    return data().activeVolatiles[0];
+  };
+  [[deprecated]] const VolatileStatus& getVolatile() const {
+    return data().activeVolatiles[0];
+  };
 
   /* Resets all pokemon in this team */
   void initialize(size_t numActivePokemon);

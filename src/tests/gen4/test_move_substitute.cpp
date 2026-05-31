@@ -42,7 +42,7 @@ TEST_F(SubstituteTest, CreatesSubstitute) {
   uint32_t expectedHP = maxHP - (maxHP / 4);
   uint32_t expectedSubHP = maxHP / 4;
   EXPECT_EQ(blissey.getHP(), expectedHP);
-  EXPECT_EQ(blissey.status().cTeammate.substitute, expectedSubHP);
+  EXPECT_EQ(blissey.status().substitute, expectedSubHP);
 }
 
 TEST_F(SubstituteTest, FailsWithLowHP) {
@@ -57,7 +57,7 @@ TEST_F(SubstituteTest, FailsWithLowHP) {
 
   // HP should not change, substitute should not be created
   EXPECT_EQ(blissey.getHP(), 10U);
-  EXPECT_EQ(blissey.status().cTeammate.substitute, 0U);
+  EXPECT_EQ(blissey.status().substitute, 0U);
 }
 
 TEST_F(SubstituteTest, AbsorbsDamage) {
@@ -65,7 +65,7 @@ TEST_F(SubstituteTest, AbsorbsDamage) {
   auto state1 = turn1_results.where1();
 
   uint32_t initialHP = state1.teammate(0, 0).getHP();
-  uint32_t initialSubHP = state1.teammate(0, 0).status().cTeammate.substitute;
+  uint32_t initialSubHP = state1.teammate(0, 0).status().substitute;
 
   // Turn 2: Gengar uses Sludge Bomb (Move index 3 - hits Blissey)
   auto turn2 = engine_->updateState(state1, Action::wait(), Action::move(3));
@@ -74,7 +74,7 @@ TEST_F(SubstituteTest, AbsorbsDamage) {
   // Blissey's HP should not have decreased
   EXPECT_EQ(blissey2.getHP(), initialHP);
   // Substitute HP should have decreased
-  EXPECT_LT(blissey2.status().cTeammate.substitute, initialSubHP);
+  EXPECT_LT(blissey2.status().substitute, initialSubHP);
 }
 
 TEST_F(SubstituteTest, BreaksSubstitute) {
@@ -84,14 +84,14 @@ TEST_F(SubstituteTest, BreaksSubstitute) {
   // Force break substitute by creating a mutable state
   EnvironmentVolatileData stateData = state1.getEnv().data();
   EnvironmentVolatile mutableState{state1.getEnv().nv(), stateData};
-  mutableState.teammate(0, 0).status().cTeammate.substitute = 1;
+  mutableState.teammate(0, 0).status().substitute = 1;
 
   // Turn 2: Gengar uses Sludge Bomb (Move index 3)
   auto turn2 = engine_->updateState(mutableState, Action::wait(), Action::move(3));
   auto blissey2 = turn2.where1().teammate(0, 0);
 
   // Substitute should be gone
-  EXPECT_EQ(blissey2.status().cTeammate.substitute, 0U);
+  EXPECT_EQ(blissey2.status().substitute, 0U);
   // Blissey's HP should still be same as start of Turn 2
   EXPECT_EQ(blissey2.getHP(), state1.teammate(0, 0).getHP());
 }
@@ -117,7 +117,7 @@ TEST_F(SubstituteTest, BypassedByTaunt) {
   auto blissey2 = turn2.where1().teammate(0, 0);
 
   // Blissey should be taunted
-  EXPECT_GT(blissey2.status().cTeammate.taunt_duration, 0U);
+  EXPECT_GT(blissey2.status().taunt_duration, 0U);
 }
 
 TEST_F(SubstituteTest, BlocksSecondaryEffect) {

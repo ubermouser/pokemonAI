@@ -40,7 +40,10 @@ class StateTransitionPrinter {
   static void reportSwitch(
       std::ostream& os, const ConstEnvironmentPossible& nsP, size_t iTeam);
   static void reportHitResult(
-      std::ostream& os, const ConstEnvironmentPossible& nsP, size_t iTeam);
+      std::ostream& os,
+      const ConstEnvironmentVolatile& osP,
+      const ConstEnvironmentPossible& nsP,
+      size_t iTeam);
   static void reportFainting(
       std::ostream& os,
       const ConstEnvironmentVolatile& osP,
@@ -60,16 +63,20 @@ class StateTransitionPrinter {
       const ConstPokemonVolatile& pkNew);
   static void reportVolatileStatusChange(
       std::ostream& os,
-      const ConstTeamVolatile& teamOld,
-      const ConstTeamVolatile& teamNew);
+      const ConstPokemonVolatile& pkOld,
+      const ConstPokemonVolatile& pkNew);
   static void reportTeamVolatileStatusChange(
       std::ostream& os,
       const ConstTeamVolatile& teamOld,
-      const ConstTeamVolatile& teamNew);
+      const ConstTeamVolatile& teamNew,
+      size_t activeIndex);
   static void reportStatBoosts(
       std::ostream& os,
-      const ConstTeamVolatile& teamOld,
-      const ConstTeamVolatile& teamNew);
+      const ConstPokemonVolatile& pkOld,
+      const ConstPokemonVolatile& pkNew);
+  static size_t getSwitchedInIndex(
+      const ConstEnvironmentPossible& nsP,
+      size_t iTeam);
   static std::string pokemonName(const ConstPokemonVolatile& pk);
 };
 

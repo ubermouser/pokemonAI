@@ -55,7 +55,7 @@ int ability_synchronize(
         syncAilment = AIL_NV_POISON;
       }
 
-      cPKV.status().cTeammate.toxicPoison_tier = 0;
+      cPKV.status().toxicPoison_tier = 0;
       cPKV.setStatusAilment(syncAilment);
     }
   }

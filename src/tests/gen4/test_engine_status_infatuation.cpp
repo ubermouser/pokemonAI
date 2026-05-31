@@ -35,7 +35,7 @@ TEST_F(InfatuationStatusTest, Test_AppliesInfatuation) {
 
   // Snorlax should be infatuated in the state where Attract hit
   auto infatuated_state = results.where1Status(0);
-  EXPECT_EQ(infatuated_state.teammate(1, 0).status().cTeammate.infatuate, 1);
+  EXPECT_EQ(infatuated_state.teammate(1, 0).status().infatuate, 1);
 }
 
 TEST_F(InfatuationStatusTest, Test_InfatuationBlocksMove) {
@@ -44,7 +44,7 @@ TEST_F(InfatuationStatusTest, Test_InfatuationBlocksMove) {
   // Turn 1: Mew uses Attract, Snorlax waits
   auto results1 = engine_->updateState(initial_state, Action::move(0), Action::wait());
   auto infatuated_state = results1.where1Status(0);
-  EXPECT_EQ(infatuated_state.teammate(1, 0).status().cTeammate.infatuate, 1);
+  EXPECT_EQ(infatuated_state.teammate(1, 0).status().infatuate, 1);
 
   // Turn 2: Snorlax tries to move (Strength), Mew waits
   auto results2 = engine_->updateState(infatuated_state, Action::wait(), Action::move(0));

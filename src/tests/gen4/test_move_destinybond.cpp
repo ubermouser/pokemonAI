@@ -52,7 +52,7 @@ TEST_F(DestinyBondTest, NoTriggerNoKill) {
   auto env = possible_envs.where1();
   EXPECT_GT(env.teammate(0, 0).getHP(), 0);
   EXPECT_GT(env.teammate(1, 0).getHP(), 0);
-  EXPECT_TRUE(env.teammate(0, 0).status().cTeammate.destinyBond);
+  EXPECT_TRUE(env.teammate(0, 0).status().destinyBond);
 }
 
 TEST_F(DestinyBondTest, ConsecutiveUseFails) {
@@ -60,7 +60,7 @@ TEST_F(DestinyBondTest, ConsecutiveUseFails) {
   auto envs1 = engine_->updateState(
     engine_->initialState(), Action::move(0), Action::move(1));
   auto state1 = envs1.where1();
-  EXPECT_TRUE(state1.teammate(0, 0).status().cTeammate.destinyBond);
+  EXPECT_TRUE(state1.teammate(0, 0).status().destinyBond);
 
   // Turn 2: Gengar uses Destiny Bond again
   auto envs2 = engine_->updateState(
@@ -68,7 +68,7 @@ TEST_F(DestinyBondTest, ConsecutiveUseFails) {
   auto state2 = envs2.where1();
   
   // In Gen 4, Destiny Bond fails if used consecutively.
-  EXPECT_FALSE(state2.teammate(0, 0).status().cTeammate.destinyBond);
+  EXPECT_FALSE(state2.teammate(0, 0).status().destinyBond);
 }
 
 TEST_F(DestinyBondTest, EffectWearsOff) {
@@ -76,7 +76,7 @@ TEST_F(DestinyBondTest, EffectWearsOff) {
   auto envs1 = engine_->updateState(
     engine_->initialState(), Action::move(0), Action::move(1));
   auto state1 = envs1.where1(); 
-  EXPECT_TRUE(state1.teammate(0, 0).status().cTeammate.destinyBond);
+  EXPECT_TRUE(state1.teammate(0, 0).status().destinyBond);
 
   // Turn 2: Gengar uses Shadow Ball, Snorlax uses Crunch and kills Gengar
   auto envs2 = engine_->updateState(

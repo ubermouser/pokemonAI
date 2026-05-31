@@ -15,8 +15,8 @@ int item_lumBerry(PkCUEngine& cu, const Actor& actor) {
 
   bool conditionCured = false;
   // volatile status condition confusion will be cured
-  if (tPKV.status().cTeammate.confused > 0) {
-    tPKV.status().cTeammate.confused = 0;
+  if (tPKV.status().confused > 0) {
+    tPKV.status().confused = 0;
     conditionCured = true;
   }
   // all nonvolatile status conditions will be cured:

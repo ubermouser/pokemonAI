@@ -12,10 +12,9 @@
 #include "pokemonai/pokemon_nonvolatile.h"
 #include "pokemonai/team_nonvolatile.h"
 
-BOOST_STATIC_ASSERT(sizeof(NonVolatileStatus) == (sizeof(uint32_t)*1));
 BOOST_STATIC_ASSERT(sizeof(VolatileStatus) == (sizeof(uint32_t)*4));
-BOOST_STATIC_ASSERT(sizeof(TeamStatus) == (sizeof(uint32_t)*5));
-BOOST_STATIC_ASSERT(sizeof(TeamVolatileData) == (sizeof(uint32_t)*17));
+BOOST_STATIC_ASSERT(sizeof(TeamStatus) == (sizeof(uint32_t) * 1));
+BOOST_STATIC_ASSERT(sizeof(TeamVolatileData) == (sizeof(uint32_t) * 25));
 
 bool TeamVolatileData::operator==(const TeamVolatileData& other) const {
   return std::memcmp(this, &other, sizeof(TeamVolatileData)) == 0;
@@ -41,11 +40,14 @@ void TeamVolatile::initialize(size_t numActivePokemon) {
 TEAM_VOLATILE_IMPL_TEMPLATE
 typename TEAM_VOLATILE_IMPL::pokemonvolatile_t
 TEAM_VOLATILE_IMPL::teammate(size_t iTeammate) const {
+  auto& teammateData = data().teammates[iTeammate];
+  size_t activeSlot = teammateData.active;
+  auto& activeVol = activeSlot > 0 ? data().activeVolatiles[activeSlot - 1]
+                                   : data().activeVolatiles[0];
   return pokemonvolatile_t{
-      nv().teammate(iTeammate), // contains assertion
-      data().teammates[iTeammate],
-      data().status
-  };
+      nv().teammate(iTeammate),  // contains assertion
+      teammateData,
+      const_cast<typename pokemonvolatile_t::status_t&>(activeVol)};
 };
 
 
@@ -103,16 +105,19 @@ bool TeamVolatile::swapPokemon(
   // make sure we're not switching to ourself
   if (actor == target) { return false; }
 
-  // reset the volatile status:
-  if (!preserveVolatile) { resetVolatile(); };
-
   // rewrite swap pokemon value:
   auto oPkmn = teammate(actor);
   auto nPkmn = teammate(target);
 
   assert(oPkmn.isActive());
 
-  data_->status.nonvolatile.iCPokemon = (uint8_t)target.iTeammate();
+  auto oPkmnActive = oPkmn.data().active;
+  assert(oPkmnActive > 0 && oPkmnActive <= 3);
+
+  // reset the volatile status for the slot we are switching out of:
+  if (!preserveVolatile) {
+    data_->activeVolatiles[oPkmnActive - 1] = VolatileStatus();
+  }
 
   // cannot use std::swap because this is a bitfield
   auto nPkmnActive = nPkmn.data().active;
@@ -137,10 +142,8 @@ size_t TeamVolatile::activatePokemon(const Actor& actor) {
   size_t firstEmptySlot = std::countl_one(occupied.to_ulong());
   pkmn.data().active = (uint8_t)firstEmptySlot + 1;
 
-  // TODO: remove ICPokemon!
-  if (firstEmptySlot == 0) {
-    data_->status.nonvolatile.iCPokemon = (uint8_t)actor.iTeammate();
-  }
+  // reset volatile status in this newly active slot:
+  data_->activeVolatiles[firstEmptySlot] = VolatileStatus();
 
   return firstEmptySlot;
 }
@@ -159,15 +162,14 @@ void TEAM_VOLATILE_IMPL::printTeam(std::ostream& os, const std::string& linePref
 }
 
 
-void TeamVolatile::resetVolatile()
-{
-  // completely zero bitset
-  std::memset(&(data().status.cTeammate), 0, sizeof(VolatileStatus));
-}
-
-
 std::ostream& operator <<(std::ostream& os, const ConstTeamVolatile& team) {
   team.printTeam(os);
+  const auto& s = team.status();
+  if (s.spikes > 0) { os << fmt::format(" (SPIKES-{})", s.spikes); }
+  if (s.stealthRock > 0) { os << " (STLTH_ROCK)"; }
+  if (s.toxicSpikes > 0) { os << fmt::format(" (T-SPIKES-{})", s.toxicSpikes); }
+  if (s.lightScreen > 0) { os << fmt::format(" (L-SCRN-{})", s.lightScreen); }
+  if (s.reflect > 0) { os << fmt::format(" (REFLECT-{})", s.reflect); }
   return os;
 }
 
