@@ -308,6 +308,17 @@ int engine_updateLastAction(PkCUEngine& cu, const Actor& actor) {
   }
 };
 
+int engine_incrementNumRoundsInPlay(PkCUEngine& cu, const Actor& actor) {
+  PokemonVolatile cPKV = cu.getPKV(actor);
+  if (!cPKV.isAlive()) { return 0; }
+
+  bool switched = cu.getBase().flagsFor(actor).isSwitched();
+  if (!switched) {
+    if (cPKV.status().numRoundsInPlay < 15) { cPKV.status().numRoundsInPlay++; }
+  }
+  return 1;
+}
+
 int engine_thawOnFireHit(
     PkCUEngine& cu,
     const Actor& actor,
@@ -334,6 +345,7 @@ void register_engine_common(const Pokedex& pkAI, std::vector<plugin>& extensions
   extensions.push_back(pluginOnSecondaryEffect(engine, "secondary effect nonvolatile", engine_secondaryNonvolatileEffect, -2, all_teams));
   extensions.push_back(pluginOnSecondaryEffect(engine, "secondary effect volatile", engine_secondaryVolatileEffect, -1, all_teams));
   extensions.push_back(pluginOnEndOfRound(engine, "nonvolatile end-of-round damage", engine_endRoundDamageEffect, 0, all_teams));
+  extensions.push_back(pluginOnEndOfRound(engine, "engine increment rounds in play", engine_incrementNumRoundsInPlay, 1, all_teams));
   extensions.push_back(pluginOnModifyAttackPower(engine, "damage mod burn", engine_modifyAttackPower_burn, 0, all_teams));
   extensions.push_back(pluginOnCalculateDamage(engine, "thaw on fire hit", engine_thawOnFireHit, 0, all_teams));
   // clang-format on
