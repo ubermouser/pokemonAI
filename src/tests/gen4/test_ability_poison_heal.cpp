@@ -5,118 +5,150 @@ class PoisonHealTest : public Gen4EngineTest {
   void SetUp() override {
     Gen4EngineTest::SetUp();
 
-    // Team A: Shroomish with Poison Heal
+    // clang-format off
+    // Team A: Shroomish with Poison Heal (teammate 0) and Squirtle with Torrent (teammate 1)
     auto team_a = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->pokemon("shroomish"))
           .setAbility(pokedex_->ability("poison heal"))
           .addMove(pokedex_->move("tackle"))
-          .setLevel(100));
-
-    // Team B: Magikarp (Dummy)
-    auto team_b = TeamNonVolatile()
-        .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->pokemon("magikarp"))
-          .addMove(pokedex_->move("splash"))
-          .setLevel(100));
-
-    environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
-    engine_->setEnvironment(environment_nv);
-  }
-
-  EnvironmentNonvolatile environment_nv;
-
-  // Helper method to set HP and Status and return the modified data
-  EnvironmentVolatileData getStatusData(float hp_percent, uint32_t ailment) {
-    auto c_env_v = engine_->initialState();
-    EnvironmentVolatileData env_data = c_env_v.data(); // Copy data
-    EnvironmentVolatile env_v(c_env_v.nv(), env_data); // Wrap it
-
-    // Set Team A teammate 0 status
-    env_v.getTeam(TEAM_A).teammate(0).setPercentHP(hp_percent);
-    env_v.getTeam(TEAM_A).teammate(0).setStatusAilment(ailment);
-
-    return env_data; // Return modified copy
-  }
-};
-
-TEST_F(PoisonHealTest, PoisonHealRestoresHPWhenPoisoned) {
-    auto env_data = getStatusData(0.5, AIL_NV_POISON);
-    EnvironmentVolatile env_v(engine_->initialState().nv(), env_data);
-
-    // Wait turn
-    auto turn1 = engine_->updateState(env_v, Action::wait(), Action::wait());
-
-    ASSERT_GE(turn1.size(), 1);
-    auto pkv = turn1.where1().getTeam(TEAM_A).teammate(0);
-
-    // Should heal 1/8 (12.5%) -> 62.5%
-    // Tolerance for fixed point arithmetic
-    EXPECT_NEAR(pkv.getPercentHP(), 0.625, 0.005);
-}
-
-TEST_F(PoisonHealTest, PoisonHealRestoresHPWhenToxicPoisoned) {
-    auto env_data = getStatusData(0.5, AIL_NV_POISON_TOXIC);
-    EnvironmentVolatile env_v(engine_->initialState().nv(), env_data);
-
-    // Wait turn
-    auto turn1 = engine_->updateState(env_v, Action::wait(), Action::wait());
-
-    ASSERT_GE(turn1.size(), 1);
-    auto pkv = turn1.where1().getTeam(TEAM_A).teammate(0);
-
-    // Should heal 1/8 (12.5%) -> 62.5%
-    EXPECT_NEAR(pkv.getPercentHP(), 0.625, 0.005);
-}
-
-TEST_F(PoisonHealTest, PoisonHealPreventsToxicCounterIncrease) {
-    auto env_data = getStatusData(0.5, AIL_NV_POISON_TOXIC);
-    EnvironmentVolatile env_v(engine_->initialState().nv(), env_data);
-
-    // Check initial toxic tier (should be 0)
-    EXPECT_EQ(env_v.getTeam(TEAM_A).teammate(0).status().toxicPoison_tier, 0);
-
-    // Wait turn
-    auto turn1 = engine_->updateState(env_v, Action::wait(), Action::wait());
-
-    ASSERT_GE(turn1.size(), 1);
-    auto pkv = turn1.where1().getTeam(TEAM_A).teammate(0);
-
-    // Toxic tier should NOT increase (should remain 0)
-    EXPECT_EQ(pkv.status().toxicPoison_tier, 0);
-}
-
-TEST_F(PoisonHealTest, NormalPoisonDamageWithoutAbility) {
-     // Create a new environment where Squirtle has Torrent (implemented ability, not Poison Heal)
-    auto team_a = TeamNonVolatile()
+          .setLevel(100))
         .addPokemon(PokemonNonVolatile()
           .setBase(pokedex_->pokemon("squirtle"))
           .setAbility(pokedex_->ability("torrent"))
           .addMove(pokedex_->move("tackle"))
           .setLevel(100));
 
-    // Team B: Magikarp (Dummy)
+    // Team B: Smeargle
     auto team_b = TeamNonVolatile()
         .addPokemon(PokemonNonVolatile()
-          .setBase(pokedex_->pokemon("magikarp"))
-          .addMove(pokedex_->move("splash"))
+          .setBase(pokedex_->pokemon("smeargle"))
+          .addMove(pokedex_->move("seismic toss"))  // Deal 100 damage (Move 0)
+          .addMove(pokedex_->move("poisonpowder"))  // Poison status (Move 1)
+          .addMove(pokedex_->move("toxic"))         // Toxic status (Move 2)
+          .addMove(pokedex_->move("splash"))        // Dummy (Move 3)
           .setLevel(100));
+    // clang-format on
 
-    auto env_no_ph = EnvironmentNonvolatile(team_a, team_b, true);
-    engine_->setEnvironment(env_no_ph);
+    environment_nv = EnvironmentNonvolatile(team_a, team_b, true);
+    engine_->setEnvironment(environment_nv);
+  }
 
-    // Manually setting status here since setStatus helper assumes the default setup
-    auto c_env_v = engine_->initialState();
-    EnvironmentVolatileData env_data = c_env_v.data();
-    EnvironmentVolatile env_v(c_env_v.nv(), env_data);
+  // Turn 1: Smeargle uses Seismic Toss (Move 0) to damage Shroomish.
+  // Shroomish uses Tackle.
+  PossibleEnvironments setupDamagedShroomish() {
+    return engine_->updateState(
+        engine_->initialState(), Action::move(0), Action::move(0));
+  }
 
-    env_v.getTeam(TEAM_A).teammate(0).setPercentHP(0.5);
-    env_v.getTeam(TEAM_A).teammate(0).setStatusAilment(AIL_NV_POISON);
+  // Turn 2: Smeargle uses Poison Powder (Move 1) to poison Shroomish.
+  // Shroomish waits.
+  PossibleEnvironments setupPoisonedShroomish(
+      const ConstEnvironmentVolatile& state) {
+    return engine_->updateState(state, Action::wait(), Action::move(1));
+  }
 
-    auto turn1 = engine_->updateState(env_v, Action::wait(), Action::wait());
-    ASSERT_GE(turn1.size(), 1);
-    auto pkv = turn1.where1().getTeam(TEAM_A).teammate(0);
+  // Turn 2: Smeargle uses Toxic (Move 2) to toxic-poison Shroomish.
+  // Shroomish waits.
+  PossibleEnvironments setupToxicPoisonedShroomish(
+      const ConstEnvironmentVolatile& state) {
+    return engine_->updateState(state, Action::wait(), Action::move(2));
+  }
 
-    // Should take damage 1/8 (12.5%) -> 37.5%
-    EXPECT_NEAR(pkv.getPercentHP(), 0.375, 0.005);
+  // Turn 1: Team A swaps Shroomish out for Squirtle (index 1).
+  // Team B (Smeargle) uses Seismic Toss (Move 0) to damage Squirtle.
+  PossibleEnvironments setupDamagedSquirtle() {
+    return engine_->updateState(
+        engine_->initialState(), Action::swap(1), Action::move(0));
+  }
+
+  // Turn 2: Team A waits (Squirtle is active).
+  // Team B uses Poison Powder (Move 1) to poison Squirtle.
+  PossibleEnvironments setupPoisonedSquirtle(
+      const ConstEnvironmentVolatile& state) {
+    return engine_->updateState(state, Action::wait(), Action::move(1));
+  }
+};
+
+
+TEST_F(PoisonHealTest, PoisonHealRestoresHPWhenPoisoned) {
+  // Step 1: Damage Shroomish
+  auto turn1 = setupDamagedShroomish();
+  auto state1 = turn1.where1();
+  double hp_percent_before = state1.teammate(TEAM_A, 0).getPercentHP();
+
+  // Step 2: Poison Shroomish
+  auto turn2 = setupPoisonedShroomish(state1.getEnv());
+  // Find the state where Shroomish is poisoned
+  auto state2 = turn2.where1([](const ConstEnvironmentPossible& res) {
+    return res.teammate(TEAM_A, 0).getStatusAilment() == AIL_NV_POISON;
+  });
+
+  double hp_percent_after = state2.teammate(TEAM_A, 0).getPercentHP();
+
+  // Poison Heal restores 1/8th (12.5%) of Max HP at the end of the turn
+  EXPECT_NEAR(hp_percent_after, hp_percent_before + 0.125, 0.005);
+}
+
+
+TEST_F(PoisonHealTest, PoisonHealRestoresHPWhenToxicPoisoned) {
+  // Step 1: Damage Shroomish
+  auto turn1 = setupDamagedShroomish();
+  auto state1 = turn1.where1();
+  double hp_percent_before = state1.teammate(TEAM_A, 0).getPercentHP();
+
+  // Step 2: Toxic Shroomish
+  auto turn2 = setupToxicPoisonedShroomish(state1.getEnv());
+  // Find the state where Shroomish is toxic-poisoned
+  auto state2 = turn2.where1([](const ConstEnvironmentPossible& res) {
+    return res.teammate(TEAM_A, 0).getStatusAilment() == AIL_NV_POISON_TOXIC;
+  });
+
+  double hp_percent_after = state2.teammate(TEAM_A, 0).getPercentHP();
+
+  // Poison Heal restores 1/8th (12.5%) of Max HP at the end of the turn
+  EXPECT_NEAR(hp_percent_after, hp_percent_before + 0.125, 0.005);
+}
+
+
+TEST_F(PoisonHealTest, PoisonHealPreventsToxicCounterIncrease) {
+  // Step 1: Damage Shroomish
+  auto turn1 = setupDamagedShroomish();
+  auto state1 = turn1.where1();
+
+  // Step 2: Toxic Shroomish
+  auto turn2 = setupToxicPoisonedShroomish(state1.getEnv());
+  auto state2 = turn2.where1([](const ConstEnvironmentPossible& res) {
+    return res.teammate(TEAM_A, 0).getStatusAilment() == AIL_NV_POISON_TOXIC;
+  });
+
+  // Check initial toxic tier is 0
+  EXPECT_EQ(state2.teammate(TEAM_A, 0).status().toxicPoison_tier, 0);
+
+  // Step 3: Wait another turn
+  auto turn3 =
+      engine_->updateState(state2.getEnv(), Action::wait(), Action::wait());
+  auto state3 = turn3.where1();
+
+  // Toxic tier should remain 0
+  EXPECT_EQ(state3.teammate(TEAM_A, 0).status().toxicPoison_tier, 0);
+}
+
+
+TEST_F(PoisonHealTest, NormalPoisonDamageWithoutAbility) {
+  // Step 1: Damage Squirtle
+  auto turn1 = setupDamagedSquirtle();
+  auto state1 = turn1.where1();
+  double hp_percent_before = state1.teammate(TEAM_A, 1).getPercentHP();
+
+  // Step 2: Poison Squirtle
+  auto turn2 = setupPoisonedSquirtle(state1.getEnv());
+  auto state2 = turn2.where1([](const ConstEnvironmentPossible& res) {
+    return res.teammate(TEAM_A, 1).getStatusAilment() == AIL_NV_POISON;
+  });
+
+  double hp_percent_after = state2.teammate(TEAM_A, 1).getPercentHP();
+
+  // Without Poison Heal, poison inflicts 1/8th (12.5%) of Max HP as damage
+  EXPECT_NEAR(hp_percent_after, hp_percent_before - 0.125, 0.005);
 }
