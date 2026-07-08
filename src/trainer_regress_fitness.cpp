@@ -93,10 +93,15 @@ float TrainerRegressFitness::fit() {
 
     for (auto& batch : *dataLoader) {
       optimizer.zero_grad();
-      
+
+      // TODO: The loss is calculated between raw model output and targets that
+      // are often already scaled to [0, 1].
+      // EvaluatorNetwork::calculateFitness scales raw output from [0.15, 0.85]
+      // to [0, 1]. We should either deScale the target or scale the output
+      // before MSE.
       auto output = model->forward(batch.data);
       auto loss = torch::mse_loss(output, batch.target);
-      
+
       loss.backward();
       optimizer.step();
 
@@ -226,6 +231,15 @@ std::vector<HeatDataset::Sample> TrainerRegressFitness::prepareDataset(
         // Target_t = R_t + gamma * (Target_t+1 - R_t)
         // This interpolates between current state fitness and bootstrapped
         // future results.
+        // TODO: This TD formula is non-standard for RL in games. Usually, for
+        // mid-game states with no intermediate rewards, the target should just
+        // be gamma * nextTarget (bootstrapping) or simply the terminal result.
+        // TODO: Using turn.teams[iTeam].simpleFitness as currentFitness is
+        // problematic:
+        // 1. It is already scaled to [0, 1], while the network output being
+        // trained is raw.
+        // 2. It's a "stale" estimate from when the game was played. We should
+        // consider re-evaluating the state with the current network.
         float currentFitness = turn.teams[iTeam].simpleFitness;
         float deltaNextFitness = nextTarget - currentFitness;
         float target = currentFitness + cfg_.discountFactor * deltaNextFitness;
