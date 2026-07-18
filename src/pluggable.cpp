@@ -134,6 +134,8 @@ const char* pluginTypeToString(pluginType type) {
     return "PLUGIN_ON_EXECUTESWITCH";
   case PLUGIN_ON_UNINIT:
     return "PLUGIN_ON_UNINIT";
+  case PLUGIN_ON_POSTROUND:
+    return "PLUGIN_ON_POSTROUND";
   default:
     return "PLUGIN_UNKNOWN";
   }

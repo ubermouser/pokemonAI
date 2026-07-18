@@ -92,6 +92,7 @@ extern const Move* refresh_t;
 extern const Move* rest_t;
 extern const Move* roar_t;
 extern const Move* roost_t;
+extern const Move* sandstorm_t;
 extern const Move* seismicToss_t;
 extern const Move* selfDestruct_t;
 extern const Move* shadowClaw_t;
@@ -137,11 +138,13 @@ extern const Ability* clearBody_t;
 extern const Ability* innerFocus_t;
 extern const Ability* intimidate_t;
 extern const Ability* levitate_t;
+extern const Ability* magicGuard_t;
 extern const Ability* naturalCure_t;
 extern const Ability* noGuard_t;
 extern const Ability* overgrow_t;
 extern const Ability* poisonHeal_t;
 extern const Ability* pressure_t;
+extern const Ability* sandVeil_t;
 extern const Ability* sereneGrace_t;
 extern const Ability* shadowTag_t;
 extern const Ability* stickyHold_t;
@@ -208,6 +211,7 @@ void register_move_recoil33(const Pokedex& pkAI, std::vector<plugin>& extensions
 void register_move_refresh(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_rest(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_roar(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_move_sandstorm(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_screens(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_struggle(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_move_substitute(const Pokedex& pkAI, std::vector<plugin>& extensions);
@@ -247,6 +251,7 @@ void register_item_toxic_orb(const Pokedex& pkAI, std::vector<plugin>& extension
 void register_item_type_resisting_berry(const Pokedex& pkAI, std::vector<plugin>& extensions);
 
 void register_engine_common(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_engine_weather(const Pokedex& pkAI, std::vector<plugin>& extensions);
 
 void registerGen4Extensions(const Pokedex& pkAI, std::vector<plugin>& extensions);
 // clang-format on

@@ -397,6 +397,23 @@ Actor ENV_VOLATILE_IMPL::defaultFriendly(
 
 std::ostream& operator <<(std::ostream& os, const ConstEnvironmentVolatile& env) {
   env.printActivePokemon(os);
+  const auto& status = env.getTeam(TEAM_A).status();
+  if (status.weather_type != WEATHER_NORMAL) {
+    std::string weatherStr;
+    // clang-format off
+    switch (status.weather_type) {
+      case WEATHER_SUNNY: weatherStr = "Sunny"; break;
+      case WEATHER_RAIN: weatherStr = "Rain"; break;
+      case WEATHER_SAND: weatherStr = "Sandstorm"; break;
+      case WEATHER_HAIL: weatherStr = "Hail"; break;
+      case WEATHER_FOG: weatherStr = "Fog"; break;
+      case WEATHER_SHADOWSKY: weatherStr = "ShadowSky"; break;
+      default: weatherStr = "Unknown"; break;
+    }
+    // clang-format on
+    os << fmt::format(
+        "Weather: {} ({} turns left)\n", weatherStr, status.weather_duration);
+  }
   return os;
 };
 

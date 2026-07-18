@@ -74,6 +74,10 @@ class StateTransitionPrinter {
       std::ostream& os,
       const ConstPokemonVolatile& pkOld,
       const ConstPokemonVolatile& pkNew);
+  static void reportWeatherChange(
+      std::ostream& os,
+      const ConstEnvironmentVolatile& osP,
+      const ConstEnvironmentPossible& nsP);
   static std::string pokemonName(const ConstPokemonVolatile& pk);
 };
 

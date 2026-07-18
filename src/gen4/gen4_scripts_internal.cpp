@@ -75,6 +75,7 @@ const Move* refresh_t;
 const Move* rest_t;
 const Move* roar_t;
 const Move* roost_t;
+const Move* sandstorm_t;
 const Move* seismicToss_t;
 const Move* selfDestruct_t;
 const Move* shadowClaw_t;
@@ -120,11 +121,13 @@ const Ability* clearBody_t;
 const Ability* innerFocus_t;
 const Ability* intimidate_t;
 const Ability* levitate_t;
+const Ability* magicGuard_t;
 const Ability* naturalCure_t;
 const Ability* noGuard_t;
 const Ability* overgrow_t;
 const Ability* poisonHeal_t;
 const Ability* pressure_t;
+const Ability* sandVeil_t;
 const Ability* sereneGrace_t;
 const Ability* shadowTag_t;
 const Ability* stickyHold_t;
@@ -226,6 +229,7 @@ void initializePointers(const Pokedex& pkAI) {
   rest_t = orphan::orphanCheck(moves, "rest");
   roar_t = orphan::orphanCheck(moves, "roar");
   roost_t = orphan::orphanCheck(moves, "roost");
+  sandstorm_t = orphan::orphanCheck(moves, "sandstorm");
   seismicToss_t = orphan::orphanCheck(moves, "seismic toss");
   selfDestruct_t = orphan::orphanCheck(moves, "selfdestruct");
   shadowClaw_t = orphan::orphanCheck(moves, "shadow claw");
@@ -273,11 +277,13 @@ void initializePointers(const Pokedex& pkAI) {
   innerFocus_t = orphan::orphanCheck(abilities, "inner focus");
   intimidate_t = orphan::orphanCheck(abilities, "intimidate");
   levitate_t = orphan::orphanCheck(abilities, "levitate");
+  magicGuard_t = orphan::orphanCheck(abilities, "magic guard");
   naturalCure_t = orphan::orphanCheck(abilities, "natural cure");
   noGuard_t = orphan::orphanCheck(abilities, "no guard");
   overgrow_t = orphan::orphanCheck(abilities, "overgrow");
   poisonHeal_t = orphan::orphanCheck(abilities, "poison heal");
   pressure_t = orphan::orphanCheck(abilities, "pressure");
+  sandVeil_t = orphan::orphanCheck(abilities, "sand veil");
   sereneGrace_t = orphan::orphanCheck(abilities, "serene grace");
   shadowTag_t = orphan::orphanCheck(abilities, "shadow tag");
   stickyHold_t = orphan::orphanCheck(abilities, "sticky hold");
@@ -348,6 +354,7 @@ void registerGen4Extensions(
   register_move_refresh(pkAI, extensions);
   register_move_rest(pkAI, extensions);
   register_move_roar(pkAI, extensions);
+  register_move_sandstorm(pkAI, extensions);
   register_move_screens(pkAI, extensions);
   register_move_struggle(pkAI, extensions);
   register_move_substitute(pkAI, extensions);
@@ -387,6 +394,7 @@ void registerGen4Extensions(
   register_item_type_resisting_berry(pkAI, extensions);
 
   register_engine_common(pkAI, extensions);
+  register_engine_weather(pkAI, extensions);
 }
 
 } // namespace gen4

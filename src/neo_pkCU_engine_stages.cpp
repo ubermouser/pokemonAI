@@ -716,7 +716,8 @@ void NeoPkCUEngine::evaluateMove_postRound() {
     gotoStackStage(StageType::ENDOFROUND);
   } else {
     frame.iActor = 0;
-    // allow stackStage to increment at end of postRound
+    // call post-round plugins once per round:
+    callPlugins<onPostRound_rawType>(PLUGIN_ON_POSTROUND, *this);
   }
 }
 

@@ -41,6 +41,10 @@ typedef int (*onEndOfRound_rawType)
   const Actor&
   );
 
+typedef int (*onPostRound_rawType)
+  (PkCUEngine&
+  );
+
 typedef int (*onBeginningOfTurn_rawType)
   (PkCUEngine&,
   const Actor&
@@ -145,6 +149,7 @@ template <> struct PluginSignature<PLUGIN_ON_TESTSWITCH> { using type = onTestSw
 template <> struct PluginSignature<PLUGIN_ON_MODIFYACTION> { using type = onModifyAction_rawType; };
 template <> struct PluginSignature<PLUGIN_ON_EXECUTESWITCH> { using type = onExecuteSwitch_rawType; };
 template <> struct PluginSignature<PLUGIN_ON_UNINIT> { using type = onInitMove_rawType; };
+template <> struct PluginSignature<PLUGIN_ON_POSTROUND> { using type = onPostRound_rawType; };
 
 // Convenience functions
 #define PLUGIN_FACTORY(name, pType, pRawType) \
@@ -186,6 +191,7 @@ PLUGIN_FACTORY(OnTestSwitch, PLUGIN_ON_TESTSWITCH, onTestSwitch_rawType)
 PLUGIN_FACTORY(OnModifyAction, PLUGIN_ON_MODIFYACTION, onModifyAction_rawType)
 PLUGIN_FACTORY(OnExecuteSwitch, PLUGIN_ON_EXECUTESWITCH, onExecuteSwitch_rawType)
 PLUGIN_FACTORY(OnUninit, PLUGIN_ON_UNINIT, onInitMove_rawType)
+PLUGIN_FACTORY(OnPostRound, PLUGIN_ON_POSTROUND, onPostRound_rawType)
 
 #undef PLUGIN_FACTORY
 

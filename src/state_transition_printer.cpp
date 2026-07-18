@@ -83,6 +83,25 @@ void StateTransitionPrinter::print(
       break;
     }
   }
+
+  reportWeatherChange(os, osP, nsP);
+}
+
+
+void StateTransitionPrinter::reportWeatherChange(
+    std::ostream& os,
+    const ConstEnvironmentVolatile& osP,
+    const ConstEnvironmentPossible& nsP) {
+  // Report environment changes (stored on TEAM_A)
+  const auto& statusOld = osP.getTeam(TEAM_A).status();
+  const auto& statusNew = nsP.getTeam(TEAM_A).status();
+  if (statusNew.weather_type != statusOld.weather_type) {
+    if (statusNew.weather_type == WEATHER_SAND) {
+      fmt::print(os, "A sandstorm kicked up!\n");
+    } else if (statusOld.weather_type == WEATHER_SAND && statusNew.weather_type == WEATHER_NORMAL) {
+      fmt::print(os, "The sandstorm subsided.\n");
+    }
+  }
 }
 
 
