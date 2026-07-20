@@ -70,7 +70,6 @@ void register_engine_weather(
 
   // Register dummy plugins for sandstorm-related abilities to mark them as implemented:
   extensions.push_back(pluginOnInit(ability, "magic guard", dummy_ability, 0, current_team));
-  extensions.push_back(pluginOnInit(ability, "sand veil", dummy_ability, 0, current_team));
   // clang-format on
 }
 

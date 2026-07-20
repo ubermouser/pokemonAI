@@ -127,7 +127,7 @@ const Ability* noGuard_t;
 const Ability* overgrow_t;
 const Ability* poisonHeal_t;
 const Ability* pressure_t;
-const Ability* sandStream_t = nullptr;
+const Ability* sandStream_t;
 const Ability* sandVeil_t;
 const Ability* sereneGrace_t;
 const Ability* shadowTag_t;
@@ -379,6 +379,7 @@ void registerGen4Extensions(
   register_ability_poison_heal(pkAI, extensions);
   register_ability_pressure(pkAI, extensions);
   register_ability_sand_stream(pkAI, extensions);
+  register_ability_sand_veil(pkAI, extensions);
   register_ability_serene_grace(pkAI, extensions);
   register_ability_shadow_tag(pkAI, extensions);
   register_ability_sticky_hold(pkAI, extensions);

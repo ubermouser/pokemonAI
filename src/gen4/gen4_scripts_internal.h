@@ -235,6 +235,7 @@ void register_ability_pinch_boost(const Pokedex& pkAI, std::vector<plugin>& exte
 void register_ability_poison_heal(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_pressure(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_sand_stream(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_ability_sand_veil(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_serene_grace(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_shadow_tag(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_sticky_hold(const Pokedex& pkAI, std::vector<plugin>& extensions);
