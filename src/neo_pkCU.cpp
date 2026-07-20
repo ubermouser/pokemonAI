@@ -246,7 +246,22 @@ EnvironmentVolatileData NeoPkCU::createInitialVolatileState() const {
   EnvironmentVolatileData initialState =
       EnvironmentVolatileData::create(*nv_, cfg_.numActivePokemon);
 
-  // TODO - beginning of game plugins
+  // Run beginning of game plugins
+  {
+    EnvironmentVolatile env(*nv_, initialState);
+
+    const auto& plugins = pluginSet_[(size_t)PLUGIN_ON_BEGINNINGOFGAME];
+
+    for (const auto& actor : env.yieldActiveActors()) {
+      for (const auto& p : plugins) {
+        if (p.isActiveAtBeginningOfGame(env, actor)) {
+          onBeginningOfGame_rawType func =
+              reinterpret_cast<onBeginningOfGame_rawType>(p.getFunction());
+          func(env, actor);
+        }
+      }
+    }
+  }
 
   return initialState;
 }

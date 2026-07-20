@@ -483,34 +483,16 @@ size_t NeoPkCUEngine::advanceAllStages() {
 }
 
 
+EnvironmentVolatile NeoPkCUEngine::getEnv() const {
+  return const_cast<NeoPkCUEngine*>(this)->getBase().getEnv();
+}
+
+const Move& NeoPkCUEngine::getMV() const {
+  return const_cast<NeoPkCUEngine*>(this)->getMV().getBase();
+}
+
 bool NeoPkCUEngine::isPluginSourceActive(const plugin& p) {
-  if (!p.getSource()) return true;  // Global engine plugin
-
-  bool checkCurrentTeam =
-      (p.getTarget() == current_team || p.getTarget() == all_teams);
-  bool checkOtherTeam =
-      (p.getTarget() == other_team || p.getTarget() == all_teams);
-
-  if (checkCurrentTeam) {
-    PokemonVolatile pkv = getPKV();
-    if (getCAction().isMove()) {
-      if (p.getSource() == &getMV().getBase()) return true;
-    }
-    if (p.getSource() == &pkv.nv().getAbility()) return true;
-    if (p.getSource() == &pkv.nv().getInitialItem()) return true;
-  }
-
-  if (checkOtherTeam) {
-    PokemonVolatile tpkv = getTPKV();
-    if (tpkv.isAlive()) {  // Ensure target is valid to check
-      if (p.getSource() == &tpkv.nv().getAbility())
-        return true;
-      if (p.getSource() == &tpkv.nv().getInitialItem())
-        return true;
-    }
-  }
-
-  return false;
+  return p.isActive(*this);
 }
 
 

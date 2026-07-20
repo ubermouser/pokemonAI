@@ -9,9 +9,21 @@
 #include <boost/function.hpp>
 
 class plugin;
+class Actor;
+class EnvironmentVolatile;
+class Action;
+class Move;
+class IPluginEvaluationContext;
 typedef void (*voidFunction_rawType)(void*);
 
-#define PLUGIN_MAXSIZE 31
+enum class PluginSourceKind {
+  GLOBAL,
+  MOVE,
+  ABILITY,
+  ITEM
+};
+
+#define PLUGIN_MAXSIZE 32
 
 enum pluginTarget {
   current_team = 0,
@@ -50,7 +62,8 @@ enum pluginType {
   PLUGIN_ON_MODIFYACTION = 27,
   PLUGIN_ON_EXECUTESWITCH = 28,
   PLUGIN_ON_UNINIT = 29,
-  PLUGIN_ON_POSTROUND = 30
+  PLUGIN_ON_POSTROUND = 30,
+  PLUGIN_ON_BEGINNINGOFGAME = 31
 };
 
 enum pluginCategory {
@@ -74,6 +87,7 @@ private:
   int32_t priority;
   pluginTarget target;
   const class Pluggable* source;
+  PluginSourceKind sourceKind;
 
 public:
   plugin()
@@ -83,7 +97,8 @@ public:
     pFunction(nullptr),
     priority(0),
     target(current_team),
-    source(nullptr)
+    source(nullptr),
+    sourceKind(PluginSourceKind::GLOBAL)
   {
   };
 
@@ -94,7 +109,8 @@ public:
     pFunction(other.pFunction),
     priority(other.priority),
     target(other.target),
-    source(other.source)
+    source(other.source),
+    sourceKind(other.sourceKind)
   {
   };
 
@@ -112,7 +128,8 @@ public:
         pFunction((void*)_function),
         priority(_priority),
         target(_target),
-        source(nullptr){};
+        source(nullptr),
+        sourceKind(PluginSourceKind::GLOBAL){};
 
   ~plugin() { };
 
@@ -141,7 +158,12 @@ public:
   };
 
   const class Pluggable* getSource() const { return source; }
-  void setSource(const class Pluggable* _source) { source = _source; }
+  PluginSourceKind getSourceKind() const { return sourceKind; }
+  void setSource(const class Pluggable* _source);
+
+  bool isActive(const IPluginEvaluationContext& ctx) const;
+  bool isActiveAtBeginningOfGame(
+      const EnvironmentVolatile& env, const Actor& actor) const;
 
   bool operator== (const plugin& other) const
   {
@@ -160,6 +182,16 @@ public:
   };
 };
 
+class PKAISHARED IPluginEvaluationContext {
+ public:
+  virtual ~IPluginEvaluationContext() = default;
+  virtual EnvironmentVolatile getEnv() const = 0;
+  virtual const Actor& getCActor() const = 0;
+  virtual const Actor& getTarget() const = 0;
+  virtual const Action& getCAction() const = 0;
+  virtual const Move& getMV() const = 0;
+};
+
 class PKAISHARED PluggableInterface
 {
  public:
@@ -172,6 +204,9 @@ private:
   static plugin emptyPlugin;
   std::array<plugin, PLUGIN_MAXSIZE> plugins;
   bool implemented;
+
+public:
+  virtual PluginSourceKind getSourceKind() const { return PluginSourceKind::GLOBAL; }
 
   bool registerPlugin_void(
     pluginType pType, 

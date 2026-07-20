@@ -18,6 +18,11 @@ typedef int (*onSwitch_rawType)
   PkCUEngine&,
   const Actor&);
 
+typedef int (*onBeginningOfGame_rawType)
+  (
+  EnvironmentVolatile&,
+  const Actor&);
+
 typedef int (*onEvaluateMove_rawType)
   (
   PkCUEngine&,
@@ -150,6 +155,7 @@ template <> struct PluginSignature<PLUGIN_ON_MODIFYACTION> { using type = onModi
 template <> struct PluginSignature<PLUGIN_ON_EXECUTESWITCH> { using type = onExecuteSwitch_rawType; };
 template <> struct PluginSignature<PLUGIN_ON_UNINIT> { using type = onInitMove_rawType; };
 template <> struct PluginSignature<PLUGIN_ON_POSTROUND> { using type = onPostRound_rawType; };
+template <> struct PluginSignature<PLUGIN_ON_BEGINNINGOFGAME> { using type = onBeginningOfGame_rawType; };
 
 // Convenience functions
 #define PLUGIN_FACTORY(name, pType, pRawType) \
@@ -192,6 +198,7 @@ PLUGIN_FACTORY(OnModifyAction, PLUGIN_ON_MODIFYACTION, onModifyAction_rawType)
 PLUGIN_FACTORY(OnExecuteSwitch, PLUGIN_ON_EXECUTESWITCH, onExecuteSwitch_rawType)
 PLUGIN_FACTORY(OnUninit, PLUGIN_ON_UNINIT, onInitMove_rawType)
 PLUGIN_FACTORY(OnPostRound, PLUGIN_ON_POSTROUND, onPostRound_rawType)
+PLUGIN_FACTORY(OnBeginningOfGame, PLUGIN_ON_BEGINNINGOFGAME, onBeginningOfGame_rawType)
 
 #undef PLUGIN_FACTORY
 

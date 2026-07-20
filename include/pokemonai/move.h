@@ -17,7 +17,7 @@ class Pokedex;
 
 class PKAISHARED Move: public Name, public Pluggable
 {
-public:
+ public:
   using BuffModArray = std::array<int32_t, 9>;
 
   static const Move* move_struggle;
@@ -174,6 +174,10 @@ public:
   bool lostChild = true;
 
   static bool input(const std::vector<std::string>& lines, size_t& iLine);
+
+  PluginSourceKind getSourceKind() const override {
+    return PluginSourceKind::MOVE;
+  }
 
   bool isImplemented() const
   {

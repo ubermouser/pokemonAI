@@ -144,6 +144,7 @@ extern const Ability* noGuard_t;
 extern const Ability* overgrow_t;
 extern const Ability* poisonHeal_t;
 extern const Ability* pressure_t;
+extern const Ability* sandStream_t;
 extern const Ability* sandVeil_t;
 extern const Ability* sereneGrace_t;
 extern const Ability* shadowTag_t;
@@ -233,6 +234,7 @@ void register_ability_no_guard(const Pokedex& pkAI, std::vector<plugin>& extensi
 void register_ability_pinch_boost(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_poison_heal(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_pressure(const Pokedex& pkAI, std::vector<plugin>& extensions);
+void register_ability_sand_stream(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_serene_grace(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_shadow_tag(const Pokedex& pkAI, std::vector<plugin>& extensions);
 void register_ability_sticky_hold(const Pokedex& pkAI, std::vector<plugin>& extensions);

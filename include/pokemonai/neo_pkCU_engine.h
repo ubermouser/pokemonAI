@@ -4,10 +4,12 @@
 #include "engine.h"
 #include "pkCU_types.h"
 
+#include "pluggable.h"
+
 class NeoPkCU;
 
 
-class NeoPkCUEngine {
+class PKAISHARED NeoPkCUEngine : public IPluginEvaluationContext {
  public:
   /**
   * @struct MoveBracket
@@ -317,12 +319,18 @@ class NeoPkCUEngine {
   // getIndexOpponentTeam
   size_t getIOTeam() const;
 
+  // EnvironmentVolatile accessor
+  EnvironmentVolatile getEnv() const override;
+
+  // Move accessor for IPluginEvaluationContext
+  const Move& getMV() const override;
+
   // getCurrentActor
-  const Actor& getCActor() const;
+  const Actor& getCActor() const override;
   const Actor& getCActor(size_t iStack) const;
 
   // getTargetActor
-  const Actor& getTarget() const;
+  const Actor& getTarget() const override;
   const Actor& getTarget(size_t iStack) const;
 
   // getOpponentActor (deprecated)
@@ -330,7 +338,7 @@ class NeoPkCUEngine {
   [[deprecated]] Actor getOActor(size_t iStack) const;
 
   // getCurrentAction
-  const Action& getCAction() const;
+  const Action& getCAction() const override;
 
   // getOpponentAction (deprecated)
   [[deprecated]] const Action& getOAction() const;

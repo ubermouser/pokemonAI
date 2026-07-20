@@ -1,6 +1,12 @@
 #include "pokemonai/pluggable.h"
 
 #include "pokemonai/plugin.h"
+#include "pokemonai/environment_volatile.h"
+#include "pokemonai/actor.h"
+#include "pokemonai/action.h"
+#include "pokemonai/move.h"
+#include "pokemonai/ability.h"
+#include "pokemonai/item.h"
 
 
 plugin Pluggable::emptyPlugin = plugin();
@@ -136,7 +142,107 @@ const char* pluginTypeToString(pluginType type) {
     return "PLUGIN_ON_UNINIT";
   case PLUGIN_ON_POSTROUND:
     return "PLUGIN_ON_POSTROUND";
+  case PLUGIN_ON_BEGINNINGOFGAME:
+    return "PLUGIN_ON_BEGINNINGOFGAME";
   default:
     return "PLUGIN_UNKNOWN";
   }
+}
+
+void plugin::setSource(const class Pluggable* _source) {
+  source = _source;
+  sourceKind = _source ? _source->getSourceKind() : PluginSourceKind::GLOBAL;
+}
+
+bool plugin::isActive(const IPluginEvaluationContext& ctx) const {
+  switch (sourceKind) {
+    case PluginSourceKind::GLOBAL:
+      return true;
+
+    case PluginSourceKind::MOVE: {
+      if (!ctx.getCAction().isMove()) return false;
+      return source == &ctx.getMV();
+    }
+
+    case PluginSourceKind::ABILITY: {
+      bool checkCurrentTeam = (target == current_team || target == all_teams);
+      bool checkOtherTeam = (target == other_team || target == all_teams);
+
+      if (checkCurrentTeam) {
+        PokemonVolatile pkv = ctx.getEnv().teammate(ctx.getCActor());
+        if (source == &pkv.nv().getAbility()) return true;
+      }
+      if (checkOtherTeam) {
+        PokemonVolatile tpkv = ctx.getEnv().teammate(ctx.getTarget());
+        if (tpkv.isAlive() && source == &tpkv.nv().getAbility()) return true;
+      }
+      return false;
+    }
+
+    case PluginSourceKind::ITEM: {
+      bool checkCurrentTeam = (target == current_team || target == all_teams);
+      bool checkOtherTeam = (target == other_team || target == all_teams);
+
+      if (checkCurrentTeam) {
+        PokemonVolatile pkv = ctx.getEnv().teammate(ctx.getCActor());
+        if (source == &pkv.nv().getInitialItem()) return true;
+      }
+      if (checkOtherTeam) {
+        PokemonVolatile tpkv = ctx.getEnv().teammate(ctx.getTarget());
+        if (tpkv.isAlive() && source == &tpkv.nv().getInitialItem()) return true;
+      }
+      return false;
+    }
+  }
+  return false;
+}
+
+bool plugin::isActiveAtBeginningOfGame(
+    const EnvironmentVolatile& env, const Actor& actor) const {
+  switch (sourceKind) {
+    case PluginSourceKind::GLOBAL:
+      return true;
+
+    case PluginSourceKind::MOVE:
+      return false;
+
+    case PluginSourceKind::ABILITY: {
+      bool checkCurrentTeam = (target == current_team || target == all_teams);
+      bool checkOtherTeam = (target == other_team || target == all_teams);
+
+      if (checkCurrentTeam) {
+        PokemonVolatile pkv = env.teammate(actor);
+        if (source == &pkv.nv().getAbility()) return true;
+      }
+      if (checkOtherTeam) {
+        size_t oppTeam = 1 - actor.iTeam();
+        auto oppTeamVol = env.getTeam(oppTeam);
+        for (auto oppActor : oppTeamVol.getActiveActors()) {
+          PokemonVolatile tpkv = env.teammate(oppActor);
+          if (source == &tpkv.nv().getAbility()) return true;
+        }
+      }
+      return false;
+    }
+
+    case PluginSourceKind::ITEM: {
+      bool checkCurrentTeam = (target == current_team || target == all_teams);
+      bool checkOtherTeam = (target == other_team || target == all_teams);
+
+      if (checkCurrentTeam) {
+        PokemonVolatile pkv = env.teammate(actor);
+        if (source == &pkv.nv().getInitialItem()) return true;
+      }
+      if (checkOtherTeam) {
+        size_t oppTeam = 1 - actor.iTeam();
+        auto oppTeamVol = env.getTeam(oppTeam);
+        for (auto oppActor : oppTeamVol.getActiveActors()) {
+          PokemonVolatile tpkv = env.teammate(oppActor);
+          if (source == &tpkv.nv().getInitialItem()) return true;
+        }
+      }
+      return false;
+    }
+  }
+  return false;
 }

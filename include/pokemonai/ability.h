@@ -18,13 +18,17 @@
 
 class PKAISHARED Ability: public Name, public Pluggable
 {
-public:
+ public:
   static const Ability* no_ability;
 
   Ability() = default;
   Ability(const Ability& source) = default;
   Ability& operator=(const Ability& source) = default;
   virtual ~Ability() override = default;
+
+  PluginSourceKind getSourceKind() const override {
+    return PluginSourceKind::ABILITY;
+  }
 
   std::string script_;
 

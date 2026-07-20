@@ -22,8 +22,12 @@ class Types;
 
 class PKAISHARED Item : public Name, public Pluggable
 {
-public:
+ public:
   static const Item* no_item;
+
+  PluginSourceKind getSourceKind() const override {
+    return PluginSourceKind::ITEM;
+  }
 
   bool isImplemented() const override
   {
