@@ -28,7 +28,9 @@ bool Natures::initialize(const std::string& path) {
 
   {
     // find special case no nature:
-    Nature::no_nature = count("none")?&at("none"):new Nature();
+    if (Nature::no_nature == nullptr) {
+      Nature::no_nature = count("none") ? &at("none") : new Nature();
+    }
   }
   
   return true;

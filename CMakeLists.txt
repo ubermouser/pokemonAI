@@ -43,7 +43,7 @@ add_compile_definitions(
 find_package(OpenMP REQUIRED)
 find_package(fmt REQUIRED)
 find_package(spdlog REQUIRED)
-find_package(Torch REQUIRED)
+include(cmake/TorchSetup.cmake)
 
 # Add subdirectories
 add_subdirectory(pkaiEngine)
