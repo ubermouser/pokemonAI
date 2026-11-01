@@ -100,9 +100,9 @@ std::ostream& operator <<(std::ostream& os, const ConstEnvironmentPossible& envP
 
 class SortByProbability {
 public:
-  static fpType getValue(const EnvironmentPossibleData& cEnvP)
+  static double getValue(const EnvironmentPossibleData& cEnvP)
   {
-    if (cEnvP.isPruned()) { return std::numeric_limits<fpType>::quiet_NaN(); }
+    if (cEnvP.isPruned()) { return std::numeric_limits<double>::quiet_NaN(); }
     return cEnvP.probability.to_double();
   };
 };
@@ -130,19 +130,27 @@ std::vector<size_t> PossibleEnvironments::stateSelect_rouletteN(size_t n) const 
 
 
 std::vector<size_t> PossibleEnvironments::stateSelect_mostLikelyN(size_t n) const {
+  if (n == 0) { return {}; }
+
   std::vector<size_t> indices;
+  indices.reserve(size());
   for (size_t i = 0; i < size(); ++i) {
     if (!at(i).isPruned()) {
       indices.push_back(i);
     }
   }
 
-  std::stable_sort(indices.begin(), indices.end(), [&](size_t a, size_t b) {
-    return at(a).getProbability() > at(b).getProbability();
-  });
+  auto cmp = [&](size_t a, size_t b) {
+    const FixType& pa = at(a).getProbability();
+    const FixType& pb = at(b).getProbability();
+    return (pa != pb) ? (pa > pb) : (a < b);
+  };
 
   if (indices.size() > n) {
+    std::partial_sort(indices.begin(), indices.begin() + n, indices.end(), cmp);
     indices.resize(n);
+  } else {
+    std::sort(indices.begin(), indices.end(), cmp);
   }
 
   return indices;
@@ -172,6 +180,23 @@ size_t PossibleEnvironments::mostProbableIndex(
   }
 
   return bestIndex;
+}
+
+
+bool PossibleEnvironments::saneProbabilities() const {
+  FixType sumOfStateProbabilities = FixType(0);
+  for (size_t i = 0; i < size(); ++i) {
+    auto state = at(i);
+    if (state.isPruned()) { continue; }
+
+    auto probability = state.getProbability();
+    if (!(probability > FixType(0)) || !(probability <= FixType(1))) {
+      return false;
+    }
+    sumOfStateProbabilities += probability;
+  }
+
+  return sumOfStateProbabilities == FixType(1);
 }
 
 

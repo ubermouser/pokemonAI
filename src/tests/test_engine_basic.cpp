@@ -132,6 +132,61 @@ TEST_F(BasicEngineTest, ReturnAllStates_MostLikely) {
 }
 
 
+TEST_F(BasicEngineTest, CollapseStages_Random_MaxNumStates) {
+  spdlog::set_level(spdlog::level::warn);
+  srand(12345);
+  engine_->setAccuracy(16)
+      .setMaxNumStates(15)
+      .setStateSelectMethod(NeoPkCU::StateSelectMethod::RANDOM);
+
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(), Action::move(1), Action::move(1));
+
+  EXPECT_GT(result.size(), 1);
+  EXPECT_LE(result.size(), 15);
+  EXPECT_TRUE(result.saneProbabilities());
+}
+
+
+TEST_F(BasicEngineTest, CollapseStages_MostLikely_MaxNumStates) {
+  spdlog::set_level(spdlog::level::warn);
+  engine_->setAccuracy(16)
+      .setMaxNumStates(15)
+      .setStateSelectMethod(NeoPkCU::StateSelectMethod::MOST_LIKELY);
+
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(), Action::move(1), Action::move(1));
+
+  EXPECT_LE(result.size(), 15);
+  EXPECT_GT(result.getNumUnique(), 1);
+  EXPECT_TRUE(result.saneProbabilities());
+}
+
+
+TEST_F(BasicEngineTest, CollapseStages_CustomMultiplierAndMinProbability) {
+  spdlog::set_level(spdlog::level::warn);
+  engine_->setAccuracy(16)
+      .setMaxNumStates(10)
+      .setMaxStatesMultiplier(1.0)
+      .setMinStateProbability(1e-6)
+      .setStateSelectMethod(NeoPkCU::StateSelectMethod::MOST_LIKELY);
+
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(), Action::move(1), Action::move(1));
+
+  EXPECT_LE(result.size(), 10);
+  EXPECT_GT(result.size(), 0);
+  EXPECT_TRUE(result.saneProbabilities());
+}
+
+
+TEST_F(BasicEngineTest, CollapseConfigValidation) {
+  EXPECT_THROW(engine_->setMaxNumStates(0), std::invalid_argument);
+  EXPECT_THROW(engine_->setMaxStatesMultiplier(0.5), std::invalid_argument);
+  EXPECT_THROW(engine_->setMinStateProbability(-0.01), std::invalid_argument);
+}
+
+
 TEST_F(BasicEngineTest, HighEngineAccuracy_WithSpeedTie) {
   spdlog::set_level(spdlog::level::warn);
   engine_->setAccuracy(16);

@@ -169,11 +169,13 @@ void NeoPkCUEngine::evaluateMove() {
           stageTypeToString(frame.stage)));
     }
 
-    maybeCollapseStages();
+    size_t prevStackSize = lastStackSize_;
     // advance stack stage of current state, as well as all new states
     stagesCompleted += advanceAllStages();
+    stagesCompleted -= maybeCollapseStages(prevStackSize);
     iBase_ = (iBase_ + 1) % getStack().size();
   }  // endOf while stages not completed
+  collapseStages();
 }  // endOf evaluateMove
 
 

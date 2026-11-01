@@ -101,6 +101,18 @@ class PKAISHARED NeoPkCU {
      */
     size_t maxNumStates = 1;
 
+    /**
+     * @brief High-water mark multiplier on maxNumStates before mid-round
+     * stage collapsing triggers (must be >= 1.0).
+     */
+    double maxStatesMultiplier = 2.0;
+
+    /**
+     * @brief Minimum probability floor below which non-final active branches
+     * are pruned during stage collapsing to prevent fixed-point underflow.
+     */
+    double minStateProbability = 1.0 / static_cast<double>(1ULL << 45);
+
     Config(){};
 
     /**
@@ -134,6 +146,8 @@ class PKAISHARED NeoPkCU {
   NeoPkCU& setNumActivePokemon(size_t numActivePokemon);
   NeoPkCU& setStateSelectMethod(StateSelectMethod method);
   NeoPkCU& setMaxNumStates(size_t maxNumStates);
+  NeoPkCU& setMaxStatesMultiplier(double multiplier);
+  NeoPkCU& setMinStateProbability(double minProbability);
   NeoPkCU& setAllowInvalidMoves(ActionValidationMethod allow = ActionValidationMethod::NONE);
   Config getConfig() const { return cfg_; }
 

@@ -174,12 +174,12 @@ class PKAISHARED NeoPkCUEngine : public IPluginEvaluationContext {
   FixType getProbabilityToHit();
 
   /**
-   * If returnAllStates is false, choose a state at random to keep, discard the
-   * rest. The engine returns a single state at 100% probability.
+   * When StateSelectMethod is RANDOM or MOST_LIKELY, collapses the stack down
+   * to at most maxNumStates environments (renormalizing probabilities to 1.0).
    *
-   * @return The number of removed stages.
+   * @return The number of removed FINAL stages.
    */
-  size_t maybeCollapseStages();
+  size_t maybeCollapseStages(size_t prevStackSize);
   size_t collapseStages();
 
   template <size_t numEnvironments>
@@ -399,6 +399,12 @@ class PKAISHARED NeoPkCUEngine : public IPluginEvaluationContext {
    * @brief The size of the stack just prior to the last stage being executed.
    */
   size_t lastStackSize_;
+
+  /**
+   * @brief Precomputed probability floor and high-water mark for stage collapsing.
+   */
+  FixType minStateProb_;
+  size_t collapseHighWaterMark_;
 
   /**
    * @brief Updates the current StackFrame and target lists when an actor switches.

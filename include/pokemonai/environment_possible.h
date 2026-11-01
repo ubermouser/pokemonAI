@@ -322,6 +322,13 @@ public:
 
   size_t getNumUnique() const { return size() - numMerged_; };
   void decrementUnique() { numMerged_++; }
+  void resetMerged() { numMerged_ = 0; }
+
+  /**
+   * @brief Verifies that the probability distribution across non-pruned states is sane:
+   * non-empty, every active state has 0 < p <= 1, and the total sum equals exactly 1.
+   */
+  bool saneProbabilities() const;
 
   void setNonvolatileEnvironment(const EnvironmentNonvolatile& nv) {
     nv_ = std::make_shared<const EnvironmentNonvolatile>(nv);

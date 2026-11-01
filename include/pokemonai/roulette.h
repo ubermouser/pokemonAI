@@ -1,130 +1,117 @@
 #ifndef ROULETTE_H
 #define ROULETTE_H
 
+#include <stdint.h>
+
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
+#include <iterator>
+#include <random>
+#include <utility>
+#include <vector>
+
 #include "pokemonai/pkai.h"
 
-#include <stdint.h>
-#include <vector>
-#include <array>
-#include "fp_compare.h"
-#include <boost/math/special_functions/fpclassify.hpp>
+struct CStdRandURBG {
+  using result_type = unsigned int;
+  static constexpr result_type min() { return 0; }
+  static constexpr result_type max() { return RAND_MAX; }
+  result_type operator()() const {
+    return static_cast<result_type>(std::rand());
+  }
+};
+static_assert(std::uniform_random_bit_generator<CStdRandURBG>);
 
-template<class unknownType>
-class basicSortBySize
-{
-public:
-  static fpType getValue (const unknownType& cValue)
-  {
-    return (fpType) cValue;
-  };
+template <class unknownType>
+class basicSortBySize {
+ public:
+  static double getValue(const unknownType& cValue) {
+    return static_cast<double>(cValue);
+  }
 };
 
-template <class unknownType,
-class typeValue = basicSortBySize<unknownType> >
-class roulette
-{
-private:
-
-  template<class UnknownTypeCollection>
-  static void generatePartitionTable(
-    std::vector<fpType>& partition, 
-    std::vector<bool>& isValid,
-    size_t& numValid,
-    fpType& accumulator,
-    const UnknownTypeCollection& values,
-    const typeValue& comparator)
-  {
-    // set array of allowable values:
-    size_t values_size = std::end(values) - std::begin(values);
-    isValid.assign(values_size, true);
-    partition.assign(values_size, std::numeric_limits<fpType>::quiet_NaN());
-    numValid = values_size;
-    auto partition_ptr = std::begin(partition);
-    auto value_ptr = std::begin(values);
-    auto isValid_ptr = std::begin(isValid);
-    for (; value_ptr != std::end(values); ++value_ptr, ++partition_ptr, ++isValid_ptr) {
-      fpType cValue = comparator.getValue(*value_ptr);
-
-      if (boost::math::isnan(cValue)) { *isValid_ptr = false; numValid--; continue; }
-      if (mostlyLTE(cValue, (fpType)0.0)) { *isValid_ptr = false; numValid--; continue; }
-
-      accumulator += cValue;
-      *partition_ptr = cValue;
-    }
-  };
-
-public:
-  template<class UnknownTypeCollection> static size_t select(
-    const UnknownTypeCollection& values,
-    const typeValue& comparator = basicSortBySize<unknownType>())
-  {
-    std::array<size_t, 1> result;
-    result.fill(SIZE_MAX);
-    _selectN< std::array<size_t, 1> >(values, result, comparator);
-
-    return result[0];
-  };
-
-  template<class UnknownTypeCollection> static std::vector<size_t> selectDynamic(
-    const UnknownTypeCollection& values,
-    size_t numValues,
-    const typeValue& comparator = basicSortBySize<unknownType>())
-  {
-    std::vector<size_t> result(numValues, SIZE_MAX);
-
-    _selectN< std::vector<size_t> >(values, result, comparator);
-
-    return result;
-  };
-
-private:
-  template<class ResultCollectionType, class UnknownCollectionType>
-  static void _selectN(
-    const UnknownCollectionType& values,
-    ResultCollectionType& results,
-    const typeValue& comparator = basicSortBySize<unknownType>())
-  {
-    fpType accumulator = 0;
-    std::vector<fpType> partition;
-    std::vector<bool> isValid;
-    size_t numValid;
-    size_t numSelections = results.size();
-    // set partition table, accumulator, numValid, isValid
-    generatePartitionTable(partition, isValid, numValid, accumulator, values, comparator);
-    assert(accumulator < RAND_MAX);
-
-    for (size_t iResult = 0, maxResults = std::min(numSelections, numValid); iResult != maxResults; ++iResult)
-    {
-      size_t cResult = SIZE_MAX;
-      fpType cValue = 0.0;
-      fpType target = (double)rand()/(double)RAND_MAX;
-      target *= accumulator;
-      size_t iValue = rand() % values.size();
-
-      for (size_t iNValue = 0, iSize = values.size() * 2; iNValue != iSize; ++iNValue)
-      {
-        // ignore partitions with values we've already used / no value / string values, etc:
-        if (!isValid[iValue]) { iValue = (iValue + 1) % values.size() ; continue; }
-
-        cValue = partition[iValue];
-        if (target < cValue) { cResult = iValue; break; }
-        target -= cValue;
-
-        iValue = (iValue + 1) % values.size();
+template <class unknownType, class typeValue = basicSortBySize<unknownType>>
+class roulette {
+ public:
+  template <class UnknownTypeCollection>
+  static size_t select(
+      const UnknownTypeCollection& values,
+      const typeValue& comparator = typeValue()) {
+    double sum = 0.0;
+    size_t lastValid = SIZE_MAX;
+    size_t idx = 0;
+    for (const auto& v : values) {
+      double w = static_cast<double>(comparator.getValue(v));
+      if (!std::isnan(w) && w > 0.0) {
+        sum += w;
+        lastValid = idx;
       }
+      ++idx;
+    }
+    if (lastValid == SIZE_MAX) { return SIZE_MAX; }
 
-      assert(cResult != SIZE_MAX);
+    CStdRandURBG rng;
+    double target = std::uniform_real_distribution<double>(0.0, sum)(rng);
+    idx = 0;
+    for (const auto& v : values) {
+      double w = static_cast<double>(comparator.getValue(v));
+      if (!std::isnan(w) && w > 0.0) {
+        if (target < w) { return idx; }
+        target -= w;
+      }
+      ++idx;
+    }
+    return lastValid;
+  }
 
-      results[iResult] = cResult;
-      accumulator -= cValue;
-      isValid[cResult] = false;
-      numValid--;
-    } // endOf per result
+  template <class UnknownTypeCollection>
+  static std::vector<size_t> selectDynamic(
+      const UnknownTypeCollection& values,
+      size_t numValues,
+      const typeValue& comparator = typeValue()) {
+    if (numValues == 0) { return {}; }
+    if (numValues == 1) {
+      size_t chosen = select(values, comparator);
+      return (chosen == SIZE_MAX) ? std::vector<size_t>{}
+                                  : std::vector<size_t>{chosen};
+    }
 
-    // return a completed array of results:
-    return;
-  };
+    const size_t totalSize =
+        static_cast<size_t>(std::distance(std::begin(values), std::end(values)));
+    std::vector<std::pair<double, size_t>> candidates;
+    candidates.reserve(totalSize);
 
-}; //endOf roulette
+    size_t idx = 0;
+    for (const auto& v : values) {
+      double w = static_cast<double>(comparator.getValue(v));
+      if (!std::isnan(w) && w > 0.0) {
+        candidates.emplace_back(w, idx);
+      }
+      ++idx;
+    }
+
+    if (candidates.size() > numValues) {
+      CStdRandURBG rng;
+      for (auto& [weightOrKey, i] : candidates) {
+        // Efraimidis-Spirakis: independent Exp(w_i) arrival times; smallest N win
+        weightOrKey = std::exponential_distribution<double>(weightOrKey)(rng);
+      }
+      std::nth_element(
+          candidates.begin(),
+          candidates.begin() + numValues,
+          candidates.end(),
+          [](const auto& a, const auto& b) { return a.first < b.first; });
+      candidates.resize(numValues);
+    }
+
+    std::vector<size_t> result;
+    result.reserve(candidates.size());
+    for (const auto& [key, i] : candidates) {
+      result.push_back(i);
+    }
+    return result;
+  }
+};  // endOf roulette
 
 #endif /* ROULETTE_H */

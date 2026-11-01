@@ -1,5 +1,6 @@
 #include "pokemonai/neo_pkCU.h"
 
+#include <cmath>
 #include <stdexcept>
 
 #include "pokemonai/environment_volatile.h"
@@ -115,7 +116,13 @@ boost::program_options::options_description NeoPkCU::Config::options(
       "method used to validate actions: FULL, WAIT_ONLY, NONE.")
       ((prefix + "max-num-states").c_str(),
       po::value<size_t>(&maxNumStates)->default_value(maxNumStates),
-      "maximum number of states the engine should return when StateSelectMethod is RANDOM or MOST_LIKELY.");
+      "maximum number of states the engine should return when StateSelectMethod is RANDOM or MOST_LIKELY.")
+      ((prefix + "max-states-multiplier").c_str(),
+      po::value<double>(&maxStatesMultiplier)->default_value(maxStatesMultiplier),
+      "high-water mark multiplier on max-num-states before mid-round collapsing triggers (>= 1.0).")
+      ((prefix + "min-state-probability").c_str(),
+      po::value<double>(&minStateProbability)->default_value(minStateProbability),
+      "minimum probability floor for non-final branches during stage collapsing (>= 0.0).");
 
   // clang-format on
 
@@ -163,7 +170,28 @@ NeoPkCU& NeoPkCU::setAllowInvalidMoves(ActionValidationMethod allow) {
 
 
 NeoPkCU& NeoPkCU::setMaxNumStates(size_t maxNumStates) {
+  if (maxNumStates == 0) {
+    throw std::invalid_argument("maxNumStates must be >= 1");
+  }
   cfg_.maxNumStates = maxNumStates;
+  return *this;
+}
+
+
+NeoPkCU& NeoPkCU::setMaxStatesMultiplier(double multiplier) {
+  if (std::isnan(multiplier) || multiplier < 1.0) {
+    throw std::invalid_argument("maxStatesMultiplier must be >= 1.0");
+  }
+  cfg_.maxStatesMultiplier = multiplier;
+  return *this;
+}
+
+
+NeoPkCU& NeoPkCU::setMinStateProbability(double minProbability) {
+  if (std::isnan(minProbability) || minProbability < 0.0) {
+    throw std::invalid_argument("minStateProbability must be >= 0.0");
+  }
+  cfg_.minStateProbability = minProbability;
   return *this;
 }
 

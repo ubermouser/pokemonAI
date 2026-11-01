@@ -3,8 +3,10 @@
 #include <spdlog/spdlog.h>
 
 #include <algorithm>
+#include <cmath>
 #include <map>
 #include <stdexcept>
+#include <vector>
 
 #include "pokemonai/fp_compare.h"
 #include "pokemonai/neo_pkCU.h"
@@ -20,7 +22,30 @@ NeoPkCUEngine::NeoPkCUEngine(
       cPlugins_(&cu.pluginSet_),
       actions_(actions),
       iBase_(0),
-      lastStackSize_(1) {
+      lastStackSize_(1),
+      minStateProb_(0),
+      collapseHighWaterMark_(SIZE_MAX) {
+  if (cu_.cfg_.stateSelectMethod != NeoPkCU::StateSelectMethod::ALL) {
+    if (cu_.cfg_.maxNumStates == 0) {
+      throw std::invalid_argument(
+          "NeoPkCUEngine: maxNumStates must be >= 1");
+    }
+    if (std::isnan(cu_.cfg_.maxStatesMultiplier) ||
+        cu_.cfg_.maxStatesMultiplier < 1.0) {
+      throw std::invalid_argument(
+          "NeoPkCUEngine: maxStatesMultiplier must be >= 1.0");
+    }
+    if (std::isnan(cu_.cfg_.minStateProbability) ||
+        cu_.cfg_.minStateProbability < 0.0) {
+      throw std::invalid_argument(
+          "NeoPkCUEngine: minStateProbability must be >= 0.0");
+    }
+    minStateProb_ = FixType(cu_.cfg_.minStateProbability);
+    collapseHighWaterMark_ = static_cast<size_t>(std::ceil(
+        static_cast<double>(cu_.cfg_.maxNumStates) *
+        cu_.cfg_.maxStatesMultiplier));
+  }
+
   stack_.setNonvolatileEnvironment(cu.nv_);
   stack_.push_back(EnvironmentPossibleData::create(initial, false));
 
@@ -157,71 +182,138 @@ std::vector<Actor> NeoPkCUEngine::computeActorOrder() {
   return std::move(actors);
 }
 
-size_t NeoPkCUEngine::maybeCollapseStages() {
-  if (cu_.cfg_.stateSelectMethod == NeoPkCU::StateSelectMethod::ALL) {
+size_t NeoPkCUEngine::maybeCollapseStages(size_t prevStackSize) {
+  if (cu_.cfg_.stateSelectMethod == NeoPkCU::StateSelectMethod::ALL ||
+      stack_.size() == prevStackSize) {
     return 0;
   }
 
-  return collapseStages();
+  bool needsCollapse = stack_.size() > collapseHighWaterMark_;
+  if (!needsCollapse && minStateProb_ > FixType(0)) {
+    auto isUnderflowRisk = [&](size_t idx) {
+      return stackFrame_[idx].stage != StageType::FINAL &&
+             stack_[idx].getProbability() < minStateProb_;
+    };
+    needsCollapse = isUnderflowRisk(iBase_);
+    for (size_t i = prevStackSize; !needsCollapse && i < stack_.size(); ++i) {
+      needsCollapse = isUnderflowRisk(i);
+    }
+  }
+
+  return needsCollapse ? collapseStages() : 0;
 }
 
 
 size_t NeoPkCUEngine::collapseStages() {
-  if (stack_.size() <= 1) { return 0; }
+  if (cu_.cfg_.stateSelectMethod == NeoPkCU::StateSelectMethod::ALL ||
+      stack_.size() <= 1) {
+    return 0;
+  }
 
-  // TODO: collapseStages must be able to collapse to N states, not just 1!
-  size_t indexState;
+  const size_t maxStates = cu_.cfg_.maxNumStates;
+  auto isUnderflowRisk = [&](size_t idx) {
+    return minStateProb_ > FixType(0) &&
+           stackFrame_[idx].stage != StageType::FINAL &&
+           stack_[idx].getProbability() < minStateProb_;
+  };
+
+  if (stack_.size() <= maxStates) {
+    bool hasUnderflowState = false;
+    for (size_t i = 0; i < stack_.size(); ++i) {
+      if (isUnderflowRisk(i)) {
+        hasUnderflowState = true;
+        break;
+      }
+    }
+    if (!hasUnderflowState) { return 0; }
+  }
+
+  std::vector<size_t> keptIndices;
   switch (cu_.cfg_.stateSelectMethod) {
   case NeoPkCU::StateSelectMethod::RANDOM:
-    stack_.stateSelect_roulette(indexState);
+    keptIndices = stack_.stateSelect_rouletteN(maxStates);
     break;
   case NeoPkCU::StateSelectMethod::MOST_LIKELY:
-    stack_.stateSelect_mostLikely(indexState);
+    keptIndices = stack_.stateSelect_mostLikelyN(maxStates);
     break;
   default:
     throw std::runtime_error(
         "NeoPkCUEngine::collapseStages: invalid stateSelectMethod");
   }
 
-  size_t stack_size = stack_.size();
+  if (minStateProb_ > FixType(0)) {
+    std::erase_if(keptIndices, isUnderflowRisk);
+  }
+  if (keptIndices.empty()) {
+    keptIndices.push_back(stack_.mostProbableIndex());
+  }
+
+  std::sort(keptIndices.begin(), keptIndices.end());
+
+  const size_t oldSize = stack_.size();
+  size_t writeIdx = 0;
+  size_t countKeptUpToIBase = 0;
+  size_t removedCompleted = 0;
+  stackHashToIdx_.clear();
+
+  for (size_t readIdx = 0; readIdx < oldSize; ++readIdx) {
+    if (writeIdx < keptIndices.size() && readIdx == keptIndices[writeIdx]) {
+      if (readIdx <= iBase_) { ++countKeptUpToIBase; }
+      if (writeIdx != readIdx) {
+        stack_[writeIdx] = std::move(stack_[readIdx]);
+        stackFrame_[writeIdx] = std::move(stackFrame_[readIdx]);
+      }
+      stackFrame_[writeIdx].iStack = writeIdx;
+      if (stackFrame_[writeIdx].stage == StageType::FINAL) {
+        stackHashToIdx_[stack_[writeIdx].getHash()] = writeIdx;
+      }
+      ++writeIdx;
+    } else if (stackFrame_[readIdx].stage == StageType::FINAL) {
+      ++removedCompleted;
+    }
+  }
+
+  stack_.resize(writeIdx);
+  stack_.resetMerged();
+  stackFrame_.resize(writeIdx);
+
   SPDLOG_TRACE(
-      "Collapsing ({}) to iSTACK={:4d} of {:4d} with P={:.5f}",
+      "Collapsed ({}) stack from {:4d} to {:4d} states",
       (cu_.cfg_.stateSelectMethod == NeoPkCU::StateSelectMethod::RANDOM
            ? "RANDOM"
            : "MOST_LIKELY"),
-      indexState,
-      stack_.size(),
-      getBase(indexState).getProbability().to_double());
+      oldSize,
+      writeIdx);
 
-  // remove all but indexState
-  stack_.erase(stack_.begin() + indexState + 1, stack_.end());
-  stack_.erase(stack_.begin(), stack_.begin() + indexState);
-
-  stackFrame_.erase(stackFrame_.begin() + indexState + 1, stackFrame_.end());
-  stackFrame_.erase(stackFrame_.begin(), stackFrame_.begin() + indexState);
-
-  iBase_ = 0;
-  stackFrame_.front().iStack = 0;
-  lastStackSize_ = 1;
-  getBase().getProbability() = FixType(1);
-  return stack_size - 1;
+  lastStackSize_ = writeIdx;
+  iBase_ = (countKeptUpToIBase + writeIdx - 1) % writeIdx;
+  renormalizeStackProbabilities();
+  return removedCompleted;
 }
 
 
 void NeoPkCUEngine::renormalizeStackProbabilities() {
+  if (stack_.empty()) { return; }
+
   FixType probabilitySum = FixType(0);
-  for (const auto& env : stack_) { probabilitySum += env.getProbability(); }
+  size_t mostProbableIdx = 0;
+  for (size_t i = 0; i < stack_.size(); ++i) {
+    assert(!stack_[i].isPruned());
+    probabilitySum += stack_[i].getProbability();
+    if (stack_[i].getProbability() > stack_[mostProbableIdx].getProbability()) {
+      mostProbableIdx = i;
+    }
+  }
 
   FixType accumulated = FixType(0);
-  for (size_t i = 0; i < stack_.size() - 1; ++i) {
+  for (size_t i = 0; i < stack_.size(); ++i) {
+    stackFrame_[i].iStack = i;
+    if (i == mostProbableIdx) { continue; }
     stack_[i].getProbability() = stack_[i].getProbability() / probabilitySum;
     accumulated += stack_[i].getProbability();
-    stackFrame_[i].iStack = i;
   }
-  if (stack_.size() > 0) {
-    stack_.back().getProbability() = FixType(1) - accumulated;
-    stackFrame_.back().iStack = stack_.size() - 1;
-  }
+  stack_[mostProbableIdx].getProbability() = FixType(1) - accumulated;
+  assert(saneStackProbability());
 }
 
 
@@ -319,18 +411,7 @@ void NeoPkCUEngine::triplicateState(
 
 
 bool NeoPkCUEngine::saneStackProbability() const {
-  FixType sumOfStateProbabilities = FixType(0);
-  for (auto begin = stack_.begin(), end = stack_.end(); begin != end; ++begin) {
-    auto probability = begin->getProbability();
-    if (begin->isPruned()) { continue; }
-
-    sumOfStateProbabilities += probability;
-    if (!(probability > FixType(0)) || !(probability <= FixType(1))) {
-      return false;
-    }
-  }
-
-  return sumOfStateProbabilities == FixType(1);
+  return stack_.saneProbabilities();
 }
 
 

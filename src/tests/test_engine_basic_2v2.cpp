@@ -328,8 +328,9 @@ TEST_F(BasicEngine2v2Test, HighEngineAccuracy_TwoMoves_MonteCarlo) {
 }
 
 
-TEST_F(BasicEngine2v2Test, DISABLED_HighEngineAccuracy_TwoMoves) {
+TEST_F(BasicEngine2v2Test, HighEngineAccuracy_TwoMoves) {
   spdlog::set_level(spdlog::level::warn);
+  srand(42);
   engine_->setAccuracy(16);
   engine_->setMaxNumStates(10000);
   engine_->setStateSelectMethod(PkCU::StateSelectMethod::RANDOM);
@@ -344,13 +345,15 @@ TEST_F(BasicEngine2v2Test, DISABLED_HighEngineAccuracy_TwoMoves) {
   );
   // clang-format on
 
-  result.printStates();
+  EXPECT_GT(result.size(), 0);
   EXPECT_LE(result.size(), 10000);
+  EXPECT_TRUE(result.saneProbabilities());
 }
 
 
-TEST_F(BasicEngine2v2Test, DISABLED_HighEngineAccuracy_FourMoves) {
+TEST_F(BasicEngine2v2Test, HighEngineAccuracy_FourMoves) {
   spdlog::set_level(spdlog::level::warn);
+  srand(42);
   engine_->setAccuracy(16);
   engine_->setMaxNumStates(10000);
   engine_->setStateSelectMethod(PkCU::StateSelectMethod::RANDOM);
@@ -365,8 +368,31 @@ TEST_F(BasicEngine2v2Test, DISABLED_HighEngineAccuracy_FourMoves) {
   );
   // clang-format on
 
-  result.printStates();
+  EXPECT_GT(result.size(), 0);
   EXPECT_LE(result.size(), 10000);
+  EXPECT_TRUE(result.saneProbabilities());
+}
+
+
+TEST_F(BasicEngine2v2Test, HighEngineAccuracy_FourMoves_MostLikely) {
+  spdlog::set_level(spdlog::level::warn);
+  engine_->setAccuracy(16);
+  engine_->setMaxNumStates(256);
+  engine_->setStateSelectMethod(PkCU::StateSelectMethod::MOST_LIKELY);
+
+  // clang-format off
+  PossibleEnvironments result = engine_->updateState(
+      engine_->initialState(),
+      {{Actor(TEAM_A, 0), Action::moveAdjacent(2)},
+       {Actor(TEAM_A, 1), Action::moveAdjacent(2)}},
+      {{Actor(TEAM_B, 0), Action::moveAdjacent(2)},
+       {Actor(TEAM_B, 1), Action::moveAdjacent(2)}}
+  );
+  // clang-format on
+
+  EXPECT_GT(result.size(), 0);
+  EXPECT_LE(result.size(), 256);
+  EXPECT_TRUE(result.saneProbabilities());
 }
 
 
